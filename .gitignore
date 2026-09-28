@@ -26,3 +26,9 @@ data/volare/
 
 # stray file, not part of the site
 g.html
+
+# sources and build scripts stay local (LaTeX, notebook and Quantlet builders)
+*.tex
+latex/
+notebooks/*.py
+Quantlets/Ch_*/build_quantlets.py
