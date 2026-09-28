@@ -101,7 +101,7 @@ def arch_effects_table():
         r = rets[k]
         q, qp = ljung_box(r ** 2, 10)
         q1, q1p = ljung_box(r, 10)
-        lm, lmp = arch_lm(r, 5)
+        lm, lmp = arch_lm(r - r.mean(), 5)
         rows.append(dict(market=k, label=LABELS[k], start=str(r.index[0].date()), N=len(r), ppy=PPY[k],
                          ann_vol=r.std() * np.sqrt(PPY[k]), kurt=stats.kurtosis(r), skew=stats.skew(r),
                          Q10_r=q1, Q10_r_p=q1p, Q10_r2=q, Q10_r2_p=qp, LM5=lm, LM5_p=lmp,
@@ -385,7 +385,7 @@ def diagnostics(fits):
             q, qp = ljung_box(z, 10)
             q2, q2p = ljung_box(z ** 2, 10)
             lm, lmp = arch_lm(z, 5)
-            sb = sign_bias_test(z)
+            sb = sign_bias_test(z, f.eps)
             rows.append(dict(market=k, vol=vol, dist=dist, Q10_z=q, Q10_z_p=qp, Q10_z2=q2, Q10_z2_p=q2p,
                              LM5=lm, LM5_p=lmp, z_kurt=stats.kurtosis(z), z_skew=stats.skew(z), **sb))
     t = pd.DataFrame(rows)
@@ -551,7 +551,7 @@ def forecast_eval(k='sp500', first_year=2016, H=22):
     ly, lx = np.log(y[okk]), np.log(x[okk])
     ax.scatter(lx, ly, s=10, color=IDAred, label='GJR-GARCH-t, non-overlapping 22-day windows')
     lim = [min(lx.min(), ly.min()) - 0.2, max(lx.max(), ly.max()) + 0.2]
-    ax.plot(lim, lim, color=Gray, lw=0.7, ls='--', label='45-degree line (unbiased forecast)')
+    ax.plot(lim, lim, color=Gray, lw=0.7, ls='--', label='45-degree reference line (equal plotted values)')
     a, b = tH.loc['GJR-t', 'lmz_a'], tH.loc['GJR-t', 'lmz_b']
     xx = np.linspace(*lim, 10)
     ax.plot(xx, a + b * xx, color=MainBlue, label=f'Mincer-Zarnowitz fit in logs: a = {a:.2f}, b = {b:.2f}')

@@ -5,7 +5,7 @@ garch_tools.py -- Functii pentru Capitolul 5 (MFM): estimarea, diagnosticul si p
                                  (pachetul arch); seria este rescalata intern daca este prea putin volatila
   * half_life(persistence)    -- timpul de injumatatire al unui soc de volatilitate
   * news_impact(res, eps)     -- curba de impact a stirilor (Engle-Ng, 1993)
-  * sign_bias_test(z)         -- testele de asimetrie Engle-Ng pe reziduurile standardizate
+  * sign_bias_test(z, eps)    -- testele de asimetrie Engle-Ng (1993, ec. 18): z_t^2 pe S-, S- eps, S+ eps
   * ewma_variance(r, lam)     -- varianta EWMA (RiskMetrics, lambda = 0.94)
   * qlike, mz_regression, dm_test -- evaluarea prognozelor de volatilitate (Patton, 2011; Mincer-Zarnowitz; Diebold-Mariano)
 
@@ -36,9 +36,19 @@ class Fit:
         else:
             p['omega'] = p['omega'] / c ** 2
         self.params = p
-        self.se = res.std_err                      # erori standard robuste (Bollerslev-Wooldridge)
-        self.tvalues = res.tvalues
-        self.pvalues = res.pvalues
+        # covarianta robusta (Bollerslev-Wooldridge) transformata in unitatile originale cu jacobianul
+        # transformarii: mu/c, omega/c^2 (GARCH, GJR) sau omega - (1 - beta) ln c^2 (EGARCH)
+        names = list(res.params.index)
+        J = np.eye(len(names))
+        J[names.index('mu'), names.index('mu')] = 1 / c
+        if vol == 'EGARCH':
+            J[names.index('omega'), names.index('beta[1]')] = np.log(c ** 2)
+        else:
+            J[names.index('omega'), names.index('omega')] = 1 / c ** 2
+        self.cov = pd.DataFrame(J @ res.param_cov.values @ J.T, index=names, columns=names)
+        self.se = pd.Series(np.sqrt(np.diag(self.cov.values)), index=names)
+        self.tvalues = p[names] / self.se
+        self.pvalues = pd.Series(2 * stats.norm.sf(np.abs(self.tvalues.values)), index=names)
         n = res.nobs
         self.nobs = n
         self.loglik = res.loglikelihood + n * np.log(c)
@@ -47,6 +57,7 @@ class Fit:
         self.bic = -2 * self.loglik + k * np.log(n)
         self.sigma = res.conditional_volatility / c
         self.z = res.std_resid
+        self.eps = res.resid / c                   # reziduuri nestandardizate, in unitatile seriei originale
         self.converged = res.convergence_flag == 0
 
     @property
@@ -110,13 +121,15 @@ def news_impact(fit, eps, sigma2_bar=None):
     return p['omega'] + (p['alpha[1]'] + g * (eps < 0)) * eps ** 2 + p['beta[1]'] * s2
 
 
-def sign_bias_test(z):
-    """Engle-Ng (1993): z_t^2 pe S-_{t-1}, S-_{t-1} z_{t-1}, S+_{t-1} z_{t-1}; t-uri si testul comun n R^2 ~ chi2(3)."""
-    z = pd.Series(np.asarray(z)).dropna().values
+def sign_bias_test(z, eps):
+    """Engle-Ng (1993, ec. 18): z_t^2 pe S-_{t-1}, S-_{t-1} eps_{t-1}, S+_{t-1} eps_{t-1}, cu eps_{t-1} reziduul
+    NESTANDARDIZAT si z_t reziduul standardizat; t-uri si testul comun T R^2 ~ chi2(3)."""
+    d = pd.concat([pd.Series(z), pd.Series(eps)], axis=1, keys=['z', 'e']).dropna()
+    z, e = d['z'].values, d['e'].values
     y = z[1:] ** 2
-    zl = z[:-1]
-    sneg = (zl < 0).astype(float)
-    X = np.column_stack([np.ones_like(zl), sneg, sneg * zl, (1 - sneg) * zl])
+    el = e[:-1]
+    sneg = (el < 0).astype(float)
+    X = np.column_stack([np.ones_like(el), sneg, sneg * el, (1 - sneg) * el])
     ols = sm.OLS(y, X).fit()
     joint = len(y) * ols.rsquared
     return {'sign_t': ols.tvalues[1], 'neg_size_t': ols.tvalues[2], 'pos_size_t': ols.tvalues[3],

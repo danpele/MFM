@@ -45,8 +45,8 @@ window.MFM_DATA.quizzes['garch'] = {
                     "alpha + beta < 1 (covariance stationarity)",
                     "Normally distributed innovations z_t"
                 ],
-                correctExplanation: "Consistency needs strict stationarity, identifiability and a compact parameter space, but no moments. Asymptotic normality adds an interior theta_0 and E z_t^4 < infinity, since the score variance is proportional to kappa_z - 1.",
-                incorrectExplanation: "No moment of the returns is needed, alpha + beta >= 1 is covered by Lumsdaine and by Jensen-Rahbek, and Normal z_t would make the estimator the MLE. The extra condition is a finite fourth moment of the innovations z_t."
+                correctExplanation: "Consistency needs strict stationarity, identifiability and a compact parameter space, but no moment of the returns (z_t keeps unit variance). Asymptotic normality adds an interior theta_0 and E z_t^4 < infinity, since the score variance is proportional to kappa_z - 1.",
+                incorrectExplanation: "Under strict stationarity, E ln(alpha z_t^2 + beta) < 0, no moment of the returns eps_t is needed, so alpha + beta >= 1 (e.g. IGARCH) is covered; Normal z_t would make the estimator the MLE. The nonstationary case is a separate result (Jensen-Rahbek: alpha and beta, with omega fixed). The extra condition is a finite fourth moment of the innovations z_t."
             },
             ro: {
                 title: "QMLE: consistență și normalitate",
@@ -57,8 +57,8 @@ window.MFM_DATA.quizzes['garch'] = {
                     "alpha + beta < 1 (staționaritate în covarianță)",
                     "Inovații z_t distribuite Normal"
                 ],
-                correctExplanation: "Consistența cere staționaritate strictă, identificabilitate și un spațiu compact al parametrilor, dar niciun moment. Normalitatea asimptotică adaugă theta_0 interior și E z_t^4 < infinit, deoarece dispersia scorului este proporțională cu kappa_z - 1.",
-                incorrectExplanation: "Nu este necesar niciun moment al randamentelor, cazul alpha + beta >= 1 este acoperit de Lumsdaine și de Jensen-Rahbek, iar z_t Normal ar face din estimator MLE. Condiția suplimentară este momentul de ordin patru finit al inovațiilor z_t."
+                correctExplanation: "Consistența cere staționaritate strictă, identificabilitate și un spațiu compact al parametrilor, dar niciun moment al randamentelor (z_t păstrează dispersia unitară). Normalitatea asimptotică adaugă theta_0 interior și E z_t^4 < infinit, deoarece dispersia scorului este proporțională cu kappa_z - 1.",
+                incorrectExplanation: "Sub staționaritate strictă, E ln(alpha z_t^2 + beta) < 0, nu este necesar niciun moment al randamentelor eps_t, deci alpha + beta >= 1 (de ex. IGARCH) este acoperit; z_t Normal ar face din estimator MLE. Cazul nestaționar este un rezultat separat (Jensen-Rahbek: alpha și beta, cu omega fixat). Condiția suplimentară este momentul de ordin patru finit al inovațiilor z_t."
             }
         },
         {
@@ -72,7 +72,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'To remove the need for maximum likelihood estimation',
                     'To model the mean of returns instead of the variance'
                 ],
-                correctExplanation: 'Substituting backwards, GARCH(1,1) equals an ARCH(infinity) with weights alpha * beta^(j-1): long memory in variance with only three parameters.',
+                correctExplanation: 'Substituting backwards, GARCH(1,1) equals an ARCH(infinity) with weights alpha * beta^(j-1): persistent short-memory variance dynamics with only three parameters.',
                 incorrectExplanation: 'The lagged variance gives an ARCH of infinite order with geometrically declining weights, so persistent clustering needs only three parameters.'
             },
             ro: {
@@ -84,7 +84,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Pentru a elimina nevoia estimării prin verosimilitate maximă',
                     'Pentru a modela media randamentelor în locul dispersiei'
                 ],
-                correctExplanation: 'Prin substituție înapoi, GARCH(1,1) este un ARCH(infinit) cu ponderi alpha * beta^(j-1): memorie în dispersie cu doar trei parametri.',
+                correctExplanation: 'Prin substituție înapoi, GARCH(1,1) este un ARCH(infinit) cu ponderi alpha * beta^(j-1): o dinamică persistentă a dispersiei, cu memorie scurtă, cu doar trei parametri.',
                 incorrectExplanation: 'Dispersia decalată dă un ARCH de ordin infinit cu ponderi descrescătoare geometric, deci gruparea persistentă cere doar trei parametri.'
             }
         },
@@ -173,7 +173,7 @@ window.MFM_DATA.quizzes['garch'] = {
             correct: 0,
             en: {
                 title: 'Multi-step forecasts',
-                text: 'In a stationary GARCH(1,1), how does the h-step variance forecast behave as h grows?',
+                text: 'In a covariance-stationary GARCH(1,1) (alpha + beta < 1), how does the h-step variance forecast behave as h grows?',
                 options: [
                     'It converges to the long-run variance, closing the gap by the factor alpha + beta each day',
                     'It stays equal to tomorrow\'s variance forever',
@@ -181,11 +181,11 @@ window.MFM_DATA.quizzes['garch'] = {
                     'It oscillates between high and low values'
                 ],
                 correctExplanation: 'E_t sigma_{t+h}^2 = sigma^2 + (alpha + beta)^(h-1) (sigma_{t+1}^2 - sigma^2): mean reversion towards the long-run variance.',
-                incorrectExplanation: 'With alpha + beta < 1 the forecast reverts geometrically to omega / (1 - alpha - beta); a flat forecast is the EWMA/IGARCH case.'
+                incorrectExplanation: 'With alpha + beta < 1 the forecast reverts geometrically to omega / (1 - alpha - beta); a flat forecast is the EWMA case (IGARCH with omega = 0); with omega > 0, IGARCH forecasts grow by omega per day.'
             },
             ro: {
                 title: 'Prognoze pe mai mulți pași',
-                text: 'Într-un GARCH(1,1) staționar, cum se comportă prognoza dispersiei pe h pași când h crește?',
+                text: 'Într-un GARCH(1,1) staționar în covarianță (alpha + beta < 1), cum se comportă prognoza dispersiei pe h pași când h crește?',
                 options: [
                     'Converge spre dispersia de termen lung, reducând distanța cu factorul alpha + beta în fiecare zi',
                     'Rămâne egală pentru totdeauna cu dispersia de mâine',
@@ -193,7 +193,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Oscilează între valori mari și mici'
                 ],
                 correctExplanation: 'E_t sigma_{t+h}^2 = sigma^2 + (alpha + beta)^(h-1) (sigma_{t+1}^2 - sigma^2): revenire la medie spre dispersia de termen lung.',
-                incorrectExplanation: 'Cu alpha + beta < 1 prognoza revine geometric spre omega / (1 - alpha - beta); prognoza constantă este cazul EWMA/IGARCH.'
+                incorrectExplanation: 'Cu alpha + beta < 1 prognoza revine geometric spre omega / (1 - alpha - beta); prognoza constantă este cazul EWMA (IGARCH cu omega = 0); cu omega > 0, prognozele IGARCH cresc cu omega pe zi.'
             }
         },
         {
@@ -227,26 +227,26 @@ window.MFM_DATA.quizzes['garch'] = {
             correct: 1,
             en: {
                 title: 'Fat tails from clustering',
-                text: 'A GARCH(1,1) with Normal innovations z_t generates returns with kurtosis...',
+                text: 'A GARCH(1,1) with Normal innovations z_t, alpha > 0 and a finite fourth moment ((alpha + beta)^2 + 2 alpha^2 < 1) generates returns with kurtosis...',
                 options: [
                     'exactly 3, because z_t is Normal',
                     'above 3, because mixing periods of low and high variance produces heavy tails',
                     'below 3, because the variance is bounded',
                     'that cannot be computed'
                 ],
-                correctExplanation: 'The kurtosis is 3[1 - (alpha+beta)^2] / [1 - (alpha+beta)^2 - 2 alpha^2] > 3 when finite: clustering alone creates fat tails.',
+                correctExplanation: 'The kurtosis is 3[1 - (alpha+beta)^2] / [1 - (alpha+beta)^2 - 2 alpha^2] > 3 for alpha > 0: clustering alone creates fat tails.',
                 incorrectExplanation: 'Even with Normal innovations, a time-varying variance makes the unconditional distribution leptokurtic.'
             },
             ro: {
                 title: 'Cozi groase din grupare',
-                text: 'Un GARCH(1,1) cu inovații z_t Normale generează randamente cu aplatizarea...',
+                text: 'Un GARCH(1,1) cu inovații z_t Normale, alpha > 0 și moment de ordin patru finit ((alpha + beta)^2 + 2 alpha^2 < 1) generează randamente cu aplatizarea...',
                 options: [
                     'exact 3, deoarece z_t este Normal',
                     'peste 3, deoarece amestecul perioadelor cu dispersie mică și mare produce cozi groase',
                     'sub 3, deoarece dispersia este mărginită',
                     'care nu poate fi calculată'
                 ],
-                correctExplanation: 'Aplatizarea este 3[1 - (alpha+beta)^2] / [1 - (alpha+beta)^2 - 2 alpha^2] > 3 când este finită: gruparea singură creează cozi groase.',
+                correctExplanation: 'Aplatizarea este 3[1 - (alpha+beta)^2] / [1 - (alpha+beta)^2 - 2 alpha^2] > 3 pentru alpha > 0: gruparea singură creează cozi groase.',
                 incorrectExplanation: 'Chiar și cu inovații Normale, o dispersie variabilă în timp face distribuția necondiționată leptocurtică.'
             }
         },
@@ -254,26 +254,26 @@ window.MFM_DATA.quizzes['garch'] = {
             correct: 2,
             en: {
                 title: 'Quasi-maximum likelihood',
-                text: 'You estimate a GARCH by maximising the Normal likelihood, but the innovations are heavy-tailed. What should you do?',
+                text: 'You estimate a GARCH by maximising the Normal likelihood, but the innovations are heavy-tailed, with a finite fourth moment. What should you do?',
                 options: [
                     'Nothing: the classical standard errors remain valid',
                     'Abandon GARCH, since the estimates are inconsistent',
                     'Keep the estimates (consistent under correct mean and variance equations) but use robust Bollerslev-Wooldridge standard errors',
                     'Multiply the standard errors by the kurtosis'
                 ],
-                correctExplanation: 'Quasi-maximum likelihood is consistent if the first two conditional moments are correct; inference needs the sandwich covariance A^-1 B A^-1.',
+                correctExplanation: 'Quasi-maximum likelihood is consistent if the first two conditional moments are correct; with E z_t^4 < infinity, inference uses the sandwich covariance A^-1 B A^-1 (if E z_t^4 = infinity, sqrt(n) inference fails: Hall and Yao, 2003).',
                 incorrectExplanation: 'The QML estimates stay consistent; only the standard errors must be replaced by the robust sandwich form.'
             },
             ro: {
                 title: 'Cvasi-verosimilitate maximă',
-                text: 'Estimați un GARCH maximizând verosimilitatea Normală, dar inovațiile au cozi groase. Ce trebuie să faceți?',
+                text: 'Estimați un GARCH maximizând verosimilitatea Normală, dar inovațiile au cozi groase, cu moment de ordin patru finit. Ce trebuie să faceți?',
                 options: [
                     'Nimic: erorile standard clasice rămân valide',
                     'Renunțați la GARCH, deoarece estimările sunt inconsistente',
                     'Păstrați estimările (consistente dacă ecuațiile mediei și dispersiei sunt corecte), dar folosiți erorile standard robuste Bollerslev-Wooldridge',
                     'Înmulțiți erorile standard cu aplatizarea'
                 ],
-                correctExplanation: 'Cvasi-verosimilitatea maximă este consistentă dacă primele două momente condiționate sunt corecte; inferența cere covarianța „sandviș” A^-1 B A^-1.',
+                correctExplanation: 'Cvasi-verosimilitatea maximă este consistentă dacă primele două momente condiționate sunt corecte; cu E z_t^4 < infinit, inferența folosește covarianța „sandviș” A^-1 B A^-1 (dacă E z_t^4 = infinit, inferența în sqrt(n) nu mai funcționează: Hall și Yao, 2003).',
                 incorrectExplanation: 'Estimările QML rămân consistente; doar erorile standard trebuie înlocuite cu forma robustă „sandviș”.'
             }
         },
@@ -297,7 +297,7 @@ window.MFM_DATA.quizzes['garch'] = {
                 options: [
                     'Inovațiile au cozi extrem de groase și nu au moment de ordin patru finit',
                     'Inovațiile sunt apropiate de distribuția Normală',
-                    'Modelul este greșit specificat, deoarece nu trebuie să fie întreg',
+                    'Modelul este greșit specificat, deoarece parametrul ν trebuie să fie un număr întreg',
                     'Dispersia inovațiilor este infinită'
                 ],
                 correctExplanation: 'La o Student-t, momentul de ordin patru există doar dacă nu > 4; cu nu = 3,18 aplatizarea este infinită, deși dispersia (nu > 2) este finită.',
@@ -477,7 +477,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Ljung-Box on the squared standardised residuals z_t^2 and the ARCH-LM test on z_t',
                     'The number of parameters'
                 ],
-                correctExplanation: 'If the variance equation is adequate, z_t^2 should be uncorrelated: Q(10) on z_t^2 and the LM test must not reject.',
+                correctExplanation: 'If the variance equation is adequate, z_t^2 is uncorrelated in the population: significant dependence in Q(10) on z_t^2 or the LM test is evidence against the model, while non-rejection only means insufficient evidence against it.',
                 incorrectExplanation: 'Remaining clustering is tested on the squared standardised residuals, not on raw returns.'
             },
             ro: {
@@ -489,7 +489,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Ljung-Box pe pătratele reziduurilor standardizate z_t^2 și testul ARCH-LM pe z_t',
                     'Numărul de parametri'
                 ],
-                correctExplanation: 'Dacă ecuația dispersiei este adecvată, z_t^2 trebuie să fie necorelate: Q(10) pe z_t^2 și testul LM nu trebuie să respingă.',
+                correctExplanation: 'Dacă ecuația dispersiei este adecvată, z_t^2 sunt necorelate în populație: o dependență semnificativă în Q(10) pe z_t^2 sau în testul LM este o dovadă împotriva modelului, iar nerespingerea înseamnă doar dovezi insuficiente împotriva lui.',
                 incorrectExplanation: 'Gruparea rămasă se testează pe pătratele reziduurilor standardizate, nu pe randamentele brute.'
             }
         },
@@ -558,7 +558,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Because it does not need a proxy for volatility',
                     'Because it rewards under-prediction of risk'
                 ],
-                correctExplanation: 'QLIKE and MSE are robust to noise in the volatility proxy: the ranking with r_t^2 matches the ranking with the true variance. QLIKE also penalises under-prediction more.',
+                correctExplanation: 'QLIKE and MSE are robust to proxy noise: if r_t^2 is conditionally unbiased for the variance, the ranking by expected loss with r_t^2 matches the ranking with the true variance (sample rankings can still differ). QLIKE also penalises under-prediction more.',
                 incorrectExplanation: 'QLIKE is robust to a noisy proxy (Patton, 2011) and penalises under-prediction more heavily, not less.'
             },
             ro: {
@@ -570,7 +570,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Pentru că nu are nevoie de o aproximare a volatilității',
                     'Pentru că recompensează subestimarea riscului'
                 ],
-                correctExplanation: 'QLIKE și MSE sunt robuste la zgomotul aproximării: ordonarea cu r_t^2 coincide cu ordonarea cu dispersia reală. QLIKE penalizează în plus mai mult subestimarea.',
+                correctExplanation: 'QLIKE și MSE sunt robuste la zgomotul aproximării: dacă r_t^2 este condiționat nedeplasat pentru dispersie, ordonarea după pierderea așteptată cu r_t^2 coincide cu cea după dispersia reală (ordonările din eșantion pot totuși diferi). QLIKE penalizează în plus mai mult subestimarea.',
                 incorrectExplanation: 'QLIKE este robustă la o aproximare zgomotoasă (Patton, 2011) și penalizează mai mult subestimarea, nu mai puțin.'
             }
         },
@@ -578,11 +578,11 @@ window.MFM_DATA.quizzes['garch'] = {
             correct: 2,
             en: {
                 title: 'Mincer-Zarnowitz',
-                text: 'A Mincer-Zarnowitz regression r_t^2 = a + b h_t for one-day GARCH forecasts gives b close to 1 but R^2 of only about 0.25. What is the right conclusion?',
+                text: 'A Mincer-Zarnowitz regression r_t^2 = a + b h_t for one-day GARCH forecasts gives a = 0.03, b = 0.97, a joint HAC Wald test of a = 0, b = 1 with p = 0.99, and R^2 of only about 0.25. What is the right conclusion?',
                 options: [
                     'The forecasts are useless',
                     'The model is biased',
-                    'The forecasts are unbiased; the low R^2 reflects the noise of r_t^2 as a proxy',
+                    'Unbiasedness is not rejected; the low R^2 reflects the noise of r_t^2 as a proxy',
                     'The regression must be run without a constant'
                 ],
                 correctExplanation: 'Since r_t^2 = sigma_t^2 z_t^2, even a perfect forecast explains only part of the variation of r_t^2 (Andersen and Bollerslev, 1998).',
@@ -590,11 +590,11 @@ window.MFM_DATA.quizzes['garch'] = {
             },
             ro: {
                 title: 'Mincer-Zarnowitz',
-                text: 'O regresie Mincer-Zarnowitz r_t^2 = a + b h_t pentru prognozele GARCH pe o zi dă b aproape de 1, dar R^2 de doar circa 0,25. Care este concluzia corectă?',
+                text: 'O regresie Mincer-Zarnowitz r_t^2 = a + b h_t pentru prognozele GARCH pe o zi dă a = 0,03, b = 0,97, un test Wald comun HAC pentru a = 0, b = 1 cu p = 0,99 și R^2 de doar circa 0,25. Care este concluzia corectă?',
                 options: [
                     'Prognozele sunt inutile',
                     'Modelul este deplasat',
-                    'Prognozele sunt nedeplasate; R^2 mic reflectă zgomotul lui r_t^2 ca aproximare',
+                    'Nedeplasarea nu este respinsă; R^2 mic reflectă zgomotul lui r_t^2 ca aproximare',
                     'Regresia trebuie estimată fără termen liber'
                 ],
                 correctExplanation: 'Deoarece r_t^2 = sigma_t^2 z_t^2, chiar și o prognoză perfectă explică doar o parte din variația lui r_t^2 (Andersen și Bollerslev, 1998).',
@@ -637,7 +637,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'It cannot produce volatility clustering',
                     'It cannot be estimated on daily data',
                     'It always gives negative variances',
-                    'Its autocorrelation of squared returns decays geometrically, while in the data absolute returns show slow, long-memory decay'
+                    'Its autocorrelation of squared returns decays geometrically, while in the data the autocorrelation of absolute returns shows slow, long-memory decay'
                 ],
                 correctExplanation: 'GARCH(1,1) has a single time scale; FIGARCH (Baillie, Bollerslev and Mikkelsen, 1996) and realised-volatility models (Chapter 9) address long memory. Structural breaks can also inflate alpha + beta.',
                 incorrectExplanation: 'GARCH does produce clustering; its main limits are geometric (short) memory, spurious persistence under breaks and the reaction lag.'
@@ -649,7 +649,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Nu poate produce gruparea volatilității',
                     'Nu poate fi estimat pe date zilnice',
                     'Dă mereu dispersii negative',
-                    'Autocorelația pătratelor randamentelor scade geometric, în timp ce în date randamentele absolute scad lent, cu memorie lungă'
+                    'Autocorelația pătratelor randamentelor scade geometric, în timp ce în date autocorelația randamentelor absolute scade lent, cu memorie lungă'
                 ],
                 correctExplanation: 'GARCH(1,1) are o singură scară de timp; FIGARCH (Baillie, Bollerslev și Mikkelsen, 1996) și modelele de volatilitate realizată (Capitolul 9) tratează memoria lungă. Rupturile structurale pot și ele umfla alpha + beta.',
                 incorrectExplanation: 'GARCH produce gruparea; limitele principale sunt memoria geometrică (scurtă), persistența falsă sub rupturi structurale și întârzierea reacției.'
@@ -693,7 +693,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     "A p-value of 0.62 means the null is not rejected: there is no evidence of remaining ARCH effects",
                     "A p-value of 0.62 means the model explains 62% of the variance"
                 ],
-                correctExplanation: "The null of the test is no autocorrelation in the squared standardised residuals. A p-value of 0.62 is far above 5%, so the null is not rejected: the GARCH model has absorbed the volatility clustering.",
+                correctExplanation: "The null of the test is no autocorrelation in the squared standardised residuals. A p-value of 0.62 is far above 5%, so the null is not rejected: the test finds no evidence of remaining volatility clustering.",
                 incorrectExplanation: "The test and the statistic are fine; the p-value is misread: 0.62 is far above 5%, so there is no evidence of remaining ARCH effects."
             },
             ro: {
@@ -705,7 +705,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     "O valoare p de 0,62 înseamnă că ipoteza nulă nu este respinsă: nu există dovezi de efecte ARCH rămase",
                     "O valoare p de 0,62 înseamnă că modelul explică 62% din dispersie"
                 ],
-                correctExplanation: "Ipoteza nulă a testului este absența autocorelației în pătratele reziduurilor standardizate. O valoare p de 0,62 este mult peste 5%, deci ipoteza nulă nu este respinsă: modelul GARCH a absorbit gruparea volatilității.",
+                correctExplanation: "Ipoteza nulă a testului este absența autocorelației în pătratele reziduurilor standardizate. O valoare p de 0,62 este mult peste 5%, deci ipoteza nulă nu este respinsă: testul nu găsește dovezi de grupare a volatilității rămasă.",
                 incorrectExplanation: "Testul și statistica sunt corecte; valoarea p este citită greșit: 0,62 este mult peste 5%, deci nu există dovezi de efecte ARCH rămase."
             }
         }
