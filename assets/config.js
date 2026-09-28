@@ -9,5 +9,5 @@ window.MFM_CONFIG = {
     GITHUB_CLIENT_ID: 'YOUR_GITHUB_CLIENT_ID',
     APPS_SCRIPT_URL: 'YOUR_GOOGLE_APPS_SCRIPT_URL',
     // Public link of the attendance Google Form (created by tools/attendance_form.gs)
-    ATTENDANCE_FORM_URL: 'YOUR_ATTENDANCE_FORM_URL'
+    ATTENDANCE_FORM_URL: 'https://forms.gle/ANZuwZorJYpcroGo7'
 };
