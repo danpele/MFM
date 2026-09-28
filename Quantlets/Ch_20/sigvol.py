@@ -310,19 +310,36 @@ def first_origin(D, cfg):
     return max(22, cfg['L']) + cfg['W'] + D['h']
 
 
+def eval_start(D, cfg, cutoff=None):
+    """First evaluation origin: after the asset's validation block + h days and, if given, strictly after the date of
+    the last validation target of its asset class (cutoff), so that no evaluated origin precedes a tuning target."""
+    st = first_origin(D, cfg) + cfg['VAL'] + D['h']
+    if cutoff is not None:
+        st = max(st, int(D['dates'].searchsorted(pd.Timestamp(cutoff), side='right')))
+    return st
+
+
+def tuned(res, kind, h):
+    """(c for Sig-LK, c for log-HAR-K, class cutoff date) chosen on the validation block of the asset class
+    (from ch20_results.json: keys 'validation' and 'val_cutoff')."""
+    v = res['validation']
+    return v[f'{kind}|Sig-LK|{h}']['c'], v[f'{kind}|logHAR-K|{h}']['c'], res['val_cutoff'][f'{kind}|{h}']
+
+
 def run_forecasts(D, cfg, c_sig, c_har, start, stop, models=MODELS, weight_dates=()):
-    """Rolling forecasts for origins start..stop-1; re-estimation every cfg['K'] days."""
+    """Rolling forecasts for origins start..stop-1; re-estimation every cfg['K'] days.
+    For a date in weight_dates the kernel weights are recomputed at that exact origin (diagnostic; the forecast of that
+    day still uses the coefficients estimated at the start of its 5-day block)."""
     rows, ks, wsave = [], [], {}
     wd = set(pd.DatetimeIndex(weight_dates))
     t = start
     while t < stop:
         blk = np.arange(t, min(t + cfg['K'], stop))
-        keepw = any(D['dates'][s] in wd for s in blk)
-        specs, info, (lo, hi, mu) = fit_models(D, t, cfg, c_sig, c_har, models, keep_weights=keepw)
-        if keepw:
-            for s in blk:
-                if D['dates'][s] in wd:
-                    wsave[D['dates'][s]] = info.get('weights')
+        specs, info, (lo, hi, mu) = fit_models(D, t, cfg, c_sig, c_har, models)
+        for s in blk:
+            if D['dates'][s] in wd:
+                _, inf_s, _ = fit_models(D, s, cfg, c_sig, c_har, ['Sig-LK'], keep_weights=True)
+                wsave[D['dates'][s]] = inf_s.get('weights')
         f = {m: predict(D, blk, specs[m]) for m in models}
         for m in models:                                          # positivity: QLIKE needs f > 0
             v = f[m]

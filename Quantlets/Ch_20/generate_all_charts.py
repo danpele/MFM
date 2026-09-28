@@ -235,6 +235,8 @@ def aggregate(ev):
             qf = pd.DataFrame(list(Eg.ql_filter))
             filt[h][g] = {m: (qf[m] / qf['HAR']).mean() for m in M}
             filt[h][g]['n_filter'] = pd.DataFrame(list(Eg.n_filter)).sum().to_dict()
+            filt[h][g]['rl'] = {m: (qf[m] / qf['logHAR']).mean() for m in M}     # filtered, relative to filtered log-HAR
+            filt[h][g]['n_fc'] = int(Eg['T'].sum())
             rr = {}
             for tag in ['N2', 'noret']:
                 vals = [x.get(tag) for x in Eg.rob]
@@ -587,11 +589,13 @@ if __name__ == '__main__':
                       '2025-04-07': weights_chart('2025-04-07', 'ch20_weights_2025')}
     RES['hv'] = chart_hv_share()
     val = json.load(open(os.path.join(CACHE, 'validation.json')))
-    RES['validation'] = val['choice']
+    RES['validation'] = val['choice']            # keys 'class|model|h': c chosen on the class validation block
+    RES['val_cutoff'] = val['cutoff']            # keys 'class|h': date of the last validation target of the class
     RES['design'] = {k: (list(v) if isinstance(v, tuple) else v) for k, v in S.CFG.items()}
     per = E.groupby('kind').agg(start=('start', 'min'), end=('end', 'max'), T=('T', 'median'))
     RES['eval_period'] = per.astype(str).to_dict('index')
     RES['n_forecasts'] = int(E['T'].sum())
+    RES['n_forecasts_h'] = {str(h): int(E[E.h == h]['T'].sum()) for h in H}
     RES['dm_p'] = {str(h): {comp: {f"{r.kind}|{r.sym}": r.dm[comp]['p_ql'] for _, r in E[E.h == h].iterrows()}
                             for comp in ['Sig-LK|logHAR', 'Sig-LK|HAR', 'Sig-L|logHAR']} for h in H}
     RES['per_asset'] = {f"{r.kind}|{r.sym}|{r.h}": {'rq_loghar': r.ql['Sig-LK'] / r.ql['logHAR'],

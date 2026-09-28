@@ -77,14 +77,17 @@ def part_a():
     sq = np.array([[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]], float)
     A['a4'] = {'levy_square': S.levy_area(sq), 'levy_square_shift': S.levy_area(sq + 5),
                'levy_square_cw': S.levy_area(sq[::-1])}
-    # A5: HAR as a restricted AR(22) with the full-sample log-HAR of JPM
+    # A5: HAR as a restricted AR(22) for log RV of JPM, regressors = arithmetic averages of log RV (daily, 5, 22 days);
+    # the benchmark log-HAR of the lecture uses logs of averages of RV and has no exact AR(22) representation
     a = S.load_asset('stocks', 'JPM')
     D = S.build_design(a, 1)
-    ok = np.isfinite(D['X_loghar']).all(1) & np.isfinite(D['ly'])
-    b, se, _ = ols_hac(D['ly'][ok], D['X_loghar'][ok], 5)
+    Xl = S.har_parts(np.log(a.rv.values))
+    ok = np.isfinite(Xl).all(1) & np.isfinite(D['ly'])
+    b, se, _ = ols_hac(D['ly'][ok], Xl[ok], 5)
     phi = np.r_[b[1] + b[2] / 5 + b[3] / 22, np.repeat(b[2] / 5 + b[3] / 22, 4), np.repeat(b[3] / 22, 17)]
+    bl, _, _ = ols_hac(D['ly'][ok], D['X_loghar'][ok], 5)      # logs of averages, for comparison
     A['a5'] = {'b': b.tolist(), 'se': se.tolist(), 'phi1': phi[0], 'phi2': phi[1], 'phi6': phi[5], 'sum': phi.sum(),
-               'N': int(ok.sum())}
+               'N': int(ok.sum()), 'b_logavg': bl.tolist(), 'phi_min': float(phi.min())}
     # A7: QLIKE of +/-50% errors
     A['a7'] = {'under': float(S.qlike(1.0, 0.5)), 'over': float(S.qlike(1.0, 1.5)),
                'mse_under': 0.25, 'mse_over': 0.25}
@@ -116,7 +119,8 @@ def levy_regression(kind, sym):
     r2 = 1 - e1.var() / y[ok].var()
     r20 = 1 - e0.var() / y[ok].var()
     return {'b_levy': b[4], 'se_levy': se[4], 't_levy': b[4] / se[4], 'r2': r2, 'r2_base': r20,
-            'N': int(ok.sum()), 'mean_levy': float(np.nanmean(levy)), 'frac_neg': float(np.nanmean(levy < 0))}
+            'N': int(ok.sum()), 'mean_levy': float(np.nanmean(levy)),
+            'frac_neg': float(np.mean(levy[np.isfinite(levy)] < 0))}
 
 
 def har_family(kind, sym):
@@ -154,11 +158,11 @@ def block_boot_ratio(la, lb, block=10, B=2000, seed=20):
     return np.percentile(stats_, [2.5, 97.5]).tolist()
 
 
-def sig_vs_loghar(kind, sym, h, c):
+def sig_vs_loghar(kind, sym, h, c, cutoff=None):
     cfg = dict(S.CFG)
     a = S.load_asset(kind, sym)
     D = S.build_design(a, h, cfg)
-    st = S.first_origin(D, cfg) + cfg['VAL'] + h
+    st = S.eval_start(D, cfg, cutoff)
     fc, info, _ = S.run_forecasts(D, cfg, c, c, st, len(a) - h, models=['logHAR', 'Sig-LK'])
     qa, qb = S.qlike(fc.y.values, fc['Sig-LK'].values), S.qlike(fc.y.values, fc['logHAR'].values)
     t, p1, p2 = S.dm_test(qa, qb, h)
@@ -176,9 +180,11 @@ def part_b():
     B['b2'] = levy_regression('futures', 'ES')
     B['b3'] = har_family('stocks', 'JPM')
     B['b4'] = har_family('futures', 'CL')
-    val = lecture_results()['validation']
-    B['b5'], fc = sig_vs_loghar('stocks', 'JPM', 1, val['Sig-LK|1']['c'])
-    B['b6'], _ = sig_vs_loghar('futures', 'ES', 5, val['Sig-LK|5']['c'])
+    LR = lecture_results()
+    c1, _, cut1 = S.tuned(LR, 'stocks', 1)
+    c5, _, cut5 = S.tuned(LR, 'futures', 5)
+    B['b5'], fc = sig_vs_loghar('stocks', 'JPM', 1, c1, cut1)
+    B['b6'], _ = sig_vs_loghar('futures', 'ES', 5, c5, cut5)
     # B5 chart: cumulative QLIKE difference
     d = (S.qlike(fc.y, fc['Sig-LK']) - S.qlike(fc.y, fc['logHAR'])).cumsum()
     fig, ax = plt.subplots(figsize=(8.5, 3.2))
@@ -188,7 +194,6 @@ def part_b():
     legend_outside_bottom(ax, ncol=1, y=-0.12)
     save_fig('ch20_sem_cumloss')
     # B7/B8: multiple testing on the lecture's 50 DM p-values
-    LR = lecture_results()
     for key, h, comp in [('b7', 1, 'Sig-LK|logHAR'), ('b8', 22, 'Sig-LK|HAR')]:
         dmp = LR['dm_p'][str(h)][comp]                      # {kind|sym: one-sided DM p-value}
         rows = [(k.split('|')[1], k.split('|')[0], v) for k, v in dmp.items()]
@@ -224,12 +229,12 @@ def prepend_segment(v, sig, d, depth):
     return np.concatenate(out, axis=1)
 
 
-def basepoint_job(kind, sym, h, c):
+def basepoint_job(kind, sym, h, c, cutoff=None):
     """Sig-LK whose kernel distance uses the basepoint-augmented path (level of log RV relative to the window mean)."""
     cfg = dict(S.CFG)
     a = S.load_asset(kind, sym)
     D = S.build_design(a, h, cfg)
-    st = S.first_origin(D, cfg) + cfg['VAL'] + h
+    st = S.eval_start(D, cfg, cutoff)
     stop = len(a) - h
     L, W = cfg['L'], cfg['W']
     lrv = np.log(a.rv.values)
@@ -271,9 +276,10 @@ def basepoint_job(kind, sym, h, c):
 
 def part_c(syms=None):
     from joblib import Parallel, delayed
-    c = lecture_results()['validation']['Sig-LK|1']['c']
+    c, _, cut = S.tuned(lecture_results(), 'stocks', 1)
     syms = syms or S.symbols('stocks')
-    out = Parallel(n_jobs=int(os.environ.get('CH20_JOBS', '14')))(delayed(basepoint_job)('stocks', s, 1, c) for s in syms)
+    out = Parallel(n_jobs=int(os.environ.get('CH20_JOBS', '14')))(delayed(basepoint_job)('stocks', s, 1, c, cut)
+                                                                  for s in syms)
     Q = pd.DataFrame({o['sym']: o['ql'] for o in out}).T
     QC = pd.DataFrame({o['sym']: o['ql_covid'] for o in out}).T
     p = np.array([o['p_vs_loghar'] for o in out])
