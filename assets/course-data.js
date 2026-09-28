@@ -821,10 +821,10 @@
             },
             {
                 id: 'signatures', num: 20, selfStudy: false, available: true,
-                title: { en: 'Special Chapter: Path Signatures and Realised Volatility', ro: 'Capitol special: signaturi de căi și volatilitate realizată' },
+                title: { en: 'Special Chapter: Path Signatures and Realised Volatility', ro: 'Capitol special: semnătura traiectoriilor și volatilitatea realizată' },
                 topics: {
                     en: ['Path signatures, Chen\'s identity, Lévy area, signature kernel', 'Replicating an ML paper (Gu et al., KDD 2024) on the VOLARE database', 'HAR, log-HAR, HARQ, SHAR against signature LASSO with kernel weights', 'QLIKE, DM, Giacomini–White, Model Confidence Set, Holm/BH across 50 assets'],
-                    ro: ['Signaturi de căi, identitatea lui Chen, aria Lévy, nucleul signaturii', 'Replicarea unui articol de ML (Gu et al., KDD 2024) pe baza de date VOLARE', 'HAR, log-HAR, HARQ, SHAR față de LASSO pe signaturi cu ponderi kernel', 'QLIKE, DM, Giacomini–White, Model Confidence Set, Holm/BH pe 50 de active']
+                    ro: ['Semnătura traiectoriilor (path signature), identitatea lui Chen, aria Lévy, nucleul de semnătură', 'Replicarea unui articol de ML (Gu et al., KDD 2024) pe baza de date VOLARE', 'HAR, log-HAR, HARQ, SHAR față de LASSO pe variabile de semnătură, cu ponderi din nucleul de semnătură', 'QLIKE, DM, Giacomini–White, Model Confidence Set, Holm/BH pe 50 de active']
                 },
                 links: signaturesLinks,
                 quantinar: []
