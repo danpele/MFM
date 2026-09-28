@@ -402,6 +402,14 @@
         renderStatic();
         renderOverview();
         initLightbox();
+        if (isConfigured(CFG.ATTENDANCE_FORM_URL)) {
+            $('attendance-btn').href = CFG.ATTENDANCE_FORM_URL;
+            $('attendance-btn').hidden = false;
+        }
+        if (isConfigured(CFG.ATTENDANCE_FORM_URL)) {
+            $('attendance-btn').href = CFG.ATTENDANCE_FORM_URL;
+            $('attendance-btn').hidden = false;
+        }
         renderChapters();
         renderProject();
         renderResources();

@@ -7,5 +7,7 @@
 // ============================================================
 window.MFM_CONFIG = {
     GOOGLE_CLIENT_ID: '1095360272769-rhjjncfor0gumhev6a0l6tnnrnmdrnna.apps.googleusercontent.com',
+    // Attendance Google Form (answers count only with the code given in the room)
+    ATTENDANCE_FORM_URL: 'https://forms.gle/ANZuwZorJYpcroGo7',
     QUIZ_SCORES_URL: 'https://script.google.com/macros/s/AKfycbzaF6BMoREZWPCV9hnh0WnabJz-AY2C7ivfcqFazpP6e29PcAC73LmQ2FogMenGrA4iMg/exec'
 };
