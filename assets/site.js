@@ -228,11 +228,14 @@
         }
         box.innerHTML = `<p>${T.loginPrompt}</p><div id="g-button"></div><p class="login-msg" id="login-msg" aria-live="polite"></p>`;
         const draw = () => {
+            const el = $('g-button');
+            if (!el || el.dataset.drawn || !(window.google && google.accounts && google.accounts.id)) return;
+            el.dataset.drawn = '1';
             google.accounts.id.initialize({ client_id: CFG.GOOGLE_CLIENT_ID, callback: onGoogleCredential, auto_select: true });
-            google.accounts.id.renderButton($('g-button'), { theme: 'outline', size: 'large', text: 'signin_with', locale: LANG });
+            google.accounts.id.renderButton(el, { theme: 'outline', size: 'large', text: 'signin_with', locale: LANG, width: 280 });
         };
-        if (window.google && google.accounts && google.accounts.id) draw();
-        else window.addEventListener('load', () => { if (window.google && google.accounts) draw(); });
+        draw();
+        window.addEventListener('load', draw, { once: true });
     }
 
     function sendResults(ch, score, total) {
