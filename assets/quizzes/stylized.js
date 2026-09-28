@@ -10,54 +10,54 @@ window.MFM_DATA.quizzes['stylized'] = {
         {
             "correct": 2,
             "en": {
-                "title": "Validity of the Jarque-Bera p-value",
-                "text": "The Hill estimate of the tail index of daily S&P 500 returns is about 3, and the Jarque-Bera statistic is about 45,800. Is its chi-square(2) p-value reliable?",
+                "title": "What a Jarque-Bera rejection means",
+                "text": "The Hill estimate of the tail index of daily S&P 500 returns is about 3, and the Jarque-Bera statistic is about 45,800 with a chi-square(2) p-value below 10^-10. What does this result establish?",
                 "options": [
-                    "Yes, because the sample has more than 9,000 observations",
-                    "Yes, provided the returns are serially uncorrelated",
-                    "No: the chi-square(2) limit of JB requires finite moments up to order 8, which a tail index near 3 rules out",
-                    "No, because Jarque-Bera can only be used with fewer than 1,000 observations"
+                    "Nothing: the p-value is invalid because the eighth moment of the returns is infinite",
+                    "That the returns are serially correlated",
+                    "That the joint null 'i.i.d. returns from the Normal distribution' is rejected; the test alone does not say whether the marginal distribution or independence fails",
+                    "That the returns have infinite variance"
                 ],
-                "correctExplanation": "The asymptotic variance of the sample kurtosis involves the eighth moment. With a tail index near 3 that moment is infinite, so JB grows with T without a limit and its p-value has no meaning; report quantile-based measures and the tail index instead.",
-                "incorrectExplanation": "A large sample does not help when the limit distribution does not exist: the chi-square(2) limit needs finite moments up to order 8."
+                "correctExplanation": "The chi-square(2) limit is derived under the null of i.i.d. Normal returns, where all moments exist, so the p-value is valid for that null. Heavy tails under the alternative make JB grow with T: that is the power of the test. Dependence (GARCH) is a separate reason for rejection; to test the marginal distribution of a time series use HAC-studentised tests (Bai and Ng, 2005), and report quantile-based measures and the tail index.",
+                "incorrectExplanation": "The null calibration is not affected by the moments of the alternative; a JB rejection concerns the joint null of i.i.d. Normal returns."
             },
             "ro": {
-                "title": "Validitatea p-valorii Jarque-Bera",
-                "text": "Estimarea Hill a indicelui de coadă pentru randamentele zilnice S&P 500 este aproximativ 3, iar statistica Jarque-Bera este aproximativ 45.800. Este fiabilă p-valoarea ei chi-pătrat(2)?",
+                "title": "Ce înseamnă o respingere Jarque-Bera",
+                "text": "Estimarea Hill a indicelui de coadă pentru randamentele zilnice S&P 500 este aproximativ 3, iar statistica Jarque-Bera este aproximativ 45.800, cu p-valoarea chi-pătrat(2) sub 10^-10. Ce stabilește acest rezultat?",
                 "options": [
-                    "Da, pentru că eșantionul are peste 9.000 de observații",
-                    "Da, cu condiția ca randamentele să fie necorelate serial",
-                    "Nu: limita chi-pătrat(2) a JB cere momente finite până la ordinul 8, excluse de un indice de coadă în jur de 3",
-                    "Nu, pentru că Jarque-Bera se poate folosi doar sub 1.000 de observații"
+                    "Nimic: p-valoarea este invalidă pentru că momentul de ordin opt al randamentelor este infinit",
+                    "Că randamentele sunt corelate serial",
+                    "Că ipoteza nulă comună ,,randamente i.i.d. din distribuția Normală'' este respinsă; testul singur nu spune dacă cade distribuția marginală sau independența",
+                    "Că randamentele au varianță infinită"
                 ],
-                "correctExplanation": "Varianța asimptotică a kurtosisului de selecție depinde de momentul de ordin opt. Cu un indice de coadă în jur de 3 acest moment este infinit, deci JB crește cu T fără limită și p-valoarea nu are sens; raportați măsuri bazate pe cuantile și indicele de coadă.",
-                "incorrectExplanation": "Un eșantion mare nu ajută când distribuția limită nu există: limita chi-pătrat(2) cere momente finite până la ordinul 8."
+                "correctExplanation": "Limita chi-pătrat(2) este derivată sub ipoteza nulă a randamentelor i.i.d. din distribuția Normală, în care toate momentele există, deci p-valoarea este validă pentru această ipoteză. Cozile groase din alternativă fac ca JB să crească cu T: aceasta este puterea testului. Dependența (GARCH) este un alt motiv de respingere; pentru a testa distribuția marginală a unei serii de timp folosiți teste studentizate HAC (Bai și Ng, 2005) și raportați măsuri bazate pe cuantile și indicele de coadă.",
+                "incorrectExplanation": "Calibrarea sub ipoteza nulă nu depinde de momentele alternativei; o respingere JB privește ipoteza nulă comună a randamentelor i.i.d. din distribuția Normală."
             }
         },
         {
             "correct": 0,
             "en": {
                 "title": "Autocorrelation band under clustering",
-                "text": "Returns are uncorrelated but show volatility clustering. How does the asymptotic variance of the square root of T times the lag-1 sample autocorrelation compare with 1?",
+                "text": "Returns x_t are a stationary martingale difference with finite fourth moments whose squares are positively autocorrelated (volatility clustering). How does the asymptotic variance of sqrt(T) times the lag-1 sample autocorrelation compare with 1?",
                 "options": [
                     "It is larger than 1: it equals E[x_t^2 x_(t-1)^2]/sigma^4, which exceeds 1 under clustering",
                     "It equals 1, because the returns are uncorrelated",
                     "It is smaller than 1, because the sample mean is removed",
                     "It is not defined for uncorrelated returns"
                 ],
-                "correctExplanation": "For a martingale difference the variance is tau_1 = E[x_t^2 x_(t-1)^2]/sigma^4. Clustering makes large squares follow large squares, so tau_1 > 1 and the i.i.d. band of 1.96/sqrt(T) is too narrow (S&P 500: T tau_1 = 5).",
+                "correctExplanation": "For a martingale difference the asymptotic variance of sqrt(T) rho_hat_1 is E[x_t^2 x_(t-1)^2]/sigma^4. Clustering makes large squares follow large squares, so it exceeds 1 and the i.i.d. band of 1.96/sqrt(T) is too narrow (S&P 500: about 5).",
                 "incorrectExplanation": "Zero correlation fixes the mean of the autocorrelation, not its variance: clustering inflates the variance above the i.i.d. value 1."
             },
             "ro": {
                 "title": "Banda autocorelației în prezența grupării",
-                "text": "Randamentele sunt necorelate, dar volatilitatea se grupează. Cum se compară varianța asimptotică a rădăcinii lui T înmulțite cu autocorelația de selecție de ordin 1 cu 1?",
+                "text": "Randamentele x_t sunt o diferență de martingală staționară, cu momente de ordin patru finite, ale cărei pătrate sunt autocorelate pozitiv (gruparea volatilității). Cum se compară varianța asimptotică a rădăcinii lui T înmulțite cu autocorelația de selecție de ordin 1 cu 1?",
                 "options": [
                     "Este mai mare decât 1: este egală cu E[x_t^2 x_(t-1)^2]/sigma^4, care depășește 1 în prezența grupării",
                     "Este egală cu 1, pentru că randamentele sunt necorelate",
                     "Este mai mică decât 1, pentru că media de selecție este eliminată",
                     "Nu este definită pentru randamente necorelate"
                 ],
-                "correctExplanation": "Pentru o diferență de martingală varianța este tau_1 = E[x_t^2 x_(t-1)^2]/sigma^4. Gruparea face ca pătratele mari să urmeze pătratelor mari, deci tau_1 > 1 și banda i.i.d. 1,96/sqrt(T) este prea îngustă (S&P 500: T tau_1 = 5).",
+                "correctExplanation": "Pentru o diferență de martingală, varianța asimptotică a lui sqrt(T) rho_hat_1 este E[x_t^2 x_(t-1)^2]/sigma^4. Gruparea face ca pătratele mari să urmeze pătratelor mari, deci ea depășește 1 și banda i.i.d. 1,96/sqrt(T) este prea îngustă (S&P 500: aproximativ 5).",
                 "incorrectExplanation": "Corelația zero fixează media autocorelației, nu varianța ei: gruparea crește varianța peste valoarea i.i.d. 1."
             }
         },
@@ -69,10 +69,10 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "options": [
                     "A data error",
                     "Transaction costs",
-                    "Volatility drag: the geometric mean is approximately the arithmetic mean minus half the variance",
+                    "Volatility drag: the mean log growth rate is approximately the arithmetic mean minus half the variance",
                     "Bitcoin pays no dividends"
                 ],
-                "correctExplanation": "mu_geo is approximately mu_arith - sigma^2/2; with volatility of about 67% per year the drag is large.",
+                "correctExplanation": "The annualised mean log return is approximately P mean(R) - P Var(R)/2 = 65.2% - 0.66^2/2, about 43.3%, and CAGR = exp(43.3%) - 1, about 54%. With volatility near 66% per year the drag is large.",
                 "incorrectExplanation": "The gap is the volatility drag between arithmetic and geometric means."
             },
             "ro": {
@@ -81,10 +81,10 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "options": [
                     "O eroare de date",
                     "Costurile de tranzacționare",
-                    "Frâna volatilității: media geometrică este aproximativ media aritmetică minus jumătate din varianță",
+                    "Frâna volatilității: rata medie de creștere logaritmică este aproximativ media aritmetică minus jumătate din varianță",
                     "Bitcoin nu plătește dividende"
                 ],
-                "correctExplanation": "mu_geo este aproximativ mu_arit - sigma^2/2; la o volatilitate de circa 67% pe an, frâna este mare.",
+                "correctExplanation": "Randamentul log mediu anualizat este aproximativ P medie(R) - P Var(R)/2 = 65,2% - 0,66^2/2, circa 43,3%, iar CAGR = exp(43,3%) - 1, circa 54%. La o volatilitate de circa 66% pe an, frâna este mare.",
                 "incorrectExplanation": "Diferența este frâna volatilității dintre media aritmetică și cea geometrică."
             }
         },
@@ -200,7 +200,7 @@ window.MFM_DATA.quizzes['stylized'] = {
             "correct": 3,
             "en": {
                 "title": "Mixture of normals",
-                "text": "Daily volatility is 1% on 90% of days and 3% on 10% of days; conditional on volatility, returns follow the Normal distribution. What is the kurtosis?",
+                "text": "Daily volatility is 1% on 90% of days and 3% on 10% of days; conditional on volatility, returns follow the Normal distribution with mean zero. What is the kurtosis?",
                 "options": [
                     "3, because each regime follows the Normal distribution",
                     "1.8",
@@ -212,7 +212,7 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Mixtură de distribuții Normale",
-                "text": "Volatilitatea zilnică este 1% în 90% din zile și 3% în 10% din zile; condiționat de volatilitate, randamentele urmează distribuția Normală. Cât este kurtosisul?",
+                "text": "Volatilitatea zilnică este 1% în 90% din zile și 3% în 10% din zile; condiționat de volatilitate, randamentele urmează distribuția Normală cu media zero. Cât este kurtosisul?",
                 "options": [
                     "3, pentru că fiecare regim urmează distribuția Normală",
                     "1,8",
@@ -261,7 +261,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Returns have no variance at all",
                     "The tails are thinner than those of the Normal distribution"
                 ],
-                "correctExplanation": "With power-law tails, moments exist only up to order below alpha: variance needs alpha > 2, kurtosis alpha > 4. Sample kurtosis then depends heavily on a few extreme days. (A Student-t fit is not a tail-index estimator: it is dominated by the centre.)",
+                "correctExplanation": "With power-law tails, moments exist only up to order below alpha: variance needs alpha > 2, kurtosis alpha > 4. Sample kurtosis then depends heavily on a few extreme days. (A Student-t fit gives a model-based tail index, valid only if the Student-t fits centre and tails together.)",
                 "incorrectExplanation": "A tail index between 2 and 4 means finite variance but a fourth moment that very likely does not exist."
             },
             "ro": {
@@ -273,7 +273,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Randamentele nu au deloc varianță",
                     "Cozile sunt mai subțiri decât cele ale distribuției Normale"
                 ],
-                "correctExplanation": "Cu cozi de tip lege de putere, momentele există doar până la un ordin mai mic decât alpha: varianța cere alpha > 2, kurtosisul alpha > 4. Kurtosisul de selecție depinde atunci mult de câteva zile extreme. (O distribuție Student-t estimată nu este un estimator al indicelui de coadă: este dominată de centru.)",
+                "correctExplanation": "Cu cozi de tip lege de putere, momentele există doar până la un ordin mai mic decât alpha: varianța cere alpha > 2, kurtosisul alpha > 4. Kurtosisul de selecție depinde atunci mult de câteva zile extreme. (O distribuție Student-t estimată dă un indice de coadă bazat pe model, valid doar dacă Student-t potrivește împreună centrul și cozile.)",
                 "incorrectExplanation": "Un indice de coadă între 2 și 4 înseamnă varianță finită, dar un moment de ordin patru foarte probabil inexistent."
             }
         },
@@ -281,7 +281,7 @@ window.MFM_DATA.quizzes['stylized'] = {
             "correct": 2,
             "en": {
                 "title": "Gain/loss asymmetry",
-                "text": "For the S&P 500 the 1% loss quantile is 3.15% and the 99% gain quantile is 2.97%. For EUR/RON the values are 0.76% and 0.94%. What is the correct reading?",
+                "text": "For the S&P 500, VaR 1% (minus the 1% return quantile) is 3.15% and the 99% return quantile is 2.97%. For EUR/RON the values are 0.76% and 0.94%. What is the correct reading?",
                 "options": [
                     "Both markets show larger losses than gains",
                     "EUR/RON is a data error",
@@ -293,7 +293,7 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Asimetria câștig/pierdere",
-                "text": "Pentru S&P 500, cuantila de pierdere de 1% este 3,15%, iar cuantila de câștig de 99% este 2,97%. Pentru EUR/RON valorile sunt 0,76% și 0,94%. Care este interpretarea corectă?",
+                "text": "Pentru S&P 500, VaR 1% (minus cuantila de 1% a randamentelor) este 3,15%, iar cuantila de 99% a randamentelor este 2,97%. Pentru EUR/RON valorile sunt 0,76% și 0,94%. Care este interpretarea corectă?",
                 "options": [
                     "Ambele piețe au pierderi mai mari decât câștigurile",
                     "EUR/RON este o eroare de date",
@@ -308,26 +308,26 @@ window.MFM_DATA.quizzes['stylized'] = {
             "correct": 1,
             "en": {
                 "title": "Precision of a Sharpe ratio",
-                "text": "An annual Sharpe ratio of 0.55 is estimated from 36.7 years of daily returns, assumed i.i.d. What is its approximate standard error?",
+                "text": "An annual Sharpe ratio of 0.55 is estimated from 36.7 years of daily returns, assumed i.i.d. from the Normal distribution. What is its approximate standard error?",
                 "options": [
                     "0.01, i.e. 1/sqrt(T) with T = 9,245 daily observations, not annualised",
                     "0.17, i.e. about 1/sqrt(Y) with Y = 36.7 years",
                     "0.09, i.e. SR/sqrt(Y)",
                     "0.55, the Sharpe ratio itself"
                 ],
-                "correctExplanation": "By the delta method Var(SR_daily) is about (1 + SR_daily^2/2)/T; annualising multiplies the standard error by sqrt(P), giving about sqrt(P/T) = 1/sqrt(Y) = 0.17. The span of the sample matters, not the sampling frequency.",
+                "correctExplanation": "Under i.i.d. Normal returns the delta method gives Var(SR_daily) of about (1 + SR_daily^2/2)/T; annualising multiplies the standard error by sqrt(P), giving about sqrt(P/T) = 1/sqrt(Y) = 0.17. For other i.i.d. distributions skewness and kurtosis enter (Opdyke, 2007). The span of the sample matters, not the sampling frequency.",
                 "incorrectExplanation": "The daily standard error must be annualised with sqrt(P); the result depends on the number of years, not on the number of days."
             },
             "ro": {
                 "title": "Precizia unui raport Sharpe",
-                "text": "Un raport Sharpe anual de 0,55 este estimat din 36,7 ani de randamente zilnice, presupuse i.i.d. Care este aproximativ eroarea sa standard?",
+                "text": "Un raport Sharpe anual de 0,55 este estimat din 36,7 ani de randamente zilnice, presupuse i.i.d. din distribuția Normală. Care este aproximativ eroarea sa standard?",
                 "options": [
                     "0,01, adică 1/sqrt(T) cu T = 9.245 de observații zilnice, neanualizat",
                     "0,17, adică aproximativ 1/sqrt(Y) cu Y = 36,7 ani",
                     "0,09, adică SR/sqrt(Y)",
                     "0,55, chiar raportul Sharpe"
                 ],
-                "correctExplanation": "Prin metoda delta, Var(SR_zilnic) este aproximativ (1 + SR_zilnic^2/2)/T; anualizarea înmulțește eroarea standard cu sqrt(P), deci aproximativ sqrt(P/T) = 1/sqrt(Y) = 0,17. Contează durata eșantionului, nu frecvența.",
+                "correctExplanation": "Pentru randamente i.i.d. din distribuția Normală, metoda delta dă Var(SR_zilnic) aproximativ (1 + SR_zilnic^2/2)/T; anualizarea înmulțește eroarea standard cu sqrt(P), deci aproximativ sqrt(P/T) = 1/sqrt(Y) = 0,17. Pentru alte distribuții i.i.d. intră asimetria și kurtosisul (Opdyke, 2007). Contează durata eșantionului, nu frecvența.",
                 "incorrectExplanation": "Eroarea standard zilnică trebuie anualizată cu sqrt(P); rezultatul depinde de numărul de ani, nu de numărul de zile."
             }
         },
@@ -335,54 +335,54 @@ window.MFM_DATA.quizzes['stylized'] = {
             "correct": 0,
             "en": {
                 "title": "Non-overlapping windows",
-                "text": "Why should h-day returns be built from non-overlapping windows when estimating their kurtosis?",
+                "text": "Why are h-day returns built from non-overlapping windows when their kurtosis is compared with the standard error sqrt(24/N)?",
                 "options": [
-                    "Overlapping windows share observations, create artificial dependence and bias moment estimates",
+                    "Overlapping windows share observations, so consecutive h-day returns are dependent and the effective sample is much smaller than N",
                     "Overlapping windows produce negative returns",
                     "Non-overlapping windows always give more observations",
                     "Kurtosis is only defined for weekly data"
                 ],
-                "correctExplanation": "Overlapping h-day sums reuse the same daily returns, so consecutive observations are strongly dependent.",
-                "incorrectExplanation": "The problem with overlapping windows is induced dependence between observations."
+                "correctExplanation": "Overlapping sums still estimate the same moments, but they reuse the same daily returns: consecutive observations are strongly dependent, and formulas that assume N independent observations understate the sampling error.",
+                "incorrectExplanation": "The problem with overlapping windows is induced dependence and a smaller effective sample, not the target moment."
             },
             "ro": {
                 "title": "Ferestre nesuprapuse",
-                "text": "De ce trebuie construite randamentele pe h zile din ferestre nesuprapuse atunci când le estimăm kurtosisul?",
+                "text": "De ce se construiesc randamentele pe h zile din ferestre nesuprapuse atunci când kurtosisul lor este comparat cu eroarea standard sqrt(24/N)?",
                 "options": [
-                    "Ferestrele suprapuse au observații comune, creează dependență artificială și deplasează estimările momentelor",
+                    "Ferestrele suprapuse au observații comune, deci randamentele consecutive pe h zile sunt dependente, iar eșantionul efectiv este mult mai mic decât N",
                     "Ferestrele suprapuse produc randamente negative",
                     "Ferestrele nesuprapuse dau întotdeauna mai multe observații",
                     "Kurtosisul este definit doar pentru date săptămânale"
                 ],
-                "correctExplanation": "Sumele suprapuse pe h zile refolosesc aceleași randamente zilnice, deci observațiile consecutive sunt puternic dependente.",
-                "incorrectExplanation": "Problema ferestrelor suprapuse este dependența indusă între observații."
+                "correctExplanation": "Sumele suprapuse estimează aceleași momente, dar refolosesc aceleași randamente zilnice: observațiile consecutive sunt puternic dependente, iar formulele care presupun N observații independente subestimează eroarea de eșantionare.",
+                "incorrectExplanation": "Problema ferestrelor suprapuse este dependența indusă și un eșantion efectiv mai mic, nu momentul estimat."
             }
         },
         {
             "correct": 1,
             "en": {
-                "title": "Long memory",
-                "text": "The ACF of absolute S&P 500 returns is 0.27 at lag 1 and still 0.09 at lag 100. Why is this important?",
+                "title": "Persistent volatility",
+                "text": "The ACF of absolute S&P 500 returns is 0.27 at lag 1 and still 0.09 at lag 100. What can be concluded?",
                 "options": [
                     "It proves returns are predictable in direction",
-                    "The decay is much slower than the exponential decay of a short-memory model such as GARCH(1,1)",
+                    "Volatility is highly persistent; long memory, a short-memory model with persistence near 1 and structural breaks can all produce this, so further diagnostics (d estimates, break tests, model simulations) are needed",
                     "It shows that volatility is constant",
                     "It is an artefact of using log returns"
                 ],
-                "correctExplanation": "Slow, hyperbolic-like decay of the ACF of absolute returns indicates long memory in volatility, which GARCH(1,1) cannot fully reproduce.",
-                "incorrectExplanation": "The key point is the slow decay of volatility autocorrelation (long memory)."
+                "correctExplanation": "Two ACF values are matched by an exponential decay with phi of about 0.989, and a GARCH(1,1)-t with persistence 0.994 reproduces them in Seminar B14. Distinguishing long memory from persistent short memory or breaks needs estimates of d, break tests and simulation checks.",
+                "incorrectExplanation": "Slow decay shows persistent volatility; it does not by itself identify long memory."
             },
             "ro": {
-                "title": "Memorie lungă",
-                "text": "ACF a randamentelor absolute S&P 500 este 0,27 la lagul 1 și încă 0,09 la lagul 100. De ce este important acest lucru?",
+                "title": "Volatilitate persistentă",
+                "text": "ACF a randamentelor absolute S&P 500 este 0,27 la lagul 1 și încă 0,09 la lagul 100. Ce se poate concluziona?",
                 "options": [
                     "Demonstrează că direcția randamentelor este predictibilă",
-                    "Descreșterea este mult mai lentă decât descreșterea exponențială a unui model cu memorie scurtă precum GARCH(1,1)",
+                    "Volatilitatea este foarte persistentă; memoria lungă, un model cu memorie scurtă cu persistență aproape de 1 și rupturile structurale pot produce toate acest lucru, deci sunt necesare diagnostice suplimentare (estimări ale lui d, teste de ruptură, simulări de model)",
                     "Arată că volatilitatea este constantă",
                     "Este un artefact al folosirii randamentelor log"
                 ],
-                "correctExplanation": "Descreșterea lentă, aproape hiperbolică, a ACF a randamentelor absolute indică memorie lungă în volatilitate, pe care GARCH(1,1) nu o poate reproduce complet.",
-                "incorrectExplanation": "Ideea cheie este descreșterea lentă a autocorelației volatilității (memorie lungă)."
+                "correctExplanation": "Cele două valori ACF sunt reproduse de o descreștere exponențială cu phi de circa 0,989, iar un GARCH(1,1)-t cu persistența 0,994 le reproduce în Seminarul B14. Separarea memoriei lungi de memoria scurtă persistentă sau de rupturi cere estimări ale lui d, teste de ruptură și verificări prin simulare.",
+                "incorrectExplanation": "Descreșterea lentă arată volatilitate persistentă; ea singură nu identifică memoria lungă."
             }
         },
         {
@@ -605,27 +605,27 @@ window.MFM_DATA.quizzes['stylized'] = {
             "correct": 3,
             "en": {
                 "title": "Non-synchronous trading",
-                "text": "BET-TR and S&P 500 daily returns have correlation 0.31 on the same day and 0.12 with the S&P 500 lagged one day (Bucharest closes before New York). Which is the best estimate of their co-movement?",
+                "text": "BET-TR and S&P 500 daily log returns have correlation 0.31 on the same day, 0.12 with the S&P 500 of the previous day and 0.03 with that of the next day (Bucharest closes before New York). Which correlation should be used for a portfolio held for a week?",
                 "options": [
                     "0.31, the same-day correlation",
                     "0.12, the lagged correlation",
-                    "0.19, the difference of the two",
-                    "About 0.43, the Dimson / Scholes-Williams sum, close to the weekly correlation of 0.46"
+                    "0.43, the sum of the same-day and lagged correlations",
+                    "The correlation of synchronised weekly returns (0.46), close to 0.31 + 0.12 + 0.03 because the weekly covariance collects the lead-lag daily covariances"
                 ],
-                "correctExplanation": "US news after the Bucharest close reaches BET-TR only on the next day, so part of the co-movement appears at lag 1. Summing the lead-lag correlations recovers about 0.43, in line with the weekly 0.46.",
-                "incorrectExplanation": "Asynchronous closes split the common reaction across two days; the same-day correlation alone understates the link."
+                "correctExplanation": "US news after the Bucharest close reaches BET-TR only on the next day, so part of the co-movement appears at lag 1. A sum of daily correlations is not itself a correlation (it can exceed 1); synchronised weekly returns give a proper correlation, 0.46.",
+                "incorrectExplanation": "Asynchronous closes split the common reaction across days; use synchronised returns at the portfolio horizon."
             },
             "ro": {
                 "title": "Tranzacționare nesincronă",
-                "text": "Randamentele zilnice BET-TR și S&P 500 au corelația 0,31 în aceeași zi și 0,12 cu S&P 500 din ziua precedentă (Bucureștiul închide înaintea New York-ului). Care este cea mai bună estimare a mișcării lor comune?",
+                "text": "Randamentele log zilnice BET-TR și S&P 500 au corelația 0,31 în aceeași zi, 0,12 cu S&P 500 din ziua precedentă și 0,03 cu cel din ziua următoare (Bucureștiul închide înaintea New York-ului). Ce corelație ar trebui folosită pentru un portofoliu deținut o săptămână?",
                 "options": [
                     "0,31, corelația din aceeași zi",
                     "0,12, corelația cu decalaj",
-                    "0,19, diferența celor două",
-                    "Aproximativ 0,43, suma Dimson / Scholes-Williams, apropiată de corelația săptămânală de 0,46"
+                    "0,43, suma corelațiilor din aceeași zi și cu decalaj",
+                    "Corelația randamentelor săptămânale sincronizate (0,46), apropiată de 0,31 + 0,12 + 0,03, pentru că covarianța săptămânală adună covarianțele zilnice cu decalaj și avans"
                 ],
-                "correctExplanation": "Știrile americane de după închiderea bursei din București ajung în BET-TR abia a doua zi, deci o parte din mișcarea comună apare la decalajul 1. Suma corelațiilor cu decalaj recuperează aproximativ 0,43, în acord cu valoarea săptămânală de 0,46.",
-                "incorrectExplanation": "Închiderile nesincrone împart reacția comună pe două zile; corelația din aceeași zi, singură, subestimează legătura."
+                "correctExplanation": "Știrile americane de după închiderea bursei din București ajung în BET-TR abia a doua zi, deci o parte din mișcarea comună apare la decalajul 1. O sumă de corelații zilnice nu este ea însăși o corelație (poate depăși 1); randamentele săptămânale sincronizate dau o corelație propriu-zisă, 0,46.",
+                "incorrectExplanation": "Închiderile nesincrone împart reacția comună pe mai multe zile; folosiți randamente sincronizate la orizontul portofoliului."
             }
         },
         {

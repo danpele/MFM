@@ -126,6 +126,24 @@ def fig_robust_acf(asset='sp500', m=20):
     save_fig('ch1_sem_robust_acf')
 
 
+def dgp_q(r, m=10, lam=2.576):
+    """Dalla, Giraitis & Phillips (2022): Q = t' R*^{-1} t, t_k = sum e_t e_{t-k} / sqrt(sum e_t^2 e_{t-k}^2);
+    R* pastreaza doar termenii incrucisati semnificativi (|tau_jk| > 2.576). R* = I da Q-tilde diagonal."""
+    e = (r - r.mean()).values
+    P = np.array([np.r_[np.zeros(k), e[k:] * e[:-k]] for k in range(1, m + 1)])
+    d = np.sqrt((P ** 2).sum(1))
+    t = P.sum(1) / d
+    R = (P @ P.T) / np.outer(d, d)
+    for j in range(m):
+        for k in range(m):
+            if j != k:
+                pp = P[j] * P[k]
+                if abs(pp.sum() / np.sqrt((pp ** 2).sum())) < lam:
+                    R[j, k] = 0.0
+    q = float(t @ np.linalg.solve(R, t))
+    return q, float(stats.chi2.sf(q, m)), int((R != 0).sum() - m)
+
+
 def robust_lb_table(assets=('sp500', 'bettr', 'eurron'), m_q=10, m_band=20):
     rows = []
     for a in assets:
@@ -140,7 +158,8 @@ def robust_lb_table(assets=('sp500', 'bettr', 'eurron'), m_q=10, m_band=20):
                      'Qt10': qt, 'Qt10_p': float(stats.chi2.sf(qt, m_q)),
                      'sig_classic': int(np.sum(np.abs(rho) > 1.96 / np.sqrt(T))),
                      'sig_robust': int(np.sum(np.abs(rho) > 1.96 * np.sqrt(tau))),
-                     'robust_lags': [int(k) for k in ks[np.abs(rho) > 1.96 * np.sqrt(tau)]], 'rho1': rho[0]})
+                     'robust_lags': [int(k) for k in ks[np.abs(rho) > 1.96 * np.sqrt(tau)]], 'rho1': rho[0],
+                     **dict(zip(['Q_DGP', 'Q_DGP_p', 'n_cross_terms'], dgp_q(rets[a], m_q)))})
     return pd.DataFrame(rows).set_index('asset')
 
 
@@ -255,8 +274,10 @@ def fig_leverage_ro_crypto(K=20):
         ax.plot(L.index, L.values, marker='o', ms=2.5, lw=1.0, color=COLORS[a], label=LABELS[a])
     ax.axhline(0, color=Gray, lw=0.5)
     ax.axvline(0, color=LightGray, lw=0.5)
-    band = 1.96 / np.sqrt(len(rets['bettr']))
-    ax.axhspan(-band, band, color=LightGray, alpha=0.5, lw=0)
+    for a in ('bettr', 'btc'):                      # banda i.i.d. de referinta, cu T-ul fiecarei serii
+        band = 1.96 / np.sqrt(len(rets[a]))
+        ax.axhline(band, color=COLORS[a], ls=':', lw=0.9, label=f'{LABELS[a]}: i.i.d. reference band $\\pm${band:.3f}')
+        ax.axhline(-band, color=COLORS[a], ls=':', lw=0.9)
     ax.set_xlabel('Lag $k$ (days); $k>0$: return today, volatility later')
     ax.set_ylabel('corr$(r_t, |r_{t+k}|)$')
     ax.set_title('Leverage effect: Romania (BET-TR) vs crypto (Bitcoin)', fontsize=9, loc='left')
@@ -317,14 +338,14 @@ def bettr_vs_sp500(n_boot=2000, block=21):
                 boot_ci=(np.quantile(diffs, 0.025), np.quantile(diffs, 0.975)),
                 boot_p=2 * min((diffs <= 0).mean(), (diffs >= 0).mean()),
                 corr_lag0=r['bet'].corr(r['spx']), corr_lag1=lag1, corr_lead1=lead1,
-                corr_sw=r['bet'].corr(r['spx']) + lag1,
+                corr_sum3=r['bet'].corr(r['spx']) + lag1 + lead1,   # ~ corelatia saptamanala; nu este o corelatie
                 corr_weekly=wk['bet'].corr(wk['spx']))
 
 
 # =============================================================================
 # B11: verificarea unui model -- GARCH(1,1) cu inovatii t, estimat pe S&P 500
 # =============================================================================
-def garch_check(n_paths=200, lags=(1, 20, 100), frac=0.02):
+def garch_check(n_paths=200, lags=(1, 20, 100, 250), frac=0.02):
     """GARCH(1,1)-t pe S&P 500; 200 traiectorii simulate; benzi 5-95% pentru fapte stilizate."""
     from arch import arch_model
     r = 100 * rets['sp500']
@@ -367,7 +388,10 @@ def garch_check(n_paths=200, lags=(1, 20, 100), frac=0.02):
     legend_outside_bottom(ax, ncol=2, y=-0.25)
     plt.tight_layout()
     save_fig('ch1_sem_garch_check')
-    return dict(params=res.params.round(4).to_dict(), persistence=res.params['alpha[1]'] + res.params['beta[1]'],
+    a_, b_, nu_ = res.params['alpha[1]'], res.params['beta[1]'], res.params['nu']
+    kappa = 3 * (nu_ - 2) / (nu_ - 4)                     # E z^4 pentru t standardizat
+    return dict(params=res.params.round(4).to_dict(), persistence=a_ + b_,
+                fourth_moment_cond=(a_ + b_) ** 2 + (kappa - 1) * a_ ** 2,
                 table=table, n_paths=n_paths, k=k)
 
 
@@ -383,11 +407,20 @@ def garch_normal_sp500():
 # C1: autocorelatia BET-TR inainte si dupa reclasificarea FTSE (21.09.2020)
 # =============================================================================
 def rho_robust(r):
+    """rho_1 si EE robusta sub H0: rho_1 = 0 (diferenta de martingala); pentru benzi in jurul lui 0."""
     e = (r - r.mean()).values
     s2 = np.sum(e ** 2)
     rho = np.sum(e[1:] * e[:-1]) / s2
     se = np.sqrt(np.sum(e[1:] ** 2 * e[:-1] ** 2)) / s2
     return rho, se
+
+
+def rho_hac(r):
+    """rho_1 ca panta regresiei r_t pe r_{t-1}, cu EE Newey-West (HAC): valida si cand rho_1 != 0."""
+    df = pd.DataFrame({'y': r, 'x': r.shift(1)}).dropna()
+    L = int(4 * (len(df) / 100) ** (2 / 9))
+    fit = sm.OLS(df['y'], sm.add_constant(df['x'])).fit(cov_type='HAC', cov_kwds={'maxlags': L})
+    return fit.params['x'], fit.bse['x']
 
 
 BLUE_CHIPS = ['TLV.RO', 'SNP.RO', 'BRD.RO', 'TGN.RO', 'FP.RO', 'SNG.RO', 'H2O.RO', 'SNN.RO', 'EL.RO', 'DIGI.RO', 'TEL.RO']
@@ -412,7 +445,7 @@ def fig_bettr_rolling_acf(window=250, split='2020-09-21'):
     roll = pd.Series(vals, index=idx)
     fig, ax = plt.subplots(figsize=(6.8, 3.0))
     ax.plot(idx, vals, color=IDAred, lw=1.0, label='Rolling lag-1 autocorrelation (250 days)')
-    ax.fill_between(idx, lo, hi, color=IDAred, alpha=0.15, lw=0, label='95% band, heteroskedasticity-robust')
+    ax.fill_between(idx, lo, hi, color=IDAred, alpha=0.15, lw=0, label='$\\pm1.96$ robust SE under $\\rho_1 = 0$')
     ax.axhline(0, color=Gray, lw=0.5)
     ax.axvline(pd.Timestamp(split), color=MainBlue, ls='--', lw=0.9, label='FTSE Russell reclassification (Sep 2020)')
     ax.set_ylabel('$\\hat\\rho_1$')
@@ -421,8 +454,8 @@ def fig_bettr_rolling_acf(window=250, split='2020-09-21'):
     plt.tight_layout()
     save_fig('ch1_sem_bettr_rolling_acf')
     pre, post = r.loc[:split].iloc[:-1], r.loc[split:]
-    rp, sp = rho_robust(pre)
-    rq, sq = rho_robust(post)
+    rp, sp = rho_hac(pre)
+    rq, sq = rho_hac(post)
     z = (rp - rq) / np.sqrt(sp ** 2 + sq ** 2)
     df = pd.DataFrame({'y': r, 'x': r.shift(1)}).dropna()
     df['post'] = (df.index >= pd.Timestamp(split)).astype(float)
@@ -454,7 +487,7 @@ def mdd_brownian(assets=('gold', 'sp500', 'btc')):
         e = np.sqrt(np.pi / 2) * sig * np.sqrt(Y)
         mdd = float(np.log(c / c.cummax()).min())
         rows.append({'asset': LABELS[a], 'years': Y, 'sigma': sig, 'mu_log': rets[a].mean() * PERIODS[a],
-                     'E_mdd_log': e, 'E_mdd_pct': 100 * (1 - np.exp(-e)), 'mdd_log': mdd,
+                     'E_mdd_log': e, 'pct_fall_at_mean_log_dd': 100 * (1 - np.exp(-e)), 'mdd_log': mdd,   # 1-exp(-E[D]) nu este E[MDD] procentual (Jensen)
                      'mdd_pct': 100 * (np.exp(mdd) - 1)})
     return pd.DataFrame(rows).set_index('asset')
 
@@ -467,13 +500,12 @@ def eurron_regimes(periods=(('2005-07-01', '2011-12-31'), ('2012-01-01', '2019-1
     rows = []
     for a, b in periods:
         x = (r[a:b] - r[a:b].mean()).values
-        s2 = np.sum(x ** 2)
-        rho = np.sum(x[1:] * x[:-1]) / s2
-        rows.append({'period': f'{a[:4]}-{b[:4]}', 'rho1': rho, 'se_robust': np.sqrt(np.sum(x[1:] ** 2 * x[:-1] ** 2)) / s2,
+        rho, se = rho_hac(r[a:b])        # EE HAC: valida si pentru rho_1 != 0 (tau_1 e varianta sub rho_1 = 0)
+        rows.append({'period': f'{a[:4]}-{b[:4]}', 'rho1': rho, 'se_hac': se,
                      'se_iid': 1 / np.sqrt(len(x)), 'vol_pct': 100 * x.std() * np.sqrt(252),
                      'exkurt': stats.kurtosis(x)})
     t = pd.DataFrame(rows).set_index('period')
-    w = 1 / t['se_robust'] ** 2
+    w = 1 / t['se_hac'] ** 2
     rbar = np.sum(w * t['rho1']) / np.sum(w)
     wald = float(np.sum(w * (t['rho1'] - rbar) ** 2))
     j, it = cusum_squares_break(r.values)

@@ -270,11 +270,13 @@ def fig_acf_sp500(nlags=100):
     for ax, (s, t, c) in zip(axes, series):
         a = acf(s, nlags=nlags, fft=True)[1:]
         ax.bar(range(1, nlags + 1), a, color=c, width=0.8)
-        ax.axhspan(-band, band, color=LightGray, alpha=0.7, lw=0)
+        ax.axhspan(-band, band, color=LightGray, alpha=0.7, lw=0, label='i.i.d. reference band $\\pm1.96/\\sqrt{T}$')
         ax.axhline(0, color=Gray, lw=0.4)
         ax.set_title(t, fontsize=8.5, loc='left')
         ax.set_xlabel('Lag (days)')
     axes[0].set_ylabel('Autocorrelation')
+    h, l = axes[0].get_legend_handles_labels()
+    fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=1, frameon=False)
     plt.tight_layout()
     save_fig('ch1_acf_sp500')
 
@@ -317,11 +319,13 @@ def fig_leverage():
         out[a] = pd.Series(c, index=ks)
         ax.bar(ks, c, color=np.where(c < 0, IDAred, Forest), width=0.8)
         band = 1.96 / np.sqrt(len(rets[a]))
-        ax.axhspan(-band, band, color=LightGray, alpha=0.7, lw=0)
+        ax.axhspan(-band, band, color=LightGray, alpha=0.7, lw=0, label='i.i.d. reference band $\\pm1.96/\\sqrt{T}$')
         ax.axhline(0, color=Gray, lw=0.4)
         ax.set_xlabel('Lag $k$ (days)')
         ax.set_title(f'{LABELS[a]}: corr$(r_t, |r_{{t+k}}|)$', fontsize=8.5, loc='left')
     axes[0].set_ylabel('Correlation')
+    h, l = axes[0].get_legend_handles_labels()
+    fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=1, frameon=False)
     plt.tight_layout()
     save_fig('ch1_leverage')
     return pd.DataFrame(out)
@@ -477,7 +481,7 @@ def fig_risk_return(t):
     ax.set_ylabel('CAGR (%)')
     ax.set_xlim(3, 120)
     ax.axhline(0, color=Gray, lw=0.4)
-    ax.set_title('Risk and return across markets (full sample of each series)', fontsize=9, loc='left')
+    ax.set_title('Risk and return across markets (full samples; Sharpe SE for i.i.d. Normal returns)', fontsize=9, loc='left')
     plt.tight_layout()
     save_fig('ch1_risk_return')
 
@@ -555,8 +559,15 @@ def fig_hill():
 def moving_block_indices(T, block, rng):
     """Indicii unui esantion bootstrap pe blocuri mobile (moving-block) de lungime `block`."""
     nb = int(np.ceil(T / block))
-    st = rng.integers(0, T - block, nb)
+    st = rng.integers(0, T - block + 1, nb)      # toate cele T - block + 1 inceputuri valide
     return (st[:, None] + np.arange(block)[None, :]).ravel()[:T]
+
+
+def hill_threshold(x, u):
+    """Hill cu prag fix u: k = #{x > u}, alpha_hat = k / sum ln(x_i / u) pe x_i > u."""
+    x = np.asarray(x)
+    e = x[x > u]
+    return len(e) / np.sum(np.log(e / u))
 
 
 def hill_inference(frac=0.025, n_boot=500, block=20, seed=42):
@@ -576,8 +587,8 @@ def hill_inference(frac=0.025, n_boot=500, block=20, seed=42):
                      'se_block': np.std(boot, ddof=1), 'ci_lo': al * (1 - 1.96 / np.sqrt(k)),
                      'ci_hi': al * (1 + 1.96 / np.sqrt(k)), 'alpha_loss_k': hill_estimator(-r, k),
                      'alpha_gain_k': hill_estimator(r, k), 'u_common_pct': 100 * u, 'k_abs_u': kA,
-                     'alpha_abs_u': hill_estimator(np.abs(r), kA), 'alpha_loss_u': hill_estimator(-r, kL),
-                     'alpha_gain_u': hill_estimator(r, kG)})
+                     'alpha_abs_u': hill_threshold(np.abs(r), u), 'alpha_loss_u': hill_threshold(-r, u),
+                     'alpha_gain_u': hill_threshold(r, u)})
     t = pd.DataFrame(rows).set_index('asset')
     t.to_csv(os.path.join(TABLE_DIR, 'ch1_hill_inference.csv'), float_format='%.4g')
     return t

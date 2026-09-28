@@ -59,8 +59,8 @@ for name in ['btc', 'sp500']:
     z_boot = diff / np.hypot(a['pre']['se_boot'], a['post']['se_boot'])
     for lab in a:
         a[lab].pop('boot')
-    # diferenta minima detectabila (test bilateral 5%, putere 80%) cu erorile bootstrap
-    mde = 2.8 * np.hypot(a['pre']['se_boot'], a['post']['se_boot'])
+    # diferenta minima detectabila (test unilateral 5%, putere 80%: 1.645 + 0.842) cu erorile bootstrap
+    mde = 2.486 * np.hypot(a['pre']['se_boot'], a['post']['se_boot'])
     res[name] = dict(pre=a['pre'], post=a['post'], diff=diff, z_iid=z_iid, z_boot=z_boot, mde=mde)
 
 if __name__ == '__main__':
