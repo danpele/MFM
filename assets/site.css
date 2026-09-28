@@ -572,3 +572,9 @@ body.no-scroll { overflow: hidden; }
 .cf { padding: 0.4rem 0.8rem 0.6rem; border-top: 1px solid #eef1f5; }
 .cf h5 { font-size: 0.8rem; color: var(--main-blue); margin-bottom: 0.2rem; }
 .cf-tex { font-size: 0.78rem; overflow-x: auto; overflow-y: hidden; }
+
+/* ---------------- quiz login (Google) ---------------- */
+.quiz-login { background: #f4f7fc; border: 1px solid #dbe3f0; border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1.2rem; }
+.quiz-login p { margin-bottom: 0.6rem; }
+.login-msg { color: var(--ida-red); font-size: 0.9rem; min-height: 1.2em; }
+.save-status { font-size: 0.9rem; color: var(--forest); min-height: 1.2em; }

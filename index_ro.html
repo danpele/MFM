@@ -27,7 +27,6 @@
     <script src="assets/config.js"></script>
     <script src="assets/course-data.js"></script>
     <script src="assets/showcase.js"></script>
-    <script src="assets/stats.js"></script>
     <script src="assets/quizzes/markets.js"></script>
     <script src="assets/quizzes/stylized.js"></script>
     <script src="assets/quizzes/efficiency.js"></script>
@@ -48,6 +47,7 @@
     <script src="assets/quizzes/systemic.js"></script>
     <script src="assets/quizzes/bubbles.js"></script>
     <script src="assets/quizzes/ml.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="assets/site.js"></script>
 </head>
 <body>
@@ -81,7 +81,6 @@
     <section class="hero" aria-label="Course at a glance">
         <div class="hero-inner">
             <p class="hero-tag" data-t="heroTag"></p>
-            <div class="hero-stats" id="hero-stats"></div>
             <div class="hero-cta">
                 <a class="btn btn-primary btn-lg" href="#chapters" data-t="heroCta1"></a>
                 <a class="btn btn-ghost btn-lg" href="#project" data-t="heroCta2"></a>
@@ -111,7 +110,7 @@
 
         <section id="quizzes">
             <h2 data-t="quizzes"></h2>
-            <div id="github-login" style="display: none;"></div>
+            <div id="quiz-login" class="quiz-login" style="display: none;"></div>
             <div class="quiz-tabs" id="quiz-tabs"></div>
             <div class="quiz-container" id="quiz-container"></div>
         </section>

@@ -57,23 +57,6 @@
     }
 
     // ------------------------------------------------------------
-    // HERO STATS
-    // ------------------------------------------------------------
-    function renderHero() {
-        const S = window.MFM_STATS || {};
-        const quiz = Object.values(D.quizzes).reduce((n, b) => n + b.questions.length, 0);
-        const fmt = n => Number(n).toLocaleString(LANG === 'ro' ? 'ro-RO' : 'en-GB');
-        const items = [
-            ['chapters', S.chapters || D.chapters.length],
-            ['slides', S.slides], ['seminar', S.seminar],
-            ['quantlets', S.quantlets], ['quiz', quiz], ['charts', S.charts]
-        ].filter(([, v]) => v);
-        $('hero-stats').innerHTML = items.map(([k, v]) =>
-            `<div class="stat"><span class="stat-num">${fmt(v)}</span><span class="stat-label">${T.stats[k]}</span></div>`
-        ).join('');
-    }
-
-    // ------------------------------------------------------------
     // LIGHTBOX (chapter charts)
     // ------------------------------------------------------------
     function openLightbox(src, caption) {
@@ -109,9 +92,7 @@
 
     function renderChapters() {
         $('chapters-grid').innerHTML = D.chapters.map(ch => {
-            const badge = (ch.available
-                ? `<span class="badge badge-live">${T.available}</span>`
-                : `<span class="badge badge-soon">${T.comingSoon}</span>`) +
+            const badge = (ch.available ? '' : `<span class="badge badge-soon">${T.comingSoon}</span>`) +
                 (ch.selfStudy ? `<span class="badge badge-self">${T.selfStudy}</span>` : '');
             const links = ch.available
                 ? ch.links[LANG].map(linkButton).join('')
@@ -189,58 +170,84 @@
     }
 
     // ------------------------------------------------------------
-    // GITHUB LOGIN (optional)
+    // GOOGLE SIGN-IN (ASE accounts) - required for the quizzes
+    // The ID token is kept only for this browser tab (sessionStorage) and sent with each score;
+    // the Apps Script backend verifies it with Google and takes name and e-mail from it.
     // ------------------------------------------------------------
+    const ALLOWED = ['ase.ro', 'stud.ase.ro'];
+    const session = {
+        get(k) { try { return sessionStorage.getItem('mfm-' + k); } catch (e) { return null; } },
+        set(k, v) { try { sessionStorage.setItem('mfm-' + k, v); } catch (e) { /* ignore */ } },
+        del(k) { try { sessionStorage.removeItem('mfm-' + k); } catch (e) { /* ignore */ } }
+    };
+
+    function decodeJwt(t) {
+        try {
+            const b = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(decodeURIComponent(atob(b).split('').map(c =>
+                '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+        } catch (e) { return null; }
+    }
+
     function getUser() {
-        const raw = store.get('github-user');
-        if (!raw) return null;
-        try { return JSON.parse(raw); } catch (e) { return null; }
+        const cred = session.get('google-credential');
+        const u = cred && decodeJwt(cred);
+        if (!u || u.exp * 1000 < Date.now()) return null;
+        return { name: u.name || u.email, email: u.email, credential: cred };
+    }
+
+    const loginEnabled = () => isConfigured(CFG.GOOGLE_CLIENT_ID);
+
+    function onGoogleCredential(resp) {
+        const u = decodeJwt(resp.credential);
+        const domain = u && String(u.email).split('@')[1];
+        if (!u || !ALLOWED.includes(domain)) {
+            $('login-msg').textContent = T.loginWrongDomain;
+            return;
+        }
+        session.set('google-credential', resp.credential);
+        renderLogin();
+        if (activeChapter) showQuiz(activeChapter);
     }
 
     function renderLogin() {
-        const box = $('github-login');
-        if (!isConfigured(CFG.GITHUB_CLIENT_ID) || !isConfigured(CFG.APPS_SCRIPT_URL)) {
-            box.style.display = 'none';
-            return;
-        }
+        const box = $('quiz-login');
+        if (!loginEnabled()) { box.style.display = 'none'; return; }
         box.style.display = '';
         const user = getUser();
         if (user) {
-            box.innerHTML = `<p>${T.loggedAs} <strong>${esc(user.name || user.login)}</strong>
-                <button class="btn btn-outline" id="gh-logout" style="margin-left:0.5rem;padding:0.2rem 0.6rem">${T.logout}</button></p>`;
-            $('gh-logout').onclick = () => { store.del('github-user'); renderLogin(); };
-        } else {
-            box.innerHTML = `<p>${T.loginPrompt}</p><button class="btn btn-primary" id="gh-login">${T.loginBtn}</button>`;
-            $('gh-login').onclick = loginWithGitHub;
+            box.innerHTML = `<p>${T.loggedAs} <strong>${esc(user.name)}</strong> (${esc(user.email)})
+                <button class="btn btn-outline" id="g-logout" style="margin-left:0.5rem;padding:0.2rem 0.6rem">${T.logout}</button></p>`;
+            $('g-logout').onclick = () => {
+                session.del('google-credential');
+                if (window.google && google.accounts) google.accounts.id.disableAutoSelect();
+                renderLogin();
+                if (activeChapter) showQuiz(activeChapter);
+            };
+            return;
         }
-    }
-
-    function loginWithGitHub() {
-        store.set('login-return', window.location.href);
-        const redirectUri = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'callback.html';
-        window.location.href = 'https://github.com/login/oauth/authorize?client_id=' + encodeURIComponent(CFG.GITHUB_CLIENT_ID) +
-            '&redirect_uri=' + encodeURIComponent(redirectUri) + '&scope=read:user';
+        box.innerHTML = `<p>${T.loginPrompt}</p><div id="g-button"></div><p class="login-msg" id="login-msg" aria-live="polite"></p>`;
+        const draw = () => {
+            google.accounts.id.initialize({ client_id: CFG.GOOGLE_CLIENT_ID, callback: onGoogleCredential, auto_select: true });
+            google.accounts.id.renderButton($('g-button'), { theme: 'outline', size: 'large', text: 'signin_with', locale: LANG });
+        };
+        if (window.google && google.accounts && google.accounts.id) draw();
+        else window.addEventListener('load', () => { if (window.google && google.accounts) draw(); });
     }
 
     function sendResults(ch, score, total) {
-        if (!isConfigured(CFG.APPS_SCRIPT_URL)) return;
-        const user = getUser() || {};
-        const payload = {
-            nume: user.name || user.login || 'Anonymous',
-            github_username: user.login || '',
-            grupa: store.get('student-group') || '',
-            capitol: 'Chapter ' + ch.num + ' (' + ch.id + ')',
-            limba: LANG,
-            scor: score + '/' + total,
-            total: total,
-            nota: Math.round((score / total) * 100) + '%'
-        };
-        fetch(CFG.APPS_SCRIPT_URL, {
+        const user = getUser();
+        const out = $('quiz-save-status');
+        if (!isConfigured(CFG.QUIZ_SCORES_URL) || !user) return;
+        out.textContent = T.saving;
+        // text/plain avoids a CORS preflight; the backend parses the JSON body
+        fetch(CFG.QUIZ_SCORES_URL, {
             method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        }).catch(err => console.log('Score submission error:', err));
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ credential: user.credential, chapter: ch.id, score, total, lang: LANG })
+        }).then(r => r.json()).then(j => {
+            out.textContent = j.ok ? T.saved : (j.error === 'token' ? T.saveExpired : T.saveFailed);
+        }).catch(() => { out.textContent = T.saveFailed; });
     }
 
     // ------------------------------------------------------------
@@ -285,6 +292,11 @@
             box.innerHTML = `${heading}<p class="quiz-intro">${T.quizSoon}</p>`;
             return;
         }
+        if (loginEnabled() && !getUser()) {
+            quiz = null;
+            box.innerHTML = `${heading}<p class="quiz-intro">${T.loginRequired}</p>`;
+            return;
+        }
         box.innerHTML = `${heading}
             <p class="quiz-intro">${T.quizIntro}</p>
             <div id="quiz-questions"></div>
@@ -293,6 +305,7 @@
                 <button class="btn btn-outline" id="quiz-reset">${T.reset}</button>
             </div>
             <p class="score-display" id="quiz-score-display" aria-live="polite"></p>
+            <p class="save-status" id="quiz-save-status" aria-live="polite"></p>
             <div id="quiz-answer-key"></div>`;
         $('quiz-score').onclick = calculateScore;
         $('quiz-reset').onclick = () => showQuiz(id);
@@ -362,7 +375,7 @@
         if (answered < total) msg += ` - ${total - answered} ${T.unanswered}`;
         msg += ' - ' + T.verdicts[pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 50 ? 1 : 0];
         $('quiz-score-display').textContent = msg;
-        sendResults(quiz.chapter, score, total);
+        if (!quiz.sent) { quiz.sent = true; sendResults(quiz.chapter, score, total); }
 
         const rows = quiz.items.map((it, k) => {
             const L = it.q[LANG];
@@ -385,7 +398,6 @@
     function init() {
         renderStatic();
         renderOverview();
-        renderHero();
         initLightbox();
         renderChapters();
         renderProject();
