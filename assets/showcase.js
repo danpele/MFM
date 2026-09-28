@@ -18,13 +18,22 @@
     ];
 
     D.formulas = [
+        // ---- course organisation / review
+        { g: 'returns', ch: 'markets', en: 'Sharpe ratio and its standard error', ro: 'Raportul Sharpe și eroarea sa standard',
+          tex: String.raw`$$\widehat{SR} = \frac{\bar r - r_f}{\hat\sigma}, \qquad \operatorname{se}(\widehat{SR}) \approx \sqrt{\frac{1 + \widehat{SR}^2/2}{T}} \;\;(\text{i.i.d.})$$` },
+        { g: 'returns', ch: 'markets', en: 'Maximum drawdown', ro: 'Scăderea maximă (maximum drawdown)',
+          tex: String.raw`$$\mathrm{MDD}_T = \max_{t \le T}\Big(1 - \frac{P_t}{\max_{s \le t} P_s}\Big)$$` },
+        { g: 'ml', ch: 'wrap-up', en: 'Minimum detectable effect', ro: 'Efectul minim detectabil',
+          tex: String.raw`$$\mathrm{MDE} = \big(z_{1-\alpha/2} + z_{1-\beta}\big)\,\operatorname{se}(\hat\theta) \approx 2.8\,\operatorname{se}(\hat\theta) \quad (\alpha = 5\%,\ 1-\beta = 80\%)$$` },
+        { g: 'ml', ch: 'wrap-up', en: 'Benjamini–Hochberg (false discovery rate)', ro: 'Benjamini–Hochberg (rata descoperirilor false)',
+          tex: String.raw`$$\text{reject } H_{(1)},\dots,H_{(k)}, \qquad k = \max\Big\{i : p_{(i)} \le \frac{i}{m}\,q\Big\}$$` },
         // ---- returns and efficiency
         { g: 'returns', ch: 'stylized', en: 'Log returns and time aggregation', ro: 'Randamente logaritmice și agregarea în timp',
           tex: String.raw`$$r_t = \ln P_t - \ln P_{t-1}, \qquad r_t^{(k)} = \sum_{i=0}^{k-1} r_{t-i}$$` },
         { g: 'returns', ch: 'stylized', en: 'Ljung–Box test', ro: 'Testul Ljung–Box',
           tex: String.raw`$$Q(m) = T(T+2)\sum_{k=1}^{m}\frac{\hat\rho_k^2}{T-k} \;\xrightarrow{d}\; \chi^2_m$$` },
         { g: 'returns', ch: 'stylized', en: 'Hill estimator of the tail index', ro: 'Estimatorul Hill al indicelui de coadă',
-          tex: String.raw`$$\hat\xi_k = \frac{1}{k}\sum_{i=1}^{k}\ln X_{(i)} - \ln X_{(k+1)}, \qquad X_{(1)} \ge X_{(2)} \ge \dots$$` },
+          tex: String.raw`$$\hat\xi_k = \frac{1}{k}\sum_{i=1}^{k}\ln X_{(i)} - \ln X_{(k+1)}$$` },
         { g: 'returns', ch: 'efficiency', en: 'Variance ratio', ro: 'Raportul varianțelor',
           tex: String.raw`$$VR(q) = \frac{\operatorname{Var}\big(r_t^{(q)}\big)}{q\operatorname{Var}(r_t)} = 1 + 2\sum_{k=1}^{q-1}\Big(1-\frac{k}{q}\Big)\rho_k$$` },
         // ---- factors and portfolios
@@ -100,22 +109,27 @@
           tex: String.raw`$$x\,y = k, \qquad p = \frac{y}{x}, \qquad \mathrm{IL}(r) = \frac{2\sqrt r}{1 + r} - 1, \;\; r = \frac{p_1}{p_0}$$` }
     ];
 
-    D.gallery = [
-        { src: 'charts/ch0_cross_asset_growth.png', ch: 'markets', en: 'Growth of 1 USD across asset classes, 2015–2026', ro: 'Creșterea a 1 USD pe clase de active, 2015–2026' },
-        { src: 'charts/ch1_hist_qq.png', ch: 'stylized', en: 'Fat tails: S&P 500 and Bitcoin against the Normal distribution', ro: 'Cozi groase: S&P 500 și Bitcoin față de distribuția Normală' },
-        { src: 'charts/ch3_factor_cum.png', ch: 'factors', en: 'Fama–French factors and momentum since 1963', ro: 'Factorii Fama–French și momentum din 1963' },
-        { src: 'charts/ch4_frontier.png', ch: 'portfolio', en: 'Efficient frontier of sector ETFs', ro: 'Frontiera eficientă a ETF-urilor sectoriale' },
-        { src: 'charts/ch5_sp500_vol.png', ch: 'garch', en: 'VIX against GARCH volatility, 2000–2026', ro: 'VIX față de volatilitatea GARCH, 2000–2026' },
-        { src: 'charts/ch6_copula_zoo.png', ch: 'dependence', en: 'Five copulas with the same Kendall tau', ro: 'Cinci copule cu același tau Kendall' },
-        { src: 'charts/ch7_gpd_tail.png', ch: 'var-es', en: 'Extreme value theory: GPD tails of daily losses', ro: 'Teoria valorilor extreme: cozi GPD ale pierderilor zilnice' },
-        { src: 'charts/ch8_traffic_light.png', ch: 'backtesting', en: 'Basel traffic light for four VaR 1% models', ro: 'Semaforul Basel pentru patru modele VaR 1%' },
-        { src: 'charts/ch11_gbm_fan.png', ch: 'continuous-time', en: 'Geometric Brownian motion: 20,000 paths of the S&P 500', ro: 'Mișcare browniană geometrică: 20.000 de traiectorii ale S&P 500' },
-        { src: 'charts/ch12_btc_smile.png', ch: 'options', en: 'Bitcoin volatility smiles with SVI fits', ro: 'Zâmbetele de volatilitate Bitcoin, ajustate SVI' },
-        { src: 'charts/ch13_deflated_sharpe.png', ch: 'ml', en: 'Deflated Sharpe ratio and the number of trials', ro: 'Deflated Sharpe Ratio și numărul de încercări' },
-        { src: 'charts/ch14_fan_chart.png', ch: 'tsfm', en: 'Chronos-2 zero-shot volatility forecast', ro: 'Prognoza zero-shot a volatilității cu Chronos-2' },
-        { src: 'charts/ch15_event_study.png', ch: 'llm', en: 'News sentiment: event study around headlines', ro: 'Sentimentul știrilor: studiu de eveniment în jurul titlurilor' },
-        { src: 'charts/ch17_lppls_btc2017.png', ch: 'bubbles', en: 'LPPLS on the 2017 Bitcoin bubble', ro: 'LPPLS pe bula Bitcoin din 2017' },
-        { src: 'charts/ch17_episodes.png', ch: 'bubbles', en: 'Nine run-ups and crashes aligned at the peak', ro: 'Nouă creșteri și prăbușiri aliniate la vârf' },
-        { src: 'charts/ch18_spill_network.png', ch: 'systemic', en: 'Volatility spillover network of US, European and Romanian banks', ro: 'Rețeaua de contagiune a volatilității: bănci din SUA, Europa și România' }
-    ];
+    // One representative chart per chapter, shown on the chapter card (click to enlarge)
+    D.chapterCharts = {
+        'markets': { src: 'charts/ch0_cross_asset_growth.png', en: 'Growth of 1 USD across asset classes, 2015–2026', ro: 'Creșterea a 1 USD pe clase de active, 2015–2026' },
+        'stylized': { src: 'charts/ch1_hist_qq.png', en: 'Fat tails: S&P 500 and Bitcoin against the Normal distribution', ro: 'Cozi groase: S&P 500 și Bitcoin față de distribuția Normală' },
+        'efficiency': { src: 'charts/ch2_rolling_hurst.png', en: 'Time-varying memory: rolling DFA exponents', ro: 'Memorie variabilă în timp: exponenți DFA pe ferestre mobile' },
+        'factors': { src: 'charts/ch3_factor_cum.png', en: 'Fama–French factors and momentum since 1963', ro: 'Factorii Fama–French și momentum din 1963' },
+        'portfolio': { src: 'charts/ch4_frontier.png', en: 'Efficient frontier of sector ETFs', ro: 'Frontiera eficientă a ETF-urilor sectoriale' },
+        'garch': { src: 'charts/ch5_sp500_vol.png', en: 'VIX against GARCH volatility, 2000–2026', ro: 'VIX față de volatilitatea GARCH, 2000–2026' },
+        'dependence': { src: 'charts/ch6_copula_zoo.png', en: 'Five copulas with the same Kendall tau', ro: 'Cinci copule cu același tau Kendall' },
+        'var-es': { src: 'charts/ch7_gpd_tail.png', en: 'Extreme value theory: GPD tails of daily losses', ro: 'Teoria valorilor extreme: cozi GPD ale pierderilor zilnice' },
+        'backtesting': { src: 'charts/ch8_traffic_light.png', en: 'Basel traffic light for four VaR 1% models', ro: 'Semaforul Basel pentru patru modele VaR 1%' },
+        'realized-vol': { src: 'charts/ch9_signature.png', en: 'Volatility signature plots: SPY and Bitcoin', ro: 'Grafice de semnătură a volatilității: SPY și Bitcoin' },
+        'microstructure': { src: 'charts/ch10_lob_snapshot.png', en: 'A limit order book and its average depth', ro: 'Un registru de ordine limită și adâncimea sa medie' },
+        'continuous-time': { src: 'charts/ch11_gbm_fan.png', en: 'Geometric Brownian motion: 20,000 paths of the S&P 500', ro: 'Mișcare browniană geometrică: 20.000 de traiectorii ale S&P 500' },
+        'options': { src: 'charts/ch12_btc_smile.png', en: 'Bitcoin volatility smiles with SVI fits', ro: 'Zâmbetele de volatilitate Bitcoin, ajustate SVI' },
+        'ml': { src: 'charts/ch13_deflated_sharpe.png', en: 'Deflated Sharpe ratio and the number of trials', ro: 'Deflated Sharpe Ratio și numărul de încercări' },
+        'tsfm': { src: 'charts/ch14_fan_chart.png', en: 'Chronos-2 zero-shot volatility forecast', ro: 'Prognoza zero-shot a volatilității cu Chronos-2' },
+        'llm': { src: 'charts/ch15_event_study.png', en: 'News sentiment: event study around headlines', ro: 'Sentimentul știrilor: studiu de eveniment în jurul titlurilor' },
+        'digital-assets': { src: 'charts/ch16_ust_collapse.png', en: 'The collapse of TerraUSD, May 2022', ro: 'Prăbușirea TerraUSD, mai 2022' },
+        'bubbles': { src: 'charts/ch17_lppls_btc2017.png', en: 'LPPLS on the 2017 Bitcoin bubble', ro: 'LPPLS pe bula Bitcoin din 2017' },
+        'systemic': { src: 'charts/ch18_spill_network.png', en: 'Volatility spillover network of US, European and Romanian banks', ro: 'Rețeaua de contagiune a volatilității: bănci din SUA, Europa și România' },
+        'wrap-up': { src: 'charts/ch19_bet_var.png', en: 'Case study: VaR 1% models on the BET index', ro: 'Studiu de caz: modele VaR 1% pe indicele BET' }
+    };
 })();

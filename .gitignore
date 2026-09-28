@@ -21,5 +21,8 @@ __pycache__/
 *_solutions.pdf
 *_solutions.ipynb
 
+# VOLARE realised measures (licensed for research use; download from volare.unime.it, not redistributed)
+data/volare/
+
 # stray file, not part of the site
 g.html

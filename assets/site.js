@@ -74,65 +74,24 @@
     }
 
     // ------------------------------------------------------------
-    // GALLERY (+ lightbox)
+    // LIGHTBOX (chapter charts)
     // ------------------------------------------------------------
-    function chapterOf(id) { return D.chapters.find(c => c.id === id); }
+    function openLightbox(src, caption) {
+        $('lightbox-img').src = src;
+        $('lightbox-img').alt = caption;
+        $('lightbox-cap').textContent = caption;
+        $('lightbox').hidden = false;
+        document.body.classList.add('no-scroll');
+        $('lightbox-close').focus();
+    }
 
-    function renderGallery() {
-        $('gallery').innerHTML = D.gallery.map((g, i) => {
-            const ch = chapterOf(g.ch);
-            return `<figure class="gallery-item">
-                <button type="button" class="gallery-open" data-i="${i}" aria-label="${esc(g[LANG])}">
-                    <img src="${g.src}" alt="${esc(g[LANG])}" loading="lazy">
-                </button>
-                <figcaption>${g[LANG]}${ch ? ` <a href="#chapter-${ch.id}">${T.toChapter} ${ch.num}</a>` : ''}</figcaption>
-            </figure>`;
-        }).join('');
+    function initLightbox() {
         const box = $('lightbox');
         const close = () => { box.hidden = true; document.body.classList.remove('no-scroll'); };
-        $('gallery').querySelectorAll('.gallery-open').forEach(b => {
-            b.onclick = () => {
-                const g = D.gallery[+b.dataset.i];
-                $('lightbox-img').src = g.src;
-                $('lightbox-img').alt = g[LANG];
-                $('lightbox-cap').textContent = g[LANG];
-                box.hidden = false;
-                document.body.classList.add('no-scroll');
-                $('lightbox-close').focus();
-            };
-        });
         $('lightbox-close').setAttribute('aria-label', T.close);
         $('lightbox-close').onclick = close;
         box.onclick = e => { if (e.target === box) close(); };
         document.addEventListener('keydown', e => { if (e.key === 'Escape' && !box.hidden) close(); });
-    }
-
-    // ------------------------------------------------------------
-    // FORMULAS (grouped, filterable)
-    // ------------------------------------------------------------
-    function renderFormulas() {
-        const groups = [{ id: 'all', en: T.allFormulas, ro: T.allFormulas }].concat(D.formulaGroups);
-        $('formula-filters').innerHTML = groups.map(g =>
-            `<button type="button" class="chip${g.id === 'all' ? ' active' : ''}" data-g="${g.id}" role="tab">${g[LANG]}</button>`
-        ).join('');
-        const gname = id => (D.formulaGroups.find(g => g.id === id) || {})[LANG] || '';
-        $('formula-grid').innerHTML = D.formulas.map(f => {
-            const ch = chapterOf(f.ch);
-            return `<div class="formula-card" data-g="${f.g}">
-                <div class="formula-head"><h4>${f[LANG]}</h4><span class="formula-group">${gname(f.g)}</span></div>
-                <div class="formula-tex">${f.tex}</div>
-                ${ch ? `<a class="formula-link" href="#chapter-${ch.id}">${T.toChapter} ${ch.num}: ${ch.title[LANG]} &rarr;</a>` : ''}
-            </div>`;
-        }).join('');
-        $('formula-filters').querySelectorAll('.chip').forEach(c => {
-            c.onclick = () => {
-                const g = c.dataset.g;
-                $('formula-filters').querySelectorAll('.chip').forEach(x => x.classList.toggle('active', x === c));
-                $('formula-grid').querySelectorAll('.formula-card').forEach(card => {
-                    card.hidden = !(g === 'all' || card.dataset.g === g);
-                });
-            };
-        });
     }
 
     // ------------------------------------------------------------
@@ -162,15 +121,31 @@
                   ch.quantinar.map(c => `<li><a href="${c.url}" target="_blank" rel="noopener">${esc(c.title)}</a></li>`).join('') +
                   '</ul></div>'
                 : '';
+            const chart = (D.chapterCharts || {})[ch.id];
+            const fig = chart
+                ? `<button type="button" class="chapter-chart" data-src="${chart.src}" data-cap="${esc(chart[LANG])}" title="${esc(chart[LANG])}">
+                       <img src="${chart.src}" alt="${esc(chart[LANG])}" loading="lazy"></button>`
+                : '';
+            const fs = (D.formulas || []).filter(f => f.ch === ch.id);
+            const formulas = fs.length
+                ? `<details class="chapter-formulas"><summary>${T.formulas} (${fs.length})</summary>` +
+                  fs.map(f => `<div class="cf"><h5>${f[LANG]}</h5><div class="cf-tex">${f.tex}</div></div>`).join('') +
+                  '</details>'
+                : '';
             return `<div class="chapter-card${ch.available ? '' : ' soon'}${ch.selfStudy ? ' self-study' : ''}" id="chapter-${ch.id}">
                 <div class="chapter-header"><h3>${T.chapter} ${ch.num}: ${ch.title[LANG]}</h3><div class="badges">${badge}</div></div>
+                ${fig}
                 <div class="chapter-body">
                     <ul>${ch.topics[LANG].map(t => `<li>${t}</li>`).join('')}</ul>
+                    ${formulas}
                     <div class="chapter-links">${links}</div>
                     ${qn}
                 </div>
             </div>`;
         }).join('');
+        $('chapters-grid').querySelectorAll('.chapter-chart').forEach(b => {
+            b.onclick = () => openLightbox(b.dataset.src, b.dataset.cap);
+        });
     }
 
     // ------------------------------------------------------------
@@ -411,8 +386,7 @@
         renderStatic();
         renderOverview();
         renderHero();
-        renderGallery();
-        renderFormulas();
+        initLightbox();
         renderChapters();
         renderProject();
         renderResources();
