@@ -439,6 +439,7 @@
                 projectTitle: 'Team Project and the Use of AI',
                 aiTitle: 'Using AI in this course',
                 templates: 'Templates for your repository',
+                attendanceForm: 'Attendance form (fill it in during each lecture and seminar, with the code on the board)',
                 quizzes: 'Self-Assessment Quizzes',
                 quizIntro: 'Each attempt draws 20 questions at random from the chapter bank and shuffles the answers. An answer is locked once selected.',
                 loginPrompt: 'Log in with GitHub to record your quiz scores:',
@@ -489,6 +490,7 @@
                 projectTitle: 'Proiectul de echipă și utilizarea AI',
                 aiTitle: 'Utilizarea AI în acest curs',
                 templates: 'Șabloane pentru repository-ul vostru',
+                attendanceForm: 'Formularul de prezență (se completează la fiecare curs și seminar, cu codul de pe tablă)',
                 quizzes: 'Quiz-uri de autoevaluare',
                 quizIntro: 'La fiecare încercare se extrag aleator 20 de întrebări din banca de întrebări a capitolului, iar variantele de răspuns sunt amestecate. Răspunsul se blochează după selectare.',
                 loginPrompt: 'Autentifică-te cu GitHub pentru a înregistra scorurile:',
@@ -528,14 +530,14 @@
                 { h: 'Course', p: ['Modelling Financial Markets', "Master's programme Applied Statistics and Data Science", 'Bucharest University of Economic Studies'] },
                 { h: 'Schedule', p: ['<strong>Lectures:</strong> 2 hours/week', '<strong>Seminars:</strong> 2 hours/week', 'Academic year 2026/2027'] },
                 { h: 'Prerequisites', p: ['Probability &amp; statistics', 'Econometrics / time series', 'Python programming'] },
-                { h: 'Assessment', p: ['Team project (GitHub + presentation + oral defence): 70%', 'Quizzes &amp; activity: 20%', 'Attendance: 10%'] },
+                { h: 'Assessment', p: ['Team project (GitHub + presentation + oral defence): 70%', 'Quizzes &amp; activity: 20%', 'Attendance: 10% (at least 4 lectures and 4 seminars)'] },
                 { h: 'Tools', p: ['Python, Jupyter / Google Colab', 'GitHub, Quantlet, Quantinar'] }
             ],
             ro: [
                 { h: 'Curs', p: ['Modelarea piețelor financiare', 'Masterul Statistică aplicată și Data Science', 'Academia de Studii Economice din București'] },
                 { h: 'Orar', p: ['<strong>Curs:</strong> 2 ore/săptămână', '<strong>Seminar:</strong> 2 ore/săptămână', 'Anul universitar 2026/2027'] },
                 { h: 'Cunoștințe necesare', p: ['Probabilități și statistică', 'Econometrie / serii de timp', 'Programare în Python'] },
-                { h: 'Evaluare', p: ['Proiect în echipă (GitHub + prezentare + susținere orală): 70%', 'Quiz-uri și activitate: 20%', 'Prezență: 10%'] },
+                { h: 'Evaluare', p: ['Proiect în echipă (GitHub + prezentare + susținere orală): 70%', 'Quiz-uri și activitate: 20%', 'Prezență: 10% (cel puțin 4 cursuri și 4 seminarii)'] },
                 { h: 'Instrumente', p: ['Python, Jupyter / Google Colab', 'GitHub, Quantlet, Quantinar'] }
             ]
         },

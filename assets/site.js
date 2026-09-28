@@ -107,7 +107,9 @@
         $('ai-policy').innerHTML = D.aiPolicy[LANG].map(o => `<li>${o}</li>`).join('');
         // templates in the page language first
         const tpl = D.projectTemplates.slice().sort((a, b) => (b.lang === LANG) - (a.lang === LANG));
-        $('project-templates').innerHTML = tpl.map(t =>
+        const form = isConfigured(CFG.ATTENDANCE_FORM_URL)
+            ? `<li><a href="${CFG.ATTENDANCE_FORM_URL}" target="_blank" rel="noopener"><strong>${T.attendanceForm}</strong></a></li>` : '';
+        $('project-templates').innerHTML = form + tpl.map(t =>
             `<li><a href="${t.href}" target="_blank" rel="noopener">${t[LANG]}</a></li>`
         ).join('');
     }
