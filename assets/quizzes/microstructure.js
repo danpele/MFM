@@ -11,7 +11,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
             "correct": 2,
             "en": {
                 "title": "Roll with autocorrelated order flow",
-                "text": "In the Roll model, trade signs have Corr(q_t, q_{t-1}) = 0.5 (split orders) and carry no information. Relative to the true half-spread c, the Roll estimator sqrt(-Cov(dp_t, dp_{t-1}))...",
+                "text": "In the Roll model, trade signs form a symmetric stationary Markov chain with Corr(q_t, q_{t-k}) = 0.5^k (split orders), independent of efficient-price innovations and without information. Relative to the true half-spread c, the Roll estimator sqrt(-Cov(dp_t, dp_{t-1}))...",
                 "options": [
                     "...overestimates c, because persistent flow adds negative autocorrelation",
                     "...is unbiased, because the efficient price is still a random walk",
@@ -23,7 +23,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
             },
             "ro": {
                 "title": "Roll cu flux de ordine autocorelat",
-                "text": "În modelul Roll, semnele tranzacțiilor au Corr(q_t, q_{t-1}) = 0,5 (ordine împărțite) și nu conțin informație. Față de jumătatea adevărată de spread c, estimatorul Roll sqrt(-Cov(dp_t, dp_{t-1}))...",
+                "text": "În modelul Roll, semnele tranzacțiilor formează un lanț Markov simetric și staționar cu Corr(q_t, q_{t-k}) = 0,5^k (ordine împărțite), independent de inovațiile prețului eficient și fără informație. Față de jumătatea adevărată de spread c, estimatorul Roll sqrt(-Cov(dp_t, dp_{t-1}))...",
                 "options": [
                     "...supraestimează c, fiindcă fluxul persistent adaugă autocorelație negativă",
                     "...este nedeplasat, fiindcă prețul eficient rămâne un mers aleator",
@@ -208,7 +208,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "No estimate: the square root of a negative number does not exist"
                 ],
                 "correctExplanation": "With positive autocovariance, -Cov is negative and the estimator is undefined.",
-                "incorrectExplanation": "The formula 2 sqrt(-Cov) needs a negative covariance; positive values come from trends, stale prices or split orders."
+                "incorrectExplanation": "The formula 2 sqrt(-Cov) needs a non-positive sample covariance for a real-valued result. Positive sample values can arise from sampling error even when the Roll model holds, or from departures from its assumptions (trends, stale prices)."
             },
             "ro": {
                 "title": "Când Roll eșuează",
@@ -220,7 +220,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Nicio estimare: rădăcina pătrată a unui număr negativ nu există"
                 ],
                 "correctExplanation": "Cu autocovarianță pozitivă, -Cov este negativă și estimatorul nu este definit.",
-                "incorrectExplanation": "Formula 2 sqrt(-Cov) cere o covarianță negativă; valorile pozitive vin din tendințe, prețuri vechi sau ordine împărțite."
+                "incorrectExplanation": "Formula 2 sqrt(-Cov) cere o covarianță de selecție nepozitivă pentru un rezultat real. Valorile de selecție pozitive pot apărea din eroarea de selecție chiar când modelul Roll este adevărat sau din abateri de la ipotezele lui (tendințe, prețuri vechi)."
             }
         },
         {
@@ -254,9 +254,9 @@ window.MFM_DATA.quizzes['microstructure'] = {
             "correct": 2,
             "en": {
                 "title": "Frequency matters",
-                "text": "For SPY, daily Corwin-Schultz gives about 22 bp while one price step is about 0.2 bp. What explains the gap?",
+                "text": "For SPY, daily Corwin-Schultz gives about 27 bp while one price step is about 0.2 bp. What explains the gap?",
                 "options": [
-                    "The SPY spread is really 22 bp",
+                    "The SPY spread is really 27 bp",
                     "The data are wrong",
                     "On daily data the high-low range is dominated by volatility",
                     "The estimator only works for crypto-assets"
@@ -266,9 +266,9 @@ window.MFM_DATA.quizzes['microstructure'] = {
             },
             "ro": {
                 "title": "Frecvența contează",
-                "text": "Pentru SPY, Corwin-Schultz zilnic dă circa 22 pb, iar un pas de cotare este circa 0,2 pb. Ce explică diferența?",
+                "text": "Pentru SPY, Corwin-Schultz zilnic dă circa 27 pb, iar un pas de cotare este circa 0,2 pb. Ce explică diferența?",
                 "options": [
-                    "Spread-ul SPY este chiar de 22 pb",
+                    "Spread-ul SPY este chiar de 27 pb",
                     "Datele sunt greșite",
                     "Pe date zilnice, intervalul maxim-minim este dominat de volatilitate",
                     "Estimatorul funcționează doar pentru cripto-active"
@@ -288,19 +288,19 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "The number of trades per day",
                     "The volatility of volume"
                 ],
-                "correctExplanation": "ILLIQ = average of |r| / traded value: the price move caused by one unit of trading.",
+                "correctExplanation": "ILLIQ is the average of the daily ratios |r_d| / traded value_d: an illiquidity proxy measuring absolute return per unit of money traded, not an identified causal impact.",
                 "incorrectExplanation": "Amihud divides the absolute daily return by the traded value, giving price impact per unit of money."
             },
             "ro": {
                 "title": "Raportul Amihud",
-                "text": "Ce măsoară raportul de iliciditate Amihud?",
+                "text": "Ce măsoară raportul de ilichiditate Amihud?",
                 "options": [
                     "Randamentul absolut mediu per unitate de bani tranzacționați",
                     "Spread-ul cotat împărțit la preț",
                     "Numărul de tranzacții pe zi",
                     "Volatilitatea volumului"
                 ],
-                "correctExplanation": "ILLIQ = media |r| / valoarea tranzacționată: mișcarea de preț produsă de o unitate de tranzacționare.",
+                "correctExplanation": "ILLIQ este media rapoartelor zilnice |r_d| / valoarea tranzacționată_d: o aproximare a ilichidității, randamentul absolut per unitate de bani tranzacționați, nu un impact cauzal identificat.",
                 "incorrectExplanation": "Amihud împarte randamentul zilnic absolut la valoarea tranzacționată, obținând impactul per unitate de bani."
             }
         },
@@ -401,15 +401,15 @@ window.MFM_DATA.quizzes['microstructure'] = {
             },
             "ro": {
                 "title": "Lichiditatea și VIX",
-                "text": "Cum este legată iliciditatea intrazilnică a SPY de VIX?",
+                "text": "Cum este legată ilichiditatea intrazilnică a SPY de VIX?",
                 "options": [
                     "Crește când crește VIX, aproape proporțional",
                     "Scade când crește VIX",
                     "Nu are legătură cu VIX",
                     "Depinde doar de ziua săptămânii"
                 ],
-                "correctExplanation": "Elasticitatea logaritmului iliciditații în raport cu logaritmul VIX este circa 0,95: lichiditatea dispare când volatilitatea crește.",
-                "incorrectExplanation": "Formatorii de piață lărgesc cotațiile și reduc adâncimea când riscul crește, deci iliciditatea și VIX evoluează împreună."
+                "correctExplanation": "Elasticitatea logaritmului ilichidității în raport cu logaritmul VIX este circa 0,95: lichiditatea dispare când volatilitatea crește.",
+                "incorrectExplanation": "Formatorii de piață lărgesc cotațiile și reduc adâncimea când riscul crește, deci ilichiditatea și VIX evoluează împreună."
             }
         },
         {
@@ -605,26 +605,26 @@ window.MFM_DATA.quizzes['microstructure'] = {
             "correct": 2,
             "en": {
                 "title": "Roll in small samples",
-                "text": "For SPY 5-minute bars (77 returns a day) the within-day Roll covariance is positive on about 41% of days. Under the Roll model with a one-tick spread, a Monte Carlo gives about 45%. What follows?",
+                "text": "For SPY 5-minute bars (77 returns a day) the within-day Roll covariance is positive on about 41% of days. Under the Roll model with a one-tick spread, a Monte Carlo gives about 45% (95% band 43% to 48%). What follows?",
                 "options": [
                     "The Roll model is rejected, since a true bounce gives negative covariances",
                     "The market is inefficient on 41% of days",
-                    "Positive days are not evidence against Roll: with c/sigma near 0.01 the covariance is almost as often positive as negative",
+                    "Positive days alone are not evidence against Roll: with c/sigma near 0.01 they occur almost half the time; the observed share is even below the band, i.e. more negative autocorrelation than a one-tick bounce",
                     "The spread of SPY is about 41% of a tick"
                 ],
-                "correctExplanation": "Harris (1990): when c^2 is small relative to sigma^2 / sqrt(T), P(Cov-hat > 0) is close to one half even if the model holds; demeaning adds a further negative bias.",
+                "correctExplanation": "Harris (1990): when c^2 is small relative to sigma^2 / sqrt(T), P(Cov-hat > 0) is close to one half even if the model holds. The observed 41% lies below the one-tick band, so the data are more, not less, negatively autocorrelated than a one-tick bounce.",
                 "incorrectExplanation": "Compare the observed share with the sampling distribution under the null: a tiny bounce relative to volatility gives little power in 77 observations."
             },
             "ro": {
                 "title": "Roll în eșantioane mici",
-                "text": "Pentru barele SPY de 5 minute (77 de randamente pe zi), covarianța Roll din cursul zilei este pozitivă în circa 41% din zile. Sub modelul Roll cu un spread de un pas, o simulare Monte Carlo dă circa 45%. Ce rezultă?",
+                "text": "Pentru barele SPY de 5 minute (77 de randamente pe zi), covarianța Roll din cursul zilei este pozitivă în circa 41% din zile. Sub modelul Roll cu un spread de un pas, o simulare Monte Carlo dă circa 45% (banda 95%: între 43% și 48%). Ce rezultă?",
                 "options": [
                     "Modelul Roll este respins, fiindcă o oscilație adevărată dă covarianțe negative",
                     "Piața este ineficientă în 41% din zile",
-                    "Zilele pozitive nu sunt o dovadă împotriva Roll: cu c/sigma aproape de 0,01, covarianța este aproape la fel de des pozitivă ca negativă",
+                    "Zilele pozitive nu sunt, singure, o dovadă împotriva Roll: cu c/sigma aproape de 0,01, apar în aproape jumătate din zile; ponderea observată este chiar sub bandă, adică o autocorelație mai negativă decât o oscilație de un pas",
                     "Spread-ul SPY este circa 41% dintr-un pas"
                 ],
-                "correctExplanation": "Harris (1990): când c^2 este mic față de sigma^2 / sqrt(T), P(Cov-estimat > 0) este aproape de o jumătate chiar dacă modelul este adevărat; demedierea adaugă o deplasare negativă.",
+                "correctExplanation": "Harris (1990): când c^2 este mic față de sigma^2 / sqrt(T), P(Cov-estimat > 0) este aproape de o jumătate chiar dacă modelul este adevărat. Cei 41% observați sunt sub banda pentru un pas, deci datele sunt mai negativ autocorelate, nu mai puțin, decât o oscilație de un pas.",
                 "incorrectExplanation": "Comparați ponderea observată cu distribuția de selecție sub ipoteza nulă: o oscilație minusculă față de volatilitate dă putere mică în 77 de observații."
             }
         },
@@ -643,16 +643,16 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "incorrectExplanation": "An unexpected rise in illiquidity raises required returns, so current prices fall on each of the three markets."
             },
             "ro": {
-                "title": "Șocurile de iliciditate",
-                "text": "La seminar, cum reacționează randamentele lunare ale pieței la o creștere neașteptată a iliciditații?",
+                "title": "Șocurile de ilichiditate",
+                "text": "La seminar, cum reacționează randamentele lunare ale pieței la o creștere neașteptată a ilichidității?",
                 "options": [
                     "Cresc, pe toate cele trei piețe",
                     "Scad, pe BVB, în SUA și pe piața cripto",
                     "Scad doar în SUA",
                     "Nu reacționează"
                 ],
-                "correctExplanation": "Coeficientul șocului de iliciditate este negativ, cu statistici t apropiate de -4 pe toate cele trei piețe, cum prezice Amihud (2002).",
-                "incorrectExplanation": "O creștere neașteptată a iliciditații crește randamentele cerute, deci prețurile curente scad pe fiecare dintre cele trei piețe."
+                "correctExplanation": "Coeficientul șocului de ilichiditate este negativ, cu statistici t apropiate de -4 pe toate cele trei piețe, cum prezice Amihud (2002).",
+                "incorrectExplanation": "O creștere neașteptată a ilichidității crește randamentele cerute, deci prețurile curente scad pe fiecare dintre cele trei piețe."
             }
         },
         {
@@ -664,9 +664,9 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "The factor should be 1, not 2",
                     "The Roll estimator uses the variance of price changes, not their autocovariance",
                     "The autocovariance should be computed from prices, not price changes",
-                    "A positive autocovariance contradicts the Roll model, so the estimator is undefined; report it as missing or use another estimator, such as a high-low one"
+                    "A positive sample autocovariance makes the unmodified Roll estimator undefined over the real numbers, although it can arise through sampling error; report it as missing or use another estimator, such as a high-low one"
                 ],
-                "correctExplanation": "The Roll model implies Cov(dp_t, dp_{t-1}) = -c^2 < 0. A positive value means bid-ask bounce does not dominate the sample (trends, stale prices), and taking the absolute value produces a spread that has no basis in the model (Roll, 1984; Hasbrouck, 2007).",
+                "correctExplanation": "The Roll model implies a negative population autocovariance, -c^2. A sample value can still be positive, through sampling error or departures from the model (trends, stale prices); either way the square root is undefined, and taking the absolute value produces a spread with no basis in the model (Roll, 1984; Hasbrouck, 2007).",
                 "incorrectExplanation": "The formula s = 2 sqrt(-Cov) is right; the error is forcing a positive autocovariance into it with an absolute value."
             },
             "ro": {
@@ -676,9 +676,9 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Factorul ar trebui să fie 1, nu 2",
                     "Estimatorul Roll folosește varianța variațiilor de preț, nu autocovarianța lor",
                     "Autocovarianța ar trebui calculată din prețuri, nu din variațiile lor",
-                    "O autocovarianță pozitivă contrazice modelul Roll, deci estimatorul nu este definit; raportați-l ca lipsă sau folosiți alt estimator, de exemplu unul maxim-minim"
+                    "O autocovarianță de selecție pozitivă face ca estimatorul Roll nemodificat să nu fie definit în numere reale, deși poate apărea din eroarea de selecție; raportați-l ca lipsă sau folosiți alt estimator, de exemplu unul maxim-minim"
                 ],
-                "correctExplanation": "Modelul Roll implică Cov(dp_t, dp_{t-1}) = -c^2 < 0. O valoare pozitivă arată că oscilația bid-ask nu domină eșantionul (tendințe, prețuri învechite), iar valoarea absolută produce un spread fără nicio bază în model (Roll, 1984; Hasbrouck, 2007).",
+                "correctExplanation": "Modelul Roll implică o autocovarianță negativă în populație, -c^2. O valoare de selecție poate fi totuși pozitivă, din eroarea de selecție sau din abateri de la model (tendințe, prețuri învechite); în ambele cazuri rădăcina nu este definită, iar valoarea absolută produce un spread fără nicio bază în model (Roll, 1984; Hasbrouck, 2007).",
                 "incorrectExplanation": "Formula s = 2 sqrt(-Cov) este corectă; greșeala este forțarea unei autocovarianțe pozitive în formulă prin valoarea absolută."
             }
         },
@@ -698,7 +698,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
             },
             "ro": {
                 "title": "Găsiți eroarea AI: raportul Amihud",
-                "text": "Un asistent AI scrie: „Iliciditatea Amihud a unei acțiuni este media pe zile a lui |r_d| împărțit la numărul de acțiuni tranzacționate în ziua d.” Ce este greșit?",
+                "text": "Un asistent AI scrie: „Ilichiditatea Amihud a unei acțiuni este media pe zile a lui |r_d| împărțit la numărul de acțiuni tranzacționate în ziua d.” Ce este greșit?",
                 "options": [
                     "Numărătorul ar trebui să fie pătratul randamentului, nu randamentul absolut",
                     "Numitorul trebuie să fie valoarea tranzacționată (preț ori număr de acțiuni, în bani), nu numărul de acțiuni",

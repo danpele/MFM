@@ -44,6 +44,10 @@ ASSETS = {
 }
 GROUPS = {g: [k for k, v in ASSETS.items() if v[2] == g] for g in ('US', 'BVB', 'Crypto')}
 LABELS = {k: v[1] for k, v in ASSETS.items()}
+# evenimente de ajustare mari care sunt dividende in numerar, nu split-uri (verificate la emitent):
+#   SNN.RO 2018-12-21: dividend brut de 1,61 lei pe actiune, data ex 21.12.2018
+#   (https://www.nuclearelectrica.ro/wp-content/uploads/2018/12/SNN_Comunicat-plata-dividende-suplimentare_EN.pdf)
+CASH_DIVIDENDS = {'SNN.RO': ['2018-12-21']}
 
 _CACHE = {}
 
@@ -98,10 +102,13 @@ def ohlc(key, start='2016-09-19', end=END):
     return _clean(key, d)[['open', 'high', 'low', 'close', 'volume']]
 
 
-def split_adjusted_close(d):
-    """Pretul de inchidere ajustat DOAR pentru split-uri (aceeasi baza ca volumul in numar de actiuni)."""
+def split_adjusted_close(d, symbol=None):
+    """Pretul de inchidere ajustat DOAR pentru split-uri si actiuni gratuite (aceeasi baza ca volumul in numar de
+    actiuni); dividendele in numerar mari din CASH_DIVIDENDS nu sunt tratate ca split-uri."""
     k = (d['close'].shift(1) / d['close']) / (d['adjusted_close'].shift(1) / d['adjusted_close'])
     k = k.where(np.abs(np.log(k)) > 0.15, 1.0).fillna(1.0)      # zilele de split: raportul de divizare
+    for day in CASH_DIVIDENDS.get(symbol, []):
+        k.loc[k.index == pd.Timestamp(day)] = 1.0
     back = k[::-1].cumprod()[::-1].shift(-1).fillna(1.0)          # produsul split-urilor ulterioare fiecarei zile
     return d['close'] / back
 
@@ -120,7 +127,7 @@ def dollar_volume(key, start='2016-09-19', end=END):
     if grp == 'Crypto':
         dv = d['volume']                                          # deja in USD
     else:
-        dv = split_adjusted_close(d) * d['volume']
+        dv = split_adjusted_close(d, ASSETS[key][0]) * d['volume']
         if grp == 'BVB':                                          # RON -> USD la cursul de referinta BNR
             fx = read_reference_rate('USD', start='2014-01-01', end=end)
             dv = dv / fx.reindex(dv.index).ffill()

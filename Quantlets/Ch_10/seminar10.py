@@ -4,9 +4,9 @@ seminar10.py -- Calculele Seminarului 10 (MFM): microstructura pietei
 Partea A: derivari -- momentele si eroarea standard a estimatorului Roll, Glosten-Milgrom pentru theta general,
           echilibrul Kyle, Almgren-Chriss prin ecuatia Euler-Lagrange, verosimilitatea PIN (pas cu pas).
 Partea B: tiparul intrazilnic SPY, estimatori de spread la doua frecvente (si o simulare Monte Carlo a modelului Roll),
-          iliciditatea si VIX (cu test de ruptura), iliciditatea Amihud pe trei piete, relatia volum - miscare de pret
+          ilichiditatea si VIX (cu test de ruptura), ilichiditatea Amihud pe trei piete, relatia volum - miscare de pret
           (cu variabila instrumentala), tiparul orar Bitcoin, descoperirea pretului intre ETF-ul pe BET si indice.
-Partea C: prima de iliciditate (Amihud, 2002) pe BVB, in SUA si pe piata cripto.
+Partea C: prima de ilichiditate (Amihud, 2002) pe BVB, in SUA si pe piata cripto.
 Cifrele sunt salvate in sem10_results.json.
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """
@@ -235,21 +235,31 @@ def b2_spreads():
     tick = 1e4 * (0.01 / E['price']).mean()
     # date zilnice: bootstrap pe blocuri mobile de 20 de zile
     d = ohlc('SPY', START2)
-    cs = cs_spread(d['high'], d['low'])
+    cs = cs_spread(d['high'], d['low'], d['close'])
     ar2 = ar_terms(d['close'], d['high'], d['low'])
+    dp = np.diff(np.log(d['close'].values))
+    pairs = np.column_stack([dp[1:], dp[:-1]])                # perechile (dp_t, dp_{t-1}) pentru covarianta Roll
+    roll_cov = lambda x: np.mean(x[:, 0] * x[:, 1]) - x[:, 0].mean() * x[:, 1].mean()
     rng = np.random.default_rng(SEED)
     n, L = len(cs), 20
-    csb, arb = [], []
+    csb, arb, rlb = [], [], []
     for _ in range(B):
-        st = rng.integers(0, n - L, n // L + 1)
+        st = rng.integers(0, n - L + 1, n // L + 1)             # inceputurile posibile ale blocurilor: 0, ..., n - L
         idx = np.concatenate([np.arange(a, a + L) for a in st])[:n]
         csb.append(1e4 * cs[idx].mean())
         arb.append(1e4 * np.sqrt(max(ar2[idx].mean(), 0)))
+        ip = np.minimum(idx, len(pairs) - 1)
+        rlb.append(roll_cov(pairs[ip]))
+    rlb = np.array(rlb)
+    roll_d = 1e4 * 2 * np.sqrt(max(-roll_cov(pairs), 0))
+    rlb_s = 1e4 * 2 * np.sqrt(np.maximum(-rlb, 0))
     sd_daily = 1e4 * np.log(d['close']).diff().std()
     return dict(roll5=roll5, rlo=rlo, rhi=rhi, cs5=cs5, clo=clo, chi=chi, ar5=ar5, alo=alo, ahi=ahi, tick=tick,
                 cs_d=1e4 * cs.mean(), cs_dlo=float(np.percentile(csb, 2.5)), cs_dhi=float(np.percentile(csb, 97.5)),
                 ar_d=1e4 * np.sqrt(max(ar2.mean(), 0)), ar_dlo=float(np.percentile(arb, 2.5)),
-                ar_dhi=float(np.percentile(arb, 97.5)), sd_daily=sd_daily, share_negcov=float((E['cov'] < 0).mean()))
+                ar_dhi=float(np.percentile(arb, 97.5)), sd_daily=sd_daily, share_negcov=float((E['cov'] < 0).mean()),
+                roll_d=float(roll_d), roll_dlo=float(np.percentile(rlb_s, 2.5)), roll_dhi=float(np.percentile(rlb_s, 97.5)),
+                roll_d_pos=float((rlb >= 0).mean()))
 
 
 def b3_cross():
@@ -361,6 +371,10 @@ def b6_sqrt():
     # pe barele individuale (nu pe grupe)
     y = np.log(x['r'].abs() + 1e-6) - np.log(x.groupby('date')['r'].transform('std'))
     raw = sm.OLS(y, sm.add_constant(np.log(x['part']))).fit(cov_type='cluster', cov_kwds={'groups': pd.factorize(x['date'])[0]})
+    # randamentele nule: ln|r| nu este definit; constanta 1e-6 (0,01 pb) si, ca sensibilitate, excluderea barelor cu r = 0
+    nz = (x['r'] != 0).values
+    raw_nz = sm.OLS(y[nz], sm.add_constant(np.log(x['part'][nz]))).fit(cov_type='cluster',
+                                                                       cov_kwds={'groups': pd.factorize(x['date'][nz])[0]})
     # (c) variabila instrumentala: volumul relativ al aceleiasi bare (aceeasi ora) din ziua precedenta
     x = x.assign(ly=y, lv=np.log(x['part']))
     x['lv_lag'] = x.groupby('tod')['lv'].shift(1)             # barele sunt ordonate in timp; shift pe ora = ziua anterioara
@@ -378,7 +392,8 @@ def b6_sqrt():
     se_iv = np.sqrt(np.diag(A @ meat @ A))
     red = np.corrcoef(z['ly'], z['ly_lag'])[0, 1]            # |r| de ieri la aceeasi ora: canalul care incalca excluderea
     return dict(slope=float(slope), lo=float(lo), hi=float(hi), n=int(len(x)), n_days=int(len(days)),
-                raw=float(raw.params.iloc[1]), raw_se=float(raw.bse.iloc[1]), fs=float(fs.params.iloc[1]),
+                raw=float(raw.params.iloc[1]), raw_se=float(raw.bse.iloc[1]), zero_share=float(1 - nz.mean()),
+                raw_nz=float(raw_nz.params.iloc[1]), raw_nz_se=float(raw_nz.bse.iloc[1]), fs=float(fs.params.iloc[1]),
                 fs_t=float(fs.tvalues.iloc[1]), iv=float(b_iv[1]), iv_se=float(se_iv[1]), n_iv=int(len(z)),
                 corr_absr_lag=float(red))
 
@@ -402,11 +417,14 @@ def b7_btc():
                 asia=float(1e4 * b['r'].abs()[(~wk) & (h >= 3) & (h < 11)].mean()))
 
 
-def b8_price_discovery(p=1, B=B, L=20, seed=SEED):
+def b8_price_discovery(B=B, L=20, seed=SEED):
     """ETF-ul Patria-TVBETETF si indicele BET-TR: VECM cu vectorul (1, -1), limitele ponderii Hasbrouck, ponderea
     Gonzalo-Granger; intervale bootstrap pe blocuri mobile (blocuri de L zile) ale perechilor (X_t, Y_t) din VECM;
     apoi cele doua jumatati ale esantionului."""
+    from statsmodels.tsa.vector_ar.vecm import coint_johansen, select_order
     y = bet_etf_pair().values
+    p = max(int(select_order(y, maxlags=10, deterministic='co').bic), 1)   # BIC pe 1..10 decalaje ale lui dy
+    jo = coint_johansen(y, 0, p)                                           # constanta nerestrictionata
     base = price_discovery(y, p)
     dy = np.diff(y, axis=0)
     z = (y[:, 0] - y[:, 1])[:-1]
@@ -416,7 +434,7 @@ def b8_price_discovery(p=1, B=B, L=20, seed=SEED):
     n = len(Y)
     draws = []
     for _ in range(B):
-        st = rng.integers(0, n - L, n // L + 1)
+        st = rng.integers(0, n - L + 1, n // L + 1)
         idx = np.concatenate([np.arange(a, a + L) for a in st])[:n]
         Xb, Yb = X[idx], Y[idx]
         Bb = np.linalg.lstsq(Xb, Yb, rcond=None)[0]
@@ -439,11 +457,12 @@ def b8_price_discovery(p=1, B=B, L=20, seed=SEED):
                 is_idx_hi=float(base['is_hi'][1]), ci_a_etf=ci(0), ci_a_idx=ci(1), ci_cs_idx=ci(2), ci_is_lo=ci(3),
                 ci_is_hi=ci(4), h1_a_etf=float(h1['alpha'][0]), h1_t_etf=float(h1['t'][0]), h2_a_etf=float(h2['alpha'][0]),
                 h2_t_etf=float(h2['t'][0]), h1_a_idx=float(h1['alpha'][1]), h2_a_idx=float(h2['alpha'][1]),
-                h1_t_idx=float(h1['t'][1]), h2_t_idx=float(h2['t'][1]), corr=base['corr'], n=int(base['n']))
+                h1_t_idx=float(h1['t'][1]), h2_t_idx=float(h2['t'][1]), corr=base['corr'], n=int(base['n']), p=p,
+                trace=float(jo.lr1[0]), cv=float(jo.cvt[0, 1]), trace1=float(jo.lr1[1]), cv1=float(jo.cvt[1, 1]))
 
 
 # =============================================================================
-# PARTEA C: prima de iliciditate (Amihud 2002, efectul in serie de timp)
+# PARTEA C: prima de ilichiditate (Amihud 2002, efectul in serie de timp)
 # =============================================================================
 C_MARKETS = {
     'BVB': dict(ret=('BETTR.INDX', 'close'), keys=[k for k in GROUPS['BVB'] if k != 'TVBETETF']),
@@ -453,7 +472,7 @@ C_MARKETS = {
 
 
 def market_illiq(keys, start='2016-09-19'):
-    """Iliciditatea agregata lunara: media transversala a logaritmului Amihud lunar al fiecarui activ."""
+    """Ilichiditatea agregata lunara: media transversala a logaritmului Amihud lunar al fiecarui activ."""
     cols = {}
     for k in keys:
         x = pd.concat([returns(k, start).rename('r'), dollar_volume(k, start).rename('dv')], axis=1, join='inner').dropna()
@@ -470,7 +489,7 @@ def c1_premium():
         p = read_market(sym)[col].loc['2016-08-01':'2026-08-31']
         r = 100 * np.log(p.resample('ME').last()).diff().rename('r')
         li = market_illiq(spec['keys']).dropna()
-        # socul de iliciditate: rezidul unui AR(1) pe logaritmul iliciditatii
+        # socul de ilichiditate: rezidul unui AR(1) pe logaritmul ilichiditatii
         ar = sm.OLS(li.iloc[1:].values, sm.add_constant(li.shift(1).iloc[1:].values)).fit()
         shock = pd.Series(ar.resid, index=li.index[1:], name='shock')
         d = pd.concat([r, li.shift(1).rename('lag'), shock], axis=1, join='inner').dropna().loc['2016-11':'2026-08']
@@ -511,7 +530,7 @@ def c1_premium():
     # sectiunea transversala BVB: portofoliul celor mai putin lichide vs cele mai lichide (reechilibrare anuala)
     keys = C_MARKETS['BVB']['keys']
     px = pd.concat({k: read_market(ASSETS[k][0])['adjusted_close'] for k in keys}, axis=1).loc['2017-01-01':'2026-08-31']
-    mret = np.log(px.resample('ME').last()).diff()
+    mret = px.resample('ME').last().pct_change(fill_method=None)       # randamente simple totale (portofoliu exact)
     spreads = []
     for y in range(2018, 2027):
         il = {}

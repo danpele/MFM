@@ -33,11 +33,23 @@ def roll_spread(close):
     return (2 * np.sqrt(-c) if c < 0 else np.nan), c
 
 
-def cs_spread(high, low):
-    """Estimatorul Corwin-Schultz pentru fiecare pereche de perioade consecutive (valorile negative devin 0)."""
-    h, l = np.log(np.asarray(high, float)), np.log(np.asarray(low, float))
-    beta = (h[:-1] - l[:-1]) ** 2 + (h[1:] - l[1:]) ** 2
-    gamma = (np.maximum(h[:-1], h[1:]) - np.minimum(l[:-1], l[1:])) ** 2
+def cs_spread(high, low, close=None):
+    """Estimatorul Corwin-Schultz pentru fiecare pereche de perioade consecutive (valorile negative devin 0).
+    Cu close (date zilnice): ajustarea pentru miscarea de peste noapte din Corwin si Schultz (2012): daca minimul zilei t+1
+    este peste inchiderea zilei t, maximul si minimul lui t+1 scad cu diferenta; daca maximul lui t+1 este sub
+    inchiderea lui t, ambele cresc cu diferenta. Barele intraday ale aceleiasi sesiuni nu se ajusteaza."""
+    H, L = np.asarray(high, float), np.asarray(low, float)
+    h0, l0, h1, l1 = H[:-1], L[:-1], H[1:].copy(), L[1:].copy()
+    if close is not None:
+        c0 = np.asarray(close, float)[:-1]
+        up = l1 > c0
+        d = np.where(up, l1 - c0, 0.0)
+        h1, l1 = h1 - d, l1 - d
+        dn = h1 < c0
+        d = np.where(dn, c0 - h1, 0.0)
+        h1, l1 = h1 + d, l1 + d
+    beta = np.log(h0 / l0) ** 2 + np.log(h1 / l1) ** 2
+    gamma = np.log(np.maximum(h0, h1) / np.minimum(l0, l1)) ** 2
     k = 3 - 2 * np.sqrt(2)
     alpha = (np.sqrt(2 * beta) - np.sqrt(beta)) / k - np.sqrt(gamma / k)
     return np.clip(2 * (np.exp(alpha) - 1) / (1 + np.exp(alpha)), 0, None)
@@ -58,8 +70,8 @@ def ar_spread(close, high, low):
 
 def edge_spread(open_, high, low, close, sign=True):
     """EDGE (Ardia, Guidotti si Kroencke, 2024, JFE 161, 103916): spread-ul relativ din preturile OHLC.
-    Transcrierea implementarii de referinta a autorilor (pachetul bidask, licenta MIT). sign=True pastreaza semnul
-    estimarii (recomandat cand se face media estimarilor pe mai multe ferestre: media ramane nedeplasata)."""
+    Transcrierea implementarii de referinta a autorilor (pachetul bidask, licenta MIT). sign=True intoarce estimarea
+    cu semn; pentru medii pe mai multe ferestre, autorii recomanda estimarile cu semn cu valorile negative puse la zero."""
     o, h, l, c = (np.log(np.asarray(x, float)) for x in (open_, high, low, close))
     if len(o) < 3:
         return np.nan
@@ -140,16 +152,17 @@ def pin_loglik(B, S, alpha, delta, mu, eb, es):
 
 
 def amihud(r, dv, scale=1e6):
-    """Iliciditatea Amihud: media |r| (puncte de baza) la 1 milion USD tranzactionat."""
+    """Ilichiditatea Amihud: media |r| (puncte de baza) la 1 milion USD tranzactionat."""
     x = pd.concat([r.rename('r'), dv.rename('dv')], axis=1, join='inner').dropna()
     x = x[x['dv'] > 0]
     return float((1e4 * x['r'].abs() / (x['dv'] / scale)).mean())
 
 
-def daily_estimates(d):
-    """Estimatorii de spread pe o fereastra de bare (o zi de bare intraday sau o perioada de date zilnice)."""
+def daily_estimates(d, overnight=True):
+    """Estimatorii de spread pe o fereastra de bare: overnight=True pentru date zilnice (ajustarea Corwin-Schultz
+    pentru miscarea de peste noapte), overnight=False pentru barele intraday ale unei sesiuni."""
     rs, cov = roll_spread(d['close'])
-    cs = cs_spread(d['high'], d['low'])
+    cs = cs_spread(d['high'], d['low'], d['close'] if overnight else None)
     ar2 = ar_terms(d['close'], d['high'], d['low'])
     return pd.Series(dict(cov=cov, roll=rs, cs=cs.mean(), ar2=ar2.mean()))
 
@@ -275,7 +288,8 @@ def zi_simulate(n_events=300_000, L=40, rate_limit=1.0, rate_market=0.25, rate_c
                 ask_q[ba] -= 1 if ask_q[ba] > 0 else 0
             else:
                 bid_q[bb] -= 1 if bid_q[bb] > 0 else 0
-        else:                                          # anulare a unui ordin existent, ales uniform
+        else:                                          # anulare a unui ordin existent, ales uniform dintre toate ordinele
+            side = rng.random() < bid_q.sum() / n_orders   # partea aleasa proportional cu numarul de ordine in asteptare
             if side and bid_q.sum() > 1:
                 idx = rng.choice(np.flatnonzero(bid_q), p=bid_q[bid_q > 0] / bid_q.sum())
                 bid_q[idx] -= 1

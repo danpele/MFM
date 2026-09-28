@@ -290,7 +290,8 @@ def intraday_spreads(s):
     rows = {}
     for d, g in s.dropna(subset=['close', 'high', 'low']).groupby('date'):
         rs, cov = roll_spread(g['close'])
-        rows[d] = dict(cov=cov, cs=cs_spread(g['high'], g['low']).mean(),
+        rows[d] = dict(cov=cov, cs=cs_spread(g['high'], g['low']).mean(),          # in cursul sesiunii: fara ajustare de noapte
+                      
                        ar2=ar_terms(g['close'], g['high'], g['low']).mean(), price=g['close'].mean(),
                        edge=edge_spread(g['open'], g['high'], g['low'], g['close']),
                        var=np.var(np.diff(np.log(g['close'].values)), ddof=1))
@@ -301,7 +302,7 @@ def daily_spreads(key, start=START2):
     """Estimatorii din date zilnice pe ultimii doi ani (valori in puncte de baza)."""
     d = ohlc(key, start)
     rs, cov = roll_spread(d['close'])
-    cs = cs_spread(d['high'], d['low'])
+    cs = cs_spread(d['high'], d['low'], d['close'])
     ar2 = ar_terms(d['close'], d['high'], d['low'])
     return dict(roll=1e4 * rs if rs == rs else np.nan, roll_cov=float(cov), cs=1e4 * float(np.mean(cs)),
                 edge=1e4 * edge_spread(d['open'], d['high'], d['low'], d['close']),
@@ -313,7 +314,7 @@ def fig_spread_frequency(E, sp_daily):
     roll5 = 1e4 * 2 * np.sqrt(max(-E['cov'].mean(), 0))
     cs5 = 1e4 * E['cs'].mean()
     ar5 = 1e4 * np.sqrt(max(E['ar2'].mean(), 0))
-    edge5 = 1e4 * E['edge'].mean()                  # media estimarilor EDGE cu semn (nedeplasata)
+    edge5 = 1e4 * E['edge'].clip(lower=0).mean()     # estimari cu semn, negativele puse la zero (recomandarea autorilor)
     vals = {'Roll': (sp_daily['roll'], roll5), 'Corwin-Schultz': (sp_daily['cs'], cs5), 'Abdi-Ranaldo': (sp_daily['ar'], ar5),
             'EDGE': (sp_daily['edge'], edge5)}
     fig, ax = plt.subplots(figsize=(6.8, 3.3))
@@ -328,7 +329,7 @@ def fig_spread_frequency(E, sp_daily):
     legend_outside_bottom(ax, ncol=1, y=-0.14)
     save_fig('ch10_spread_frequency')
     rng = np.random.default_rng(SEED)
-    ev = E['edge'].values
+    ev = E['edge'].clip(lower=0).values
     eb = [1e4 * ev[rng.integers(0, len(ev), len(ev))].mean() for _ in range(B_BOOT)]
     return dict(tick=float(tick), roll5=float(roll5), cs5=float(cs5), ar5=float(ar5), roll_d=float(sp_daily['roll']),
                 cs_d=float(sp_daily['cs']), ar_d=float(sp_daily['ar']), edge5=float(edge5), edge_d=float(sp_daily['edge']),
@@ -391,7 +392,7 @@ def fig_amihud(A):
 
 
 def monthly_illiq(keys, start=START10):
-    """Iliciditatea Amihud lunara (pb la 1 milion USD) pentru fiecare activ; mediana pe grup."""
+    """Ilichiditatea Amihud lunara (pb la 1 milion USD) pentru fiecare activ; mediana pe grup."""
     cols = {}
     for k in keys:
         x = pd.concat([returns(k, start).rename('r'), dollar_volume(k, start).rename('dv')], axis=1, join='inner').dropna()
@@ -424,7 +425,7 @@ def fig_amihud_time():
 
 
 def spy_illiq_daily(s):
-    """Iliciditatea intrazilnica: media |r_5min| (pb) la 100 milioane USD tranzactionati, pe zi."""
+    """Ilichiditatea intrazilnica: media |r_5min| (pb) la 100 milioane USD tranzactionati, pe zi."""
     x = s.dropna(subset=['r', 'dv'])
     x = x[x['dv'] > 0]
     return (1e4 * x['r'].abs() / (x['dv'] / 1e8)).groupby(x['date']).mean().rename('illiq')
@@ -703,7 +704,7 @@ END_PD = '2026-09-18'
 def price_discovery_bet():
     from statsmodels.tsa.vector_ar.vecm import coint_johansen, select_order
     y = bet_etf_pair()
-    p = int(select_order(y.values, maxlags=10, deterministic='ci').bic)
+    p = int(select_order(y.values, maxlags=10, deterministic='co').bic)
     jo = coint_johansen(y.values, 0, max(p, 1))
     r = price_discovery(y.values, max(p, 1))
     sd = float(100 * (y['etf'] - y['idx']).std())
