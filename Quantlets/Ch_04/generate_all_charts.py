@@ -241,6 +241,8 @@ def weights(name, Rw):
         return w_long_only(S)
     if name == 'GMV-LW':
         return w_gmv(lw_cc(X)[0])
+    if name == 'GMV-NL':
+        return w_gmv(nl_shrink(X))
     if name == 'ERC':
         return w_erc(S)
     if name == 'HRP':
@@ -309,7 +311,8 @@ def max_drawdown(r):
 # INFERENTA PENTRU DIFERENTE DE SHARPE
 # =============================================================================
 def sr_diff_hac(r1, r2, lags=None):
-    """Ledoit-Wolf (2008), varianta HAC: Delta = SR1 - SR2 (lunar), eroare standard prin metoda delta."""
+    """Ledoit-Wolf (2008), Sectiunea 3.1: Delta = SR1 - SR2 (lunar), eroare standard prin metoda delta,
+    covarianta HAC cu nucleul Bartlett (Newey-West) si lag floor(4 (T/100)^(2/9))."""
     r1, r2 = np.asarray(r1, float), np.asarray(r2, float)
     T = len(r1)
     m1, m2 = r1.mean(), r2.mean()
@@ -329,21 +332,138 @@ def sr_diff_hac(r1, r2, lags=None):
     return d * np.sqrt(12), se * np.sqrt(12), p
 
 
-def sr_diff_boot(r1, r2, block=6, B=5000, seed=SEED):
-    """Bootstrap circular pe blocuri pentru Delta Sharpe (anualizat): interval 95% si valoare p."""
+# Ledoit-Wolf (2008), Sectiunea 3.2.2: bootstrap studentizat, circular pe blocuri
+LW_BLOCKS = (1, 2, 4, 6, 8, 10)     # grila de blocuri din LW (2008), Sectiunea 3.2.2 si Sectiunea 5
+LW_K = 5000                         # secvente pseudo pentru calibrare (LW 2008, Sectiunea 5)
+LW_M = 4999                         # replicari bootstrap pentru valoarea p (LW 2008, Sectiunea 5)
+LW_M_CAL = 499                      # replicari bootstrap in calibrare (LW 2008, Sectiunea 4)
+LW_SB_MEAN = 5                      # bootstrap stationar al reziduurilor VAR(1), bloc mediu 5
+
+
+def _lw_parts(r1, r2):
+    """Delta = SR1 - SR2 (lunar), gradientul lui f si seriile y_t (LW 2008, ec. 1-5)."""
+    m1, m2 = r1.mean(-1), r2.mean(-1)
+    g1, g2 = (r1 ** 2).mean(-1), (r2 ** 2).mean(-1)
+    v1, v2 = g1 - m1 ** 2, g2 - m2 ** 2
+    d = m1 / np.sqrt(v1) - m2 / np.sqrt(v2)
+    grad = np.stack([g1 / v1 ** 1.5, -g2 / v2 ** 1.5, -m1 / (2 * v1 ** 1.5), m2 / (2 * v2 ** 1.5)], -1)
+    Y = np.stack([r1 - m1[..., None], r2 - m2[..., None], r1 ** 2 - g1[..., None], r2 ** 2 - g2[..., None]], -1)
+    return d, grad, Y
+
+
+def qs_kernel(x):
+    """Nucleul Quadratic Spectral (Andrews 1991)."""
+    x = np.asarray(x, float)
+    out = np.ones_like(x)
+    nz = x != 0
+    z = 6 * np.pi * x[nz] / 5
+    out[nz] = 25 / (12 * np.pi ** 2 * x[nz] ** 2) * (np.sin(z) / z - np.cos(z))
+    return out
+
+
+def hac_qs_pw(Y):
+    """Covarianta HAC cu nucleul QS prealbit (Andrews & Monahan 1992), latime de banda automata
+    (Andrews 1991, AR(1)), factorul T/(T-4) din LW (2008, ec. 5). Y: T x 4, centrat."""
+    T, k = Y.shape
+    X0, X1 = Y[:-1], Y[1:]
+    A = np.linalg.lstsq(X0, X1, rcond=None)[0].T                # VAR(1) fara termen liber
+    U, s, Vt = np.linalg.svd(A)                                  # Andrews-Monahan: valori singulare <= 0.97
+    A = U @ np.diag(np.minimum(s, 0.97)) @ Vt
+    E = X1 - X0 @ A.T
+    n = len(E)
+    rho = np.array([np.sum(E[1:, a] * E[:-1, a]) / np.sum(E[:-1, a] ** 2) for a in range(k)])
+    sig2 = np.array([np.mean((E[1:, a] - rho[a] * E[:-1, a]) ** 2) for a in range(k)])
+    num = np.sum(4 * rho ** 2 * sig2 ** 2 / (1 - rho) ** 8)
+    den = np.sum(sig2 ** 2 / (1 - rho) ** 4)
+    ST = 1.3221 * (num / den * n) ** 0.2
+    Psi = E.T @ E / n
+    for j in range(1, n):
+        w = qs_kernel(j / ST)
+        G = E[j:].T @ E[:-j] / n
+        Psi += w * (G + G.T)
+    B = np.linalg.inv(np.eye(k) - A)
+    return T / (T - 4) * B @ Psi @ B.T
+
+
+def lw_se(r1, r2):
+    """Delta (lunar) si eroarea standard s(Delta) din datele originale (LW 2008, ec. 5)."""
+    d, grad, Y = _lw_parts(np.asarray(r1, float), np.asarray(r2, float))
+    Psi = hac_qs_pw(Y)
+    return float(d), float(np.sqrt(grad @ Psi @ grad / len(r1)))
+
+
+def cbb_stat(r1, r2, b, M, rng):
+    """M replicari bootstrap circular pe blocuri de lungime b: Delta* si s(Delta*) 'natural'
+    (Goetze & Kuensch 1996; LW 2008, Sectiunea 3.2.2)."""
+    T = len(r1)
+    nb = -(-T // b)
+    st = rng.integers(0, T, (M, nb))
+    idx = ((st[:, :, None] + np.arange(b)) % T).reshape(M, -1)[:, :T]
+    x1, x2 = r1[idx], r2[idx]
+    d, grad, Y = _lw_parts(x1, x2)
+    l = T // b
+    Z = Y[:, :l * b].reshape(M, l, b, 4).sum(2) / np.sqrt(b)
+    Psi = np.einsum('mjk,mjl->mkl', Z, Z) / l
+    se = np.sqrt(np.einsum('mk,mkl,ml->m', grad, Psi, grad) / T)
+    return d, se
+
+
+def _sb_indices(T, n, mean_block, rng):
+    """Indicii unui bootstrap stationar (Politis & Romano 1994), bloc mediu `mean_block`."""
+    idx = np.empty(n, int)
+    idx[0] = rng.integers(T)
+    new = rng.random(n) < 1 / mean_block
+    starts = rng.integers(0, T, n)
+    for t in range(1, n):
+        idx[t] = starts[t] if new[t] else (idx[t - 1] + 1) % T
+    return idx
+
+
+def lw_block_calibration(r1, r2, blocks=LW_BLOCKS, K=LW_K, M=LW_M_CAL, alpha=0.05, seed=SEED):
+    """Algoritmul 3.1 din LW (2008): VAR(1) + bootstrap stationar al reziduurilor, K secvente pseudo,
+    acoperirea intervalului studentizat simetric pentru fiecare b; alege b cu acoperirea cea mai apropiata de 1-alpha."""
     rng = np.random.default_rng(seed)
     r1, r2 = np.asarray(r1, float), np.asarray(r2, float)
-    T = len(r1)
-    d_hat = sharpe(r1) - sharpe(r2)
-    nb = int(np.ceil(T / block))
-    ext1, ext2 = np.r_[r1, r1[:block]], np.r_[r2, r2[:block]]
-    out = np.empty(B)
-    for b in range(B):
-        st = rng.integers(0, T, nb)
-        idx = (st[:, None] + np.arange(block)).ravel()[:T]
-        out[b] = sharpe(ext1[idx]) - sharpe(ext2[idx])
-    p = np.mean(np.abs(out - d_hat) >= abs(d_hat))
-    return d_hat, np.percentile(out, [2.5, 97.5]), p, out
+    X = np.column_stack([r1, r2])
+    T = len(X)
+    d0, _ = lw_se(r1, r2)
+    Z = np.column_stack([np.ones(T - 1), X[:-1]])
+    coef = np.linalg.lstsq(Z, X[1:], rcond=None)[0]
+    U = X[1:] - Z @ coef
+    U = U - U.mean(0)
+    cover = np.zeros(len(blocks))
+    for k in range(K):
+        u = U[_sb_indices(len(U), T - 1, LW_SB_MEAN, rng)]
+        Xs = np.empty_like(X)
+        Xs[0] = X[0]
+        for t in range(1, T):
+            Xs[t] = coef[0] + Xs[t - 1] @ coef[1:] + u[t - 1]
+        dk, sk = lw_se(Xs[:, 0], Xs[:, 1])
+        for j, b in enumerate(blocks):
+            ds, ss = cbb_stat(Xs[:, 0], Xs[:, 1], b, M, rng)
+            z = np.quantile(np.abs(ds - dk) / ss, 1 - alpha)
+            cover[j] += abs(dk - d0) <= z * sk
+    g_hat = cover / K
+    return blocks[int(np.argmin(np.abs(g_hat - (1 - alpha))))], dict(zip(map(str, blocks), g_hat.tolist()))
+
+
+def sr_diff_boot(r1, r2, block=None, M=LW_M, K=LW_K, alpha=0.05, seed=SEED):
+    """Testul Ledoit-Wolf (2008, Sectiunea 3.2.2 si Remarca 3.2) pentru H0: SR1 = SR2:
+    bootstrap studentizat circular pe blocuri; blocul din Algoritmul 3.1 (daca block=None).
+    Intoarce Delta (anualizat), intervalul 95% simetric (anualizat), valoarea p (ec. 9), statisticile
+    studentizate bootstrap, blocul ales si functia de calibrare."""
+    r1, r2 = np.asarray(r1, float), np.asarray(r2, float)
+    cal = None
+    if block is None:
+        block, cal = lw_block_calibration(r1, r2, K=K, alpha=alpha, seed=seed)
+    d, s = lw_se(r1, r2)
+    ds, ss = cbb_stat(r1, r2, block, M, np.random.default_rng(seed + 1))
+    tstar = (ds - d) / ss
+    z = np.quantile(np.abs(tstar), 1 - alpha)
+    p = (np.sum(np.abs(tstar) >= abs(d) / s) + 1) / (M + 1)
+    a = np.sqrt(12)
+    return dict(diff=d * a, se=s * a, ci=[(d - z * s) * a, (d + z * s) * a], p_boot=float(p),
+                t_obs=d / s, z_star=float(z), block=int(block), calibration=cal), tstar
 
 
 # =============================================================================
@@ -795,39 +915,261 @@ def fig_costs(bts, universe='Combined'):
     save_fig('ch4_costs')
 
 
-def sharpe_tests(bts, bench='1/N'):
+def _test_pair(args):
+    """Un test de diferenta Sharpe: HAC (Sectiunea 3.1) si bootstrap studentizat (Sectiunea 3.2.2)."""
+    r1, r2, block = args
+    d, se, p = sr_diff_hac(r1, r2)
+    res, tstar = sr_diff_boot(r1, r2, block=block)
+    return dict(diff=d, se_hac=se, p_hac=p, ci_boot=res['ci'], p_boot=res['p_boot'], block=res['block'],
+                calibration=res['calibration'], se_qs=res['se'], t_obs=res['t_obs'], z_star=res['z_star']), tstar
+
+
+def run_tests(pairs, n_jobs=1, blocks=None):
+    """pairs: dict {cheie: (r1, r2)}; blocks: dict {cheie: bloc} deja calibrat (altfel Algoritmul 3.1);
+    n_jobs > 1 foloseste procese paralele (calibrarea e costisitoare)."""
+    keys = list(pairs)
+    blocks = blocks or {}
+    args = [(np.asarray(pairs[k][0], float), np.asarray(pairs[k][1], float), blocks.get(k)) for k in keys]
+    if n_jobs > 1:
+        from concurrent.futures import ProcessPoolExecutor
+        with ProcessPoolExecutor(n_jobs) as ex:
+            res = list(ex.map(_test_pair, args))
+    else:
+        res = [_test_pair(a) for a in args]
+    return dict(zip(keys, res))
+
+
+def sharpe_tests(bts, bench='1/N', n_jobs=1, blocks=None):
+    """Toate regulile contra 1/N in cele trei universuri; intoarce rezultatele si statisticile bootstrap.
+    blocks: {(univers, regula): bloc} din calibrarea anterioara (optional)."""
+    pairs = {(u, s): (bts[u][0][s], bts[u][0][bench]) for u in bts for s in STRATS if s != bench}
+    res = run_tests(pairs, n_jobs, blocks)
+    out = {u: {s: res[(u, s)][0] for s in STRATS if s != bench} for u in bts}
+    draws = {k: v[1] for k, v in res.items()}
+    return out, draws
+
+
+def holm(pvals):
+    """Holm (1979): valori p ajustate pas cu pas descendent, valide sub orice dependenta intre teste."""
+    keys = list(pvals)
+    p = np.array([pvals[k] for k in keys], float)
+    m = len(p)
+    order = np.argsort(p)
+    adj = np.empty(m)
+    run = 0.0
+    for i, j in enumerate(order):
+        run = max(run, min(1.0, (m - i) * p[j]))
+        adj[j] = run
+    return dict(zip(keys, adj.tolist()))
+
+
+def holm_sharpe(tests):
+    """Ajustarea Holm pe toate testele regula minus 1/N (3 universuri x 7 reguli), HAC si bootstrap."""
     out = {}
-    for u, (ret, to, W) in bts.items():
-        out[u] = {}
-        for s in STRATS:
-            if s == bench:
-                continue
-            d, se, p = sr_diff_hac(ret[s], ret[bench])
-            db, ci, pb, _ = sr_diff_boot(ret[s], ret[bench], B=2000)
-            out[u][s] = dict(diff=d, se_hac=se, p_hac=p, ci_boot=ci.tolist(), p_boot=pb)
+    for kind in ['p_hac', 'p_boot']:
+        adj = holm({f'{u}: {s}': tests[u][s][kind] for u in tests for s in tests[u]})
+        out[kind] = adj
+    out['m'] = len(adj)
+    out['n_raw_05'] = {kind: int(sum(tests[u][s][kind] < 0.05 for u in tests for s in tests[u]))
+                       for kind in ['p_hac', 'p_boot']}
+    out['n_holm_05'] = {kind: int(sum(v < 0.05 for v in out[kind].values())) for kind in ['p_hac', 'p_boot']}
+    out['min_holm'] = {kind: float(min(out[kind].values())) for kind in ['p_hac', 'p_boot']}
     return out
 
 
-def fig_sharpe_test(bts):
+def fig_sharpe_test(tests, draws):
     fig, axes = plt.subplots(1, 2, figsize=(7.6, 3.6), sharey=True)
     res = {}
     for ax, (u, s) in zip(axes, [('Sectors', 'GMV-LW'), ('Multi-asset', 'ERC')]):
-        ret = bts[u][0]
-        d, ci, p, draws = sr_diff_boot(ret[s], ret['1/N'])
-        dh, se, ph = sr_diff_hac(ret[s], ret['1/N'])
-        ax.hist(draws, bins=60, color=SCOL[s], alpha=0.8, density=True, label='Bootstrap draws')
-        ax.axvline(0, color='black', lw=0.8)
-        ax.axvline(d, color=IDAred, lw=1.2, label=f'Estimate {d:+.2f}')
-        ax.axvline(ci[0], color=IDAred, ls='--', lw=0.8, label='95% interval')
-        ax.axvline(ci[1], color=IDAred, ls='--', lw=0.8)
-        ax.set_title(f'{u}: {s} minus 1/N (HAC p = {ph:.2f})', fontsize=9, loc='left')
-        ax.set_xlabel('Difference in annualised Sharpe ratio')
-        legend_outside_bottom(ax, ncol=2, y=-0.2)
-        res[u] = dict(strategy=s, diff=d, ci=ci.tolist(), p_boot=p, se_hac=se, p_hac=ph)
+        r = tests[u][s]
+        ts = draws[(u, s)]
+        ax.hist(ts, bins=np.linspace(-6, 6, 61), color=SCOL[s], alpha=0.8, density=True,
+                label='Bootstrap studentized statistic')
+        ax.axvline(r['t_obs'], color=IDAred, lw=1.4, label=f"Observed statistic {r['t_obs']:+.2f}")
+        ax.axvline(-r['z_star'], color='black', ls='--', lw=0.8, label=f"Critical values +/-{r['z_star']:.2f} (5%)")
+        ax.axvline(r['z_star'], color='black', ls='--', lw=0.8)
+        ax.set_title(f"{u}: {s} minus 1/N, block {r['block']}\nHAC p = {r['p_hac']:.2f}, bootstrap p = {r['p_boot']:.2f}",
+                     fontsize=9, loc='left')
+        ax.set_xlabel('(Delta* - Delta) / s(Delta*)')
+        legend_outside_bottom(ax, ncol=1, y=-0.2)
+        res[u] = dict(strategy=s, **r)
     axes[0].set_ylabel('Density')
     plt.tight_layout()
     save_fig('ch4_sharpe_test')
     return res
+
+
+# =============================================================================
+# INFERENTA PE PORTOFOLII ESTIMATE (nivel master)
+# =============================================================================
+def britten_jones(Rex):
+    """Britten-Jones (1999): regresia lui 1 pe randamentele in exces, fara termen liber.
+    b ~ Sigma^-1 mu; testul t al lui b_i = 0 (pondere tangenta nula) si testul F al lui b proportional cu 1 (1/N)."""
+    X = np.asarray(Rex, float)
+    T, N = X.shape
+    y = np.ones(T)
+    XtX_inv = np.linalg.inv(X.T @ X)
+    b = XtX_inv @ X.T @ y
+    u = y - X @ b
+    s2 = u @ u / (T - N)
+    se = np.sqrt(np.diag(s2 * XtX_inv))
+    t = b / se
+    R = np.hstack([np.eye(N - 1), np.zeros((N - 1, 1))]) - np.hstack([np.zeros((N - 1, N - 1)), np.ones((N - 1, 1))])
+    Rb = R @ b
+    F = Rb @ np.linalg.solve(R @ XtX_inv @ R.T, Rb) / (N - 1) / s2
+    pF = 1 - stats.f.cdf(F, N - 1, T - N)
+    # varianta HAC (Bartlett, Newey-West), pentru abateri de la i.i.d. Normal
+    L = int(np.floor(4 * (T / 100) ** (2 / 9)))
+    Xu = X * u[:, None]
+    Om = Xu.T @ Xu / T
+    for l in range(1, L + 1):
+        G = Xu[l:].T @ Xu[:-l] / T
+        Om += (1 - l / (L + 1)) * (G + G.T)
+    Vh = T * XtX_inv @ Om @ XtX_inv
+    W = Rb @ np.linalg.solve(R @ Vh @ R.T, Rb)
+    pW = 1 - stats.chi2.cdf(W, N - 1)
+    w = b / b.sum()
+    return dict(T=T, N=N, b=b.tolist(), w=w.tolist(), t=t.tolist(), F=float(F), pF=float(pF), df=(N - 1, T - N),
+                wald_hac=float(W), p_wald_hac=float(pW), t_hac=(b / np.sqrt(np.diag(Vh))).tolist(),
+                w_check=w_tan(X.mean(0), np.cov(X.T)).tolist())
+
+
+def kz_bias(theta_ann, N, T):
+    """Kan & Zhou (2007): E[theta_hat^2] = (T theta^2 + N)/(T - N - 2) pentru Sigma_hat de verosimilitate maxima,
+    i.i.d. Normal; intoarce valorile anualizate."""
+    th2 = (theta_ann / np.sqrt(12)) ** 2
+    e2 = (T * th2 + N) / (T - N - 2)
+    return dict(theta2_m=th2, E_theta2_m=e2, E_theta_ann_approx=float(np.sqrt(e2 * 12)),
+                inv_bias=T / (T - N - 2))
+
+
+def theta2_unbiased(Rex):
+    """Estimatorul nedeplasat al lui theta^2 (Kan & Zhou 2007): ((T-N-2) theta_hat^2 - N)/T, Sigma_hat MV."""
+    X = np.asarray(Rex, float)
+    T, N = X.shape
+    mu, S = X.mean(0), np.cov(X.T, bias=True)
+    th2 = mu @ np.linalg.solve(S, mu)
+    u = ((T - N - 2) * th2 - N) / T
+    return dict(T=T, N=N, theta_hat_ann=float(np.sqrt(th2 * 12)), theta2_u=float(u),
+                theta_u_ann=float(np.sqrt(max(u, 0) * 12)))
+
+
+def mp_bounds(c, s2=1.0):
+    """Suportul legii Marchenko-Pastur pentru raportul c = N/T < 1."""
+    return s2 * (1 - np.sqrt(c)) ** 2, s2 * (1 + np.sqrt(c)) ** 2
+
+
+def mp_density(x, c, s2=1.0):
+    a, b = mp_bounds(c, s2)
+    out = np.zeros_like(x)
+    ok = (x > a) & (x < b)
+    out[ok] = np.sqrt((b - x[ok]) * (x[ok] - a)) / (2 * np.pi * s2 * c * x[ok])
+    return out
+
+
+def fig_mp():
+    """Valorile proprii ale matricei de corelatie pe ultima fereastra de 60 de luni vs banda Marchenko-Pastur."""
+    res = {}
+    fig, axes = plt.subplots(1, 2, figsize=(7.6, 3.6), sharey=True)
+    for ax, (u, syms) in zip(axes, [('Combined', COMBINED), ('Sectors', SECTORS)]):
+        R, Rex, rf = us_monthly(syms)
+        X = Rex.values[-WINDOW:]
+        ev = np.sort(np.linalg.eigvalsh(np.corrcoef(X.T)))[::-1]
+        N = len(syms)
+        c = N / WINDOW
+        lo, hi = mp_bounds(c)
+        k = np.arange(1, N + 1)
+        ax.axhspan(lo, hi, color=LightGray, alpha=0.6, label='Marchenko-Pastur noise band')
+        ax.axhline(1, color=Gray, lw=0.6, ls=':')
+        inside = (ev >= lo) & (ev <= hi)
+        ax.plot(k[inside], ev[inside], 'o', color=MainBlue, ms=5, label='Eigenvalue inside the band')
+        ax.plot(k[~inside], ev[~inside], 'D', color=IDAred, ms=5, label='Eigenvalue outside the band')
+        ax.set_yscale('log')
+        ax.set_xticks(k if N < 10 else k[::3])
+        ax.set_xlabel('Eigenvalue rank')
+        ax.set_title(f'{u}: N = {N}, T = {WINDOW}, c = N/T = {c:.2f}', fontsize=9, loc='left')
+        res[u] = dict(N=N, T=WINDOW, c=c, lo=lo, hi=hi, ev=ev.tolist(), n_above=int((ev > hi).sum()),
+                      n_below=int((ev < lo).sum()), share_top=float(ev[0] / N),
+                      start=str(Rex.index[-WINDOW].date()), end=str(Rex.index[-1].date()))
+    axes[0].set_ylabel('Eigenvalue of the correlation matrix (log)')
+    h, l = axes[0].get_legend_handles_labels()
+    fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=3, frameon=False)
+    fig.suptitle(f'Last 60-month window, {Rex.index[-WINDOW]:%b %Y} - {Rex.index[-1]:%b %Y}', fontsize=9, x=0.02, ha='left')
+    plt.tight_layout()
+    save_fig('ch4_mp')
+    return res
+
+
+def nl_shrink(X):
+    """Shrinkage neliniar analitic (Ledoit & Wolf 2020, Annals of Statistics), cazul N <= T-1."""
+    X = np.asarray(X, float)
+    X = X - X.mean(0)
+    n, p = X.shape
+    n = n - 1                                               # corectie pentru centrare
+    S = X.T @ X / n
+    lam, U = np.linalg.eigh(S)
+    lam = np.maximum(lam, 1e-18)
+    L = np.tile(lam[:, None], (1, p))
+    h = n ** (-1 / 3)
+    H = h * L.T
+    x = (L - L.T) / H
+    ft = (3 / 4 / np.sqrt(5)) * np.mean(np.maximum(1 - x ** 2 / 5, 0) / H, axis=1)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        Hf = (-3 / 10 / np.pi) * x + (3 / 4 / np.sqrt(5) / np.pi) * (1 - x ** 2 / 5) * \
+            np.log(np.abs((np.sqrt(5) - x) / (np.sqrt(5) + x)))
+    edge = np.isclose(np.abs(x), np.sqrt(5))
+    Hf[edge] = (-3 / 10 / np.pi) * x[edge]
+    Hft = np.mean(Hf / H, axis=1)
+    c = p / n
+    d = lam / ((np.pi * c * lam * ft) ** 2 + (1 - c - np.pi * c * lam * Hft) ** 2)
+    return U @ np.diag(d) @ U.T
+
+
+def gmv_nl_backtests():
+    """GMV cu shrinkage neliniar (LW 2020) vs GMV si GMV-LW, aceeasi fereastra rulanta de 60 de luni."""
+    out = {}
+    for u in ['Sectors', 'Combined']:
+        R, Rex, rf = us_monthly(UNIVERSES[u])
+        ret, to, W = backtest(R, Rex, strategies=['GMV', 'GMV-LW', 'GMV-NL'])
+        out[u] = {s: dict(vol=float(ret[s].std() * np.sqrt(12)), sharpe=float(sharpe(ret[s])),
+                          turnover=float(to[s].mean())) for s in ret.columns}
+        out[u]['var_ratio_nl_gmv'] = float(ret['GMV-NL'].var() / ret['GMV'].var())
+        out[u]['var_ratio_nl_lw'] = float(ret['GMV-NL'].var() / ret['GMV-LW'].var())
+    return out
+
+
+def lo_sharpe(r, q=12):
+    """Lo (2002): eroarea standard i.i.d. a raportului Sharpe lunar si factorul de anualizare cu autocorelatii."""
+    r = np.asarray(r, float)
+    T = len(r)
+    sr = r.mean() / r.std()
+    se_iid = np.sqrt((1 + sr ** 2 / 2) / T)
+    rc = r - r.mean()
+    rho = np.array([np.sum(rc[k:] * rc[:-k]) / np.sum(rc ** 2) for k in range(1, q)])
+    eta = q / np.sqrt(q + 2 * np.sum((q - np.arange(1, q)) * rho))
+    return dict(T=T, sr_m=float(sr), se_m=float(se_iid), sr_ann_sqrt=float(sr * np.sqrt(q)),
+                se_ann=float(se_iid * np.sqrt(q)), eta=float(eta), sr_ann_lo=float(sr * eta),
+                rho1=float(rho[0]), rho_sum=float(rho.sum()))
+
+
+def deflated_sharpe(rets):
+    """Bailey & Lopez de Prado (2014): raportul Sharpe deflatat al celei mai bune reguli din N incercari.
+    rets: dict {nume: serie de randamente lunare in exces}."""
+    names = list(rets)
+    srs = np.array([np.mean(rets[k]) / np.std(rets[k], ddof=1) for k in names])
+    N = len(srs)
+    gam = 0.5772156649
+    sr0 = np.sqrt(srs.var(ddof=1)) * ((1 - gam) * stats.norm.ppf(1 - 1 / N) + gam * stats.norm.ppf(1 - 1 / (N * np.e)))
+    k = int(np.argmax(srs))
+    r = np.asarray(rets[names[k]], float)
+    T = len(r)
+    g3, g4 = stats.skew(r), stats.kurtosis(r, fisher=False)
+    s = srs[k]
+    z = (s - sr0) * np.sqrt(T - 1) / np.sqrt(1 - g3 * s + (g4 - 1) / 4 * s ** 2)
+    psr0 = stats.norm.cdf(s * np.sqrt(T - 1) / np.sqrt(1 - g3 * s + (g4 - 1) / 4 * s ** 2))
+    return dict(N=N, best=names[k], sr_best_ann=float(s * np.sqrt(12)), sr0_ann=float(sr0 * np.sqrt(12)),
+                T=T, skew=float(g3), kurt=float(g4), dsr=float(stats.norm.cdf(z)), psr0=float(psr0),
+                sd_sr_ann=float(np.sqrt(srs.var(ddof=1)) * np.sqrt(12)))
 
 
 # =============================================================================
@@ -844,7 +1186,7 @@ def bvb_backtest(window=36):
     return ret, to, W, bench, removed, m
 
 
-def fig_bvb(bb):
+def fig_bvb(bb, n_jobs=1, blocks=None):
     ret, to, W, bench, removed, m = bb
     fig, ax = plt.subplots(figsize=(7.2, 4.2))
     for s in BVB_STRATS:
@@ -862,11 +1204,8 @@ def fig_bvb(bb):
         tab.loc[b] = dict(mean=bench[b].mean() * 12, vol=bench[b].std() * np.sqrt(12), sharpe=sharpe(bench[b]),
                           turnover=0, mdd=max_drawdown(bench[b]), sharpe_10bp=sharpe(bench[b]),
                           sharpe_50bp=sharpe(bench[b]))
-    tests = {}
-    for s in BVB_STRATS:
-        d, se, p = sr_diff_hac(ret[s], bench['BET-TR'])
-        db, ci, pb, _ = sr_diff_boot(ret[s], bench['BET-TR'], B=2000)
-        tests[s] = dict(diff=d, p_hac=p, ci_boot=ci.tolist(), p_boot=pb)
+    res = run_tests({s: (ret[s], bench['BET-TR']) for s in BVB_STRATS}, n_jobs, blocks)
+    tests = {s: res[s][0] for s in BVB_STRATS}
     return dict(table=tab.round(4).to_dict(orient='index'), tests=tests, removed=removed,
                 start=str(ret.index[0].date()), end=str(ret.index[-1].date()), T=len(ret),
                 corr_mean=float(m[BVB].corr().values[np.triu_indices(len(BVB), 1)].mean()),
@@ -915,9 +1254,20 @@ if __name__ == '__main__':
     fig_oos_cum(bts)
     fig_oos_sharpe(tabs)
     fig_costs(bts)
-    R['sharpe_tests'] = sharpe_tests(bts)
-    R['sharpe_test_fig'] = fig_sharpe_test(bts)
-    R['bvb'] = fig_bvb(bvb_backtest())
+    NJ = max(1, (os.cpu_count() or 2) - 2)
+    R['sharpe_tests'], draws = sharpe_tests(bts, n_jobs=NJ)
+    R['sharpe_test_fig'] = fig_sharpe_test(R['sharpe_tests'], draws)
+    R['holm'] = holm_sharpe(R['sharpe_tests'])
+    R['bvb'] = fig_bvb(bvb_backtest(), n_jobs=NJ)
+    # nivel master: inferenta pe portofolii estimate
+    R_s, Rex_s, _ = us_monthly(SECTORS)
+    R['britten_jones'] = britten_jones(Rex_s)
+    R['kz_bias'] = kz_bias(R['frontier']['sharpe']['tan'], len(SECTORS), 60)
+    R['theta2_unbiased'] = theta2_unbiased(Rex_s)
+    R['mp'] = fig_mp()
+    R['gmv_nl'] = gmv_nl_backtests()
+    R['lo_sharpe'] = {u: lo_sharpe(bts[u][0]['1/N']) for u in bts}
+    R['deflated_sharpe'] = deflated_sharpe({f'{u}: {s}': bts[u][0][s].values for u in bts for s in STRATS})
     with open(os.path.join(HERE, 'ch4_results.json'), 'w') as f:
         json.dump(to_py(R), f, indent=1, default=str)
     print(json.dumps(to_py(R), indent=1, default=str)[:30000])

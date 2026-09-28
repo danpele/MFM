@@ -8,84 +8,84 @@ window.MFM_DATA.quizzes['portfolio'] = {
     "draw": 20,
     "questions": [
         {
-            "correct": 1,
-            "en": {
-                "title": "Global minimum variance",
-                "text": "Which inputs does the global minimum-variance (GMV) portfolio need?",
-                "options": [
-                    "Expected returns only",
-                    "The covariance matrix only",
-                    "Expected returns and the risk-free rate",
-                    "Market capitalisations"
-                ],
-                "correctExplanation": "w_GMV = Σ⁻¹1 / 1'Σ⁻¹1 uses only the covariance matrix, which is why it is more robust than the tangency portfolio.",
-                "incorrectExplanation": "The GMV formula contains no expected returns: only Σ is needed."
-            },
-            "ro": {
-                "title": "Varianța minimă globală",
-                "text": "De ce date de intrare are nevoie portofoliul de varianță minimă globală (GMV)?",
-                "options": [
-                    "Doar de randamentele așteptate",
-                    "Doar de matricea de covarianță",
-                    "De randamentele așteptate și rata fără risc",
-                    "De capitalizările bursiere"
-                ],
-                "correctExplanation": "w_GMV = Σ⁻¹1 / 1'Σ⁻¹1 folosește doar matricea de covarianță; de aceea este mai robust decât portofoliul tangent.",
-                "incorrectExplanation": "Formula GMV nu conține randamente așteptate: este nevoie doar de Σ."
-            }
-        },
-        {
             "correct": 2,
             "en": {
-                "title": "Two-asset diversification",
-                "text": "SPY and TLT had volatilities of 14.7% and 13.5% and a correlation of −0.10 (2002–2026). What was the volatility of their minimum-variance mix?",
+                "title": "In-sample Sharpe bias",
+                "text": "Returns are i.i.d. Normal with N = 10 assets and T = 60 months; θ² = μ'Σ⁻¹μ is the true squared maximum Sharpe ratio and θ̂² its plug-in estimate with the maximum-likelihood covariance. What holds?",
                 "options": [
-                    "About 14%",
-                    "About 13.5%",
-                    "About 9.4%",
-                    "Exactly zero"
+                    "θ̂² is unbiased because the sample mean and covariance are unbiased",
+                    "θ̂² is biased downwards because Σ̂⁻¹ underestimates Σ⁻¹",
+                    "E[θ̂²] = (Tθ² + N)/(T − N − 2), above θ²",
+                    "The bias is proportional to 1/T and does not depend on N"
                 ],
-                "correctExplanation": "With ρ = −0.10 the minimum-variance weight is 46% SPY and the volatility falls to 9.4%, below either asset.",
-                "incorrectExplanation": "A negative correlation pushes the mix well below both volatilities, but not to zero (that needs ρ = −1)."
+                "correctExplanation": "E[Σ̂⁻¹] = T/(T−N−2)·Σ⁻¹ and E[μ̂'Σ⁻¹μ̂] = θ² + N/T; with μ̂ and Σ̂ independent this gives (Tθ² + N)/(T − N − 2), which grows with N/T.",
+                "incorrectExplanation": "Unbiased inputs do not give an unbiased nonlinear function; the inverse Wishart moment inflates Σ̂⁻¹ and the bias grows with the number of assets N."
             },
             "ro": {
-                "title": "Diversificarea cu două active",
-                "text": "SPY și TLT au avut volatilități de 14,7% și 13,5% și o corelație de −0,10 (2002–2026). Care a fost volatilitatea combinației de varianță minimă?",
+                "title": "Deplasarea raportului Sharpe în eșantion",
+                "text": "Randamentele sunt i.i.d. din distribuția Normală, cu N = 10 active și T = 60 de luni; θ² = μ'Σ⁻¹μ este pătratul raportului Sharpe maxim adevărat, iar θ̂² estimatorul său cu covarianța de verosimilitate maximă. Ce este adevărat?",
                 "options": [
-                    "Circa 14%",
-                    "Circa 13,5%",
-                    "Circa 9,4%",
-                    "Exact zero"
+                    "θ̂² este nedeplasat, pentru că media și covarianța de selecție sunt nedeplasate",
+                    "θ̂² este deplasat în jos, pentru că Σ̂⁻¹ subestimează Σ⁻¹",
+                    "E[θ̂²] = (Tθ² + N)/(T − N − 2), peste θ²",
+                    "Deplasarea este proporțională cu 1/T și nu depinde de N"
                 ],
-                "correctExplanation": "Cu ρ = −0,10 ponderea de varianță minimă este 46% SPY, iar volatilitatea scade la 9,4%, sub a oricărui activ.",
-                "incorrectExplanation": "O corelație negativă coboară combinația mult sub ambele volatilități, dar nu la zero (pentru asta ar trebui ρ = −1)."
+                "correctExplanation": "E[Σ̂⁻¹] = T/(T−N−2)·Σ⁻¹ și E[μ̂'Σ⁻¹μ̂] = θ² + N/T; cu μ̂ și Σ̂ independente rezultă (Tθ² + N)/(T − N − 2), care crește cu N/T.",
+                "incorrectExplanation": "Estimatori nedeplasați nu dau o funcție neliniară nedeplasată; momentul Wishart invers mărește Σ̂⁻¹, iar deplasarea crește cu numărul de active N."
             }
         },
         {
             "correct": 0,
             "en": {
-                "title": "Tobin separation",
-                "text": "What does two-fund separation (Tobin, 1958) state?",
+                "title": "Britten-Jones regression",
+                "text": "You regress the constant 1 on the vector of excess returns r_t, without a constant term. The OLS coefficients are proportional to…",
                 "options": [
-                    "With a riskless asset, all investors hold the same risky portfolio and differ only in how much they borrow or lend",
-                    "Every investor should hold only two assets",
-                    "Risky and riskless assets must have equal weights",
-                    "The market portfolio has zero variance"
+                    "the sample tangency weights Σ̂⁻¹μ̂, so a zero tangency weight is tested with an OLS t-test",
+                    "the sample GMV weights Σ̂⁻¹1",
+                    "the CAPM betas of the assets",
+                    "equal weights 1/N"
                 ],
-                "correctExplanation": "Risk aversion changes only the mix between the riskless asset and the tangency portfolio, not the risky portfolio itself.",
-                "incorrectExplanation": "Separation concerns the split between cash and a single risky portfolio, the tangency portfolio."
+                "correctExplanation": "X'X/T = Σ̂ + μ̂μ̂', and Sherman–Morrison gives b̂ = Σ̂⁻¹μ̂/(1 + θ̂²): the tangency direction (Britten-Jones, 1999).",
+                "incorrectExplanation": "The regressand is a constant and there is no constant term: the coefficients involve Σ̂⁻¹μ̂, not Σ̂⁻¹1, and the regression does not explain one asset by the market."
             },
             "ro": {
-                "title": "Separarea lui Tobin",
-                "text": "Ce afirmă separarea în două fonduri (Tobin, 1958)?",
+                "title": "Regresia Britten-Jones",
+                "text": "Regresați constanta 1 pe vectorul randamentelor în exces r_t, fără termen liber. Coeficienții OLS sunt proporționali cu…",
                 "options": [
-                    "Cu un activ fără risc, toți investitorii dețin același portofoliu riscant și diferă doar prin cât împrumută sau plasează",
-                    "Fiecare investitor trebuie să dețină doar două active",
-                    "Activele riscante și cel fără risc trebuie să aibă ponderi egale",
-                    "Portofoliul pieței are varianță zero"
+                    "ponderile tangente de selecție Σ̂⁻¹μ̂, deci o pondere tangentă nulă se testează cu un test t OLS",
+                    "ponderile GMV de selecție Σ̂⁻¹1",
+                    "coeficienții beta CAPM ai activelor",
+                    "ponderile egale 1/N"
                 ],
-                "correctExplanation": "Aversiunea la risc schimbă doar combinația dintre activul fără risc și portofoliul tangent, nu portofoliul riscant.",
-                "incorrectExplanation": "Separarea privește împărțirea între numerar și un singur portofoliu riscant, cel tangent."
+                "correctExplanation": "X'X/T = Σ̂ + μ̂μ̂', iar Sherman–Morrison dă b̂ = Σ̂⁻¹μ̂/(1 + θ̂²): direcția tangentă (Britten-Jones, 1999).",
+                "incorrectExplanation": "Variabila dependentă este o constantă și nu există termen liber: coeficienții conțin Σ̂⁻¹μ̂, nu Σ̂⁻¹1, iar regresia nu explică un activ prin piață."
+            }
+        },
+        {
+            "correct": 3,
+            "en": {
+                "title": "Marchenko–Pastur",
+                "text": "N = 16 assets, T = 64 months, i.i.d. returns with Σ = σ²I. For large N and T, where does the largest sample eigenvalue lie?",
+                "options": [
+                    "Close to σ², since all true eigenvalues equal σ²",
+                    "Close to 16σ², the trace of Σ",
+                    "Close to σ²(1 + 0.25) = 1.25σ²",
+                    "Close to σ²(1 + √0.25)² = 2.25σ²"
+                ],
+                "correctExplanation": "With c = N/T = 0.25 the sample eigenvalues fill [σ²(1 − √c)², σ²(1 + √c)²] = [0.25σ², 2.25σ²]: noise alone spreads them nine-fold.",
+                "incorrectExplanation": "Sampling noise spreads the eigenvalues around σ² even when all true ones are equal; the edge involves the square root of c = N/T, and the trace is the sum, not the largest eigenvalue."
+            },
+            "ro": {
+                "title": "Marchenko–Pastur",
+                "text": "N = 16 active, T = 64 de luni, randamente i.i.d. cu Σ = σ²I. Pentru N și T mari, unde se află cea mai mare valoare proprie de selecție?",
+                "options": [
+                    "Aproape de σ², pentru că toate valorile proprii adevărate sunt σ²",
+                    "Aproape de 16σ², urma lui Σ",
+                    "Aproape de σ²(1 + 0,25) = 1,25σ²",
+                    "Aproape de σ²(1 + √0,25)² = 2,25σ²"
+                ],
+                "correctExplanation": "Cu c = N/T = 0,25, valorile proprii de selecție umplu [σ²(1 − √c)², σ²(1 + √c)²] = [0,25σ², 2,25σ²]: zgomotul singur le împrăștie de nouă ori.",
+                "incorrectExplanation": "Zgomotul de eșantionare împrăștie valorile proprii în jurul lui σ² chiar când cele adevărate sunt egale; marginea conține rădăcina pătrată a lui c = N/T, iar urma este suma, nu cea mai mare valoare proprie."
             }
         },
         {
@@ -170,57 +170,57 @@ window.MFM_DATA.quizzes['portfolio'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 1,
             "en": {
-                "title": "Window length",
-                "text": "In the chapter's simulation with nine sectors, from which estimation window did sample MV beat 1/N (median true Sharpe)?",
+                "title": "Ledoit–Wolf intensity",
+                "text": "N is fixed and the sample length T grows. What happens to the optimal Ledoit–Wolf shrinkage intensity δ* = κ/T?",
                 "options": [
-                    "36 months",
-                    "60 months",
-                    "120 months",
-                    "480 months"
+                    "It tends to 1: the target dominates",
+                    "It tends to 0 at rate 1/T",
+                    "It stays constant, because κ does not depend on T",
+                    "It tends to 0 at rate 1/√T, the rate of the sample covariance"
                 ],
-                "correctExplanation": "Sample MV reached a median true Sharpe of 0.55 versus 0.54 for 1/N only with 480 months (40 years).",
-                "incorrectExplanation": "With 60 months MV reached only 0.31; it needed decades of data."
+                "correctExplanation": "κ converges to a constant, so δ* = κ/T falls like 1/T: with long samples the consistent sample matrix wins.",
+                "incorrectExplanation": "The estimation error of S shrinks as T grows while the bias of the target does not, so the weight on the target must vanish; the rate is that of δ* = κ/T, not the √T rate of the estimator itself."
             },
             "ro": {
-                "title": "Lungimea ferestrei",
-                "text": "În simularea din capitol cu nouă sectoare, de la ce fereastră de estimare a bătut MV de selecție 1/N (Sharpe adevărat median)?",
+                "title": "Intensitatea Ledoit–Wolf",
+                "text": "N este fix, iar lungimea eșantionului T crește. Ce se întâmplă cu intensitatea optimă de shrinkage Ledoit–Wolf δ* = κ/T?",
                 "options": [
-                    "36 de luni",
-                    "60 de luni",
-                    "120 de luni",
-                    "480 de luni"
+                    "Tinde la 1: ținta domină",
+                    "Tinde la 0 cu viteza 1/T",
+                    "Rămâne constantă, pentru că κ nu depinde de T",
+                    "Tinde la 0 cu viteza 1/√T, viteza covarianței de selecție"
                 ],
-                "correctExplanation": "MV de selecție a atins un Sharpe adevărat median de 0,55 față de 0,54 pentru 1/N abia cu 480 de luni (40 de ani).",
-                "incorrectExplanation": "Cu 60 de luni, MV a atins doar 0,31; a avut nevoie de decenii de date."
+                "correctExplanation": "κ converge la o constantă, deci δ* = κ/T scade ca 1/T: în eșantioane lungi câștigă matricea de selecție, consistentă.",
+                "incorrectExplanation": "Eroarea de estimare a lui S scade cu T, dar deplasarea țintei nu, deci ponderea țintei trebuie să dispară; viteza este cea a lui δ* = κ/T, nu viteza √T a estimatorului."
             }
         },
         {
-            "correct": 1,
+            "correct": 2,
             "en": {
-                "title": "In-sample optimism",
-                "text": "In 2000 simulated 60-month samples, what was the median Sharpe of the estimated tangency portfolio in sample and with the true parameters?",
+                "title": "Black–Litterman with certain views",
+                "text": "In Black–Litterman, the views are held with certainty (Ω → 0). What does the posterior mean μ_BL become?",
                 "options": [
-                    "0.66 and 0.66",
-                    "1.57 and 0.30",
-                    "0.30 and 1.57",
-                    "0.54 and 0.54"
+                    "The implied returns π: the views are ignored",
+                    "q for every asset, even those not in the views",
+                    "The GLS projection of π that satisfies Pμ_BL = q exactly",
+                    "It is undefined, because Ω⁻¹ does not exist"
                 ],
-                "correctExplanation": "In-sample Sharpe ratios of optimised portfolios are biased upwards: 1.57 estimated against 0.30 true.",
-                "incorrectExplanation": "The in-sample value is far too optimistic; evaluated with the true parameters the portfolio is much worse."
+                "correctExplanation": "μ_BL = π + τΣP'(PτΣP' + Ω)⁻¹(q − Pπ); with Ω = 0 the views hold exactly and π is moved as little as possible in the τΣ metric (restricted least squares).",
+                "incorrectExplanation": "Only the combinations P of the means are pinned to q; the other directions stay at the prior, and the limit exists in the form π + τΣP'(PτΣP')⁻¹(q − Pπ)."
             },
             "ro": {
-                "title": "Optimismul din eșantion",
-                "text": "În 2000 de eșantioane simulate de 60 de luni, care a fost Sharpe-ul median al portofoliului tangent estimat în eșantion și cu parametrii adevărați?",
+                "title": "Black–Litterman cu opinii certe",
+                "text": "În Black–Litterman, opiniile sunt sigure (Ω → 0). Ce devine media a posteriori μ_BL?",
                 "options": [
-                    "0,66 și 0,66",
-                    "1,57 și 0,30",
-                    "0,30 și 1,57",
-                    "0,54 și 0,54"
+                    "Randamentele implicite π: opiniile sunt ignorate",
+                    "q pentru fiecare activ, chiar și pentru cele din afara opiniilor",
+                    "Proiecția GLS a lui π care satisface exact Pμ_BL = q",
+                    "Nu este definită, pentru că Ω⁻¹ nu există"
                 ],
-                "correctExplanation": "Rapoartele Sharpe în eșantion ale portofoliilor optimizate sunt deplasate în sus: 1,57 estimat față de 0,30 adevărat.",
-                "incorrectExplanation": "Valoarea din eșantion este mult prea optimistă; evaluat cu parametrii adevărați, portofoliul este mult mai slab."
+                "correctExplanation": "μ_BL = π + τΣP'(PτΣP' + Ω)⁻¹(q − Pπ); cu Ω = 0 opiniile sunt satisfăcute exact, iar π se mută cât mai puțin în metrica τΣ (cele mai mici pătrate cu restricții).",
+                "incorrectExplanation": "Doar combinațiile P ale mediilor sunt fixate la q; celelalte direcții rămân la valoarea a priori, iar limita există sub forma π + τΣP'(PτΣP')⁻¹(q − Pπ)."
             }
         },
         {
@@ -359,57 +359,57 @@ window.MFM_DATA.quizzes['portfolio'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 0,
             "en": {
-                "title": "Risk contribution",
-                "text": "How is the risk contribution of asset i defined?",
+                "title": "Studentized bootstrap",
+                "text": "Why do Ledoit and Wolf (2008) bootstrap the studentized statistic |Δ̂* − Δ̂|/s(Δ̂*) rather than Δ̂* itself?",
                 "options": [
-                    "w_i σ_i",
-                    "w_i / σ_p",
-                    "σ_i² / σ_p²",
-                    "w_i (Σw)_i / σ_p, and the contributions sum to σ_p"
+                    "The studentized statistic is asymptotically pivotal, so the bootstrap test is more accurate than the Normal approximation",
+                    "Studentizing removes the serial dependence of the returns",
+                    "Studentizing makes the returns Normal",
+                    "Studentizing reduces the computing time"
                 ],
-                "correctExplanation": "Volatility is homogeneous of degree one, so Euler's theorem splits it additively into w_i ∂σ_p/∂w_i.",
-                "incorrectExplanation": "The definition uses the marginal contribution (Σw)_i/σ_p times the weight."
+                "correctExplanation": "A pivotal statistic has a limit law free of unknown parameters; bootstrapping it gives a higher-order refinement, which a non-studentized bootstrap does not.",
+                "incorrectExplanation": "Serial dependence is handled by resampling blocks, not by studentizing, and a studentized bootstrap costs more computing time, not less."
             },
             "ro": {
-                "title": "Contribuția la risc",
-                "text": "Cum se definește contribuția la risc a activului i?",
+                "title": "Bootstrap studentizat",
+                "text": "De ce aplică Ledoit și Wolf (2008) bootstrap statisticii studentizate |Δ̂* − Δ̂|/s(Δ̂*), și nu direct lui Δ̂*?",
                 "options": [
-                    "w_i σ_i",
-                    "w_i / σ_p",
-                    "σ_i² / σ_p²",
-                    "w_i (Σw)_i / σ_p, iar contribuțiile se adună la σ_p"
+                    "Statistica studentizată este asimptotic pivotală, deci testul bootstrap este mai precis decât aproximarea Normală",
+                    "Studentizarea elimină dependența serială a randamentelor",
+                    "Studentizarea face randamentele să urmeze distribuția Normală",
+                    "Studentizarea reduce timpul de calcul"
                 ],
-                "correctExplanation": "Volatilitatea este omogenă de gradul unu, deci teorema lui Euler o descompune aditiv în w_i ∂σ_p/∂w_i.",
-                "incorrectExplanation": "Definiția folosește contribuția marginală (Σw)_i/σ_p înmulțită cu ponderea."
+                "correctExplanation": "O statistică pivotală are o lege limită fără parametri necunoscuți; bootstrap-ul ei dă o rafinare de ordin superior, pe care bootstrap-ul nestudentizat nu o dă.",
+                "incorrectExplanation": "Dependența serială se tratează prin reeșantionarea blocurilor, nu prin studentizare, iar bootstrap-ul studentizat costă mai mult timp de calcul, nu mai puțin."
             }
         },
         {
-            "correct": 1,
+            "correct": 3,
             "en": {
-                "title": "ERC with two assets",
-                "text": "For two assets, what are the equal-risk-contribution (ERC) weights?",
+                "title": "Multiple testing",
+                "text": "You test 21 rules against 1/N; the smallest p-value is 0.03. What does Holm's procedure at a 5% family-wise level conclude?",
                 "options": [
-                    "Equal weights",
-                    "Proportional to 1/σ_i, whatever the correlation",
-                    "Proportional to σ_i",
-                    "The GMV weights"
+                    "Significant, because 0.03 < 0.05",
+                    "Significant, because correlated tests need no adjustment",
+                    "Holm cannot be used, because it requires independent tests",
+                    "Not significant, because 21 × 0.03 = 0.63 > 0.05"
                 ],
-                "correctExplanation": "Both risk contributions share the same cross term, so they are equal when w₁σ₁ = w₂σ₂.",
-                "incorrectExplanation": "With two assets the correlation drops out of the ERC condition."
+                "correctExplanation": "Holm compares the smallest p-value with 0.05/21 ≈ 0.0024; the adjusted value 0.63 is far above 5%, and Holm is valid under any dependence.",
+                "incorrectExplanation": "A single p-value below 0.05 is expected by chance among 21 tests; Holm controls the family-wise error rate under arbitrary dependence, so correlation neither removes the need for it nor forbids it."
             },
             "ro": {
-                "title": "ERC cu două active",
-                "text": "Pentru două active, care sunt ponderile cu contribuții egale la risc (ERC)?",
+                "title": "Testarea multiplă",
+                "text": "Testați 21 de reguli contra 1/N; cea mai mică valoare p este 0,03. Ce conclude procedura Holm la un nivel de 5% pentru familie?",
                 "options": [
-                    "Ponderi egale",
-                    "Proporționale cu 1/σ_i, oricare ar fi corelația",
-                    "Proporționale cu σ_i",
-                    "Ponderile GMV"
+                    "Semnificativ, pentru că 0,03 < 0,05",
+                    "Semnificativ, pentru că testele corelate nu necesită ajustare",
+                    "Holm nu se poate folosi, pentru că cere teste independente",
+                    "Nesemnificativ, pentru că 21 × 0,03 = 0,63 > 0,05"
                 ],
-                "correctExplanation": "Ambele contribuții la risc au același termen încrucișat, deci sunt egale când w₁σ₁ = w₂σ₂.",
-                "incorrectExplanation": "Cu două active, corelația dispare din condiția ERC."
+                "correctExplanation": "Holm compară cea mai mică valoare p cu 0,05/21 ≈ 0,0024; valoarea ajustată 0,63 este mult peste 5%, iar Holm este valid sub orice dependență.",
+                "incorrectExplanation": "O valoare p sub 0,05 este de așteptat din întâmplare printre 21 de teste; Holm controlează probabilitatea de cel puțin o eroare în familie sub orice dependență, deci corelația nici nu elimină ajustarea, nici nu o interzice."
             }
         },
         {
@@ -496,28 +496,28 @@ window.MFM_DATA.quizzes['portfolio'] = {
         {
             "correct": 1,
             "en": {
-                "title": "Turnover",
-                "text": "How is monthly turnover measured in the chapter's backtests?",
+                "title": "Jagannathan–Ma mechanism",
+                "text": "The long-only GMV equals the unconstrained GMV of a modified matrix S̃ = S − (λ1' + 1λ'), with λ ≥ 0 the multipliers of w ≥ 0. What does a binding constraint on asset i do?",
                 "options": [
-                    "The number of assets with a non-zero weight",
-                    "The sum of absolute differences between new weights and drifted old weights",
-                    "The change in portfolio volatility",
-                    "The share of months with a loss"
+                    "It raises the variance of asset i",
+                    "It lowers all covariances of asset i by λ_i, shrinking large estimates",
+                    "It sets the correlations of asset i to zero",
+                    "It leaves the covariance matrix unchanged"
                 ],
-                "correctExplanation": "TO = Σ|w_new − w⁺|, where w⁺ are last month's weights after they drifted with returns; net return = gross − c × TO.",
-                "incorrectExplanation": "Turnover is the fraction of wealth traded at rebalancing, computed from drifted weights."
+                "correctExplanation": "s̃_ij = s_ij − λ_i − λ_j: the assets the GMV would short usually have overestimated covariances, and the constraint pulls them down, which acts as shrinkage.",
+                "incorrectExplanation": "The modification subtracts nonnegative multipliers from every covariance of the constrained asset, so it lowers them rather than raising, zeroing or ignoring them."
             },
             "ro": {
-                "title": "Rulajul",
-                "text": "Cum se măsoară rulajul lunar în backtest-urile din capitol?",
+                "title": "Mecanismul Jagannathan–Ma",
+                "text": "GMV fără vânzări în lipsă este GMV nerestricționat al matricei modificate S̃ = S − (λ1' + 1λ'), cu λ ≥ 0 multiplicatorii restricțiilor w ≥ 0. Ce face o restricție activă pe activul i?",
                 "options": [
-                    "Numărul activelor cu pondere nenulă",
-                    "Suma diferențelor absolute dintre ponderile noi și ponderile vechi după evoluția prețurilor",
-                    "Schimbarea volatilității portofoliului",
-                    "Ponderea lunilor cu pierderi"
+                    "Crește varianța activului i",
+                    "Scade toate covarianțele activului i cu λ_i, micșorând estimările mari",
+                    "Anulează corelațiile activului i",
+                    "Lasă matricea de covarianță neschimbată"
                 ],
-                "correctExplanation": "TO = Σ|w_nou − w⁺|, unde w⁺ sunt ponderile lunii trecute după evoluția prețurilor; randament net = brut − c × TO.",
-                "incorrectExplanation": "Rulajul este fracțiunea din avere tranzacționată la reechilibrare, calculată din ponderile după evoluția prețurilor."
+                "correctExplanation": "s̃_ij = s_ij − λ_i − λ_j: activele pe care GMV le-ar vinde în lipsă au de obicei covarianțe supraestimate, iar restricția le coboară, ceea ce acționează ca un shrinkage.",
+                "incorrectExplanation": "Modificarea scade multiplicatori nenegativi din fiecare covarianță a activului restricționat, deci le micșorează, nu le crește, nu le anulează și nu le ignoră."
             }
         },
         {
@@ -575,30 +575,30 @@ window.MFM_DATA.quizzes['portfolio'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 2,
             "en": {
-                "title": "BVB benchmark",
-                "text": "Why should optimised BVB portfolios be compared with BET-TR rather than BET?",
+                "title": "Annualising a Sharpe ratio",
+                "text": "Monthly returns have first-order autocorrelation ρ₁ = 0.2 and no higher autocorrelations. Compared with multiplying the monthly Sharpe ratio by √12, the correct annual Sharpe ratio (Lo, 2002) is…",
                 "options": [
-                    "BET-TR contains more stocks",
-                    "BET is computed in euro",
-                    "BET-TR has lower volatility by construction",
-                    "BET is a price index; BET-TR reinvests dividends, worth about 7% a year in 2017–2026"
+                    "identical, because √12 is exact for any return process",
+                    "larger, because autocorrelation adds return",
+                    "smaller, because positive autocorrelation raises the annual variance",
+                    "undefined, because Sharpe ratios cannot be annualised"
                 ],
-                "correctExplanation": "The stock returns include dividends, so the benchmark must too: BET-TR averaged 24.7% a year against 17.8% for BET.",
-                "incorrectExplanation": "The difference between the two indices is the dividends, not the number of stocks or the currency."
+                "correctExplanation": "SR(q) = η(q)·SR with η(q) = q/√(q + 2Σ(q−k)ρ_k); with ρ₁ = 0.2, η(12) = 12/√(12 + 4.4) = 2.96 < √12 = 3.46.",
+                "incorrectExplanation": "The √12 rule assumes serially uncorrelated returns; positive autocorrelation makes annual variance grow faster than 12 times the monthly one, while the mean still scales by 12."
             },
             "ro": {
-                "title": "Reperul BVB",
-                "text": "De ce trebuie comparate portofoliile BVB optimizate cu BET-TR și nu cu BET?",
+                "title": "Anualizarea raportului Sharpe",
+                "text": "Randamentele lunare au autocorelația de ordinul întâi ρ₁ = 0,2 și nicio altă autocorelație. Față de înmulțirea raportului Sharpe lunar cu √12, raportul Sharpe anual corect (Lo, 2002) este…",
                 "options": [
-                    "BET-TR conține mai multe acțiuni",
-                    "BET se calculează în euro",
-                    "BET-TR are prin construcție volatilitate mai mică",
-                    "BET este un indice de preț; BET-TR reinvestește dividendele, de circa 7% pe an în 2017–2026"
+                    "identic, pentru că √12 este exact pentru orice proces",
+                    "mai mare, pentru că autocorelația adaugă randament",
+                    "mai mic, pentru că autocorelația pozitivă mărește varianța anuală",
+                    "nedefinit, pentru că rapoartele Sharpe nu se pot anualiza"
                 ],
-                "correctExplanation": "Randamentele acțiunilor includ dividendele, deci și reperul trebuie să le includă: BET-TR a avut în medie 24,7% pe an față de 17,8% pentru BET.",
-                "incorrectExplanation": "Diferența dintre cei doi indici o reprezintă dividendele, nu numărul de acțiuni sau moneda."
+                "correctExplanation": "SR(q) = η(q)·SR, cu η(q) = q/√(q + 2Σ(q−k)ρ_k); cu ρ₁ = 0,2, η(12) = 12/√(12 + 4,4) = 2,96 < √12 = 3,46.",
+                "incorrectExplanation": "Regula √12 presupune randamente necorelate serial; autocorelația pozitivă face varianța anuală să crească mai repede decât de 12 ori varianța lunară, în timp ce media crește tot de 12 ori."
             }
         },
         {

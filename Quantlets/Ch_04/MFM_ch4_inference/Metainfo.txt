@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_inference'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Inference on estimated portfolios: Britten-Jones (1999) regression test of the tangency weights on nine sector ETFs, the Kan-Zhou (2007) bias of the in-sample maximum Sharpe ratio, Marchenko-Pastur noise band for correlation eigenvalues, GMV with analytical nonlinear shrinkage (Ledoit-Wolf 2020), the Lo (2002) standard error and annualisation of a Sharpe ratio, and the deflated Sharpe ratio (Bailey and Lopez de Prado 2014) of the best of 24 backtested rules.'
+
+Keywords: 'Britten-Jones, Sharpe ratio bias, Marchenko-Pastur, random matrix theory, nonlinear shrinkage, deflated Sharpe ratio, Lo 2002'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): sector and multi-asset ETFs; risk-free rate from the Kenneth French Data Library'
+
+Output: 'ch4_mp.pdf'

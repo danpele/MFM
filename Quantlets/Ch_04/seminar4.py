@@ -58,8 +58,11 @@ def part_a():
     Rm, mu, sd, rho = g.two_asset_stats()
     w = g.gmv_two(sd['SPY'], sd['TLT'], rho)
     v = np.sqrt(w ** 2 * sd['SPY'] ** 2 + (1 - w) ** 2 * sd['TLT'] ** 2 + 2 * w * (1 - w) * rho * sd['SPY'] * sd['TLT'])
+    Sig2 = np.array([[sd['SPY'] ** 2, rho * sd['SPY'] * sd['TLT']], [rho * sd['SPY'] * sd['TLT'], sd['TLT'] ** 2]])
+    A_ = float(np.ones(2) @ np.linalg.solve(Sig2, np.ones(2)))
     R['A1'] = dict(s1=sd['SPY'], s2=sd['TLT'], rho=rho, m1=mu['SPY'], m2=mu['TLT'], w=w, vol=v,
-                   mean=w * mu['SPY'] + (1 - w) * mu['TLT'], T=len(Rm))
+                   mean=w * mu['SPY'] + (1 - w) * mu['TLT'], T=len(Rm), A=A_, vol_from_A=float(1 / np.sqrt(A_)),
+                   Sigma=Sig2.tolist(), w_matrix=(np.linalg.solve(Sig2, np.ones(2)) / A_).tolist())
     # A2 [Propus] GMV cu doua active: SPY si GLD (lunar, zile comune)
     r, rex, rf = g.us_monthly(['SPY', 'GLD'])
     s1, s2 = r['SPY'].std() * np.sqrt(12), r['GLD'].std() * np.sqrt(12)
@@ -119,15 +122,16 @@ def part_a_tests(bts):
 # =============================================================================
 # PARTEA B
 # =============================================================================
-def b_backtest_stats(bts):
+def b_backtest_stats(bts, n_jobs=1):
     R = {}
     tab = g.summary(*bts['Sectors'][:2])
     ret, to, W = bts['Sectors']
     tests = {}
+    res = g.run_tests({s: (ret[s], ret['1/N']) for s in ['MV', 'MV-LO', 'GMV']}, n_jobs)
     for s in ['MV', 'MV-LO', 'GMV']:
-        d, se, p = g.sr_diff_hac(ret[s], ret['1/N'])
-        db, ci, pb, _ = g.sr_diff_boot(ret[s], ret['1/N'])
-        tests[s] = dict(diff=d, se=se, p_hac=p, ci=ci.tolist(), p_boot=pb)
+        r = res[s][0]
+        tests[s] = dict(diff=r['diff'], se=r['se_hac'], p_hac=r['p_hac'], ci=r['ci_boot'], p_boot=r['p_boot'],
+                        block=r['block'])
     R['B1'] = dict(table=tab.loc[['1/N', 'MV', 'MV-LO', 'GMV']].round(4).to_dict(orient='index'), tests=tests,
                    T=len(ret), start=f'{ret.index[0]:%Y-%m}', end=f'{ret.index[-1]:%Y-%m}')
     # B2 [Rezolvat] shrinkage pe sectoare: volatilitatea out-of-sample a GMV
@@ -161,9 +165,10 @@ def b_backtest_stats(bts):
                    cond_lw=float(np.linalg.cond(g.lw_cc(Xc[-g.WINDOW:])[0])))
     # B6 [Propus] HRP vs GMV pe universul combinat
     d, se, p = g.sr_diff_hac(retc['HRP'], retc['GMV'])
-    db, ci, pb, _ = g.sr_diff_boot(retc['HRP'], retc['GMV'])
+    rb = g.run_tests({'x': (retc['HRP'], retc['GMV'])})['x'][0]
+    ci, pb = rb['ci_boot'], rb['p_boot']
     R['B6'] = dict(sr_hrp=g.sharpe(retc['HRP']), sr_gmv=g.sharpe(retc['GMV']), to_hrp=toc['HRP'].mean(),
-                   to_gmv=toc['GMV'].mean(), diff=d, se=se, p_hac=p, ci=ci.tolist(), p_boot=pb,
+                   to_gmv=toc['GMV'].mean(), diff=d, se=se, p_hac=p, ci=ci, p_boot=pb, block=rb['block'],
                    vol_hrp=retc['HRP'].std() * np.sqrt(12), vol_gmv=retc['GMV'].std() * np.sqrt(12),
                    net50_hrp=g.sharpe(retc['HRP'] - 0.005 * toc['HRP'].fillna(0)),
                    net50_gmv=g.sharpe(retc['GMV'] - 0.005 * toc['GMV'].fillna(0)))
@@ -213,6 +218,36 @@ def b7_bl_multi():
     return dict(pi=dict(zip(MULTI, pi)), mu_bl=dict(zip(MULTI, mu_bl)), w_bl=dict(zip(MULTI, w_bl)),
                 prior_view=float(P @ pi), post_view=float(P @ mu_bl),
                 sample_view=float(rex['GLD'].mean() * 12 - rex['TLT'].mean() * 12), T=len(rex))
+
+
+def master_level(bts):
+    """A9, B2(d), B4(e), B9: exercitiile de nivel master."""
+    out = {}
+    # A9 [Propus] deplasarea lui theta_hat^2 (Kan & Zhou 2007), N = 9, T = 60, theta = Sharpe tangent din curs
+    R_s, Rex_s, _ = g.us_monthly(SECTORS)
+    mu, S = Rex_s.mean().values, Rex_s.cov().values
+    wt = g.w_tan(mu, S)
+    theta = float((wt @ mu) / np.sqrt(wt @ S @ wt) * np.sqrt(12))
+    out['A9'] = dict(theta_ann=theta, **g.kz_bias(theta, 9, 60))
+    # B2(d) [Rezolvat] Marchenko-Pastur pe fereastra de 60 de luni a sectoarelor
+    X = Rex_s.values[-g.WINDOW:]
+    ev = np.sort(np.linalg.eigvalsh(np.corrcoef(X.T)))[::-1]
+    lo, hi = g.mp_bounds(9 / g.WINDOW)
+    out['B2d'] = dict(ev=ev.tolist(), lo=lo, hi=hi, n_above=int((ev > hi).sum()), n_below=int((ev < lo).sum()))
+    # B4(e) [Propus] shrinkage neliniar (Ledoit & Wolf 2020) pe universul combinat
+    Rc, Rexc, _ = g.us_monthly(g.COMBINED)
+    retn, ton, _ = g.backtest(Rc, Rexc, strategies=['GMV', 'GMV-LW', 'GMV-NL'])
+    vr, ci, pgt = var_ratio_boot(retn['GMV-NL'], retn['GMV'])
+    vr2, ci2, pgt2 = var_ratio_boot(retn['GMV-NL'], retn['GMV-LW'])
+    out['B4e'] = dict(vol={s: float(retn[s].std() * np.sqrt(12)) for s in retn},
+                      to={s: float(ton[s].mean()) for s in retn}, sr={s: g.sharpe(retn[s]) for s in retn},
+                      vr_nl_gmv=vr, ci_nl_gmv=ci.tolist(), vr_nl_lw=vr2, ci_nl_lw=ci2.tolist())
+    # B9 [Propus] testul Britten-Jones al ipotezei 'tangent = 1/N', esantion complet si doua jumatati
+    h = len(Rex_s) // 2
+    out['B9'] = {k: {q: v for q, v in g.britten_jones(x).items() if q in ('T', 'F', 'pF', 'wald_hac', 'p_wald_hac', 't', 't_hac', 'w')}
+                 | dict(start=f'{x.index[0]:%Y-%m}', end=f'{x.index[-1]:%Y-%m}')
+                 for k, x in [('full', Rex_s), ('first', Rex_s.iloc[:h]), ('second', Rex_s.iloc[h:])]}
+    return out
 
 
 # =============================================================================
@@ -279,7 +314,8 @@ if __name__ == '__main__':
     R = {'A': part_a()}
     bts = g.run_backtests()
     R['A'].update(part_a_tests(bts))
-    R['B'] = b_backtest_stats(bts)
+    R['B'] = b_backtest_stats(bts, n_jobs=3)
+    R['M'] = master_level(bts)
     R['B']['B5'] = b5_btc()
     R['B']['B7'] = b7_bl_multi()
     R['C'] = part_c()

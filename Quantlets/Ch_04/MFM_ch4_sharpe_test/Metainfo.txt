@@ -2,9 +2,9 @@ Name of QuantLet: 'MFM_ch4_sharpe_test'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Testing Sharpe ratio differences out of sample: the HAC test of Ledoit and Wolf (2008) and a circular block bootstrap for every rule against 1/N on three universes.'
+Description: 'Testing Sharpe ratio differences out of sample, every rule against 1/N on three universes: the HAC test of Ledoit and Wolf (2008, Section 3.1) and their studentized circular block bootstrap (Section 3.2.2), with the block length calibrated by their Algorithm 3.1 (first-order vector autoregression, stationary bootstrap of the residuals, 5000 pseudo sequences, blocks 1 to 10, 4999 bootstrap draws).'
 
-Keywords: 'Sharpe ratio test, Ledoit-Wolf, HAC, block bootstrap, 1/N, out-of-sample'
+Keywords: 'Sharpe ratio test, Ledoit-Wolf, HAC, studentized bootstrap, circular block bootstrap, calibration, 1/N'
 
 Author: 'Daniel Traian Pele'
 
