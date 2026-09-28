@@ -686,7 +686,7 @@ def fig_defi_tvl():
 
 
 # =============================================================================
-# 9. SUNT CRIPTO-ACTIVELE O CLASA ALTERNATIVA? (in spiritul Pele et al., 2023)
+# 9. SUNT CRIPTO-ACTIVELE O CLASA ALTERNATIVA? (replicare restransa a abordarii Pele et al., 2023)
 # =============================================================================
 WINDOWS = {'W1': ('2019-01-01', '2021-06-30'), 'W2': (ETF_START, END)}
 FEATURES = ['ann_vol', 'skew', 'kurt', 'acf1', 'acf1_sq', 'hill_left', 'hill_right', 'mdd']

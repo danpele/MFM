@@ -35,57 +35,57 @@ window.MFM_DATA.quizzes['bubbles'] = {
             }
         },
         {
-            "correct": 0,
+            "correct": 2,
             "en": {
-                "title": "Blanchard-Watson bubble",
-                "text": "A Blanchard-Watson bubble survives each period with probability 0.9. What is its expected lifetime?",
+                "title": "Null limit of SADF",
+                "text": "Why can one set of simulated SADF critical values serve every series with the same sample size T and minimum window r0?",
                 "options": [
-                    "10 periods",
-                    "0.9 periods",
-                    "1.1 periods",
-                    "9 periods"
+                    "Because SADF is asymptotically Normal",
+                    "Because the critical values depend on the variance of the data, which simulation matches",
+                    "Because under the unit-root null the statistic converges to a functional of standard Brownian motion that depends only on r0 and the deterministic terms",
+                    "Because the ADF lags remove all dependence in the data"
                 ],
-                "correctExplanation": "The number of periods until the collapse is geometric with success probability 1 - 0.9 = 0.1, so the expected lifetime is 1/0.1 = 10.",
-                "incorrectExplanation": "The collapse probability per period is 0.1; the expected waiting time for the first collapse is its inverse, 10 periods."
+                "correctExplanation": "Under a random walk with an asymptotically negligible drift, each window ADF converges to a ratio of Brownian functionals in which sigma cancels; SADF and GSADF are suprema of that functional, so their quantiles depend only on r0 (and the constant/drift specification).",
+                "incorrectExplanation": "The limit is pivotal but non-standard: sigma and the drift drop out, and the supremum over windows is not Normal. Only r0 and the deterministic specification change the critical values."
             },
             "ro": {
-                "title": "Bula Blanchard-Watson",
-                "text": "O bulă Blanchard-Watson supraviețuiește în fiecare perioadă cu probabilitatea 0,9. Care este durata ei de viață așteptată?",
+                "title": "Limita SADF sub ipoteza nulă",
+                "text": "De ce un singur set de valori critice SADF simulate poate servi orice serie cu aceeași mărime a eșantionului T și aceeași fereastră minimă r0?",
                 "options": [
-                    "10 perioade",
-                    "0,9 perioade",
-                    "1,1 perioade",
-                    "9 perioade"
+                    "Pentru că SADF are asimptotic distribuția Normală",
+                    "Pentru că valorile critice depind de dispersia datelor, pe care simularea o reproduce",
+                    "Pentru că sub ipoteza nulă a rădăcinii unitare statistica tinde la o funcțională a mișcării browniene standard care depinde doar de r0 și de termenii determiniști",
+                    "Pentru că întârzierile ADF elimină orice dependență din date"
                 ],
-                "correctExplanation": "Numărul de perioade până la prăbușire urmează o distribuție geometrică cu probabilitatea 1 - 0,9 = 0,1, deci durata așteptată este 1/0,1 = 10.",
-                "incorrectExplanation": "Probabilitatea de prăbușire pe perioadă este 0,1; timpul mediu până la prima prăbușire este inversul ei, 10 perioade."
+                "correctExplanation": "Sub un mers aleator cu derivă asimptotic neglijabilă, fiecare ADF pe fereastră tinde la un raport de funcționale browniene în care sigma se simplifică; SADF și GSADF sunt supremuri ale acestei funcționale, deci cuantilele lor depind doar de r0 (și de specificarea termenului liber/derivei).",
+                "incorrectExplanation": "Limita este pivotală, dar nestandard: sigma și deriva dispar, iar supremul pe ferestre nu urmează distribuția Normală. Doar r0 și specificarea deterministă schimbă valorile critice."
             }
         },
         {
-            "correct": 0,
+            "correct": 1,
             "en": {
-                "title": "Growth while the bubble survives",
-                "text": "In the same bubble (survival probability 0.9, required return 6%), how fast does it grow in the periods it survives?",
+                "title": "Mildly explosive alternative",
+                "text": "Under rho_T = 1 + c/k_T with c > 0, k_T -> infinity and k_T = o(T), what happens to the right-tailed ADF t-ratio as T grows?",
                 "options": [
-                    "(1.06/0.9) - 1, about 17.8% per period",
-                    "6% per period",
-                    "0.9 x 6% = 5.4% per period",
-                    "It does not grow"
+                    "It converges to the Dickey-Fuller distribution",
+                    "It diverges to plus infinity, so the right-tailed test is consistent",
+                    "It converges to N(0, 1)",
+                    "It diverges to minus infinity"
                 ],
-                "correctExplanation": "The expected growth must be 6%: 0.9 x (1 + g) = 1.06, so the bubble grows by 1.06/0.9 - 1, about 17.8%, whenever it survives.",
-                "incorrectExplanation": "The crash risk has to be compensated: conditional on survival the bubble must grow faster than r, by the factor (1 + r)/0.9."
+                "correctExplanation": "Phillips and Magdalinos show that (rho_T^T/(rho_T^2 - 1))(rho_hat - rho_T) has a Cauchy limit; the estimator converges so fast that the t-ratio of rho - 1 grows like rho_T^T, so power tends to one.",
+                "incorrectExplanation": "A mildly explosive root is not local to unity: the estimation error vanishes at rate k_T rho_T^T while the deviation c/k_T stays, so the t-ratio explodes upwards, not towards a fixed distribution."
             },
             "ro": {
-                "title": "Creșterea cât timp bula supraviețuiește",
-                "text": "În aceeași bulă (probabilitatea de supraviețuire 0,9, randamentul cerut 6%), cât de repede crește în perioadele în care supraviețuiește?",
+                "title": "Alternativa ușor explozivă",
+                "text": "Sub rho_T = 1 + c/k_T cu c > 0, k_T -> infinit și k_T = o(T), ce se întâmplă cu raportul t ADF la dreapta când T crește?",
                 "options": [
-                    "(1,06/0,9) - 1, aproximativ 17,8% pe perioadă",
-                    "6% pe perioadă",
-                    "0,9 x 6% = 5,4% pe perioadă",
-                    "Nu crește"
+                    "Tinde la distribuția Dickey-Fuller",
+                    "Diverge la plus infinit, deci testul la dreapta este consistent",
+                    "Tinde la N(0, 1)",
+                    "Diverge la minus infinit"
                 ],
-                "correctExplanation": "Creșterea așteptată trebuie să fie 6%: 0,9 x (1 + g) = 1,06, deci bula crește cu 1,06/0,9 - 1, aproximativ 17,8%, de fiecare dată când supraviețuiește.",
-                "incorrectExplanation": "Riscul de prăbușire trebuie compensat: condiționat de supraviețuire, bula trebuie să crească mai repede decât r, cu factorul (1 + r)/0,9."
+                "correctExplanation": "Phillips și Magdalinos arată că (rho_T^T/(rho_T^2 - 1))(rho_hat - rho_T) are o limită Cauchy; estimatorul converge atât de repede încât raportul t al lui rho - 1 crește ca rho_T^T, deci puterea tinde la unu.",
+                "incorrectExplanation": "O rădăcină ușor explozivă nu este local-unitară: eroarea de estimare dispare cu viteza k_T rho_T^T, iar abaterea c/k_T rămâne, deci raportul t explodează în sus, nu tinde la o distribuție fixă."
             }
         },
         {
@@ -116,30 +116,30 @@ window.MFM_DATA.quizzes['bubbles'] = {
             }
         },
         {
-            "correct": 1,
+            "correct": 3,
             "en": {
-                "title": "Right-tailed ADF",
-                "text": "In the regression Delta y_t = a + b y_{t-1} + e_t on log prices, which alternative does a bubble test use?",
+                "title": "Date-stamping multiplicity",
+                "text": "BSADF is compared with its pointwise 95% critical value at each of 400 dates of a series with no bubble. What is the risk?",
                 "options": [
-                    "b < 0 (stationarity)",
-                    "b > 0 (explosive root)",
-                    "b = 0 (unit root)",
-                    "a > 0 (positive drift)"
+                    "None: each comparison has size 5%, so the whole procedure has size 5%",
+                    "The minimum-duration rule makes the family-wise error exactly 5%",
+                    "The risk exists only for weekly data",
+                    "The probability of at least one false episode over the sample is far above 5%; use family-wise (bootstrap sup-over-window) critical values or a slowly increasing critical value"
                 ],
-                "correctExplanation": "Bubble tests reverse the usual unit-root test: the null is b = 0 and the alternative is b > 0, an explosive autoregressive root, so large positive t-statistics reject.",
-                "incorrectExplanation": "The standard ADF test looks for stationarity (b < 0); bubble tests are right-tailed and look for explosive behaviour, b > 0."
+                "correctExplanation": "Hundreds of dependent 5% tests almost surely produce some crossing; in this chapter's simulation about half of the random-walk paths contain a false date-stamped episode. Phillips and Shi bootstrap the maximum of BSADF over a window to control the family-wise error; PSY's consistency theory lets the critical value grow slowly.",
+                "incorrectExplanation": "Pointwise control is not family-wise control: the chance of at least one false alarm grows with the monitoring length, and the minimum duration reduces it but does not bring it back to 5%."
             },
             "ro": {
-                "title": "ADF la dreapta",
-                "text": "În regresia Delta y_t = a + b y_{t-1} + e_t pe logaritmul prețului, ce ipoteză alternativă folosește un test de bulă?",
+                "title": "Multiplicitatea în datare",
+                "text": "BSADF este comparat cu valoarea critică punctuală de 95% la fiecare dintre cele 400 de date ale unei serii fără bulă. Care este riscul?",
                 "options": [
-                    "b < 0 (staționaritate)",
-                    "b > 0 (rădăcină explozivă)",
-                    "b = 0 (rădăcină unitară)",
-                    "a > 0 (derivă pozitivă)"
+                    "Niciunul: fiecare comparație are nivelul 5%, deci întreaga procedură are nivelul 5%",
+                    "Regula duratei minime face eroarea pe familie exact 5%",
+                    "Riscul există doar pentru datele săptămânale",
+                    "Probabilitatea a cel puțin unui episod fals pe selecție este mult peste 5%; folosiți valori critice pe familie (bootstrap pentru supremul pe fereastră) sau o valoare critică ce crește lent"
                 ],
-                "correctExplanation": "Testele de bulă inversează testul obișnuit de rădăcină unitară: ipoteza nulă este b = 0, iar alternativa b > 0, o rădăcină autoregresivă explozivă; respingem pentru valori t mari și pozitive.",
-                "incorrectExplanation": "Testul ADF obișnuit caută staționaritate (b < 0); testele de bulă sunt la dreapta și caută un comportament exploziv, b > 0."
+                "correctExplanation": "Sute de teste dependente la 5% produc aproape sigur o depășire; în simularea din acest capitol, aproximativ jumătate dintre mersurile aleatoare conțin un episod datat fals. Phillips și Shi fac bootstrap pentru maximul BSADF pe o fereastră ca să controleze eroarea pe familie; teoria de consistență PSY lasă valoarea critică să crească lent.",
+                "incorrectExplanation": "Controlul punctual nu este control pe familie: șansa a cel puțin unei alarme false crește cu lungimea monitorizării, iar durata minimă o reduce, dar nu o readuce la 5%."
             }
         },
         {
@@ -224,30 +224,30 @@ window.MFM_DATA.quizzes['bubbles'] = {
             }
         },
         {
-            "correct": 2,
+            "correct": 0,
             "en": {
-                "title": "Minimum window",
-                "text": "With the Phillips-Shi-Yu rule r0 = 0.01 + 1.8/sqrt(T), what is the minimum window for T = 400 observations?",
+                "title": "Size under a volatility shift",
+                "text": "A series has no explosive root, but its volatility triples in mid-sample. What does GSADF with Monte Carlo critical values simulated under constant variance do?",
                 "options": [
-                    "4 observations",
-                    "94 observations",
-                    "40 observations",
-                    "200 observations"
+                    "It over-rejects, flagging spurious explosiveness; a wild bootstrap that keeps the variance path restores roughly correct size",
+                    "It always under-rejects",
+                    "Its size stays exactly 5%",
+                    "The shift only lowers power; size is unaffected"
                 ],
-                "correctExplanation": "r0 = 0.01 + 1.8/20 = 0.10, so the smallest window has 0.10 x 400 = 40 observations.",
-                "incorrectExplanation": "Plug T = 400 into the rule: sqrt(400) = 20, 1.8/20 = 0.09, plus 0.01 gives 0.10 of the sample."
+                "correctExplanation": "High variance in the recent windows inflates the supremum of the window ADF statistics; in this chapter's Monte Carlo the rejection rate was about 32% instead of 5%, and about 4% with the wild bootstrap (Harvey, Leybourne, Sollis and Taylor).",
+                "incorrectExplanation": "The null distribution under constant variance is the wrong reference when volatility rises late in the sample: large recent shocks look like acceleration, so false rejections multiply; bootstrapping the observed changes with random signs fixes this."
             },
             "ro": {
-                "title": "Fereastra minimă",
-                "text": "Cu regula Phillips-Shi-Yu r0 = 0,01 + 1,8/sqrt(T), care este fereastra minimă pentru T = 400 de observații?",
+                "title": "Nivelul la o schimbare de volatilitate",
+                "text": "O serie nu are rădăcină explozivă, dar volatilitatea ei se triplează la mijlocul eșantionului. Ce face GSADF cu valori critice Monte Carlo simulate sub dispersie constantă?",
                 "options": [
-                    "4 observații",
-                    "94 de observații",
-                    "40 de observații",
-                    "200 de observații"
+                    "Respinge prea des, semnalând explozivitate falsă; un wild bootstrap care păstrează traiectoria dispersiei readuce un nivel aproximativ corect",
+                    "Respinge mereu prea rar",
+                    "Nivelul rămâne exact 5%",
+                    "Schimbarea scade doar puterea; nivelul nu este afectat"
                 ],
-                "correctExplanation": "r0 = 0,01 + 1,8/20 = 0,10, deci cea mai mică fereastră are 0,10 x 400 = 40 de observații.",
-                "incorrectExplanation": "Înlocuim T = 400 în regulă: sqrt(400) = 20, 1,8/20 = 0,09, plus 0,01 dă 0,10 din selecție."
+                "correctExplanation": "Dispersia mare din ferestrele recente umflă supremul statisticilor ADF pe ferestre; în simularea Monte Carlo din acest capitol rata de respingere a fost de aproximativ 32% în loc de 5% și de circa 4% cu wild bootstrap (Harvey, Leybourne, Sollis și Taylor).",
+                "incorrectExplanation": "Distribuția nulă sub dispersie constantă este referința greșită când volatilitatea crește târziu în eșantion: șocurile recente mari par accelerare, deci respingerile false se înmulțesc; bootstrap-ul variațiilor observate cu semne aleatoare corectează asta."
             }
         },
         {
@@ -334,28 +334,28 @@ window.MFM_DATA.quizzes['bubbles'] = {
         {
             "correct": 2,
             "en": {
-                "title": "LPPLS critical time",
-                "text": "In the LPPLS model ln p(t) = A + B(tc - t)^m + C(tc - t)^m cos(omega ln(tc - t) - phi), what is tc?",
+                "title": "Evaluating the LPPLS indicator",
+                "text": "An LPPLS confidence indicator is computed every 5 days and the outcome is a fall of at least 20% within 90 days. Why is a two-sample z-test of the hit rates after signal vs no signal inappropriate?",
                 "options": [
-                    "The time of the last observation",
-                    "The trading cost",
-                    "The most probable time of the end of the bubble (the critical time)",
-                    "The time constant of volatility"
+                    "Because proportions can never be compared",
+                    "Because the sample is too large for a z-test",
+                    "Because outcome windows overlap and signals come in runs, so observations are dependent; use a block bootstrap or a regression with HAC standard errors",
+                    "Because price falls are Normally distributed"
                 ],
-                "correctExplanation": "tc is the finite-time singularity where the hazard rate of a crash peaks; the bubble ends at or near tc, by a crash or a slower transition.",
-                "incorrectExplanation": "The model describes faster-than-exponential growth that ends at a critical time; tc is a parameter to estimate, not a data point."
+                "correctExplanation": "Consecutive dates share up to 85 of their 90 outcome days and the indicator is persistent, so the effective number of independent observations is much smaller; a circular block bootstrap with 90-day blocks or Newey-West standard errors gives an honest interval.",
+                "incorrectExplanation": "The z-test assumes independent dates. Overlapping outcomes and clustered signals make its standard error too small, which overstates significance."
             },
             "ro": {
-                "title": "Momentul critic LPPLS",
-                "text": "În modelul LPPLS ln p(t) = A + B(tc - t)^m + C(tc - t)^m cos(omega ln(tc - t) - phi), ce este tc?",
+                "title": "Evaluarea indicatorului LPPLS",
+                "text": "Un indicator de încredere LPPLS este calculat la fiecare 5 zile, iar rezultatul este o scădere de cel puțin 20% în 90 de zile. De ce nu este potrivit un test z pentru două eșantioane al ratelor de reușită după semnal vs fără semnal?",
                 "options": [
-                    "Momentul ultimei observații",
-                    "Costul de tranzacționare",
-                    "Momentul cel mai probabil al sfârșitului bulei (momentul critic)",
-                    "Constanta de timp a volatilității"
+                    "Pentru că proporțiile nu pot fi comparate niciodată",
+                    "Pentru că eșantionul este prea mare pentru un test z",
+                    "Pentru că ferestrele rezultatului se suprapun și semnalele vin în serii, deci observațiile sunt dependente; folosiți un bootstrap pe blocuri sau o regresie cu erori standard HAC",
+                    "Pentru că scăderile de preț urmează distribuția Normală"
                 ],
-                "correctExplanation": "tc este singularitatea în timp finit la care rata de hazard a unei prăbușiri este maximă; bula se termină la sau aproape de tc, printr-o prăbușire sau o tranziție mai lentă.",
-                "incorrectExplanation": "Modelul descrie o creștere mai rapidă decât exponențiala care se termină la un moment critic; tc este un parametru de estimat, nu o observație."
+                "correctExplanation": "Datele consecutive au în comun până la 85 din cele 90 de zile ale rezultatului, iar indicatorul este persistent, deci numărul efectiv de observații independente este mult mai mic; un bootstrap pe blocuri circulare de 90 de zile sau erorile standard Newey-West dau un interval onest.",
+                "incorrectExplanation": "Testul z presupune date independente. Rezultatele suprapuse și semnalele grupate îi fac eroarea standard prea mică, ceea ce exagerează semnificația."
             }
         },
         {
@@ -467,30 +467,30 @@ window.MFM_DATA.quizzes['bubbles'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 1,
             "en": {
-                "title": "Markov-switching durations",
-                "text": "In a two-regime Markov-switching model the turbulent regime persists with probability 0.9 per week. What is its expected duration?",
+                "title": "How many Markov regimes?",
+                "text": "For weekly Bitcoin returns the likelihood-ratio statistic of one vs two Markov regimes is about 123. Why is comparing it with the chi-square(4) critical value invalid?",
                 "options": [
-                    "0.9 weeks",
-                    "1.9 weeks",
-                    "9 weeks",
-                    "10 weeks"
+                    "Because the sample has too many observations",
+                    "Because under one regime the second regime's mean and variance are not identified and the transition probabilities lie on the boundary; use Hansen-type bounds, the Carrasco-Hu-Ploberger test or a parametric bootstrap",
+                    "Because a likelihood ratio must be negative",
+                    "Because chi-square tests require Normal returns and nothing else"
                 ],
-                "correctExplanation": "The expected duration of a regime is 1/(1 - p_ii) = 1/0.1 = 10 weeks.",
-                "incorrectExplanation": "Each week the regime ends with probability 0.1; the expected number of weeks until it ends is the inverse, 10."
+                "correctExplanation": "The regularity conditions behind Wilks' theorem fail: nuisance parameters are unidentified under the null and some parameters sit on the boundary. Simulating from the fitted one-regime model and refitting both models gives the correct null distribution.",
+                "incorrectExplanation": "The problem is not the sample size or the sign of the statistic: the LR test of the number of regimes is non-standard, so its critical values must come from bounds, an optimal test or a bootstrap."
             },
             "ro": {
-                "title": "Duratele în modelul Markov-switching",
-                "text": "Într-un model Markov-switching cu două regimuri, regimul turbulent persistă cu probabilitatea 0,9 pe săptămână. Care este durata lui așteptată?",
+                "title": "Câte regimuri Markov?",
+                "text": "Pentru randamentele săptămânale Bitcoin, statistica raportului de verosimilitate pentru un regim vs două regimuri Markov este aproximativ 123. De ce comparația cu valoarea critică chi-pătrat(4) nu este validă?",
                 "options": [
-                    "0,9 săptămâni",
-                    "1,9 săptămâni",
-                    "9 săptămâni",
-                    "10 săptămâni"
+                    "Pentru că eșantionul are prea multe observații",
+                    "Pentru că sub un singur regim media și dispersia celui de-al doilea regim nu sunt identificate, iar probabilitățile de tranziție sunt pe frontieră; folosiți marginile de tip Hansen, testul Carrasco-Hu-Ploberger sau un bootstrap parametric",
+                    "Pentru că raportul de verosimilitate trebuie să fie negativ",
+                    "Pentru că testele chi-pătrat cer doar randamente din distribuția Normală"
                 ],
-                "correctExplanation": "Durata așteptată a unui regim este 1/(1 - p_ii) = 1/0,1 = 10 săptămâni.",
-                "incorrectExplanation": "În fiecare săptămână regimul se termină cu probabilitatea 0,1; numărul mediu de săptămâni până la sfârșit este inversul, 10."
+                "correctExplanation": "Condițiile de regularitate din teorema lui Wilks nu sunt îndeplinite: parametrii de deranj nu sunt identificați sub ipoteza nulă, iar unii parametri sunt pe frontieră. Simularea din modelul estimat cu un regim și reestimarea ambelor modele dau distribuția nulă corectă.",
+                "incorrectExplanation": "Problema nu este mărimea eșantionului sau semnul statisticii: testul LR pentru numărul de regimuri este nestandard, deci valorile lui critice vin din margini, dintr-un test optim sau dintr-un bootstrap."
             }
         },
         {

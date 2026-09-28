@@ -253,7 +253,7 @@ def lomb_pvalue(fit, wmin=2.0, wmax=25.0, nw=200):
     x = np.log(dt)
     r = r - r.mean()
     ws = np.linspace(wmin, wmax, nw)
-    p = lombscargle(x, r, ws) * 2 / (len(r) * r.var())          # periodograma normalizata
+    p = lombscargle(x, r, ws) / r.var()                          # periodograma normalizata (Scargle 1982): P_N = P / var(r)
     z = p.max()
     M = min(nw, len(r))
     return float(1 - (1 - np.exp(-z)) ** M)

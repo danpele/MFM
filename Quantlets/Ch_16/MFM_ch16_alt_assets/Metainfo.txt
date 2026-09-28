@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch16_alt_assets'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Are cryptos becoming alternative assets? Eight tail, memory and moment features of 26 assets (cryptos, equity indices, currencies, commodities, bonds) in 2019-2021 and 2024-2026, principal components and distances between class centroids (in the spirit of Pele et al., 2023).'
+Description: 'Are cryptos becoming alternative assets? Eight tail, memory and moment features of 26 assets (cryptos, equity indices, currencies, commodities, bonds) in 2019-2021 and 2024-2026, principal components and distances between class centroids (a small replication of the feature-space approach of Pele et al., 2023).'
 
 Keywords: 'alternative assets, asset classes, cryptocurrency, principal component analysis, tail index, classification'
 
@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama'
+Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama; 4-week Treasury bill rate from FRED'
 
 Output: 'ch16_alt_assets.pdf, ch16_asset_features.csv'

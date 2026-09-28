@@ -11,28 +11,28 @@ window.MFM_DATA.quizzes['wrap-up'] = {
         {
             "correct": 2,
             "en": {
-                "title": "Log returns over time",
-                "text": "Why are log returns convenient for multi-period analysis?",
+                "title": "The GRS null distribution",
+                "text": "Under which assumptions is the GRS statistic of a factor model exactly F(N, T - N - K) distributed?",
                 "options": [
-                    "They are always normally distributed",
-                    "They add up across assets in a portfolio",
-                    "They add up over time: the log return of a period is the sum of the daily log returns",
-                    "They are always smaller than simple returns in absolute value"
+                    "For any stationary return distribution",
+                    "Whenever T is larger than N",
+                    "With i.i.d. multivariate Normal errors, conditional on the factors",
+                    "With HAC-robust errors"
                 ],
-                "correctExplanation": "ln(P_T/P_0) is the sum of the daily log returns, so aggregation over time is exact.",
-                "incorrectExplanation": "Only aggregation over time is exact for log returns; across assets the simple returns add up with the weights, and log returns are not Normal in general."
+                "correctExplanation": "The exact F distribution of Gibbons, Ross and Shanken needs i.i.d. multivariate Normal errors; with heavy tails or heteroskedasticity a GMM/HAC Wald or bootstrap version is needed.",
+                "incorrectExplanation": "T > N only makes the statistic computable; stationarity or HAC errors do not deliver the exact F distribution, which rests on i.i.d. Normal errors."
             },
             "ro": {
-                "title": "Randamente log în timp",
-                "text": "De ce sunt randamentele logaritmice comode pentru analiza pe mai multe perioade?",
+                "title": "Distribuția nulă GRS",
+                "text": "În ce ipoteze are statistica GRS a unui model factorial exact distribuția F(N, T - N - K)?",
                 "options": [
-                    "Sunt întotdeauna distribuite Normal",
-                    "Se adună între active într-un portofoliu",
-                    "Se adună în timp: randamentul log al unei perioade este suma randamentelor log zilnice",
-                    "Sunt întotdeauna mai mici în valoare absolută decât randamentele simple"
+                    "Pentru orice distribuție staționară a randamentelor",
+                    "Ori de câte ori T este mai mare decât N",
+                    "Cu erori i.i.d. Normale multivariate, condiționat de factori",
+                    "Cu erori robuste HAC"
                 ],
-                "correctExplanation": "ln(P_T/P_0) este suma randamentelor log zilnice, deci agregarea în timp este exactă.",
-                "incorrectExplanation": "Doar agregarea în timp este exactă pentru randamentele log; între active se adună randamentele simple, ponderate, iar randamentele log nu sunt Normale în general."
+                "correctExplanation": "Distribuția F exactă a lui Gibbons, Ross și Shanken cere erori i.i.d. Normale multivariate; cu cozi groase sau heteroscedasticitate este nevoie de o versiune Wald GMM/HAC sau bootstrap.",
+                "incorrectExplanation": "T > N doar face statistica calculabilă; staționaritatea sau erorile HAC nu dau distribuția F exactă, care se bazează pe erori i.i.d. Normale."
             }
         },
         {
@@ -90,30 +90,30 @@ window.MFM_DATA.quizzes['wrap-up'] = {
             }
         },
         {
-            "correct": 1,
+            "correct": 0,
             "en": {
-                "title": "Variance ratio",
-                "text": "Under a random walk, what is the variance ratio VR(q)?",
+                "title": "An interval at the boundary",
+                "text": "A Wald 95% interval for the GARCH persistence alpha + beta of the BET is [0.974, 1.007]. What is the main problem?",
                 "options": [
-                    "q",
-                    "1",
-                    "0",
-                    "1/q"
+                    "The parameter is near the boundary of the stationary region, so the symmetric Normal interval is unreliable; use a profile-likelihood or bootstrap interval restricted to the parameter space",
+                    "The model must be an IGARCH",
+                    "The standard errors are too large because of Student-t innovations",
+                    "Nothing: the interval is exact"
                 ],
-                "correctExplanation": "The variance of a q-period return equals q times the one-period variance, so VR(q) = 1.",
-                "incorrectExplanation": "Under a random walk variances add up with the horizon; positive autocorrelation pushes VR above 1, negative below 1."
+                "correctExplanation": "Near alpha + beta = 1 the Normal approximation fails (Andrews, 1999); the profile-likelihood interval for the BET is [0.975, 1), a half-life of at least 27 days with no finite upper bound.",
+                "incorrectExplanation": "An interval that leaves the parameter space signals that the Normal approximation does not hold there; it neither proves IGARCH nor is exact."
             },
             "ro": {
-                "title": "Raportul varianțelor",
-                "text": "Pentru un mers aleator, cât este raportul varianțelor VR(q)?",
+                "title": "Un interval la frontieră",
+                "text": "Un interval Wald de 95% pentru persistența GARCH alpha + beta a BET este [0,974; 1,007]. Care este problema principală?",
                 "options": [
-                    "q",
-                    "1",
-                    "0",
-                    "1/q"
+                    "Parametrul este lângă frontiera regiunii staționare, deci intervalul Normal simetric nu este fiabil; folosiți un interval din verosimilitatea profil sau bootstrap, restrâns la spațiul parametrilor",
+                    "Modelul trebuie să fie IGARCH",
+                    "Erorile standard sunt prea mari din cauza inovațiilor Student-t",
+                    "Nimic: intervalul este exact"
                 ],
-                "correctExplanation": "Varianța randamentului pe q perioade este de q ori varianța pe o perioadă, deci VR(q) = 1.",
-                "incorrectExplanation": "Pentru un mers aleator varianțele se adună cu orizontul; autocorelația pozitivă duce VR peste 1, cea negativă sub 1."
+                "correctExplanation": "Lângă alpha + beta = 1 aproximarea Normală nu funcționează (Andrews, 1999); intervalul profil pentru BET este [0,975; 1), un timp de înjumătățire de cel puțin 27 de zile, fără limită superioară finită.",
+                "incorrectExplanation": "Un interval care iese din spațiul parametrilor arată că aproximarea Normală nu este valabilă acolo; nu dovedește IGARCH și nici nu este exact."
             }
         },
         {
@@ -228,26 +228,26 @@ window.MFM_DATA.quizzes['wrap-up'] = {
             "correct": 2,
             "en": {
                 "title": "Uncertainty of persistence",
-                "text": "For the BET, the 95% CI of alpha + beta includes 1. What does that imply?",
+                "text": "For the BET, the 95% interval for alpha + beta reaches the stationarity boundary. What does that imply for the half-life?",
                 "options": [
                     "Volatility shocks disappear in one day",
                     "The GARCH model is misspecified and must be dropped",
                     "The half-life is very uncertain: from about a month to unbounded",
                     "The point estimate of the half-life is exact"
                 ],
-                "correctExplanation": "A persistence CI of [0.974, 1.007] maps to a half-life from 26 days to infinity.",
+                "correctExplanation": "The profile-likelihood interval for alpha + beta is [0.975, 1): the half-life is at least about 27 days and has no finite upper bound.",
                 "incorrectExplanation": "The half-life is a nonlinear function of alpha + beta; near 1, small changes in persistence mean huge changes in the half-life."
             },
             "ro": {
                 "title": "Incertitudinea persistenței",
-                "text": "Pentru BET, CI 95% al lui alpha + beta include valoarea 1. Ce implică asta?",
+                "text": "Pentru BET, intervalul de 95% pentru alpha + beta ajunge la frontiera staționarității. Ce implică acest lucru pentru timpul de înjumătățire?",
                 "options": [
                     "Șocurile de volatilitate dispar într-o zi",
                     "Modelul GARCH este greșit specificat și trebuie abandonat",
                     "Timpul de înjumătățire este foarte incert: de la aproximativ o lună la nemărginit",
                     "Estimarea punctuală a timpului de înjumătățire este exactă"
                 ],
-                "correctExplanation": "Un CI al persistenței de [0,974; 1,007] corespunde unui timp de înjumătățire de la 26 de zile la infinit.",
+                "correctExplanation": "Intervalul din verosimilitatea profil pentru alpha + beta este [0,975; 1): timpul de înjumătățire este de cel puțin aproximativ 27 de zile și nu are o limită superioară finită.",
                 "incorrectExplanation": "Timpul de înjumătățire este o funcție neliniară de alpha + beta; aproape de 1, mici schimbări ale persistenței înseamnă schimbări uriașe ale timpului de înjumătățire."
             }
         },
@@ -441,30 +441,30 @@ window.MFM_DATA.quizzes['wrap-up'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 1,
             "en": {
-                "title": "Realised variance",
-                "text": "What is realised variance?",
+                "title": "The power of Kupiec",
+                "text": "With 250 days and a true breach rate of 2% for a VaR 1% model, how often does the 5% Kupiec test reject?",
                 "options": [
-                    "The variance of daily returns over a year",
-                    "The square of the VIX",
-                    "The GARCH forecast of tomorrow's variance",
-                    "The sum of squared intraday returns over a day"
+                    "About 95% of the time",
+                    "About one time in four",
+                    "Exactly 5% of the time",
+                    "About half of the time"
                 ],
-                "correctExplanation": "RV_t = sum of r_{t,i}^2 over the intraday intervals of day t; it measures that day's variance.",
-                "incorrectExplanation": "RV is a measurement from high-frequency data, not a model forecast or an implied quantity."
+                "correctExplanation": "The rejection region is x = 0 or x >= 7; under Bin(250, 0.02) its probability is about 0.24: one year of data rarely detects a doubled breach rate.",
+                "incorrectExplanation": "Power is not the confidence level and not the size of the test; doubling the breach rate still leaves only about five expected breaches, too few to reject reliably."
             },
             "ro": {
-                "title": "Varianța realizată",
-                "text": "Ce este varianța realizată?",
+                "title": "Puterea testului Kupiec",
+                "text": "Cu 250 de zile și o rată reală a depășirilor de 2% pentru un model VaR 1%, cât de des respinge testul Kupiec de 5%?",
                 "options": [
-                    "Varianța randamentelor zilnice pe un an",
-                    "Pătratul VIX",
-                    "Prognoza GARCH a varianței de mâine",
-                    "Suma pătratelor randamentelor intraday dintr-o zi"
+                    "Aproximativ 95% din cazuri",
+                    "Aproximativ o dată din patru",
+                    "Exact 5% din cazuri",
+                    "Aproximativ jumătate din cazuri"
                 ],
-                "correctExplanation": "RV_t = suma r_{t,i}^2 pe intervalele intraday ale zilei t; măsoară varianța acelei zile.",
-                "incorrectExplanation": "RV este o măsurătoare din date de frecvență înaltă, nu o prognoză de model sau o mărime implicită."
+                "correctExplanation": "Regiunea de respingere este x = 0 sau x >= 7; pentru Bin(250; 0,02) probabilitatea ei este aproximativ 0,24: un an de date detectează rar o rată a depășirilor dublată.",
+                "incorrectExplanation": "Puterea nu este nivelul de încredere și nici nivelul testului; dublarea ratei lasă doar aproximativ cinci depășiri așteptate, prea puține pentru o respingere sigură."
             }
         },
         {
@@ -495,57 +495,57 @@ window.MFM_DATA.quizzes['wrap-up'] = {
             }
         },
         {
-            "correct": 2,
+            "correct": 3,
             "en": {
-                "title": "Amihud illiquidity",
-                "text": "What does the Amihud ratio measure?",
+                "title": "Comparing many risk models",
+                "text": "Six VaR and ES models are compared on the same period. Which approach controls the risk of wrongly declaring one model best?",
                 "options": [
-                    "The bid-ask spread in basis points",
-                    "The number of trades per day",
-                    "The absolute return per unit of traded value: price impact of trading",
-                    "The correlation of volume with volatility"
+                    "Pick the lowest average loss",
+                    "Run a Kupiec test on each model",
+                    "Compare the R-squared of the forecasts",
+                    "A model confidence set on a consistent loss for (VaR, ES), such as FZ0"
                 ],
-                "correctExplanation": "ILLIQ = average of |r_d| / traded value_d; Banca Transilvania was about 15,500 times less liquid than SPY by this measure.",
-                "incorrectExplanation": "Amihud is a daily proxy for price impact, not a direct spread measure."
+                "correctExplanation": "The model confidence set (Hansen, Lunde and Nason, 2011) keeps all models not significantly worse than the best, controlling the family-wise error; FZ0 is consistent for the pair (VaR, ES).",
+                "incorrectExplanation": "The lowest average loss ignores sampling error, Kupiec only checks coverage of one model, and R-squared is not a consistent score for tail risk."
             },
             "ro": {
-                "title": "Iliciditatea Amihud",
-                "text": "Ce măsoară raportul Amihud?",
+                "title": "Compararea mai multor modele de risc",
+                "text": "Șase modele VaR și ES sunt comparate pe aceeași perioadă. Ce abordare controlează riscul de a declara greșit un model drept cel mai bun?",
                 "options": [
-                    "Spread-ul bid-ask în puncte de bază",
-                    "Numărul de tranzacții pe zi",
-                    "Randamentul absolut pe unitatea de valoare tranzacționată: impactul tranzacțiilor asupra prețului",
-                    "Corelația volumului cu volatilitatea"
+                    "Alegem cea mai mică pierdere medie",
+                    "Rulăm un test Kupiec pentru fiecare model",
+                    "Comparăm R-pătrat al prognozelor",
+                    "Un set de modele de încredere pe o funcție de pierdere consistentă pentru (VaR, ES), de exemplu FZ0"
                 ],
-                "correctExplanation": "ILLIQ = media lui |r_d| / valoarea tranzacționată_d; după această măsură, Banca Transilvania a fost de circa 15.500 de ori mai puțin lichidă decât SPY.",
-                "incorrectExplanation": "Amihud este o aproximare zilnică a impactului asupra prețului, nu o măsură directă a spread-ului."
+                "correctExplanation": "Setul de modele de încredere (Hansen, Lunde și Nason, 2011) păstrează toate modelele care nu sunt semnificativ mai slabe decât cel mai bun, controlând eroarea la nivel de familie; FZ0 este consistent pentru perechea (VaR, ES).",
+                "incorrectExplanation": "Cea mai mică pierdere medie ignoră eroarea de eșantionare, Kupiec verifică doar acoperirea unui model, iar R-pătrat nu este un scor consistent pentru riscul de coadă."
             }
         },
         {
-            "correct": 3,
+            "correct": 0,
             "en": {
-                "title": "Geometric Brownian motion",
-                "text": "Which stylised fact does geometric Brownian motion fail to reproduce?",
+                "title": "Identification of an event",
+                "text": "Tail risk of the BET seems to fall after the 2020 FTSE upgrade. What would make this a credible effect of the upgrade?",
                 "options": [
-                    "Positive prices",
-                    "Log returns that add up over time",
-                    "A constant expected log return",
-                    "Heavy tails and volatility clustering"
+                    "A pre-specified comparison with a control market (difference-in-differences or synthetic control), placebo dates and a break test that locates the change near the event",
+                    "A significant before/after t-test",
+                    "A longer sample before 2020",
+                    "A GARCH model estimated in each period"
                 ],
-                "correctExplanation": "GBM implies Normal i.i.d. log returns; the S&P 500 has excess kurtosis 10.9 and clustered volatility.",
-                "incorrectExplanation": "GBM keeps prices positive and log returns additive, but its constant volatility cannot create heavy tails or clustering."
+                "correctExplanation": "One event needs a counterfactual: in the course data the difference-in-differences with WIG20 is not significant, placebo dates give similar changes and the sup-Wald break falls in November 2024.",
+                "incorrectExplanation": "A before/after comparison, a longer sample or separate models cannot separate the event from everything else that changed at the same time."
             },
             "ro": {
-                "title": "Mișcarea browniană geometrică",
-                "text": "Ce fapt stilizat nu poate reproduce mișcarea browniană geometrică?",
+                "title": "Identificarea unui eveniment",
+                "text": "Riscul de coadă al BET pare să scadă după reclasificarea FTSE din 2020. Ce ar face credibil un efect al reclasificării?",
                 "options": [
-                    "Prețurile pozitive",
-                    "Randamentele log care se adună în timp",
-                    "Un randament log așteptat constant",
-                    "Cozile groase și grupările de volatilitate"
+                    "O comparație stabilită dinainte cu o piață de control (diferența în diferențe sau control sintetic), date placebo și un test de ruptură care plasează schimbarea lângă eveniment",
+                    "Un test t semnificativ înainte/după",
+                    "Un eșantion mai lung înainte de 2020",
+                    "Un model GARCH estimat în fiecare perioadă"
                 ],
-                "correctExplanation": "GBM implică randamente log Normale i.i.d.; S&P 500 are exces de kurtosis 10,9 și volatilitate grupată.",
-                "incorrectExplanation": "GBM păstrează prețurile pozitive și randamentele log aditive, dar volatilitatea constantă nu poate crea cozi groase sau grupări."
+                "correctExplanation": "Un singur eveniment cere un contrafactual: pe datele cursului, diferența în diferențe cu WIG20 nu este semnificativă, datele placebo dau schimbări similare, iar ruptura sup-Wald cade în noiembrie 2024.",
+                "incorrectExplanation": "O comparație înainte/după, un eșantion mai lung sau modele separate nu pot separa evenimentul de tot ce s-a mai schimbat în același timp."
             }
         },
         {
@@ -630,30 +630,30 @@ window.MFM_DATA.quizzes['wrap-up'] = {
             }
         },
         {
-            "correct": 1,
+            "correct": 2,
             "en": {
-                "title": "A good project question",
-                "text": "Which is the best project question?",
+                "title": "A specification search",
+                "text": "A team tries 48 combinations of window, lag and level and reports the best p = 0.01. What should they report instead?",
                 "options": [
-                    "Is Bitcoin risky?",
-                    "Does a boosting model beat log-HAR for next-day BET volatility in QLIKE, 2018-2026?",
-                    "Can machine learning predict the market?",
-                    "What is the best investment?"
+                    "Only the best specification",
+                    "The median p-value without adjustment",
+                    "The full specification curve and a multiplicity-adjusted p-value (Holm, Benjamini-Hochberg or a bootstrap reality check)",
+                    "Only the specifications with p < 0.05, the others being misspecified"
                 ],
-                "correctExplanation": "It names one market, one target, one benchmark, one loss and one period: it is specific and testable.",
-                "incorrectExplanation": "Vague or broad questions have no benchmark and no test; a good question can be answered with a hypothesis test."
+                "correctExplanation": "With 48 tries a p-value of 0.01 is expected by chance; the specification curve shows the whole distribution and the correction accounts for the search.",
+                "incorrectExplanation": "Reporting the best cell, an unadjusted summary or only the significant cells hides the search and inflates the evidence."
             },
             "ro": {
-                "title": "O întrebare bună de proiect",
-                "text": "Care este cea mai bună întrebare de proiect?",
+                "title": "O căutare printre specificații",
+                "text": "O echipă încearcă 48 de combinații de fereastră, întârziere și nivel și raportează cea mai bună valoare p = 0,01. Ce ar trebui să raporteze în schimb?",
                 "options": [
-                    "Este Bitcoin riscant?",
-                    "Bate un model de boosting modelul log-HAR pentru volatilitatea BET de a doua zi, în QLIKE, 2018-2026?",
-                    "Poate machine learning să prezică piața?",
-                    "Care este cea mai bună investiție?"
+                    "Doar cea mai bună specificație",
+                    "Valoarea p mediană, fără ajustare",
+                    "Întreaga curbă a specificațiilor și o valoare p ajustată pentru testele multiple (Holm, Benjamini-Hochberg sau un bootstrap de tip reality check)",
+                    "Doar specificațiile cu p < 0,05, celelalte fiind greșit specificate"
                 ],
-                "correctExplanation": "Numește o piață, o țintă, un reper, o funcție de pierdere și o perioadă: este specifică și testabilă.",
-                "incorrectExplanation": "Întrebările vagi sau prea largi nu au reper și nici test; o întrebare bună poate primi răspuns printr-un test de ipoteză."
+                "correctExplanation": "Din 48 de încercări, o valoare p de 0,01 apare din întâmplare; curba specificațiilor arată întreaga distribuție, iar corecția ține cont de căutare.",
+                "incorrectExplanation": "Raportarea celei mai bune celule, a unui rezumat neajustat sau doar a celulelor semnificative ascunde căutarea și umflă dovezile."
             }
         },
         {

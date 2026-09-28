@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch16_stablecoins'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Stablecoins: supply of USD stablecoins (DefiLlama), daily deviations of Tether, USD Coin and Dai from 1 USD with AR(1) half-lives (2021-2026), the March 2023 USD Coin depeg and the May 2022 TerraUSD run.'
+Description: 'Stablecoins: supply of USD stablecoins (DefiLlama), daily deviations of Tether, USD Coin and Dai from 1 USD (2021-2026), the March 2023 USD Coin depeg and the May 2022 TerraUSD run.'
 
 Keywords: 'stablecoin, peg, depeg, Tether, USD Coin, Dai, TerraUSD, half-life, Silicon Valley Bank'
 
@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama'
+Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama; 4-week Treasury bill rate from FRED'
 
 Output: 'ch16_stablecoin_supply.pdf, ch16_peg_deviation.pdf, ch16_depeg_2023.pdf, ch16_ust_collapse.pdf'

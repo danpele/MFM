@@ -8,84 +8,84 @@ window.MFM_DATA.quizzes['systemic'] = {
     "draw": 20,
     "questions": [
         {
-            "correct": 0,
-            "en": {
-                "title": "Systemic risk",
-                "text": "What distinguishes systemic risk from the risk of a single bank?",
-                "options": [
-                    "It is the risk that distress of one or several institutions impairs the financial system as a whole",
-                    "It is the VaR of the largest bank",
-                    "It is the market risk of the stock index",
-                    "It is the credit risk of households"
-                ],
-                "correctExplanation": "Systemic risk concerns the whole system: one failure can spread through runs, common exposures, fire sales and counterparty links.",
-                "incorrectExplanation": "Systemic risk is not the risk of one institution or one asset class; it is the risk that distress spreads and impairs the system as a whole."
-            },
-            "ro": {
-                "title": "Riscul sistemic",
-                "text": "Ce deosebește riscul sistemic de riscul unei singure bănci?",
-                "options": [
-                    "Este riscul ca dificultățile uneia sau ale mai multor instituții să afecteze sistemul financiar în ansamblu",
-                    "Este VaR al celei mai mari bănci",
-                    "Este riscul de piață al indicelui bursier",
-                    "Este riscul de credit al gospodăriilor"
-                ],
-                "correctExplanation": "Riscul sistemic privește întregul sistem: un faliment se poate propaga prin retrageri, expuneri comune, vânzări forțate și legături între contrapărți.",
-                "incorrectExplanation": "Riscul sistemic nu este riscul unei instituții sau al unei clase de active; este riscul ca dificultățile să se propage și să afecteze sistemul în ansamblu."
-            }
-        },
-        {
             "correct": 1,
             "en": {
-                "title": "Definition of MES",
-                "text": "What is the MES 5% of bank i?",
+                "title": "Overlapping intervals",
+                "text": "The 95% block-bootstrap intervals of Delta-CoVaR 1% for JPMorgan and Citigroup overlap. What can you conclude about equal contributions?",
                 "options": [
-                    "The VaR 5% of the bank",
-                    "The average loss of the bank on the worst 5% of days for the market",
-                    "The average loss of the market on the worst 5% of days for the bank",
-                    "The capital the bank must raise in a crisis"
+                    "The two banks are equally systemic",
+                    "Nothing yet: test the difference on joint bootstrap draws of the same days (paired test) or with a dominance test",
+                    "The ranking of the two banks is significant at 5%",
+                    "Apply a Bonferroni correction to each interval separately"
                 ],
-                "correctExplanation": "MES = -E[X_i | X_m <= q_5%(X_m)]: the bank's average loss on the market's worst days.",
-                "incorrectExplanation": "MES conditions on the market being in its tail and averages the bank's loss; the reverse conditioning is exposure of the market, and the capital need is SRISK."
+                "correctExplanation": "Both estimates use the same days, so they are positively correlated; the interval of the difference can exclude zero even when the marginal intervals overlap. Only a test on the difference answers the question.",
+                "incorrectExplanation": "Overlap of two marginal intervals is neither a test of equality nor of ranking; the difference must be tested directly, using draws that resample the same days for both banks."
             },
             "ro": {
-                "title": "Definiția MES",
-                "text": "Ce este MES 5% al băncii i?",
+                "title": "Intervale suprapuse",
+                "text": "Intervalele bootstrap pe blocuri de 95% ale Delta-CoVaR 1% pentru JPMorgan și Citigroup se suprapun. Ce puteți concluziona despre egalitatea contribuțiilor?",
                 "options": [
-                    "VaR 5% al băncii",
-                    "Pierderea medie a băncii în cele mai rele 5% din zilele pieței",
-                    "Pierderea medie a pieței în cele mai rele 5% din zilele băncii",
-                    "Capitalul pe care banca trebuie să îl atragă într-o criză"
+                    "Cele două bănci sunt la fel de sistemice",
+                    "Încă nimic: testăm diferența pe extrageri bootstrap comune ale acelorași zile (test pe perechi) sau cu un test de dominanță",
+                    "Clasamentul celor două bănci este semnificativ la 5%",
+                    "Aplicăm o corecție Bonferroni fiecărui interval separat"
                 ],
-                "correctExplanation": "MES = -E[X_i | X_m <= q_5%(X_m)]: pierderea medie a băncii în cele mai rele zile ale pieței.",
-                "incorrectExplanation": "MES condiționează pe piața aflată în coadă și face media pierderii băncii; condiționarea inversă privește piața, iar necesarul de capital este SRISK."
+                "correctExplanation": "Ambele estimări folosesc aceleași zile, deci sunt corelate pozitiv; intervalul diferenței poate exclude zero chiar dacă intervalele marginale se suprapun. Doar un test pe diferență răspunde la întrebare.",
+                "incorrectExplanation": "Suprapunerea a două intervale marginale nu este nici test al egalității, nici al clasamentului; diferența se testează direct, cu extrageri care reeșantionează aceleași zile pentru ambele bănci."
             }
         },
         {
-            "correct": 2,
+            "correct": 3,
             "en": {
-                "title": "MES under the Normal distribution",
-                "text": "Bank and market are jointly Normal with zero means. The bank's beta is 1.2 and the market's ES 5% is 3%. What is the MES 5%?",
+                "title": "Extremal quantiles",
+                "text": "Delta-CoVaR at 1% is estimated from about 40 tail days out of 3,960. Why are the usual quantile-regression standard errors unreliable?",
                 "options": [
-                    "1.2%",
-                    "2.5%",
-                    "3.6%",
-                    "4.2%"
+                    "Quantile regression has no standard errors",
+                    "Only because the residuals are heteroskedastic",
+                    "Because the bank is included in the system portfolio",
+                    "Because the effective tail sample (alpha times n) is small, so the Normal approximation for central quantiles fails; extremal-quantile inference or subsampling is needed"
                 ],
-                "correctExplanation": "Under joint normality E[X_i | X_m] = beta X_m, so MES = beta x ES_5%(market) = 1.2 x 3% = 3.6%.",
-                "incorrectExplanation": "With joint normality the conditional mean is beta times the market return, so MES is beta times the market's ES: 1.2 x 3% = 3.6%."
+                "correctExplanation": "The asymptotics of quantile regression need many observations near the quantile; with alpha n of a few dozen the sparsity estimate is noisy and extreme-value (extremal-quantile) theory is the valid route.",
+                "incorrectExplanation": "Standard errors exist, and the system excludes the bank; the problem is the small number of observations in the tail, which invalidates the central-quantile Normal approximation."
             },
             "ro": {
-                "title": "MES sub distribuția Normală",
-                "text": "Banca și piața au distribuție Normală bivariată cu medii zero. Beta băncii este 1,2, iar ES 5% al pieței este 3%. Cât este MES 5%?",
+                "title": "Cuantile extreme",
+                "text": "Delta-CoVaR la 1% este estimat din aproximativ 40 de zile din coadă din 3.960. De ce nu sunt fiabile erorile standard obișnuite ale regresiei cuantile?",
                 "options": [
-                    "1,2%",
-                    "2,5%",
-                    "3,6%",
-                    "4,2%"
+                    "Regresia cuantilă nu are erori standard",
+                    "Doar pentru că reziduurile sunt heteroscedastice",
+                    "Pentru că banca este inclusă în portofoliul sistemului",
+                    "Pentru că eșantionul efectiv din coadă (alpha înmulțit cu n) este mic, deci aproximarea Normală pentru cuantile centrale nu mai funcționează; este nevoie de inferență pentru cuantile extreme sau de subeșantionare"
                 ],
-                "correctExplanation": "Sub normalitate bivariată E[X_i | X_m] = beta X_m, deci MES = beta x ES_5%(piață) = 1,2 x 3% = 3,6%.",
-                "incorrectExplanation": "Cu normalitate bivariată media condiționată este beta înmulțit cu randamentul pieței, deci MES este beta înmulțit cu ES al pieței: 1,2 x 3% = 3,6%."
+                "correctExplanation": "Asimptotica regresiei cuantile cere multe observații în jurul cuantilei; cu alpha n de câteva zeci, estimarea rarefierii este zgomotoasă, iar teoria cuantilelor extreme este calea validă.",
+                "incorrectExplanation": "Erorile standard există, iar sistemul exclude banca; problema este numărul mic de observații din coadă, care invalidează aproximarea Normală pentru cuantile centrale."
+            }
+        },
+        {
+            "correct": 0,
+            "en": {
+                "title": "SRISK as published",
+                "text": "How do Brownlees and Engle (2017) obtain the LRMES that enters SRISK?",
+                "options": [
+                    "By simulating 22-day bank and market paths from GJR-GARCH and DCC models with resampled standardised innovations, keeping the paths where the market falls below -10%",
+                    "Only through the approximation 1 - exp(-18 x MES)",
+                    "As the historical average of six-month bank returns",
+                    "From the implied volatility of bank options"
+                ],
+                "correctExplanation": "Their Section 1.2 and Appendix A: GJR-GARCH volatilities, a DCC correlation, resampled pairs of innovations, and LRMES as minus the average bank return over the crisis paths (horizon 22 days, threshold -10%).",
+                "incorrectExplanation": "The exponential formula is a shortcut used where the simulation is not implemented; the published measure is simulated from a GJR-GARCH/DCC model conditional on a market crisis."
+            },
+            "ro": {
+                "title": "SRISK ca în lucrarea publicată",
+                "text": "Cum obțin Brownlees și Engle (2017) LRMES care intră în SRISK?",
+                "options": [
+                    "Prin simularea unor traiectorii de 22 de zile ale băncii și pieței din modele GJR-GARCH și DCC cu inovații standardizate reeșantionate, păstrând traiectoriile în care piața scade sub -10%",
+                    "Doar prin aproximarea 1 - exp(-18 x MES)",
+                    "Ca medie istorică a randamentelor pe șase luni ale băncii",
+                    "Din volatilitatea implicită a opțiunilor pe acțiunile băncii"
+                ],
+                "correctExplanation": "Secțiunea 1.2 și Anexa A: volatilități GJR-GARCH, o corelație DCC, perechi reeșantionate de inovații și LRMES ca minus media randamentului băncii pe traiectoriile de criză (orizont 22 de zile, prag -10%).",
+                "incorrectExplanation": "Formula exponențială este o aproximare folosită acolo unde simularea nu este implementată; măsura publicată se simulează dintr-un model GJR-GARCH/DCC condiționat pe o criză a pieței."
             }
         },
         {
@@ -172,28 +172,28 @@ window.MFM_DATA.quizzes['systemic'] = {
         {
             "correct": 2,
             "en": {
-                "title": "Definition of CoVaR",
-                "text": "What does the CoVaR 1% of the system given bank i measure?",
+                "title": "Backtesting CoVaR",
+                "text": "Which hit variable does a coverage backtest of the Girardi-Ergun CoVaR at level alpha use?",
                 "options": [
-                    "The VaR 1% of bank i",
-                    "The average loss of bank i when the system is in distress",
-                    "The VaR 1% of the system on a day when bank i is at its own VaR 1%",
-                    "The correlation between bank i and the system"
+                    "1{X_i <= -VaR_i}, with probability alpha",
+                    "1{X_sys <= -VaR_sys}, with probability alpha",
+                    "1{X_sys <= -CoVaR and X_i <= -VaR_i}, with probability alpha squared",
+                    "The number of banks in distress on the same day"
                 ],
-                "correctExplanation": "CoVaR is the VaR of the system conditional on the institution being at its VaR.",
-                "incorrectExplanation": "CoVaR conditions the system's quantile on bank i being in distress; the loss of the bank given system distress is the exposure CoVaR."
+                "correctExplanation": "CoVaR conditions on X_i <= -VaR_i, which has probability alpha, and the system then breaches CoVaR with probability alpha: the joint hit has probability alpha squared under the null.",
+                "incorrectExplanation": "A backtest of CoVaR must check the joint event of bank distress and system loss beyond CoVaR; its null probability is alpha times alpha, not alpha."
             },
             "ro": {
-                "title": "Definiția CoVaR",
-                "text": "Ce măsoară CoVaR 1% al sistemului condiționat de banca i?",
+                "title": "Verificarea ex post a CoVaR",
+                "text": "Ce variabilă de depășire folosește un test de acoperire pentru CoVaR Girardi-Ergun la nivelul alpha?",
                 "options": [
-                    "VaR 1% al băncii i",
-                    "Pierderea medie a băncii i când sistemul este în dificultate",
-                    "VaR 1% al sistemului într-o zi în care banca i se află la propriul VaR 1%",
-                    "Corelația dintre banca i și sistem"
+                    "1{X_i <= -VaR_i}, cu probabilitatea alpha",
+                    "1{X_sys <= -VaR_sys}, cu probabilitatea alpha",
+                    "1{X_sys <= -CoVaR și X_i <= -VaR_i}, cu probabilitatea alpha la pătrat",
+                    "Numărul de bănci aflate în dificultate în aceeași zi"
                 ],
-                "correctExplanation": "CoVaR este VaR al sistemului condiționat de instituția aflată la nivelul VaR-ului ei.",
-                "incorrectExplanation": "CoVaR condiționează cuantila sistemului de dificultățile băncii i; pierderea băncii când sistemul este în dificultate este CoVaR de expunere."
+                "correctExplanation": "CoVaR condiționează pe X_i <= -VaR_i, cu probabilitatea alpha, iar sistemul depășește apoi CoVaR cu probabilitatea alpha: evenimentul comun are probabilitatea alpha la pătrat sub ipoteza nulă.",
+                "incorrectExplanation": "Verificarea CoVaR trebuie să urmărească evenimentul comun: banca în dificultate și sistemul dincolo de CoVaR; probabilitatea lui sub ipoteza nulă este alpha înmulțit cu alpha, nu alpha."
             }
         },
         {
@@ -386,57 +386,57 @@ window.MFM_DATA.quizzes['systemic'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 0,
             "en": {
-                "title": "Total connectedness",
-                "text": "Three banks have normalized variance shares (%) with rows (70, 20, 10), (25, 60, 15), (5, 10, 85). What is total connectedness?",
+                "title": "Network estimation error",
+                "text": "A VAR(1) on 13 bank volatilities is estimated on 250-day rolling windows. What is the main problem for the connectedness table?",
                 "options": [
-                    "71.7%",
-                    "85%",
-                    "33.3%",
-                    "28.3%"
+                    "169 slope coefficients from 250 days give large estimation error: report bootstrap intervals and consider shrinkage (elastic-net) VARs",
+                    "The table depends on the ordering of the banks",
+                    "Log volatilities are not stationary",
+                    "The horizon H = 10 is too short"
                 ],
-                "correctExplanation": "Off-diagonal sum = 30 + 40 + 15 = 85; divided by N = 3 gives 28.3%.",
-                "incorrectExplanation": "Add the off-diagonal elements (the 'from others' of each row) and divide by the number of banks: 85/3 = 28.3%."
+                "correctExplanation": "Each table entry is a nonlinear function of many noisy coefficients; in short windows the noise adds spurious links, so intervals and regularisation (as in Demirer et al., 2018) are needed.",
+                "incorrectExplanation": "The generalized decomposition does not depend on the ordering, and log volatilities are persistent but stationary; the key issue is the number of parameters relative to the window length."
             },
             "ro": {
-                "title": "Conectivitatea totală",
-                "text": "Trei bănci au proporțiile normalizate ale dispersiei (%) cu liniile (70, 20, 10), (25, 60, 15), (5, 10, 85). Cât este conectivitatea totală?",
+                "title": "Eroarea de estimare a rețelei",
+                "text": "Un VAR(1) pe volatilitățile a 13 bănci este estimat pe ferestre mobile de 250 de zile. Care este principala problemă pentru tabelul de conectivitate?",
                 "options": [
-                    "71,7%",
-                    "85%",
-                    "33,3%",
-                    "28,3%"
+                    "169 de coeficienți de pantă din 250 de zile dau o eroare de estimare mare: raportăm intervale bootstrap și luăm în calcul VAR-uri cu micșorare (elastic net)",
+                    "Tabelul depinde de ordinea băncilor",
+                    "Logaritmii volatilităților nu sunt staționari",
+                    "Orizontul H = 10 este prea scurt"
                 ],
-                "correctExplanation": "Suma elementelor din afara diagonalei = 30 + 40 + 15 = 85; împărțită la N = 3 dă 28,3%.",
-                "incorrectExplanation": "Adunați elementele din afara diagonalei („de la ceilalți” pe fiecare linie) și împărțiți la numărul de bănci: 85/3 = 28,3%."
+                "correctExplanation": "Fiecare element al tabelului este o funcție neliniară de mulți coeficienți zgomotoși; în ferestrele scurte zgomotul adaugă legături false, deci sunt necesare intervale și regularizare (ca în Demirer et al., 2018).",
+                "incorrectExplanation": "Descompunerea generalizată nu depinde de ordine, iar logaritmii volatilităților sunt persistenți, dar staționari; problema principală este numărul de parametri față de lungimea ferestrei."
             }
         },
         {
-            "correct": 0,
+            "correct": 3,
             "en": {
-                "title": "Net transmitter",
-                "text": "In the same three-bank table, which bank is a net transmitter?",
+                "title": "Generalized FEVD with diagonal covariance",
+                "text": "If the VAR residual covariance matrix is diagonal, how do the generalized and the Cholesky variance decompositions compare?",
                 "options": [
-                    "Bank 3: it sends 25 to others and receives 15",
-                    "Bank 1: its own share is the smallest",
-                    "Bank 2: it receives the most",
-                    "None: net spillovers are always zero"
+                    "The generalized one is always larger",
+                    "The Cholesky one becomes dependent on the ordering",
+                    "The generalized rows sum to the number of variables",
+                    "They coincide, and the generalized rows already sum to one"
                 ],
-                "correctExplanation": "Net = to - from: bank 3 has 25 - 15 = +10.",
-                "incorrectExplanation": "Net spillover compares column sums (to others) with row sums (from others); only bank 3 sends more than it receives."
+                "correctExplanation": "With a diagonal Sigma the generalized impulse Sigma e_j / sqrt(sigma_jj) equals the Cholesky impulse sqrt(sigma_jj) e_j, so both decompositions are the same and no normalisation is needed.",
+                "incorrectExplanation": "Differences between the two decompositions come only from correlated shocks; with a diagonal covariance there is no common shock to allocate, and ordering does not matter."
             },
             "ro": {
-                "title": "Transmițător net",
-                "text": "În același tabel cu trei bănci, ce bancă este transmițător net?",
+                "title": "FEVD generalizată cu covarianță diagonală",
+                "text": "Dacă matricea de covarianță a reziduurilor VAR este diagonală, cum se compară descompunerea generalizată a dispersiei cu cea Cholesky?",
                 "options": [
-                    "Banca 3: trimite 25 către ceilalți și primește 15",
-                    "Banca 1: are cea mai mică pondere proprie",
-                    "Banca 2: primește cel mai mult",
-                    "Niciuna: transmiterile nete sunt întotdeauna zero"
+                    "Cea generalizată este întotdeauna mai mare",
+                    "Cea Cholesky devine dependentă de ordine",
+                    "Liniile celei generalizate însumează numărul de variabile",
+                    "Coincid, iar liniile celei generalizate însumează deja unu"
                 ],
-                "correctExplanation": "Net = către - de la: banca 3 are 25 - 15 = +10.",
-                "incorrectExplanation": "Transmiterea netă compară sumele pe coloane (către ceilalți) cu sumele pe linii (de la ceilalți); doar banca 3 trimite mai mult decât primește."
+                "correctExplanation": "Cu Sigma diagonală, impulsul generalizat Sigma e_j / sqrt(sigma_jj) este egal cu impulsul Cholesky sqrt(sigma_jj) e_j, deci cele două descompuneri sunt identice și nu mai este nevoie de normalizare.",
+                "incorrectExplanation": "Diferențele dintre cele două descompuneri vin doar din șocurile corelate; cu o covarianță diagonală nu există un șoc comun de alocat, iar ordinea nu contează."
             }
         },
         {

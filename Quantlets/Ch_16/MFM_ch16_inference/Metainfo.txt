@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch16_inference'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Inference for Chapter 16: Hill tail-index standard errors, confidence intervals and block bootstrap; sup-Wald test (Andrews, 1993) for a break in the Bitcoin - S&P 500 regression with HAC errors, Bai (1997) confidence interval for the break date and the Forbes-Rigobon adjusted correlation; equilibrium threshold autoregression for stablecoin pegs with the Hansen (1996) fixed-regressor bootstrap; block-bootstrap interval for the realised loss-versus-rebalancing rate; block bootstrap of the asset-class centroid distances; GRS and Fama-MacBeth tests with Shanken errors on eight coins; Dimson betas of IBIT and ETHA.'
+
+Keywords: 'Hill estimator, structural break, sup-Wald, threshold autoregression, Hansen bootstrap, GRS test, Fama-MacBeth, Shanken correction, Dimson beta, loss-versus-rebalancing'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama; 4-week Treasury bill rate from FRED'
+
+Output: 'ch16_inference.json'

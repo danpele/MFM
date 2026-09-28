@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch16_crix'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'A CRIX-style market-value weighted Laspeyres index with monthly reallocation and a divisor; top-k indices, equal weights, tracking error and the AIC rule for the number of constituents (Trimborn and Hardle, 2018).'
+Description: 'A market-value weighted Laspeyres index with monthly reallocation and a divisor; top-k indices, equal weights, tracking error, and the published CRIX rule for the number of constituents (Trimborn and Hardle, 2018): free weights for added coins, Epanechnikov kernel likelihood with a Sheather-Jones bandwidth, AIC reviewed quarterly, ECRIX and EFCRIX stopping rules.'
 
 Keywords: 'CRIX, cryptocurrency index, Laspeyres index, divisor, Akaike information criterion, tracking error'
 
@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama'
+Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama; 4-week Treasury bill rate from FRED'
 
-Output: 'ch16_crix_index.pdf, ch16_crix_aic.pdf, ch16_crix_weights.pdf'
+Output: 'ch16_crix_index.pdf, ch16_crix_aic.pdf, ch16_crix_weights.pdf, ch16_crix_rule.pdf'

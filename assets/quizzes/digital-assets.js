@@ -8,30 +8,30 @@ window.MFM_DATA.quizzes['digital-assets'] = {
     "draw": 20,
     "questions": [
         {
-            "correct": 0,
+            "correct": 1,
             "en": {
-                "title": "Market value",
-                "text": "How is the market value (market capitalisation) of a coin computed?",
+                "title": "GRS under heavy tails",
+                "text": "Weekly crypto test-asset returns have a Hill tail index of about 2.7. Which statement about the GRS F-test of zero alphas is correct?",
                 "options": [
-                    "Price times the number of coins in circulation",
-                    "Price times daily trading volume",
-                    "Total value locked in DeFi protocols",
-                    "Price divided by the number of coins mined per day"
+                    "It is exact for any error distribution, because it is an F statistic",
+                    "Its exact F distribution relies on i.i.d. Normal errors; a HAC-Wald test or a bootstrap version is needed",
+                    "It needs only T > N, whatever the tails",
+                    "Heavy tails make it conservative, so its rejections are always reliable"
                 ],
-                "correctExplanation": "M = P x Q: the price times the coins in circulation.",
-                "incorrectExplanation": "Market value multiplies the price by the supply in circulation; volume and value locked measure other things."
+                "correctExplanation": "The F(N, T - N - K) distribution of GRS is derived under i.i.d. Normal errors; with heavy tails and volatility clustering use a GMM/HAC Wald test or a wild bootstrap under the null.",
+                "incorrectExplanation": "GRS is exactly F only under i.i.d. Normal errors; heavy tails can bias its size in either direction, so a robust or bootstrap version is needed."
             },
             "ro": {
-                "title": "Valoarea de piață",
-                "text": "Cum se calculează valoarea de piață (capitalizarea) unei monede?",
+                "title": "GRS cu cozi grele",
+                "text": "Randamentele săptămânale ale activelor cripto de test au un indice de coadă Hill de aproximativ 2,7. Ce afirmație despre testul F GRS pentru alfa nule este corectă?",
                 "options": [
-                    "Prețul înmulțit cu numărul de monede în circulație",
-                    "Prețul înmulțit cu volumul zilnic tranzacționat",
-                    "Valoarea totală blocată în protocoalele DeFi",
-                    "Prețul împărțit la numărul de monede minate pe zi"
+                    "Este exact pentru orice distribuție a erorilor, fiindcă este o statistică F",
+                    "Distribuția F exactă cere erori i.i.d. cu distribuția Normală; este nevoie de un test Wald HAC sau de o versiune bootstrap",
+                    "Cere doar T > N, oricare ar fi cozile",
+                    "Cozile grele îl fac conservator, deci respingerile lui sunt mereu sigure"
                 ],
-                "correctExplanation": "M = P x Q: prețul înmulțit cu monedele în circulație.",
-                "incorrectExplanation": "Valoarea de piață înmulțește prețul cu oferta în circulație; volumul și valoarea blocată măsoară alte lucruri."
+                "correctExplanation": "Distribuția F(N, T - N - K) a statisticii GRS este derivată pentru erori i.i.d. cu distribuția Normală; cu cozi grele și grupare a volatilității folosim un test Wald GMM/HAC sau un bootstrap sălbatic sub ipoteza nulă.",
+                "incorrectExplanation": "GRS este exact F doar pentru erori i.i.d. cu distribuția Normală; cozile grele pot deplasa nivelul testului în orice direcție, deci este nevoie de o versiune robustă sau bootstrap."
             }
         },
         {
@@ -91,28 +91,28 @@ window.MFM_DATA.quizzes['digital-assets'] = {
         {
             "correct": 3,
             "en": {
-                "title": "Annualisation",
-                "text": "How should the daily volatility of Bitcoin be annualised?",
+                "title": "Shanken correction",
+                "text": "Why are Fama-MacBeth standard errors of crypto factor premia too small?",
                 "options": [
-                    "Multiply by 252",
-                    "Multiply by the square root of 252",
-                    "Multiply by 365",
-                    "Multiply by the square root of 365"
+                    "Because the weekly estimates of the premium are autocorrelated",
+                    "Because the crypto market factor is not a traded portfolio",
+                    "Because there are too many coins in the cross-section",
+                    "Because they ignore that the first-pass betas are estimated (errors in variables)"
                 ],
-                "correctExplanation": "Crypto trades every day, so sigma_a = s x sqrt(365).",
-                "incorrectExplanation": "Volatility scales with the square root of the number of observations per year, and crypto has about 365."
+                "correctExplanation": "The second pass treats the estimated betas as known; Shanken (1992) inflates the variance by (1 + lambda' Sigma_f^-1 lambda) and adds Sigma_f / T.",
+                "incorrectExplanation": "The problem is errors in variables: the betas in the second pass are estimates, which Fama-MacBeth standard errors ignore."
             },
             "ro": {
-                "title": "Anualizarea",
-                "text": "Cum se anualizează volatilitatea zilnică a Bitcoin?",
+                "title": "Corecția Shanken",
+                "text": "De ce sunt prea mici erorile standard Fama-MacBeth ale primelor factorilor cripto?",
                 "options": [
-                    "Se înmulțește cu 252",
-                    "Se înmulțește cu rădăcina pătrată din 252",
-                    "Se înmulțește cu 365",
-                    "Se înmulțește cu rădăcina pătrată din 365"
+                    "Pentru că estimările săptămânale ale primei sunt autocorelate",
+                    "Pentru că factorul pieței cripto nu este un portofoliu tranzacționat",
+                    "Pentru că sunt prea multe monede în secțiunea transversală",
+                    "Pentru că ignoră faptul că beta din prima etapă sunt estimate (erori în variabile)"
                 ],
-                "correctExplanation": "Cripto se tranzacționează în fiecare zi, deci sigma_a = s x rad(365).",
-                "incorrectExplanation": "Volatilitatea se scalează cu rădăcina pătrată a numărului de observații pe an, iar cripto are aproximativ 365."
+                "correctExplanation": "A doua etapă tratează beta estimate ca și cum ar fi cunoscute; Shanken (1992) înmulțește varianța cu (1 + lambda' Sigma_f^-1 lambda) și adaugă Sigma_f / T.",
+                "incorrectExplanation": "Problema este eroarea în variabile: beta din a doua etapă sunt estimări, lucru ignorat de erorile standard Fama-MacBeth."
             }
         },
         {
@@ -170,30 +170,30 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             }
         },
         {
-            "correct": 1,
+            "correct": 0,
             "en": {
-                "title": "Index divisor",
-                "text": "Why does a market-value weighted index change its divisor at a reallocation?",
+                "title": "Kurtosis when the tail index is below 4",
+                "text": "Bitcoin's Hill tail index is 2.7 and its sample excess kurtosis 14.8. What follows?",
                 "options": [
-                    "To pay the index fee",
-                    "So that the index level does not jump when quantities or members change",
-                    "To make the weights equal",
-                    "To remove the largest coin"
+                    "The population fourth moment is likely infinite, so the sample kurtosis is not a consistent estimate and its bootstrap CI is unreliable",
+                    "The kurtosis is 14.8 plus or minus 1.96 standard errors",
+                    "The Hill index and the kurtosis measure the same thing",
+                    "Rescaling the returns to unit variance makes the kurtosis finite"
                 ],
-                "correctExplanation": "The new divisor makes the old and the new basket give the same level on the switch day.",
-                "incorrectExplanation": "The divisor is a continuity device; it does not charge fees or change the weighting scheme."
+                "correctExplanation": "With alpha < 4 the fourth moment does not exist; the sample kurtosis grows with the sample and is driven by the largest days, and the bootstrap fails with infinite moments (Athreya, 1987): report the tail index with its CI.",
+                "incorrectExplanation": "When alpha < 4 the population kurtosis is infinite, so no standard error or rescaling rescues the sample kurtosis; the Hill index is the right summary of the tail."
             },
             "ro": {
-                "title": "Divizorul indicelui",
-                "text": "De ce își schimbă un indice ponderat cu valoarea de piață divizorul la o realocare?",
+                "title": "Aplatizarea când indicele de coadă este sub 4",
+                "text": "Indicele de coadă Hill al Bitcoin este 2,7, iar excesul de aplatizare de selecție 14,8. Ce rezultă?",
                 "options": [
-                    "Pentru a plăti comisionul indicelui",
-                    "Pentru ca nivelul indicelui să nu sară când se schimbă cantitățile sau membrii",
-                    "Pentru a egaliza ponderile",
-                    "Pentru a elimina cea mai mare monedă"
+                    "Momentul de ordinul patru al populației este probabil infinit, deci aplatizarea de selecție nu este un estimator consistent, iar CI bootstrap pentru ea nu este de încredere",
+                    "Aplatizarea este 14,8 plus sau minus 1,96 erori standard",
+                    "Indicele Hill și aplatizarea măsoară același lucru",
+                    "Rescalarea randamentelor la varianță unitară face aplatizarea finită"
                 ],
-                "correctExplanation": "Noul divizor face ca vechiul și noul coș să dea același nivel în ziua schimbării.",
-                "incorrectExplanation": "Divizorul asigură continuitatea; nu percepe comisioane și nu schimbă modul de ponderare."
+                "correctExplanation": "Cu alpha < 4 momentul de ordinul patru nu există; aplatizarea de selecție crește odată cu eșantionul și este dominată de cele mai mari zile, iar bootstrap-ul eșuează la momente infinite (Athreya, 1987): raportăm indicele de coadă cu CI.",
+                "incorrectExplanation": "Când alpha < 4, aplatizarea populației este infinită, deci nicio eroare standard și nicio rescalare nu salvează aplatizarea de selecție; indicele Hill este rezumatul potrivit al cozii."
             }
         },
         {
@@ -227,54 +227,54 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             "correct": 3,
             "en": {
                 "title": "AIC penalty",
-                "text": "In AIC(k) = n ln(s_k^2) + 2k, when is a new constituent admitted?",
+                "text": "In the Gaussian form of the CRIX criterion, AIC = T ln(s_k^2) + 2s with s the number of added coins, when is one more constituent admitted?",
                 "options": [
                     "When its price is rising",
                     "When it has the lowest volatility",
                     "Always",
-                    "When it lowers n ln(s_k^2) by more than 2"
+                    "When it lowers T ln(s_k^2) by more than 2"
                 ],
                 "correctExplanation": "Each extra coin costs 2 in the penalty; it is admitted if the tracking improvement is larger.",
-                "incorrectExplanation": "The rule compares the fall in n ln(s_k^2) with the penalty per constituent."
+                "incorrectExplanation": "The rule compares the fall in T ln(s_k^2) with the penalty of 2 per added constituent."
             },
             "ro": {
                 "title": "Penalizarea AIC",
-                "text": "În AIC(k) = n ln(s_k^2) + 2k, când este admis un constituent nou?",
+                "text": "În forma gaussiană a criteriului CRIX, AIC = T ln(s_k^2) + 2s, cu s numărul de monede adăugate, când este admis încă un constituent?",
                 "options": [
                     "Când prețul lui crește",
                     "Când are cea mai mică volatilitate",
                     "Întotdeauna",
-                    "Când scade n ln(s_k^2) cu mai mult de 2"
+                    "Când scade T ln(s_k^2) cu mai mult de 2"
                 ],
                 "correctExplanation": "Fiecare monedă în plus costă 2 în penalizare; este admisă dacă îmbunătățirea urmăririi este mai mare.",
-                "incorrectExplanation": "Regula compară scăderea lui n ln(s_k^2) cu penalizarea pe constituent."
+                "incorrectExplanation": "Regula compară scăderea lui T ln(s_k^2) cu penalizarea de 2 pentru fiecare constituent adăugat."
             }
         },
         {
             "correct": 2,
             "en": {
-                "title": "Stablecoin designs",
-                "text": "Which stablecoin design has no external collateral?",
+                "title": "Threshold AR identification",
+                "text": "Testing a linear AR(1) against a threshold AR for stablecoin peg deviations, why are chi-square critical values invalid?",
                 "options": [
-                    "Fiat-backed",
-                    "Crypto-backed",
-                    "Algorithmic",
-                    "Tokenised Treasury fund"
+                    "There are too few observations outside the band",
+                    "The AR coefficient outside the band is negative",
+                    "The threshold is not identified under the null (the Davies problem), so the sup-Wald statistic needs bootstrap p-values",
+                    "The deviations are measured in basis points"
                 ],
-                "correctExplanation": "Algorithmic stablecoins such as TerraUSD kept the peg through a second token, not reserves.",
-                "incorrectExplanation": "Fiat-backed coins hold deposits and bills, crypto-backed coins hold crypto collateral; only algorithmic designs have neither."
+                "correctExplanation": "Under the linear null the threshold c does not enter the model, so the sup over c of W(c) is not chi-square; Hansen (1996) obtains p-values from a fixed-regressor bootstrap.",
+                "incorrectExplanation": "The issue is a nuisance parameter that is not identified under the null: the supremum over thresholds has a non-standard distribution."
             },
             "ro": {
-                "title": "Tipuri de stablecoin",
-                "text": "Ce tip de stablecoin nu are garanții externe?",
+                "title": "Identificarea AR cu prag",
+                "text": "Când testăm un AR(1) liniar împotriva unui AR cu prag pentru abaterile de la paritate ale unui stablecoin, de ce sunt invalide valorile critice chi-pătrat?",
                 "options": [
-                    "Acoperit cu fiat",
-                    "Acoperit cu cripto-active",
-                    "Algoritmic",
-                    "Fondul tokenizat de titluri de stat"
+                    "Sunt prea puține observații în afara benzii",
+                    "Coeficientul AR din afara benzii este negativ",
+                    "Pragul nu este identificat sub ipoteza nulă (problema Davies), deci statistica sup-Wald cere p-valori bootstrap",
+                    "Abaterile sunt măsurate în puncte de bază"
                 ],
-                "correctExplanation": "Stablecoin-urile algoritmice precum TerraUSD își mențineau paritatea printr-un al doilea token, nu prin rezerve.",
-                "incorrectExplanation": "Cele acoperite cu fiat dețin depozite și titluri, cele acoperite cu cripto dețin garanții cripto; doar cele algoritmice nu au niciuna."
+                "correctExplanation": "Sub ipoteza nulă liniară, pragul c nu apare în model, deci supremul după c al lui W(c) nu are distribuția chi-pătrat; Hansen (1996) obține p-valorile dintr-un bootstrap cu regresori ficși.",
+                "incorrectExplanation": "Problema este un parametru de perturbare neidentificat sub ipoteza nulă: supremul după praguri are o distribuție nestandard."
             }
         },
         {
@@ -332,30 +332,30 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 1,
             "en": {
-                "title": "Half-life",
-                "text": "An AR(1) fit to daily peg deviations gives phi = 0.5. What is the half-life?",
+                "title": "Where LVR comes from",
+                "text": "Which property of the constant-product pool value V(P) = 2 sqrt(kP) produces the loss versus rebalancing?",
                 "options": [
-                    "0.5 days",
-                    "2 days",
-                    "5 days",
-                    "1 day"
+                    "The trading fee charged on each swap",
+                    "Its concavity in P (negative gamma): the LVR rate is -V''(P) sigma^2 P^2 / (2V) = sigma^2 / 8",
+                    "The impermanent loss at the end of the holding period",
+                    "Its linearity in P"
                 ],
-                "correctExplanation": "h = ln 0.5 / ln 0.5 = 1 day.",
-                "incorrectExplanation": "Use h = ln 0.5 / ln phi."
+                "correctExplanation": "By Ito, the rebalancing portfolio minus the pool grows at -0.5 V'' sigma^2 P^2 dt; with V'' = -0.5 sqrt(k) P^(-3/2) this equals (sigma^2/8) V dt.",
+                "incorrectExplanation": "LVR is a second-order (gamma) effect of a concave value function; fees reduce it and impermanent loss is a path-independent endpoint quantity."
             },
             "ro": {
-                "title": "Timpul de înjumătățire",
-                "text": "Un model AR(1) pentru abaterile zilnice de la paritate dă phi = 0,5. Care este timpul de înjumătățire?",
+                "title": "De unde vine LVR",
+                "text": "Ce proprietate a valorii fondului cu produs constant V(P) = 2 sqrt(kP) produce pierderea față de reechilibrare?",
                 "options": [
-                    "0,5 zile",
-                    "2 zile",
-                    "5 zile",
-                    "1 zi"
+                    "Comisionul perceput la fiecare schimb",
+                    "Concavitatea în P (gamma negativă): rata LVR este -V''(P) sigma^2 P^2 / (2V) = sigma^2 / 8",
+                    "Pierderea impermanentă de la sfârșitul perioadei de deținere",
+                    "Liniaritatea în P"
                 ],
-                "correctExplanation": "h = ln 0,5 / ln 0,5 = 1 zi.",
-                "incorrectExplanation": "Folosiți h = ln 0,5 / ln phi."
+                "correctExplanation": "Prin Itô, portofoliul de reechilibrare minus fondul crește cu -0,5 V'' sigma^2 P^2 dt; cu V'' = -0,5 sqrt(k) P^(-3/2) aceasta este (sigma^2/8) V dt.",
+                "incorrectExplanation": "LVR este un efect de ordinul doi (gamma) al unei funcții de valoare concave; comisioanele îl reduc, iar pierderea impermanentă este o mărime de capăt, independentă de traiectorie."
             }
         },
         {
@@ -612,7 +612,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "The trading volume",
                     "The number of exchanges"
                 ],
-                "correctExplanation": "Classification methods place cryptos in a separate class mainly because of the tail factor.",
+                "correctExplanation": "Classification methods place cryptos in a separate class mainly because of the tail factor, a feature-space factor that loads on quantiles, tail expectations, variance and stable tail and scale parameters, not a gap in Hill indices.",
                 "incorrectExplanation": "The study uses tail, memory and moment factors; the tail factor drives the separation."
             },
             "ro": {
@@ -624,35 +624,35 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "Volumul tranzacționat",
                     "Numărul de burse"
                 ],
-                "correctExplanation": "Metodele de clasificare plasează cripto-activele într-o clasă separată în principal din cauza factorului de coadă.",
+                "correctExplanation": "Metodele de clasificare plasează cripto-activele într-o clasă separată în principal din cauza factorului de coadă, un factor al spațiului caracteristicilor cu încărcări pe cuantile, așteptări în coadă, varianță și parametrii de coadă și de scală ai distribuției stabile, nu o diferență între indici Hill.",
                 "incorrectExplanation": "Studiul folosește factorii de coadă, memorie și momente; factorul de coadă determină separarea."
             }
         },
         {
-            "correct": 2,
+            "correct": 3,
             "en": {
-                "title": "Risk in numbers",
-                "text": "Historical daily VaR 1% for Bitcoin (2018-2026) is about 10% and for the S&P 500 about 3.4%. What does VaR 1% mean here?",
+                "title": "Nonsynchronous closes",
+                "text": "IBIT's daily OLS beta on Bitcoin is 0.93 and its weekly beta 1.01. Which daily estimator corrects the bias?",
                 "options": [
-                    "The average loss on the worst 1% of days",
-                    "The largest loss ever observed",
-                    "The loss exceeded on 1% of days",
-                    "The loss with a 99% probability"
+                    "OLS with Newey-West standard errors",
+                    "Dropping the weekend returns of Bitcoin",
+                    "Generalised least squares",
+                    "A Dimson sum beta with lead and lag terms"
                 ],
-                "correctExplanation": "VaR 1% = -q_1%(r): a loss exceeded with probability 1%.",
-                "incorrectExplanation": "VaR 1% is a quantile; the average beyond it is ES."
+                "correctExplanation": "Summing the coefficients on the lagged, current and next-day Bitcoin returns (Dimson, 1979) captures the moves that reach the ETF a day later; here the sum is about 1.00.",
+                "incorrectExplanation": "Newey-West changes only the standard error, not the downward bias from nonsynchronous closes; the Dimson sum beta removes it."
             },
             "ro": {
-                "title": "Riscul în cifre",
-                "text": "VaR 1% zilnic istoric pentru Bitcoin (2018-2026) este aproximativ 10%, iar pentru S&P 500 aproximativ 3,4%. Ce înseamnă aici VaR 1%?",
+                "title": "Închideri nesincrone",
+                "text": "Beta OLS zilnic al IBIT față de Bitcoin este 0,93, iar beta săptămânal 1,01. Ce estimator zilnic corectează deplasarea?",
                 "options": [
-                    "Pierderea medie în cele mai rele 1% dintre zile",
-                    "Cea mai mare pierdere observată vreodată",
-                    "Pierderea depășită în 1% din zile",
-                    "Pierderea cu probabilitatea de 99%"
+                    "OLS cu erori standard Newey-West",
+                    "Eliminarea randamentelor de weekend ale Bitcoin",
+                    "Cele mai mici pătrate generalizate",
+                    "Beta sumă Dimson, cu termeni decalați și avansați"
                 ],
-                "correctExplanation": "VaR 1% = -q_1%(r): o pierdere depășită cu probabilitatea de 1%.",
-                "incorrectExplanation": "VaR 1% este o cuantilă; media de dincolo de ea este ES."
+                "correctExplanation": "Suma coeficienților randamentelor Bitcoin din ziua anterioară, din ziua curentă și din ziua următoare (Dimson, 1979) captează mișcările care ajung în ETF cu o zi întârziere; aici suma este aproximativ 1,00.",
+                "incorrectExplanation": "Newey-West schimbă doar eroarea standard, nu și deplasarea în jos din închiderile nesincrone; beta sumă Dimson o elimină."
             }
         },
         {

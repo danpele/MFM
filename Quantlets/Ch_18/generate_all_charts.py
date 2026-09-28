@@ -63,7 +63,7 @@ EVENTS = [('2011-08-08', 'Euro crisis'), ('2016-06-24', 'Brexit vote'), ('2018-1
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 SEED = 42
-B_BOOT = 200
+B_BOOT = 999
 RESULTS = {}
 
 

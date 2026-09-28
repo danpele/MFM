@@ -23,6 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import log_returns  # noqa: E402
 from case_study import (ALPHA, MODELS, stylised_facts, kurtosis_boot_ci, garch_t_fit, garch_summary,  # noqa: E402
                         rolling_var, backtest_table, kupiec, binom_band, t_std_q, acf)
+from inference19 import hill_ci, profile_ci, formal_eval, kupiec_power, kupiec_mde  # noqa: E402
 
 # Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
 plt.rcParams['figure.facecolor'] = 'none'
@@ -96,8 +97,8 @@ RES = {}
 # =============================================================================
 def part_facts():
     sf = stylised_facts(r)
-    lo, hi = kurtosis_boot_ci(r)
-    sf['kurt_ci'] = [lo, hi]
+    h = hill_ci(r.values)                     # indicele de coada (kurtosis-ul nu este consistent daca alpha < 4)
+    sf['hill'] = {k: v for k, v in h.items() if k != 'draws'}
     sf['ppy'] = len(r) / ((r.index[-1] - r.index[0]).days / 365.25)
     sf['ann_vol'] = r.std() * np.sqrt(sf['ppy'])
     RES['facts'] = sf
@@ -135,6 +136,7 @@ def part_garch():
     res = garch_t_fit(r)
     g = garch_summary(res)
     RES['garch'] = g
+    RES['garch']['profile'] = profile_ci(r.values, res)   # CI profil pentru alpha + beta, restrans la < 1
     sig = res.conditional_volatility
     fig, ax = plt.subplots(figsize=(9.6, 3.2))
     ax.plot(r.index, r.values, color=MainBlue, lw=0.4, label='BET daily log return (%)')
@@ -164,6 +166,21 @@ def part_var(full_res):
     lo, hi = binom_band(len(fc))
     RES['eval']['band'] = [lo, hi]
     RES['es'] = {m: float(fc[m + '_ES'].mean()) for m in MODELS}
+    RES['formal'] = formal_eval(fc)
+    pw = {f'{T}_{p1}': kupiec_power(T, p1)[0] for T in (250, 1000, len(fc)) for p1 in (0.013, 0.015, 0.02)}
+    RES['power'] = dict(pw=pw, mde={str(T): kupiec_mde(T) for T in (250, 1000, len(fc))}, T=len(fc),
+                        rej250=[int(x) for x in kupiec_power(250, 0.02)[1][:12]])
+    fig, ax = plt.subplots(figsize=(7.6, 3.0))
+    grid = np.arange(0.002, 0.0405, 0.0005)
+    for T, c in [(250, Orange), (1000, MainBlue), (len(fc), IDAred)]:
+        ax.plot(100 * grid, [kupiec_power(T, p1)[0] for p1 in grid], color=c, lw=1.2, label=f'T = {T} days')
+    ax.axhline(0.8, color=Gray, lw=0.6, ls='--')
+    ax.axhline(0.05, color=Gray, lw=0.6, ls=':')
+    ax.axvline(1.0, color='black', lw=0.6, ls='--', label='Null: 1%')
+    ax.set_xlabel('True breach rate of the VaR 1% model (%)')
+    ax.set_ylabel('Rejection probability of\nthe 5% Kupiec test')
+    legend_outside_bottom(ax, ncol=4, y=-0.2)
+    save_fig('ch19_kupiec_power')
 
     # grafic: pierderi si VaR 1% (2020-2026)
     d = fc.loc['2020-01-01':]

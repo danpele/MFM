@@ -828,16 +828,16 @@
         // ---------------------------------------------------------------
         project: {
             en: [
-                { h: '1. Replicate', p: ['Start by reproducing one published number: a table, a coefficient or a backtest result from a paper or from the lecture.', 'An AI assistant cannot guess an exact published figure. Matching it shows that your data and code are right.'] },
-                { h: '2. Extend', p: ['Apply the method to new data, a new market (for example BVB or crypto) or a more recent sample.', 'State one clear question and answer it with a test, not only with a chart.'] },
-                { h: '3. Deliver on GitHub', p: ['A public repository with code, data description and a README that reproduces every result.', 'The files <code>AI_USE.md</code> and <code>AI_ERRORS.md</code> are mandatory.'] },
-                { h: '4. Present and defend', p: ['Team presentation, then a 10-minute oral defence.', 'Each member explains one result and answers a "what changes if..." question. Grades can differ between team members.'] }
+                { h: '1. Replicate', p: ['Reproduce a full published table or figure, cell by cell (DOI, page, table number), and explain every gap.', 'An AI assistant cannot guess an exact published figure: matching it shows that your data and code are right.'] },
+                { h: '2. Pre-register and extend', p: ['Before opening the test period, commit a pre-analysis plan: the null, test, loss, sample split, identification strategy (control market, placebo dates, unknown-date break test) and a power / minimum-detectable-effect statement.', 'Extend to new data or a new market; report a specification curve with a multiple-testing correction.'] },
+                { h: '3. Deliver on GitHub', p: ['A reproducible repository (fixed seeds, data provenance, one command regenerates every number) with <code>AI_USE.md</code> and <code>AI_ERRORS.md</code>.', 'An 8–12 page paper with 10–15 references, at least three from the last five years.'] },
+                { h: '4. Present and defend', p: ['Team presentation, then a 10-minute oral defence without AI.', 'Each member explains one result and answers a "what changes if..." question. Grades can differ between team members.'] }
             ],
             ro: [
-                { h: '1. Replicați', p: ['Începeți prin a reproduce un rezultat publicat: un tabel, un coeficient sau un rezultat de backtest dintr-un articol sau din curs.', 'Un asistent AI nu poate ghici o cifră publicată exactă. Dacă o obțineți, datele și codul vostru sunt corecte.'] },
-                { h: '2. Extindeți', p: ['Aplicați metoda pe date noi, pe altă piață (de exemplu BVB sau cripto) sau pe un eșantion mai recent.', 'Formulați o întrebare clară și răspundeți cu un test, nu doar cu un grafic.'] },
-                { h: '3. Livrați pe GitHub', p: ['Un repository public cu cod, descrierea datelor și un README care reproduce fiecare rezultat.', 'Fișierele <code>AI_USE.md</code> și <code>AI_ERRORS.md</code> sunt obligatorii.'] },
-                { h: '4. Prezentați și susțineți', p: ['Prezentarea echipei, apoi o susținere orală de 10 minute.', 'Fiecare membru explică un rezultat și răspunde la o întrebare de tipul „ce se schimbă dacă...”. Notele pot diferi între membrii echipei.'] }
+                { h: '1. Replicați', p: ['Reproduceți integral un tabel sau o figură publicată, celulă cu celulă (DOI, pagină, număr de tabel), și explicați orice diferență.', 'Un asistent AI nu poate ghici o cifră publicată exactă: dacă o obțineți, datele și codul vostru sunt corecte.'] },
+                { h: '2. Pre-înregistrați și extindeți', p: ['Înainte de a deschide perioada de test, încărcați în repository un plan de analiză: ipoteza nulă, testul, funcția de pierdere, împărțirea eșantionului, strategia de identificare (piață de control, date placebo, test de ruptură la dată necunoscută) și o declarație de putere / efect minim detectabil.', 'Extindeți pe date noi sau pe altă piață; raportați o curbă a specificațiilor cu corecție pentru teste multiple.'] },
+                { h: '3. Livrați pe GitHub', p: ['Un repository reproductibil (seed-uri fixate, proveniența datelor, o singură comandă regenerează fiecare cifră), cu <code>AI_USE.md</code> și <code>AI_ERRORS.md</code>.', 'O lucrare de 8–12 pagini cu 10–15 referințe, dintre care cel puțin trei din ultimii cinci ani.'] },
+                { h: '4. Prezentați și susțineți', p: ['Prezentarea echipei, apoi o susținere orală de 10 minute, fără AI.', 'Fiecare membru explică un rezultat și răspunde la o întrebare de tipul „ce se schimbă dacă...”. Notele pot diferi între membrii echipei.'] }
             ]
         },
 

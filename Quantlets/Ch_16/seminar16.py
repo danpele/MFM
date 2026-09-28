@@ -1,12 +1,14 @@
 """
 seminar16.py -- Calculele Seminarului 16 (MFM): active digitale si DeFi
 ======================================================================
-Partea A: indice ponderat cu valoarea de piata si divizorul (A1, A2), schimb intr-un fond x*y = k (A3, A4),
-pierderea impermanenta si comisioanele (A5, A6), arbitrajul de rascumparare al unui stablecoin (A7) si
-al unui ETF (A8).
-Partea B: Bitcoin vs S&P 500 si efectul de weekend cu bootstrap pe blocuri (B1, B2), dinamica abaterilor de la
-paritate (B3, B4), urmarirea IBIT / ETHA (B5, B6), beta Strategy / Coinbase (B7, B8).
-Partea C: este Bitcoin un activ alternativ, un activ de risc sau o acoperire? (C1)
+Partea A: indice ponderat cu valoarea de piata si divizorul (A1, A2), banda de ne-arbitraj si arbitrajul optim
+intr-un fond cu comision (A3) si intr-un fond ponderat (A4), pierderea impermanenta a unui fond ponderat (A5),
+LVR prin Ito (A6), algebra AR cu prag si banda (A7, A8).
+Partea B: Bitcoin vs S&P 500 si efectul de weekend cu bootstrap pe blocuri (B1, B2), paritatea ca AR cu prag
+(EQ-TAR) cu testul sup-Wald si bootstrap cu regresori ficsi (B3, B4), deriva din comision cu HAC, ADF/KPSS si beta
+Dimson pentru IBIT / ETHA (B5, B6), ruptura la data necunoscuta pentru beta Strategy / Coinbase (B7, B8).
+Partea C: este Bitcoin un activ alternativ, un activ de risc sau o acoperire? (C1), cu corelatia Forbes-Rigobon
+si regresia cuantila.
 Cifrele sunt salvate in sem16_results.json.
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """
@@ -17,10 +19,11 @@ import json
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.signal import lfilter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import price, log_returns, joint_returns, read_market, ASSETS, END   # noqa: E402
+import statsmodels.api as sm                                                        # noqa: E402
+import inference16 as I                                                             # noqa: E402
 from generate_all_charts import (plt, MainBlue, IDAred, Forest, Amber, Orange, Purple, Teal, Gray, COL,  # noqa: E402,F811
                                  save_fig, legend_outside_bottom, fig_legend_bottom, jsonable, hac_ols,
                                  amm_swap, impermanent_loss, etf_tracking, ETF_START, SEED, B_BOOT)
@@ -61,69 +64,73 @@ def a2_replace():
     return dict(old_mv=(p * q).sum(), new_mv=new_mv, D_old=D, D_new=D_new, I=I, mvD=pD * qD, mvC=p[2] * q[2])
 
 
-def a3_swap():
-    """Vanzarea a 50 ETH intr-un fond cu 1000 ETH si 3 milioane USDC, comision 0.3%."""
-    x, y, dx, fee = 1000.0, 3_000_000.0, 50.0, 0.003
-    dy, pe = amm_swap(x, y, dx, fee)
-    dy0, pe0 = amm_swap(x, y, dx, 0.0)
-    p_new = (y - dy) / (x + dx)
-    return dict(k=x * y, dy=dy, pe=pe, shortfall=100 * (1 - pe / (y / x)), dy_nofee=dy0,
-                fee_cost=dy0 - dy, p_new=p_new, move=100 * (p_new / (y / x) - 1), g_dx=(1 - fee) * dx)
-
-
-def a4_arbitrage():
-    """Pretul extern creste la 3300 USDC: cati USDC trebuie adaugati (fara comision) si profitul arbitrajului."""
-    x, y, P = 1000.0, 3_000_000.0, 3300.0
+def a3_band(x=1000.0, y=3_000_000.0, P=3300.0, fee=0.003):
+    """Banda de ne-arbitraj a unui fond x*y = k cu comision f: gamma P <= p <= P / gamma; marimea optima a
+    arbitrajului cand pretul extern P depaseste banda: y' = sqrt(gamma P k), dy* = (y' - y) / gamma."""
+    g = 1 - fee
     k = x * y
-    x1, y1 = np.sqrt(k / P), np.sqrt(k * P)
-    dUSDC, dETH = y1 - y, x - x1
-    profit = dETH * P - dUSDC
-    lp_before, lp_after = x * P + y, x1 * P + y1
-    return dict(x1=x1, y1=y1, dUSDC=dUSDC, dETH=dETH, profit=profit, avg=dUSDC / dETH, lp_hold=lp_before,
-                lp_after=lp_after, loss=lp_before - lp_after)
+    p = y / x
+    y1 = np.sqrt(g * P * k)
+    x1 = k / y1
+    dy = (y1 - y) / g
+    dx = x - x1
+    profit = dx * P - dy
+    return dict(k=k, p=p, lo=g * P, hi=P / g, y1=y1, x1=x1, dy=dy, dx=dx, profit=profit, p_new=y1 / x1,
+                avg=dy / dx, profit_nofee=a4_nofee(x, y, P))
+
+
+def a4_nofee(x, y, P):
+    """Profitul arbitrajului fara comision (acelasi fond): P (x - x1) - (y1 - y), x1 = sqrt(k/P), y1 = sqrt(kP)."""
+    k = x * y
+    return P * (x - np.sqrt(k / P)) - (np.sqrt(k * P) - y)
+
+
+def a4_weighted(w=0.8, x=1000.0, p=3000.0, P=3300.0, fee=0.003):
+    """Fond ponderat x^w y^(1-w) = k (tip Balancer): pretul marginal p = (w/(1-w)) y/x; rezervele dupa arbitraj
+    x' = k (w/(gamma P (1-w)))^(1-w), y' = k (gamma P (1-w)/w)^w; dy* = (y' - y)/gamma."""
+    g = 1 - fee
+    y = p * x * (1 - w) / w
+    k = x ** w * y ** (1 - w)
+    x1 = k * (w / (g * P * (1 - w))) ** (1 - w)
+    y1 = k * (g * P * (1 - w) / w) ** w
+    dy = (y1 - y) / g
+    dx = x - x1
+    return dict(w=w, y=y, k=k, x1=x1, y1=y1, dy=dy, dx=dx, profit=dx * P - dy, p_new=(w / (1 - w)) * y1 / x1)
+
+
+def il_weighted(r, w):
+    """Pierderea impermanenta a unui fond ponderat: r^w / (w r + 1 - w) - 1."""
+    return r ** w / (w * r + 1 - w) - 1
 
 
 def a5_il():
-    """Pierderea impermanenta pentru r = 2, 0.5, 4; valoarea furnizorului vs pastrarea activelor."""
-    out = {f'{r:g}': 100 * impermanent_loss(r) for r in [0.5, 1.5, 2, 4]}
-    V0 = 20000.0
-    r = 2.0
-    hold = V0 / 2 * (1 + r)
-    lp = V0 * np.sqrt(r)
-    return dict(il=out, hold=hold, lp=lp, diff=lp - hold)
+    """IL pentru w = 0.5 si w = 0.8 la r = 0.5, 2, 4; aproximarea de ordinul doi -w(1-w)(ln r)^2 / 2."""
+    out = {}
+    for w in [0.5, 0.8]:
+        for r in [0.5, 2.0, 4.0]:
+            out[f'w{w:g}_r{r:g}'] = 100 * il_weighted(r, w)
+            out[f'q{w:g}_r{r:g}'] = -100 * w * (1 - w) * np.log(r) ** 2 / 2
+    return out
 
 
-def a6_fees():
-    """Comisioanele anuale care compenseaza pierderea impermanenta (r = 2 intr-un an) si LVR = sigma^2 / 8."""
-    il2 = -impermanent_loss(2.0)
-    sig = 0.70
-    return dict(il2=100 * il2, fee_needed=100 * (1 / (1 - il2) - 1), lvr=100 * sig ** 2 / 8, sig=100 * sig,
-                vol_tvl=100 * (sig ** 2 / 8) / 0.003 / 365)
+def a6_lvr(sig=0.70):
+    """Rata LVR a unui fond ponderat: sigma^2 w (1 - w) / 2; w = 1/2 da sigma^2 / 8."""
+    return {f'w{w:g}': 100 * sig ** 2 * w * (1 - w) / 2 for w in [0.5, 0.8, 0.95]}
 
 
-def a7_stablecoin():
-    """Arbitrajul de rascumparare: pret de piata 0.97, rascumparare la 1 USD cu comision 0.1% si cost fix."""
-    m, fee, fixed, N = 0.97, 0.001, 25.0, 1_000_000
-    buy = m * N
-    redeem = N * (1 - fee)
-    profit = redeem - buy - fixed
-    lower = 1 - fee
-    return dict(buy=buy, redeem=redeem, profit=profit, ret=100 * profit / buy, lower=lower,
-                breakeven=(redeem - fixed) / N)
+def a7_tar(tar):
+    """Algebra EQ-TAR pe estimarile USDC din B3: timpii de injumatatire in fiecare regim si numarul de zile pana cand
+    o abatere de -285 pb (inchiderea din 11 martie 2023) reintra in banda."""
+    d0 = 285.0
+    n_out = np.log(tar['c'] / d0) / np.log(tar['phi_out'])
+    return dict(d0=d0, n_out=n_out, n_days=int(np.ceil(n_out)), hl_in=tar['hl_in'], hl_out=tar['hl_out'])
 
 
-def a8_etf():
-    """ETF spot pe Bitcoin: NAV pe unitate dupa comisionul anual 0.25% si prima / discountul."""
-    btc0 = 0.000568                  # bitcoin detinut pe unitate la lansare (ipoteza de lucru)
-    fee = 0.0025
-    t = 2.5
-    btc_t = btc0 * (1 - fee) ** t
-    P_btc = 95000.0
-    nav = btc_t * P_btc
-    px = 53.10
-    prem = 100 * (px / nav - 1)
-    cost = 0.0010
-    return dict(btc_t=btc_t, nav=nav, prem=prem, band=100 * cost, lost=100 * (1 - (1 - fee) ** t))
+def a8_mix(tar):
+    """Limita in probabilitate a OLS liniar pe date EQ-TAR: phi_lin = phi_in (1 - s) + phi_out s,
+    s = ponderea lui sum d_{t-1}^2 din afara benzii."""
+    s = tar['share_var_out'] / 100
+    return dict(s=100 * s, mix=tar['phi_in'] * (1 - s) + tar['phi_out'] * s, phi_lin=tar['phi_lin'])
 
 
 # =============================================================================
@@ -180,41 +187,21 @@ def fig_sem_weekend(b1):
     save_fig('ch16_sem_weekend')
 
 
-def ar1_boot(dev, B=B_BOOT, seed=SEED):
-    """AR(1) pe abateri: phi, timpul de injumatatire si interval bootstrap pe reziduuri."""
-    x = dev.values
-    X = np.column_stack([np.ones(len(x) - 1), x[:-1]])
-    b = np.linalg.lstsq(X, x[1:], rcond=None)[0]
-    e = x[1:] - X @ b
-    rng = np.random.default_rng(seed)
-    phis = []
-    for _ in range(B):
-        es = rng.choice(e, len(e), replace=True)
-        # x_t = c + phi x_{t-1} + e_t, pornind de la x_0 observat (filtru recursiv)
-        xs = np.concatenate([[x[0]], lfilter([1.0], [1.0, -b[1]], b[0] + es, zi=[b[1] * x[0]])[0]])
-        Xs = np.column_stack([np.ones(len(xs) - 1), xs[:-1]])
-        phis.append(np.linalg.lstsq(Xs, xs[1:], rcond=None)[0][1])
-    lo, hi = np.percentile(phis, [2.5, 97.5])
-    hl = lambda p: np.log(0.5) / np.log(p) if 0 < p < 1 else np.inf
-    return dict(phi=b[1], mu=b[0] / (1 - b[1]), phi_lo=lo, phi_hi=hi, hl=hl(b[1]), hl_lo=hl(lo), hl_hi=hl(hi),
-                sd_e=e.std(), n=len(x))
-
-
 def b3_usdc(key='USDC', start='2021-01-01'):
-    """Abaterea zilnica de la paritate (bp): AR(1) cu si fara martie 2023; zile in afara benzii de +-50 bp."""
+    """Abaterea zilnica de la paritate (pb): statistici, EQ-TAR cu testul sup-Wald si bootstrap cu regresori ficsi
+    (Hansen, 1996), cu si fara saptamana 9-16 martie 2023."""
     d = read_market(ASSETS[key][0]).loc[start:END]
     dev = 1e4 * (d['close'] - 1)
-    full = ar1_boot(dev)
     ex = dev.drop(dev.loc['2023-03-09':'2023-03-16'].index)
-    exl = ar1_boot(ex, seed=SEED + 1)
     return dict(key=key, n=len(dev), sd=dev.std(), sd_ex=ex.std(), out50=int((dev.abs() > 50).sum()),
                 out50_ex=int((ex.abs() > 50).sum()), min=dev.min(), min_date=str(dev.idxmin().date()),
-                low=1e4 * (d['low'].min() - 1), low_date=str(d['low'].idxmin().date()), full=full, ex=exl,
-                kurt=float(dev.kurt()))
+                low=1e4 * (d['low'].min() - 1), low_date=str(d['low'].idxmin().date()),
+                full=I.tar_fit(dev), ex=I.tar_fit(ex), kurt=float(dev.kurt()))
 
 
-def fig_sem_usdc():
-    """USDC: abaterea de la paritate in 2023 si graficul de dispersie x_t vs x_{t-1} (AR(1))."""
+def fig_sem_usdc(tar):
+    """USDC: abaterea de la paritate in 2023 si abaterea de azi fata de cea de ieri cu dreptele EQ-TAR din fiecare
+    regim (pragul estimat c) si dreapta AR(1) liniara."""
     d = read_market(ASSETS['USDC'][0]).loc['2021-01-01':END]
     dev = 1e4 * (d['close'] - 1)
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.9))
@@ -225,13 +212,18 @@ def fig_sem_usdc():
     axes[0].set_ylabel('bp')
     z1 = pd.concat([dev.shift(1), dev], axis=1).dropna()
     z1.columns = ['lag', 'now']
-    zz = z1[(z1.abs() <= 30).all(axis=1)]
-    axes[1].scatter(zz['lag'], zz['now'], s=5, color=Teal, alpha=0.6, label='Pairs of days (within 30 bp)')
-    b = np.polyfit(z1['lag'], z1['now'], 1)
-    xs = np.array([-30, 30])
-    axes[1].plot(xs, np.polyval(b, xs), color=IDAred, lw=1.2, label=f'AR(1) fit on all days, slope {b[0]:.2f}')
-    axes[1].set_xlim(-30, 30)
-    axes[1].set_ylim(-30, 30)
+    zz = z1[(z1.abs() <= 12).all(axis=1)]
+    axes[1].scatter(zz['lag'], zz['now'], s=5, color=Teal, alpha=0.6, label='Pairs of days (within 12 bp)')
+    c = tar['c']
+    xi = np.array([-c, c])
+    axes[1].plot(xi, tar['phi_in'] * xi, color=Forest, lw=1.8, label=f'Inside the band: slope {tar["phi_in"]:.2f}')
+    for xo in [np.array([-12, -c]), np.array([c, 12])]:
+        axes[1].plot(xo, tar['phi_out'] * xo, color=IDAred, lw=1.8)
+    axes[1].plot([], [], color=IDAred, lw=1.8, label=f'Outside the band: slope {tar["phi_out"]:.2f}')
+    for v in [-c, c]:
+        axes[1].axvline(v, color=Gray, lw=0.6, ls='--')
+    axes[1].set_xlim(-12, 12)
+    axes[1].set_ylim(-12, 12)
     axes[1].set_xlabel('Deviation yesterday (bp)')
     axes[1].set_ylabel('Deviation today (bp)')
     fig.tight_layout()
@@ -240,20 +232,35 @@ def fig_sem_usdc():
 
 
 def b5_etf(etf='IBIT', coin='BTC'):
-    """Urmarirea: beta zilnic vs saptamanal (HAC), abaterea de urmarire si deriva anuala a raportului ETF / activ."""
+    """Urmarirea: beta zilnic vs saptamanal (HAC); deriva din comision ca medie a lui Delta ln(P_ETF/P_coin) cu eroare
+    HAC; teste ADF (H0: radacina unitara) si KPSS (H0: stationaritate in jurul unei tendinte) pe nivelul raportului;
+    comparatie cu panta regresiei nivelului pe timp; beta Dimson (1979) cu un decalaj si un avans."""
+    from statsmodels.tsa.stattools import adfuller, kpss
     t = etf_tracking(etf, coin)
     p = pd.concat([price(etf), price(coin)], axis=1, join='inner').dropna()
     lr = np.log(p[etf] / p[coin])
+    yrs = (lr.index[-1] - lr.index[0]).days / 365.25
+    dl = lr.diff().dropna()
+    ppy = len(dl) / yrs
+    L = I.nw_lags(len(dl))
+    m0 = sm.OLS(dl.values, np.ones(len(dl))).fit(cov_type='HAC', cov_kwds={'maxlags': L})
     tt = pd.Series((lr.index - lr.index[0]).days / 365.25, index=lr.index)
     m = hac_ols(lr, tt, lags=20)
-    t.update(drift_hac=100 * m.params.iloc[1], drift_se=100 * m.bse.iloc[1],
+    adf = adfuller(lr.values, regression='ct', autolag='AIC')
+    kp = kpss(lr.values, regression='ct', nlags='auto')
+    adf_d = adfuller(dl.values, regression='c', autolag='AIC')
+    t.update(drift_mean=100 * ppy * m0.params[0], drift_mse=100 * ppy * m0.bse[0],
+             drift_mlo=100 * ppy * (m0.params[0] - 1.96 * m0.bse[0]), drift_mhi=100 * ppy * (m0.params[0] + 1.96 * m0.bse[0]),
+             drift_hac=100 * m.params.iloc[1], drift_se=100 * m.bse.iloc[1],
              drift_lo=100 * (m.params.iloc[1] - 1.96 * m.bse.iloc[1]), drift_hi=100 * (m.params.iloc[1] + 1.96 * m.bse.iloc[1]),
-             t_beta_w=(t['beta_w'] - 1) / t['se_w'])
+             adf=adf[0], adf_p=adf[1], kpss=kp[0], kpss_p=kp[1], adf_d=adf_d[0], adf_d_p=adf_d[1],
+             t_beta_w=(t['beta_w'] - 1) / t['se_w'], lags=L, dimson=I.dimson(etf, coin))
     return t
 
 
 def b7_equity(key='MSTR'):
-    """Regresie saptamanala cu doi factori, testul b_BTC = 1 si stabilitatea pe doua subperioade."""
+    """Regresie saptamanala cu doi factori, testul b_BTC = 1 pe subperioade si testul sup-Wald (Andrews, 1993)
+    pentru o ruptura la o data necunoscuta in toti cei trei coeficienti, cu erori HAC si CI Bai (1997)."""
     out = {}
     for lab, a, b in [('full', '2021-04-16', END), ('p1', '2021-04-16', '2023-12-31'), ('p2', ETF_START, END)]:
         w = joint_returns([key, 'BTC', 'SPX'], None, freq='W').loc[a:b]
@@ -261,6 +268,14 @@ def b7_equity(key='MSTR'):
         out[lab] = dict(n=len(w), b_btc=m.params['BTC'], se_btc=m.bse['BTC'], b_spx=m.params['SPX'],
                         se_spx=m.bse['SPX'], r2=m.rsquared, t1=(m.params['BTC'] - 1) / m.bse['BTC'],
                         alpha=52 * 100 * m.params['const'], alpha_t=m.tvalues['const'])
+    w = 100 * joint_returns([key, 'BTC', 'SPX'], None, freq='W').loc['2021-04-16':END]
+    X = np.column_stack([np.ones(len(w)), w['BTC'].values, w['SPX'].values])
+    sw = I.sup_wald(w[key].values, X, w.index)
+    Wser = pd.Series(sw.pop('W'), index=w.index)
+    crit = I.sup_wald_crit(3)
+    sw.update(p=float((crit >= sw['sup_w']).mean()), cv5=float(np.percentile(crit, 95)),
+              W_etf=float(Wser.loc[ETF_START:].iloc[0]), W_date=float(Wser.loc[sw['date']]))
+    out['sw'] = sw
     return out
 
 
@@ -307,6 +322,36 @@ def c1_hedge():
         bl[lab]['worst10_spx'] = worst['SPX'].mean()
         bl[lab]['worst10_btc'] = worst['BTC'].mean()
     out['bl'] = bl
+    # Forbes-Rigobon: corelatia de dupa ETF-uri ajustata pentru volatilitatea S&P 500 (relativ la perioada 'pre')
+    r = joint_returns(['BTC', 'SPX'], '2021-01-01')
+    x0, x1 = r.loc[per['pre'][0]:per['pre'][1]].values, r.loc[per['post'][0]:per['post'][1]].values
+    def rstar(z0, z1):
+        r0, r1 = np.corrcoef(z0.T)[0, 1], np.corrcoef(z1.T)[0, 1]
+        dl = z1[:, 1].var() / z0[:, 1].var() - 1
+        return r1 / np.sqrt(1 + dl * (1 - r1 ** 2)) - r0, dl, r1 / np.sqrt(1 + dl * (1 - r1 ** 2))
+    d_fr, delta, rs = rstar(x0, x1)
+    rng = np.random.default_rng(SEED)
+    def mbb(z):
+        n = len(z)
+        st = rng.integers(0, n - 19, int(np.ceil(n / 20)))
+        return z[(st[:, None] + np.arange(20)[None, :]).ravel()[:n]]
+    dd = [rstar(mbb(x0), mbb(x1))[0] for _ in range(B_BOOT)]
+    out['fr'] = dict(delta=delta, rho_star=rs, diff=d_fr, lo=np.percentile(dd, 2.5), hi=np.percentile(dd, 97.5))
+    # regresie cuantila (Koenker & Bassett, 1978): cuantila tau a lui r_BTC conditionata de r_SPX, bootstrap pe blocuri
+    from statsmodels.regression.quantile_regression import QuantReg
+    qr = {}
+    for lab, (a, b) in per.items():
+        z = 100 * joint_returns(['BTC', 'SPX'], a).loc[a:b]
+        Xq = sm.add_constant(z['SPX'].values)
+        for tau in [0.01, 0.05, 0.5]:
+            bq = QuantReg(z['BTC'].values, Xq).fit(q=tau).params[1]
+            bs = []
+            zz = z.values
+            for _ in range(300):
+                y = mbb(zz)
+                bs.append(QuantReg(y[:, 0], sm.add_constant(y[:, 1])).fit(q=tau).params[1])
+            qr[f'{lab}_{int(100 * tau)}'] = dict(b=bq, se=float(np.std(bs)))
+    out['qr'] = qr
     # volatilitatea si cea mai mare scadere in cele doua perioade
     p = price('BTC', '2021-01-01')
     for lab, (a, b) in per.items():
@@ -337,14 +382,15 @@ def fig_sem_hedge(c1):
 if __name__ == '__main__':
     print('Seminar 16')
     S = {}
-    S['A1'], S['A2'], S['A3'], S['A4'] = a1_index(), a2_replace(), a3_swap(), a4_arbitrage()
-    S['A5'], S['A6'], S['A7'], S['A8'] = a5_il(), a6_fees(), a7_stablecoin(), a8_etf()
+    S['A1'], S['A2'], S['A3'], S['A4'] = a1_index(), a2_replace(), a3_band(), a4_weighted()
+    S['A5'], S['A6'] = a5_il(), a6_lvr()
     b1 = b1_btc_facts('BTC')
     fig_sem_weekend(b1)
     S['B1'] = {k: v for k, v in b1.items() if not k.startswith('_')}
     S['B2'] = {k: {kk: vv for kk, vv in b1_btc_facts(k).items() if not kk.startswith('_')} for k in ['ETH', 'SOL']}
     S['B3'] = b3_usdc('USDC')
-    fig_sem_usdc()
+    fig_sem_usdc(S['B3']['full'])
+    S['A7'], S['A8'] = a7_tar(S['B3']['full']), a8_mix(S['B3']['full'])
     S['B4'] = {k: b3_usdc(k) for k in ['USDT', 'DAI']}
     S['B5'] = b5_etf('IBIT', 'BTC')
     S['B6'] = b5_etf('ETHA', 'ETH')

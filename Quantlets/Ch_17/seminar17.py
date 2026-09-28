@@ -25,10 +25,10 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import LABELS, price, shiller   # noqa: E402
 from bubbles import (psy, psy_cv, wild_cv, episodes, min_window, lppls_fit, lppls_qualified,   # noqa: E402
-                     lppls_confidence, drawdown)
+                     lppls_confidence, drawdown, LPPLS_WINDOWS, LPPLS_SEARCH, LPPLS_FILTER)
 from generate_all_charts import (plt, MainBlue, IDAred, Forest, Amber, Orange, Purple, Teal, Magenta, Gray,  # noqa: E402
                                  SEED, save_fig, legend_outside_bottom, fig_legend, jsonable, yrs, todate, d2s,
-                                 run_psy, summarise, real_time, ms_fit, ms_summary, CI_WINDOWS, ci_evaluation, HERE,
+                                 run_psy, summarise, real_time, ms_fit, ms_summary, ci_evaluation, HERE,
                                  QL_RAW, _chg)
 
 
@@ -40,7 +40,7 @@ def a1_present_value(D1=2.0, r=0.06, g=0.02, P=65.0):
     F = D1 / (r - g)
     B = P - F
     out = dict(F=F, B=B, share0=B / P)
-    for h in (5, 30):
+    for h in (5, 30, 100):
         Fh, Bh = F * (1 + g) ** h, B * (1 + r) ** h
         out[f'F{h}'], out[f'B{h}'], out[f'share{h}'] = Fh, Bh, Bh / (Fh + Bh)
     return out
@@ -49,44 +49,55 @@ def a1_present_value(D1=2.0, r=0.06, g=0.02, P=65.0):
 def a2_blanchard_watson(B0=15.0, r=0.06, pi=0.9, h=5):
     """Bula Blanchard-Watson: supravietuieste cu pi pe an; conditionat de supravietuire creste cu (1+r)/pi."""
     return dict(growth=(1 + r) / pi - 1, surv=pi ** h, life=1 / (1 - pi), EB=B0 * (1 + r) ** h,
-                B_surv=B0 * ((1 + r) / pi) ** h, pi=pi, h=h)
+                B_surv=B0 * ((1 + r) / pi) ** h, pi=pi, h=h,
+                csd=B0 * (1 + r) * np.sqrt((1 - pi) / pi),          # abaterea standard conditionata (fara zgomot)
+                log_slope=-(1 - pi))                                # panta E[Delta y | y] in logaritmi
 
 
-A3_Y = [4.60, 4.62, 4.66, 4.71, 4.79, 4.90, 5.05, 5.25]
-
-
-def a3_adf(y=A3_Y, R=100_000):
-    """ADF la dreapta pas cu pas: Delta y_t = a + b y_{t-1} + e_t; valoarea critica de 95% prin simulare (T = 7)."""
-    y = np.asarray(y)
-    x, z = y[:-1], np.diff(y)
-    n = len(z)
-    Sx, Sxx, Sz, Sxz, Szz = x.sum(), (x * x).sum(), z.sum(), (x * z).sum(), (z * z).sum()
-    den = n * Sxx - Sx ** 2
-    b = (n * Sxz - Sx * Sz) / den
-    a = (Sz - b * Sx) / n
-    res = z - a - b * x
-    ssr = float(res @ res)
-    s2 = ssr / (n - 2)
-    se = np.sqrt(s2 * n / den)
-    rng = np.random.default_rng(SEED)
-    Y = np.cumsum(rng.standard_normal((R, n + 1)), axis=1)
+def _df_t(Y):
+    """Statistica t a lui b din Delta y_t = a + b y_{t-1} + e_t, pe fiecare rand al lui Y."""
     X, Z = Y[:, :-1], np.diff(Y, axis=1)
+    n = Z.shape[1]
     sx, sxx, sz, sxz, szz = X.sum(1), (X * X).sum(1), Z.sum(1), (X * Z).sum(1), (Z * Z).sum(1)
     dd = n * sxx - sx ** 2
     bb = (n * sxz - sx * sz) / dd
     aa = (sz - bb * sx) / n
-    tt = bb / np.sqrt((szz - aa * sz - bb * sxz) / (n - 2) * n / dd)
-    return dict(n=n, Sx=Sx, Sxx=Sxx, Sz=Sz, Sxz=Sxz, Szz=Szz, xbar=Sx / n, zbar=Sz / n,
-                Sxx_c=Sxx - Sx ** 2 / n, Sxz_c=Sxz - Sx * Sz / n, b=b, a=a, ssr=ssr, s2=s2, se=se, t=b / se,
-                cv95=float(np.quantile(tt, 0.95)), cv99=float(np.quantile(tt, 0.99)))
+    return bb / np.sqrt((szz - aa * sz - bb * sxz) / (n - 2) * n / dd)
+
+
+def a3_df_limit(T=1000, R=20_000):
+    """Distributia Dickey-Fuller cu termen liber: simulare pentru T mare; media numaratorului limita = -1/2."""
+    rng = np.random.default_rng(SEED)
+    tt = np.concatenate([_df_t(np.cumsum(rng.standard_normal((2000, T + 1)), axis=1)) for _ in range(R // 2000)])
+    # functionala limita aproximata pe grila de T puncte: numarator 1/2 (W(1)^2 - 1) - W(1) int W
+    W = np.cumsum(rng.standard_normal((5000, T)), axis=1) / np.sqrt(T)
+    num = 0.5 * (W[:, -1] ** 2 - 1) - W[:, -1] * W.mean(1)
+    return dict(T=T, R=R, q05=float(np.quantile(tt, 0.05)), q50=float(np.quantile(tt, 0.50)),
+                q95=float(np.quantile(tt, 0.95)), q99=float(np.quantile(tt, 0.99)),
+                p_neg=float((tt < 0).mean()), num_mean=float(num.mean()))
+
+
+def a4_mild(Ts=(100, 400, 1600), alpha=0.8, c=1.0, R=4000):
+    """Radacina usor exploziva rho_T = 1 + c / T^alpha: mediana statisticii ADF creste cu T (divergenta la +inf)."""
+    rng = np.random.default_rng(SEED)
+    out = []
+    for T in Ts:
+        rho = 1 + c / T ** alpha
+        e = rng.standard_normal((R, T))
+        Y = np.zeros((R, T + 1))
+        for t in range(T):
+            Y[:, t + 1] = rho * Y[:, t] + e[:, t]
+        tt = _df_t(Y)
+        out.append(dict(T=T, rho=rho, rhoT=float(rho ** T), med=float(np.median(tt)), rej=float((tt > 1.28).mean())))
+    return out
 
 
 def a4_windows(T=440):
+    """(pastrat pentru notebook) ferestrele PSY pentru T = 440."""
     w0, r0 = min_window(T)
     n_sadf = T - w0 + 1
     return dict(T=T, r0=r0, w0=w0, n_sadf=n_sadf, n_gsadf=n_sadf * (n_sadf + 1) // 2, logT=float(np.log(T)),
-                L=int(np.ceil(np.log(T))), T_d=2520, w0_d=min_window(2520)[0], r0_d=min_window(2520)[1],
-                L_d=int(np.ceil(np.log(2520))))
+                L=int(np.ceil(np.log(T))))
 
 
 def _ms_step(P, mu, sd, prev_turb, r):
@@ -119,14 +130,16 @@ def a6_markov(P=((0.95, 0.05), (0.20, 0.80)), mu=(0.4, -1.0), sd=(2.0, 6.0), pre
 
 
 def _lppls_diag(t1, t2, tc, m, w, B, C1, C2):
+    """Conditiile din Shu & Zhu (2020), ec. (11)-(12), care se pot verifica din parametri (fara date)."""
     C = np.hypot(C1, C2)
     D = t2 - t1
-    O = w / (2 * np.pi) * np.log((tc - t1) / (tc - t2))
+    O = w / np.pi * np.log((tc - t1) / (tc - t2))          # numarul de semiperioade (Shu & Zhu 2020, ec. 12)
     damp = m * abs(B) / (w * C)
+    exact = m * abs(B) / (C * np.hypot(m, w))              # rata de hazard >= 0 pentru orice faza: m|B| >= |C| sqrt(m^2 + w^2)
     slope = -B * m * (tc - t2) ** (m - 1)          # d/dt [B (tc - t)^m] la t2, fara oscilatii
-    return dict(C=C, D=D, O=O, damping=damp, dtc=tc - t2, dtc_days=(tc - t2) * 365.25, tc_lim=0.1 * D,
-                slope=slope, m=m, w=w, B=B, ok_B=B < 0, ok_m=0.01 <= m <= 0.99, ok_w=2 <= w <= 15,
-                ok_tc=tc - t2 <= 0.1 * D, ok_O=O >= 2.5, ok_D=damp >= 0.5)
+    return dict(C=C, D=D, O=O, damping=damp, exact=exact, dtc=tc - t2, dtc_days=(tc - t2) * 365.25, tc_lim=D / 5,
+                slope=slope, m=m, w=w, B=B, ok_B=B < 0, ok_m=0.01 <= m <= 0.99, ok_w=2 <= w <= 25,
+                ok_tc=0 <= tc - t2 <= D / 5, ok_O=O >= 2.5, ok_D=damp >= 1, ok_exact=exact >= 1)
 
 
 def a7_lppls():
@@ -219,7 +232,7 @@ def b5_tc_windows(t2='2017-11-15', starts=('2016-06-01', '2017-08-01')):
         w = p.loc[t1:t2]
         f = lppls_fit(yrs(w.index), np.log(w.values))
         rows.append(dict(t1=w.index[0], tc=todate(f['tc']), m=f['m'], w=f['w'], q=lppls_qualified(f),
-                         at_bound=bool(f['m'] <= 0.011 or f['m'] >= 0.989 or f['w'] <= 2.01 or f['w'] >= 24.9)))
+                         at_bound=bool(f['m'] <= 0.002 or f['m'] >= 0.998 or f['w'] <= 1.01 or f['w'] >= 49.9)))
     d = pd.DataFrame(rows)
     pk = p.loc['2017'].idxmax()
     err = (d['tc'] - pk).dt.days
@@ -373,19 +386,20 @@ def c1_ai():
         p = price(k, 'D', '2022-01-01')
         t, yy = yrs(p.index), np.log(p.values)
         idx = np.arange(len(p) - 1, len(p) - 1 - 26 * 5, -10)
-        ci = [lppls_confidence(t, yy, i, CI_WINDOWS[:9]) for i in idx]
+        ci = [lppls_confidence(t, yy, i, LPPLS_WINDOWS) for i in idx]
         out[f'ci_{k}_mean'] = float(np.mean(ci))
         out[f'ci_{k}_max'] = float(np.max(ci))
         out[f'ci_{k}_last'] = float(ci[0])
     return out
 
 
-if __name__ == '__main__':
+def main():
     S = {}
     S['A1'] = a1_present_value()
     S['A2'] = a2_blanchard_watson()
-    S['A3'] = a3_adf()
-    S['A4'] = a4_windows()
+    S['A3'] = a3_df_limit()
+    S['A4'] = a4_mild()
+    S['A4w'] = a4_windows()
     S['A5'] = a5_markov()
     S['A6'] = a6_markov()
     S['A7'] = a7_lppls()
@@ -402,3 +416,7 @@ if __name__ == '__main__':
     with open(os.path.join(HERE, 'sem17_results.json'), 'w') as f:
         json.dump(jsonable(S), f, indent=1)
     print('saved sem17_results.json')
+
+
+if __name__ == '__main__':
+    main()

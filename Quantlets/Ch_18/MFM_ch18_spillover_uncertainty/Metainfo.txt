@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch18_spillover_uncertainty'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Estimation error in the Diebold-Yilmaz network of 13 banks: residual block-bootstrap intervals for total and net connectedness, the adaptive elastic-net VAR and 150-day elastic-net windows of Demirer, Diebold, Liu and Yilmaz (2018) against OLS, and pairwise Granger-causality networks with Holm and Benjamini-Hochberg control.'
+
+Keywords: 'connectedness, bootstrap, elastic net, regularised VAR, Granger causality, false discovery rate, Holm'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market), January 2010 - September 2026: JPMorgan Chase, Bank of America, Citigroup, Goldman Sachs, Morgan Stanley, Wells Fargo, Deutsche Bank, BNP Paribas, Santander, ING, HSBC, Banca Transilvania, BRD-Groupe Societe Generale; S&P 500, Euro Stoxx 50, BET and VIX indices'
+
+Output: 'ch18_spill_ci.pdf, ch18_spill_enet.pdf'

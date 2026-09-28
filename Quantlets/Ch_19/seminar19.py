@@ -24,7 +24,8 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import log_returns, asset_price  # noqa: E402
 from case_study import (ALPHA, MODELS, stylised_facts, kurtosis_boot_ci, garch_t_fit, garch_summary,  # noqa: E402
-                        rolling_var, backtest_table)
+                        rolling_var, backtest_table, ljung_box)
+from inference19 import hill_ci, profile_ci, formal_eval, sup_wald_break  # noqa: E402
 from generate_all_charts import (plt, MainBlue, IDAred, Orange, Teal, Gray, Forest, save_fig,  # noqa: E402
                                  legend_outside_bottom)
 
@@ -50,11 +51,31 @@ def half_life_ci(res):
                 hl=hl, se_hl=se_hl, hl_at_lo=np.log(0.5) / np.log(lo))
 
 
+def robust_q(x, m=10):
+    """Portmanteau robust la heteroscedasticitate conditionata (Lobato, Nankervis & Savin, 2001):
+    Q* = T sum_k rho_k^2 / tau_k, tau_k = mean(x_t^2 x_{t-k}^2) / gamma_0^2, ~ chi2(m) sub H0 (necorelare)."""
+    x = np.asarray(x) - np.mean(x)
+    T = len(x)
+    g0 = np.mean(x ** 2)
+    q = 0.0
+    for k in range(1, m + 1):
+        rho = np.mean(x[k:] * x[:-k]) / g0
+        tau = np.mean((x[k:] * x[:-k]) ** 2) / g0 ** 2
+        q += T * rho ** 2 / tau
+    return q, stats.chi2.sf(q, m)
+
+
 def part_facts():
     for k, r in [('bet', bet), ('btc', btc)]:
         sf = stylised_facts(r)
-        sf['kurt_ci'] = list(kurtosis_boot_ci(r))
+        h = hill_ci(r.values, seed=1)
+        sf['hill'] = {kk: v for kk, v in h.items() if kk != 'draws'}
+        sf['q_robust'], sf['q_robust_p'] = robust_q(r.values)
+        sf['q_r_raw'], sf['q_r_raw_p'] = ljung_box(r.values)
         RES[f'facts_{k}'] = sf
+    d = RES['facts_btc']['hill']['alpha'] - RES['facts_bet']['hill']['alpha']
+    se = np.sqrt(RES['facts_btc']['hill']['se_boot'] ** 2 + RES['facts_bet']['hill']['se_boot'] ** 2)
+    RES['hill_diff'] = dict(d=d, se=se, p=2 * stats.norm.sf(abs(d / se)))
 
 
 def part_garch():
@@ -62,6 +83,7 @@ def part_garch():
     g = garch_summary(res)
     g.update(half_life_ci(res))
     g['loglik'] = res.loglikelihood
+    g['profile'] = profile_ci(bet.values, res)
     RES['garch_bet'] = g
     gjr = arch_model(bet, mean='Constant', vol='GARCH', p=1, o=1, q=1, dist='t', rescale=False).fit(disp='off')
     lr = 2 * (gjr.loglikelihood - res.loglikelihood)
@@ -74,6 +96,8 @@ def part_garch():
 def part_var_btc():
     fc = rolling_var(btc, '2019-01-01')
     RES['bt_btc'] = backtest_table(fc)
+    RES['formal_btc'] = formal_eval(fc)
+    fc.to_csv(os.path.join(HERE, 'ch19_forecasts_btc.csv'))
     RES['eval_btc'] = dict(start=str(fc.index[0].date()), end=str(fc.index[-1].date()), T=len(fc))
     d = fc.loc['2022-01-01':]
     fig, ax = plt.subplots(figsize=(9.6, 3.3))
@@ -121,34 +145,51 @@ def part_join():
 
 
 def part_c():
-    """Analiza de referinta pentru C1: BET inainte si dupa reclasificarea FTSE (21.09.2020)."""
+    """Analiza de referinta pentru C1: BET inainte si dupa reclasificarea FTSE (21.09.2020), control WIG20."""
     pre, post = bet.loc['2014-09-22':FTSE].iloc[:-1], bet.loc[FTSE:]
     out = {}
+    hd = {}
     for lab, r in [('pre', pre), ('post', post)]:
         res = garch_t_fit(r)
         g = garch_summary(res)
-        ci = kurtosis_boot_ci(r, B=1000)
+        h = hill_ci(r.values, seed=5)
+        hd[lab] = h['draws']
         out[lab] = dict(N=len(r), start=str(r.index[0].date()), end=str(r.index[-1].date()),
-                        vol=r.std() * np.sqrt(252), kurt=stats.kurtosis(r), kurt_lo=ci[0], kurt_hi=ci[1],
-                        pers=g['pers'], nu=g['nu'], hs_var=float(np.quantile(-r, 0.99)))
-    # diferenta de kurtosis: bootstrap pe blocuri, independent in cele doua perioade
-    rng = np.random.default_rng(3)
-
-    def boot(x, B=1000, block=20):
-        x = np.asarray(x)
-        T = len(x)
-        nb = int(np.ceil(T / block))
-        return np.array([stats.kurtosis(x[(rng.integers(0, T - block, nb)[:, None] + np.arange(block)).ravel()[:T]])
-                         for _ in range(B)])
-    dk = boot(post) - boot(pre)
-    out['dkurt'] = stats.kurtosis(post) - stats.kurtosis(pre)
-    # sensibilitate: kurtosis-ul perioadei de dinainte fara cele mai mari una si doua zile (in valoare absoluta)
+                        vol=r.std() * np.sqrt(252), kurt=stats.kurtosis(r), hill=h['alpha'], hill_lo=h['lo'],
+                        hill_hi=h['hi'], k=h['k'], pers=g['pers'], nu=g['nu'], hs_var=float(np.quantile(-r, 0.99)))
+    # diferenta indicilor Hill: extrageri independente in cele doua perioade disjuncte
+    dd = hd['post'] - hd['pre']
+    out['dhill'] = out['post']['hill'] - out['pre']['hill']
+    out['dhill_ci'] = list(np.percentile(dd, [2.5, 97.5]))
+    # sensibilitatea kurtosis-ului (necontrolat cand alpha < 4) la cele mai mari zile
     top = pre.abs().nlargest(2).index
     out['pre']['top_days'] = [str(d.date()) for d in top]
     out['pre']['top_returns'] = [float(pre.loc[d]) for d in top]
     out['pre']['kurt_ex1'] = stats.kurtosis(pre.drop(top[:1]))
     out['pre']['kurt_ex2'] = stats.kurtosis(pre.drop(top))
-    out['dkurt_ci'] = list(np.percentile(dk, [2.5, 97.5]))
+    out['dkurt'] = stats.kurtosis(post) - stats.kurtosis(pre)
+    # control: WIG20 (neafectat de reclasificarea BVB), diferenta-in-diferente pe indicele Hill
+    wp = asset_price('WIG20')
+    wp = wp[wp.diff() != 0]                                  # sarbatori completate cu valoarea anterioara
+    w = 100 * np.log(wp).diff().dropna()
+    wpre, wpost = w.loc['2014-09-22':FTSE].iloc[:-1], w.loc[FTSE:'2026-09-18']
+    hw = {lab: hill_ci(r.values, seed=6) for lab, r in [('pre', wpre), ('post', wpost)]}
+    out['wig'] = dict(pre=hw['pre']['alpha'], post=hw['post']['alpha'], d=hw['post']['alpha'] - hw['pre']['alpha'])
+    did = dd - (hw['post']['draws'] - hw['pre']['draws'])
+    out['did'] = out['dhill'] - out['wig']['d']
+    out['did_ci'] = list(np.percentile(did, [2.5, 97.5]))
+    # ruptura cu data necunoscuta in log|r| (toate momentele finite), 2014-2026
+    y = np.log(np.abs(bet.loc['2014-09-22':'2026-09-18']))
+    sw = sup_wald_break(y.values)
+    out['supwald'] = dict(stat=sw['stat'], p=sw['p'], cv5=sw['cv5'], date=str(y.index[sw['k']].date()))
+    # date placebo: aceeasi analiza Hill la +/- un an
+    out['placebo'] = {}
+    for lab, d0 in [('m1', '2019-09-23'), ('p1', '2021-09-20')]:
+        a1, a2 = bet.loc['2014-09-22':d0].iloc[:-1], bet.loc[d0:'2026-09-18']
+        h1, h2 = hill_ci(a1.values, seed=7), hill_ci(a2.values, seed=8)
+        dpl = h2['draws'] - h1['draws']
+        out['placebo'][lab] = dict(date=d0, d=h2['alpha'] - h1['alpha'], lo=float(np.percentile(dpl, 2.5)),
+                                   hi=float(np.percentile(dpl, 97.5)))
     fc = rolling_var(bet, '2014-09-22')
     for lab, a, z in [('pre', '2014-09-22', '2020-09-18'), ('post', FTSE, '2026-09-18')]:
         d = fc.loc[a:z]

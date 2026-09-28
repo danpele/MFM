@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch18_covar_tests'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Inference for systemic-risk measures of 11 US and European banks: joint moving-block bootstrap (999 draws) tests of Delta-CoVaR = 0, of equal tail and median slopes and of equal contributions (Holm correction, joint Wald test), the Euler identity ES = sum of MES when conditioning on the portfolio itself, the Girardi-Ergun CoVaR at 5% and an out-of-sample backtest of its joint hits.'
+
+Keywords: 'CoVaR, Delta-CoVaR, quantile regression, block bootstrap, Holm, Euler allocation, MES, Girardi-Ergun, backtesting'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market), January 2010 - September 2026: JPMorgan Chase, Bank of America, Citigroup, Goldman Sachs, Morgan Stanley, Wells Fargo, Deutsche Bank, BNP Paribas, Santander, ING, HSBC, Banca Transilvania, BRD-Groupe Societe Generale; S&P 500, Euro Stoxx 50, BET and VIX indices'
+
+Output: ''

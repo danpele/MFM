@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch17_inference'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Inference for the real-time bubble claims of Chapter 17: Monte Carlo size of GSADF under volatility shifts and GARCH (Monte Carlo vs wild bootstrap critical values, false date-stamped episodes); family-wise error of BSADF date-stamping and the Phillips-Shi (2020) bootstrap critical value for Bitcoin; a circular block bootstrap and Newey-West test of the LPPLS confidence indicator; parametric-bootstrap likelihood-ratio tests of the number of Markov regimes; the effective sample size of Bubbles for Fama.'
+
+Keywords: 'size distortion, wild bootstrap, family-wise error rate, date-stamping, LPPLS evaluation, block bootstrap, Markov switching, likelihood ratio, parametric bootstrap, Bitcoin, Nasdaq 100'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Nasdaq 100, S&P 500, BET, BET-FI, Bitcoin, Ethereum, Dogecoin, NVIDIA, Cisco, Tesla, GameStop, Strategy; S&P Composite monthly since 1871 (Robert J. Shiller); 49 US industry portfolios (Kenneth French Data Library)'
+
+Output: 'ch17_fwer_btc.pdf, ch17_ms_lr.pdf, inference17.json'

@@ -199,7 +199,7 @@ def chain_tvl():
     return _CACHE['chains']
 
 
-# universul pentru clasificarea activelor (in spiritul Pele et al., 2023): simbol -> (eticheta, clasa, tip)
+# universul pentru clasificarea activelor (replicare restransa a abordarii Pele et al., 2023): simbol -> (eticheta, clasa, tip)
 CLASS_ASSETS = {
     'BTC-USD.CC': ('Bitcoin', 'Crypto', 'crypto'), 'ETH-USD.CC': ('Ethereum', 'Crypto', 'crypto'),
     'XRP-USD.CC': ('XRP', 'Crypto', 'crypto'), 'LTC-USD.CC': ('Litecoin', 'Crypto', 'crypto'),

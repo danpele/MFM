@@ -25,6 +25,7 @@ from generate_all_charts import (plt, R, V, ALL, US, EU, RO, NAMES, MainBlue, ID
                                  frm_design, frm_window, weekly_returns, SEED)
 from systemic import (covar_static, covar_boot, block_bootstrap_idx, mes, mes_threshold, lrmes, breakeven_leverage,  # noqa: E402
                       srisk_ratio, var_fit, gfevd, spillover_table, ma_coefs)
+from inference18 import spill_bootstrap  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SEM = {}
@@ -46,6 +47,28 @@ def a2_covar_normal():
     return {'A': a1_covar_normal(rho=0.6, s_i=2.0), 'B': a1_covar_normal(rho=0.3, s_i=4.0)}
 
 
+def a2_ge_covar(s_sys=1.5, rho=0.6, alpha=0.01):
+    """CoVaR Girardi-Ergun sub distributia Normala: P(X_sys <= -c, X_i <= q_alpha(X_i)) = alpha^2."""
+    from scipy.optimize import brentq
+    z = stats.norm.ppf(alpha)
+    mvn = stats.multivariate_normal(mean=[0, 0], cov=[[1, rho], [rho, 1]])
+    f = lambda c: mvn.cdf([-c / s_sys, z]) - alpha ** 2
+    c = brentq(f, 0.01, 20)
+    ab = a1_covar_normal(s_sys=s_sys, rho=rho, alpha=alpha)
+    return {'ge_covar': c, 'ab_covar': ab['covar'], 'ab_dcovar': ab['dcovar'], 'z': z}
+
+
+def a3_euler(w=(0.5, 0.5), s=(2.0, 3.0), rho=0.5, alpha=0.05):
+    """Descompunerea Euler a ES sub distributia Normala: ES_p = sum w_i MES_i, cu MES conditionat pe portofoliu."""
+    w, s = np.asarray(w), np.asarray(s)
+    C = np.array([[s[0] ** 2, rho * s[0] * s[1]], [rho * s[0] * s[1], s[1] ** 2]])
+    sp = np.sqrt(w @ C @ w)
+    k = stats.norm.pdf(stats.norm.ppf(alpha)) / alpha
+    beta = C @ w / sp ** 2
+    mes_i = beta * sp * k
+    return {'sp': sp, 'k': k, 'es_p': sp * k, 'beta': beta, 'mes': mes_i, 'sum': w @ mes_i, 'cov': C @ w}
+
+
 def a3_mes_srisk(beta=1.3, s_m=1.0, alpha=0.05, W=100.0, D=1100.0, k=0.08):
     """MES, LRMES si SRISK pentru o banca ilustrativa, cu randamente Normale bivariate."""
     z = stats.norm.ppf(alpha)
@@ -58,11 +81,42 @@ def a3_mes_srisk(beta=1.3, s_m=1.0, alpha=0.05, W=100.0, D=1100.0, k=0.08):
             'L': (D + W) / W, 'Lstar': breakeven_leverage(lr, k)}
 
 
+def a4_lrmes_shortcut(beta=1.3, d=0.40):
+    """De unde vine 18: LRMES = 1 - (1 - d)^beta = 1 - exp(-kappa MES^{2%}), kappa = -ln(1 - d) / ES^{2%}(pietei)."""
+    m = R['SPX'].values
+    es2 = -m[m < -2].mean() / 100                           # pierderea medie a S&P 500 in zilele sub -2% (fractie)
+    kappa = -np.log(1 - d) / es2
+    return {'es2': 100 * es2, 'n2': int((m < -2).sum()), 'kappa': kappa, 'ln': -np.log(1 - d),
+            'exact': 1 - (1 - d) ** beta, 'short18': 1 - np.exp(-18 * beta * es2), 'shortk': 1 - np.exp(-kappa * beta * es2),
+            'norm_tail2': stats.norm.pdf(2) / stats.norm.cdf(-2)}
+
+
 def a4_srisk_k():
     """Aceeasi banca cu k = 5.5% (prag prudential mai mic) si pragul de levier."""
     r8 = a3_mes_srisk()
     r55 = a3_mes_srisk(k=0.055)
     return {'k8': r8, 'k55': r55}
+
+
+def a5_gfevd(A=((0.5, 0.2), (0.1, 0.4)), S=((1.0, 0.5), (0.5, 1.0))):
+    """GFEVD la H = 1 si 2 pentru un VAR(1) bivariat: nenormalizat, normalizat si Cholesky."""
+    A, S = np.asarray(A), np.asarray(S)
+    out = {}
+    for H in (1, 2):
+        Phi = ma_coefs([A], H)
+        num = sum((P @ S) ** 2 for P in Phi) / np.diag(S)[None, :]
+        den = np.array([sum((P @ S @ P.T)[i, i] for P in Phi) for i in range(2)])
+        th = num / den[:, None]
+        out[f'H{H}'] = {'raw': th, 'rowsum': th.sum(1), 'norm': th / th.sum(1, keepdims=True),
+                        'C': 100 * (th / th.sum(1, keepdims=True))[[0, 1], [1, 0]].sum() / 2}
+    L = np.linalg.cholesky(S)
+    num = (L ** 2)
+    out['chol_H1'] = num / num.sum(1, keepdims=True)
+    return out
+
+
+def a6_gfevd():
+    return a5_gfevd(A=((0.5, 0.0), (0.4, 0.5)), S=((1.0, 0.3), (0.3, 1.0)))
 
 
 A5_M = np.array([[70, 20, 10], [25, 60, 15], [5, 10, 85]], float)
@@ -97,7 +151,16 @@ def a7_reverse():
 
 
 def a8_reverse():
-    return {'rho': reverse_2f([1.2, 0.8], [[16, 6], [6, 9]], 30), 'zero': reverse_2f([1.2, 0.8], [[16, 0], [0, 9]], 30)}
+    """Scenariul A7 sub o distributie Student-t multivariata cu nu = 4 (aceeasi covarianta)."""
+    r = reverse_2f([1.2, 0.8], [[16, 6], [6, 9]], 20)
+    nu = 4
+    out = {'nu': nu, 'd': r['d'], 'p_norm': r['p'], 'scale': np.sqrt(nu / (nu - 2)),
+           'p_t': stats.t.sf(r['d'] * np.sqrt(nu / (nu - 2)), nu)}
+    r30 = reverse_2f([1.2, 0.8], [[16, 6], [6, 9]], 30)
+    out.update({'d30': r30['d'], 'p30_norm': r30['p'], 'p30_t': stats.t.sf(r30['d'] * np.sqrt(nu / (nu - 2)), nu)})
+    out['ratio'] = out['p_t'] / out['p_norm']
+    out['ratio30'] = out['p30_t'] / out['p30_norm']
+    return out
 
 
 # =============================================================================
@@ -110,9 +173,9 @@ def b1_us_dcovar5():
     for i, k in enumerate(US):
         xs, xi = system_ex(k, US).values, R[k].values
         c = covar_static(xs, xi, 0.05)
-        lo, hi = covar_boot(xs, xi, 0.05, B=200, block=20, seed=SEED + i)
+        lo, hi = covar_boot(xs, xi, 0.05, B=999, block=20, seed=SEED + i)
         iid = []
-        for _ in range(200):
+        for _ in range(999):
             idx = rng.integers(0, len(xi), len(xi))
             iid.append(covar_static(xs[idx], xi[idx], 0.05)['dcovar'])
         out[k] = {'b': c['b'], 'var_i': c['var_i'], 'covar': c['covar'], 'dcovar': c['dcovar'], 'lo': lo, 'hi': hi,
@@ -142,7 +205,7 @@ def b2_eu_dcovar():
     for i, k in enumerate(EU):
         xs, xi = system_ex(k, EU).values, R[k].values
         c1, c5 = covar_static(xs, xi, 0.01), covar_static(xs, xi, 0.05)
-        lo, hi = covar_boot(xs, xi, 0.01, B=200, block=20, seed=SEED + 10 + i)
+        lo, hi = covar_boot(xs, xi, 0.01, B=999, block=20, seed=SEED + 10 + i)
         out[k] = {'d1': c1['dcovar'], 'd5': c5['dcovar'], 'lo1': lo, 'hi1': hi, 'var1': c1['var_i'], 'b1': c1['b']}
     t = pd.DataFrame(out).T
     return {'table': t.to_dict(orient='index'), 'rank1': list(t['d1'].sort_values(ascending=False).index),
@@ -150,7 +213,7 @@ def b2_eu_dcovar():
             'spearman': stats.spearmanr(t['d1'], t['d5']).correlation}
 
 
-def b4_rank_boot(B=200):
+def b4_rank_boot(B=999):
     """Corelatia Spearman intre VaR 1% si Delta-CoVaR 1% pe cele 11 banci, cu bootstrap pe blocuri pe zile."""
     ks = US + EU
     def stat(idx):
@@ -223,6 +286,20 @@ def b6_rolling_test():
             'diff': m.params[1], 't_hac': m.tvalues[1], 't_ols': m0.tvalues[1], 'n': len(tot)}
 
 
+def b6_subsample_boot(B=999):
+    """Conectivitatea totala 2010-2019 fata de 2020-2026: VAR(1) pe fiecare subperioada, bootstrap pe blocuri de
+    reziduuri in fiecare subperioada (extrageri independente) -> interval pentru diferenta."""
+    Y1, Y2 = V.loc[:'2019-12-31'].values, V.loc['2020-01-01':].values
+    t1, _ = spill_bootstrap(Y1, 1, B=B, seed=SEED + 61)
+    t2, _ = spill_bootstrap(Y2, 1, B=B, seed=SEED + 62)
+    c1 = spillover_table(gfevd(*var_fit(Y1, 1), 10), ALL)['total']
+    c2 = spillover_table(gfevd(*var_fit(Y2, 1), 10), ALL)['total']
+    d = t2 - t1
+    return {'c1': c1, 'c2': c2, 'diff': c2 - c1, 'lo': np.percentile(d, 2.5), 'hi': np.percentile(d, 97.5),
+            'lo1': np.percentile(t1, 2.5), 'hi1': np.percentile(t1, 97.5), 'lo2': np.percentile(t2, 2.5),
+            'hi2': np.percentile(t2, 97.5), 'n1': len(Y1), 'n2': len(Y2), 'bias1': t1.mean() - c1, 'bias2': t2.mean() - c2}
+
+
 def b7_frm_window():
     """FRM intr-o fereastra: lambda GACV si legaturile active pentru JPMorgan (calm vs COVID-19)."""
     D = frm_design()
@@ -272,15 +349,25 @@ def c1_ro_exposure():
         row = {}
         for a in [0.05, 0.01]:
             e = covar_static(R[k], sys_eu, a)                   # banca romaneasca | sistemul european in criza
-            lo, hi = covar_boot(R[k].values, sys_eu.values, a, B=200, block=20, seed=SEED + 30)
+            lo, hi = covar_boot(R[k].values, sys_eu.values, a, B=999, block=20, seed=SEED + 30)
             row[f'e{int(a * 100)}'] = {'covar': e['covar'], 'dcovar': e['dcovar'], 'b': e['b'], 'var': -np.quantile(R[k], a),
                                        'lo': lo, 'hi': hi}
             dom = covar_static(R[k], R['BET'], a)
             row[f'bet{int(a * 100)}'] = {'dcovar': dom['dcovar'], 'b': dom['b']}
         for lab, a, b in [('p1', '2010-01-01', '2017-12-31'), ('p2', '2018-01-01', '2026-12-31')]:
             e = covar_static(R[k].loc[a:b], sys_eu.loc[a:b], 0.05)
-            lo, hi = covar_boot(R[k].loc[a:b].values, sys_eu.loc[a:b].values, 0.05, B=200, block=20, seed=SEED + 31)
-            row[lab] = {'dcovar': e['dcovar'], 'b': e['b'], 'lo': lo, 'hi': hi}
+            y_, x_ = R[k].loc[a:b].values, sys_eu.loc[a:b].values
+            rng = np.random.default_rng(SEED + 31)
+            dr = []
+            for _ in range(999):
+                idx = block_bootstrap_idx(len(y_), 20, rng)
+                dr.append(covar_static(y_[idx], x_[idx], 0.05)['dcovar'])
+            row[lab] = {'dcovar': e['dcovar'], 'b': e['b'], 'lo': np.percentile(dr, 2.5), 'hi': np.percentile(dr, 97.5),
+                        'se': np.std(dr, ddof=1)}
+        # subperioadele sunt disjuncte: extragerile bootstrap sunt independente, deci se(dif)^2 = se1^2 + se2^2
+        dd = row['p2']['dcovar'] - row['p1']['dcovar']
+        sd = np.sqrt(row['p1']['se'] ** 2 + row['p2']['se'] ** 2)
+        row['diff'] = {'d': dd, 'se': sd, 'z': dd / sd, 'p': 2 * stats.norm.sf(abs(dd / sd))}
         row['corr'] = R[k].corr(sys_eu)
         row['corr_bet'] = R[k].corr(R['BET'])
         out[k] = row
@@ -332,6 +419,11 @@ def fig_c1(res, f):
 if __name__ == '__main__':
     SEM['A1'] = a1_covar_normal()
     SEM['A2'] = a2_covar_normal()
+    SEM['A2GE'] = a2_ge_covar()
+    SEM['A3E'] = a3_euler()
+    SEM['A4S'] = a4_lrmes_shortcut()
+    SEM['A5G'] = a5_gfevd()
+    SEM['A6G'] = a6_gfevd()
     SEM['A3'] = a3_mes_srisk()
     SEM['A4'] = a4_srisk_k()
     SEM['A5'] = a5_dy()
@@ -349,6 +441,8 @@ if __name__ == '__main__':
     SEM['B5'] = b5_dy_sensitivity()
     fig_b5(SEM['B5'])
     SEM['B6'] = b6_rolling_test()
+    print('B6 bootstrap')
+    SEM['B6S'] = b6_subsample_boot()
     print('B7')
     SEM['B7'] = b7_frm_window()
     SEM['B8'] = b8_ro_stress()

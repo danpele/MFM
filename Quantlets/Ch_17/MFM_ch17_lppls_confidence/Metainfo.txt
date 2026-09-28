@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch17_lppls_confidence'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Real-time LPPLS confidence indicator for Bitcoin (2016-2026) and the Nasdaq 100 (1997-2026): share of qualified fits over eleven windows, and the frequency of 20% falls within 90 days after a signal.'
+Description: 'Real-time LPPLS confidence indicator for Bitcoin (2016-2026) and the Nasdaq 100 (1997-2026) with the search space, filter and window grid of Shu and Zhu (2020, Section 2.3, eqs. 11-12): share of qualified fits over 141 windows of 750 to 50 observations, and the frequency of 20% falls within 90 days after a signal.'
 
 Keywords: 'LPPLS confidence indicator, bubble early warning, false alarms, Bitcoin, Nasdaq 100, evaluation'
 

@@ -124,7 +124,8 @@ def rolling_var(r, eval_from, window=WINDOW, refit=REFIT, a=ALPHA, a_es=ALPHA_ES
         nu = res.params['nu']
         z = ((est - mu) / sig.iloc[:window]).values   # reziduuri standardizate din fereastra
         zq = np.quantile(z, a)
-        zes = z[z <= np.quantile(z, a_es)].mean()
+        zq_es = np.quantile(z, a_es)
+        zes = z[z <= zq_es].mean()
         for j in range(b0, b1):
             hist = r.iloc[j - HS_WINDOW:j].values
             s = sig.iloc[j - (b0 - window)]
@@ -138,7 +139,10 @@ def rolling_var(r, eval_from, window=WINDOW, refit=REFIT, a=ALPHA, a_es=ALPHA_ES
                              Normal_ES=-(m - sd * stats.norm.pdf(stats.norm.ppf(a_es)) / a_es),
                              **{'GARCH-t': -(mu + s * t_std_q(nu, a)),
                                 'GARCH-t_ES': -(mu + s * t_std_es(nu, a_es))},
-                             FHS=-(mu + s * zq), FHS_ES=-(mu + s * zes)))
+                             FHS=-(mu + s * zq), FHS_ES=-(mu + s * zes),
+                             # VaR la nivelul ES (2.5%): perechea (VaR, ES) la acelasi nivel, pentru scorul FZ0
+                             HS_V25=q_hs_es, Normal_V25=-(m + sd * stats.norm.ppf(a_es)),
+                             **{'GARCH-t_V25': -(mu + s * t_std_q(nu, a_es))}, FHS_V25=-(mu + s * zq_es)))
     return pd.DataFrame(rows).set_index('date')
 
 

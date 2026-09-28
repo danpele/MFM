@@ -63,7 +63,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 SEED = 42
 R_MC = 2000            # replici Monte Carlo pentru valorile critice
-RECOMPUTE = True       # True: recalculeaza indicatorii LPPLS (cateva minute); False: ii citeste din fisierele CSV
+RECOMPUTE = os.environ.get('MFM_CH17_RECOMPUTE', '1') == '1'   # True: recalculeaza indicatorii LPPLS (zeci de minute); False: ii citeste din fisierele CSV
 QL_RAW = 'https://raw.githubusercontent.com/danpele/MFM/main/Quantlets/Ch_17/'
 
 
@@ -757,7 +757,7 @@ def fig_ai_dotcom():
 # =============================================================================
 # MAIN
 # =============================================================================
-if __name__ == '__main__':
+def main():
     RES = {}
     RES['rational'] = fig_rational_bubble()
     RES['evans'] = fig_evans()
@@ -850,3 +850,7 @@ if __name__ == '__main__':
     with open(os.path.join(HERE, 'ch17_results.json'), 'w') as f:
         json.dump(jsonable(RES), f, indent=1)
     print('saved ch17_results.json')
+
+
+if __name__ == '__main__':
+    main()

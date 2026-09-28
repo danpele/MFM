@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch18_srisk_sim'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'SRISK as in Brownlees and Engle (2017): GJR-GARCH(1,1) and DCC(1,1) for each bank and its market, LRMES by simulation with resampled standardised innovations (22 days, market fall of 10%; and six months, fall of 40%), compared with the shortcut 1 - exp(-18 MES) and with Normal innovations; break-even leverage.'
+
+Keywords: 'SRISK, LRMES, GJR-GARCH, DCC, simulation, model risk, capital shortfall, systemic risk'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market), January 2010 - September 2026: JPMorgan Chase, Bank of America, Citigroup, Goldman Sachs, Morgan Stanley, Wells Fargo, Deutsche Bank, BNP Paribas, Santander, ING, HSBC, Banca Transilvania, BRD-Groupe Societe Generale; S&P 500, Euro Stoxx 50, BET and VIX indices'
+
+Output: 'ch18_lrmes_models.pdf'
