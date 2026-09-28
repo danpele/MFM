@@ -44,7 +44,7 @@ def hill_ci(r, share=0.05, B=999, block=20, seed=0):
     rng = np.random.default_rng(seed)
     T = len(L)
     nb = int(np.ceil(T / block))
-    bs = np.array([hill(L[(rng.integers(0, T - block, nb)[:, None] + np.arange(block)).ravel()[:T]], k)
+    bs = np.array([hill(L[(rng.integers(0, T - block + 1, nb)[:, None] + np.arange(block)).ravel()[:T]], k)
                    for _ in range(B)])
     return dict(alpha=a, k=k, se_iid=a / np.sqrt(k), lo_iid=a - 1.96 * a / np.sqrt(k), hi_iid=a + 1.96 * a / np.sqrt(k),
                 lo=np.percentile(bs, 2.5), hi=np.percentile(bs, 97.5), se_boot=bs.std(ddof=1), draws=bs)
@@ -56,7 +56,7 @@ def hill_ci(r, share=0.05, B=999, block=20, seed=0):
 def garch_t_nll(theta, r):
     """-log L pentru GARCH(1,1) cu inovatii Student-t standardizate; theta = (mu, omega, alpha, beta, nu)."""
     mu, om, a, b, nu = theta
-    if om <= 0 or a < 0 or b < 0 or a + b >= 1 or nu <= 2.05:
+    if om <= 0 or a < 0 or b < 0 or a + b > 1 or nu <= 2.05:        # a + b = 1 (IGARCH) este admis
         return 1e10
     e = r - mu
     T = len(e)
@@ -85,18 +85,23 @@ def profile_pers(r, grid, x0):
 
 
 def profile_ci(r, res):
-    """CI 95% {p < 1 : 2(l_max - l(p)) <= 3.84}; l_max din estimarea nerestrictionata."""
+    """CI 95% din verosimilitatea profil pentru p = alpha + beta, pe grila 0.960-0.9999 si in p = 1 (IGARCH).
+    Punctele interioare p < 1: 2(l_max - l(p)) <= 3.84 (chi2(1)); p = 1 este pe frontiera spatiului p <= 1, unde
+    statistica LR are distributia 0.5 chi2(0) + 0.5 chi2(1) (Andrews, 1999): p = 1 este inclus daca LR <= 2.71."""
     p = res.params
     pers = p['alpha[1]'] + p['beta[1]']
     lmax = -garch_t_nll((p['mu'], p['omega'], p['alpha[1]'], p['beta[1]'], p['nu']), np.asarray(r))
     x0 = np.array([p['mu'], p['omega'], p['alpha[1]'] / pers, p['nu']])
-    grid = np.unique(np.concatenate([np.linspace(0.960, 0.998, 39), [0.999, 0.9995, 0.9999, pers]]))
+    grid = np.unique(np.concatenate([np.linspace(0.960, 0.998, 39), [0.999, 0.9995, 0.9999, 1.0, pers]]))
     lp = profile_pers(r, grid, x0)
     lr = 2 * (max(lmax, lp.max()) - lp)
-    ok = grid[lr <= stats.chi2.ppf(0.95, 1)]
+    crit = np.where(grid < 1, stats.chi2.ppf(0.95, 1), stats.chi2.ppf(0.90, 1))
+    ok = grid[lr <= crit]
+    lr1 = float(lr[grid == 1.0][0])
     return dict(pers=pers, lmax=lmax, lo=ok.min(), hi=ok.max(), grid=list(grid), lr=list(lr),
-                hl_lo=np.log(0.5) / np.log(ok.min()), hl_hi=np.log(0.5) / np.log(ok.max()),
-                hi_at_edge=bool(ok.max() >= grid.max()))
+                hl_lo=np.log(0.5) / np.log(ok.min()), hl_hi=(np.inf if ok.max() >= 1 else np.log(0.5) / np.log(ok.max())),
+                lr_one=lr1, p_one=float(0.5 * stats.chi2.sf(lr1, 1)), cv_one=float(stats.chi2.ppf(0.90, 1)),
+                hi_at_edge=bool(ok.max() >= 1.0))
 
 
 # =============================================================================
@@ -144,7 +149,7 @@ def mcs(losses, B=999, block=20, alpha=0.10, seed=0):
     L = losses.values
     T, m = L.shape
     nb = int(np.ceil(T / block))
-    idx = [(rng.integers(0, T - block, nb)[:, None] + np.arange(block)).ravel()[:T] for _ in range(B)]
+    idx = [(rng.integers(0, T - block + 1, nb)[:, None] + np.arange(block)).ravel()[:T] for _ in range(B)]
     alive = list(range(m))
     pvals = {}
     pmax = 0.0

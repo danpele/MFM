@@ -148,7 +148,10 @@ def part_garch():
     legend_outside_bottom(ax, ncol=2, y=-0.14)
     save_fig('ch19_bet_garch')
     s = sig.copy()
-    RES['garch']['sigma_last'] = float(s.iloc[-1])
+    RES['garch']['sigma_last'] = float(s.iloc[-1])                                   # sigma_T
+    RES['garch']['sigma_next'] = float(np.sqrt(res.forecast(horizon=1).variance.iloc[-1, 0]))   # sigma_{T+1}
+    RES['garch']['mu'] = float(res.params['mu'])
+    RES['garch']['r_last'] = float(r.iloc[-1])
     RES['garch']['sigma_max'] = float(s.max())
     RES['garch']['sigma_max_date'] = str(s.idxmax().date())
     return res
@@ -190,7 +193,7 @@ def part_var(full_res):
     ax.plot(d.index, d['FHS'], color=IDAred, lw=0.9, label='FHS VaR 1% (GARCH-t filter)')
     exc = d['L'] > d['FHS']
     ax.scatter(d.index[exc], d['L'][exc], s=12, color='black', zorder=3, label='Loss above FHS VaR 1%')
-    ax.set_ylabel('Loss (% of position)')
+    ax.set_ylabel('Loss = negative log return (%)')
     legend_outside_bottom(ax, ncol=2, y=-0.14)
     save_fig('ch19_bet_var')
     RES['var_2020'] = dict(n=len(d), x_fhs=int(exc.sum()), x_normal=int((d['L'] > d['Normal']).sum()),

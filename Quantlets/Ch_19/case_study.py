@@ -68,7 +68,7 @@ def kurtosis_boot_ci(r, B=2000, block=20, seed=0):
     nb = int(np.ceil(T / block))
     ks = []
     for _ in range(B):
-        idx = (rng.integers(0, T - block, nb)[:, None] + np.arange(block)).ravel()[:T]
+        idx = (rng.integers(0, T - block + 1, nb)[:, None] + np.arange(block)).ravel()[:T]
         ks.append(stats.kurtosis(x[idx]))
     return np.percentile(ks, [2.5, 97.5])
 
@@ -81,14 +81,18 @@ def garch_t_fit(r, last_obs=None):
     return am.fit(disp='off', last_obs=last_obs)
 
 
-def garch_summary(res):
-    """Parametri, erori standard robuste, persistenta si timpul de injumatatire."""
+def garch_summary(res, ppy=None):
+    """Parametri, erori standard robuste, persistenta si timpul de injumatatire; volatilitatea de termen lung
+    anualizata cu frecventa reala a seriei (ppy = observatii pe an; implicit din datele estimarii)."""
     p, se = res.params, res.std_err
+    if ppy is None:
+        ix = res.resid.dropna().index
+        ppy = len(ix) / ((ix[-1] - ix[0]).days / 365.25)
     pers = p['alpha[1]'] + p['beta[1]']
     return dict(mu=p['mu'], omega=p['omega'], alpha=p['alpha[1]'], beta=p['beta[1]'], nu=p['nu'],
                 se_alpha=se['alpha[1]'], se_beta=se['beta[1]'], se_nu=se['nu'],
                 pers=pers, half_life=np.log(0.5) / np.log(pers),
-                uncond_vol=np.sqrt(252 * p['omega'] / (1 - pers)))
+                uncond_vol=np.sqrt(ppy * p['omega'] / (1 - pers)))
 
 
 def t_std_q(nu, a):
@@ -116,12 +120,18 @@ def rolling_var(r, eval_from, window=WINDOW, refit=REFIT, a=ALPHA, a_es=ALPHA_ES
     for b0 in range(start, len(r), refit):
         b1 = min(b0 + refit, len(r))
         est = r.iloc[b0 - window:b0]
-        am = arch_model(r.iloc[b0 - window:b1], mean='Constant', vol='GARCH', p=1, q=1, dist='t', rescale=False)
-        res = am.fit(disp='off', last_obs=window)
-        fx = am.fix(res.params)
-        sig = fx.conditional_volatility          # sigma_t foloseste informatia pana la t-1
-        mu = res.params['mu']
-        nu = res.params['nu']
+        # estimare DOAR pe fereastra (fara date din blocul de evaluare); sigma_t pentru t >= b0 prin recursia
+        # GARCH pornita din ultima varianta filtrata a ferestrei, cu randamentele deja observate (pana la t-1)
+        res = arch_model(est, mean='Constant', vol='GARCH', p=1, q=1, dist='t', rescale=False).fit(disp='off')
+        mu, nu = res.params['mu'], res.params['nu']
+        om, al, be = res.params['omega'], res.params['alpha[1]'], res.params['beta[1]']
+        s_tr = res.conditional_volatility.values
+        s2 = np.empty(b1 - b0)
+        prev_s2, prev_e = s_tr[-1] ** 2, est.iloc[-1] - mu
+        for i in range(b1 - b0):
+            s2[i] = om + al * prev_e ** 2 + be * prev_s2
+            prev_s2, prev_e = s2[i], r.iloc[b0 + i] - mu
+        sig = pd.Series(np.concatenate([s_tr, np.sqrt(s2)]), index=r.index[b0 - window:b1])
         z = ((est - mu) / sig.iloc[:window]).values   # reziduuri standardizate din fereastra
         zq = np.quantile(z, a)
         zq_es = np.quantile(z, a_es)

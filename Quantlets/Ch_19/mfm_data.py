@@ -77,18 +77,25 @@ def read_reference_rate(currency='EUR', start='2005-07-01', end=END):
     return _CACHE[key]
 
 
+def drop_duplicate_records(df):
+    """Elimina inregistrarile duplicate: randuri identice (open, high, low, close, volume) cu randul anterior."""
+    cols = [c for c in ('open', 'high', 'low', 'close', 'volume') if c in df.columns]
+    return df[~(df[cols] == df[cols].shift()).all(axis=1)]
+
+
 def load_close(name, start=None, end=END):
     """Pretul zilnic, curatat dupa conventiile capitolului."""
     symbol, _, kind, start0 = MARKETS[name]
     start = start or start0
     if symbol.startswith('REF:'):
         return read_reference_rate(symbol.split(':')[1], start=start, end=end).rename(name)
-    s = read_market(symbol)['close'].loc[start:end]
-    s = s[s > 0].dropna()
+    df = read_market(symbol).loc[start:end]
     if kind != 'crypto':
-        s = s[s.index.dayofweek < 5]          # fara cotatii de weekend
+        df = df[df.index.dayofweek < 5]       # fara cotatii de weekend
     if kind == 'index':
-        s = s[s.diff() != 0]                  # fara sarbatori completate cu pretul anterior
+        df = drop_duplicate_records(df)       # fara inregistrari duplicate
+    s = df['close']
+    s = s[s > 0].dropna()
     return s.rename(name)
 
 
@@ -104,10 +111,13 @@ def periods_per_year(r):
 
 def asset_price(key, end=END):
     symbol, col = ASSETS[key]
-    s = read_market(symbol)[col].loc[:end]
-    s = s[s > 0].dropna()
+    df = read_market(symbol).loc[:end]
     if key != 'BTC':
-        s = s[s.index.dayofweek < 5]
+        df = df[df.index.dayofweek < 5]       # fara cotatii de weekend
+    if symbol.endswith('.INDX'):
+        df = drop_duplicate_records(df)       # fara inregistrari duplicate
+    s = df[col]
+    s = s[s > 0].dropna()
     return s.rename(key)
 
 

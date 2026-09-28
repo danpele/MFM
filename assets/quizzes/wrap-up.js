@@ -20,7 +20,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "With HAC-robust errors"
                 ],
                 "correctExplanation": "The exact F distribution of Gibbons, Ross and Shanken needs i.i.d. multivariate Normal errors; with heavy tails or heteroskedasticity a GMM/HAC Wald or bootstrap version is needed.",
-                "incorrectExplanation": "T > N only makes the statistic computable; stationarity or HAC errors do not deliver the exact F distribution, which rests on i.i.d. Normal errors."
+                "incorrectExplanation": "T > N alone does not even make the statistic computable: it needs T - N - K >= 1 and invertible covariance matrices; stationarity or HAC errors do not deliver the exact F distribution, which rests on i.i.d. Normal errors."
             },
             "ro": {
                 "title": "Distribuția nulă GRS",
@@ -32,7 +32,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Cu erori robuste HAC"
                 ],
                 "correctExplanation": "Distribuția F exactă a lui Gibbons, Ross și Shanken cere erori i.i.d. Normale multivariate; cu cozi groase sau heteroscedasticitate este nevoie de o versiune Wald GMM/HAC sau bootstrap.",
-                "incorrectExplanation": "T > N doar face statistica calculabilă; staționaritatea sau erorile HAC nu dau distribuția F exactă, care se bazează pe erori i.i.d. Normale."
+                "incorrectExplanation": "T > N nu este suficient nici măcar pentru a calcula statistica: sunt necesare T - N - K >= 1 și matrici de covarianță inversabile; staționaritatea sau erorile HAC nu dau distribuția F exactă, care se bazează pe erori i.i.d. Normale."
             }
         },
         {
@@ -74,7 +74,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Keep the common days of the prices, then compute returns"
                 ],
                 "correctExplanation": "Aligning prices first makes Monday's return span Friday to Monday for both assets.",
-                "incorrectExplanation": "Computing returns first and then joining deletes Bitcoin's weekend moves, which understates its variance and cumulative return."
+                "incorrectExplanation": "Computing returns first and then joining gives the two assets different holding periods on Mondays and drops Bitcoin's weekend moves, which distorts variances, correlations and cumulative returns; the direction of the error depends on the sample (in the course's 2015-2026 data the cumulative return was understated)."
             },
             "ro": {
                 "title": "Unirea a două active",
@@ -86,7 +86,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Păstrăm zilele comune ale prețurilor, apoi calculăm randamentele"
                 ],
                 "correctExplanation": "Alinierea întâi a prețurilor face ca randamentul de luni să acopere intervalul vineri--luni pentru ambele active.",
-                "incorrectExplanation": "Calculul randamentelor înainte de join șterge mișcările Bitcoin din weekend, ceea ce subestimează varianța și randamentul cumulat."
+                "incorrectExplanation": "Calculul randamentelor înainte de join dă celor două active perioade de deținere diferite lunea și elimină mișcările Bitcoin din weekend, ceea ce distorsionează dispersiile, corelațiile și randamentele cumulate; direcția erorii depinde de eșantion (în datele cursului, 2015-2026, randamentul cumulat a fost subestimat)."
             }
         },
         {
@@ -120,26 +120,26 @@ window.MFM_DATA.quizzes['wrap-up'] = {
             "correct": 0,
             "en": {
                 "title": "Multiple testing",
-                "text": "300 useless factors are each tested at |t| > 1.96. What happens?",
+                "text": "300 useless factors, with approximately independent and standard Normal t-statistics under the null, are each tested at |t| > 1.96. What happens?",
                 "options": [
-                    "About 15 look significant by chance, and the best one reaches |t| near 3",
+                    "About 15 are expected to look significant by chance, and the best one typically reaches |t| near 3",
                     "None looks significant",
                     "All of them look significant",
                     "Exactly one looks significant"
                 ],
-                "correctExplanation": "At 5% each, 300 tests give about 15 false discoveries, and the maximum |t| is around 3.",
+                "correctExplanation": "At 5% each, 300 independent tests give about 15 false discoveries in expectation, and the median of the maximum |t| is about 3.05; with strongly correlated tests the maximum would be much smaller.",
                 "incorrectExplanation": "Each test has a 5% false-positive rate, so many tests produce false discoveries; this is why the factor literature asks for |t| > 3."
             },
             "ro": {
                 "title": "Testare multiplă",
-                "text": "300 de factori fără valoare sunt testați fiecare la |t| > 1,96. Ce se întâmplă?",
+                "text": "300 de factori fără valoare, cu statistici t aproximativ independente și Normale standard sub ipoteza nulă, sunt testați fiecare la |t| > 1,96. Ce se întâmplă?",
                 "options": [
-                    "Circa 15 par semnificativi din întâmplare, iar cel mai bun ajunge la |t| aproape de 3",
+                    "Circa 15 sunt de așteptat să pară semnificativi din întâmplare, iar cel mai bun ajunge de regulă la |t| aproape de 3",
                     "Niciunul nu pare semnificativ",
                     "Toți par semnificativi",
                     "Exact unul pare semnificativ"
                 ],
-                "correctExplanation": "La 5% fiecare, 300 de teste dau circa 15 descoperiri false, iar |t| maxim este în jur de 3.",
+                "correctExplanation": "La 5% fiecare, 300 de teste independente dau în medie circa 15 descoperiri false, iar mediana lui |t| maxim este în jur de 3,05; cu teste puternic corelate, maximul ar fi mult mai mic.",
                 "incorrectExplanation": "Fiecare test are o rată de 5% de fals pozitive, deci multe teste produc descoperiri false; de aceea literatura despre factori cere |t| > 3."
             }
         },
@@ -370,7 +370,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Clustered breaches mean the model reacts too slowly to volatility, even if the total is right",
                     "Independence tests replace coverage tests"
                 ],
-                "correctExplanation": "In the BET case study, HS had a nearly right count but failed independence: its breaches clustered in crises.",
+                "correctExplanation": "A model can have the right number of breaches and still cluster them in crises, which only an independence test detects. In the BET case study HS failed both: 79 breaches against about 54 expected (Kupiec p = 0.002) and clustered breaches (Christoffersen p < 0.001).",
                 "incorrectExplanation": "Coverage and independence test different failures; the Christoffersen test adds the second."
             },
             "ro": {
@@ -382,7 +382,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Depășirile grupate arată că modelul reacționează prea lent la volatilitate, chiar dacă totalul este corect",
                     "Testele de independență înlocuiesc testele de acoperire"
                 ],
-                "correctExplanation": "În studiul de caz BET, HS a avut un număr apropiat de cel corect, dar a picat testul de independență: depășirile s-au grupat în crize.",
+                "correctExplanation": "Un model poate avea numărul corect de depășiri și totuși să le grupeze în crize, lucru pe care doar un test de independență îl detectează. În studiul de caz BET, HS a picat ambele teste: 79 de depășiri față de aproximativ 54 așteptate (Kupiec p = 0,002) și depășiri grupate (Christoffersen p < 0,001).",
                 "incorrectExplanation": "Acoperirea și independența testează eșecuri diferite; testul Christoffersen îl adaugă pe al doilea."
             }
         },
@@ -473,25 +473,25 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                 "title": "QLIKE",
                 "text": "Why is QLIKE preferred to MSE for comparing variance forecasts?",
                 "options": [
-                    "It ranks forecasts consistently with a noisy proxy and is less dominated by extreme days",
+                    "With a conditionally unbiased proxy it ranks forecasts as the true variance would, and it is less dominated by extreme days",
                     "It ignores the size of errors",
                     "It always gives smaller numbers",
                     "It does not need a proxy of the true variance"
                 ],
-                "correctExplanation": "Both are robust to proxy noise, but MSE is dominated by a few extreme days; QLIKE depends on the ratio RV/h.",
-                "incorrectExplanation": "QLIKE = RV/h - ln(RV/h) - 1 penalises relative errors, so crisis days do not swamp the comparison."
+                "correctExplanation": "If the proxy (e.g. RV) is conditionally unbiased for the true variance, both MSE and QLIKE rank forecasts by expected loss as the true variance would (Patton, 2011); MSE is dominated by a few extreme days, while QLIKE depends only on the ratio RV/h. A biased proxy breaks the ranking for both.",
+                "incorrectExplanation": "QLIKE = RV/h - ln(RV/h) - 1 penalises relative errors, so crisis days do not swamp the comparison; its robustness to proxy noise still requires a conditionally unbiased proxy."
             },
             "ro": {
                 "title": "QLIKE",
                 "text": "De ce este preferat QLIKE în locul MSE pentru compararea prognozelor de varianță?",
                 "options": [
-                    "Clasifică prognozele în mod consistent cu o aproximare zgomotoasă și este mai puțin dominat de zilele extreme",
+                    "Cu o aproximare condiționat nedeplasată ierarhizează prognozele la fel ca varianța adevărată și este mai puțin dominat de zilele extreme",
                     "Ignoră mărimea erorilor",
                     "Dă mereu numere mai mici",
                     "Nu are nevoie de o aproximare a varianței adevărate"
                 ],
-                "correctExplanation": "Ambele sunt robuste la zgomotul aproximării, dar MSE este dominat de câteva zile extreme; QLIKE depinde de raportul RV/h.",
-                "incorrectExplanation": "QLIKE = RV/h - ln(RV/h) - 1 penalizează erorile relative, deci zilele de criză nu domină comparația."
+                "correctExplanation": "Dacă aproximarea (de exemplu RV) este condiționat nedeplasată pentru varianța adevărată, atât MSE, cât și QLIKE ierarhizează prognozele după pierderea așteptată la fel ca varianța adevărată (Patton, 2011); MSE este dominat de câteva zile extreme, iar QLIKE depinde doar de raportul RV/h. O aproximare deplasată strică ierarhia pentru ambele.",
+                "incorrectExplanation": "QLIKE = RV/h - ln(RV/h) - 1 penalizează erorile relative, deci zilele de criză nu domină comparația; robustețea lui la zgomotul aproximării cere totuși o aproximare condiționat nedeplasată."
             }
         },
         {
@@ -552,26 +552,26 @@ window.MFM_DATA.quizzes['wrap-up'] = {
             "correct": 3,
             "en": {
                 "title": "Variance risk premium",
-                "text": "What is the variance risk premium?",
+                "text": "How is the variance risk premium measured ex post in the course?",
                 "options": [
                     "Realised variance minus the GARCH forecast",
                     "The difference between two stock indices",
                     "The premium of a call over a put",
                     "Implied variance minus the variance realised afterwards; positive on most days"
                 ],
-                "correctExplanation": "VRP_t = VIX_t^2 - RV_{t,t+21}; on the S&P 500 it was positive on 86% of days.",
+                "correctExplanation": "The premium itself is E_Q[RV_{t,t+21}] - E_P[RV_{t,t+21}]; its ex-post measure is VRP_t = VIX_t^2 - RV_{t,t+21}, with both variances over the same 21-day horizon and in the same units (annualised, in %^2). It adds the forecast error of RV; on the S&P 500 it was positive on 86% of days.",
                 "incorrectExplanation": "Option buyers pay for protection, so implied variance usually exceeds the variance that follows, except in crashes."
             },
             "ro": {
                 "title": "Prima de risc a varianței",
-                "text": "Ce este prima de risc a varianței?",
+                "text": "Cum se măsoară ex post prima de risc a varianței în curs?",
                 "options": [
                     "Varianța realizată minus prognoza GARCH",
                     "Diferența dintre doi indici bursieri",
                     "Prima unei opțiuni call față de un put",
                     "Varianța implicită minus varianța realizată ulterior; pozitivă în cele mai multe zile"
                 ],
-                "correctExplanation": "VRP_t = VIX_t^2 - RV_{t,t+21}; pentru S&P 500 a fost pozitivă în 86% din zile.",
+                "correctExplanation": "Prima propriu-zisă este E_Q[RV_{t,t+21}] - E_P[RV_{t,t+21}]; măsura ei ex post este VRP_t = VIX_t^2 - RV_{t,t+21}, cu ambele varianțe pe același orizont de 21 de zile și în aceleași unități (anualizate, în %^2). Ea include și eroarea de prognoză a RV; pentru S&P 500 a fost pozitivă în 86% din zile.",
                 "incorrectExplanation": "Cumpărătorii de opțiuni plătesc pentru protecție, deci varianța implicită depășește de obicei varianța care urmează, cu excepția prăbușirilor."
             }
         },
@@ -609,24 +609,24 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                 "text": "What did Chapter 14 find for zero-shot foundation models on SPY realised volatility?",
                 "options": [
                     "They beat every benchmark by a wide margin",
-                    "They tied with log-HAR: the QLIKE differences were not significant",
+                    "No statistically significant QLIKE difference from log-HAR was detected",
                     "They were worse than a random walk",
                     "They could not produce volatility forecasts"
                 ],
-                "correctExplanation": "Chronos-2 had QLIKE 0.231 against 0.234 for log-HAR; the Diebold--Mariano test did not separate them.",
-                "incorrectExplanation": "New models must be judged against strong benchmarks with the tests of Chapter 8; here they matched but did not beat log-HAR."
+                "correctExplanation": "Chronos-2 had QLIKE 0.231 against 0.234 for log-HAR; the Diebold--Mariano test did not reject equal accuracy. This is not proof of equivalence, which would need a stated tolerance.",
+                "incorrectExplanation": "New models must be judged against strong benchmarks with the tests of Chapter 8; here no significant difference from log-HAR was detected, so they did not beat it."
             },
             "ro": {
                 "title": "Modele fundaționale",
                 "text": "Ce a arătat Capitolul 14 pentru modelele fundaționale zero-shot pe volatilitatea realizată SPY?",
                 "options": [
                     "Au bătut toate reperele cu mult",
-                    "Au egalat log-HAR: diferențele QLIKE nu au fost semnificative",
+                    "Nu s-a detectat o diferență QLIKE semnificativă statistic față de log-HAR",
                     "Au fost mai slabe decât un mers aleator",
                     "Nu au putut produce prognoze de volatilitate"
                 ],
-                "correctExplanation": "Chronos-2 a avut QLIKE 0,231 față de 0,234 pentru log-HAR; testul Diebold--Mariano nu le-a separat.",
-                "incorrectExplanation": "Modelele noi trebuie judecate față de repere puternice, cu testele din Capitolul 8; aici au egalat log-HAR, fără să-l bată."
+                "correctExplanation": "Chronos-2 a avut QLIKE 0,231 față de 0,234 pentru log-HAR; testul Diebold--Mariano nu a respins acuratețea egală. Aceasta nu dovedește echivalența, care ar cere o toleranță stabilită dinainte.",
+                "incorrectExplanation": "Modelele noi trebuie judecate față de repere puternice, cu testele din Capitolul 8; aici nu s-a detectat o diferență semnificativă față de log-HAR, deci nu l-au bătut."
             }
         },
         {
@@ -662,24 +662,24 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                 "title": "Spot the error: an AI-written backtest",
                 "text": "An AI assistant writes a VaR 1% backtest: var = -r.rolling(500).quantile(0.01); hit = (-r > var). It reports a breach rate below 1% and says the model is conservative. What is wrong?",
                 "options": [
-                    "The VaR for day t is computed from a window that already contains the return of day t (look-ahead); it must be shifted by one day, var.shift(1)",
+                    "The VaR for day t is computed from a window that already contains the return of day t (look-ahead); it must be shifted by one day, var.shift(1), and the breach rate computed only on days that have a forecast",
                     "VaR 1% must be the 99% quantile of returns",
                     "A 500-day window is too long for historical simulation",
                     "The breaches should be counted on returns, not on losses"
                 ],
-                "correctExplanation": "The rolling quantile at t includes r_t, so a loss can breach only if it lies beyond the 1% quantile of a sample that includes it: breaches are under-counted. The forecast for day t must use data up to t - 1.",
+                "correctExplanation": "The rolling quantile at t includes r_t, so a loss can breach only if it lies beyond the 1% quantile of a sample that includes it: breaches are under-counted. The forecast for day t must use data up to t - 1. Also, comparisons with the missing VaR of the first 500 days return False, so hit.mean() over all days understates the rate: keep only rows where var.shift(1) is not missing.",
                 "incorrectExplanation": "The window length and the sign convention (loss = -r, VaR positive) are fine; the error is timing: the VaR used on day t already knows day t's return."
             },
             "ro": {
                 "title": "Găsiți eroarea: un backtest scris de AI",
                 "text": "Un asistent AI scrie un backtest pentru VaR 1%: var = -r.rolling(500).quantile(0.01); hit = (-r > var). Raportează o rată a depășirilor sub 1% și spune că modelul este prudent. Ce este greșit?",
                 "options": [
-                    "VaR-ul pentru ziua t este calculat pe o fereastră care conține deja randamentul zilei t (informație din viitor); trebuie decalat cu o zi, var.shift(1)",
+                    "VaR-ul pentru ziua t este calculat pe o fereastră care conține deja randamentul zilei t (informație din viitor); trebuie decalat cu o zi, var.shift(1), iar rata depășirilor calculată doar în zilele care au o prognoză",
                     "VaR 1% trebuie să fie cuantila 99% a randamentelor",
                     "O fereastră de 500 de zile este prea lungă pentru simularea istorică",
                     "Depășirile trebuie numărate pe randamente, nu pe pierderi"
                 ],
-                "correctExplanation": "Cuantila pe fereastra mobilă de la momentul t include r_t, deci o pierdere poate depăși doar dacă este dincolo de cuantila 1% a unui eșantion care o conține: depășirile sunt subnumărate. Prognoza pentru ziua t trebuie să folosească datele până la t - 1.",
+                "correctExplanation": "Cuantila pe fereastra mobilă de la momentul t include r_t, deci o pierdere poate depăși doar dacă este dincolo de cuantila 1% a unui eșantion care o conține: depășirile sunt subnumărate. Prognoza pentru ziua t trebuie să folosească datele până la t - 1. În plus, comparațiile cu VaR-ul lipsă din primele 500 de zile dau False, deci hit.mean() pe toate zilele subestimează rata: păstrați doar rândurile în care var.shift(1) nu lipsește.",
                 "incorrectExplanation": "Lungimea ferestrei și convenția de semn (pierderea = -r, VaR pozitiv) sunt corecte; eroarea este de moment: VaR-ul folosit în ziua t cunoaște deja randamentul zilei t."
             }
         },
@@ -695,7 +695,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Asking an AI assistant for help during the oral defence when a question is hard"
                 ],
                 "correctExplanation": "AI is allowed but must be declared in AI_USE.md; at least three caught errors go into AI_ERRORS.md; every reference must exist and have a working DOI or link; the oral defence is answered without AI.",
-                "incorrectExplanation": "Undeclared AI use counts as plagiarism, an unchecked reference may not exist and counts as fabricated data, and no AI is allowed during the oral defence."
+                "incorrectExplanation": "Undeclared AI use counts as plagiarism; every reference must be checked, and a reference that does not exist counts as fabricated data; no AI is allowed during the oral defence."
             },
             "ro": {
                 "title": "Politica AI a proiectului de echipă",
@@ -707,7 +707,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Cererea de ajutor unui asistent AI în timpul susținerii orale, când o întrebare este grea"
                 ],
                 "correctExplanation": "AI-ul este permis, dar se declară în AI_USE.md; cel puțin trei erori prinse se notează în AI_ERRORS.md; fiecare referință trebuie să existe și să aibă un DOI sau link funcțional; la susținerea orală se răspunde fără AI.",
-                "incorrectExplanation": "Utilizarea nedeclarată a AI este tratată ca plagiat, o referință neverificată poate să nu existe și este tratată ca date fabricate, iar la susținerea orală AI-ul nu este permis."
+                "incorrectExplanation": "Utilizarea nedeclarată a AI este tratată ca plagiat; fiecare referință trebuie verificată, iar o referință inexistentă este tratată ca date fabricate; la susținerea orală AI-ul nu este permis."
             }
         }
     ]

@@ -22,10 +22,10 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from mfm_data import log_returns, asset_price  # noqa: E402
+from mfm_data import log_returns, asset_price, load_close  # noqa: E402
 from case_study import (ALPHA, MODELS, stylised_facts, kurtosis_boot_ci, garch_t_fit, garch_summary,  # noqa: E402
                         rolling_var, backtest_table, ljung_box)
-from inference19 import hill_ci, profile_ci, formal_eval, sup_wald_break  # noqa: E402
+from inference19 import hill, hill_k, hill_ci, holm, profile_ci, formal_eval, sup_wald_break  # noqa: E402
 from generate_all_charts import (plt, MainBlue, IDAred, Orange, Teal, Gray, Forest, save_fig,  # noqa: E402
                                  legend_outside_bottom)
 
@@ -106,7 +106,7 @@ def part_var_btc():
     ax.plot(d.index, d['FHS'], color=IDAred, lw=0.9, label='FHS VaR 1% (GARCH-t filter)')
     exc = d['L'] > d['FHS']
     ax.scatter(d.index[exc], d['L'][exc], s=12, color='black', zorder=3, label='Loss above FHS VaR 1%')
-    ax.set_ylabel('Loss (% of position)')
+    ax.set_ylabel('Loss = negative log return (%)')
     legend_outside_bottom(ax, ncol=2, y=-0.14)
     save_fig('ch19_sem_btc_var')
 
@@ -144,23 +144,40 @@ def part_join():
     save_fig('ch19_sem_join')
 
 
+def joint_hill_boot(R, share=0.05, B=999, block=20, rng=None):
+    """Hill pe pierderile fiecarei coloane din R (T x m, zile comune) si bootstrap pe blocuri mobile COMUN:
+    aceleasi blocuri de zile pentru toate coloanele, deci dependenta dintre piete este pastrata."""
+    R = np.asarray(R)
+    T, m = R.shape
+    ks = [hill_k(R[:, j], share) for j in range(m)]
+    est = np.array([hill(-R[:, j], ks[j]) for j in range(m)])
+    nb = int(np.ceil(T / block))
+    draws = np.empty((B, m))
+    for b in range(B):
+        ix = (rng.integers(0, T - block + 1, nb)[:, None] + np.arange(block)).ravel()[:T]
+        draws[b] = [hill(-R[ix, j], ks[j]) for j in range(m)]
+    return est, draws, ks
+
+
 def part_c():
     """Analiza de referinta pentru C1: BET inainte si dupa reclasificarea FTSE (21.09.2020), control WIG20."""
+    rngs = iter(np.random.SeedSequence(2020).spawn(64))   # fluxuri aleatoare independente pentru fiecare extragere
     pre, post = bet.loc['2014-09-22':FTSE].iloc[:-1], bet.loc[FTSE:]
     out = {}
     hd = {}
     for lab, r in [('pre', pre), ('post', post)]:
         res = garch_t_fit(r)
         g = garch_summary(res)
-        h = hill_ci(r.values, seed=5)
+        h = hill_ci(r.values, seed=next(rngs))
         hd[lab] = h['draws']
         out[lab] = dict(N=len(r), start=str(r.index[0].date()), end=str(r.index[-1].date()),
                         vol=r.std() * np.sqrt(252), kurt=stats.kurtosis(r), hill=h['alpha'], hill_lo=h['lo'],
                         hill_hi=h['hi'], k=h['k'], pers=g['pers'], nu=g['nu'], hs_var=float(np.quantile(-r, 0.99)))
-    # diferenta indicilor Hill: extrageri independente in cele doua perioade disjuncte
+    # diferenta indicilor Hill: extrageri independente (fluxuri aleatoare distincte) in cele doua perioade disjuncte
     dd = hd['post'] - hd['pre']
     out['dhill'] = out['post']['hill'] - out['pre']['hill']
     out['dhill_ci'] = list(np.percentile(dd, [2.5, 97.5]))
+    out['dhill_se'] = float(dd.std(ddof=1))
     # sensibilitatea kurtosis-ului (necontrolat cand alpha < 4) la cele mai mari zile
     top = pre.abs().nlargest(2).index
     out['pre']['top_days'] = [str(d.date()) for d in top]
@@ -168,16 +185,40 @@ def part_c():
     out['pre']['kurt_ex1'] = stats.kurtosis(pre.drop(top[:1]))
     out['pre']['kurt_ex2'] = stats.kurtosis(pre.drop(top))
     out['dkurt'] = stats.kurtosis(post) - stats.kurtosis(pre)
-    # control: WIG20 (neafectat de reclasificarea BVB), diferenta-in-diferente pe indicele Hill
-    wp = asset_price('WIG20')
-    wp = wp[wp.diff() != 0]                                  # sarbatori completate cu valoarea anterioara
-    w = 100 * np.log(wp).diff().dropna()
-    wpre, wpost = w.loc['2014-09-22':FTSE].iloc[:-1], w.loc[FTSE:'2026-09-18']
-    hw = {lab: hill_ci(r.values, seed=6) for lab, r in [('pre', wpre), ('post', wpost)]}
-    out['wig'] = dict(pre=hw['pre']['alpha'], post=hw['post']['alpha'], d=hw['post']['alpha'] - hw['pre']['alpha'])
-    did = dd - (hw['post']['draws'] - hw['pre']['draws'])
-    out['did'] = out['dhill'] - out['wig']['d']
-    out['did_ci'] = list(np.percentile(did, [2.5, 97.5]))
+    # control: WIG20 (neafectat de reclasificarea BVB); diferenta-in-diferente pe indicele Hill:
+    # join pe PRETURI in zilele comune BET-WIG20, apoi randamente; in fiecare perioada aceleasi blocuri pentru
+    # ambele piete (pastreaza dependenta dintre ele), extrageri independente intre cele doua perioade
+    P = pd.concat([load_close('bet', '2014-09-01', '2026-09-18'), asset_price('WIG20', '2026-09-18')],
+                  axis=1, join='inner').dropna()
+    J = (100 * np.log(P).diff().dropna()).loc['2014-09-22':'2026-09-18']
+    Jpre, Jpost = J[J.index < FTSE], J[J.index >= FTSE]
+    out['joint_N'] = dict(pre=len(Jpre), post=len(Jpost))
+
+    def did_spec(share, block, B=999):
+        e1, d1, k1 = joint_hill_boot(Jpre.values, share, B, block, np.random.default_rng(next(rngs)))
+        e2, d2, k2 = joint_hill_boot(Jpost.values, share, B, block, np.random.default_rng(next(rngs)))
+        est = (e2[0] - e1[0]) - (e2[1] - e1[1])
+        dr = (d2[:, 0] - d1[:, 0]) - (d2[:, 1] - d1[:, 1])
+        se = float(dr.std(ddof=1))
+        return dict(share=share, block=block, bet_pre=e1[0], bet_post=e2[0], wig_pre=e1[1], wig_post=e2[1],
+                    k_pre=k1, k_post=k2, did=est, se=se, lo=float(np.percentile(dr, 2.5)),
+                    hi=float(np.percentile(dr, 97.5)), p=float(2 * stats.norm.sf(abs(est) / se)),
+                    cov_pre=float(np.cov(d1.T)[0, 1]), cov_post=float(np.cov(d2.T)[0, 1]))
+    base = did_spec(0.05, 20)
+    out['wig'] = dict(pre=base['wig_pre'], post=base['wig_post'], d=base['wig_post'] - base['wig_pre'],
+                      bet_pre=base['bet_pre'], bet_post=base['bet_post'], bet_d=base['bet_post'] - base['bet_pre'],
+                      cov_pre=base['cov_pre'], cov_post=base['cov_post'])
+    out['did'] = base['did']
+    out['did_ci'] = [base['lo'], base['hi']]
+    out['did_se'] = base['se']
+    out['did_mde'] = (stats.norm.ppf(0.975) + stats.norm.ppf(0.80)) * base['se']   # efectul minim detectabil, putere 80%
+    # grila de specificatii: k = 2.5%, 5%, 10% din zilele cu pierdere x blocuri de 10, 20, 40 de zile; corectia Holm
+    grid = [base if (sh, bl) == (0.05, 20) else did_spec(sh, bl) for sh in (0.025, 0.05, 0.10) for bl in (10, 20, 40)]
+    pg = np.array([g['p'] for g in grid])
+    out['grid'] = dict(specs=[{k: g[k] for k in ('share', 'block', 'did', 'se', 'p')} for g in grid],
+                       n=len(grid), rej_raw=int((pg < 0.05).sum()), rej_holm=int((holm(pg) < 0.05).sum()),
+                       did_min=float(min(g['did'] for g in grid)), did_max=float(max(g['did'] for g in grid)),
+                       p_min=float(pg.min()))
     # ruptura cu data necunoscuta in log|r| (toate momentele finite), 2014-2026
     y = np.log(np.abs(bet.loc['2014-09-22':'2026-09-18']))
     sw = sup_wald_break(y.values)
@@ -186,7 +227,7 @@ def part_c():
     out['placebo'] = {}
     for lab, d0 in [('m1', '2019-09-23'), ('p1', '2021-09-20')]:
         a1, a2 = bet.loc['2014-09-22':d0].iloc[:-1], bet.loc[d0:'2026-09-18']
-        h1, h2 = hill_ci(a1.values, seed=7), hill_ci(a2.values, seed=8)
+        h1, h2 = hill_ci(a1.values, seed=next(rngs)), hill_ci(a2.values, seed=next(rngs))
         dpl = h2['draws'] - h1['draws']
         out['placebo'][lab] = dict(date=d0, d=h2['alpha'] - h1['alpha'], lo=float(np.percentile(dpl, 2.5)),
                                    hi=float(np.percentile(dpl, 97.5)))
