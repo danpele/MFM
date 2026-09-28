@@ -317,7 +317,7 @@ def fig_signature():
         ax.plot(m, s['sparse'], 'o-', color=col, ms=3.5, label='One grid (sparse sampling)')
         ax.plot(m, s['subsampled'], 's--', color=IDAred, ms=3, label='Average over shifted grids (subsampling)')
         ax.set_xlabel('Sampling interval (minutes)')
-        ax.set_ylabel('Mean realised volatility (% p.a.)')
+        ax.set_ylabel('Volatility from mean RV (% p.a.)')
         ax.set_title(name, fontsize=9, loc='left')
         lo, hi = s.values.min(), s.values.max()
         ax.set_ylim(lo - 0.12 * lo, hi + 0.12 * hi)
@@ -325,9 +325,7 @@ def fig_signature():
     plt.tight_layout(rect=(0, 0.08, 1, 1))
     save_fig('ch9_signature')
     nz_s, nz_b = T.noise_var(R_SPY), T.noise_var(R_BTC)
-    ts = T.tsrv(P_SPY, 6)
-    nbar = (T.nret(R_SPY) - 5) / 6
-    ts_adj = ts / (1 - nbar / T.nret(R_SPY))
+    ts_adj = T.tsrv(P_SPY, 6, adjust=True)
     rk, H = T.realized_kernel(R_SPY, P_SPY)
     return {'spy5': float(ss['sparse'].iloc[0]), 'spy30': float(ss['subsampled'].loc[6]), 'spy130': float(ss['subsampled'].iloc[-1]),
             'spy_range': float(ss.values.max() - ss.values.min()),
@@ -494,7 +492,7 @@ def fig_har(tab):
     fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.2), gridspec_kw={'width_ratios': [1, 1.5]})
     lg = np.arange(1, 31)
     axes[0].bar(lg - 0.2, ws, 0.4, color=MainBlue, label='SPY: implied weight on lag')
-    axes[0].bar(lg + 0.2, wb, 0.4, color=Amber, label='Bitcoin: implied weight on lag')
+    axes[0].bar(lg + 0.2, wb, 0.4, color=Amber, label='Bitcoin: implied weight on lag (complete 7- and 30-day windows)')
     axes[0].axhline(0, color=Gray, lw=0.6)
     axes[0].set_xlabel('Lag (days)')
     last = fit.index[-250:]

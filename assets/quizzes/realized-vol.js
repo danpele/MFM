@@ -18,11 +18,11 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "Because intraday returns are Normal and independent of volatility",
                     "Because RQ_t is an unbiased estimator of IQ_t"
                 ],
-                "correctExplanation": "Barndorff-Nielsen and Shephard: sqrt(M)(RV − IV) converges stably to MN(0, 2 IQ); stable convergence allows dividing by RQ, which converges to the random IQ.",
+                "correctExplanation": "Barndorff-Nielsen and Shephard: sqrt(M)(RV − IV) converges stably to MN(0, 2 IQ); stable convergence allows studentising by sqrt(2 RQ/M), because RQ consistently estimates the random IQ.",
                 "incorrectExplanation": "The argument needs neither constant volatility nor Normal returns nor unbiasedness of RQ: it rests on a mixed-normal limit that holds stably, jointly with the path of volatility."
             },
             "ro": {
-                "title": "Convergența stabilă și TLC fezabilă",
+                "title": "Convergența stabilă și CLT fezabilă",
                 "text": "Cvarticitatea integrată IQ_t este aleatoare. De ce putem totuși împărți RV_t − IV_t la sqrt(2 RQ_t / M) și folosi cuantilele N(0,1)?",
                 "options": [
                     "Deoarece limita este Normală mixtă, iar convergența este stabilă, deci studentizarea cu o estimare consistentă a varianței aleatoare dă N(0,1)",
@@ -30,7 +30,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "Deoarece randamentele intraday sunt Normale și independente de volatilitate",
                     "Deoarece RQ_t este un estimator nedeplasat al lui IQ_t"
                 ],
-                "correctExplanation": "Barndorff-Nielsen și Shephard: sqrt(M)(RV − IV) converge stabil la MN(0, 2 IQ); convergența stabilă permite împărțirea la RQ, care converge la IQ aleator.",
+                "correctExplanation": "Barndorff-Nielsen și Shephard: sqrt(M)(RV − IV) converge stabil la MN(0, 2 IQ); convergența stabilă permite studentizarea cu sqrt(2 RQ/M), deoarece RQ estimează consistent IQ aleator.",
                 "incorrectExplanation": "Argumentul nu cere volatilitate constantă, randamente Normale sau un RQ nedeplasat: se bazează pe o limită Normală mixtă valabilă stabil, împreună cu traiectoria volatilității."
             }
         },
@@ -207,7 +207,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "RV falls sharply from 5 to 130 minutes",
                     "The plot is flat and the first-order autocorrelation is about -0.01: noise is negligible at 5 minutes"
                 ],
-                "correctExplanation": "Mean annualised volatility stays between 12.6% and 13.1% from 5 to 130 minutes; noise-robust estimators add nothing at this frequency.",
+                "correctExplanation": "Annualised volatility from mean RV stays between 12.6% and 13.1% from 5 to 130 minutes; noise corrections change little at this frequency.",
                 "incorrectExplanation": "For a liquid ETF at 5 minutes the noise is invisible: the signature plot is flat and the autocorrelation of returns is almost zero."
             },
             "ro": {
@@ -219,7 +219,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "RV scade puternic de la 5 la 130 de minute",
                     "Graficul este plat, iar autocorelația de ordinul 1 este aproximativ -0,01: zgomotul este neglijabil la 5 minute"
                 ],
-                "correctExplanation": "Volatilitatea anualizată medie rămâne între 12,6% și 13,1% de la 5 la 130 de minute; estimatorii robuști la zgomot nu aduc nimic la această frecvență.",
+                "correctExplanation": "Volatilitatea anualizată din RV medie rămâne între 12,6% și 13,1% de la 5 la 130 de minute; corecțiile de zgomot schimbă puțin la această frecvență.",
                 "incorrectExplanation": "Pentru un ETF lichid la 5 minute zgomotul este invizibil: graficul semnăturii este plat, iar autocorelația randamentelor este aproape zero."
             }
         },
@@ -281,7 +281,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             "correct": 2,
             "en": {
                 "title": "False discovery rate for jump days",
-                "text": "The daily jump test on 1,489 SPY days at 5% gives 235 rejections. Which procedure controls the expected share of false jump days among the rejected days?",
+                "text": "The daily jump test on 1,489 SPY days at 5% gives 235 rejections. Which procedure sorts the N daily p-values and rejects the k smallest, with k the largest index such that p_(k) ≤ k × 0.05/N, so that the expected share of false jump days among the rejected days stays at most 5%?",
                 "options": [
                     "Bonferroni at 5%",
                     "Raising the number of intraday returns M",
@@ -289,11 +289,11 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "Replacing RV by BV in the numerator of the statistic"
                 ],
                 "correctExplanation": "Benjamini–Hochberg controls the FDR, the expected proportion of false rejections; in the chapter it leaves 42 SPY jump days (17 after the periodicity correction).",
-                "incorrectExplanation": "Bonferroni controls the probability of any false rejection (FWER) and is much stricter, a larger M changes power but not multiplicity, and the numerator must contrast RV with BV."
+                "incorrectExplanation": "Bonferroni compares every p-value with the single threshold 0.05/N: it controls the probability of any false rejection (FWER), hence also the FDR, but rejects far fewer days; a larger M changes power but not multiplicity, and the numerator must contrast RV with BV."
             },
             "ro": {
                 "title": "Rata descoperirilor false pentru zilele cu salt",
-                "text": "Testul zilnic de salturi pe 1.489 de zile SPY la 5% dă 235 de respingeri. Ce procedură controlează ponderea așteptată a zilelor cu salt false printre zilele respinse?",
+                "text": "Testul zilnic de salturi pe 1.489 de zile SPY la 5% dă 235 de respingeri. Ce procedură ordonează cele N valori p zilnice și respinge cele mai mici k, cu k cel mai mare indice pentru care p_(k) ≤ k × 0,05/N, astfel încât ponderea așteptată a zilelor cu salt false printre zilele respinse să rămână cel mult 5%?",
                 "options": [
                     "Bonferroni la 5%",
                     "Creșterea numărului de randamente intraday M",
@@ -301,7 +301,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "Înlocuirea lui RV cu BV la numărătorul statisticii"
                 ],
                 "correctExplanation": "Benjamini–Hochberg controlează FDR, proporția așteptată a respingerilor false; în capitol lasă 42 de zile SPY cu salt (17 după corecția de periodicitate).",
-                "incorrectExplanation": "Bonferroni controlează probabilitatea oricărei respingeri false (FWER) și este mult mai strict, un M mai mare schimbă puterea, dar nu multiplicitatea, iar numărătorul trebuie să compare RV cu BV."
+                "incorrectExplanation": "Bonferroni compară fiecare valoare p cu pragul unic 0,05/N: controlează probabilitatea oricărei respingeri false (FWER), deci și FDR, dar respinge mult mai puține zile; un M mai mare schimbă puterea, dar nu multiplicitatea, iar numărătorul trebuie să compare RV cu BV."
             }
         },
         {
@@ -490,7 +490,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "Componenta săptămânală preia efectul zilnic"
                 ],
                 "correctExplanation": "Bollerslev, Patton și Quaedvlieg (2016): raportul semnal/zgomot al lui RV_t scade când IQ_t este mare, deci HARQ folosește β_d + β_Q sqrt(RQ_t) cu β_Q < 0.",
-                "incorrectExplanation": "Mecanismul este cel al erorilor în variabile: TLC dă Var(RV − IV) = 2 IQ/M, deci un regresor mai zgomotos merită o pondere mai mică; efectul de pârghie și salturile sunt extensii separate."
+                "incorrectExplanation": "Mecanismul este cel al erorilor în variabile: CLT dă Var(RV − IV) = 2 IQ/M, deci un regresor mai zgomotos merită o pondere mai mică; efectul de pârghie și salturile sunt extensii separate."
             }
         },
         {
@@ -524,26 +524,26 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             "correct": 3,
             "en": {
                 "title": "Which loss survives a noisy proxy",
-                "text": "Forecasts are evaluated against RV, an unbiased but noisy proxy of the true variance. Which loss ranks the forecasts as the true variance would?",
+                "text": "Forecasts are evaluated against RV, a noisy proxy of the true variance that is conditionally unbiased: E[RV_t | past] = E[IV_t | past]. Which loss ranks the forecasts as the true variance would?",
                 "options": [
                     "MSE on volatility, (sqrt(RV) − sqrt(F))²",
                     "Mean absolute error on variance",
                     "Mean absolute percentage error",
                     "QLIKE on variance, RV/F − ln(RV/F) − 1"
                 ],
-                "correctExplanation": "Patton (2011): the expected QLIKE is minimised at F = E[RV | past] = E[IV | past], so a noisy unbiased proxy does not change the ranking.",
+                "correctExplanation": "Patton (2011): the QLIKE difference of two forecasts is linear in RV, so its conditional expectation depends on RV only through E[RV | past] = E[IV | past]; the expected ranking is the one under the true variance.",
                 "incorrectExplanation": "Losses on volatility or absolute errors are minimised by a forecast other than the conditional variance (by Jensen, (E sqrt(RV))² is below E RV), so proxy noise distorts the ranking."
             },
             "ro": {
                 "title": "Ce funcție de pierdere rezistă unui proxy zgomotos",
-                "text": "Prognozele sunt evaluate față de RV, un proxy nedeplasat, dar zgomotos, al varianței adevărate. Ce funcție de pierdere ordonează prognozele la fel ca varianța adevărată?",
+                "text": "Prognozele sunt evaluate față de RV, un proxy zgomotos al varianței adevărate, nedeplasat condiționat: E[RV_t | trecut] = E[IV_t | trecut]. Ce funcție de pierdere ordonează prognozele la fel ca varianța adevărată?",
                 "options": [
                     "MSE pe volatilitate, (sqrt(RV) − sqrt(F))²",
                     "Eroarea absolută medie pe varianță",
                     "Eroarea procentuală absolută medie",
                     "QLIKE pe varianță, RV/F − ln(RV/F) − 1"
                 ],
-                "correctExplanation": "Patton (2011): QLIKE așteptată este minimă în F = E[RV | trecut] = E[IV | trecut], deci un proxy zgomotos nedeplasat nu schimbă ordonarea.",
+                "correctExplanation": "Patton (2011): diferența QLIKE dintre două prognoze este liniară în RV, deci speranța ei condiționată depinde de RV doar prin E[RV | trecut] = E[IV | trecut]; ordonarea așteptată este cea dată de varianța adevărată.",
                 "incorrectExplanation": "Funcțiile de pierdere pe volatilitate sau cu erori absolute sunt minimizate de altă prognoză decât varianța condiționată (din Jensen, (E sqrt(RV))² este sub E RV), deci zgomotul proxy-ului distorsionează ordonarea."
             }
         },
@@ -605,7 +605,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             "correct": 2,
             "en": {
                 "title": "Joint test in Mincer–Zarnowitz",
-                "text": "In the MZ regression for GARCH, â = 0.24 (SE 0.23), b̂ = 0.70 (SE 0.24) and corr(â, b̂) = −0.98. How should unbiasedness, (a, b) = (0, 1), be tested?",
+                "text": "In the MZ regression for GARCH, â = 0.2418 (SE 0.2310), b̂ = 0.7046 (SE 0.2382) and corr(â, b̂) = −0.9750. How should unbiasedness, (a, b) = (0, 1), be tested?",
                 "options": [
                     "Two separate t-tests, rejecting if either rejects",
                     "Test b = 1 only, because the intercept is irrelevant",
@@ -617,7 +617,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             },
             "ro": {
                 "title": "Testul comun în Mincer–Zarnowitz",
-                "text": "În regresia MZ pentru GARCH, â = 0,24 (SE 0,23), b̂ = 0,70 (SE 0,24) și corr(â, b̂) = −0,98. Cum trebuie testată nedeplasarea, (a, b) = (0, 1)?",
+                "text": "În regresia MZ pentru GARCH, â = 0,2418 (SE 0,2310), b̂ = 0,7046 (SE 0,2382) și corr(â, b̂) = −0,9750. Cum trebuie testată nedeplasarea, (a, b) = (0, 1)?",
                 "options": [
                     "Două teste t separate, respingând dacă oricare respinge",
                     "Doar testul b = 1, deoarece termenul liber este irelevant",

@@ -80,7 +80,7 @@ def a5_har(b=(-0.08, 0.36, 0.34, 0.17), d=np.log(2.0), w=np.log(1.2), m=np.log(0
     """Prognoza log-HAR pentru maine; ponderi implicite pe intarzieri; persistenta."""
     lf = b[0] + b[1] * d + b[2] * w + b[3] * m
     return {'lf': lf, 'f': np.exp(lf), 'w1': b[1] + b[2] / 5 + b[3] / 22, 'w2': b[2] / 5 + b[3] / 22, 'w6': b[3] / 22,
-            'pers': b[1] + b[2] + b[3], 'mean': np.exp(b[0] / (1 - sum(b[1:]))), 'd': d, 'w': w, 'm': m}
+            'pers': b[1] + b[2] + b[3], 'geo_mean': np.exp(b[0] / (1 - sum(b[1:]))), 'd': d, 'w': w, 'm': m}
 
 
 def a6_losses():
@@ -233,16 +233,18 @@ def b5_har_insample():
             't_nw': list(res['b'] / res['se']), 'ratio_se': list(res['se'] / se_ols)}
 
 
-def garch_params_blocks(r, dates, refit=21):
-    """Parametrii GARCH(1,1)-t reestimati la fiecare `refit` zile si varianta conditionata pentru fiecare zi."""
+def garch_params_blocks(r, dates, refit=21, window=None):
+    """Parametrii GARCH(1,1)-t reestimati la fiecare `refit` zile si varianta conditionata pentru fiecare zi;
+    window=None: fereastra extinsa (toate randamentele anterioare); window=m: ultimele m randamente (fereastra mobila)."""
     from arch import arch_model
     dates = pd.DatetimeIndex(dates)
     pos = r.index.get_indexer(dates)
     rows = []
     for i0 in range(0, len(dates), refit):
         blk = dates[i0:i0 + refit]
-        fit = arch_model(r.iloc[:pos[i0]], mean='Constant', vol='GARCH', p=1, q=1, dist='t').fit(disp='off')
-        fixed = arch_model(r.iloc[:pos[min(i0 + refit, len(dates)) - 1] + 1], mean='Constant', vol='GARCH', p=1, q=1,
+        s0 = 0 if window is None else max(0, pos[i0] - window)
+        fit = arch_model(r.iloc[s0:pos[i0]], mean='Constant', vol='GARCH', p=1, q=1, dist='t').fit(disp='off')
+        fixed = arch_model(r.iloc[s0:pos[min(i0 + refit, len(dates)) - 1] + 1], mean='Constant', vol='GARCH', p=1, q=1,
                            dist='t').fix(fit.params)
         s2 = (fixed.conditional_volatility ** 2).reindex(blk)
         for d in blk:
@@ -283,13 +285,17 @@ def b6_week():
 
 
 def b7_harcj():
-    """HAR-CJ pe log (Andersen, Bollerslev si Diebold): componenta continua si de salt; in esantion si out-of-sample."""
+    """HAR-CJ pe log (Andersen, Bollerslev si Diebold, 2007): tinta ln(varianta totala a zilei t), regresori din ziua t-1;
+    in esantion (Newey-West) si out-of-sample."""
     j = T.jump_test(R_SPY)
     C = j['C'] + ON ** 2                                    # partea continua a variantei totale (noaptea inclusa)
     Jc = j['J']
     v = RVT_SPY
-    X = pd.DataFrame({'cd': np.log(C).shift(1), 'cw': np.log(C).rolling(5).mean().shift(1),
-                      'cm': np.log(C).rolling(22).mean().shift(1), 'j': np.log1p(Jc).shift(1)})
+    # specificatia pe log din Andersen, Bollerslev si Diebold (2007): log al mediilor aritmetice ale lui C si
+    # log(1 + J) pentru componentele de salt zilnica, saptamanala si lunara; toate cunoscute in seara zilei t-1
+    X = pd.DataFrame({'cd': np.log(C).shift(1), 'cw': np.log(C.rolling(5).mean()).shift(1),
+                      'cm': np.log(C.rolling(22).mean()).shift(1), 'jd': np.log1p(Jc).shift(1),
+                      'jw': np.log1p(Jc.rolling(5).mean()).shift(1), 'jm': np.log1p(Jc.rolling(22).mean()).shift(1)})
     y = np.log(v)
     ok = X.notna().all(axis=1)
     res = T.ols_nw(y[ok], X[ok])
@@ -305,7 +311,12 @@ def b7_harcj():
     fl = T.har_expanding(v, '2022-01-03', log=True).reindex(f.index)
     yy = v.reindex(f.index)
     dq = T.dm_test(T.qlike(yy, f), T.qlike(yy, fl))
+    Rj = np.zeros((3, 7))
+    Rj[0, 4] = Rj[1, 5] = Rj[2, 6] = 1.0                   # H0: beta_Jd = beta_Jw = beta_Jm = 0
+    dj = Rj @ res['b']
+    wj = float(dj @ np.linalg.solve(Rj @ res['V'] @ Rj.T, dj))
     return {'b': res['b'], 'se': res['se'], 'r2': res['r2'], 'r2_base': base['r2'], 'T': res['T'],
+            'wald_j': wj, 'p_j': float(stats.chi2.sf(wj, 3)),
             'q_cj': float(T.qlike(yy, f).mean()), 'q_har': float(T.qlike(yy, fl).mean()), 'dm_t': dq['t'], 'dm_p': dq['p']}
 
 
@@ -346,18 +357,27 @@ def c1_predictability():
         o['gain_rw'] = 1 - o['logHAR']['qlike'] / o['RW']['qlike']
         o['gain_garch'] = 1 - o['logHAR']['qlike'] / o['GARCH-t']['qlike']
         out[k] = o
-    # bootstrap pe blocuri pentru diferenta R^2 (pe log) intre Bitcoin si SPY
+    # bootstrap pe blocuri pentru diferenta R^2 (pe log) intre Bitcoin si SPY: aceleasi blocuri de timp calendaristic
+    # (28 de zile, circa 20 de zile de tranzactionare SPY) pentru ambele active, deci covarianta dintre ele se pastreaza
     a = np.c_[np.log(F['proxy']), np.log(F['logHAR'])]
     b = np.c_[np.log(Fb['proxy']), np.log(Fb['logHAR'])]
+    cal = pd.date_range(min(F.index[0], Fb.index[0]), max(F.index[-1], Fb.index[-1]), freq='D')
+    rowa = np.full(len(cal), -1)
+    rowa[cal.get_indexer(F.index)] = np.arange(len(F))
+    rowb = np.full(len(cal), -1)
+    rowb[cal.get_indexer(Fb.index)] = np.arange(len(Fb))
     rng = np.random.default_rng(SEED)
+    block, ncal = 28, len(cal)
+    nb = int(np.ceil(ncal / block))
 
-    def boot_r2(x, block=20):
-        n = len(x)
-        nb = int(np.ceil(n / block))
-        st = rng.integers(0, n - block + 1, nb)
-        idx = (st[:, None] + np.arange(block)[None, :]).ravel()[:n]
-        return np.corrcoef(x[idx, 0], x[idx, 1])[0, 1] ** 2
-    d = np.array([boot_r2(b) - boot_r2(a) for _ in range(B_BOOT)])
+    def r2(x, rows):
+        rows = rows[rows >= 0]
+        return np.corrcoef(x[rows, 0], x[rows, 1])[0, 1] ** 2
+    d = np.empty(B_BOOT)
+    for i in range(B_BOOT):
+        st = rng.integers(0, ncal - block + 1, nb)
+        days = (st[:, None] + np.arange(block)[None, :]).ravel()[:ncal]
+        d[i] = r2(b, rowb[days]) - r2(a, rowa[days])
     out['r2diff'] = float(out['btc']['logHAR']['r2log'] - out['spy']['logHAR']['r2log'])
     out['r2diff_lo'] = float(np.percentile(d, 2.5))
     out['r2diff_hi'] = float(np.percentile(d, 97.5))
@@ -443,9 +463,11 @@ def ex_jump_inference(K=270, alpha_lm=0.01, c_trunc=3.0, varpi=0.49):
     x, day, slot = x[ok], day[ok], slot[ok]
     prod = np.r_[np.nan, np.abs(x[1:]) * np.abs(x[:-1])]
     bvl = pd.Series(prod).rolling(K - 2).mean().shift(1).values
-    L = x / np.sqrt(bvl * np.pi / 2)     # mu_1^{-2} = pi/2: BV local estimeaza varianta pe interval
+    L = x / np.sqrt(bvl * np.pi / 2)     # mu_1^{-2} = pi/2: BV local estimeaza varianta pe interval, deci L ~ N(0, 1)
     n = int(np.isfinite(L).sum())
-    c = np.sqrt(2 / np.pi)
+    # Lee si Mykland (2008) impart la BV local fara pi/2 si folosesc c = sqrt(2/pi) in C_n, S_n;
+    # cu numitorul corectat (L standardizat) aceleasi praguri se obtin cu c = 1
+    c = 1.0
     Cn = np.sqrt(2 * np.log(n)) / c - (np.log(np.pi) + np.log(np.log(n))) / (2 * c * np.sqrt(2 * np.log(n)))
     Sn = 1 / (c * np.sqrt(2 * np.log(n)))
     beta = -np.log(-np.log(1 - alpha_lm))
@@ -465,7 +487,7 @@ def ex_jump_inference(K=270, alpha_lm=0.01, c_trunc=3.0, varpi=0.49):
     A = R_SPY.values
     trv = np.nansum(np.where(np.abs(A) <= thr, A ** 2, 0.0), axis=1)
     a = np.abs(A)
-    med = np.nanmedian(np.stack([a[:, :-2], a[:, 1:-1], a[:, 2:]]), axis=0)
+    med = np.median(np.stack([a[:, :-2], a[:, 1:-1], a[:, 2:]]), axis=0)   # doar ferestre cu trei randamente observate
     medrv = np.pi / (6 - 4 * np.sqrt(3) + np.pi) * Mt / (Mt - 2) * np.nansum(med ** 2, axis=1)
     rvs = j['rv'].values
     out.update({'trv_share': float(1 - trv.sum() / rvs.sum()), 'bv_share': float(1 - j['bv'].sum() / rvs.sum()),
@@ -572,8 +594,15 @@ def ex_harq_shar(start='2022-01-03'):
     return out
 
 
+GW_WIN_HAR = 250      # fereastra mobila a log-HAR direct (ultimele 250 de tinte complet observate)
+GW_WIN_GARCH = 1000   # fereastra mobila a GARCH(1,1)-t (ultimele 1000 de randamente zilnice)
+
+
 def ex_gw_week():
-    """Testul conditional Giacomini-White pentru prognozele pe 5 zile (B6): instrumente (1, d_{t-5}), HAC cu 4 intarzieri."""
+    """Testul conditional Giacomini-White (2006) pentru prognozele pe 5 zile (B6). Teoria lor cere ferestre de estimare
+    de lungime fixa (mobile), deci ambele metode sunt reestimate pe ferestre mobile: log-HAR direct pe ultimele 250 de
+    tinte, GARCH(1,1)-t pe ultimele 1000 de randamente (la fiecare 21 de zile). Instrumente (1, d_{t-5}); sub ipoteza
+    nula Z_t d_{t+5} este necorelat dincolo de 4 intarzieri, deci Omega = suma neponderata a autocovariantelor 0..4."""
     v = RVT_SPY
     y5 = v[::-1].rolling(5).sum()[::-1]
     X = T.har_design(np.log(v))
@@ -583,16 +612,17 @@ def ex_gw_week():
     idx = np.where((v.index >= pd.Timestamp('2022-01-03')) & ok.values)[0]
     fh = {}
     for t in idx:
-        tr = np.where(ok.values[:t - 4])[0]
+        tr = np.where(ok.values[:t - 4])[0][-GW_WIN_HAR:]
         b, *_ = np.linalg.lstsq(Xc[tr], ly[tr], rcond=None)
         fh[v.index[t]] = np.exp(Xc[t] @ b + np.var(ly[tr] - Xc[tr] @ b) / 2)
     fh = pd.Series(fh)
-    G = garch_params_blocks(D_SPY, fh.index)
+    G = garch_params_blocks(D_SPY, fh.index, window=GW_WIN_GARCH)
     pers = G['alpha'] + G['beta']
-    lr = G['omega'] / (1 - pers)
-    fg = sum(lr + pers ** h * (G['s2'] - lr) for h in range(5))
+    # E[sigma^2_{t+h}] = omega (1 + p + ... + p^{h-1}) + p^h sigma^2_t: valabila si la p = 1 (IGARCH), frecvent pe ferestre scurte
+    fg = sum(G['omega'] * sum(pers ** j for j in range(h)) + pers ** h * G['s2'] for h in range(5))
     yy = y5.reindex(fh.index)
-    d = (T.qlike(yy, fh) - T.qlike(yy, fg)).values
+    lh, lg = T.qlike(yy, fh), T.qlike(yy, fg)
+    d = (lh - lg).values
     tau = 5
     Z = np.column_stack([np.ones(len(d) - tau), d[:-tau]]) * d[tau:, None]
     n = len(Z)
@@ -600,17 +630,18 @@ def ex_gw_week():
     U = Z - zbar
     S = U.T @ U / n
     for l in range(1, tau):
-        w = 1 - l / tau
         g = U[l:].T @ U[:-l] / n
-        S += w * (g + g.T)
+        S += g + g.T
+    if np.min(np.linalg.eigvalsh(S)) <= 0:          # rezerva: Newey-West cu regula de latime de banda, daca S nu este PD
+        L_ = T.nw_lags(n)
+        S = U.T @ U / n
+        for l in range(1, L_ + 1):
+            g = U[l:].T @ U[:-l] / n
+            S += (1 - l / (L_ + 1)) * (g + g.T)
     stat = float(n * zbar @ np.linalg.solve(S, zbar))
-    u = d - d.mean()
-    s0 = u @ u / len(d)
-    for l in range(1, tau):
-        s0 += 2 * (1 - l / tau) * (u[l:] @ u[:-l]) / len(d)
-    t_unc = float(d.mean() / np.sqrt(s0 / len(d)))
-    return {'gw': stat, 'p': float(stats.chi2.sf(stat, 2)), 'T': n, 't_unc': t_unc,
-            'p_unc': float(2 * stats.norm.sf(abs(t_unc)))}
+    dm = T.dm_test(lh, lg)                           # testul neconditionat: Newey-West cu regula de latime de banda
+    return {'gw': stat, 'p': float(stats.chi2.sf(stat, 2)), 'T': n, 't_unc': dm['t'], 'p_unc': dm['p'],
+            'q_har': float(lh.mean()), 'q_garch': float(lg.mean()), 'win_har': GW_WIN_HAR, 'win_garch': GW_WIN_GARCH}
 
 
 def ex_rk_ratio():

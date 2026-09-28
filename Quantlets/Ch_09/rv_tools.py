@@ -109,12 +109,16 @@ def signature(P, ks, scale):
         'subsampled': [np.sqrt(scale * subsampled_rv(P, k).mean()) for k in ks]}, index=list(ks))
 
 
-def tsrv(P, K=6):
-    """Two-scale realised variance (Zhang, Mykland si Ait-Sahalia): media pe K grile minus corectia de zgomot."""
+def tsrv(P, K=6, adjust=False):
+    """Two-scale realised variance (Zhang, Mykland si Ait-Sahalia): media pe K grile minus corectia de zgomot.
+    Grilele pastreaza deschiderea si inchiderea, deci nbar = numarul mediu EFECTIV de randamente pe grila
+    (deplasarea din zgomot a mediei este 2 nbar omega^2); adjust=True imparte la 1 - nbar/n (esantioane mici)."""
     R = 100 * np.log(P).diff(axis=1).iloc[:, 1:]
     n = nret(R)
-    nbar = (n - K + 1) / K
-    return subsampled_rv(P, K) - nbar / n * rv(R)
+    nbar = pd.concat([pd.Series({d: len(x) - 1 for d, x in sparse_points(P, K, o).items()}) for o in range(K)],
+                     axis=1).mean(axis=1)
+    ts = subsampled_rv(P, K) - nbar / n * rv(R)
+    return ts / (1 - nbar / n) if adjust else ts
 
 
 def noise_var(R):
