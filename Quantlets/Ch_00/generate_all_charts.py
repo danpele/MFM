@@ -99,7 +99,7 @@ fx_usd = load_panel(['USD per EUR', 'JPY per USD'])   # FRED
 def to_usd(local, fx, invert=False):
     """Converteste un indice in moneda locala in USD cu cursul FRED din aceeasi zi
     (ultimul curs disponibil, cel mult 5 zile in urma, daca ziua lipseste)."""
-    f = fx.reindex(local.index, method='ffill', limit=5)
+    f = fx.dropna().reindex(local.index, method='ffill', tolerance=pd.Timedelta(days=5))
     return (local / f if invert else local * f).dropna()
 
 
@@ -193,8 +193,7 @@ def fig_risk_return(start='2015-01-02'):
     panel = cross_panel()
     for n in names:
         s = (eurron if n == 'EUR/RON' else panel[n]).loc[start:].dropna()
-        periods = 365 if n in ('Bitcoin', 'Ethereum') else ('obs' if n in ('Gold', 'EUR/USD') else 252)
-        cagr, v = ann_stats(s, periods)
+        cagr, v = ann_stats(s, 'obs')          # q = numarul observat de zile de tranzactionare pe an
         rows.append((n, cagr, v, s.index[0]))
     res = pd.DataFrame(rows, columns=['asset', 'cagr', 'vol', 'from']).set_index('asset')
     fig, ax = plt.subplots(figsize=(6.6, 3.2))
@@ -214,7 +213,7 @@ def fig_risk_return(start='2015-01-02'):
     ax.set_ylim(-0.08, None)
     ax.set_xlabel('Annualised volatility (log scale)')
     ax.set_ylabel('Annualised return (CAGR)')
-    ax.set_title('Risk and return in USD, 2015-2026: higher volatility is not always rewarded',
+    ax.set_title('Risk and return, 2015-2026: assets in USD, EUR/RON in RON per EUR',
                  fontsize=9, loc='left')
     plt.tight_layout()
     save_fig('ch0_risk_return')
@@ -388,7 +387,7 @@ def fig_rolling_vol(window=63):
     ax.plot(v_eq.loc['2014-09':].index, v_eq.loc['2014-09':].values, color=MainBlue, lw=0.8,
             label='S&P 500 (252 days/year)')
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f'{v:.0%}'))
-    ax.set_ylabel('Annualised volatility (3 months)')
+    ax.set_ylabel('Annualised volatility (63 observations)')
     ratio = (v_btc.loc['2024':].mean() / v_eq.loc['2024':].mean())
     ax.set_title(f'Rolling volatility: Bitcoin is still about {ratio:.1f} times as volatile as the S&P 500 '
                  f'(2024-2026)', fontsize=9, loc='left')
@@ -474,8 +473,8 @@ def fig_romania():
     axes[1].plot(fx.index, fx.values, color=IDAred, lw=0.7)
     axes[1].set_title('EUR/RON (BNR)', fontsize=8, loc='left')
     y = pd.concat([clean_series(bonds[c].dropna()) for c in bonds], axis=1).dropna()
-    axes[2].plot(y.index, y['Romania 10y'], color=MainBlue, lw=0.7, label='Romania')
-    axes[2].plot(y.index, y['Germany 10y'], color=IDAred, lw=0.7, label='Germany')
+    axes[2].plot(y.index, y['Romania 10y'], color=MainBlue, lw=0.7, label='Romania (bonds in RON)')
+    axes[2].plot(y.index, y['Germany 10y'], color=IDAred, lw=0.7, label='Germany (bonds in EUR)')
     axes[2].set_title('10-year yields (%)', fontsize=8, loc='left')
     axes[2].legend(loc='upper center', bbox_to_anchor=(0.5, -0.14), ncol=2, fontsize=6, frameon=False)
     for ax in axes:
@@ -488,7 +487,7 @@ def fig_romania():
     spread = (y['Romania 10y'] - y['Germany 10y'])
     return dict(growth=out, bettr_first=b.index[0].date(), eurron_first=fx.iloc[0], eurron_first_date=fx.index[0].date(),
                 eurron_last=fx.iloc[-1], eurron_last_date=fx.index[-1].date(),
-                eurron_vol_2015_26=r_fx.loc['2015':].std() * np.sqrt(252),
+                eurron_vol_2015_26=ann_stats(fx.loc['2015':], 'obs')[1],
                 ro10y_last=y['Romania 10y'].iloc[-1], de10y_last=y['Germany 10y'].iloc[-1],
                 spread_last=spread.iloc[-1], spread_max=spread.max(), spread_max_date=spread.idxmax().date(),
                 bonds_first=y.index[0].date(), h2o_first=bvb['Hidroelectrica'].first_valid_index().date())
@@ -499,7 +498,8 @@ def data_pitfall():
     r_e = np.log(eurron_mkt).diff().dropna().loc['2015':]
     r_b = np.log(eurron).diff().dropna().loc['2015':]
     top = r_e.abs().sort_values(ascending=False).head(6)
-    return dict(vol_market=r_e.std() * np.sqrt(252), vol_bnr=r_b.std() * np.sqrt(252),
+    q = lambda r: len(r) / ((r.index[-1] - r.index[0]).days / 365.25)   # frecventa observata (FX: nu 252)
+    return dict(vol_market=r_e.std() * np.sqrt(q(r_e)), vol_bnr=r_b.std() * np.sqrt(q(r_b)),
                 largest={d.date(): round(r_e.loc[d], 4) for d in top.index})
 
 

@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch0_correlations'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'One-year rolling correlations of daily log returns: S&P 500 versus long US Treasuries (TLT) and S&P 500 versus Bitcoin; three-month rolling annualised volatility of Bitcoin and the S&P 500.'
+Description: 'One-year rolling correlations of daily log returns: S&P 500 versus long US Treasuries (TLT) and S&P 500 versus Bitcoin; rolling annualised volatility over 63 observations (about three months for the S&P 500, two for Bitcoin).'
 
 Keywords: 'rolling correlation, diversification, stock-bond correlation, Bitcoin, rolling volatility'
 

@@ -45,7 +45,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "About 3.7%: factor sqrt(0.83/1.17)",
                     "About 5.1%: factor 1.17"
                 ],
-                "correctExplanation": "For an AR(1) the variance ratio tends to (1 + rho)/(1 - rho), so volatility is multiplied by sqrt(1.17/0.83) = 1.19: 4.4% becomes 5.3%.",
+                "correctExplanation": "For an AR(1) the variance ratio tends to (1 + rho)/(1 - rho), so volatility is multiplied by sqrt(1.17/0.83) = 1.19: 4.4% becomes 5.3%. This holds only under the AR(1) assumption: for the BNR series the negative autocorrelations at lags 2-4 offset lag 1, and monthly returns give 4.4% again.",
                 "incorrectExplanation": "Positive autocorrelation makes multi-day variance larger than h times the daily one: the factor is sqrt((1 + rho)/(1 - rho)) = 1.19, so about 5.3%."
             },
             "ro": {
@@ -57,7 +57,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "Circa 3,7%: factorul sqrt(0,83/1,17)",
                     "Circa 5,1%: factorul 1,17"
                 ],
-                "correctExplanation": "Pentru un AR(1) raportul varianțelor tinde la (1 + rho)/(1 - rho), deci volatilitatea se înmulțește cu sqrt(1,17/0,83) = 1,19: 4,4% devine 5,3%.",
+                "correctExplanation": "Pentru un AR(1) raportul varianțelor tinde la (1 + rho)/(1 - rho), deci volatilitatea se înmulțește cu sqrt(1,17/0,83) = 1,19: 4,4% devine 5,3%. Aceasta este valabilă doar sub ipoteza AR(1): pentru seria BNR, autocorelațiile negative de la decalajele 2-4 compensează decalajul 1, iar randamentele lunare dau din nou 4,4%.",
                 "incorrectExplanation": "Autocorelația pozitivă face varianța pe mai multe zile mai mare decât de h ori cea zilnică: factorul este sqrt((1 + rho)/(1 - rho)) = 1,19, deci circa 5,3%."
             }
         },
@@ -146,7 +146,7 @@ window.MFM_DATA.quizzes['markets'] = {
             "correct": 1,
             "en": {
                 "title": "Maximum drawdown and the horizon",
-                "text": "The same driftless process is observed over 10 years and over 40 years. How does the expected maximum drawdown (log scale) of the 40-year sample compare?",
+                "text": "The log price follows a Brownian motion with zero drift and constant volatility, observed over 10 years and over 40 years. How does the expected maximum drawdown (log scale) of the 40-year sample compare?",
                 "options": [
                     "It is the same: drawdown does not depend on the horizon",
                     "About twice as large: it grows with sqrt(T)",
@@ -158,7 +158,7 @@ window.MFM_DATA.quizzes['markets'] = {
             },
             "ro": {
                 "title": "Drawdown-ul maxim și orizontul",
-                "text": "Același proces fără drift este observat pe 10 ani și pe 40 de ani. Cum se compară drawdown-ul maxim așteptat (pe scară logaritmică) al eșantionului de 40 de ani?",
+                "text": "Logaritmul prețului urmează o mișcare browniană fără drift și cu volatilitate constantă, observată pe 10 ani și pe 40 de ani. Cum se compară drawdown-ul maxim așteptat (pe scară logaritmică) al eșantionului de 40 de ani?",
                 "options": [
                     "Este același: drawdown-ul nu depinde de orizont",
                     "Circa de două ori mai mare: crește cu sqrt(T)",
@@ -281,27 +281,27 @@ window.MFM_DATA.quizzes['markets'] = {
             "correct": 0,
             "en": {
                 "title": "Correlation in turbulent periods",
-                "text": "The true correlation between two markets is constant, but you estimate it only on days when the variance of the source market is several times higher. What happens to the estimate?",
+                "text": "Two markets are linked by y = beta x + e, with beta and the variance of e constant and e uncorrelated with x. You estimate their correlation only on days when the variance of x is several times higher. What happens to the estimate?",
                 "options": [
-                    "It is biased upward in absolute value (Forbes-Rigobon)",
+                    "It is higher in absolute value although the link is unchanged (Forbes-Rigobon)",
                     "It is unbiased, only noisier",
                     "It is biased toward zero",
                     "It is undefined because the variance changes"
                 ],
                 "correctExplanation": "Conditioning on high variance gives rho* = rho sqrt((1 + delta)/(1 + delta rho^2)), larger than rho in absolute value: Bitcoin-S&P 500 is 0.52 on high-VIX days but 0.27 after the adjustment.",
-                "incorrectExplanation": "Selecting high-variance days inflates the correlation even when the true one is constant: rho* = rho sqrt((1 + delta)/(1 + delta rho^2)) (Forbes and Rigobon, 2002)."
+                "incorrectExplanation": "With a fixed link y = beta x + e, a higher variance of x raises the share of y explained by x, so the correlation rises: rho* = rho sqrt((1 + delta)/(1 + delta rho^2)) (Forbes and Rigobon, 2002)."
             },
             "ro": {
                 "title": "Corelația în perioade turbulente",
-                "text": "Corelația reală dintre două piețe este constantă, dar o estimați doar în zilele în care varianța pieței-sursă este de câteva ori mai mare. Ce se întâmplă cu estimația?",
+                "text": "Două piețe sunt legate prin y = beta x + e, cu beta și varianța lui e constante și e necorelat cu x. Estimați corelația lor doar în zilele în care varianța lui x este de câteva ori mai mare. Ce se întâmplă cu estimația?",
                 "options": [
-                    "Este deplasată în sus în valoare absolută (Forbes-Rigobon)",
+                    "Este mai mare în valoare absolută, deși legătura nu s-a schimbat (Forbes-Rigobon)",
                     "Este nedeplasată, doar mai zgomotoasă",
                     "Este deplasată spre zero",
                     "Nu este definită, pentru că varianța se schimbă"
                 ],
                 "correctExplanation": "Condiționarea pe varianță mare dă rho* = rho sqrt((1 + delta)/(1 + delta rho^2)), mai mare decât rho în valoare absolută: Bitcoin-S&P 500 are 0,52 în zilele cu VIX ridicat, dar 0,27 după ajustare.",
-                "incorrectExplanation": "Selectarea zilelor cu varianță mare umflă corelația chiar dacă cea reală este constantă: rho* = rho sqrt((1 + delta)/(1 + delta rho^2)) (Forbes și Rigobon, 2002)."
+                "incorrectExplanation": "Cu o legătură fixă y = beta x + e, o varianță mai mare a lui x crește partea din y explicată de x, deci corelația crește: rho* = rho sqrt((1 + delta)/(1 + delta rho^2)) (Forbes și Rigobon, 2002)."
             }
         },
         {
@@ -313,10 +313,10 @@ window.MFM_DATA.quizzes['markets'] = {
                     "Small firms outperformed large firms",
                     "The S&P 500 fell in value",
                     "ETFs stopped tracking the index",
-                    "The largest firms outperformed the average stock: the index became more concentrated"
+                    "The cap-weighted fund beat the equal-weighted one: the most heavily weighted stocks did better than the average stock"
                 ],
-                "correctExplanation": "The cap-weighted fund gives more weight to the largest companies; its outperformance means those companies drove index returns.",
-                "incorrectExplanation": "A rising SPY/RSP ratio means the largest firms outperformed the typical stock."
+                "correctExplanation": "The cap-weighted fund gives more weight to the largest companies; its outperformance means that the heavily weighted stocks drove index returns. Whether concentration rose must be checked from the constituent weights (e.g. the effective number of stocks).",
+                "incorrectExplanation": "A rising SPY/RSP ratio means that the heavily weighted stocks beat the typical stock; the constituent weights show whether concentration also rose."
             },
             "ro": {
                 "title": "Concentrare",
@@ -325,10 +325,10 @@ window.MFM_DATA.quizzes['markets'] = {
                     "Firmele mici au avut randamente mai bune decât cele mari",
                     "S&P 500 a scăzut",
                     "ETF-urile nu mai replică indicele",
-                    "Firmele cele mai mari au depășit acțiunea medie: indicele a devenit mai concentrat"
+                    "Fondul ponderat după capitalizare l-a depășit pe cel cu ponderi egale: acțiunile cu ponderile cele mai mari au avut randamente mai bune decât acțiunea medie"
                 ],
-                "correctExplanation": "Fondul ponderat după capitalizare dă o pondere mai mare celor mai mari companii; performanța sa superioară înseamnă că acestea au condus randamentul indicelui.",
-                "incorrectExplanation": "Un raport SPY/RSP în creștere înseamnă că firmele cele mai mari au depășit acțiunea tipică."
+                "correctExplanation": "Fondul ponderat după capitalizare dă o pondere mai mare celor mai mari companii; performanța sa superioară înseamnă că acțiunile cu ponderi mari au condus randamentul indicelui. Dacă a crescut concentrarea se verifică din ponderile componentelor (de exemplu numărul efectiv de acțiuni).",
+                "incorrectExplanation": "Un raport SPY/RSP în creștere înseamnă că acțiunile cu ponderi mari au depășit acțiunea tipică; ponderile componentelor arată dacă a crescut și concentrarea."
             }
         },
         {
@@ -450,7 +450,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "Supply contracted after the collapse of the algorithmic stablecoin TerraUSD and during the 2022 crypto downturn",
                     "Nothing: the numbers refer to different coins"
                 ],
-                "correctExplanation": "The 2022 decline followed the TerraUSD collapse and the wider crypto downturn; supply then recovered to about 310 bn USD by September 2026.",
+                "correctExplanation": "The 2022 decline followed the TerraUSD collapse and the wider crypto downturn; supply then recovered to about 308 bn USD by September 2026.",
                 "incorrectExplanation": "Supply shrank after the TerraUSD collapse and the 2022 crypto downturn, then recovered."
             },
             "ro": {
@@ -462,7 +462,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "Oferta s-a contractat după prăbușirea stablecoin-ului algoritmic TerraUSD și în timpul declinului cripto din 2022",
                     "Nimic: cifrele se referă la monede diferite"
                 ],
-                "correctExplanation": "Scăderea din 2022 a urmat prăbușirii TerraUSD și declinului general al pieței cripto; oferta a revenit apoi la circa 310 mld. USD în septembrie 2026.",
+                "correctExplanation": "Scăderea din 2022 a urmat prăbușirii TerraUSD și declinului general al pieței cripto; oferta a revenit apoi la circa 308 mld. USD în septembrie 2026.",
                 "incorrectExplanation": "Oferta s-a redus după prăbușirea TerraUSD și declinul cripto din 2022, apoi și-a revenit."
             }
         },
@@ -578,26 +578,26 @@ window.MFM_DATA.quizzes['markets'] = {
             "correct": 1,
             "en": {
                 "title": "Bad ticks",
-                "text": "The EUR/RON market file gives an annualised volatility of 12.1% for 2015–2026, while the BNR reference rate gives 2.1%. Why?",
+                "text": "The EUR/RON market file gives an annualised volatility of 12.4% for 2015–2026, while the BNR reference rate gives 2.1%. Why?",
                 "options": [
                     "The reference rate is a 30-day moving average of market quotes",
                     "The market file contains isolated bad ticks (e.g. +/-15% on 13–14 August 2025) that reverse the next day",
                     "EUR/RON is more volatile in the morning",
                     "The two series use different currencies"
                 ],
-                "correctExplanation": "A few spikes that reverse the next day inflate the standard deviation more than five-fold; removing weekend rows and outliers gives about 2.5%.",
+                "correctExplanation": "A few spikes that reverse the next day inflate the standard deviation more than five-fold; removing weekend rows and outliers gives about 2.6%.",
                 "incorrectExplanation": "Isolated bad ticks that reverse the next day inflate the measured volatility."
             },
             "ro": {
                 "title": "Cotații eronate",
-                "text": "Fișierul de piață EUR/RON dă o volatilitate anualizată de 12,1% pentru 2015–2026, iar cursul de referință BNR dă 2,1%. De ce?",
+                "text": "Fișierul de piață EUR/RON dă o volatilitate anualizată de 12,4% pentru 2015–2026, iar cursul de referință BNR dă 2,1%. De ce?",
                 "options": [
                     "Cursul de referință este o medie mobilă pe 30 de zile a cotațiilor de piață",
                     "Fișierul de piață conține cotații eronate izolate (de exemplu +/-15% pe 13–14 august 2025), inversate a doua zi",
                     "EUR/RON este mai volatil dimineața",
                     "Cele două serii folosesc monede diferite"
                 ],
-                "correctExplanation": "Câteva vârfuri inversate a doua zi umflă abaterea standard de peste cinci ori; eliminând rândurile de weekend și valorile aberante se obține circa 2,5%.",
+                "correctExplanation": "Câteva vârfuri inversate a doua zi umflă abaterea standard de peste cinci ori; eliminând rândurile de weekend și valorile aberante se obține circa 2,6%.",
                 "incorrectExplanation": "Cotațiile eronate izolate, inversate a doua zi, umflă volatilitatea măsurată."
             }
         },
@@ -713,26 +713,26 @@ window.MFM_DATA.quizzes['markets'] = {
             "correct": 0,
             "en": {
                 "title": "Spot the AI error: annualising volatility",
-                "text": "An AI assistant writes: \"The daily volatility of the S&P 500 is 1.2%. To annualise it, multiply by 252 trading days: the annual volatility is 302%.\" What is wrong?",
+                "text": "An AI assistant writes: \"The daily volatility of the S&P 500 is 1.2%. To annualise it, multiply by 252 trading days: the annual volatility is 302%.\" Assuming uncorrelated daily returns with constant variance, what is wrong?",
                 "options": [
                     "Volatility grows with the square root of time: 1.2% × √252 ≈ 19.0% a year",
                     "An equity index must be annualised with 365 days, not 252",
                     "Volatility is annualised as (1 + 1.2%)^252 − 1",
                     "Nothing: variance and volatility both grow linearly with time"
                 ],
-                "correctExplanation": "Variance grows linearly with the horizon, so volatility grows with its square root: 1.2% × √252 ≈ 19.0%. A value of 302% is a warning sign in itself.",
+                "correctExplanation": "For uncorrelated returns with constant variance, variance grows linearly with the horizon, so volatility grows with its square root: 1.2% × √252 ≈ 19.0%. A value of 302% is a warning sign in itself.",
                 "incorrectExplanation": "Only the variance scales with the number of days; the volatility scales with √252, giving about 19.0% a year, not 302%."
             },
             "ro": {
                 "title": "Găsiți eroarea AI: anualizarea volatilității",
-                "text": "Un asistent AI scrie: „Volatilitatea zilnică a S&P 500 este 1,2%. Pentru anualizare, înmulțim cu 252 de zile de tranzacționare: volatilitatea anuală este 302%.” Ce este greșit?",
+                "text": "Un asistent AI scrie: „Volatilitatea zilnică a S&P 500 este 1,2%. Pentru anualizare, înmulțim cu 252 de zile de tranzacționare: volatilitatea anuală este 302%.” Presupunând randamente zilnice necorelate, cu varianță constantă, ce este greșit?",
                 "options": [
                     "Volatilitatea crește cu rădăcina pătrată a timpului: 1,2% × √252 ≈ 19,0% pe an",
                     "Un indice bursier se anualizează cu 365 de zile, nu cu 252",
                     "Volatilitatea se anualizează ca (1 + 1,2%)^252 − 1",
                     "Nimic: dispersia și volatilitatea cresc ambele liniar în timp"
                 ],
-                "correctExplanation": "Dispersia crește liniar cu orizontul, deci volatilitatea crește cu rădăcina lui: 1,2% × √252 ≈ 19,0%. O valoare de 302% este deja un semnal de alarmă.",
+                "correctExplanation": "Pentru randamente necorelate, cu varianță constantă, dispersia crește liniar cu orizontul, deci volatilitatea crește cu rădăcina lui: 1,2% × √252 ≈ 19,0%. O valoare de 302% este deja un semnal de alarmă.",
                 "incorrectExplanation": "Doar dispersia se scalează cu numărul de zile; volatilitatea se scalează cu √252, adică aproximativ 19,0% pe an, nu 302%."
             }
         },
