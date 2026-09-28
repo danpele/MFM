@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch1_inference'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Inference for stylised facts under heavy tails and dependence: quantile-based skewness and kurtosis (Hinkley, Crow-Siddiqui) with moving-block bootstrap intervals, heteroskedasticity-robust lag-1 autocorrelation, Hill tail indices with i.i.d. and block-bootstrap standard errors and a common-threshold comparison of the two tails, and the long-memory parameter d of absolute returns (local Whittle, log-periodogram) before and after a CUSUM-of-squares variance break.'
+
+Keywords: 'robust skewness, robust kurtosis, block bootstrap, robust autocorrelation, Hill estimator, tail index, long memory, local Whittle, GPH, structural break, CUSUM of squares'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET-TR, Bitcoin, gold; EUR/RON official reference rate'
+
+Output: 'ch1_hill_inference.csv, ch1_robust_moments.csv, ch1_long_memory.csv'

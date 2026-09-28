@@ -58,10 +58,13 @@ class Fit:
         return p['alpha[1]'] + p['beta[1]'] + g * self.neg_share()
 
     def neg_share(self):
-        """P(z < 0) pentru distributia inovatiilor (0.5 daca este simetrica)."""
+        """E[z^2 1(z < 0)] pentru distributia inovatiilor (0.5 daca este simetrica); intra in persistenta GJR."""
         d = self.res.model.distribution
         if d.name.startswith('Standardized Skew'):
-            return float(d.cdf(np.array([0.0]), self.res.params[d.parameter_names()].values)[0])
+            from scipy import integrate
+            par = self.res.params[d.parameter_names()].values
+            pdf = lambda x: float(np.exp(d.loglikelihood(par, np.array([x]), np.array([1.0]), individual=True))[0])
+            return float(integrate.quad(lambda x: x ** 2 * pdf(x), -np.inf, 0, limit=200)[0])
         return 0.5
 
     def uncond_var(self):

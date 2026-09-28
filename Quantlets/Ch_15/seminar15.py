@@ -83,6 +83,85 @@ def part_a_costs(R):
     S['A8'] = {'mean_active_bp': st['mean_active_bp'], 'hold': 5}
 
 
+def part_a_inference(R):
+    """A1-A8 (derivari): atenuarea prin clasificare gresita (Aigner, 1973), varianta si puterea testului McNemar,
+    kappa Fleiss si un pas E Dawid-Skene pe un tabel mic, conditia de ordinul intai pentru temperatura,
+    eroarea standard a costului de echilibru (metoda delta)."""
+    from scipy import stats as st
+    out = {}
+    # A1-A2: variabila "stire negativa" (rand/coloana 0 din matricea de confuzie Twitter)
+    for key in ('A3', 'A4'):
+        cm = np.array(S[key]['cm'], float)
+        n = cm.sum()
+        pi = cm[0].sum() / n
+        p = cm[:, 0].sum() / n
+        a1 = (cm[0, 1] + cm[0, 2]) / cm[0].sum()
+        a0 = (cm[1, 0] + cm[2, 0]) / (cm[1].sum() + cm[2].sum())
+        lam = pi * (1 - pi) * (1 - a0 - a1) / (p * (1 - p))
+        out['att_' + key] = {'n': n, 'pi': pi, 'p': p, 'a0': a0, 'a1': a1, 'lam': lam, 'inv': 1 / lam,
+                             'n_tp': cm[0, 0], 'n_neg': cm[0].sum(), 'n_predneg': cm[:, 0].sum(),
+                             'n_fp': cm[1, 0] + cm[2, 0], 'n_nonneg': cm[1].sum() + cm[2].sum()}
+    # A3-A4: diferenta de acuratete pe perechi, varianta multinomiala, McNemar exact, puterea
+    for key in ('B1', 'B2'):
+        b = S[key]
+        n = int(np.array(S['A3']['cm']).sum())       # titlurile din setul de validare Twitter
+        n01, n10 = b['n01'], b['n10']
+        d = (n01 - n10) / n
+        q = (n01 + n10) / n
+        se = np.sqrt((q - d ** 2) / n)
+        pz = 2 * st.norm.sf(abs(d) / se)
+        pex = 2 * st.binom.cdf(min(n01, n10), n01 + n10, 0.5)
+        zc = st.norm.ppf(0.975)
+        power = st.norm.cdf(abs(d) * np.sqrt(n) / np.sqrt(q - d ** 2) - zc)
+        n80 = (zc + st.norm.ppf(0.8)) ** 2 * (q - d ** 2) / d ** 2
+        out['mc_' + key] = {'n': n, 'n01': n01, 'n10': n10, 'd': d, 'q': q, 'se': se, 'lo': d - zc * se, 'hi': d + zc * se,
+                            'p_z': pz, 'p_exact': min(1.0, pex), 'power': power, 'n80': n80}
+    # A6: kappa Fleiss si un pas E Dawid-Skene pe un tabel ilustrativ (6 propozitii x 5 evaluatori)
+    V = np.array([[5, 0, 0], [0, 5, 0], [0, 1, 4], [1, 3, 1], [2, 3, 0], [0, 2, 3]], float)
+    m = V.sum(1)[0]
+    Pi = (V * (V - 1)).sum(1) / (m * (m - 1))
+    pj = V.sum(0) / V.sum()
+    Pbar, Pe = Pi.mean(), (pj ** 2).sum()
+    kappa = (Pbar - Pe) / (1 - Pe)
+    acc_r = 0.8
+    Pi_mat = np.full((3, 3), (1 - acc_r) / 2) + np.eye(3) * (acc_r - (1 - acc_r) / 2)
+    like = np.array([[np.prod(Pi_mat[j] ** v) for j in range(3)] for v in V])
+    post = like / like.sum(1, keepdims=True)
+    maj = V / V.sum(1, keepdims=True)
+    out['fleiss'] = {'votes': V.tolist(), 'Pi': Pi.tolist(), 'pj': pj.tolist(), 'Pbar': Pbar, 'Pe': Pe, 'kappa': kappa,
+                     'acc_r': acc_r, 'post': post.tolist(), 'share': maj.tolist()}
+    # A5(d): temperatura optima pentru Qwen2.5-7B (conditia de ordinul intai), pe jumatatea de validare
+    tw = g.load_csv('ch15_twitter_scores.csv')
+    y = tw['label'].map({'negative': 0, 'neutral': 1, 'positive': 2}).values
+    P = tw[['qwen7B_negative', 'qwen7B_neutral', 'qwen7B_positive']].values.astype(float)
+    Z = np.log(np.clip(P / P.sum(1, keepdims=True), 1e-12, 1))
+    idx = np.random.default_rng(15).permutation(len(y))[:len(y) // 2]
+    Zv, yv = Z[idx], y[idx]
+
+    def foc(T):
+        L = Zv / T
+        L = L - L.max(1, keepdims=True)
+        E = np.exp(L)
+        Pt = E / E.sum(1, keepdims=True)
+        return float(np.mean(Zv[np.arange(len(yv)), yv]) - np.mean((Pt * Zv).sum(1)))
+    from scipy.optimize import brentq
+    T_star = brentq(foc, 0.5, 50)
+    out['temp'] = {'T': T_star, 'foc_1': foc(1.0), 'foc_T': foc(T_star)}
+    # A7-A8: costul de echilibru si eroarea lui standard (metoda delta, varianta Newey-West a mediei)
+    for c in ('finbert', 'qwen'):
+        x = R['news']['strat'][c]
+        mu, t, a = x['mean_bp'], x['t'], x['active']
+        se_mu = mu / t
+        cstar = mu / (4 * a)
+        se_c = se_mu / (4 * a)
+        sigma = np.sqrt(252) * mu / x['sr']
+        out['cost_' + c] = {'mu': mu, 't': t, 'a': a, 'se_mu': se_mu, 'c': cstar, 'se_c': se_c,
+                            'lo': cstar - 1.96 * se_c, 'hi': cstar + 1.96 * se_c, 'sigma': sigma,
+                            'sr': x['sr'], 'sr_net5': np.sqrt(252) * (mu - 4 * a * 5) / sigma, 'sr_net': x['sr_net']}
+    S['AI'] = out
+    return out
+
+
 # =============================================================================
 # PARTEA B
 # =============================================================================
@@ -274,6 +353,7 @@ if __name__ == '__main__':
     S['B7'] = b_memory()
     S['B8'] = b_prompts()
     S['C'] = part_c(P, rets)
+    part_a_inference(R)
     with open(os.path.join(HERE, 'sem15_results.json'), 'w') as f:
         json.dump(jsonable(S), f, indent=1, default=float)
     print('saved sem15_results.json')

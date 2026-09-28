@@ -246,29 +246,43 @@ def fig_hurst_rs():
 # FIG 6: Exponentul DFA pe piete, cu banda de amestecare (ipoteza i.i.d.)
 # =============================================================================
 def shuffle_band(r, func, n_sim=200, seed=SEED):
+    """Banda 95% din permutari: distruge ORICE dependenta (inclusiv gruparea volatilitatii)."""
     rng = np.random.default_rng(seed)
     x = np.asarray(r, dtype=float)
     sims = [func(rng.permutation(x)) for _ in range(n_sim)]
     return np.percentile(sims, [2.5, 97.5])
 
 
+def wild_band(r, func, n_sim=199, seed=SEED):
+    """Banda 95% wild bootstrap: semne Rademacher pe randamentele centrate.
+    Pastreaza traiectoria volatilitatii |e_t| (permisa sub RW3), distruge autocorelatia randamentelor."""
+    rng = np.random.default_rng(seed)
+    e = np.asarray(r, dtype=float)
+    e = e - e.mean()
+    sims = [func(e * rng.choice([-1.0, 1.0], len(e))) for _ in range(n_sim)]
+    return np.percentile(sims, [2.5, 97.5])
+
+
 def fig_hurst_markets(t):
-    band = {k: shuffle_band(rets[k], lambda x: dfa_hurst(x)[0], n_sim=100) for k in ORDER}
-    t = t.assign(band_lo=[band[k][0] for k in t.index], band_hi=[band[k][1] for k in t.index]).sort_values('H_dfa')
+    dfa = lambda x: dfa_hurst(x)[0]
+    shuf = {k: shuffle_band(rets[k], dfa, n_sim=100) for k in ORDER}
+    band = {k: wild_band(rets[k], dfa, n_sim=199) for k in ORDER}
+    t = t.assign(band_lo=[band[k][0] for k in t.index], band_hi=[band[k][1] for k in t.index],
+                 shuf_lo=[shuf[k][0] for k in t.index], shuf_hi=[shuf[k][1] for k in t.index]).sort_values('H_dfa')
     fig, ax = plt.subplots(figsize=(6.8, 4.2))
     y = np.arange(len(t))
-    ax.hlines(y, t['band_lo'], t['band_hi'], color=LightGray, lw=6, label='95% band of shuffled series (no memory)')
+    ax.hlines(y, t['band_lo'], t['band_hi'], color=LightGray, lw=6)
     ax.scatter(t['H_dfa'], y, color=[GROUP_COL[g] for g in t['group']], zorder=3, s=22)
     ax.axvline(0.5, color=Gray, ls='--', lw=0.8)
     ax.set_yticks(y, t['market'], fontsize=7.5)
-    ax.set_xlabel('DFA exponent of daily log returns (0.5 = no long memory)')
+    ax.set_xlabel(r'DFA exponent $\alpha_{DFA}$ of daily log returns (0.5 = no long memory)')
     handles = [plt.Line2D([], [], color=c, marker='o', ls='', label=g) for g, c in GROUP_COL.items()]
-    handles.append(plt.Line2D([], [], color=LightGray, lw=6, label='Shuffled 95% band'))
-    ax.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=5, frameon=False)
+    handles.append(plt.Line2D([], [], color=LightGray, lw=6, label='Wild-bootstrap 95% band (RW3 null)'))
+    ax.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=3, frameon=False)
     ax.set_title('Long memory in returns? Detrended fluctuation analysis across markets', fontsize=9, loc='left')
     plt.tight_layout()
     save_fig('ch2_hurst_markets')
-    return t[['H_dfa', 'band_lo', 'band_hi']]
+    return t[['H_dfa', 'band_lo', 'band_hi', 'shuf_lo', 'shuf_hi']]
 
 
 # =============================================================================
@@ -299,25 +313,39 @@ def fig_rolling_vr():
     return share
 
 
-def fig_rolling_hurst():
+def fig_rolling_hurst(n_sim=199):
+    """DFA pe ferestre mobile; banda nula wild bootstrap calculata separat pentru FIECARE fereastra
+    (pastreaza volatilitatea ferestrei, permisa sub RW3). Pentru comparatie: banda i.i.d. Student-t4."""
     rng = np.random.default_rng(SEED)
     null = [dfa_hurst(rng.standard_t(4, WINDOW))[0] for _ in range(300)]
-    lo, hi = np.percentile(null, [2.5, 97.5])
-    fig, ax = plt.subplots(figsize=(7.0, 3.1))
-    out = {}
-    for k, c in ROLL:
-        h = rolling_stat(rets[k], lambda x: dfa_hurst(x)[0], WINDOW, STEP)
-        out[k] = h
-        ax.plot(h.index, h.values, color=c, lw=0.9, label=LABELS[k])
-    ax.axhspan(lo, hi, color=LightGray, alpha=0.7, lw=0, label=f'95% band without memory ({WINDOW} obs.)')
-    ax.axhline(0.5, color=Gray, ls='--', lw=0.8)
-    ax.set_ylabel('Rolling DFA exponent')
-    ax.set_title(f'Time-varying memory: DFA exponent on rolling {WINDOW}-day windows', fontsize=9, loc='left')
-    legend_outside_bottom(ax, ncol=4, y=-0.13)
+    lo_t, hi_t = np.percentile(null, [2.5, 97.5])
+    dfa = lambda x: dfa_hurst(x)[0]
+    fig, axes = plt.subplots(3, 1, figsize=(8.6, 4.2), sharex=True)
+    out, share, share_t = {}, {}, {}
+    for ax, (k, c) in zip(axes, ROLL):
+        x = rets[k].values
+        rows = []
+        for end in range(WINDOW, len(x) + 1, STEP):
+            w = x[end - WINDOW:end]
+            lo, hi = wild_band(w, dfa, n_sim, SEED + end)
+            rows.append((rets[k].index[end - 1], dfa(w), lo, hi))
+        d = pd.DataFrame(rows, columns=['date', 'dfa', 'lo', 'hi']).set_index('date')
+        out[k] = d
+        share[k] = float(((d['dfa'] < d['lo']) | (d['dfa'] > d['hi'])).mean())
+        share_t[k] = float(((d['dfa'] < lo_t) | (d['dfa'] > hi_t)).mean())
+        ax.fill_between(d.index, d['lo'], d['hi'], color=LightGray, alpha=0.8, lw=0)
+        ax.plot(d.index, d['dfa'], color=c, lw=0.9)
+        ax.axhline(0.5, color=Gray, ls='--', lw=0.7)
+        ax.set_ylabel(LABELS[k].split(' (')[0], fontsize=8)
+    axes[0].set_title(f'Time-varying memory: DFA exponent on rolling {WINDOW}-day windows', fontsize=9, loc='left')
+    handles = [plt.Line2D([], [], color=c, lw=1.2, label=LABELS[k]) for k, c in ROLL]
+    handles.append(plt.Line2D([], [], color=LightGray, lw=6, label='Wild-bootstrap 95% band (per window)'))
+    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=4, frameon=False)
     plt.tight_layout()
     save_fig('ch2_rolling_hurst')
-    pd.DataFrame(out).to_csv(os.path.join(TABLE_DIR, 'ch2_rolling_hurst.csv'))
-    return (lo, hi), {k: float(((h < lo) | (h > hi)).mean()) for k, h in out.items()}
+    pd.concat(out, axis=1).to_csv(os.path.join(TABLE_DIR, 'ch2_rolling_hurst.csv'))
+    band_mean = {k: [float(d['lo'].mean()), float(d['hi'].mean())] for k, d in out.items()}
+    return (lo_t, hi_t), share, share_t, band_mean
 
 
 # =============================================================================
@@ -522,9 +550,11 @@ if __name__ == '__main__':
     hm = fig_hurst_markets(t)
     hm.to_csv(os.path.join(TABLE_DIR, 'ch2_hurst_bands.csv'), float_format='%.6g')
     N['rolling_vr_share'] = fig_rolling_vr()
-    band, share = fig_rolling_hurst()
-    N['rolling_dfa_band'] = [float(band[0]), float(band[1])]
+    band, share, share_t, band_mean = fig_rolling_hurst()
+    N['rolling_dfa_band_t4'] = [float(band[0]), float(band[1])]
     N['rolling_dfa_share'] = share
+    N['rolling_dfa_share_t4'] = share_t
+    N['rolling_dfa_band_mean'] = band_mean
     fig_crypto_yearly()
     N['calendar_p'] = {k: float(v) for k, v in fig_calendar().items()}
     calendar_table()

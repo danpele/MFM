@@ -28,7 +28,7 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_ml import (load_data, ffd_weights, frac_diff_ffd, get_daily_vol, triple_barrier,
                     PurgedKFold, build_features, sharpe_ratio, expected_max_sharpe,
-                    deflated_sharpe_ratio)
+                    deflated_sharpe_ratio, local_whittle, exact_local_whittle)
 
 # Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
 plt.rcParams['figure.facecolor'] = 'none'
@@ -141,7 +141,7 @@ def fig_ffd_adf():
     h1, l1 = ax.get_legend_handles_labels()
     h2, l2 = ax2.get_legend_handles_labels()
     ax.legend(h1 + h2, l1 + l2, loc='upper center', bbox_to_anchor=(0.5, -0.22), ncol=3, frameon=False)
-    ax.set_title('S&P 500 log price, 2000-2026: minimum $d$ for stationarity', fontsize=9, loc='left')
+    ax.set_title('S&P 500 log price, 2000-2026: ADF (constant, 1 lag) on the FFD series', fontsize=9, loc='left')
     plt.tight_layout()
     save_fig('ch13_ffd_adf')
     return d_star
@@ -155,7 +155,7 @@ def fig_ffd_series(d_star):
     x_d1 = log_spx.diff().dropna()
     fig, axes = plt.subplots(3, 1, figsize=(7.0, 4.2), sharex=True)
     panels = [(log_spx, MainBlue, '$d=0$: log price (memory, non-stationary)'),
-              (x_ffd, Forest, f'$d={d_star:.2f}$: FFD series (stationary, keeps memory)'),
+              (x_ffd, Forest, f'$d={d_star:.2f}$: FFD series (ADF rejects, yet still I(1): weights sum to {ffd_weights(d_star).sum():.3f})'),
               (x_d1, IDAred, '$d=1$: log returns (stationary, memory erased)')]
     for ax, (s, c, t) in zip(axes, panels):
         ax.plot(s.index, s.values, color=c, lw=0.6)
@@ -163,6 +163,36 @@ def fig_ffd_series(d_star):
     axes[-1].set_xlabel('Date')
     plt.tight_layout()
     save_fig('ch13_ffd_series')
+
+
+# =============================================================================
+# FIG 3b: Estimarea memoriei d (local Whittle / exact local Whittle) in functie de latimea de banda
+# =============================================================================
+def fig_memory_estimation(d_ffd=0.25):
+    r = log_spx.diff().dropna()
+    x_ffd = frac_diff_ffd(log_spx, d_ffd)
+    alphas = np.round(np.arange(0.45, 0.801, 0.025), 3)
+    series = [('Log price (exact local Whittle)', log_spx.values, exact_local_whittle, MainBlue),
+              (f'FFD series, $d={d_ffd}$ (exact local Whittle)', x_ffd.values, exact_local_whittle, Forest),
+              ('Absolute returns $|r_t|$ (local Whittle)', r.abs().values, local_whittle, Amber),
+              ('Returns $r_t$ (local Whittle)', r.values, local_whittle, IDAred)]
+    fig, ax = plt.subplots(figsize=(6.8, 3.0))
+    out = {}
+    for lab, x, est, c in series:
+        res = np.array([est(x, alpha=a) for a in alphas])
+        ax.plot(alphas, res[:, 0], color=c, marker='o', ms=2.5, label=lab)
+        ax.fill_between(alphas, res[:, 0] - 1.96 * res[:, 1], res[:, 0] + 1.96 * res[:, 1], color=c, alpha=0.15, lw=0)
+        out[lab] = dict(zip(alphas, res[:, 0]))
+    for v in (0, 0.5, 1):
+        ax.axhline(v, color=Gray, ls=':', lw=0.7)
+    ax.axvline(0.65, color=Gray, ls='--', lw=0.7)
+    ax.set_xlabel('Bandwidth exponent $a$ (number of frequencies $m = n^{a}$)')
+    ax.set_ylabel('Estimated memory $\\hat d$')
+    ax.set_title('S&P 500, 2000-2026: memory parameter with 95% CI ($\\pm 1.96/(2\\sqrt{m})$)', fontsize=9, loc='left')
+    legend_outside_bottom(ax, ncol=2, y=-0.25)
+    plt.tight_layout()
+    save_fig('ch13_memory_estimation')
+    return out
 
 
 # =============================================================================
@@ -674,6 +704,7 @@ if __name__ == '__main__':
     d_star = fig_ffd_adf()
     print('   d* =', d_star)
     fig_ffd_series(d_star)
+    fig_memory_estimation(d_star)
     fig_triple_barrier()
     print(fig_label_comparison())
     fig_purged_cv_scheme()

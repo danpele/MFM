@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch12_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 12 computations: put-call parity arbitrage, binomial trees, Black-Scholes and the Greeks, delta-gamma hedging, implied volatility by Newton, variance from an option strip, hedging error with bootstrap intervals, SVI fit of a Bitcoin smile, variance risk premium of the S&P 500 and Bitcoin with Newey-West errors, Mincer-Zarnowitz regression and a synthetic variance swap strategy.'
+Description: 'Seminar 12 computations: convexity of Bitcoin call prices in the strike, the implied forward from parity regressions, convergence of the binomial tree, Black-Scholes Greeks, delta-gamma hedging, implied volatility by Newton, truncation and discretisation of a variance strip, hedging error with bootstrap intervals, SVI fit of a Bitcoin smile, variance risk premium of the S&P 500 and Bitcoin with Newey-West errors, Mincer-Zarnowitz regression, a risk-neutral density with bootstrap bands and a synthetic variance swap strategy.'
 
 Keywords: 'options, put-call parity, binomial tree, Black-Scholes, Greeks, implied volatility, SVI, VIX, variance risk premium, variance swap, bootstrap, Newey-West, Bitcoin'
 

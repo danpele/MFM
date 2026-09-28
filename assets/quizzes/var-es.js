@@ -8,84 +8,84 @@ window.MFM_DATA.quizzes['var-es'] = {
     "draw": 20,
     "questions": [
         {
-            "correct": 1,
-            "en": {
-                "title": "Definition of VaR",
-                "text": "With losses counted as positive numbers, what is the one-day VaR 1%?",
-                "options": [
-                    "The average loss on the worst 1% of days",
-                    "The loss exceeded with probability 1%, i.e. minus the 1% quantile of the one-day return",
-                    "The largest loss ever observed",
-                    "The standard deviation of losses times 2.33"
-                ],
-                "correctExplanation": "VaR 1% = -q_1%(X): the one-day loss exceeds it with probability 1%.",
-                "incorrectExplanation": "VaR 1% is minus the 1% quantile of the return; the average beyond it is Expected Shortfall, and 2.33 standard deviations is only the Normal special case."
-            },
-            "ro": {
-                "title": "Definiția VaR",
-                "text": "Cu pierderile socotite ca numere pozitive, ce este VaR 1% pe o zi?",
-                "options": [
-                    "Pierderea medie în cele mai rele 1% dintre zile",
-                    "Pierderea depășită cu probabilitatea 1%, adică minus cuantila de 1% a randamentului pe o zi",
-                    "Cea mai mare pierdere observată vreodată",
-                    "Abaterea standard a pierderilor înmulțită cu 2,33"
-                ],
-                "correctExplanation": "VaR 1% = -q_1%(X): pierderea pe o zi îl depășește cu probabilitatea 1%.",
-                "incorrectExplanation": "VaR 1% este minus cuantila de 1% a randamentului; media de dincolo de ea este Expected Shortfall, iar 2,33 abateri standard este doar cazul particular al distribuției Normale."
-            }
-        },
-        {
             "correct": 2,
             "en": {
-                "title": "Definition of ES",
-                "text": "Which expression defines Expected Shortfall with tail probability alpha for a continuous loss L = -X?",
+                "title": "Sampling variance of historical VaR",
+                "text": "For i.i.d. losses with density f, what is the asymptotic variance of the historical VaR_alpha estimator computed from n observations?",
                 "options": [
-                    "P(L > VaR)",
-                    "VaR divided by alpha",
-                    "E[L | L >= VaR_alpha(L)]",
-                    "The median of L"
+                    "sigma^2 / n, the variance of the sample mean",
+                    "alpha / n, from the binomial count of tail observations",
+                    "alpha(1 - alpha) / (n f(VaR_alpha)^2)",
+                    "alpha(1 - alpha) / n, the variance of the empirical hit rate"
                 ],
-                "correctExplanation": "For a continuous distribution ES is the expected loss given that the loss is at least VaR, equivalently the average of VaR_u over u below alpha.",
-                "incorrectExplanation": "ES averages the losses beyond VaR; it is not a probability, a rescaled VaR or a median."
+                "correctExplanation": "The empirical quantile is asymptotically Normal with variance alpha(1 - alpha)/(n f(q)^2): the hit-rate variance alpha(1 - alpha)/n is converted into a quantile variance by the density at the quantile, which is small in the tail.",
+                "incorrectExplanation": "The binomial variance alpha(1 - alpha)/n describes the share of days beyond VaR, not VaR itself; it must be divided by the squared density at the quantile, and the variance of the mean plays no role here."
             },
             "ro": {
-                "title": "Definiția ES",
-                "text": "Ce expresie definește Expected Shortfall cu probabilitatea cozii alfa pentru o pierdere continuă L = -X?",
+                "title": "Dispersia de selecție a VaR istoric",
+                "text": "Pentru pierderi i.i.d. cu densitatea f, care este dispersia asimptotică a estimatorului istoric al VaR_alpha calculat din n observații?",
                 "options": [
-                    "P(L > VaR)",
-                    "VaR împărțit la alfa",
-                    "E[L | L >= VaR_alfa(L)]",
-                    "Mediana lui L"
+                    "sigma^2 / n, dispersia mediei de selecție",
+                    "alpha / n, din numărul binomial de observații din coadă",
+                    "alpha(1 - alpha) / (n f(VaR_alpha)^2)",
+                    "alpha(1 - alpha) / n, dispersia ratei empirice de depășire"
                 ],
-                "correctExplanation": "Pentru o distribuție continuă, ES este pierderea așteptată condiționat de faptul că pierderea este cel puțin VaR, echivalent media lui VaR_u pentru u sub alfa.",
-                "incorrectExplanation": "ES face media pierderilor de dincolo de VaR; nu este o probabilitate, un VaR rescalat sau o mediană."
+                "correctExplanation": "Cuantila empirică este asimptotic Normală cu dispersia alpha(1 - alpha)/(n f(q)^2): dispersia ratei de depășire alpha(1 - alpha)/n se transformă în dispersia cuantilei prin densitatea din cuantilă, mică în coadă.",
+                "incorrectExplanation": "Dispersia binomială alpha(1 - alpha)/n descrie proporția zilelor de dincolo de VaR, nu VaR însuși; trebuie împărțită la pătratul densității din cuantilă, iar dispersia mediei nu joacă niciun rol aici."
             }
         },
         {
             "correct": 0,
             "en": {
-                "title": "Coherence",
-                "text": "Which axiom of a coherent risk measure can VaR violate?",
+                "title": "Rockafellar-Uryasev representation",
+                "text": "Which identity holds for any integrable loss L and tail probability alpha?",
                 "options": [
-                    "Subadditivity",
-                    "Monotonicity",
-                    "Translation invariance",
-                    "Positive homogeneity"
+                    "ES_alpha(L) = min over v of { v + E[(L - v)+] / alpha }, attained at v = VaR_alpha",
+                    "ES_alpha(L) = VaR_alpha(L) + sd(L)",
+                    "ES_alpha(L) = E[L | L > VaR_alpha(L)] for every discrete L",
+                    "ES_alpha(L) = max over v of { v + E[(L - v)+] / alpha }"
                 ],
-                "correctExplanation": "VaR satisfies monotonicity, translation invariance and positive homogeneity, but the risk of a combined position can exceed the sum of the stand-alone VaRs.",
-                "incorrectExplanation": "The problematic axiom is subadditivity: VaR can penalise diversification, as in the two-bond example."
+                "correctExplanation": "The objective v + E[(L - v)+]/alpha is convex in v with derivative 1 - P(L > v)/alpha, which vanishes at VaR_alpha; its minimum value is ES_alpha, also when L has atoms.",
+                "incorrectExplanation": "The representation is a minimum, not a maximum (the objective is convex and unbounded above); the conditional mean beyond VaR fails when the distribution has atoms, and no volatility add-on is involved."
             },
             "ro": {
-                "title": "Coerența",
-                "text": "Ce axiomă a unei măsuri de risc coerente poate fi încălcată de VaR?",
+                "title": "Reprezentarea Rockafellar-Uryasev",
+                "text": "Ce identitate este adevărată pentru orice pierdere integrabilă L și orice probabilitate a cozii alpha?",
                 "options": [
-                    "Subaditivitatea",
-                    "Monotonia",
-                    "Invarianța la translație",
-                    "Omogenitatea pozitivă"
+                    "ES_alpha(L) = minimul după v al { v + E[(L - v)+] / alpha }, atins în v = VaR_alpha",
+                    "ES_alpha(L) = VaR_alpha(L) + abaterea standard a lui L",
+                    "ES_alpha(L) = E[L | L > VaR_alpha(L)] pentru orice L discret",
+                    "ES_alpha(L) = maximul după v al { v + E[(L - v)+] / alpha }"
                 ],
-                "correctExplanation": "VaR satisface monotonia, invarianța la translație și omogenitatea pozitivă, dar riscul unei poziții combinate poate depăși suma VaR-urilor individuale.",
-                "incorrectExplanation": "Axioma problematică este subaditivitatea: VaR poate penaliza diversificarea, ca în exemplul cu două obligațiuni."
+                "correctExplanation": "Funcția obiectiv v + E[(L - v)+]/alpha este convexă în v, cu derivata 1 - P(L > v)/alpha, nulă în VaR_alpha; valoarea minimă este ES_alpha, inclusiv când L are atomi.",
+                "incorrectExplanation": "Reprezentarea este un minim, nu un maxim (funcția obiectiv este convexă și nemărginită superior); media condiționată dincolo de VaR eșuează când distribuția are atomi, iar nu apare niciun adaos de volatilitate."
+            }
+        },
+        {
+            "correct": 3,
+            "en": {
+                "title": "Precision of historical ES",
+                "text": "At a fixed alpha = 2.5%, doubling the sample size n reduces the standard error of historical ES by about which factor?",
+                "options": [
+                    "2, because the variance falls with n^2",
+                    "None, because ES depends only on the tail",
+                    "The square root of 2.5",
+                    "The square root of 2, because the number of tail observations n alpha doubles"
+                ],
+                "correctExplanation": "The asymptotic variance of historical ES is Var((L - VaR)+)/(n alpha^2), so the standard error falls like 1/sqrt(n alpha): doubling n doubles the tail count and divides the standard error by sqrt(2).",
+                "incorrectExplanation": "Standard errors of smooth estimators fall with the square root of the sample size; for ES the relevant count is the n alpha tail observations, which grows linearly with n."
+            },
+            "ro": {
+                "title": "Precizia ES istoric",
+                "text": "La alpha = 2,5% fix, dublarea mărimii eșantionului n reduce eroarea standard a ES istoric cu aproximativ ce factor?",
+                "options": [
+                    "2, pentru că dispersia scade cu n^2",
+                    "Deloc, pentru că ES depinde doar de coadă",
+                    "Radical din 2,5",
+                    "Radical din 2, pentru că numărul de observații din coadă n alpha se dublează"
+                ],
+                "correctExplanation": "Dispersia asimptotică a ES istoric este Var((L - VaR)+)/(n alpha^2), deci eroarea standard scade ca 1/sqrt(n alpha): dublarea lui n dublează numărul de observații din coadă și împarte eroarea standard la sqrt(2).",
+                "incorrectExplanation": "Erorile standard ale estimatorilor netezi scad cu radicalul mărimii eșantionului; pentru ES numărul relevant este cel al celor n alpha observații din coadă, care crește liniar cu n."
             }
         },
         {
@@ -118,28 +118,28 @@ window.MFM_DATA.quizzes['var-es'] = {
         {
             "correct": 1,
             "en": {
-                "title": "Normal ES constant",
-                "text": "Under the Normal distribution with zero mean, ES 2.5% equals sigma times approximately which number?",
+                "title": "Extremal index",
+                "text": "Daily losses cluster, with extremal index theta = 0.5. How should the approximation P(monthly maximum <= x) ~ F(x)^n be corrected?",
                 "options": [
-                    "1.960",
-                    "2.338",
-                    "2.326",
-                    "2.665"
+                    "It is exact, because the monthly maximum does not depend on clustering",
+                    "Replace F(x)^n by F(x)^(n theta); ignoring theta biases the implied daily VaR downward",
+                    "Replace F(x)^n by F(x)^(n / theta)",
+                    "Keep F(x)^n: theta changes only the shape parameter xi"
                 ],
-                "correctExplanation": "ES 2.5% = sigma phi(z_2.5%)/0.025 = 2.338 sigma, almost the same as VaR 1% = 2.326 sigma.",
-                "incorrectExplanation": "1.960 and 2.326 are the Normal VaR constants at 2.5% and 1%; 2.665 is the ES 1% constant."
+                "correctExplanation": "Under clustering P(M_n <= u_n) tends to exp(-theta tau): the n days behave like n theta independent days. Using F^n instead of F^(n theta) makes the implied daily quantile too low.",
+                "incorrectExplanation": "Clustering reduces the effective number of independent days to n theta, which is smaller than n; the shape parameter is unchanged, but the mapping from block maxima to daily quantiles is not."
             },
             "ro": {
-                "title": "Constanta ES Normală",
-                "text": "Sub distribuția Normală cu medie zero, ES 2,5% este egal cu sigma înmulțit cu aproximativ ce număr?",
+                "title": "Indicele extremal",
+                "text": "Pierderile zilnice sunt grupate, cu indicele extremal theta = 0,5. Cum trebuie corectată aproximarea P(maximul lunar <= x) ~ F(x)^n?",
                 "options": [
-                    "1,960",
-                    "2,338",
-                    "2,326",
-                    "2,665"
+                    "Este exactă, pentru că maximul lunar nu depinde de grupare",
+                    "Înlocuim F(x)^n cu F(x)^(n theta); ignorarea lui theta deplasează în jos VaR-ul zilnic implicat",
+                    "Înlocuim F(x)^n cu F(x)^(n / theta)",
+                    "Păstrăm F(x)^n: theta schimbă doar parametrul de formă xi"
                 ],
-                "correctExplanation": "ES 2,5% = sigma phi(z_2,5%)/0,025 = 2,338 sigma, aproape la fel ca VaR 1% = 2,326 sigma.",
-                "incorrectExplanation": "1,960 și 2,326 sunt constantele VaR Normale la 2,5% și 1%; 2,665 este constanta ES 1%."
+                "correctExplanation": "Cu grupare, P(M_n <= u_n) tinde la exp(-theta tau): cele n zile se comportă ca n theta zile independente. Folosirea lui F^n în loc de F^(n theta) dă o cuantilă zilnică implicată prea mică.",
+                "incorrectExplanation": "Gruparea reduce numărul efectiv de zile independente la n theta, mai mic decât n; parametrul de formă nu se schimbă, dar legătura dintre maximele pe blocuri și cuantilele zilnice da."
             }
         },
         {
@@ -197,57 +197,57 @@ window.MFM_DATA.quizzes['var-es'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 0,
             "en": {
-                "title": "Historical simulation",
-                "text": "What is a known weakness of historical simulation with a 500-day window?",
+                "title": "Robustness of risk estimators",
+                "text": "In the sense of Cont, Deguest and Scandolo (2010), which historical risk estimator is qualitatively robust?",
                 "options": [
-                    "It needs a GARCH model",
-                    "It assumes the Normal distribution",
-                    "It cannot be computed for ES",
-                    "It reacts slowly to volatility changes and produces ghost effects when crisis days leave the window"
+                    "Historical VaR; historical ES is not",
+                    "Historical ES only, because ES is coherent",
+                    "Both, because both are computed from the empirical distribution",
+                    "Neither, because both depend on the tail"
                 ],
-                "correctExplanation": "HS weights all 500 days equally: VaR stays low after a calm period and drops abruptly when a crash day leaves the window.",
-                "incorrectExplanation": "HS makes no distributional assumption and gives ES directly; its problem is the equal weighting of an old window."
+                "correctExplanation": "A small change in the data distribution changes historical VaR only a little, but a single extreme loss can move historical ES arbitrarily: coherence and robustness pull in opposite directions.",
+                "incorrectExplanation": "Coherence and robustness are different properties: ES is coherent but reacts without bound to one extreme observation, whereas a quantile is insensitive to how far the extreme observations lie."
             },
             "ro": {
-                "title": "Simularea istorică",
-                "text": "Care este o slăbiciune cunoscută a simulării istorice cu o fereastră de 500 de zile?",
+                "title": "Robustețea estimatorilor de risc",
+                "text": "În sensul lui Cont, Deguest și Scandolo (2010), care estimator istoric al riscului este calitativ robust?",
                 "options": [
-                    "Are nevoie de un model GARCH",
-                    "Presupune distribuția Normală",
-                    "Nu poate fi calculată pentru ES",
-                    "Reacționează lent la schimbările de volatilitate și produce efecte fantomă când zilele de criză ies din fereastră"
+                    "VaR istoric; ES istoric nu este",
+                    "Doar ES istoric, pentru că ES este coerent",
+                    "Amândoi, pentru că ambii se calculează din distribuția empirică",
+                    "Niciunul, pentru că ambii depind de coadă"
                 ],
-                "correctExplanation": "HS ponderează egal toate cele 500 de zile: VaR rămâne mic după o perioadă calmă și scade brusc când o zi de criză iese din fereastră.",
-                "incorrectExplanation": "HS nu face nicio ipoteză de distribuție și dă direct ES; problema ei este ponderarea egală a unei ferestre vechi."
+                "correctExplanation": "O mică schimbare a distribuției datelor schimbă puțin VaR istoric, dar o singură pierdere extremă poate muta arbitrar ES istoric: coerența și robustețea trag în direcții opuse.",
+                "incorrectExplanation": "Coerența și robustețea sunt proprietăți diferite: ES este coerent, dar reacționează nemărginit la o singură observație extremă, în timp ce o cuantilă nu depinde de cât de departe se află observațiile extreme."
             }
         },
         {
-            "correct": 1,
+            "correct": 2,
             "en": {
-                "title": "Filtered historical simulation",
-                "text": "In filtered historical simulation, how is tomorrow's VaR computed?",
+                "title": "Estimation risk in FHS VaR",
+                "text": "A 90% confidence interval for tomorrow's VaR 1% from filtered historical simulation must account for the sampling error of what?",
                 "options": [
-                    "The empirical quantile of raw returns times the square root of 10",
-                    "Tomorrow's GARCH volatility times the empirical quantile of the standardised residuals, adjusted for the conditional mean",
-                    "The Normal quantile times the sample standard deviation",
-                    "The largest loss of the last year"
+                    "Only the empirical quantile of the standardised residuals",
+                    "Only the volatility forecast sigma_{t+1}",
+                    "Both the GARCH parameter estimates (through sigma_{t+1}) and the empirical residual quantile",
+                    "Nothing: a forecast is not an estimate"
                 ],
-                "correctExplanation": "FHS takes the shape of the shocks from history (standardised residuals) and the scale from the GARCH forecast.",
-                "incorrectExplanation": "FHS rescales empirical standardised residuals by the GARCH volatility forecast; it is neither a Normal model nor a raw historical quantile."
+                "correctExplanation": "The FHS VaR is -mu_{t+1} + sigma_{t+1} times a residual quantile; both factors are estimated, so a residual bootstrap that re-estimates the GARCH model on every path captures both sources.",
+                "incorrectExplanation": "The volatility forecast depends on estimated GARCH parameters and the residual quantile on a finite sample of residuals; ignoring either source gives intervals that are too narrow."
             },
             "ro": {
-                "title": "Simularea istorică filtrată",
-                "text": "În simularea istorică filtrată, cum se calculează VaR de mâine?",
+                "title": "Riscul de estimare în VaR FHS",
+                "text": "Un interval de încredere de 90% pentru VaR 1% de mâine din simularea istorică filtrată trebuie să includă eroarea de selecție a cui?",
                 "options": [
-                    "Cuantila empirică a randamentelor brute înmulțită cu radical din 10",
-                    "Volatilitatea GARCH de mâine înmulțită cu cuantila empirică a reziduurilor standardizate, ajustată pentru media condiționată",
-                    "Cuantila Normală înmulțită cu abaterea standard de selecție",
-                    "Cea mai mare pierdere din ultimul an"
+                    "Doar a cuantilei empirice a reziduurilor standardizate",
+                    "Doar a prognozei volatilității sigma_{t+1}",
+                    "Atât a parametrilor GARCH estimați (prin sigma_{t+1}), cât și a cuantilei empirice a reziduurilor",
+                    "A nimic: o prognoză nu este o estimare"
                 ],
-                "correctExplanation": "FHS ia forma șocurilor din istorie (reziduurile standardizate) și scala din prognoza GARCH.",
-                "incorrectExplanation": "FHS rescalează reziduurile standardizate empirice cu prognoza de volatilitate GARCH; nu este nici un model Normal, nici o cuantilă istorică brută."
+                "correctExplanation": "VaR FHS este -mu_{t+1} + sigma_{t+1} înmulțit cu o cuantilă a reziduurilor; ambii factori sunt estimați, deci un bootstrap pe reziduuri care re-estimează modelul GARCH pe fiecare traiectorie surprinde ambele surse.",
+                "incorrectExplanation": "Prognoza volatilității depinde de parametrii GARCH estimați, iar cuantila reziduurilor de un eșantion finit; ignorarea oricăreia dintre surse dă intervale prea înguste."
             }
         },
         {
@@ -278,30 +278,30 @@ window.MFM_DATA.quizzes['var-es'] = {
             }
         },
         {
-            "correct": 0,
+            "correct": 3,
             "en": {
-                "title": "Square-root-of-time",
-                "text": "Under which assumptions is the 10-day VaR exactly the square root of 10 times the one-day VaR?",
+                "title": "Estimating CAViaR",
+                "text": "How are the parameters of a CAViaR model for the alpha-quantile q_t of returns r_t estimated?",
                 "options": [
-                    "i.i.d. Normal daily losses with zero mean",
-                    "Any distribution with finite variance",
-                    "GARCH volatility with Student-t shocks",
-                    "Positively autocorrelated returns"
+                    "By least squares on the returns",
+                    "By Gaussian maximum likelihood",
+                    "By minimising the number of exceedances",
+                    "By minimising the pinball (tick) loss, the sum of (alpha - 1{r_t < q_t})(r_t - q_t)"
                 ],
-                "correctExplanation": "Only for i.i.d. Normal losses with zero mean is the 10-day loss Normal with standard deviation sqrt(10) sigma, so every quantile scales by sqrt(10).",
-                "incorrectExplanation": "Autocorrelation, volatility clustering, heavy tails and a non-zero mean all break the exact scaling."
+                "correctExplanation": "CAViaR is a quantile regression: the true conditional quantile minimises the expected pinball loss, so no distributional assumption is needed.",
+                "incorrectExplanation": "Least squares and the Gaussian likelihood target the mean and the variance, not a quantile; the number of exceedances is a step function with many minimisers and ignores how far returns fall beyond the quantile."
             },
             "ro": {
-                "title": "Radical din timp",
-                "text": "În ce ipoteze VaR pe 10 zile este exact radical din 10 înmulțit cu VaR pe o zi?",
+                "title": "Estimarea CAViaR",
+                "text": "Cum se estimează parametrii unui model CAViaR pentru cuantila alpha q_t a randamentelor r_t?",
                 "options": [
-                    "Pierderi zilnice i.i.d. Normale cu medie zero",
-                    "Orice distribuție cu dispersie finită",
-                    "Volatilitate GARCH cu șocuri Student-t",
-                    "Randamente cu autocorelație pozitivă"
+                    "Prin cele mai mici pătrate pe randamente",
+                    "Prin verosimilitate maximă Gaussiană",
+                    "Prin minimizarea numărului de depășiri",
+                    "Prin minimizarea pierderii pinball (tick), suma lui (alpha - 1{r_t < q_t})(r_t - q_t)"
                 ],
-                "correctExplanation": "Doar pentru pierderi i.i.d. Normale cu medie zero pierderea pe 10 zile este Normală cu abaterea standard radical(10) sigma, deci orice cuantilă se scalează cu radical(10).",
-                "incorrectExplanation": "Autocorelația, gruparea volatilității, cozile grele și media nenulă strică toate scalarea exactă."
+                "correctExplanation": "CAViaR este o regresie cuantilă: adevărata cuantilă condiționată minimizează pierderea pinball așteptată, deci nu este nevoie de nicio ipoteză de distribuție.",
+                "incorrectExplanation": "Cele mai mici pătrate și verosimilitatea Gaussiană vizează media și dispersia, nu o cuantilă; numărul de depășiri este o funcție în trepte cu multe puncte de minim și ignoră cât de departe cad randamentele dincolo de cuantilă."
             }
         },
         {
@@ -521,30 +521,30 @@ window.MFM_DATA.quizzes['var-es'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 1,
             "en": {
-                "title": "FRTB",
-                "text": "What risk measure sets market-risk capital under the Basel FRTB standard (2019)?",
+                "title": "VaR under dependence uncertainty",
+                "text": "The margins of L1 and L2 are known but their copula is not. What can be said about the worst-case VaR 1% of L1 + L2?",
                 "options": [
-                    "VaR 1% over 10 days",
-                    "VaR 0.1% over one year",
-                    "Standard deviation over one day",
-                    "ES 2.5% with a 10-day base horizon and liquidity horizons"
+                    "It equals VaR(L1) + VaR(L2), the comonotone value",
+                    "It can exceed VaR(L1) + VaR(L2)",
+                    "It equals the VaR under independence",
+                    "It is bounded by the VaR under a Gaussian copula"
                 ],
-                "correctExplanation": "FRTB uses ES 2.5% (one-tailed), scaled from a 10-day base horizon by liquidity horizons and calibrated to a stressed period.",
-                "incorrectExplanation": "The 1996 rules used VaR 1% over 10 days; FRTB replaced it by ES 2.5%."
+                "correctExplanation": "VaR is not subadditive, so a dependence structure that concentrates the tail mass can push the VaR of the sum above the comonotone sum; the rearrangement algorithm computes this worst case.",
+                "incorrectExplanation": "Comonotonicity maximises VaR only for subadditive measures; for VaR the worst case is found by rearranging the tails and is typically above the comonotone sum, far above independence or a Gaussian copula."
             },
             "ro": {
-                "title": "FRTB",
-                "text": "Ce măsură de risc stabilește capitalul pentru riscul de piață conform standardului Basel FRTB (2019)?",
+                "title": "VaR sub incertitudinea dependenței",
+                "text": "Marginalele lui L1 și L2 sunt cunoscute, dar copula lor nu. Ce se poate spune despre VaR 1% maxim al lui L1 + L2?",
                 "options": [
-                    "VaR 1% pe 10 zile",
-                    "VaR 0,1% pe un an",
-                    "Abaterea standard pe o zi",
-                    "ES 2,5% cu orizont de bază de 10 zile și orizonturi de lichiditate"
+                    "Este egal cu VaR(L1) + VaR(L2), valoarea comonotonă",
+                    "Poate depăși VaR(L1) + VaR(L2)",
+                    "Este egal cu VaR sub independență",
+                    "Este mărginit de VaR sub o copulă Gaussiană"
                 ],
-                "correctExplanation": "FRTB folosește ES 2,5% (unilateral), scalat de la un orizont de bază de 10 zile prin orizonturi de lichiditate și calibrat pe o perioadă de stres.",
-                "incorrectExplanation": "Regulile din 1996 foloseau VaR 1% pe 10 zile; FRTB l-a înlocuit cu ES 2,5%."
+                "correctExplanation": "VaR nu este subaditiv, deci o structură de dependență care concentrează masa din coadă poate împinge VaR-ul sumei peste suma comonotonă; algoritmul de rearanjare calculează acest caz cel mai rău.",
+                "incorrectExplanation": "Comonotonia maximizează VaR doar pentru măsuri subaditive; pentru VaR cazul cel mai rău se găsește rearanjând cozile și este de regulă peste suma comonotonă, mult peste independență sau o copulă Gaussiană."
             }
         },
         {

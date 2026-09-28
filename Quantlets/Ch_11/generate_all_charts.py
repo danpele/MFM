@@ -24,7 +24,7 @@ from ct_models import (scaled_random_walk, bm_paths, quadratic_variation, total_
                        max_prob, convergence_study, slope_ci, gbm_paths, gbm_mle, gbm_simulate_returns,
                        ou_exact_path, ou_mle, merton_logpdf, merton_mle, merton_moments, merton_simulate_returns,
                        lee_mykland, heston_paths, heston_from_vix, heston_simulate_returns, heston_smile, acf,
-                       stylised)
+                       stylised, short_rate_fits, nw_drift_diffusion)
 
 # Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
 plt.rcParams['figure.facecolor'] = 'none'
@@ -223,9 +223,9 @@ def fig_ito():
     dW = np.diff(w)
     ito_path = np.concatenate([[0], np.cumsum(w[:-1] * dW)])
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
-    axes[0].plot(t, w ** 2, color=MainBlue, lw=1.2, label=r'$W_t^2$')
+    axes[0].plot(t, w ** 2, color=MainBlue, lw=2.2, label=r'$W_t^2$')
     axes[0].plot(t, 2 * ito_path, color=IDAred, lw=0.9, label=r'$2\int_0^t W_s\,dW_s$ (Itô, left end points)')
-    axes[0].plot(t, 2 * ito_path + t, color=Amber, lw=0.9, ls='--', label=r'$2\int_0^t W_s\,dW_s + t$')
+    axes[0].plot(t, 2 * ito_path + t, color=Orange, lw=1.3, ls=(0, (4, 3)), label=r'$2\int_0^t W_s\,dW_s + t$')
     axes[0].set_xlabel('Time t')
     axes[0].set_title("Itô's formula on one path", loc='left')
     _, Wm = bm_paths(5000, 1000, 1.0, rng)
@@ -504,6 +504,95 @@ def fig_vix_ou():
 
 
 # =============================================================================
+# 3b. ESTIMAREA DIFUZIILOR: VEROSIMILITATE EXACTA VS EULER, CKLS, ESTIMARE NEPARAMETRICA
+# =============================================================================
+def diffusion_fits():
+    """Vasicek, CIR (exact si Euler) si CKLS pe randamentul titlurilor de stat pe 3 luni (FRED, DTB3), 1954-2007:
+    date zilnice si sfarsit de luna. Perioada 2008-2026 este exclusa: CIR are suport r > 0, iar ratele au atins 0."""
+    tb = read_fred('DTB3') / 100
+    s = tb.loc['1954':'2007']
+    out = {'daily': short_rate_fits(s.values, DT), 'monthly': short_rate_fits(s.resample('ME').last().values, 1 / 12)}
+    out['min_rate'] = float(s.min())
+    out['share_zero_post2008'] = float(np.mean(tb.loc['2008':] < 0.0005))
+    return out
+
+
+def fig_np_diffusion(fits):
+    """Driftul si difuzia neparametrice (Nadaraya-Watson) ale ratei pe 3 luni, 1954-2007, fata de Vasicek, CIR, CKLS."""
+    tb = (read_fred('DTB3') / 100).loc['1954':'2007']
+    x = tb.values
+    grid = np.linspace(np.quantile(x, 0.02), np.quantile(x, 0.98), 60)
+    nw = nw_drift_diffusion(x, DT, grid)
+    F = fits['daily']
+    lo_a, hi_a = nw['drift'] - 1.96 * nw['drift_se'], nw['drift'] + 1.96 * nw['drift_se']
+    b = np.sqrt(np.maximum(nw['diff2'], 0))
+    lo_b = np.sqrt(np.maximum(nw['diff2'] - 1.96 * nw['diff2_se'], 0))
+    hi_b = np.sqrt(nw['diff2'] + 1.96 * nw['diff2_se'])
+    vas = F['vasicek_exact']
+    par_a = vas['kappa'] * (vas['theta'] - grid)
+    par_b = {'Vasicek': np.full_like(grid, F['vasicek_euler']['sigma']),
+             'CIR': F['cir_euler']['sigma'] * np.sqrt(grid),
+             'CKLS': F['ckls']['sigma'] * grid ** F['ckls']['gamma']}
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
+    g100 = 100 * grid
+    axes[0].fill_between(g100, 100 * lo_a, 100 * hi_a, color=LightGray, alpha=0.6, lw=0, label='95% pointwise band')
+    axes[0].plot(g100, 100 * nw['drift'], color=MainBlue, lw=1.5, label='Nadaraya-Watson estimate')
+    axes[0].plot(g100, 100 * par_a, color=IDAred, ls='--', lw=1.2, label=r'Vasicek: $\hat\kappa(\hat\theta - r)$')
+    axes[0].axhline(0, color=Gray, lw=0.6)
+    axes[0].set_xlabel('Short rate r (% p.a.)')
+    axes[0].set_ylabel('Drift a(r) (% points per year)')
+    axes[0].set_title('Drift: estimated imprecisely', loc='left')
+    axes[1].fill_between(g100, 100 * lo_b, 100 * hi_b, color=LightGray, alpha=0.6, lw=0)
+    axes[1].plot(g100, 100 * b, color=MainBlue, lw=1.5)
+    cols = {'Vasicek': Orange, 'CIR': Purple, 'CKLS': Forest}
+    for k, v in par_b.items():
+        lab = {'Vasicek': r'Vasicek: $\sigma$', 'CIR': r'CIR: $\sigma\sqrt{r}$',
+               'CKLS': rf"CKLS: $\sigma r^{{\gamma}}$, $\hat\gamma$ = {F['ckls']['gamma']:.2f}"}[k]
+        axes[1].plot(g100, 100 * v, color=cols[k], lw=1.2, ls='--', label=lab)
+    axes[1].set_xlabel('Short rate r (% p.a.)')
+    axes[1].set_ylabel('Diffusion b(r) (% points per year)')
+    axes[1].set_title('Diffusion: estimated precisely', loc='left')
+    fig_legend_bottom(fig, ncol=3, y=0.03)
+    plt.tight_layout(rect=(0, 0.03, 1, 1))
+    save_fig('ch11_np_diffusion')
+    inside = {k: float(np.mean((v >= lo_b) & (v <= hi_b))) for k, v in par_b.items()}
+    rel = nw['diff2_se'] / nw['diff2']
+    out = dict(h=float(nw['h']), inside=inside, zero_in_drift_band=float(np.mean((lo_a <= 0) & (hi_a >= 0))),
+               vas_in_drift_band=float(np.mean((lo_a <= par_a) & (hi_a >= par_a))),
+               drift_se_med=float(np.median(nw['drift_se'])), diff_relse_med=float(np.median(rel)),
+               drift_ratio=float(np.median(nw['drift_se'] / np.abs(np.sqrt(nw['diff2'])))),
+               b_lo=float(b[0]), b_hi=float(b[-1]), r_lo=float(grid[0]), r_hi=float(grid[-1]),
+               slope=float(np.polyfit(np.log(grid), np.log(b), 1)[0]))
+    return out
+
+
+def measure_change(g, vs, hp):
+    """Schimbarea masurii: pretul de piata al riscului pentru S&P 500; preturile obligatiunilor Vasicek (Feynman-Kac);
+    ce identifica VIX in modelul Heston (VIX^2 afin in v_t, cu parametri sub masura neutra la risc)."""
+    tb = read_fred('DTB3') / 100
+    sp = g['sp500']
+    rbar = float(tb.loc[sp['start']:].mean())
+    th = (sp['mu'] - rbar) / sp['sigma']
+    out = {'rbar': rbar, 'theta_sp': th, 'se_theta_sp': 1 / np.sqrt(sp['years'])}
+    F = vs['1954-2026']
+    k, t, s, r0 = F['kappa'], F['theta'], F['sigma'], vs['last']
+    ys = {}
+    for tau in (1, 5, 10, 30):
+        B = (1 - np.exp(-k * tau)) / k
+        A = (t - s ** 2 / (2 * k ** 2)) * (B - tau) - s ** 2 * B ** 2 / (4 * k)
+        ys[str(tau)] = float((B * r0 - A) / tau)
+    out['vas_yields'] = ys
+    out['vas_yinf'] = float(t - s ** 2 / (2 * k ** 2))
+    dgs10 = read_fred('DGS10') / 100
+    out['dgs10_last'] = float(dgs10.iloc[-1])
+    out['dgs10_date'] = str(dgs10.index[-1].date())
+    tau = 30 / 365
+    out['vix_b'] = {str(kq): float((1 - np.exp(-kq * tau)) / (kq * tau)) for kq in (1.0, 2.5, 5.0, 10.0)}
+    out['vix_xi_corr'] = {kq: float(hp['xi'] / b) for kq, b in out['vix_b'].items()}
+    return out
+
+
+# =============================================================================
 # 4. SALTURI: MERTON
 # =============================================================================
 def merton_estimates():
@@ -686,7 +775,17 @@ def fig_models_vs_data(g, me, hp):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == '__main__' and sys.argv[1:] == ['extra']:
+    # doar sectiunile noi (estimarea difuziilor, schimbarea masurii), fara a recalcula restul
+    with open(os.path.join(HERE, 'ch11_results.json')) as f:
+        R = json.load(f)
+    R['diffusion'] = diffusion_fits()
+    R['np_diffusion'] = fig_np_diffusion(R['diffusion'])
+    R['measure'] = measure_change(R['gbm'], R['vasicek'], R['heston'])
+    with open(os.path.join(HERE, 'ch11_results.json'), 'w') as f:
+        json.dump(jsonable(R), f, indent=1)
+    print('updated ch11_results.json')
+elif __name__ == '__main__':
     R = {}
     print('1. Brownian motion')
     R['donsker'] = fig_donsker()
@@ -718,6 +817,10 @@ if __name__ == '__main__':
     R['smile'] = fig_heston_smile(hp)
     print('6. Models vs data')
     R['compare'] = fig_models_vs_data(g, me, hp)
+    print('7. Estimating diffusions, change of measure')
+    R['diffusion'] = diffusion_fits()
+    R['np_diffusion'] = fig_np_diffusion(R['diffusion'])
+    R['measure'] = measure_change(g, R['vasicek'], hp)
     R['data'] = {k: dict(n=len(v), start=str(v.index[0].date()), end=str(v.index[-1].date())) for k, v in rets.items()}
     with open(os.path.join(HERE, 'ch11_results.json'), 'w') as f:
         json.dump(jsonable(R), f, indent=1)

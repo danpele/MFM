@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch14_calibration'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Inference for forecast comparisons and calibration of predictive distributions, from the saved Chapter 14 forecasts: Clark-West tests for nested models, Holm, Romano-Wolf and SPA for the 18 return tests, the non-synchronous-trading check with the BET ETF, exact power of the Kupiec test, PIT histograms, censored Berkowitz tests and quantile scores (CRPS on the grid), the DQ test, adaptive conformal recalibration of Chronos-2 quantiles, conditional Giacomini-White tests and the ACF of absolute returns against geometric decay.'
+
+Keywords: 'Clark-West, Romano-Wolf, SPA, PIT, Berkowitz, CRPS, dynamic quantile test, conformal prediction'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), Bitcoin (BTC-USD.CC), BET; BET-tracking ETF Patria-TVBETETF (data/market); SPY 5-minute bars (data/market/intraday/SPY.US_5m.csv) and SPY daily adjusted closes (data/market)'
+
+Output: 'ch14_pit.pdf, ch14_conformal.pdf'

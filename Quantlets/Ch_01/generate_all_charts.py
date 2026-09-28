@@ -117,14 +117,19 @@ def summary_table():
 def risk_table():
     rows = []
     for a in ASSETS:
-        c, r, P = closes[a], rets[a], PERIODS[a]
+        # Sharpe si Sortino pe randamente SIMPLE (aritmetice), r_f = 0: aceeasi definitie in tot cursul
+        c, P = closes[a], PERIODS[a]
+        R = c.pct_change().dropna()
         years = (c.index[-1] - c.index[0]).days / 365.25
         cagr = (c.iloc[-1] / c.iloc[0]) ** (1 / years) - 1
-        vol = r.std() * np.sqrt(P)
-        downside = np.sqrt((np.minimum(r, 0) ** 2).mean()) * np.sqrt(P)
+        mu, vol = R.mean() * P, R.std() * np.sqrt(P)
+        downside = np.sqrt((np.minimum(R, 0) ** 2).mean()) * np.sqrt(P)   # medie peste TOATE zilele
         mdd = drawdown(c).min()
-        rows.append({'asset': LABELS[a], 'CAGR_pct': 100 * cagr, 'ann_vol_pct': 100 * vol,
-                     'Sharpe': r.mean() * P / vol, 'Sortino': r.mean() * P / downside,
+        sr_d = R.mean() / R.std()
+        rows.append({'asset': LABELS[a], 'CAGR_pct': 100 * cagr, 'mean_simple_pct': 100 * mu,
+                     'ann_vol_pct': 100 * vol, 'downside_pct': 100 * downside,
+                     'Sharpe': mu / vol, 'Sharpe_SE_Lo': np.sqrt(P * (1 + sr_d ** 2 / 2) / len(R)),
+                     'years': years, 'Sortino': mu / downside,
                      'maxDD_pct': 100 * mdd, 'Calmar': cagr / abs(mdd)})
     t = pd.DataFrame(rows).set_index('asset')
     t.to_csv(os.path.join(TABLE_DIR, 'ch1_risk_measures.csv'), float_format='%.6g')
@@ -460,8 +465,8 @@ def fig_risk_return(t):
     for a in ASSETS:
         row = t.loc[LABELS[a]]
         ax.scatter(row['ann_vol_pct'], row['CAGR_pct'], s=60, color=COLORS[a], zorder=3)
-        off = {'sp500': (8, -14), 'gold': (-8, 6), 'bettr': (8, 0), 'btc': (-10, -18), 'eurron': (8, 2)}[a]
-        ax.annotate(f"{LABELS[a]}\nSharpe {row['Sharpe']:.2f}, MDD {row['maxDD_pct']:.0f}%",
+        off = {'sp500': (8, -14), 'gold': (-8, 14), 'bettr': (8, 0), 'btc': (-10, -18), 'eurron': (8, 2)}[a]
+        ax.annotate(f"{LABELS[a]}\nSharpe {row['Sharpe']:.2f} (SE {row['Sharpe_SE_Lo']:.2f}), MDD {row['maxDD_pct']:.0f}%",
                     (row['ann_vol_pct'], row['CAGR_pct']), xytext=off, textcoords='offset points', fontsize=7,
                     ha='right' if off[0] < 0 else 'left')
     ax.set_xscale('log')
@@ -547,6 +552,129 @@ def fig_hill():
     save_fig('ch1_hill_plot')
 
 
+def moving_block_indices(T, block, rng):
+    """Indicii unui esantion bootstrap pe blocuri mobile (moving-block) de lungime `block`."""
+    nb = int(np.ceil(T / block))
+    st = rng.integers(0, T - block, nb)
+    return (st[:, None] + np.arange(block)[None, :]).ravel()[:T]
+
+
+def hill_inference(frac=0.025, n_boot=500, block=20, seed=42):
+    """Hill pentru |r_t| la k = frac*n: IC i.i.d. alpha(1 +/- 1.96/sqrt(k)), EE bootstrap pe blocuri
+    si comparatia cu cozile unilaterale la ACELASI prag u (min al pragurilor unilaterale)."""
+    rng = np.random.default_rng(seed)
+    rows = []
+    for a in ASSETS:
+        r = rets[a].values
+        n = len(r)
+        k = int(frac * n)
+        al = hill_estimator(np.abs(r), k)
+        boot = [hill_estimator(np.abs(r)[moving_block_indices(n, block, rng)], k) for _ in range(n_boot)]
+        u = min(np.sort(-r)[::-1][k], np.sort(r)[::-1][k])
+        kL, kG, kA = int((-r > u).sum()), int((r > u).sum()), int((np.abs(r) > u).sum())
+        rows.append({'asset': LABELS[a], 'n': n, 'k': k, 'alpha_abs': al, 'se_iid': al / np.sqrt(k),
+                     'se_block': np.std(boot, ddof=1), 'ci_lo': al * (1 - 1.96 / np.sqrt(k)),
+                     'ci_hi': al * (1 + 1.96 / np.sqrt(k)), 'alpha_loss_k': hill_estimator(-r, k),
+                     'alpha_gain_k': hill_estimator(r, k), 'u_common_pct': 100 * u, 'k_abs_u': kA,
+                     'alpha_abs_u': hill_estimator(np.abs(r), kA), 'alpha_loss_u': hill_estimator(-r, kL),
+                     'alpha_gain_u': hill_estimator(r, kG)})
+    t = pd.DataFrame(rows).set_index('asset')
+    t.to_csv(os.path.join(TABLE_DIR, 'ch1_hill_inference.csv'), float_format='%.4g')
+    return t
+
+
+def robust_moments(n_boot=1000, block=20, seed=42):
+    """Asimetrie si aplatizare pe cuantile (Kim & White 2004): Hinkley (5%-95%) si Crow-Siddiqui
+    (2.5%, 97.5% fata de quartile, minus 2.91, valoarea distributiei Normale); IC bootstrap pe blocuri."""
+    def qstats(v):
+        q = np.quantile(v, [0.025, 0.05, 0.25, 0.5, 0.75, 0.95, 0.975])
+        return ((q[5] + q[1] - 2 * q[3]) / (q[5] - q[1]), (q[6] - q[0]) / (q[4] - q[2]) - 2.91)
+    rng = np.random.default_rng(seed)
+    rows = []
+    for a in ASSETS:
+        v = rets[a].values
+        sk, ku = qstats(v)
+        b = np.array([qstats(v[moving_block_indices(len(v), block, rng)]) for _ in range(n_boot)])
+        rows.append({'asset': LABELS[a], 'skew_moment': stats.skew(v), 'skew_hinkley': sk,
+                     'skew_lo': np.quantile(b[:, 0], 0.025), 'skew_hi': np.quantile(b[:, 0], 0.975),
+                     'exkurt_moment': stats.kurtosis(v), 'kurt_cs': ku,
+                     'kurt_lo': np.quantile(b[:, 1], 0.025), 'kurt_hi': np.quantile(b[:, 1], 0.975)})
+    t = pd.DataFrame(rows).set_index('asset')
+    t.to_csv(os.path.join(TABLE_DIR, 'ch1_robust_moments.csv'), float_format='%.4g')
+    return t
+
+
+def acf_robust_lag1():
+    """rho_1 cu banda i.i.d. 1.96/sqrt(T) si banda robusta 1.96 sqrt(tau_1) (Romano & Thombs 1996)."""
+    rows = []
+    for a in ASSETS:
+        x = (rets[a] - rets[a].mean()).values
+        T, s2 = len(x), np.sum(x ** 2)
+        rho = np.sum(x[1:] * x[:-1]) / s2
+        tau = np.sum(x[1:] ** 2 * x[:-1] ** 2) / s2 ** 2
+        rows.append({'asset': LABELS[a], 'T': T, 'rho1': rho, 'T_tau1': T * tau, 'band_iid': 1.96 / np.sqrt(T),
+                     'band_robust': 1.96 * np.sqrt(tau), 't_iid': rho * np.sqrt(T), 't_robust': rho / np.sqrt(tau)})
+    return pd.DataFrame(rows).set_index('asset')
+
+
+def periodogram(x):
+    x = np.asarray(x) - np.mean(x)
+    T = len(x)
+    return 2 * np.pi * np.arange(T) / T, np.abs(np.fft.fft(x)) ** 2 / (2 * np.pi * T)
+
+
+def local_whittle(x, m):
+    """Robinson (1995): d minimizeaza R(d) = ln(mean(lambda_j^{2d} I_j)) - 2d mean(ln lambda_j); EE = 1/(2 sqrt m)."""
+    from scipy.optimize import minimize_scalar
+    lam, I = periodogram(x)
+    l, Ij = lam[1:m + 1], I[1:m + 1]
+    R = lambda d: np.log(np.mean(l ** (2 * d) * Ij)) - 2 * d * np.mean(np.log(l))
+    return minimize_scalar(R, bounds=(-0.49, 0.99), method='bounded').x, 1 / (2 * np.sqrt(m))
+
+
+def gph(x, m):
+    """Geweke & Porter-Hudak (1983): panta lui ln I_j pe -2 ln(2 sin(lambda_j/2)); EE = pi/sqrt(24 m)."""
+    lam, I = periodogram(x)
+    X = -2 * np.log(2 * np.sin(lam[1:m + 1] / 2))
+    return np.polyfit(X, np.log(I[1:m + 1]), 1)[0], np.pi / np.sqrt(24 * m)
+
+
+def cusum_squares_break(r):
+    """Data rupturii in varianta necoditionata: argmax |C_k/C_T - k/T| (Inclan & Tiao 1994)."""
+    x = np.asarray(r) - np.mean(r)
+    C = np.cumsum(x ** 2)
+    T = len(x)
+    D = C / C[-1] - np.arange(1, T + 1) / T
+    j = int(np.argmax(np.abs(D)))
+    return j, np.sqrt(T / 2) * np.abs(D[j])
+
+
+def long_memory_table(power=0.65):
+    """d pentru |r_t|: local Whittle si GPH cu m = T^0.65; apoi re-estimare de o parte si de alta
+    a rupturii de varianta estimate (verificarea 'memorie lunga sau rupturi?')."""
+    rows = []
+    for a in ASSETS:
+        r = rets[a]
+        x = np.abs(r.values)
+        T = len(x)
+        m = int(T ** power)
+        dlw, slw = local_whittle(x, m)
+        dg, sg = gph(x, m)
+        j, it = cusum_squares_break(r.values)
+        pre, post = x[:j + 1], x[j + 1:]
+        dpre, spre = local_whittle(pre, int(len(pre) ** power))
+        dpost, spost = local_whittle(post, int(len(post) ** power))
+        P = PERIODS[a]
+        rows.append({'asset': LABELS[a], 'T': T, 'm': m, 'd_lw': dlw, 'se_lw': slw, 'd_gph': dg, 'se_gph': sg,
+                     'break_date': r.index[j].date(), 'IT_stat': it,
+                     'vol_pre_pct': 100 * r.values[:j + 1].std() * np.sqrt(P),
+                     'vol_post_pct': 100 * r.values[j + 1:].std() * np.sqrt(P),
+                     'd_pre': dpre, 'se_pre': spre, 'd_post': dpost, 'se_post': spost})
+    t = pd.DataFrame(rows).set_index('asset')
+    t.to_csv(os.path.join(TABLE_DIR, 'ch1_long_memory.csv'), float_format='%.4g')
+    return t
+
+
 # =============================================================================
 # VERIFICARE: deschideri "stale" ale indicelui S&P 500 (Yang-Zhang)
 # =============================================================================
@@ -595,4 +723,8 @@ if __name__ == '__main__':
     fig_risk_return(rt)
     fig_rolling_vol()
     fig_hill(); print(hill_table().round(2))
+    print(hill_inference().round(3).T)
+    print(robust_moments().round(3).T)
+    print(acf_robust_lag1().round(3).T)
+    print(long_memory_table().round(3).T)
     so, so_y = stale_open_check(); print(so.round(3)); print(so_y.loc[[1995, 2000, 2005, 2006, 2007, 2008, 2010, 2020, 2026]].round(3))

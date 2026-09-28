@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch8_es_backtests'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Expected shortfall backtests of six models in four markets: McNeil-Frey exceedance residuals (bootstrap), Acerbi-Szekely Z1 and Z2 with p-values simulated from each forecast distribution, Du-Escanciano cumulative violation tests; rolling 250-day Z2 for the S&P 500.'
+Description: 'Expected shortfall backtests of six models in four markets: McNeil-Frey exceedance residuals (bootstrap), Acerbi-Szekely Z1 and Z2 with p-values simulated from each forecast distribution, Du-Escanciano cumulative violation tests; rolling 250-day Z2 for the S&P 500; Kratz-Lok-McNeil multinomial VaR test (Pearson, four tail levels).'
 
 Keywords: 'expected shortfall, backtesting, McNeil-Frey, Acerbi-Szekely, Z2, Du-Escanciano, bootstrap'
 

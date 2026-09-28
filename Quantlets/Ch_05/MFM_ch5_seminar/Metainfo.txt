@@ -2,9 +2,9 @@ Name of QuantLet: 'MFM_ch5_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 5 computations: GARCH(1,1) recursion and forecast step by step, GJR vs GARCH likelihood ratio tests (S&P 500, BET), innovation distributions for Bitcoin, out-of-sample forecast comparison (S&P 500, BET), parametric bootstrap of persistence and half-life, and a GARCH-t model for the BET with lagged S&P 500 shocks in the variance equation (prices joined on common days).'
+Description: 'Seminar 5 computations: GARCH(1,1) recursion and forecast step by step, GJR vs GARCH likelihood ratio tests (S&P 500, BET), innovation distributions for Bitcoin, out-of-sample forecast comparison (S&P 500, BET), parametric bootstrap of persistence and half-life, a test of IGARCH by simulation under the null, and a GARCH-t model for the BET with lagged S&P 500 shocks in the variance equation (prices joined on common days).'
 
-Keywords: 'GARCH, GJR-GARCH, likelihood ratio, skewed-t, QLIKE, Diebold-Mariano, parametric bootstrap, half-life, volatility spillover, BET, S&P 500, Bitcoin'
+Keywords: 'GARCH, GJR-GARCH, likelihood ratio, skewed-t, QLIKE, Diebold-Mariano, parametric bootstrap, IGARCH test, half-life, volatility spillover, BET, S&P 500, Bitcoin'
 
 Author: 'Daniel Traian Pele'
 

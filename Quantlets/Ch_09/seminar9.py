@@ -401,12 +401,265 @@ def c1_predictability():
     return out
 
 
+# =============================================================================
+# EXTINDERI DE NIVEL MASTER: inferenta pe salturi, HAR ca AR(22) restrictionat, HARQ, SHAR, MCS
+# =============================================================================
+def bh_count(p, q=0.05):
+    """Benjamini-Hochberg: numarul de ipoteze respinse cu rata falselor descoperiri controlata la q."""
+    p = np.sort(np.asarray(p))
+    n = len(p)
+    ok = np.where(p <= q * np.arange(1, n + 1) / n)[0]
+    return int(ok[-1] + 1) if len(ok) else 0
+
+
+def periodicity_sd(R, bv_day):
+    """Factorul de periodicitate intraday (estimatorul SD din Boudt, Croux si Laurent, 2011):
+    randamente standardizate cu sqrt(BV_t / M_t), abaterea patratica pe interval, normalizata la media 1 a patratelor."""
+    M_ = R.notna().sum(axis=1)
+    rb = R.div(np.sqrt(bv_day / M_), axis=0)
+    sd = np.sqrt((rb ** 2).mean(axis=0))
+    return sd / np.sqrt((sd ** 2).mean())
+
+
+def ex_jump_inference(K=270, alpha_lm=0.01, c_trunc=3.0, varpi=0.49):
+    """Salturi SPY: FDR (Benjamini-Hochberg), Bonferroni, testul raportului pe randamente ajustate de periodicitate,
+    testul intraday Lee-Mykland (K = 270 pentru 5 minute), RV trunchiata (Mancini) si MedRV (Andersen, Dobrev, Schaumburg)."""
+    j = T.jump_test(R_SPY)
+    N = len(j)
+    p = stats.norm.sf(j['z'].values)
+    out = {'N': N, 'n5': int((p < 0.05).sum()), 'bh5': bh_count(p, 0.05), 'bh1': bh_count(p, 0.01),
+           'bonf5': int((p < 0.05 / N).sum()), 'n0_1': int(j['jump'].sum())}
+    f = periodicity_sd(R_SPY, j['bv'])
+    Rs = R_SPY / f.values[None, :]
+    js = T.jump_test(Rs)
+    ps = stats.norm.sf(js['z'].values)
+    out.update({'per_n5': int((ps < 0.05).sum()), 'per_n0_1': int(js['jump'].sum()), 'per_bh5': bh_count(ps, 0.05),
+                'f_first': float(f.iloc[0]), 'f_min': float(f.min()), 'f_last': float(f.iloc[-1])})
+    # Lee-Mykland: L = r / sigma_hat, sigma_hat^2 = media produselor |r_j||r_{j-1}| pe K-1 randamente anterioare (serie concatenata)
+    x = Rs.values.ravel()
+    day = np.repeat(np.arange(N), Rs.shape[1])
+    slot = np.tile(np.arange(Rs.shape[1]), N)
+    ok = ~np.isnan(x)
+    x, day, slot = x[ok], day[ok], slot[ok]
+    prod = np.r_[np.nan, np.abs(x[1:]) * np.abs(x[:-1])]
+    bvl = pd.Series(prod).rolling(K - 2).mean().shift(1).values
+    L = x / np.sqrt(bvl * np.pi / 2)     # mu_1^{-2} = pi/2: BV local estimeaza varianta pe interval
+    n = int(np.isfinite(L).sum())
+    c = np.sqrt(2 / np.pi)
+    Cn = np.sqrt(2 * np.log(n)) / c - (np.log(np.pi) + np.log(np.log(n))) / (2 * c * np.sqrt(2 * np.log(n)))
+    Sn = 1 / (c * np.sqrt(2 * np.log(n)))
+    beta = -np.log(-np.log(1 - alpha_lm))
+    hit = np.isfinite(L) & ((np.abs(L) - Cn) / Sn > beta)
+    jd = np.unique(day[hit])
+    out.update({'lm_K': K, 'lm_n': n, 'lm_crit': float(Cn + Sn * beta), 'lm_hits': int(hit.sum()), 'lm_days': int(len(jd)),
+                'lm_open': int((slot[hit] == 0).sum()), 'lm_10': int((slot[hit] == 6).sum()),
+                'lm_slots': [int(x) for x in slot[hit]],
+                'lm_wed14': int(np.sum(hit & (np.asarray(Rs.index.dayofweek)[day] == 2) & (slot >= 54) & (slot <= 65))),
+                'lm_top': {'date': str(Rs.index[day[hit]][np.argmax(np.abs(L[hit]))].date()),
+                           'L': float(L[hit][np.argmax(np.abs(L[hit]))])},
+                'lm_in_ratio': float(np.mean(j['jump'].values[jd])) if len(jd) else float('nan'),
+                'ratio_in_lm': float(np.mean(np.isin(np.where(j['jump'].values)[0], jd)))})
+    # RV trunchiata si MedRV (pe randamentele brute, pragul tine cont de periodicitate)
+    Mt = R_SPY.notna().sum(axis=1).values
+    thr = c_trunc * np.sqrt(j['bv'].values)[:, None] * (1 / Mt[:, None]) ** varpi * f.values[None, :]
+    A = R_SPY.values
+    trv = np.nansum(np.where(np.abs(A) <= thr, A ** 2, 0.0), axis=1)
+    a = np.abs(A)
+    med = np.nanmedian(np.stack([a[:, :-2], a[:, 1:-1], a[:, 2:]]), axis=0)
+    medrv = np.pi / (6 - 4 * np.sqrt(3) + np.pi) * Mt / (Mt - 2) * np.nansum(med ** 2, axis=1)
+    rvs = j['rv'].values
+    out.update({'trv_share': float(1 - trv.sum() / rvs.sum()), 'bv_share': float(1 - j['bv'].sum() / rvs.sum()),
+                'medrv_share': float(1 - medrv.sum() / rvs.sum()), 'trunc_days': float(np.mean(trv < rvs)),
+                'c_trunc': c_trunc, 'varpi': varpi})
+    return out
+
+
+def ex_har_ar22():
+    """log-HAR ca AR(22) restrictionat: test Wald (Newey-West) al celor 19 restrictii liniare."""
+    y = np.log(RVT_SPY)
+    X = pd.concat({f'l{k}': y.shift(k) for k in range(1, 23)}, axis=1)
+    ok = X.notna().all(axis=1)
+    res = T.ols_nw(y[ok].values, X[ok].values)
+    Rm = []
+    for k in (2, 3, 4):                                   # phi_k = phi_{k+1}, k = 2..4
+        r = np.zeros(23); r[k] = 1; r[k + 1] = -1; Rm.append(r)
+    for k in range(6, 22):                                # phi_k = phi_{k+1}, k = 6..21
+        r = np.zeros(23); r[k] = 1; r[k + 1] = -1; Rm.append(r)
+    Rm = np.array(Rm)
+    d = Rm @ res['b']
+    W = float(d @ np.linalg.solve(Rm @ res['V'] @ Rm.T, d))
+    har, Xh, okh = T.har_fit(RVT_SPY, log=True)
+    # aceeasi selectie pentru comparatia R^2
+    return {'q': int(Rm.shape[0]), 'wald': W, 'p': float(stats.chi2.sf(W, Rm.shape[0])), 'r2_ar22': float(res['r2']),
+            'r2_har': float(har['r2']), 'T': int(res['T']), 'lags': int(res['lags'])}
+
+
+def _expanding_ols(y, X, start, filt=True):
+    """Prognoze OLS pe fereastra extinsa; filtrul de 'insanity' din Bollerslev, Patton si Quaedvlieg (2016):
+    prognoza din afara intervalului observat in esantionul de estimare este inlocuita cu media esantionului."""
+    ok = X.notna().all(axis=1) & y.notna()
+    Xc = np.column_stack([np.ones(len(X)), X.values])
+    f = {}
+    for t in np.where((y.index >= pd.Timestamp(start)) & ok.values)[0]:
+        tr = np.where(ok.values[:t])[0]
+        b, *_ = np.linalg.lstsq(Xc[tr], y.values[tr], rcond=None)
+        v = Xc[t] @ b
+        if filt and (v < y.values[tr].min() or v > y.values[tr].max()):
+            v = y.values[tr].mean()
+        f[y.index[t]] = v
+    return pd.Series(f)
+
+
+def ex_harq_shar(start='2022-01-03'):
+    """HARQ (Bollerslev, Patton, Quaedvlieg 2016) si SHAR (Patton, Sheppard 2015) pe varianta totala SPY, in niveluri;
+    in esantion cu erori Newey-West; prognoze out-of-sample; MCS (Hansen, Lunde, Nason 2011) pe QLIKE."""
+    v = RVT_SPY
+    rqd = T.rq(R_SPY)
+    Xh = T.har_design(v)
+    XQ = Xh.copy()
+    XQ['dq'] = (np.sqrt(rqd) * v).shift(1)
+    okq = XQ.notna().all(axis=1)
+    rQ = T.ols_nw(v[okq].values, XQ[okq].values)
+    rH = T.ols_nw(v[okq].values, Xh[okq].values)
+    # semivariante: randamentele intraday plus randamentul peste noapte ca un randament suplimentar al zilei
+    A = np.c_[ON.reindex(R_SPY.index).values, R_SPY.values]
+    rsp = pd.Series(np.nansum(np.where(A > 0, A ** 2, 0), axis=1), index=R_SPY.index)
+    rsn = pd.Series(np.nansum(np.where(A < 0, A ** 2, 0), axis=1), index=R_SPY.index)
+    XS = pd.DataFrame({'rsp': rsp.shift(1), 'rsn': rsn.shift(1), 'w': Xh['w'], 'm': Xh['m']})
+    oks = XS.notna().all(axis=1)
+    rS = T.ols_nw(v[oks].values, XS[oks].values)
+    Rr = np.array([0, 1, -1.0, 0, 0])
+    w_pm = float((Rr @ rS['b']) ** 2 / (Rr @ rS['V'] @ Rr))
+    F = pd.read_csv(os.path.join(HERE, 'ch9_forecasts_spy.csv'), index_col=0, parse_dates=True)
+    fQ = _expanding_ols(v, XQ, start).reindex(F.index)
+    fS = _expanding_ols(v, XS, start).reindex(F.index)
+    fH = _expanding_ols(v, Xh, start).reindex(F.index)
+    y = F['proxy']
+    L = pd.DataFrame({m: T.qlike(y, F[m]) for m in ['logHAR', 'HAR', 'GARCH-t', 'EWMA', 'RW']})
+    L['HARQ'] = T.qlike(y, fQ)
+    L['SHAR'] = T.qlike(y, fS)
+    L['HARf'] = T.qlike(y, fH)
+    out = {'harq': {'b': list(rQ['b']), 'se': list(rQ['se']), 'r2': float(rQ['r2']), 'r2_har': float(rH['r2']),
+                    'bd_at': {}},
+           'shar': {'b': list(rS['b']), 'se': list(rS['se']), 'r2': float(rS['r2']), 'wald_pm': w_pm,
+                    'p_pm': float(stats.chi2.sf(w_pm, 1))},
+           'qlike': {m: float(L[m].mean()) for m in L}}
+    # panta zilnica efectiva beta_d + beta_Q sqrt(RQ) la cuantilele lui sqrt(RQ)
+    s = np.sqrt(rqd.reindex(v[okq].index).values)
+    for qq in (0.5, 0.99):
+        out['harq']['bd_at'][str(qq)] = float(rQ['b'][1] + rQ['b'][4] * np.quantile(s, qq))
+    # HARQ pe RV intraday (cadrul din lucrarea originala: RQ si RV din aceleasi randamente)
+    vi = RV_SPY
+    Xi = T.har_design(vi)
+    Xi['dq'] = (np.sqrt(rqd) * vi).shift(1)
+    oki = Xi.notna().all(axis=1)
+    rI = T.ols_nw(vi[oki].values, Xi[oki].values)
+    si = np.sqrt(rqd.reindex(vi[oki].index).values)
+    out['harq_intra'] = {'b': list(rI['b']), 'se': list(rI['se']), 'r2': float(rI['r2']),
+                         'bd_at': {str(qq): float(rI['b'][1] + rI['b'][4] * np.quantile(si, qq)) for qq in (0.5, 0.99)},
+                         'sq': {str(qq): float(np.quantile(si, qq)) for qq in (0.5, 0.99)}}
+    for m in ['HARQ', 'SHAR']:
+        for base in ['HARf', 'logHAR']:
+            dq = T.dm_test(L[m], L[base])
+            out[f'dm_{m}_{base}'] = {'t': dq['t'], 'p': dq['p']}
+    from arch.bootstrap import MCS
+    mods = ['logHAR', 'HAR', 'GARCH-t', 'EWMA', 'RW', 'HARQ', 'SHAR']
+    mcs = MCS(L[mods].dropna(), size=0.10, reps=10000, block_size=20, method='R', seed=SEED)
+    mcs.compute()
+    pv = mcs.pvalues['Pvalue']
+    out['mcs'] = {'included': [str(m) for m in mcs.included], 'pvalues': {str(k): float(x) for k, x in pv.items()},
+                  'T': int(len(L[mods].dropna()))}
+    return out
+
+
+def ex_gw_week():
+    """Testul conditional Giacomini-White pentru prognozele pe 5 zile (B6): instrumente (1, d_{t-5}), HAC cu 4 intarzieri."""
+    v = RVT_SPY
+    y5 = v[::-1].rolling(5).sum()[::-1]
+    X = T.har_design(np.log(v))
+    ok = X.notna().all(axis=1) & y5.notna()
+    Xc = np.column_stack([np.ones(len(X)), X.values])
+    ly = np.log(y5).values
+    idx = np.where((v.index >= pd.Timestamp('2022-01-03')) & ok.values)[0]
+    fh = {}
+    for t in idx:
+        tr = np.where(ok.values[:t - 4])[0]
+        b, *_ = np.linalg.lstsq(Xc[tr], ly[tr], rcond=None)
+        fh[v.index[t]] = np.exp(Xc[t] @ b + np.var(ly[tr] - Xc[tr] @ b) / 2)
+    fh = pd.Series(fh)
+    G = garch_params_blocks(D_SPY, fh.index)
+    pers = G['alpha'] + G['beta']
+    lr = G['omega'] / (1 - pers)
+    fg = sum(lr + pers ** h * (G['s2'] - lr) for h in range(5))
+    yy = y5.reindex(fh.index)
+    d = (T.qlike(yy, fh) - T.qlike(yy, fg)).values
+    tau = 5
+    Z = np.column_stack([np.ones(len(d) - tau), d[:-tau]]) * d[tau:, None]
+    n = len(Z)
+    zbar = Z.mean(axis=0)
+    U = Z - zbar
+    S = U.T @ U / n
+    for l in range(1, tau):
+        w = 1 - l / tau
+        g = U[l:].T @ U[:-l] / n
+        S += w * (g + g.T)
+    stat = float(n * zbar @ np.linalg.solve(S, zbar))
+    u = d - d.mean()
+    s0 = u @ u / len(d)
+    for l in range(1, tau):
+        s0 += 2 * (1 - l / tau) * (u[l:] @ u[:-l]) / len(d)
+    t_unc = float(d.mean() / np.sqrt(s0 / len(d)))
+    return {'gw': stat, 'p': float(stats.chi2.sf(stat, 2)), 'T': n, 't_unc': t_unc,
+            'p_unc': float(2 * stats.norm.sf(abs(t_unc)))}
+
+
+def ex_rk_ratio():
+    """Nucleul realizat pe bare de 5 minute: raportul mediilor RK/RV cu CI bootstrap pe blocuri (20 de zile)."""
+    rk, H = T.realized_kernel(R_SPY, P_SPY)
+    rk = rk.reindex(RV_SPY.index)
+    boot = T.block_bootstrap(np.c_[rk.values, RV_SPY.values], lambda x: x[:, 0].mean() / x[:, 1].mean(), 20, B_BOOT, SEED)
+    return {'ratio': float(rk.mean() / RV_SPY.mean()), 'lo': float(np.percentile(boot, 2.5)),
+            'hi': float(np.percentile(boot, 97.5)), 'H_med': float(H.median())}
+
+
+def ex_a8_mz():
+    """A8: MZ pentru GARCH(1,1)-t (SPY, 2022-2026): coeficienti, erori NW si covarianta pentru testul Wald comun."""
+    F = pd.read_csv(os.path.join(HERE, 'ch9_forecasts_spy.csv'), index_col=0, parse_dates=True)
+    res = T.ols_nw(F['proxy'].values, F['GARCH-t'].values[:, None])
+    V = res['V']
+    dl = res['b'] - np.array([0, 1.0])
+    W = float(dl @ np.linalg.solve(V, dl))
+    d = (T.qlike(F['proxy'], F['logHAR']) - T.qlike(F['proxy'], F['GARCH-t']))
+    dm = T.dm_test(T.qlike(F['proxy'], F['logHAR']), T.qlike(F['proxy'], F['GARCH-t']))
+    return {'a': float(res['b'][0]), 'b': float(res['b'][1]), 'se_a': float(res['se'][0]), 'se_b': float(res['se'][1]),
+            'cov': float(V[0, 1]), 'corr': float(V[0, 1] / np.sqrt(V[0, 0] * V[1, 1])), 'wald': W,
+            'p': float(stats.chi2.sf(W, 2)), 'ta': float(res['b'][0] / res['se'][0]), 'tb': float((res['b'][1] - 1) / res['se'][1]),
+            'dbar': float(d.mean()), 'se_d': float(dm['mean_diff'] / dm['t']), 'dm_t': dm['t'], 'dm_p': dm['p']}
+
+
+def ex_a6_jensen():
+    """A6: minimizantul MSE pe volatilitate cu un proxy RV = IV chi2_M / M: F* = IV (E sqrt(chi2_M/M))^2."""
+    from scipy.special import gammaln
+    out = {}
+    for m in (1, 6, 78):
+        out[str(m)] = float(2 / m * np.exp(2 * (gammaln((m + 1) / 2) - gammaln(m / 2))))
+    return out
+
+
 if __name__ == '__main__':
+    ONLY = sys.argv[1:]                              # optional: recalculeaza doar blocurile numite, restul raman din json
     S = {}
+    if ONLY:
+        with open(os.path.join(HERE, 'sem9_results.json')) as fh:
+            S = json.load(fh)
     for name, f in [('A1', a1_rv_bv), ('A2', a2_jump), ('A3', a3_noise), ('A4', a4_tsrv), ('A5', a5_har), ('A6', a6_losses),
                     ('A7', a7_har2), ('A8', a8_dm), ('B1', b1_spy_jumps), ('B2', b2_btc_jumps), ('B3', b3_frequency),
                     ('B4', b4_standardised), ('B5', b5_har_insample), ('B6', b6_week), ('B7', b7_harcj), ('B8', b8_rough),
-                    ('C1', c1_predictability)]:
+                    ('C1', c1_predictability), ('XJ', ex_jump_inference), ('XAR', ex_har_ar22),
+                    ('XQS', ex_harq_shar), ('XGW', ex_gw_week), ('XRK', ex_rk_ratio), ('XA8', ex_a8_mz),
+                    ('XA6', ex_a6_jensen)]:
+        if ONLY and name not in ONLY:
+            continue
         print(name)
         S[name] = f()
     with open(os.path.join(HERE, 'sem9_results.json'), 'w') as fh:

@@ -6,6 +6,7 @@ ct_models.py -- Modele in timp continuu pentru Capitolul 11 (MFM): simulare si e
   * miscarea browniana geometrica (GBM): solutie exacta, estimare de verosimilitate maxima
   * Ornstein-Uhlenbeck / Vasicek: discretizare exacta AR(1), estimare, timpul de injumatatire
   * Merton (difuzie cu salturi): densitate ca mixtura Poisson, verosimilitate maxima, simulare
+  * difuzii neliniare: verosimilitate exacta CIR, pseudo-verosimilitate Euler, CKLS, drift si difuzie neparametrice
   * testul de salturi Lee-Mykland
   * Heston (volatilitate stochastica): simulare cu trunchiere completa, parametri din VIX, zambetul volatilitatii
   * fapte stilizate: aplatizare, indicele de coada Hill, autocorelatia |r|
@@ -184,6 +185,124 @@ def ou_bias_mc(kappa, theta, sigma, dt, n, n_sim, rng):
         e[0] = sigma / np.sqrt(2 * kappa) * rng.standard_normal()
         x = theta + lfilter([1.0], [1.0, -b], e)
         out[i] = ou_mle(x, dt)['kappa']
+    return out
+
+
+# =============================================================================
+# DIFUZII NELINIARE: VEROSIMILITATE EXACTA (CIR) VS EULER; CKLS; ESTIMARE NEPARAMETRICA
+# =============================================================================
+def vasicek_loglik(x, dt, kappa, theta, sigma, per_obs=False):
+    """Log-verosimilitatea exacta Vasicek (tranzitie Normala, AR(1) exact)."""
+    r0, r1 = x[:-1], x[1:]
+    b = np.exp(-kappa * dt)
+    ll = stats.norm.logpdf(r1, theta + (r0 - theta) * b, sigma * np.sqrt((1 - b * b) / (2 * kappa)))
+    return ll if per_obs else ll.sum()
+
+
+def cir_loglik(x, dt, kappa, theta, sigma, per_obs=False):
+    """Log-verosimilitatea exacta CIR: 2c r_{t+dt} | r_t ~ chi-patrat necentral cu 4 kappa theta / sigma^2 grade de libertate
+    si parametrul de noncentralitate 2c r_t e^{-kappa dt}, c = 2 kappa / (sigma^2 (1 - e^{-kappa dt})) (Cox, Ingersoll, Ross 1985)."""
+    r0, r1 = x[:-1], x[1:]
+    c = 2 * kappa / (sigma ** 2 * (1 - np.exp(-kappa * dt)))
+    ll = np.log(2 * c) + stats.ncx2.logpdf(2 * c * r1, 4 * kappa * theta / sigma ** 2, 2 * c * r0 * np.exp(-kappa * dt))
+    return ll if per_obs else ll.sum()
+
+
+def euler_loglik(x, dt, kappa, theta, sigma, gamma, per_obs=False):
+    """Pseudo-verosimilitatea Euler (Gaussiana) pentru dr = kappa (theta - r) dt + sigma r^gamma dW
+    (gamma = 0: Vasicek, gamma = 1/2: CIR, gamma liber: Chan, Karolyi, Longstaff, Sanders 1992)."""
+    r0, r1 = x[:-1], x[1:]
+    ll = stats.norm.logpdf(r1, r0 + kappa * (theta - r0) * dt, sigma * r0 ** gamma * np.sqrt(dt))
+    return ll if per_obs else ll.sum()
+
+
+def _fit(nll, p0):
+    best = None
+    for scale in (1.0, 0.5, 2.0):
+        q0 = np.array(p0, dtype=float)
+        q0[0] *= scale
+        res = optimize.minimize(nll, q0, method='Nelder-Mead', options=dict(maxiter=40000, maxfev=40000, xatol=1e-10, fatol=1e-8))
+        res = optimize.minimize(nll, res.x, method='Nelder-Mead', options=dict(maxiter=40000, maxfev=40000, xatol=1e-10, fatol=1e-8))
+        if best is None or res.fun < best.fun:
+            best = res
+    return best
+
+
+def short_rate_fits(x, dt):
+    """Vasicek (exact si Euler), CIR (exact si Euler) si CKLS (Euler) pe aceeasi serie; erori standard din hessiana
+    (pentru CKLS si erori robuste sandwich, deoarece verosimilitatea Gaussiana Euler este doar o cvasi-verosimilitate)."""
+    x = np.asarray(x, dtype=float)
+    specs = {
+        'vasicek_exact': (lambda p: vasicek_loglik(x, dt, p[0], p[1], p[2]), lambda q: (q[0], q[1], np.exp(q[2])), 0.0),
+        'vasicek_euler': (lambda p: euler_loglik(x, dt, p[0], p[1], p[2], 0.0), lambda q: (q[0], q[1], np.exp(q[2])), 0.0),
+        'cir_euler': (lambda p: euler_loglik(x, dt, p[0], p[1], p[2], 0.5), lambda q: (q[0], q[1], np.exp(q[2])), 0.5),
+        'cir_exact': (lambda p: cir_loglik(x, dt, p[0], p[1], p[2]), lambda q: (q[0], q[1], np.exp(q[2])), 0.5),
+    }
+    out = {}
+    m = x.mean()
+    for name, (ll, unpack, g) in specs.items():
+        s0 = 0.015 if g == 0 else 0.015 / np.sqrt(m)
+
+        def nll(q, ll=ll, unpack=unpack):
+            k, th, sg = unpack(q)
+            if k <= 0 or th <= 0:
+                return 1e18
+            v = -ll((k, th, sg))
+            return v if np.isfinite(v) else 1e18
+        res = _fit(nll, [0.2, m, np.log(s0)])
+        th = np.array(unpack(res.x))
+        H = numerical_hessian(lambda t, ll=ll: -ll(t), th)
+        se = np.sqrt(np.maximum(np.diag(np.linalg.inv(H)), 0))
+        out[name] = dict(kappa=th[0], theta=th[1], sigma=th[2], gamma=g, se_kappa=se[0], se_theta=se[1], se_sigma=se[2],
+                         loglik=-res.fun)
+    # CKLS: gamma liber
+    best = None
+    for g0 in (0.5, 1.0, 1.5):
+        def nll(q):
+            if q[0] <= 0 or q[1] <= 0:
+                return 1e18
+            v = -euler_loglik(x, dt, q[0], q[1], np.exp(q[2]), q[3])
+            return v if np.isfinite(v) else 1e18
+        res = _fit(nll, [0.2, m, np.log(0.015 * m ** (-g0)), g0])
+        if best is None or res.fun < best.fun:
+            best = res
+    th = np.array([best.x[0], best.x[1], np.exp(best.x[2]), best.x[3]])
+    f = lambda t: euler_loglik(x, dt, *t)
+    H = -numerical_hessian(f, th)
+    Hi = np.linalg.inv(H)
+    h = 1e-5 * np.maximum(np.abs(th), 1e-2)
+    sc = np.column_stack([(euler_loglik(x, dt, *(th + e), per_obs=True) - euler_loglik(x, dt, *(th - e), per_obs=True)) / (2 * hi)
+                          for e, hi in zip(np.diag(h), h)])
+    V = Hi @ (sc.T @ sc) @ Hi
+    out['ckls'] = dict(kappa=th[0], theta=th[1], sigma=th[2], gamma=th[3], se_gamma=float(np.sqrt(Hi[3, 3])),
+                       se_gamma_rob=float(np.sqrt(V[3, 3])), se_kappa=float(np.sqrt(Hi[0, 0])), loglik=-best.fun)
+    c = out['ckls']
+    c['lr_g0'] = 2 * (c['loglik'] - out['vasicek_euler']['loglik'])
+    c['lr_g05'] = 2 * (c['loglik'] - out['cir_euler']['loglik'])
+    c['wald_g0'] = (c['gamma'] / c['se_gamma_rob']) ** 2
+    c['wald_g05'] = ((c['gamma'] - 0.5) / c['se_gamma_rob']) ** 2
+    out['n'] = len(x) - 1
+    return out
+
+
+def nw_drift_diffusion(x, dt, grid, h=None):
+    """Estimatori Nadaraya-Watson (nucleu Gaussian) pentru driftul a(r) = E[dr | r] / dt si difuzia
+    b^2(r) = E[(dr)^2 | r] / dt (Stanton 1997; Bandi si Phillips 2003); erori standard punctuale robuste la heteroscedasticitate
+    (dependenta seriala a erorilor este ignorata)."""
+    x = np.asarray(x, dtype=float)
+    r0, d = x[:-1], np.diff(x)
+    if h is None:
+        h = 1.06 * r0.std() * len(r0) ** (-0.2)
+    out = {'grid': np.asarray(grid), 'h': h}
+    for name, y in [('drift', d / dt), ('diff2', d ** 2 / dt)]:
+        m, se = [], []
+        for g in grid:
+            w = np.exp(-0.5 * ((r0 - g) / h) ** 2)
+            w /= w.sum()
+            mm = w @ y
+            m.append(mm)
+            se.append(np.sqrt((w ** 2) @ (y - mm) ** 2))
+        out[name], out[name + '_se'] = np.array(m), np.array(se)
     return out
 
 

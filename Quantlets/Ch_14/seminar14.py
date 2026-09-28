@@ -64,6 +64,47 @@ def part_a():
     sd = (b[0.5] - b[0.1]) / stats.norm.ppf(0.9)
     S['A8'] = dict(q10=b[0.1], q50=b[0.5], sd=sd, var1=-(b[0.5] + sd * stats.norm.ppf(0.01)),
                    es25=-(b[0.5] - sd * stats.norm.pdf(stats.norm.ppf(0.025)) / 0.025), clamp=-b[0.1])
+    # V1: RNN liniarizata = VAR(1); W cu raza spectrala < 1 dar norma spectrala > 1 (D = I in h* = 0 pentru tanh)
+    W = np.array([[0.5, 0.8], [0.0, 0.5]])
+    S['V1'] = dict(rho=float(max(abs(np.linalg.eigvals(W)))), norm=float(np.linalg.norm(W, 2)),
+                   n1=float(np.linalg.norm(W, 2)), n5=float(np.linalg.norm(np.linalg.matrix_power(W, 5), 2)),
+                   n20=float(np.linalg.norm(np.linalg.matrix_power(W, 20), 2)),
+                   n50=float(np.linalg.norm(np.linalg.matrix_power(W, 50), 2)),
+                   bound20=float(np.linalg.norm(W, 2) ** 20))
+    # V2: scalarea Chronos prin media valorilor absolute; contextul S&P 500 de 512 zile inainte si dupa 16.03.2020
+    r = M.load_returns('sp500')
+    t = r.index.get_loc(pd.Timestamp('2020-03-16'))
+    x = r.values
+    s_old, s_new = np.abs(x[t - 512:t]).mean(), np.abs(x[t - 511:t + 1]).mean()
+    S['V2'] = dict(s_old=s_old, s_new=s_new, crash=x[t], drop=x[t - 512], factor=s_old / s_new,
+                   check=s_old + (abs(x[t]) - abs(x[t - 512])) / 512)
+    # V3: coada GPD pentru pierderile S&P 500 (ultimele 1000 de zile, prag = cuantila de 95% a pierderilor)
+    L = -x[-1000:]
+    u = np.quantile(L, 0.95)
+    exc = L[L > u] - u
+    xi, _, beta = stats.genpareto.fit(exc, floc=0)
+    Nu, n = len(exc), len(L)
+    var1 = u + beta / xi * ((n / Nu * 0.01) ** (-xi) - 1)
+    var25 = u + beta / xi * ((n / Nu * 0.025) ** (-xi) - 1)
+    S['V3'] = dict(u=u, xi=xi, beta=beta, Nu=Nu, n=n, var1=var1, var25=var25,
+                   es25=var25 / (1 - xi) + (beta - xi * u) / (1 - xi), date=str(r.index[-1].date()))
+    # V4: puterea exacta a testului Kupiec la T = 220 (regiunea de respingere)
+    crit = stats.chi2.ppf(0.95, 1)
+    T = 220
+    rej = [k for k in range(0, 40) if M.kupiec(np.r_[np.ones(k), np.zeros(T - k)], 0.01)['LR'] > crit]
+    k_lo = [k for k in rej if k < 2]
+    k_hi = min(k for k in rej if k > 2)
+    S['V4'] = dict(T=T, k_lo=k_lo, k_hi=k_hi, lr0=M.kupiec(np.zeros(T), 0.01)['LR'],
+                   size=float(stats.binom.pmf(0, T, 0.01) * (0 in rej) + stats.binom.sf(k_hi - 1, T, 0.01)),
+                   power=float(stats.binom.pmf(0, T, 0.0167) * (0 in rej) + stats.binom.sf(k_hi - 1, T, 0.0167)),
+                   p0_1=float(stats.binom.pmf(0, T, 0.0167)), phi_1=float(stats.binom.sf(k_hi - 1, T, 0.0167)),
+                   lr_lo=M.kupiec(np.r_[np.ones(k_hi - 1), np.zeros(T - k_hi + 1)], 0.01)['LR'],
+                   lr_hi=M.kupiec(np.r_[np.ones(k_hi), np.zeros(T - k_hi)], 0.01)['LR'])
+    # V5: QLIKE si media; raportul mediana/media din grila Chronos-2 pentru RV (lognormal: exp(-s^2/2))
+    d = load_csv('ch14_rv.csv')
+    ratio = (d['Chronos-2|median'] / d['Chronos-2']).mean()
+    s5 = float(np.sqrt(-2 * np.log(ratio)))
+    S['V5'] = dict(ratio=float(ratio), s=s5, excess=float(np.exp(s5 ** 2 / 2) - 1 - s5 ** 2 / 2))
 
 
 # =============================================================================

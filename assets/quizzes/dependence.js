@@ -9,30 +9,30 @@ window.MFM_DATA.quizzes['dependence'] = {
     draw: 20,
     questions: [
         {
-            correct: 2,
+            correct: 1,
             en: {
-                title: 'Portfolio variance',
-                text: 'For two assets with weights w and 1-w, which term of the portfolio variance depends on the correlation?',
+                title: "CML on GARCH residuals",
+                text: "A t copula is fitted by canonical maximum likelihood (CML) to the ranks of GARCH-standardised residuals. Compared with the same estimator on the ranks of the true innovations, its asymptotic variance is:",
                 options: [
-                    'w squared times the variance of asset 1',
-                    '(1-w) squared times the variance of asset 2',
-                    '2w(1-w) rho sigma1 sigma2',
-                    'None: correlation affects only expected returns'
+                    "Larger, because the GARCH parameters are estimated in a first step",
+                    "Unchanged: the first-step GARCH estimation does not affect the limit distribution (Chen and Fan, 2006)",
+                    "Smaller, because filtering removes volatility clustering",
+                    "Undefined, because ranks of residuals are not independent"
                 ],
-                correctExplanation: 'The cross term 2w(1-w)ρσ1σ2 carries the correlation; it is what makes diversification work when ρ < 1.',
-                incorrectExplanation: 'Only the cross term contains ρ; the two variance terms do not depend on it.'
+                correctExplanation: "Chen and Fan (2006) show that CML on the ranks of estimated GARCH residuals has the same limit as on the true innovations; in the lecture Monte Carlo the standard deviations were 0.0081 and 0.0082.",
+                incorrectExplanation: "Intuition suggests a first-step penalty, but for rank-based CML on GARCH residuals the limit distribution is unchanged; only the rank term of Genest, Ghoudi and Rivest is needed."
             },
             ro: {
-                title: 'Varianța portofoliului',
-                text: 'Pentru două active cu ponderile w și 1-w, ce termen al varianței portofoliului depinde de corelație?',
+                title: "CML pe reziduuri GARCH",
+                text: "O copulă t este estimată prin verosimilitate maximă canonică (CML) pe rangurile reziduurilor standardizate GARCH. Față de același estimator pe rangurile inovațiilor adevărate, varianța sa asimptotică este:",
                 options: [
-                    'w la pătrat înmulțit cu varianța activului 1',
-                    '(1-w) la pătrat înmulțit cu varianța activului 2',
-                    '2w(1-w) ρ σ1 σ2',
-                    'Niciunul: corelația afectează doar randamentele așteptate'
+                    "Mai mare, pentru că parametrii GARCH sunt estimați într-un prim pas",
+                    "Neschimbată: estimarea GARCH din primul pas nu afectează distribuția limită (Chen și Fan, 2006)",
+                    "Mai mică, pentru că filtrarea elimină gruparea volatilității",
+                    "Nedefinită, pentru că rangurile reziduurilor nu sunt independente"
                 ],
-                correctExplanation: 'Termenul încrucișat 2w(1-w)ρσ1σ2 conține corelația; el face ca diversificarea să funcționeze când ρ < 1.',
-                incorrectExplanation: 'Doar termenul încrucișat conține ρ; termenii de varianță nu depind de el.'
+                correctExplanation: "Chen și Fan (2006) arată că CML pe rangurile reziduurilor GARCH estimate are aceeași limită ca pe inovațiile adevărate; în simularea Monte Carlo din curs abaterile standard au fost 0,0081 și 0,0082.",
+                incorrectExplanation: "Intuiția sugerează o penalizare pentru primul pas, dar pentru CML pe ranguri ale reziduurilor GARCH distribuția limită nu se schimbă; este necesar doar termenul de rang Genest, Ghoudi și Rivest."
             }
         },
         {
@@ -65,55 +65,55 @@ window.MFM_DATA.quizzes['dependence'] = {
         {
             correct: 3,
             en: {
-                title: 'Hedge ratio',
-                text: 'What is the minimum-variance hedge ratio when hedging asset S with instrument F?',
+                title: "CML standard errors",
+                text: "Why is the inverse Hessian of the copula pseudo-likelihood not a valid covariance matrix for CML estimates?",
                 options: [
-                    'sigma_S / sigma_F',
-                    'rho squared',
-                    '1, always',
-                    'rho sigma_S / sigma_F, the slope of r_S on r_F'
+                    "The copula log-likelihood is not concave",
+                    "The fitted copula is always misspecified",
+                    "Financial returns are serially dependent",
+                    "The pseudo-observations are estimated ranks, which adds a variance term from the empirical margins (Genest, Ghoudi and Rivest, 1995)"
                 ],
-                correctExplanation: 'Minimising Var(r_S - h r_F) gives h* = Cov(r_S, r_F)/Var(r_F) = ρσS/σF, the regression slope; ρ² is the share of variance removed.',
-                incorrectExplanation: 'The optimal hedge ratio is the regression slope ρσS/σF; ρ² measures hedge effectiveness, not the ratio.'
+                correctExplanation: "The sandwich A⁻¹ΣA⁻¹ adds W1(U) + W2(V) to the score; for the weekly S&P 500–Euro Stoxx 50 Gaussian copula the standard error of ρ rises from 0.0085 to 0.0137.",
+                incorrectExplanation: "The issue is neither concavity nor serial dependence: the margins are estimated through ranks, and that estimation error must enter the variance."
             },
             ro: {
-                title: 'Raportul de acoperire',
-                text: 'Care este raportul de acoperire de varianță minimă când acoperim activul S cu instrumentul F?',
+                title: "Erorile standard CML",
+                text: "De ce inversa hessienei pseudo-verosimilității copulei nu este o matrice de covarianță validă pentru estimările CML?",
                 options: [
-                    'σS / σF',
-                    'ρ la pătrat',
-                    '1, întotdeauna',
-                    'ρ σS / σF, panta regresiei lui r_S pe r_F'
+                    "Log-verosimilitatea copulei nu este concavă",
+                    "Copula estimată este întotdeauna specificată greșit",
+                    "Randamentele financiare sunt dependente serial",
+                    "Pseudo-observațiile sunt ranguri estimate, ceea ce adaugă un termen de varianță din marginalele empirice (Genest, Ghoudi și Rivest, 1995)"
                 ],
-                correctExplanation: 'Minimizarea lui Var(r_S - h r_F) dă h* = Cov(r_S, r_F)/Var(r_F) = ρσS/σF, panta regresiei; ρ² este proporția de varianță eliminată.',
-                incorrectExplanation: 'Raportul optim este panta regresiei ρσS/σF; ρ² măsoară eficiența acoperirii, nu raportul.'
+                correctExplanation: "Sandwich-ul A⁻¹ΣA⁻¹ adaugă W1(U) + W2(V) la scor; pentru copula Gaussiană S&P 500–Euro Stoxx 50 săptămânală, eroarea standard a lui ρ crește de la 0,0085 la 0,0137.",
+                incorrectExplanation: "Problema nu este concavitatea sau dependența serială: marginalele sunt estimate prin ranguri, iar această eroare de estimare trebuie să intre în varianță."
             }
         },
         {
-            correct: 1,
+            correct: 0,
             en: {
-                title: 'EWMA recursion',
-                text: 'In the RiskMetrics EWMA covariance with lambda = 0.94, what is the half-life of a shock?',
+                title: "Kendall's tau of the t copula",
+                text: "For the Student t copula with correlation parameter rho and nu degrees of freedom, Kendall's tau depends on:",
                 options: [
-                    '0.94 days',
-                    'About 11 days',
-                    'About 250 days',
-                    'Infinite, because EWMA never forgets'
+                    "rho only: tau = (2/pi) arcsin(rho) for every nu",
+                    "nu only",
+                    "Both rho and nu",
+                    "Neither: tau is always 0.5"
                 ],
-                correctExplanation: 'Weights decay as λ^k, so the half-life is ln 0.5 / ln λ ≈ 11.2 days for λ = 0.94.',
-                incorrectExplanation: 'The half-life is ln 0.5 / ln λ, about 11 days for λ = 0.94.'
+                correctExplanation: "Kendall's tau is the same for all elliptical copulas with the same ρ, so τ identifies ρ but never ν; ν must come from the likelihood or from the tails.",
+                incorrectExplanation: "For elliptical copulas τ = (2/π) arcsin ρ whatever ν is, so ν cannot be recovered from τ."
             },
             ro: {
-                title: 'Recursia EWMA',
-                text: 'În covarianța EWMA RiskMetrics cu λ = 0,94, care este timpul de înjumătățire al unui șoc?',
+                title: "Tau Kendall al copulei t",
+                text: "Pentru copula Student t cu parametrul de corelație ρ și ν grade de libertate, tau Kendall depinde de:",
                 options: [
-                    '0,94 zile',
-                    'Aproximativ 11 zile',
-                    'Aproximativ 250 de zile',
-                    'Infinit, pentru că EWMA nu uită niciodată'
+                    "Doar ρ: τ = (2/π) arcsin ρ pentru orice ν",
+                    "Doar ν",
+                    "Atât ρ, cât și ν",
+                    "De niciunul: τ este întotdeauna 0,5"
                 ],
-                correctExplanation: 'Ponderile scad ca λ^k, deci timpul de înjumătățire este ln 0,5 / ln λ ≈ 11,2 zile pentru λ = 0,94.',
-                incorrectExplanation: 'Timpul de înjumătățire este ln 0,5 / ln λ, circa 11 zile pentru λ = 0,94.'
+                correctExplanation: "Tau Kendall este același pentru toate copulele eliptice cu același ρ, deci τ identifică ρ, dar niciodată ν; ν vine din verosimilitate sau din cozi.",
+                incorrectExplanation: "Pentru copulele eliptice τ = (2/π) arcsin ρ oricare ar fi ν, deci ν nu poate fi recuperat din τ."
             }
         },
         {
@@ -144,30 +144,30 @@ window.MFM_DATA.quizzes['dependence'] = {
             }
         },
         {
-            correct: 1,
+            correct: 2,
             en: {
-                title: 'Joining series',
-                text: 'When computing the correlation of Bitcoin (7 days a week) and SPY (weekdays), what is the correct order of operations?',
+                title: "Attainable correlation",
+                text: "X = exp(Z) and Y = exp(3Z), with Z following the standard Normal distribution, so X and Y are comonotone lognormal variables. Their Pearson correlation is:",
                 options: [
-                    'Compute returns on each calendar, then join the returns',
-                    'Join the prices on common days, then compute returns',
-                    'Fill SPY weekends with Friday prices and use all 7 days',
-                    'Drop Mondays'
+                    "1, because comonotone variables are perfectly correlated",
+                    "0, because their variances differ",
+                    "About 0.16: (e^3 - 1) / sqrt((e - 1)(e^9 - 1))",
+                    "It cannot be computed without data"
                 ],
-                correctExplanation: 'Joining prices first makes each Monday return include the Bitcoin weekend move, matching the SPY Friday-to-Monday return.',
-                incorrectExplanation: 'Returns computed before joining would pair a Sunday-to-Monday Bitcoin return with a Friday-to-Monday SPY return.'
+                correctExplanation: "Comonotone variables reach the maximal attainable correlation for their margins, which for these lognormals is only about 0.16: a small ρ does not mean weak dependence (Fréchet–Hoeffding bounds).",
+                incorrectExplanation: "Perfect dependence gives ρ = 1 only for linearly related variables; for these margins the maximum is (e³ − 1)/√((e − 1)(e⁹ − 1)) ≈ 0.16."
             },
             ro: {
-                title: 'Unirea seriilor',
-                text: 'Când calculăm corelația dintre Bitcoin (7 zile din 7) și SPY (zile lucrătoare), care este ordinea corectă a operațiilor?',
+                title: "Corelația posibilă",
+                text: "X = exp(Z) și Y = exp(3Z), cu Z având distribuția Normală standard, deci X și Y sunt variabile lognormale comonotone. Corelația lor Pearson este:",
                 options: [
-                    'Calculăm randamentele pe fiecare calendar, apoi unim randamentele',
-                    'Unim prețurile în zilele comune, apoi calculăm randamentele',
-                    'Completăm weekendurile SPY cu prețul de vineri și folosim toate cele 7 zile',
-                    'Eliminăm zilele de luni'
+                    "1, pentru că variabilele comonotone sunt perfect corelate",
+                    "0, pentru că varianțele lor diferă",
+                    "Aproximativ 0,16: (e^3 - 1) / sqrt((e - 1)(e^9 - 1))",
+                    "Nu se poate calcula fără date"
                 ],
-                correctExplanation: 'Unirea întâi a prețurilor face ca fiecare randament de luni să includă mișcarea Bitcoin din weekend, la fel ca randamentul SPY de vineri la luni.',
-                incorrectExplanation: 'Randamentele calculate înainte de unire ar împerechea un randament Bitcoin duminică–luni cu un randament SPY vineri–luni.'
+                correctExplanation: "Variabilele comonotone ating corelația maximă posibilă pentru marginalele lor, care pentru aceste lognormale este doar circa 0,16: un ρ mic nu înseamnă dependență slabă (marginile Fréchet–Hoeffding).",
+                incorrectExplanation: "Dependența perfectă dă ρ = 1 doar pentru variabile legate liniar; pentru aceste marginale maximul este (e³ − 1)/√((e − 1)(e⁹ − 1)) ≈ 0,16."
             }
         },
         {
@@ -335,28 +335,28 @@ window.MFM_DATA.quizzes['dependence'] = {
         {
             correct: 1,
             en: {
-                title: 'Forbes–Rigobon bias',
-                text: 'Why can correlations rise in a crisis even if the transmission mechanism does not change?',
+                title: "Forbes–Rigobon with a common shock",
+                text: "In a crisis a global shock raises both the variance of the source market and the idiosyncratic variance of the target market. The Forbes–Rigobon adjusted correlation then:",
                 options: [
-                    'Because returns become Normal in crises',
-                    'Because a higher variance of the source market mechanically raises the measured correlation',
-                    'Because trading volume falls',
-                    'Because correlations are always higher in bull markets'
+                    "Is unbiased, because the adjustment uses the variance ratio",
+                    "Over-corrects, biasing the test towards \"no contagion\" (Corsetti, Pericoli and Sbracia, 2005)",
+                    "Under-corrects, biasing the test towards contagion",
+                    "Becomes negative by construction"
                 ],
-                correctExplanation: 'In y = α + βx + ε with constant β and σε, ρ² = β²σx²/(β²σx² + σε²) rises with σx²: the heteroskedasticity bias.',
-                incorrectExplanation: 'The bias comes from the higher variance of the source market with unchanged β and σε.'
+                correctExplanation: "The adjustment assumes a constant idiosyncratic variance; a common shock inflates the variance ratio and removes too much of the rise in correlation, so true contagion can be hidden.",
+                incorrectExplanation: "With a common shock the no-omitted-factor assumption fails and the adjustment removes too much of the rise in correlation."
             },
             ro: {
-                title: 'Distorsiunea Forbes–Rigobon',
-                text: 'De ce pot crește corelațiile în criză chiar dacă mecanismul de transmitere nu se schimbă?',
+                title: "Forbes–Rigobon cu un șoc comun",
+                text: "Într-o criză, un șoc global crește atât varianța pieței-sursă, cât și varianța idiosincratică a pieței-țintă. Corelația corectată Forbes–Rigobon atunci:",
                 options: [
-                    'Pentru că randamentele devin Normale în criză',
-                    'Pentru că o varianță mai mare a pieței-sursă crește mecanic corelația măsurată',
-                    'Pentru că volumul de tranzacționare scade',
-                    'Pentru că în piețele în creștere corelațiile sunt întotdeauna mai mari'
+                    "Este nedeplasată, pentru că corecția folosește raportul varianțelor",
+                    "Corectează excesiv, deplasând testul spre „nicio contagiune” (Corsetti, Pericoli și Sbracia, 2005)",
+                    "Corectează insuficient, deplasând testul spre contagiune",
+                    "Devine negativă prin construcție"
                 ],
-                correctExplanation: 'În y = α + βx + ε cu β și σε constante, ρ² = β²σx²/(β²σx² + σε²) crește odată cu σx²: distorsiunea de heteroscedasticitate.',
-                incorrectExplanation: 'Distorsiunea vine din varianța mai mare a pieței-sursă, cu β și σε neschimbate.'
+                correctExplanation: "Corecția presupune o varianță idiosincratică constantă; un șoc comun umflă raportul varianțelor și elimină prea mult din creșterea corelației, deci contagiunea reală poate fi ascunsă.",
+                incorrectExplanation: "Cu un șoc comun, ipoteza „niciun factor omis” cade, iar corecția elimină prea mult din creșterea corelației."
             }
         },
         {
@@ -441,57 +441,57 @@ window.MFM_DATA.quizzes['dependence'] = {
             }
         },
         {
-            correct: 1,
+            correct: 3,
             en: {
-                title: 'Sklar\'s theorem',
-                text: 'What does Sklar\'s theorem state?',
+                title: "Standard error of a correlation",
+                text: "For daily returns with fat tails and volatility clustering, the Fisher interval tanh(z ± 1.96/sqrt(T − 3)) for a correlation is typically:",
                 options: [
-                    'Every joint distribution is Normal after a transformation',
-                    'Every joint distribution can be written as a copula evaluated at the marginal distribution functions',
-                    'Correlation determines the joint distribution',
-                    'Copulas exist only for elliptical distributions'
+                    "Exact for any T",
+                    "Too wide, hence conservative",
+                    "Valid once T exceeds 250",
+                    "Too narrow: the variance of the correlation depends on fourth moments and on the serial dependence of the cross-products"
                 ],
-                correctExplanation: 'F(x1, ..., xd) = C(F1(x1), ..., Fd(xd)); the copula is unique when the margins are continuous.',
-                incorrectExplanation: 'Sklar separates any joint distribution into margins and a copula.'
+                correctExplanation: "For SPY–TLT in 2002–2021 the delta-method HAC standard error was 0.0227 against 0.0120 from the Fisher formula, about 1.9 times larger.",
+                incorrectExplanation: "The Fisher formula assumes i.i.d. pairs with the Normal distribution; fat tails and GARCH make the true variance larger, so the Fisher band is too narrow."
             },
             ro: {
-                title: 'Teorema lui Sklar',
-                text: 'Ce afirmă teorema lui Sklar?',
+                title: "Eroarea standard a unei corelații",
+                text: "Pentru randamente zilnice cu cozi groase și volatilitate grupată, intervalul Fisher tanh(z ± 1,96/sqrt(T − 3)) pentru o corelație este de regulă:",
                 options: [
-                    'Orice repartiție comună devine Normală după o transformare',
-                    'Orice repartiție comună se poate scrie ca o copulă evaluată în funcțiile de repartiție marginale',
-                    'Corelația determină repartiția comună',
-                    'Copulele există doar pentru repartiții eliptice'
+                    "Exact pentru orice T",
+                    "Prea larg, deci conservator",
+                    "Valid când T depășește 250",
+                    "Prea îngust: varianța corelației depinde de momentele de ordinul patru și de dependența serială a produselor încrucișate"
                 ],
-                correctExplanation: 'F(x1, ..., xd) = C(F1(x1), ..., Fd(xd)); copula este unică atunci când marginalele sunt continue.',
-                incorrectExplanation: 'Sklar separă orice repartiție comună în marginale și o copulă.'
+                correctExplanation: "Pentru SPY–TLT în 2002–2021, eroarea standard HAC prin metoda delta a fost 0,0227, față de 0,0120 din formula Fisher, de circa 1,9 ori mai mare.",
+                incorrectExplanation: "Formula Fisher presupune perechi i.i.d. cu distribuția Normală; cozile groase și GARCH fac varianța reală mai mare, deci banda Fisher este prea îngustă."
             }
         },
         {
             correct: 0,
             en: {
-                title: 'Tail dependence by family',
-                text: 'Which copula has upper-tail dependence but no lower-tail dependence?',
+                title: "A break date chosen by eye",
+                text: "You pick January 2022 from a chart of the rolling correlation and then test for a change in correlation at that date with a Fisher z test. The test is:",
                 options: [
-                    'Gumbel',
-                    'Clayton',
-                    'Gaussian',
-                    'Frank'
+                    "Oversized: the date was chosen from the data; use an unknown-date test such as Wied, Krämer and Dehling (2012)",
+                    "Exactly sized, because the date is fixed before the statistic is computed",
+                    "Undersized, because the chart smooths the data",
+                    "Valid whenever the sample is large"
                 ],
-                correctExplanation: 'Gumbel: λU = 2 − 2^{1/θ}, λL = 0. Clayton is the mirror image; Gaussian and Frank have none; Student t has both.',
-                incorrectExplanation: 'Only the Gumbel copula has upper-tail dependence alone.'
+                correctExplanation: "Choosing the date after looking turns the statistic into a maximum over dates, whose limit is the supremum of a Brownian bridge; on the SPY–TLT residuals the unknown-date test puts the break in August 2020, not January 2022.",
+                incorrectExplanation: "A date selected from the data makes the statistic a maximum over dates, so Normal critical values reject too often."
             },
             ro: {
-                title: 'Dependența în cozi pe familii',
-                text: 'Ce copulă are dependență în coada superioară, dar nu și în cea inferioară?',
+                title: "O dată de ruptură aleasă din ochi",
+                text: "Alegeți ianuarie 2022 de pe graficul corelației mobile și apoi testați o schimbare a corelației la acea dată cu un test Fisher z. Testul este:",
                 options: [
-                    'Gumbel',
-                    'Clayton',
-                    'Gaussiană',
-                    'Frank'
+                    "Cu nivel real prea mare: data a fost aleasă din date; folosiți un test cu dată necunoscută, precum Wied, Krämer și Dehling (2012)",
+                    "Cu nivel exact, pentru că data este fixată înainte de calculul statisticii",
+                    "Cu nivel real prea mic, pentru că graficul netezește datele",
+                    "Valid oricând eșantionul este mare"
                 ],
-                correctExplanation: 'Gumbel: λU = 2 − 2^{1/θ}, λL = 0. Clayton este imaginea în oglindă; Gaussiana și Frank nu au; Student t le are pe amândouă.',
-                incorrectExplanation: 'Doar copula Gumbel are exclusiv dependență în coada superioară.'
+                correctExplanation: "Alegerea datei după ce am văzut datele transformă statistica într-un maxim după date, a cărui limită este supremumul unei punți browniene; pe reziduurile SPY–TLT testul cu dată necunoscută pune ruptura în august 2020, nu în ianuarie 2022.",
+                incorrectExplanation: "O dată aleasă din date face ca statistica să fie un maxim după date, deci valorile critice Normale resping prea des."
             }
         },
         {

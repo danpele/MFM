@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_corr_inference'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Inference on correlations and DCC: delta-method HAC standard errors of a correlation versus Fisher intervals (SPY-TLT), the Wied-Kramer-Dehling test for a change in correlation at an unknown date on GARCH residuals, two-step DCC standard errors by a parametric residual bootstrap of both steps, an out-of-sample DCC hedge of BET with the Euro Stoxx 50 with a Diebold-Mariano test, and a Forbes-Rigobon test with an estimated variance ratio (stationary bootstrap).'
+
+Keywords: 'correlation inference, delta method, HAC, change-point test, Wied-Kramer-Dehling, two-step estimation, DCC, bootstrap, hedge ratio, Forbes-Rigobon'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_corr_hac.pdf, ch6_wkd.pdf'

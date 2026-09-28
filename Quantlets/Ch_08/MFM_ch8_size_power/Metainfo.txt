@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_size_power'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Monte Carlo size and power of VaR 1% backtests (Kupiec, Christoffersen conditional coverage, Weibull duration, Dynamic Quantile) under a GARCH(1,1)-t fitted to the S&P 500, for the correct model, a Normal-GARCH and historical simulation at T = 250, 1000, 5000; estimation risk of the Kupiec test with GARCH-t re-estimated on each simulated path (fixed scheme, R = 1000).'
+
+Keywords: 'size, power, Monte Carlo, estimation risk, Dynamic Quantile test, duration test, GARCH-t'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'GSPC.INDX (data/market) for the GARCH-t parameters; simulated paths'
+
+Output: 'printed tables'

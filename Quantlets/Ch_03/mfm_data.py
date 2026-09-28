@@ -72,6 +72,8 @@ FILES = {
     ('mom', 'D'): 'F-F_Momentum_Factor_daily_CSV.zip',
     ('p25', 'M'): '25_Portfolios_5x5_CSV.zip',
     ('ind10', 'M'): '10_Industry_Portfolios_CSV.zip',
+    ('ind30', 'M'): '30_Industry_Portfolios_CSV.zip',
+    ('p100', 'M'): '100_Portfolios_10x10_CSV.zip',
 }
 
 
@@ -146,7 +148,11 @@ def ols_hac(y, X, lags=None, const=True):
 
 
 def grs_test(excess, market_excess):
-    """Testul Gibbons-Ross-Shanken (1989) pentru alfa = 0 pe N active, un factor."""
+    """Testul Gibbons-Ross-Shanken (1989) pentru alfa = 0 pe N active, un factor.
+
+    Sigma si varianta factorului sunt estimatorii de verosimilitate maxima (impartire la T),
+    ca in lucrare; sub reziduuri normale i.i.d., W ~ F(N, T - N - 1) exact.
+    """
     from scipy import stats
     R = np.asarray(excess, float)
     f = np.asarray(market_excess, float)
@@ -155,8 +161,8 @@ def grs_test(excess, market_excess):
     B = np.linalg.lstsq(X, R, rcond=None)[0]
     alpha = B[0]
     E = R - X @ B
-    Sigma = E.T @ E / (T - 2)
-    mu, s2 = f.mean(), f.var(ddof=1)
+    Sigma = E.T @ E / T
+    mu, s2 = f.mean(), f.var(ddof=0)
     stat = (T - N - 1) / N * (alpha @ np.linalg.solve(Sigma, alpha)) / (1 + mu ** 2 / s2)
     p = 1 - stats.f.cdf(stat, N, T - N - 1)
     return stat, p, alpha, B[1]

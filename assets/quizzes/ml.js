@@ -37,136 +37,136 @@ window.MFM_DATA.quizzes['ml'] = {
         {
             correct: 2,
             en: {
-                title: 'Bias-variance trade-off',
-                text: 'On S&P 500 data, as the maximum depth of a single decision tree grows from 1 to 15, training accuracy rises to about 87% while purged cross-validated accuracy falls towards 50%. What does this show?',
+                title: 'Forecast tests for nested models',
+                text: 'You compare a logistic regression with 14 features against a constant forecast (the same logit with all slopes set to zero) using the Diebold-Mariano test on squared errors. What is the problem?',
                 options: [
-                    'Underfitting: the tree is too simple',
-                    'The cross-validation is wrong because accuracy must rise with depth',
-                    'Overfitting: deeper trees reduce bias but their variance explodes, so they memorise noise',
-                    'Deeper trees are always better in finance'
+                    'The Diebold-Mariano test requires Normally distributed forecast errors',
+                    'Squared errors cannot be used for probability forecasts',
+                    'The models are nested: under the null the larger model estimates zeros with noise, so the DM statistic is not asymptotically N(0,1) and is undersized; use the Clark-West adjustment',
+                    'Nothing: the Diebold-Mariano test is valid for any pair of models'
                 ],
-                correctExplanation: 'Training accuracy measures memorisation; out-of-sample accuracy measures generalisation. Deep trees fit the noise (high variance).',
-                incorrectExplanation: 'A widening gap between training and out-of-sample accuracy is the signature of overfitting (high variance).'
+                correctExplanation: 'Clark and West (2007) add the term $(\\hat p_0 - \\hat p_1)^2$ back to the loss differential, which removes the noise a correctly nested model pays for estimating zero coefficients.',
+                incorrectExplanation: 'Think about what the large model does under the null that it adds nothing: it still estimates 14 coefficients, and their noise inflates its loss.'
             },
             ro: {
-                title: 'Compromisul bias-varianță',
-                text: 'Pe datele S&P 500, când adâncimea maximă a unui singur arbore de decizie crește de la 1 la 15, acuratețea pe antrenare urcă la circa 87%, iar acuratețea din validarea încrucișată cu purjare scade spre 50%. Ce arată acest lucru?',
+                title: 'Teste de prognoză pentru modele imbricate',
+                text: 'Comparați o regresie logistică cu 14 caracteristici cu o prognoză constantă (același logit cu toate pantele zero) prin testul Diebold-Mariano pe erori pătratice. Care este problema?',
                 options: [
-                    'Subajustare: arborele este prea simplu',
-                    'Validarea încrucișată este greșită, pentru că acuratețea trebuie să crească odată cu adâncimea',
-                    'Supraajustare: arborii mai adânci reduc bias-ul, dar varianța lor explodează, deci memorează zgomotul',
-                    'Arborii mai adânci sunt mereu mai buni în finanțe'
+                    'Testul Diebold-Mariano cere erori de prognoză din distribuția Normală',
+                    'Erorile pătratice nu pot fi folosite pentru prognoze de probabilitate',
+                    'Modelele sunt imbricate: sub ipoteza nulă modelul mare estimează cu zgomot coeficienți nuli, deci statistica DM nu este asimptotic N(0,1) și are mărime prea mică; folosiți corecția Clark-West',
+                    'Nimic: testul Diebold-Mariano este valid pentru orice pereche de modele'
                 ],
-                correctExplanation: 'Acuratețea pe antrenare măsoară memorarea, iar cea out-of-sample măsoară generalizarea. Arborii adânci modelează zgomotul (varianță mare).',
-                incorrectExplanation: 'Un decalaj tot mai mare între acuratețea pe antrenare și cea out-of-sample este semnul supraajustării (varianță mare).'
+                correctExplanation: 'Clark și West (2007) adaugă înapoi termenul $(\\hat p_0 - \\hat p_1)^2$ la diferența pierderilor, ceea ce elimină zgomotul pe care îl plătește un model imbricat corect când estimează coeficienți nuli.',
+                incorrectExplanation: 'Gândiți-vă ce face modelul mare sub ipoteza nulă că nu adaugă nimic: estimează totuși 14 coeficienți, iar zgomotul lor îi mărește pierderea.'
             }
         },
         {
             correct: 0,
             en: {
-                title: 'LASSO vs Ridge',
-                text: 'What is the main practical difference between the LASSO ($L_1$) and Ridge ($L_2$) penalties?',
+                title: 'Testing directional accuracy',
+                text: 'A model predicts "up" on 98.3% of days and is right 57.6% of the time, while 58.1% of the days are up. Which test answers whether its signs carry information?',
                 options: [
-                    'LASSO can set coefficients exactly to zero (variable selection); Ridge only shrinks them towards zero',
-                    'Ridge sets coefficients exactly to zero; LASSO never does',
-                    'Both always give identical coefficients',
-                    'LASSO can only be used for classification'
+                    'The Pesaran-Timmermann test, which compares the hit rate with the rate expected under independence given both marginal frequencies (here 57.8%, so it does not reject)',
+                    'A binomial test of the hit rate against 50%',
+                    'A t-test of the accuracy against 0.5 with i.i.d. standard errors',
+                    'A McNemar test against a coin flip'
                 ],
-                correctExplanation: 'The $L_1$ penalty has a kink at zero, so the optimum often lies exactly at zero: LASSO performs automatic feature selection.',
-                incorrectExplanation: 'Only the $L_1$ penalty produces exact zeros; the $L_2$ penalty shrinks all coefficients smoothly.'
+                correctExplanation: 'Under independence the expected hit rate is $\\hat p_y\\hat p_x + (1-\\hat p_y)(1-\\hat p_x) = 0.578$; the observed 0.576 is below it ($PT = -1.28$). With overlapping labels the variance must also be HAC-adjusted.',
+                incorrectExplanation: 'A 50% benchmark ignores that the market goes up on 58% of days and that the model almost always says "up"; the right null conditions on both frequencies.'
             },
             ro: {
-                title: 'LASSO vs Ridge',
-                text: 'Care este principala diferență practică dintre penalizările LASSO ($L_1$) și Ridge ($L_2$)?',
+                title: 'Testarea acurateței direcționale',
+                text: 'Un model prezice „sus” în 98,3% din zile și are dreptate în 57,6% din cazuri, iar 58,1% dintre zile sunt „sus”. Ce test răspunde dacă semnele lui conțin informație?',
                 options: [
-                    'LASSO poate anula exact coeficienții (selecție de variabile); Ridge doar îi micșorează spre zero',
-                    'Ridge anulează exact coeficienții; LASSO niciodată',
-                    'Ambele dau mereu coeficienți identici',
-                    'LASSO se poate folosi doar pentru clasificare'
+                    'Testul Pesaran-Timmermann, care compară rata de succes cu rata așteptată sub independență, dat fiind ambele frecvențe marginale (aici 57,8%, deci nu respinge)',
+                    'Un test binomial al ratei de succes față de 50%',
+                    'Un test t al acurateței față de 0,5, cu erori standard i.i.d.',
+                    'Un test McNemar față de aruncarea unei monede'
                 ],
-                correctExplanation: 'Penalizarea $L_1$ are un punct unghiular în zero, astfel că optimul se află adesea exact în zero: LASSO face selecție automată a variabilelor.',
-                incorrectExplanation: 'Doar penalizarea $L_1$ produce zerouri exacte; penalizarea $L_2$ micșorează continuu toți coeficienții.'
+                correctExplanation: 'Sub independență rata așteptată este $\\hat p_y\\hat p_x + (1-\\hat p_y)(1-\\hat p_x) = 0,578$; valoarea observată 0,576 este sub ea ($PT = -1,28$). Cu etichete suprapuse, varianța trebuie ajustată și HAC.',
+                incorrectExplanation: 'Un reper de 50% ignoră faptul că piața crește în 58% dintre zile și că modelul spune aproape mereu „sus”; ipoteza nulă corectă ține cont de ambele frecvențe.'
             }
         },
         {
             correct: 3,
             en: {
-                title: 'Random forest vs boosting',
-                text: 'Which statement correctly contrasts random forests and gradient boosting?',
+                title: 'Inference after selection',
+                text: 'LASSO selects 3 of 14 features; you then run OLS on these 3 and report their t-statistics as evidence that they predict returns. What is wrong?',
                 options: [
-                    'Both fit a single very deep tree',
-                    'Random forests fit trees sequentially on residuals; boosting averages independent trees',
-                    'Boosting cannot overfit, whatever the number of iterations',
-                    'Random forests average many decorrelated trees fitted in parallel (variance reduction); boosting adds shallow trees sequentially, each fitting the errors of the previous ones (bias reduction)'
+                    'Nothing, because OLS removes the shrinkage bias of LASSO',
+                    'Only the standard errors are wrong; heteroskedasticity-robust errors fix the problem',
+                    'LASSO coefficients are unbiased, so the OLS step is redundant',
+                    'The t-statistics ignore the data-driven selection step and are over-optimistic; use post-double selection, double/debiased machine learning or sample splitting'
                 ],
-                correctExplanation: 'Bagging + feature subsampling reduces variance; boosting reduces bias step by step and needs a learning rate and early stopping to avoid overfitting.',
-                incorrectExplanation: 'Random forests = parallel averaging (bagging); boosting = sequential fitting of residuals.'
+                correctExplanation: 'Selection and estimation on the same data make the reported t-statistics conditional on a selection event they ignore; Belloni, Chernozhukov and Hansen (2014) and Chernozhukov et al. (2018) give valid inference for a target coefficient.',
+                incorrectExplanation: 'Robust standard errors do not repair a distribution that was distorted by choosing the regressors on the same sample.'
             },
             ro: {
-                title: 'Random forest vs boosting',
-                text: 'Care afirmație compară corect random forest și gradient boosting?',
+                title: 'Inferența după selecție',
+                text: 'LASSO selectează 3 din 14 caracteristici; apoi rulați OLS pe aceste 3 și raportați statisticile lor t drept dovadă că prezic randamentele. Ce este greșit?',
                 options: [
-                    'Ambele estimează un singur arbore foarte adânc',
-                    'Random forest estimează arbori secvențial pe reziduuri; boosting mediază arbori independenți',
-                    'Boosting nu poate supraajusta, indiferent de numărul de iterații',
-                    'Random forest mediază mulți arbori decorelați, estimați în paralel (reduce varianța); boosting adaugă secvențial arbori mici, fiecare corectând erorile celor anteriori (reduce bias-ul)'
+                    'Nimic, pentru că OLS elimină biasul de micșorare al LASSO',
+                    'Doar erorile standard sunt greșite; erorile robuste la heteroscedasticitate rezolvă problema',
+                    'Coeficienții LASSO sunt nedeplasați, deci pasul OLS este inutil',
+                    'Statisticile t ignoră pasul de selecție bazat pe date și sunt prea optimiste; folosiți selecția dublă, machine learning dublu (DML) sau împărțirea eșantionului'
                 ],
-                correctExplanation: 'Bagging-ul plus eșantionarea variabilelor reduce varianța; boosting-ul reduce bias-ul pas cu pas și are nevoie de rată de învățare și early stopping pentru a evita supraajustarea.',
-                incorrectExplanation: 'Random forest = mediere în paralel (bagging); boosting = estimare secvențială pe reziduuri.'
+                correctExplanation: 'Selecția și estimarea pe aceleași date fac statisticile t raportate condiționate de un eveniment de selecție pe care îl ignoră; Belloni, Chernozhukov și Hansen (2014) și Chernozhukov et al. (2018) dau inferență validă pentru un coeficient-țintă.',
+                incorrectExplanation: 'Erorile standard robuste nu repară o distribuție deformată de alegerea regresorilor pe același eșantion.'
             }
         },
         {
             correct: 1,
             en: {
                 title: 'Fractional differentiation',
-                text: 'For the S&P 500 log price (2000-2026), the minimum differentiation order that passes the ADF test at 5% is $d^* = 0.25$, and the FFD series has a correlation of 0.98 with the log price. What is the point of using $d^*$ instead of $d = 1$ (returns)?',
+                text: 'For the S&P 500 log price (2000-2026), the ADF test (constant, 1 lag) first rejects on the FFD series at $d = 0.25$, where the truncated weights ($K = 444$ lags) sum to 0.178. What is the correct reading?',
                 options: [
-                    'Returns are non-stationary, so they cannot be used',
-                    'The FFD series is stationary and still keeps most of the memory of the price level, which returns erase',
-                    'FFD makes the series normally distributed',
-                    'FFD removes all autocorrelation from the price'
+                    'The FFD series is stationary, because the ADF test rejected the unit root at 5%',
+                    'The FFD series equals $0.178\\,\\log P_t$ plus a stationary part, so it is still I(1); the ADF rejection is a finite-sample artefact (with AIC-chosen lags it does not reject), and memory should be estimated directly, e.g. by local Whittle',
+                    'The sum of the weights is irrelevant as long as the correlation with the price is high',
+                    'Any fractional order $d > 0$ makes an I(1) series stationary'
                 ],
-                correctExplanation: 'Integer differencing ($d=1$) achieves stationarity by throwing away memory; the minimum $d^*$ gives stationarity while preserving predictive information.',
-                incorrectExplanation: 'The trade-off is stationarity vs memory: $d^*$ is the smallest order that makes the series stationary, so it keeps as much memory as possible.'
+                correctExplanation: 'Differencing an I(1) series by $d$ gives I($1-d$), stationary only for $d > 1/2$; truncation leaves a scaled random walk. The exact local Whittle estimate for the FFD series is 0.75, CI [0.69; 0.81].',
+                incorrectExplanation: 'Write the FFD series as $(\\sum_k w_k)X_t - \\sum_k w_k (X_t - X_{t-k})$ and ask what happens to the first term when $X_t$ has a unit root.'
             },
             ro: {
                 title: 'Diferențierea fracționară',
-                text: 'Pentru logaritmul prețului S&P 500 (2000-2026), ordinul minim de diferențiere care trece testul ADF la 5% este $d^* = 0,25$, iar seria FFD are o corelație de 0,98 cu logaritmul prețului. Care este avantajul folosirii lui $d^*$ în locul lui $d = 1$ (randamente)?',
+                text: 'Pentru logaritmul prețului S&P 500 (2000-2026), testul ADF (constantă, 1 lag) respinge pentru prima dată pe seria FFD la $d = 0,25$, unde ponderile trunchiate ($K = 444$ lag-uri) au suma 0,178. Care este interpretarea corectă?',
                 options: [
-                    'Randamentele sunt nestaționare, deci nu pot fi folosite',
-                    'Seria FFD este staționară și păstrează în mare parte memoria nivelului prețului, pe care randamentele o șterg',
-                    'FFD face ca seria să urmeze distribuția Normală',
-                    'FFD elimină toată autocorelația din preț'
+                    'Seria FFD este staționară, pentru că testul ADF a respins rădăcina unitară la 5%',
+                    'Seria FFD este egală cu $0,178\\,\\log P_t$ plus o parte staționară, deci rămâne I(1); respingerea ADF este un artefact de eșantion finit (cu lag-uri alese prin AIC nu respinge), iar memoria trebuie estimată direct, de exemplu prin local Whittle',
+                    'Suma ponderilor nu contează, cât timp corelația cu prețul este mare',
+                    'Orice ordin fracționar $d > 0$ face staționară o serie I(1)'
                 ],
-                correctExplanation: 'Diferențierea întreagă ($d=1$) obține staționaritatea renunțând la memorie; $d^*$ minim asigură staționaritatea păstrând informația predictivă.',
-                incorrectExplanation: 'Compromisul este staționaritate vs memorie: $d^*$ este cel mai mic ordin care face seria staționară, deci păstrează cât mai multă memorie.'
+                correctExplanation: 'Diferențierea unei serii I(1) cu $d$ dă o serie I($1-d$), staționară doar pentru $d > 1/2$; trunchierea lasă un mers aleator scalat. Estimatorul local Whittle exact pentru seria FFD dă 0,75, CI [0,69; 0,81].',
+                incorrectExplanation: 'Scrieți seria FFD ca $(\\sum_k w_k)X_t - \\sum_k w_k (X_t - X_{t-k})$ și întrebați-vă ce se întâmplă cu primul termen când $X_t$ are rădăcină unitară.'
             }
         },
         {
-            correct: 0,
+            correct: 1,
             en: {
-                title: 'Triple-barrier method',
-                text: 'In the triple-barrier labelling method, how is the label of an observation determined?',
+                title: 'How small is a small R²?',
+                text: 'A predictor of monthly market returns has an out-of-sample $R^2$ of 0.5%. According to Campbell and Thompson (2008), what does this mean for a mean-variance investor?',
                 options: [
-                    'By the first barrier touched: upper (profit-taking, +1), lower (stop-loss, -1), or the vertical time barrier (sign of the return at expiry)',
-                    'By the sign of the return over a fixed horizon, ignoring the path',
-                    'By the analyst, manually',
-                    'By the average of the three barrier levels'
+                    'It is negligible, because any $R^2$ below 1% has no economic value',
+                    'It is economically meaningful: the squared Sharpe ratio rises to $(SR_0^2 + R^2)/(1 - R^2)$; for the S&P 500 (annualised $SR_0 = 0.44$) the Sharpe ratio rises to about 0.51',
+                    'The measure only applies to classification models',
+                    'Such a small $R^2$ must be the result of leakage'
                 ],
-                correctExplanation: 'The label is path-dependent: it reflects what a trader with a profit target, a stop-loss and a holding-period limit would actually experience. The horizontal barriers are scaled by volatility.',
-                incorrectExplanation: 'The triple-barrier label is path-dependent and is set by whichever barrier is touched first.'
+                correctExplanation: 'Because monthly Sharpe ratios are small, a small $R^2$ is a large relative gain: $SR^{*2} = (SR_0^2 + R^2)/(1 - R^2)$. Welch and Goyal (2008) show that most predictors fail this test against the historical mean.',
+                incorrectExplanation: 'Compare the $R^2$ with the squared monthly Sharpe ratio of the market, not with 1.'
             },
             ro: {
-                title: 'Metoda celor trei bariere',
-                text: 'În metoda de etichetare cu trei bariere, cum se stabilește eticheta unei observații?',
+                title: 'Cât de mic este un R² mic?',
+                text: 'Un predictor al randamentelor lunare ale pieței are un $R^2$ în afara eșantionului de 0,5%. Potrivit lui Campbell și Thompson (2008), ce înseamnă asta pentru un investitor medie-varianță?',
                 options: [
-                    'După prima barieră atinsă: superioară (profit, +1), inferioară (stop-loss, -1) sau bariera verticală de timp (semnul randamentului la expirare)',
-                    'După semnul randamentului pe un orizont fix, ignorând traiectoria',
-                    'Manual, de către analist',
-                    'După media celor trei niveluri ale barierelor'
+                    'Este neglijabil, pentru că orice $R^2$ sub 1% nu are valoare economică',
+                    'Este relevant economic: pătratul raportului Sharpe crește la $(SR_0^2 + R^2)/(1 - R^2)$; pentru S&P 500 ($SR_0$ anualizat 0,44) raportul Sharpe crește la aproximativ 0,51',
+                    'Măsura se aplică doar modelelor de clasificare',
+                    'Un $R^2$ atât de mic trebuie să provină dintr-o scurgere de informație'
                 ],
-                correctExplanation: 'Eticheta depinde de traiectorie: reflectă ce ar trăi efectiv un trader cu țintă de profit, stop-loss și limită de timp. Barierele orizontale sunt scalate cu volatilitatea.',
-                incorrectExplanation: 'Eticheta cu trei bariere depinde de traiectorie și este dată de prima barieră atinsă.'
+                correctExplanation: 'Pentru că rapoartele Sharpe lunare sunt mici, un $R^2$ mic înseamnă un câștig relativ mare: $SR^{*2} = (SR_0^2 + R^2)/(1 - R^2)$. Welch și Goyal (2008) arată că majoritatea predictorilor pică acest test față de media istorică.',
+                incorrectExplanation: 'Comparați $R^2$ cu pătratul raportului Sharpe lunar al pieței, nu cu 1.'
             }
         },
         {
@@ -224,30 +224,30 @@ window.MFM_DATA.quizzes['ml'] = {
             }
         },
         {
-            correct: 1,
+            correct: 2,
             en: {
-                title: 'Purging',
-                text: 'What does "purging" mean in purged K-Fold cross-validation?',
+                title: 'When is K-fold valid?',
+                text: 'Bergmeir, Hyndman and Koo (2018) study standard K-fold cross-validation for time series. When is it valid?',
                 options: [
-                    'Deleting outliers from the test set',
-                    'Removing from the training set every observation whose label interval $[t_0, t_1]$ overlaps the test period',
-                    'Dropping features with low importance',
-                    'Shuffling the observations before splitting'
+                    'Never: time series must always be validated walk-forward',
+                    'Always, provided that the folds are shuffled',
+                    'For purely autoregressive models with serially uncorrelated errors; it fails with overlapping labels, persistent features outside the lag set or under-specified dynamics',
+                    'Only when the series is Normally distributed'
                 ],
-                correctExplanation: 'If a training label is determined by prices that fall inside the test window, the model has seen test information. Purging removes those observations.',
-                incorrectExplanation: 'Purging removes training observations whose labels overlap in time with the test set.'
+                correctExplanation: 'If the errors are uncorrelated, test-fold errors carry no information about training errors; overlapping $h$-day labels make the errors correlated, which is why the lecture needs purging.',
+                incorrectExplanation: 'Ask whether the errors of neighbouring observations are correlated; that, not the time ordering itself, is what breaks K-fold.'
             },
             ro: {
-                title: 'Purjarea',
-                text: 'Ce înseamnă „purjarea” în validarea încrucișată Purged K-Fold?',
+                title: 'Când este valid K-fold?',
+                text: 'Bergmeir, Hyndman și Koo (2018) studiază validarea încrucișată K-fold standard pentru serii de timp. Când este validă?',
                 options: [
-                    'Eliminarea valorilor extreme din setul de test',
-                    'Eliminarea din setul de antrenare a tuturor observațiilor al căror interval al etichetei $[t_0, t_1]$ se suprapune cu perioada de test',
-                    'Renunțarea la variabilele cu importanță mică',
-                    'Amestecarea observațiilor înainte de împărțire'
+                    'Niciodată: seriile de timp se validează întotdeauna walk-forward',
+                    'Întotdeauna, cu condiția ca pliurile să fie amestecate',
+                    'Pentru modele pur autoregresive cu erori necorelate serial; eșuează la etichete suprapuse, caracteristici persistente din afara lag-urilor modelului sau dinamică subspecificată',
+                    'Doar când seria urmează distribuția Normală'
                 ],
-                correctExplanation: 'Dacă o etichetă de antrenare depinde de prețuri din fereastra de test, modelul a „văzut” informație de test. Purjarea elimină aceste observații.',
-                incorrectExplanation: 'Purjarea elimină observațiile de antrenare ale căror etichete se suprapun în timp cu setul de test.'
+                correctExplanation: 'Dacă erorile sunt necorelate, erorile din pliul de test nu conțin informație despre erorile de antrenare; etichetele suprapuse pe $h$ zile fac erorile corelate, de aceea cursul are nevoie de purjare.',
+                incorrectExplanation: 'Întrebați-vă dacă erorile observațiilor vecine sunt corelate; asta, nu ordinea în timp în sine, strică K-fold.'
             }
         },
         {
@@ -332,30 +332,30 @@ window.MFM_DATA.quizzes['ml'] = {
             }
         },
         {
-            correct: 1,
+            correct: 0,
             en: {
-                title: 'The naive baseline',
-                text: 'For the 5-day direction of the S&P 500 (purged 5-fold CV), the four ML models reach 55-58% accuracy with AUC close to 0.50, while always predicting "up" gives 58.1%. What is the correct conclusion?',
+                title: 'Data-snooping tests',
+                text: 'You backtest 1,279 highly correlated moving-average rules on Bitcoin. Which procedure tests whether the best rule beats buy-and-hold without choosing an "effective number of trials"?',
                 options: [
-                    'The models are excellent because accuracy is above 50%',
-                    'None of the models beats the naive "always up" baseline; accuracy must always be compared with the class imbalance of the market drift',
-                    'AUC is irrelevant for classification',
-                    'The neural network is clearly the best model'
+                    'Hansen\'s SPA test (or White\'s Reality Check) with a stationary bootstrap of the whole matrix of rule returns',
+                    'A Bonferroni correction with N = 1,279',
+                    'The Deflated Sharpe Ratio with N = 1,279',
+                    'A t-test of the best rule\'s mean return'
                 ],
-                correctExplanation: 'Because the market drifts upwards, "up" is the majority class. An AUC of about 0.5 confirms that the models have no ranking ability.',
-                incorrectExplanation: 'Accuracy above 50% means nothing if a constant forecast does better; here no model beats the 58.1% baseline.'
+                correctExplanation: 'Resampling whole days keeps the correlation between rules, so the null distribution of the maximum is exact for this grid; here SPA gives $p = 0.56$ against buy-and-hold.',
+                incorrectExplanation: 'Bonferroni and the DSR both need a number of independent trials; a bootstrap of the full return matrix takes the dependence from the data.'
             },
             ro: {
-                title: 'Reperul naiv',
-                text: 'Pentru direcția pe 5 zile a S&P 500 (Purged 5-fold CV), cele patru modele ML obțin 55-58% acuratețe și un AUC apropiat de 0,50, în timp ce prognoza „mereu în sus” dă 58,1%. Care este concluzia corectă?',
+                title: 'Teste de data snooping',
+                text: 'Testați retrospectiv 1.279 de reguli de medii mobile, puternic corelate, pe Bitcoin. Ce procedură testează dacă cea mai bună regulă bate buy-and-hold fără a alege un „număr efectiv de încercări”?',
                 options: [
-                    'Modelele sunt excelente, pentru că acuratețea depășește 50%',
-                    'Niciun model nu bate reperul naiv „mereu în sus”; acuratețea trebuie comparată întotdeauna cu dezechilibrul claselor dat de trendul pieței',
-                    'AUC-ul este irelevant pentru clasificare',
-                    'Rețeaua neuronală este clar cel mai bun model'
+                    'Testul SPA al lui Hansen (sau Reality Check al lui White) cu bootstrap staționar al întregii matrice a randamentelor regulilor',
+                    'O corecție Bonferroni cu N = 1.279',
+                    'Raportul Sharpe deflatat cu N = 1.279',
+                    'Un test t al randamentului mediu al celei mai bune reguli'
                 ],
-                correctExplanation: 'Deoarece piața are un trend ascendent, „sus” este clasa majoritară. Un AUC de aproximativ 0,5 confirmă că modelele nu au capacitate de ierarhizare.',
-                incorrectExplanation: 'O acuratețe peste 50% nu înseamnă nimic dacă o prognoză constantă face mai bine; aici niciun model nu depășește reperul de 58,1%.'
+                correctExplanation: 'Reeșantionarea unor zile întregi păstrează corelația dintre reguli, deci distribuția maximului sub ipoteza nulă este exactă pentru această grilă; aici SPA dă $p = 0,56$ față de buy-and-hold.',
+                incorrectExplanation: 'Bonferroni și DSR au nevoie de un număr de încercări independente; un bootstrap al întregii matrice de randamente ia dependența din date.'
             }
         },
         {
@@ -575,57 +575,57 @@ window.MFM_DATA.quizzes['ml'] = {
             }
         },
         {
-            correct: 0,
+            correct: 3,
             en: {
-                title: 'Transaction costs',
-                text: 'In the S&P 500 walk-forward backtest (2010-2026, yearly refit), a gradient-boosting long/cash strategy with 5 bp costs has a Sharpe ratio of 0.49, against 0.66 for buy-and-hold. What is the lesson?',
+                title: 'Comparing two Sharpe ratios',
+                text: 'A walk-forward strategy has an annualised Sharpe ratio of 0.49 and buy-and-hold 0.66 over the same 4,198 days (correlation of daily returns 0.93). How do you test whether the difference is significant?',
                 options: [
-                    'A statistically "reasonable" classifier can still underperform a passive benchmark once trading costs and time out of the market are counted',
-                    'Buy-and-hold is always optimal',
-                    'Transaction costs never matter at daily frequency',
-                    'Gradient boosting cannot be used for trading'
+                    'Check whether the two separate 95% confidence intervals overlap',
+                    'Run a t-test on the difference in mean returns only',
+                    'Run an F-test of equal variances',
+                    'Test the difference of Sharpe ratios on the paired return series with the HAC delta method or a studentised block bootstrap (Ledoit and Wolf, 2008)'
                 ],
-                correctExplanation: 'Every switch costs money, and being in cash during rebounds is expensive. Always report net-of-cost performance against a simple benchmark.',
-                incorrectExplanation: 'The ML strategy loses to buy-and-hold after costs; performance must be judged net of costs and against a passive benchmark.'
+                correctExplanation: 'The two Sharpe ratios are estimated on the same days and are strongly correlated; the paired test gives a difference of -0.17 with $p = 0.073$, while each Sharpe ratio alone has a standard error of about 0.25.',
+                incorrectExplanation: 'Separate intervals ignore the correlation between the two estimates, and a mean or variance test answers a different question.'
             },
             ro: {
-                title: 'Costuri de tranzacționare',
-                text: 'În backtest-ul walk-forward pe S&P 500 (2010-2026, reestimare anuală), o strategie gradient boosting long/cash cu costuri de 5 bp are un Sharpe de 0,49, față de 0,66 pentru buy-and-hold. Care este lecția?',
+                title: 'Compararea a două rapoarte Sharpe',
+                text: 'O strategie walk-forward are un raport Sharpe anualizat de 0,49, iar buy-and-hold 0,66, pe aceleași 4.198 de zile (corelația randamentelor zilnice 0,93). Cum testați dacă diferența este semnificativă?',
                 options: [
-                    'Un clasificator „rezonabil” statistic poate avea totuși rezultate mai slabe decât un reper pasiv, odată ce se iau în calcul costurile și timpul petrecut în afara pieței',
-                    'Buy-and-hold este întotdeauna optim',
-                    'Costurile de tranzacționare nu contează niciodată la frecvență zilnică',
-                    'Gradient boosting nu poate fi folosit în tranzacționare'
+                    'Verificați dacă cele două intervale de încredere de 95%, separate, se suprapun',
+                    'Aplicați un test t doar pe diferența randamentelor medii',
+                    'Aplicați un test F al egalității varianțelor',
+                    'Testați diferența rapoartelor Sharpe pe seriile de randamente pereche, cu metoda delta HAC sau cu un bootstrap pe blocuri studentizat (Ledoit și Wolf, 2008)'
                 ],
-                correctExplanation: 'Fiecare schimbare de poziție costă, iar statul în cash în timpul revenirilor este scump. Performanța trebuie raportată mereu net de costuri, față de un reper simplu.',
-                incorrectExplanation: 'Strategia ML pierde în fața buy-and-hold după costuri; performanța trebuie judecată net de costuri și față de un reper pasiv.'
+                correctExplanation: 'Cele două rapoarte Sharpe sunt estimate pe aceleași zile și sunt puternic corelate; testul pe perechi dă o diferență de -0,17 cu $p = 0,073$, în timp ce fiecare raport Sharpe singur are o eroare standard de circa 0,25.',
+                incorrectExplanation: 'Intervalele separate ignoră corelația dintre cele două estimații, iar un test al mediilor sau al varianțelor răspunde la o altă întrebare.'
             }
         },
         {
-            correct: 2,
+            correct: 1,
             en: {
-                title: 'Backtesting is not research',
-                text: 'According to <a href="https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086" target="_blank" rel="noopener">López de Prado (2018)</a>, why is "backtesting is not a research tool"?',
+                title: 'The virtue of complexity',
+                text: 'Kelly, Malamud and Zhou (2024) find that the out-of-sample Sharpe ratio of market timing rises with the number of random features, even when the model has more parameters than its 12-month training window. Which critique did Nagel (2025) raise?',
                 options: [
-                    'Because backtests are too slow to run',
-                    'Because regulators forbid backtests',
-                    'Because iterating on backtest results until they look good turns the backtest into an overfitting machine; research should rely on feature importance and theory, with the backtest as a final check',
-                    'Because backtests cannot include transaction costs'
+                    'The result violates the bias-variance trade-off, so it must be a coding error',
+                    'With a short window the forecast is a similarity-weighted average of recent returns, i.e. a volatility-timed momentum strategy, so the gains need no complexity',
+                    'The result proves that deep networks always beat linear models',
+                    'The result holds only for cryptocurrencies'
                 ],
-                correctExplanation: 'Each tweak made after looking at a backtest is another trial. Use feature importance (MDA, SHAP) to understand the model, then run the backtest once.',
-                incorrectExplanation: 'Repeatedly adjusting a strategy to its backtest multiplies the number of trials and guarantees overfitting.'
+                correctExplanation: 'Nagel shows that for $P \\gg T$ the random-feature forecast weights past returns by similarity, which in short windows is mostly recency and falls with volatility; on data with reversals the same method loses.',
+                incorrectExplanation: 'Ask what a ridge-less regression with thousands of features and 12 observations can do with its training data.'
             },
             ro: {
-                title: 'Backtest-ul nu este cercetare',
-                text: 'Potrivit lui <a href="https://www.wiley.com/en-us/Advances+in+Financial+Machine+Learning-p-9781119482086" target="_blank" rel="noopener">López de Prado (2018)</a>, de ce „backtest-ul nu este un instrument de cercetare”?',
+                title: 'Virtutea complexității',
+                text: 'Kelly, Malamud și Zhou (2024) arată că raportul Sharpe în afara eșantionului al sincronizării pieței crește cu numărul de caracteristici aleatoare, chiar când modelul are mai mulți parametri decât fereastra lui de antrenare de 12 luni. Ce critică a formulat Nagel (2025)?',
                 options: [
-                    'Pentru că backtest-urile durează prea mult',
-                    'Pentru că autoritățile de reglementare interzic backtest-urile',
-                    'Pentru că iterarea pe rezultatele backtest-ului până când arată bine îl transformă într-o mașină de overfitting; cercetarea trebuie să se bazeze pe importanța variabilelor și pe teorie, iar backtest-ul să fie doar verificarea finală',
-                    'Pentru că backtest-urile nu pot include costuri de tranzacționare'
+                    'Rezultatul încalcă compromisul bias-varianță, deci trebuie să fie o eroare de cod',
+                    'Cu o fereastră scurtă, prognoza este o medie a randamentelor recente ponderată după similaritate, adică o strategie de momentum ajustat la volatilitate, deci câștigul nu are nevoie de complexitate',
+                    'Rezultatul dovedește că rețelele adânci bat întotdeauna modelele liniare',
+                    'Rezultatul este valabil doar pentru criptomonede'
                 ],
-                correctExplanation: 'Fiecare ajustare făcută după ce te uiți la un backtest este încă o încercare. Folosește importanța variabilelor (MDA, SHAP) pentru a înțelege modelul, apoi rulează backtest-ul o singură dată.',
-                incorrectExplanation: 'Ajustarea repetată a unei strategii după backtest crește numărul de încercări și garantează overfitting-ul.'
+                correctExplanation: 'Nagel arată că pentru $P \\gg T$ prognoza cu caracteristici aleatoare ponderează randamentele trecute după similaritate, care în ferestre scurte înseamnă mai ales apropiere în timp și scade cu volatilitatea; pe date cu reversii aceeași metodă pierde.',
+                incorrectExplanation: 'Întrebați-vă ce poate face o regresie ridge fără penalizare, cu mii de caracteristici și 12 observații, cu datele ei de antrenare.'
             }
         },
         {

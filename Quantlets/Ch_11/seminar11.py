@@ -24,7 +24,9 @@ from generate_all_charts import (plt, MainBlue, IDAred, Forest, Amber, Orange, P
                                  simulate_stats, SEED)
 from mfm_data import LABELS, load_vix, read_fred  # noqa: E402
 from ct_models import (convergence_study, slope_ci, gbm_mle, ou_mle, ou_bias_mc, merton_mle, merton_moments,  # noqa: E402
-                       lr_bootstrap, lee_mykland, heston_from_vix, heston_from_proxy, stylised)
+                       lr_bootstrap, lee_mykland, heston_from_vix, heston_from_proxy, stylised, merton_logpdf,
+                       nw_drift_diffusion, short_rate_fits)
+from scipy import optimize  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DT = 1 / 252
@@ -88,6 +90,69 @@ def a8_rare(sigma=0.15, lam=0.5, mu_j=-0.10, s_j=0.05, dt=1 / 252):
     """A8: salturi rare si mari: aplatizarea zilnica si probabilitatea de a nu observa niciun salt."""
     mo = merton_moments(dt, sigma, lam, mu_j, s_j)
     return dict(mo, p_none_1y=np.exp(-lam), p_none_10y=np.exp(-10 * lam), exp_10y=10 * lam)
+
+
+# --- Partea A, probleme de derivare (schimbarea masurii, Feynman-Kac, CIR, VIX in Heston, informatia Fisher) ---
+def a1_girsanov(mu=0.08, sigma=0.20, r=0.03, T=10.0):
+    """A1: GBM sub P si sub Q: pretul de piata al riscului theta = (mu - r) / sigma, densitatea Radon-Nikodym,
+    probabilitatea unei pierderi dupa T ani sub cele doua masuri."""
+    th = (mu - r) / sigma
+    mP, mQ = mu - 0.5 * sigma ** 2, r - 0.5 * sigma ** 2
+    return dict(theta=th, mP=mP, mQ=mQ, zP=-mP * np.sqrt(T) / sigma, zQ=-mQ * np.sqrt(T) / sigma,
+                p_loss_P=stats.norm.cdf(-mP * np.sqrt(T) / sigma), p_loss_Q=stats.norm.cdf(-mQ * np.sqrt(T) / sigma),
+                eq_growth=np.exp(r * T), var_Z=np.exp(th ** 2 * T) - 1)
+
+
+def a3_vasicek_bond(kappa=0.5, theta=0.03, sigma=0.01, r0=0.06, taus=(1, 5, 10)):
+    """A3: pretul obligatiunii zero-cupon Vasicek din ecuatia Feynman-Kac: P = exp(A(tau) - B(tau) r)."""
+    out = {}
+    for tau in taus:
+        B = (1 - np.exp(-kappa * tau)) / kappa
+        A = (theta - sigma ** 2 / (2 * kappa ** 2)) * (B - tau) - sigma ** 2 * B ** 2 / (4 * kappa)
+        out[str(tau)] = dict(B=B, A=A, P=np.exp(A - B * r0), y=(B * r0 - A) / tau)
+    return dict(out, y_inf=theta - sigma ** 2 / (2 * kappa ** 2))
+
+
+def a5_cir(kappa=0.11, theta=0.055, sigma=0.056, r0=0.03, t=1.0):
+    """A5: CIR: momentele conditionate, tranzitia chi-patrat necentrala si conditia Feller (grade de libertate >= 2)."""
+    e = np.exp(-kappa * t)
+    m = theta + (r0 - theta) * e
+    v = r0 * sigma ** 2 / kappa * (e - e ** 2) + theta * sigma ** 2 / (2 * kappa) * (1 - e) ** 2
+    c = 2 * kappa / (sigma ** 2 * (1 - e))
+    df = 4 * kappa * theta / sigma ** 2
+    nc = 2 * c * r0 * e
+    q = stats.ncx2.ppf([0.05, 0.95], df, nc) / (2 * c)
+    vas_sd = sigma * np.sqrt(r0) * np.sqrt((1 - e ** 2) / (2 * kappa))
+    return dict(cmean=m, csd=np.sqrt(v), c=c, df=df, nc=nc, feller=2 * kappa * theta / sigma ** 2, q05=q[0], q95=q[1],
+                p_zero=float(stats.ncx2.cdf(2 * c * 1e-4, df, nc)))
+
+
+def a6_vix_heston(kappa_q=5.0, tau=30 / 365, xi_hat=0.56, theta_q=0.044):
+    """A6: VIX^2 sub Heston: VIX^2 / 100^2 = a + b v_t, cu b = (1 - e^{-kappa^Q tau}) / (kappa^Q tau), a = theta^Q (1 - b)."""
+    b = (1 - np.exp(-kappa_q * tau)) / (kappa_q * tau)
+    return dict(b=b, a=theta_q * (1 - b), xi_corr=xi_hat / b, ktau=kappa_q * tau)
+
+
+def a7_fisher(lam=5.0, T=36.7, lam_mle=None, se_mle=None):
+    """A7 (d): informatia Fisher pentru intensitatea Poisson cand salturile sunt observate: I(lam) = T / lam."""
+    out = dict(se=np.sqrt(lam / T), rel=np.sqrt(lam / T) / lam)
+    if lam_mle is not None:
+        out.update(se_obs=np.sqrt(lam_mle / T), ratio=se_mle / np.sqrt(lam_mle / T))
+    return out
+
+
+def a9_ar_ou_delta(a=0.0012, b=0.97, se=0.0025, dt=1 / 12, n=600):
+    """A9: AR(1) lunar -> OU, cu erorile standard prin metoda delta; aceeasi durata T cu date zilnice."""
+    kappa = -np.log(b) / dt
+    se_b = np.sqrt((1 - b ** 2) / n)
+    se_k = se_b / (b * dt)
+    T = n * dt
+    hl = np.log(2) / kappa
+    bd = np.exp(-kappa / 252)
+    se_kd = np.sqrt((1 - bd ** 2) / (T * 252)) / (bd / 252)
+    return dict(kappa=kappa, theta=a / (1 - b), sigma=se * np.sqrt(2 * kappa / (1 - b ** 2)), hl=hl, ssd=se / np.sqrt(1 - b ** 2),
+                se_b=se_b, se_kappa=se_k, se_hl=hl / kappa * se_k, T=T, b_daily=bd, se_kappa_daily=se_kd,
+                se_kappa_limit=np.sqrt(2 * kappa / T))
 
 
 # =============================================================================
@@ -220,6 +285,85 @@ def b8_heston():
                 hl_days=float(252 * np.log(2) / hp['kappa']))
 
 
+# --- Partea B, extinderi ---
+def b4_likelihoods():
+    """B4 (d)-(e): CIR exact vs Euler si CKLS pe DTB3, 1954-2007 (din Quantlets/Ch_11/generate_all_charts.py)."""
+    tb = read_fred('DTB3') / 100
+    s = tb.loc['1954':'2007']
+    return {'daily': short_rate_fits(s.values, DT), 'monthly': short_rate_fits(s.resample('ME').last().values, 1 / 12)}
+
+
+def b6_profile(sigmas=(0.05, 0.02, 0.01)):
+    """B6 (d): verosimilitatea profil Merton in sigma (restul parametrilor reestimati) si MLE cu constrangerea sigma >= 5%."""
+    r = rets['sp500'].values
+    mf = merton_mle(r, DT)
+    out = {'mle': dict(sigma=mf['sigma'], loglik=mf['loglik'])}
+    x0 = np.array([mf['m'], np.log(mf['lam']), mf['mu_j'], np.log(mf['s_j'])])
+    for sg in sigmas:
+        nll = lambda q, sg=sg: -merton_logpdf(r, DT, q[0], sg, np.exp(q[1]), q[2], np.exp(q[3])).sum()
+        best = None
+        for lam0 in (np.exp(x0[1]), 2 * np.exp(x0[1]), 4 * np.exp(x0[1])):
+            q0 = x0.copy()
+            q0[1] = np.log(lam0)
+            res = optimize.minimize(nll, q0, method='Nelder-Mead', options=dict(maxiter=20000, maxfev=20000, xatol=1e-8, fatol=1e-6))
+            if best is None or res.fun < best.fun:
+                best = res
+        out[f'{sg:.2f}'] = dict(loglik=-best.fun, lam=float(np.exp(best.x[1])), s_j=float(np.exp(best.x[3])))
+    # sup = +infinit: sigma -> 0 cu m dt egal cu un randament observat; contributia acelui randament
+    i = int(np.argmin(np.abs(r - np.median(r))))
+    w0 = np.exp(-mf['lam'] * DT)
+    out['spike'] = {f'{sg:.0e}': float(np.log(w0) + stats.norm.logpdf(0, 0, sg * np.sqrt(DT))) for sg in (1e-2, 1e-4, 1e-8, 1e-16)}
+    out['constrained_binding'] = bool(mf['sigma'] < 0.05)
+    return out
+
+
+def b8_affine_rv(kappa_q=5.0):
+    """B8 (d)-(e): xi corectat pentru relatia afina VIX^2 = a + b v; rho din varianta realizata la 5 minute (SPY, Capitolul 9)
+    fata de rho din VIX, pe aceleasi zile."""
+    vix = load_vix()
+    r = rets['sp500']
+    hp = heston_from_vix(vix, r, DT)
+    b = (1 - np.exp(-kappa_q * 30 / 365)) / (kappa_q * 30 / 365)
+    path = os.path.join(HERE, '..', 'Ch_09', 'ch9_rv_spy.csv')
+    if not os.path.exists(path):
+        path = 'https://raw.githubusercontent.com/danpele/MFM/main/Quantlets/Ch_09/ch9_rv_spy.csv'
+    rv = pd.read_csv(path, index_col=0, parse_dates=True)['rv_total'] * 1e-4 / DT      # varianta anualizata
+    d = pd.concat([r.rename('r'), vix.rename('vix'), rv.rename('rv')], axis=1, join='inner').dropna()
+    out = dict(b=b, xi=hp['xi'], xi_corr=hp['xi'] / b, n_rv=len(d), start_rv=str(d.index[0].date()))
+    for name, v in [('vix', (d['vix'] / 100) ** 2), ('rv', d['rv'])]:
+        dv = v.diff().shift(-1) / np.sqrt(v)
+        zr = d['r'].shift(-1) / np.sqrt(v)
+        same = pd.concat([v.diff(), d['r']], axis=1).dropna().corr().iloc[0, 1]
+        rho = pd.concat([dv, zr], axis=1).dropna().corr().iloc[0, 1]
+        n = int(pd.concat([dv, zr], axis=1).dropna().shape[0])
+        z = np.arctanh(rho)
+        out[name] = dict(rho=float(rho), lo=float(np.tanh(z - 1.96 / np.sqrt(n - 3))), hi=float(np.tanh(z + 1.96 / np.sqrt(n - 3))),
+                         rho_raw=float(same))
+    return out
+
+
+def b9_np(mult=(0.5, 1.0, 2.0)):
+    """B9: difuzia neparametrica a ratei pe 3 luni (1954-2007): sensibilitatea la latimea de banda h."""
+    tb = (read_fred('DTB3') / 100).loc['1954':'2007']
+    x = tb.values
+    fits = short_rate_fits(x, DT)
+    grid = np.linspace(np.quantile(x, 0.02), np.quantile(x, 0.98), 60)
+    h0 = 1.06 * x[:-1].std() * (len(x) - 1) ** (-0.2)
+    out = {'h0': h0}
+    par = {'Vasicek': np.full_like(grid, fits['vasicek_euler']['sigma']), 'CIR': fits['cir_euler']['sigma'] * np.sqrt(grid),
+           'CKLS': fits['ckls']['sigma'] * grid ** fits['ckls']['gamma']}
+    for m in mult:
+        nw = nw_drift_diffusion(x, DT, grid, h=m * h0)
+        lo = np.sqrt(np.maximum(nw['diff2'] - 1.96 * nw['diff2_se'], 0))
+        hi = np.sqrt(nw['diff2'] + 1.96 * nw['diff2_se'])
+        b = np.sqrt(nw['diff2'])
+        out[f'{m:g}'] = dict(inside={k: float(np.mean((v >= lo) & (v <= hi))) for k, v in par.items()},
+                             slope=float(np.polyfit(np.log(grid), np.log(b), 1)[0]),
+                             relse=float(np.median(nw['diff2_se'] / nw['diff2'])),
+                             drift_zero=float(np.mean(np.abs(nw['drift']) <= 1.96 * nw['drift_se'])))
+    return out
+
+
 # =============================================================================
 # PARTEA C
 # =============================================================================
@@ -270,7 +414,31 @@ def c1_models(n_sim=100):
     return out
 
 
-if __name__ == '__main__':
+def extra(S):
+    """Problemele noi (derivari in Partea A, extinderi in Partea B), adaugate la rezultatele existente."""
+    S['A1g'] = a1_girsanov()
+    S['A3b'] = a3_vasicek_bond()
+    S['A4'] = dict(a4_ito_integral(), var_w2dw=1.0)
+    S['A5c'] = a5_cir()
+    S['A6h'] = a6_vix_heston()
+    me = json.load(open(os.path.join(HERE, 'ch11_results.json')))['merton']['sp500']
+    S['A7f'] = a7_fisher(5.0, 36.7, me['lam'], me['se']['lam'])
+    S['A8f'] = dict(a7_fisher(0.5, 36.7), years_20pct=25 / 0.5)
+    S['A9'] = a9_ar_ou_delta()
+    print('B4 likelihoods'); S['B4L'] = b4_likelihoods()
+    print('B6 profile'); S['B6P'] = b6_profile()
+    print('B8 affine, RV'); S['B8R'] = b8_affine_rv()
+    print('B9'); S['B9'] = b9_np()
+    return S
+
+
+if __name__ == '__main__' and sys.argv[1:] == ['extra']:
+    with open(os.path.join(HERE, 'sem11_results.json')) as f:
+        S = extra(json.load(f))
+    with open(os.path.join(HERE, 'sem11_results.json'), 'w') as f:
+        json.dump(jsonable(S), f, indent=1)
+    print('updated sem11_results.json')
+elif __name__ == '__main__':
     S = {}
     S['A1'] = a1_gbm()
     S['A2'] = a2_siegel()
@@ -289,6 +457,7 @@ if __name__ == '__main__':
     print('B7'); S['B7'] = b7_btc()
     print('B8'); S['B8'] = b8_heston()
     print('C1'); S['C1'] = c1_models()
+    S = extra(S)
     with open(os.path.join(HERE, 'sem11_results.json'), 'w') as f:
         json.dump(jsonable(S), f, indent=1)
     print('saved sem11_results.json')

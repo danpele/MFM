@@ -1,9 +1,11 @@
 """
 seminar10.py -- Calculele Seminarului 10 (MFM): microstructura pietei
 =====================================================================
-Partea A: registrul de ordine, modelul Roll, Glosten-Milgrom, Kyle, Almgren-Chriss (pas cu pas).
-Partea B: tiparul intrazilnic SPY, estimatori de spread la doua frecvente, iliciditatea si VIX,
-          iliciditatea Amihud pe trei piete, relatia volum - miscare de pret, tiparul orar Bitcoin.
+Partea A: derivari -- momentele si eroarea standard a estimatorului Roll, Glosten-Milgrom pentru theta general,
+          echilibrul Kyle, Almgren-Chriss prin ecuatia Euler-Lagrange, verosimilitatea PIN (pas cu pas).
+Partea B: tiparul intrazilnic SPY, estimatori de spread la doua frecvente (si o simulare Monte Carlo a modelului Roll),
+          iliciditatea si VIX (cu test de ruptura), iliciditatea Amihud pe trei piete, relatia volum - miscare de pret
+          (cu variabila instrumentala), tiparul orar Bitcoin, descoperirea pretului intre ETF-ul pe BET si indice.
 Partea C: prima de iliciditate (Amihud, 2002) pe BVB, in SUA si pe piata cripto.
 Cifrele sunt salvate in sem10_results.json.
 Modelarea Pietelor Financiare - Daniel Traian PELE
@@ -22,10 +24,12 @@ warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import ASSETS, GROUPS, LABELS, read_market, ohlc, returns, dollar_volume, intraday_spy, intraday_btc  # noqa: E402
-from micro import roll_spread, cs_spread, ar_terms, walk_book, gm_quotes, kyle, ac_trajectory  # noqa: E402
+from micro import (roll_spread, cs_spread, ar_terms, walk_book, gm_quotes, kyle, ac_trajectory,  # noqa: E402
+                   price_discovery, pin_loglik)
 from generate_all_charts import (plt, MainBlue, IDAred, Forest, Amber, Purple, Teal, Gray, GROUP_COL, save_fig,  # noqa: E402
                                  legend_outside_bottom, fig_legend_bottom, spy_tod, intraday_spreads, spread_table,
-                                 amihud_table, spy_illiq_daily, sqrt_relation, jsonable, AC, START2, START10)
+                                 amihud_table, spy_illiq_daily, sqrt_relation, jsonable, AC, START2, START10,
+                                 bet_etf_pair)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SEED = 42
@@ -46,77 +50,140 @@ def boot_days(values_by_day, stat, B=B, seed=SEED):
 # =============================================================================
 # PARTEA A
 # =============================================================================
-BOOK_ASKS = [(100.02, 300), (100.03, 500), (100.05, 400), (100.08, 1000)]
-BOOK_BIDS = [(99.98, 400), (99.97, 600), (99.95, 800), (99.90, 1500)]
-
-
-def a1_walk():
-    fills, vwap, rest, _ = walk_book(BOOK_ASKS, 1000)
-    mid = (BOOK_ASKS[0][0] + BOOK_BIDS[0][0]) / 2
-    return dict(fills=fills, vwap=vwap, mid=mid, spread=BOOK_ASKS[0][0] - BOOK_BIDS[0][0],
-                spread_bp=1e4 * (BOOK_ASKS[0][0] - BOOK_BIDS[0][0]) / mid, cost_mid=vwap - mid,
-                cost_mid_bp=1e4 * (vwap - mid) / mid, cost_ask=vwap - BOOK_ASKS[0][0], new_ask=rest[0][0],
-                new_ask_q=rest[0][1], new_spread=rest[0][0] - BOOK_BIDS[0][0], total=vwap * 1000)
-
-
-def a2_walk():
-    fills, vwap, rest, _ = walk_book([(-p, q) for p, q in BOOK_BIDS], 1500)
-    fills = [(-p, q) for p, q in fills]
-    vwap = -vwap
-    rest = [(-p, q) for p, q in rest]
-    mid = (BOOK_ASKS[0][0] + BOOK_BIDS[0][0]) / 2
-    # apoi: ordin limita de cumparare 500 @ 99.99 (in interiorul spread-ului)
-    new_bid = 99.99
-    return dict(fills=fills, vwap=vwap, cost_mid=mid - vwap, cost_mid_bp=1e4 * (mid - vwap) / mid,
-                best_after=rest[0][0], best_after_q=rest[0][1], spread_after=BOOK_ASKS[0][0] - rest[0][0],
-                new_bid=new_bid, spread_final=BOOK_ASKS[0][0] - new_bid, mid_final=(BOOK_ASKS[0][0] + new_bid) / 2)
-
-
-def a3_roll(var=0.0520, cov=-0.0081, price=20.0):
+def a1_roll(var=0.0520, cov=-0.0081, price=20.0, rho_q=0.3):
+    """Modelul Roll: momentele, estimatorul si deplasarea cand semnele tranzactiilor sunt autocorelate.
+    Cu Corr(q_t, q_{t-1}) = rho_q (lant Markov, m independent de q): Cov(dp_t, dp_{t-1}) = -c^2 (1 - rho_q)^2."""
     c = np.sqrt(-cov)
+    cov_rho = -c ** 2 * (1 - rho_q) ** 2
     return dict(c=c, s=2 * c, s_pct=100 * 2 * c / price, sig2=var - 2 * c ** 2, share=2 * c ** 2 / var,
-                rho=cov / var, var=var, cov=cov, price=price)
+                rho=cov / var, var=var, cov=cov, price=price, rho_q=rho_q, cov_rho=cov_rho,
+                c_roll_rho=np.sqrt(-cov_rho), bias_pct=100 * rho_q)
 
 
-def a4_roll():
-    x = a3_roll(var=0.0300, cov=-0.0030, price=12.0)
-    x['cov_pos'] = 0.0020
-    return x
+def a2_roll_se(var=0.0520, cov=-0.0081, Ts=(78, 250)):
+    """Eroarea standard a lui s_hat = 2 sqrt(-cov_hat) prin metoda delta; Var(cov_hat) din formula lui Bartlett
+    pentru un MA(1) (aproximare gaussiana): T Var(cov_hat) -> g0^2 + 3 g1^2."""
+    from scipy.stats import norm
+    c = np.sqrt(-cov)
+    out = dict(var=var, cov=cov, s=2 * c, avar=var ** 2 + 3 * cov ** 2)
+    for T in Ts:
+        se_g = np.sqrt((var ** 2 + 3 * cov ** 2) / T)
+        se_s = se_g / c                               # ds/dg = -1 / sqrt(-g) = -1 / c
+        out[T] = dict(se_g=se_g, se_s=se_s, cv=se_s / (2 * c), p_pos=norm.cdf(cov / se_g))
+    return out
 
 
-def a5_gm(mu=0.3, theta=0.5, vl=90.0, vh=110.0):
+def gm_spread_formula(theta, mu, dv=20.0):
+    """Spread-ul Glosten-Milgrom pentru theta general: a - b = 4 mu theta (1 - theta) dV / (1 - mu^2 (2 theta - 1)^2)."""
+    return 4 * mu * theta * (1 - theta) * dv / (1 - mu ** 2 * (2 * theta - 1) ** 2)
+
+
+def a3_gm(mu=0.3, theta=0.5, vl=90.0, vh=110.0):
     ask, bid, tb, ts = gm_quotes(theta, mu, vl, vh)
     ask2, bid2, tb2, ts2 = gm_quotes(tb, mu, vl, vh)          # dupa o cumparare
+    a7, b7, _, _ = gm_quotes(0.7, mu, vl, vh)
     return dict(ask=ask, bid=bid, spread=ask - bid, pb_h=mu + (1 - mu) / 2, pb_l=(1 - mu) / 2, th_b=tb, th_s=ts,
-                ask2=ask2, bid2=bid2, spread2=ask2 - bid2, th_b2=tb2)
+                ask2=ask2, bid2=bid2, spread2=ask2 - bid2, th_b2=tb2, spread_07=a7 - b7,
+                formula_07=gm_spread_formula(0.7, mu, vh - vl), formula_05=gm_spread_formula(0.5, mu, vh - vl))
 
 
-def a6_gm():
-    x = a5_gm(mu=0.5, theta=0.7)
-    ask3, bid3, tb3, _ = gm_quotes(x['th_b2'], 0.5, 90.0, 110.0)
-    x.update(ask3=ask3, bid3=bid3, th_b3=tb3)
-    return x
+def a4_gm_learning(mus=(0.1, 0.3, 0.5), level=108.0, vl=90.0, vh=110.0):
+    """Dupa k cumparari consecutive, cota P(V_H) se inmulteste cu (1 + mu) / (1 - mu) la fiecare cumparare;
+    bid-ul dupa k cumparari este V_L + dV theta_{k-1}, deci bid > level cere (k - 1) ln((1 + mu)/(1 - mu)) > ln(o*)."""
+    q = (level - vl) / (vh - vl)
+    out = {}
+    for mu in mus:
+        k = 1 + int(np.floor(np.log(q / (1 - q)) / np.log((1 + mu) / (1 - mu)))) + 1
+        theta, kk = 0.5, 0
+        while True:                                         # verificare directa cu cotatiile
+            kk += 1
+            ask, bid, tb, ts = gm_quotes(theta, mu, vl, vh)
+            if bid > level:
+                break
+            theta = tb
+        out[mu] = dict(k=kk - 1, k_formula=k, speed=np.log((1 + mu) / (1 - mu)))   # kk - 1 cumparari observate
+    return out
 
 
-def a7_kyle(sigma_v=2.0, sigma_u=10_000.0, y=15_000.0):
+def a5_kyle(sigma_v=2.0, sigma_u=10_000.0, y=15_000.0, sigma_u2=20_000.0):
     k = kyle(sigma_v, sigma_u)
-    k.update(sigma_v=sigma_v, sigma_u=sigma_u, y=y, dp=k['lam'] * y, lam100=100 * k['lam'])
+    k2 = kyle(sigma_v, sigma_u2)
+    k.update(sigma_v=sigma_v, sigma_u=sigma_u, y=y, dp=k['lam'] * y, lam100=100 * k['lam'],
+             lam2=k2['lam'], profit2=k2['profit'], beta2=k2['beta'])
     return k
 
 
-def a8_ac(lam=2e-6):
+def a6_kyle_ols(sigma_v=2.0, sigma_u=10_000.0, p0=50.0, n=200_000, seed=SEED):
+    """Economia Kyle simulata: panta OLS a lui (p - p0) pe y este lambda; un raport de tip Amihud |r| / (p0 |y|)
+    estimeaza lambda / p0^2, iar cu volumul total |x| + |u| in loc de |y| il subestimeaza."""
+    rng = np.random.default_rng(seed)
+    k = kyle(sigma_v, sigma_u)
+    v = p0 + sigma_v * rng.standard_normal(n)
+    x = k['beta'] * (v - p0)
+    u = sigma_u * rng.standard_normal(n)
+    y = x + u
+    p = p0 + k['lam'] * y
+    slope = np.polyfit(y, p - p0, 1)[0]
+    slope_v = np.polyfit(y, v - p0, 1)[0]
+    r = np.abs(p - p0) / p0
+    am_net = np.mean(r / (p0 * np.abs(y)))
+    am_vol = np.mean(r / (p0 * (np.abs(x) + np.abs(u))))
+    return dict(lam=k['lam'], slope=slope, slope_v=slope_v, target=k['lam'] / p0 ** 2, am_net=am_net, am_vol=am_vol,
+                am_ratio=am_vol / am_net, p0=p0, var_y=np.var(y), var_y_theory=2 * sigma_u ** 2)
+
+
+def a7_ac(lam=2e-6):
+    """Almgren-Chriss: solutia in timp continuu (Euler-Lagrange: x'' = kappa^2 x) si programul discret exact."""
     tau = AC['T'] / AC['N']
     eta_t = AC['eta'] - AC['gamma'] * tau / 2
     kt2 = lam * AC['sigma'] ** 2 / eta_t
     kappa = np.arccosh(kt2 * tau ** 2 / 2 + 1) / tau
+    kc = np.sqrt(lam * AC['sigma'] ** 2 / AC['eta'])          # timp continuu: eta_tilde -> eta cand tau -> 0
     t, x, E, V = ac_trajectory(lam=lam, **AC)
     t0, x0, E0, V0 = ac_trajectory(lam=0, **AC)
-    return dict(lam=lam, eta_t=eta_t, kt2=kt2, kappa=kappa, x=list(x), n=list(-np.diff(x)), E=E, sd=np.sqrt(V),
-                E0=E0, sd0=np.sqrt(V0), sinh5=np.sinh(5 * kappa))
+    xc = AC['X'] * np.sinh(kc * (AC['T'] - t)) / np.sinh(kc * AC['T'])
+    return dict(lam=lam, eta_t=eta_t, kt2=kt2, kappa=kappa, kc=kc, kc2=kc ** 2, x=list(x), xc=list(xc),
+                n=list(-np.diff(x)), E=E, sd=np.sqrt(V), E0=E0, sd0=np.sqrt(V0), sinh5=np.sinh(5 * kappa))
 
 
-def a9_ac():
-    return a8_ac(lam=2e-5)
+def a8_ac():
+    return a7_ac(lam=2e-5)
+
+
+PIN_PAR = dict(alpha=0.3, delta=0.5, mu=400.0, eb=1000.0, es=1000.0)
+
+
+def pin_posterior(B, S, alpha, delta, mu, eb, es):
+    """Probabilitatile a posteriori ale celor trei stari (fara stire, stire proasta, stire buna) dupa (B, S)."""
+    from scipy.special import softmax
+    _, terms = pin_loglik(B, S, alpha, delta, mu, eb, es)
+    return softmax(terms)
+
+
+def a9_pin(B=1450, S=1000, **par):
+    """Verosimilitatea EKOP pentru o zi: evaluarea directa esueaza numeric, forma factorizata nu."""
+    import warnings as _w
+    par = par or PIN_PAR
+    a, d, mu, eb, es = (par[k] for k in ('alpha', 'delta', 'mu', 'eb', 'es'))
+    pin = a * mu / (a * mu + eb + es)
+    with _w.catch_warnings():
+        _w.simplefilter('ignore')
+        naive = np.exp(-eb) * np.float64(eb) ** B                 # e^-1000 = 0 si 1000^1450 = inf: 0 * inf = nan
+    ll, _ = pin_loglik(B, S, a, d, mu, eb, es)
+    post = pin_posterior(B, S, a, d, mu, eb, es)
+    return dict(pin=pin, naive=str(naive), exp_small=float(np.exp(-eb)), loglik=ll, p_none=post[0], p_bad=post[1],
+                p_good=post[2], B=B, S=S, **par)
+
+
+def a10_pin():
+    """Aceiasi parametri: o zi cu stire proasta probabila (B = 1000, S = 1420), o zi linistita (B = S = 1000)
+    si PIN cand mu se dubleaza."""
+    x = a9_pin(B=1000, S=1420)
+    q = a9_pin(B=1000, S=1000)
+    par = dict(PIN_PAR, mu=800.0)
+    pin2 = par['alpha'] * par['mu'] / (par['alpha'] * par['mu'] + par['eb'] + par['es'])
+    return dict(bad=dict(p_none=x['p_none'], p_bad=x['p_bad'], p_good=x['p_good'], loglik=x['loglik']),
+                quiet=dict(p_none=q['p_none'], p_bad=q['p_bad'], p_good=q['p_good']), pin=x['pin'], pin2=pin2)
 
 
 # =============================================================================
@@ -239,7 +306,17 @@ def b4_illiq_vix():
     X2 = sm.add_constant(pd.DataFrame({'lvix': np.log(j2['vix']), 't': np.arange(len(j2)) / 252}))
     hac2 = sm.OLS(np.log(j2['illiq']), X2).fit(cov_type='HAC', cov_kwds={'maxlags': 20})
     rho1 = float(np.corrcoef(ols.resid[1:], ols.resid[:-1])[0, 1])
+    # (d) stabilitatea elasticitatii: ruptura la mijlocul esantionului (data fixata inainte de estimare), test Wald HAC
+    mid = j.index[len(j) // 2]
+    post = (j.index >= mid).astype(float)
+    X3 = sm.add_constant(pd.DataFrame({'lvix': np.log(j['vix']), 'post': post, 'lvix_post': post * np.log(j['vix'])},
+                                      index=j.index))
+    hac3 = sm.OLS(y, X3).fit(cov_type='HAC', cov_kwds={'maxlags': 20})
+    w = hac3.wald_test('lvix_post = 0', scalar=True)
     return dict(b=float(hac.params.iloc[1]), se_ols=float(ols.bse.iloc[1]), se_hac=float(hac.bse.iloc[1]),
+                brk=mid.strftime('%Y-%m-%d'), b_pre=float(hac3.params['lvix']),
+                b_post=float(hac3.params['lvix'] + hac3.params['lvix_post']), d_brk=float(hac3.params['lvix_post']),
+                se_brk=float(hac3.bse['lvix_post']), p_brk=float(w.pvalue),
                 lo=float(hac.params.iloc[1] - 1.96 * hac.bse.iloc[1]), hi=float(hac.params.iloc[1] + 1.96 * hac.bse.iloc[1]),
                 r2=float(ols.rsquared), n=int(len(j)), rho1=rho1, b2=float(hac2.params['lvix']),
                 se2=float(hac2.bse['lvix']), trend=float(hac2.params['t']), se_trend=float(hac2.bse['t']))
@@ -284,8 +361,26 @@ def b6_sqrt():
     # pe barele individuale (nu pe grupe)
     y = np.log(x['r'].abs() + 1e-6) - np.log(x.groupby('date')['r'].transform('std'))
     raw = sm.OLS(y, sm.add_constant(np.log(x['part']))).fit(cov_type='cluster', cov_kwds={'groups': pd.factorize(x['date'])[0]})
+    # (c) variabila instrumentala: volumul relativ al aceleiasi bare (aceeasi ora) din ziua precedenta
+    x = x.assign(ly=y, lv=np.log(x['part']))
+    x['lv_lag'] = x.groupby('tod')['lv'].shift(1)             # barele sunt ordonate in timp; shift pe ora = ziua anterioara
+    x['ly_lag'] = x.groupby('tod')['ly'].shift(1)
+    z = x.dropna(subset=['lv_lag', 'ly_lag'])
+    gid = pd.factorize(z['date'])[0]
+    fs = sm.OLS(z['lv'], sm.add_constant(z['lv_lag'])).fit(cov_type='cluster', cov_kwds={'groups': gid})
+    Z = sm.add_constant(z['lv_lag']).values
+    Xe = sm.add_constant(z['lv']).values
+    Pz = Z @ np.linalg.solve(Z.T @ Z, Z.T @ Xe)               # proiectia regresorilor pe instrumente
+    b_iv = np.linalg.solve(Pz.T @ Xe, Pz.T @ z['ly'].values)
+    e = z['ly'].values - Xe @ b_iv
+    A = np.linalg.inv(Pz.T @ Pz)
+    meat = sum(np.outer(Pz[gid == gg].T @ e[gid == gg], Pz[gid == gg].T @ e[gid == gg]) for gg in np.unique(gid))
+    se_iv = np.sqrt(np.diag(A @ meat @ A))
+    red = np.corrcoef(z['ly'], z['ly_lag'])[0, 1]            # |r| de ieri la aceeasi ora: canalul care incalca excluderea
     return dict(slope=float(slope), lo=float(lo), hi=float(hi), n=int(len(x)), n_days=int(len(days)),
-                raw=float(raw.params.iloc[1]), raw_se=float(raw.bse.iloc[1]))
+                raw=float(raw.params.iloc[1]), raw_se=float(raw.bse.iloc[1]), fs=float(fs.params.iloc[1]),
+                fs_t=float(fs.tvalues.iloc[1]), iv=float(b_iv[1]), iv_se=float(se_iv[1]), n_iv=int(len(z)),
+                corr_absr_lag=float(red))
 
 
 def b7_btc():
@@ -305,6 +400,46 @@ def b7_btc():
     return dict(ratio=float(ratio), lo=lo, hi=hi, wk=float(wkr), wklo=lo2, wkhi=hi2, n_days=len(by_day),
                 us=float(1e4 * b['r'].abs()[(~wk) & (h >= 13) & (h < 17)].mean()),
                 asia=float(1e4 * b['r'].abs()[(~wk) & (h >= 3) & (h < 11)].mean()))
+
+
+def b8_price_discovery(p=1, B=B, L=20, seed=SEED):
+    """ETF-ul Patria-TVBETETF si indicele BET-TR: VECM cu vectorul (1, -1), limitele ponderii Hasbrouck, ponderea
+    Gonzalo-Granger; intervale bootstrap pe blocuri mobile (blocuri de L zile) ale perechilor (X_t, Y_t) din VECM;
+    apoi cele doua jumatati ale esantionului."""
+    y = bet_etf_pair().values
+    base = price_discovery(y, p)
+    dy = np.diff(y, axis=0)
+    z = (y[:, 0] - y[:, 1])[:-1]
+    X = np.array([[1.0, z[t]] + [v for i in range(1, p + 1) for v in dy[t - i]] for t in range(p, len(dy))])
+    Y = dy[p:]
+    rng = np.random.default_rng(seed)
+    n = len(Y)
+    draws = []
+    for _ in range(B):
+        st = rng.integers(0, n - L, n // L + 1)
+        idx = np.concatenate([np.arange(a, a + L) for a in st])[:n]
+        Xb, Yb = X[idx], Y[idx]
+        Bb = np.linalg.lstsq(Xb, Yb, rcond=None)[0]
+        U = Yb - Xb @ Bb
+        Om = U.T @ U / (n - X.shape[1])
+        al = Bb[1]
+        ap = np.array([-al[1], al[0]])
+        ISs = []
+        for order in ([0, 1], [1, 0]):
+            F = np.linalg.cholesky(Om[np.ix_(order, order)])
+            v = (ap[order] @ F) ** 2 / (ap @ Om @ ap)
+            ISs.append(v[np.argsort(order)][1])
+        draws.append((al[0], al[1], ap[1] / ap.sum(), min(ISs), max(ISs)))
+    d = np.array(draws)
+    ci = lambda k: [float(x) for x in np.percentile(d[:, k], [2.5, 97.5])]
+    half = len(y) // 2
+    h1, h2 = price_discovery(y[:half], p), price_discovery(y[half:], p)
+    return dict(a_etf=float(base['alpha'][0]), a_idx=float(base['alpha'][1]), t_etf=float(base['t'][0]),
+                t_idx=float(base['t'][1]), cs_idx=float(base['cs'][1]), is_idx_lo=float(base['is_lo'][1]),
+                is_idx_hi=float(base['is_hi'][1]), ci_a_etf=ci(0), ci_a_idx=ci(1), ci_cs_idx=ci(2), ci_is_lo=ci(3),
+                ci_is_hi=ci(4), h1_a_etf=float(h1['alpha'][0]), h1_t_etf=float(h1['t'][0]), h2_a_etf=float(h2['alpha'][0]),
+                h2_t_etf=float(h2['t'][0]), h1_a_idx=float(h1['alpha'][1]), h2_a_idx=float(h2['alpha'][1]),
+                h1_t_idx=float(h1['t'][1]), h2_t_idx=float(h2['t'][1]), corr=base['corr'], n=int(base['n']))
 
 
 # =============================================================================
@@ -340,10 +475,23 @@ def c1_premium():
         shock = pd.Series(ar.resid, index=li.index[1:], name='shock')
         d = pd.concat([r, li.shift(1).rename('lag'), shock], axis=1, join='inner').dropna().loc['2016-11':'2026-08']
         fit = sm.OLS(d['r'], sm.add_constant(d[['lag', 'shock']])).fit(cov_type='HAC', cov_kwds={'maxlags': 6})
+        # Amihud si Hurvich (2004): regresia augmentata cu reziduul AR(1) calculat cu phi corectat de deplasare,
+        # phi_c = phi + (1 + 3 phi) / T + 3 (1 + 3 phi) / T^2; eroarea standard include incertitudinea lui phi_c
+        T_ar = len(li) - 1
+        phi = ar.params[1]
+        phi_c = min(phi + (1 + 3 * phi) / T_ar + 3 * (1 + 3 * phi) / T_ar ** 2, 0.9999)   # trunchiat la 0.9999
+        psi_c = np.mean(li.values[1:] - phi_c * li.values[:-1])
+        vc = pd.Series(li.values[1:] - psi_c - phi_c * li.values[:-1], index=li.index[1:], name='vc')
+        dc = pd.concat([r, li.shift(1).rename('lag'), vc], axis=1, join='inner').dropna().loc['2016-11':'2026-08']
+        fc = sm.OLS(dc['r'], sm.add_constant(dc[['lag', 'vc']])).fit(cov_type='HAC', cov_kwds={'maxlags': 6})
+        var_phic = (1 + 3 / T_ar + 9 / T_ar ** 2) ** 2 * ar.bse[1] ** 2
+        se_c = float(np.sqrt(fc.params['vc'] ** 2 * var_phic + fc.bse['lag'] ** 2))
+        ah = dict(phi_c=float(phi_c), b_lag_c=float(fc.params['lag']), se_lag_c=se_c, t_lag_c=float(fc.params['lag'] / se_c),
+                  bias=float(fit.params['lag'] - fc.params['lag']))
         out[name] = dict(n=int(len(d)), b_lag=float(fit.params['lag']), se_lag=float(fit.bse['lag']),
                          t_lag=float(fit.tvalues['lag']), b_shock=float(fit.params['shock']),
                          se_shock=float(fit.bse['shock']), t_shock=float(fit.tvalues['shock']), r2=float(fit.rsquared),
-                         phi=float(ar.params[1]), start=d.index[0].strftime('%Y-%m'), end=d.index[-1].strftime('%Y-%m'))
+                         phi=float(ar.params[1]), start=d.index[0].strftime('%Y-%m'), end=d.index[-1].strftime('%Y-%m'), **ah)
         series[name] = d
     fig, axes = plt.subplots(1, 3, figsize=(10.5, 3.2))
     for ax, (name, d) in zip(axes, series.items()):
@@ -387,15 +535,16 @@ def c1_premium():
 
 if __name__ == '__main__':
     R = {}
-    R['A1'] = a1_walk()
-    R['A2'] = a2_walk()
-    R['A3'] = a3_roll()
-    R['A4'] = a4_roll()
-    R['A5'] = a5_gm()
-    R['A6'] = a6_gm()
-    R['A7'] = a7_kyle()
+    R['A1'] = a1_roll()
+    R['A2'] = a2_roll_se()
+    R['A3'] = a3_gm()
+    R['A4'] = a4_gm_learning()
+    R['A5'] = a5_kyle()
+    R['A6'] = a6_kyle_ols()
+    R['A7'] = a7_ac()
     R['A8'] = a8_ac()
-    R['A9'] = a9_ac()
+    R['A9'] = a9_pin()
+    R['A10'] = a10_pin()
     R['B1'] = b1_ushape()
     R['B2'] = b2_spreads()
     R['B3'] = b3_cross()
@@ -403,6 +552,7 @@ if __name__ == '__main__':
     R['B5'] = b5_amihud_groups()
     R['B6'] = b6_sqrt()
     R['B7'] = b7_btc()
+    R['B8'] = b8_price_discovery()
     R['C1'] = c1_premium()
     with open(os.path.join(HERE, 'sem10_results.json'), 'w') as f:
         json.dump(jsonable(R), f, indent=1)

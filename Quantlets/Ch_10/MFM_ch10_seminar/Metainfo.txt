@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch10_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 10 computations: walking the order book, the Roll model, Glosten-Milgrom quotes, the Kyle equilibrium, Almgren-Chriss schedules; intraday U-shape with day-block bootstrap, spread estimators at two frequencies, spread and Amihud measures across 25 assets, illiquidity and the VIX with HAC errors, the volume-price relation, the Bitcoin clock and the time-series illiquidity premium on the BVB, US and crypto markets.'
+Description: 'Seminar 10 computations: moments, bias and standard error of the Roll estimator, Glosten-Milgrom for any prior and learning speed, the Kyle equilibrium and lambda as a regression slope, Almgren-Chriss by Euler-Lagrange, the PIN likelihood in stable form; intraday U-shape with day-block bootstrap, spread estimators at two frequencies, spread and Amihud measures across 25 assets, illiquidity and the VIX with HAC errors, the volume-price relation with an instrumental variable, the Bitcoin clock, price discovery between the BET ETF and BET-TR, and the time-series illiquidity premium on the BVB, US and crypto markets.'
 
 Keywords: 'market microstructure, bid-ask spread, Amihud illiquidity, bootstrap, HAC, liquidity premium, Bucharest Stock Exchange, Bitcoin'
 

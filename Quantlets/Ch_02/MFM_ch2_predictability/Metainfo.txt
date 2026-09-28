@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch2_predictability'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Beyond the random walk: predictive regression of S&P 500 monthly excess returns on the log dividend-price ratio with the Stambaugh (1999) bias and a size simulation; out-of-sample R2 against the historical mean with the Clark-West test and Campbell-Thompson restrictions; local Whittle estimates of d = H - 0.5; the Escanciano-Lobato automatic portmanteau test; the December 2018 bank-tax event study for TLV and BRD with prediction-error variance and a portfolio test; Romano-Wolf StepM on 15 calendar tests; and a regression test of the Adaptive Market Hypothesis on rolling z*(5).'
+
+Keywords: 'predictive regression, Stambaugh bias, out-of-sample R2, Clark-West, local Whittle, long memory, martingale difference hypothesis, event study, Kolari-Pynnonen, StepM, Romano-Wolf, adaptive markets'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, Euro Stoxx 50, Nikkei 225, Hang Seng, BET, WIG20, BUX, PX, BIST 100, Bovespa, IPC, Nifty 50, Shanghai, Bitcoin, Ethereum; EUR/RON official reference rate; S&P Composite monthly prices and dividends (Robert J. Shiller), extended with S&P 500 closes and SPY dividends; 3-month Treasury bill rate TB3MS (FRED); TLV, BRD'
+
+Output: 'ch2_oos_dp.pdf, ch2_oos_dp.csv, ch2_stepm_calendar.csv'

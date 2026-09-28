@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch10_spread_estimators'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Roll, Corwin-Schultz and Abdi-Ranaldo spread estimators for SPY from daily and 5-minute bars compared with one price step, and the daily estimators for 25 US stocks, Bucharest Stock Exchange stocks and crypto-assets.'
+Description: 'Roll, Corwin-Schultz, Abdi-Ranaldo and EDGE spread estimators for SPY from daily and 5-minute bars compared with one price step, and the daily estimators for 25 US stocks, Bucharest Stock Exchange stocks and crypto-assets.'
 
 Keywords: 'Corwin-Schultz, Abdi-Ranaldo, Roll, bid-ask spread, liquidity measures, high-frequency data, BVB, cryptocurrency'
 

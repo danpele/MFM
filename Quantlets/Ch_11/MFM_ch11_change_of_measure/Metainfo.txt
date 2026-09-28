@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_change_of_measure'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Change of measure: market price of risk of the S&P 500 with its standard error, Vasicek zero-coupon yields by Feynman-Kac against the 10-year Treasury yield (FRED DGS10), and the affine map between the VIX and the Heston variance for several risk-neutral speeds.'
+
+Keywords: 'Girsanov, market price of risk, Feynman-Kac, Vasicek bond, VIX, Heston, risk-neutral measure'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: ''

@@ -57,6 +57,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 SEED = 42
 MAX_ABS_RET = 0.5        # prag pentru erori de date in seriile BVB (log-randament zilnic)
+END = '2026-07-31'       # ultima luna a esantionului lunar folosit in capitol (T = 757 luni din iulie 1963)
 
 
 def save_fig(name):
@@ -82,7 +83,7 @@ def monthly_excess(symbols, start='1999-01-01'):
     r = p.pct_change().dropna()
     F = factors('M')
     idx = r.index.intersection(F.index)
-    r = r.loc[idx].loc[start:]
+    r = r.loc[idx].loc[start:END]
     F = F.loc[r.index]
     return r.sub(F['RF'], axis=0), F
 
@@ -160,7 +161,7 @@ def fig_frontier():
 # =============================================================================
 def sml_data(start='1963-07-31'):
     F = factors('M')
-    P = french('p25', 'M').loc[start:F.index[-1]]
+    P = french('p25', 'M').loc[start:END]
     Fx = F.loc[P.index]
     ex = P.sub(Fx['RF'], axis=0)
     mk = Fx['Mkt-RF']
@@ -183,7 +184,7 @@ def fig_sml():
     ax.scatter(res['beta'], res['avg'], s=16, color=MainBlue, label='25 size x B/M portfolios')
     xs = np.linspace(0.8, 1.5, 10)
     ax.plot(xs, prem * xs, color=IDAred, ls='--', label=f'CAPM SML (slope = {prem:.1%})')
-    ax.plot(xs, icpt + slope * xs, color=Gray, label=f'Fitted line (slope = {slope:.1%})')
+    ax.plot(xs, icpt + slope * xs, color=Forest, label=f'Fitted line (slope = {slope:.1%})')
     ax.set_xlabel('CAPM beta')
     ax.set_ylabel('Mean excess return (ann.)')
     ax.set_title('Security market line', fontsize=9, loc='left')
@@ -243,11 +244,23 @@ def beta_split():
     return b[0], b[1], se1, halves
 
 
+def vasicek_prior(b, se):
+    """Informatia a priori Vasicek estimata empiric (Bayes empiric).
+
+    Var_cs(beta_hat) = Var_cs(beta) + media se^2: dispersia beta estimate include zgomotul de estimare,
+    deci dispersia a priori a beta adevarate este Var_cs(beta_hat) - media se(beta_hat)^2.
+    """
+    m = float(b.mean())
+    v = float(b.var(ddof=1) - (se ** 2).mean())
+    return m, max(v, 1e-6)
+
+
 def fig_beta_shrink():
     b1, b2, se1, halves = beta_split()
     slope, icpt = np.polyfit(b1, b2, 1)
-    # Vasicek: media si dispersia cross-sectionala a beta ca informatie a priori
-    prior_m, prior_v = b1.mean(), b1.var(ddof=1)
+    # Vasicek (Bayes empiric): media a priori = media transversala a beta estimate;
+    # dispersia a priori = dispersia transversala a beta estimate MINUS zgomotul mediu de estimare
+    prior_m, prior_v = vasicek_prior(b1, se1)
     w = prior_v / (prior_v + se1 ** 2)
     b_vas = w * b1 + (1 - w) * prior_m
     b_blume = 0.67 * b1 + 0.33
@@ -266,7 +279,8 @@ def fig_beta_shrink():
     plt.tight_layout()
     save_fig('ch3_beta_shrink')
     return dict(slope=slope, icpt=icpt, rmse_raw=err(b1), rmse_blume=err(b_blume), rmse_vasicek=err(b_vas),
-                prior_mean=prior_m, betas1=b1.round(3).to_dict(), betas2=b2.round(3).to_dict(),
+                prior_mean=prior_m, prior_var=prior_v, var_cs=float(b1.var(ddof=1)),
+                mean_se2=float((se1 ** 2).mean()), betas1=b1.round(3).to_dict(), se1=se1.round(3).to_dict(), betas2=b2.round(3).to_dict(),
                 vasicek=b_vas.round(3).to_dict())
 
 
@@ -274,7 +288,7 @@ def fig_beta_shrink():
 # FIG 5: Randamentul cumulat al factorilor Fama-French si momentum
 # =============================================================================
 def fig_factor_cum():
-    F = factors('M')
+    F = factors('M').loc[:END]
     cols = ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA', 'MOM']
     fig, ax = plt.subplots(figsize=(7.0, 3.1))
     out = {}
@@ -296,7 +310,7 @@ def fig_factor_cum():
 # FIG 6: Statistici t ale primelor factoriale, inainte si dupa 2000
 # =============================================================================
 def factor_tstats(split='1999-12-31'):
-    F = factors('M')
+    F = factors('M').loc[:END]
     cols = ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA', 'MOM']
     rows = []
     for c in cols:
@@ -482,7 +496,7 @@ def bvb_betas(start='2015-01-01'):
         b, se, t, e, r2 = ols_hac(r[s + '.RO'].values, r['BET'].values)
         rows.append((s, b[1], se[1], r2, len(r), str(r.index[0].date()), int(bad.sum())))
     res = pd.DataFrame(rows, columns=['stock', 'beta', 'se', 'r2', 'n', 'from', 'n_removed']).set_index('stock')
-    prior_m, prior_v = res['beta'].mean(), res['beta'].var(ddof=1)
+    prior_m, prior_v = vasicek_prior(res['beta'], res['se'])
     w = prior_v / (prior_v + res['se'] ** 2)
     res['vasicek'] = w * res['beta'] + (1 - w) * prior_m
     return res.sort_values('beta')
@@ -520,11 +534,13 @@ def fama_macbeth(ex, F, fac, nw_lags=6):
     mean = lam.mean(0)
     se_fm = lam.std(0, ddof=1) / np.sqrt(len(lam))
     se_nw = np.array([ols_hac(lam[:, j], np.zeros((len(lam), 0)), lags=nw_lags)[1][0] for j in range(lam.shape[1])])
-    # corectia Shanken (1992): (1 + lambda' Sigma_f^-1 lambda) pentru termenii de prima
+    # corectia Shanken (1992): varianta FM contine deja Sigma_f / T (variatia factorilor);
+    # doar restul (partea idiosincratica) se inmulteste cu (1 + c), c = lambda' Sigma_f^-1 lambda:
+    # Var_Sh = (1 + c) (Var_FM - Sigma_f* / T) + Sigma_f* / T, Sigma_f* = Sigma_f bordat cu zero pentru termenul liber
     Sf = np.atleast_2d(np.cov(X.T))
-    c = 1 + mean[1:] @ np.linalg.solve(Sf, mean[1:])
-    se_sh = se_fm.copy()
-    se_sh[1:] = np.sqrt(se_fm[1:] ** 2 * c + np.diag(Sf) / len(lam))
+    c = mean[1:] @ np.linalg.solve(Sf, mean[1:])
+    sf_diag = np.r_[0.0, np.diag(Sf)] / len(lam)
+    se_sh = np.sqrt((1 + c) * (se_fm ** 2 - sf_diag) + sf_diag)
     return pd.DataFrame({'lambda': mean * 12, 'se_fm': se_fm * 12, 'se_nw': se_nw * 12, 'se_shanken': se_sh * 12,
                          'factor_mean': np.r_[np.nan, X.mean(0) * 12]}, index=['const'] + fac)
 
@@ -559,6 +575,295 @@ def fig_fama_macbeth():
     return {k: v.round(4).reset_index().to_dict(orient='records') for k, v in out.items()}
 
 
+
+# =============================================================================
+# INFERENTA AVANSATA (fara grafice): GRS ca test Sharpe, erori robuste la specificare gresita,
+# factori inutili, R^2 transversal (Lewellen-Nagel-Shanken), numarul de factori, compararea modelelor
+# =============================================================================
+def two_pass_gmm(ex, F, fac, lags=0):
+    """Doua etape ca GMM exact identificat: momente (R - a - B f) x (1, f) si X'(R - X gamma), X = [1, B].
+
+    Intoarce gamma (anualizat) si erorile standard:
+      * 'krs'    : robuste la specificare gresita (Kan, Robotti & Shanken, 2013) -- derivata completa,
+                   inclusiv termenul cu erorile de evaluare e = mu - X gamma;
+      * 'correct': aceeasi formula cu e = 0 (modelul presupus corect; Jagannathan & Wang, 1998).
+    lags > 0: matricea S Newey-West (Bartlett); lags = 0: momente necorelate serial.
+    """
+    R = np.asarray(ex, float)
+    Fm = np.asarray(F[fac], float)
+    T, N = R.shape
+    K = Fm.shape[1]
+    Z = np.column_stack([np.ones(T), Fm])                      # T x (K+1)
+    AB = np.linalg.lstsq(Z, R, rcond=None)[0]                  # (K+1) x N: a, B
+    B = AB[1:].T                                               # N x K
+    X = np.column_stack([np.ones(N), B])
+    mu = R.mean(0)
+    gam = np.linalg.lstsq(X, mu, rcond=None)[0]
+    npar = (K + 1) * N + K + 1
+
+    def unpack(th):
+        ab = th[:(K + 1) * N].reshape(K + 1, N)
+        return ab, th[(K + 1) * N:]
+
+    def gbar(th, target):
+        ab, g = unpack(th)
+        E = R - Z @ ab
+        g1 = (Z.T @ E / T).ravel()                            # (K+1) x N
+        Xb = np.column_stack([np.ones(N), ab[1:].T])
+        g2 = Xb.T @ (target - Xb @ g)
+        return np.r_[g1, g2]
+
+    th0 = np.r_[AB.ravel(), gam]
+
+    def jac(target):
+        J = np.empty((npar, npar))
+        h = 1e-6
+        for j in range(npar):
+            d = np.zeros(npar)
+            d[j] = h
+            J[:, j] = (gbar(th0 + d, target) - gbar(th0 - d, target)) / (2 * h)
+        return J
+
+    # contributiile individuale ale momentelor (media lor este zero in esantion)
+    E = R - Z @ AB
+    g1t = (Z[:, :, None] * E[:, None, :]).reshape(T, -1)
+    g2t = (R - X @ gam) @ X
+    G = np.column_stack([g1t, g2t])
+    S = G.T @ G / T
+    for l in range(1, lags + 1):
+        w = 1 - l / (lags + 1)
+        C = G[l:].T @ G[:-l] / T
+        S += w * (C + C.T)
+    out = {}
+    for lab, target in [('krs', mu), ('correct', X @ gam)]:
+        Ji = np.linalg.inv(jac(target))
+        V = Ji @ S @ Ji.T / T
+        out[lab] = np.sqrt(np.diag(V)[-(K + 1):]) * 12
+    e = mu - X @ gam
+    return dict(gamma=gam * 12, se_krs=out['krs'], se_correct=out['correct'],
+                pricing_error_rms=float(np.sqrt((e ** 2).mean()) * 12))
+
+
+def grs_sharpe(ex, mk):
+    """Identitatea GRS: alpha' Sigma^-1 alpha = SR^2(f, R) - SR^2(f) (estimatori MV, impartire la T)."""
+    R = np.asarray(ex, float)
+    f = np.asarray(mk, float)
+    T, N = R.shape
+    Y = np.column_stack([f, R])
+    m = Y.mean(0)
+    V = np.cov(Y.T, ddof=0)
+    sr2_all = m @ np.linalg.solve(V, m)
+    sr2_f = f.mean() ** 2 / f.var(ddof=0)
+    stat, p, _, _ = grs_test(R, f)
+    W_id = (T - N - 1) / N * (sr2_all - sr2_f) / (1 + sr2_f)
+    return dict(T=T, N=N, sr_f_m=np.sqrt(sr2_f), sr_all_m=np.sqrt(sr2_all), sr_f_ann=np.sqrt(12 * sr2_f),
+                sr_all_ann=np.sqrt(12 * sr2_all), grs=stat, grs_p=p, grs_identity=W_id)
+
+
+def fm_krs_table(ex, F, fac):
+    """Fama-MacBeth (FM, NW 6, Shanken) plus erorile Kan-Robotti-Shanken, pe aceleasi active."""
+    d = fama_macbeth(ex, F, fac)
+    k = two_pass_gmm(ex.values, F, fac)
+    d['se_krs'] = k['se_krs']
+    d['se_correct'] = k['se_correct']
+    return d
+
+
+def useless_factor_sim(reps=2000, seed=SEED):
+    """Kan & Zhang (1999): CAPM + un factor g independent de randamente, pe cele 25 de portofolii reale.
+
+    Pentru fiecare replicare: g ~ N(0, s^2) i.i.d., doua etape Fama-MacBeth; se numara respingerile
+    |t| > 1.96 ale lui lambda_g (erori FM si Shanken) si respingerile testului Wald din prima etapa beta_g = 0.
+    """
+    rng = np.random.default_rng(seed)
+    res, ex, mk = sml_data()
+    R = ex.values
+    T, N = R.shape
+    m = mk.values
+    rej_fm = rej_sh = rej_w = 0
+    tvals = []
+    for _ in range(reps):
+        gfac = rng.standard_normal(T) * m.std()
+        Z = np.column_stack([np.ones(T), m, gfac])
+        AB = np.linalg.lstsq(Z, R, rcond=None)[0]
+        B = AB[1:].T
+        X = np.column_stack([np.ones(N), B])
+        lam = np.linalg.lstsq(X, R.T, rcond=None)[0].T        # T x 3
+        mean = lam.mean(0)
+        se_fm = lam.std(0, ddof=1) / np.sqrt(T)
+        Sf = np.cov(np.column_stack([m, gfac]).T)
+        c = mean[1:] @ np.linalg.solve(Sf, mean[1:])
+        se_sh = np.sqrt((1 + c) * (se_fm[2] ** 2 - Sf[1, 1] / T) + Sf[1, 1] / T)
+        t_fm, t_sh = mean[2] / se_fm[2], mean[2] / se_sh
+        tvals.append(t_sh)
+        rej_fm += abs(t_fm) > 1.96
+        rej_sh += abs(t_sh) > 1.96
+        # Wald pentru beta_g = 0 pe toate activele (reziduuri i.i.d.)
+        E = R - Z @ AB
+        Sig = E.T @ E / T
+        vg = np.linalg.inv(Z.T @ Z)[2, 2]
+        W = AB[2] @ np.linalg.solve(Sig * vg, AB[2])
+        rej_w += W > stats.chi2.ppf(0.95, N)
+    tvals = np.array(tvals)
+    return dict(reps=reps, rej_fm=rej_fm / reps, rej_shanken=rej_sh / reps, rej_wald_beta=rej_w / reps,
+                median_abs_t=float(np.median(np.abs(tvals))))
+
+
+def lns_r2(start='1963-07-31'):
+    """Lewellen, Nagel & Shanken (2010): R^2 transversal OLS si GLS, 25 portofolii vs 25 + 30 industrii."""
+    F = factors('M')
+    P25 = french('p25', 'M').loc[start:END]
+    I30 = french('ind30', 'M').loc[start:END]
+    Fx = F.loc[P25.index]
+    sets = {'25': P25, '25+30': pd.concat([P25, I30.add_prefix('IND_')], axis=1)}
+    models = {'CAPM': ['Mkt-RF'], 'FF3': ['Mkt-RF', 'SMB', 'HML'], 'FF5': ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA']}
+    out = {}
+    for sname, P in sets.items():
+        ex = P.sub(Fx['RF'], axis=0).values
+        T, N = ex.shape
+        mu = ex.mean(0)
+        V = np.cov(ex.T)
+        Vi = np.linalg.inv(V)
+        for mname, fac in models.items():
+            f = Fx[fac].values
+            Z = np.column_stack([np.ones(T), f])
+            B = np.linalg.lstsq(Z, ex, rcond=None)[0][1:].T
+            X = np.column_stack([np.ones(N), B])
+            g_ols = np.linalg.lstsq(X, mu, rcond=None)[0]
+            e = mu - X @ g_ols
+            r2_ols = 1 - e @ e / ((mu - mu.mean()) @ (mu - mu.mean()))
+            g_gls = np.linalg.solve(X.T @ Vi @ X, X.T @ Vi @ mu)
+            eg = mu - X @ g_gls
+            one = np.ones(N)
+            mbar = (one @ Vi @ mu) / (one @ Vi @ one)
+            d = mu - mbar
+            r2_gls = 1 - (eg @ Vi @ eg) / (d @ Vi @ d)
+            # restrictia LNS pentru factori tranzactionati: lambda = media factorului, fara termen liber
+            ec = mu - B @ f.mean(0)
+            r2_c = 1 - ec @ ec / ((mu - mu.mean()) @ (mu - mu.mean()))
+            out[f'{mname} | {sname}'] = dict(N=N, r2_ols=r2_ols, r2_gls=r2_gls, r2_constrained=r2_c,
+                                             lambda_ols=(g_ols * 12).round(4).tolist())
+    return out
+
+
+def n_factors(X, kmax):
+    """Numarul de factori: Kaiser (valori proprii > 1), Bai & Ng (2002) IC_p2, Ahn & Horenstein (2013) ER."""
+    X = np.asarray(X, float)
+    X = (X - X.mean(0)) / X.std(0)
+    T, N = X.shape
+    ev = np.sort(np.linalg.eigvalsh(X.T @ X / T))[::-1]         # valorile proprii ale matricei de corelatie
+    V = [ev[k:].sum() / N for k in range(kmax + 1)]              # V(k) = (1/NT) suma patratelor reziduale
+    pen = (N + T) / (N * T) * np.log(min(N, T))
+    ic = [np.log(V[k]) + k * pen for k in range(kmax + 1)]
+    er = [ev[k - 1] / ev[k] for k in range(1, kmax + 1)]
+    return dict(T=T, N=N, kaiser=int((ev > 1).sum()), bai_ng=int(np.argmin(ic)),
+                ahn_horenstein=int(np.argmax(er) + 1), eig=ev[:kmax + 1].round(3).tolist(),
+                er=np.round(er, 2).tolist())
+
+
+def number_of_factors():
+    """Estimatorii numarului de factori pe ETF-urile sectoriale (zilnic) si pe 100 de portofolii (lunar)."""
+    vals, vecs, r, c1 = pca_sectors()
+    S = [s + '.US' for s in SECTORS_ALL]
+    out = {'sectors': n_factors(r[S].values, 5)}
+    P = french('p100', 'M').loc['1963-07-31':END].dropna(axis=1)
+    F = factors('M').loc[P.index]
+    out['p100'] = n_factors(P.sub(F['RF'], axis=0).values, 8)
+    return out
+
+
+def max_sr2(F, fac):
+    m = F[fac].mean().values
+    V = np.atleast_2d(np.cov(F[fac].values.T))
+    return float(m @ np.linalg.solve(V, m))
+
+
+def stationary_bootstrap_idx(T, mean_block, rng):
+    """Indici pentru bootstrap-ul stationar (Politis & Romano, 1994), lungime medie a blocului mean_block."""
+    idx = np.empty(T, dtype=int)
+    idx[0] = rng.integers(T)
+    for t in range(1, T):
+        idx[t] = rng.integers(T) if rng.random() < 1 / mean_block else (idx[t - 1] + 1) % T
+    return idx
+
+
+def model_comparison(B=2000, mean_block=6, seed=SEED):
+    """Barillas & Shanken (2018): SR^2 maxim al factorilor fiecarui model; intervale bootstrap stationar."""
+    rng = np.random.default_rng(seed)
+    F = factors('M')
+    models = {'CAPM': ['Mkt-RF'], 'FF3': ['Mkt-RF', 'SMB', 'HML'], 'Carhart': ['Mkt-RF', 'SMB', 'HML', 'MOM'],
+              'FF5': ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA'], 'FF5+MOM': ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA', 'MOM']}
+    # perechi imbricate (diferenta >= 0 in esantion) si o pereche neimbricata (FF5 vs Carhart)
+    pairs = [('FF3', 'CAPM'), ('FF5', 'FF3'), ('FF5+MOM', 'FF5'), ('FF5', 'Carhart')]
+    out = {}
+    for lab, a, b in [('1963-2026', '1963-07-31', END), ('2000-2026', '2000-01-31', END)]:
+        Fs = F.loc[a:b]
+        T = len(Fs)
+        sr2 = {k: max_sr2(Fs, v) for k, v in models.items()}
+        boots = {p: [] for p in pairs}
+        for _ in range(B):
+            Fb = Fs.iloc[stationary_bootstrap_idx(T, mean_block, rng)]
+            s = {k: max_sr2(Fb, v) for k, v in models.items()}
+            for p in pairs:
+                boots[p].append(12 * (s[p[0]] - s[p[1]]))
+        # alfa de spanning: fiecare factor regresat pe ceilalti cinci (NW)
+        full = models['FF5+MOM']
+        span = {}
+        for c in full:
+            bb, se, t, _, _ = ols_hac(Fs[c].values, Fs[[x for x in full if x != c]].values)
+            span[c] = dict(alpha=bb[0] * 12, t=t[0])
+        out[lab] = dict(T=T, sr_ann={k: np.sqrt(12 * v) for k, v in sr2.items()},
+                        sr2_ann={k: 12 * v for k, v in sr2.items()},
+                        diff={f'{p[0]} - {p[1]}': dict(est=12 * (sr2[p[0]] - sr2[p[1]]),
+                                                        ci=np.percentile(boots[p], [2.5, 97.5]).tolist(),
+                                                        share_le0=float(np.mean(np.array(boots[p]) <= 0)))
+                              for p in pairs},
+                        spanning=span)
+    return out
+
+
+def eiv_attenuation():
+    """Erori in variabile in etapa a doua: plim lambda_OLS / lambda = Var(beta) / (Var(beta) + s2_eps / (T s2_f))."""
+    out = {}
+    res, ex, mk = sml_data()
+    cases = {'25 size x B/M': (ex, mk)}
+    S = [s + '.US' for s in SECTORS]
+    exs, Fs = monthly_excess(S)
+    cases['9 sector ETFs'] = (exs, Fs['Mkt-RF'])
+    for k, (e, m) in cases.items():
+        R = e.values
+        f = np.asarray(m, float)
+        T = len(f)
+        Z = np.column_stack([np.ones(T), f])
+        AB = np.linalg.lstsq(Z, R, rcond=None)[0]
+        E = R - Z @ AB
+        s2e = (E ** 2).sum(0) / (T - 2)
+        noise = s2e.mean() / (T * f.var(ddof=1))
+        vb_hat = AB[1].var(ddof=1)
+        vb = vb_hat - noise
+        out[k] = dict(T=T, N=R.shape[1], var_beta_hat=vb_hat, noise=noise, var_beta=vb,
+                      attenuation=vb / (vb + noise), sd_beta=np.sqrt(vb_hat))
+    return out
+
+
+def advanced():
+    res, ex, mk = sml_data()
+    F = factors('M').loc[ex.index]
+    out = dict(grs_sharpe=grs_sharpe(ex.values, mk.values))
+    S = [s + '.US' for s in SECTORS]
+    exs, Fs = monthly_excess(S)
+    out['grs_sharpe_sectors'] = grs_sharpe(exs.values, Fs['Mkt-RF'].values)
+    out['fm_krs'] = {k: fm_krs_table(ex, F, v).round(4).reset_index().to_dict(orient='records')
+                     for k, v in {'CAPM': ['Mkt-RF'], 'FF3': ['Mkt-RF', 'SMB', 'HML'],
+                                  'FF5': ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA']}.items()}
+    out['useless'] = useless_factor_sim()
+    out['lns'] = lns_r2()
+    out['nfac'] = number_of_factors()
+    out['model_comparison'] = model_comparison()
+    out['eiv'] = eiv_attenuation()
+    return out
+
+
 # =============================================================================
 # MAIN
 # =============================================================================
@@ -590,6 +895,7 @@ if __name__ == '__main__':
     R['etf_alphas'] = fig_etf_alphas()
     R['bvb_betas'] = fig_bvb_betas()
     R['fama_macbeth'] = fig_fama_macbeth()
+    R['advanced'] = advanced()
     with open(os.path.join(HERE, 'ch3_results.json'), 'w') as f:
         json.dump(to_py(R), f, indent=1, default=str)
     print(json.dumps(to_py(R), indent=1, default=str)[:20000])

@@ -16,17 +16,19 @@ import json
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy import stats
+from scipy import stats, integrate
 import statsmodels.api as sm
 import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import load_close, deribit_chain, dvol_history  # noqa: E402
-from option_tools import bs_price, bs_greeks, implied_vol, newton_iv, svi_w, svi_fit, variance_from_strip, delta_hedge  # noqa: E402
+from option_tools import (bs_price, bs_greeks, implied_vol, newton_iv, crr_price, svi_w, svi_fit,  # noqa: E402
+                          variance_from_strip, delta_hedge)
 from generate_all_charts import (plt, MainBlue, IDAred, Forest, Amber, Orange, Purple, Teal, Gray, LightGray,  # noqa: E402
                                  save_fig, legend_outside_bottom, fig_legend_bottom, nw_mean, gbm_paths, btc_surface,
-                                 pick, vrp_sp500, vrp_btc, delta_hedged_history, jsonable, SEED, HERE)
+                                 pick, vrp_sp500, vrp_btc, delta_hedged_history, jsonable, SEED, HERE,
+                                 rnd_from_svi)
 
 B_BOOT = 1000
 
@@ -120,6 +122,125 @@ def a8_strip():
     contrib = [2 / T * 5 / K ** 2 * q for K, q in zip(A8_K, Q)]
     return dict(Q=Q, iv=[float(100 * iv(K)) for K in A8_K], var=var, vol=100 * np.sqrt(var), atm=100 * iv(100.0),
                 contrib=contrib, share_puts=sum(contrib[:4]) / sum(contrib))
+
+
+# =============================================================================
+# PARTEA A (derivari, cu cifre de verificare)
+# =============================================================================
+BFLY_EXPIRY = '2026-10-30 08:00:00'
+
+
+def a1_butterfly(h=1000.0, K0=85000.0):
+    """Convexitatea in K pe lantul Bitcoin: fluture C(K-h) - 2C(K) + C(K+h) din preturile de marcare (USD) si costul
+    executabil (aripile la ask, corpul la bid); densitatea aproximativa q(K) ~ fluture / h^2 (r = 0)."""
+    c = deribit_chain()
+    g = c[(c['expiry'] == pd.Timestamp(BFLY_EXPIRY)) & (c['type'] == 'call')].set_index('strike').sort_index()
+    F = float(g['forward'].iloc[0])
+    usd = lambda col: g[col] * F
+    m, b, a = usd('mark_price'), usd('bid'), usd('ask')
+    out = dict(F=F, h=h, K=K0, Cm=float(m[K0 - h]), C0=float(m[K0]), Cp=float(m[K0 + h]),
+               bid0=float(b[K0]), askm=float(a[K0 - h]), askp=float(a[K0 + h]))
+    out['bf_mark'] = out['Cm'] - 2 * out['C0'] + out['Cp']
+    out['bf_exec'] = out['askm'] - 2 * out['bid0'] + out['askp']
+    out['q'] = out['bf_mark'] / h ** 2
+    out['mass'] = out['bf_mark'] / h                         # ~ P(K - h < S_T < K + h), ponderare triunghiulara
+    # toate tripletele echidistante din lantul acestei scadente
+    Ks = list(g.index)
+    n_tr = n_neg_mark = n_neg_exec = 0
+    neg, spr = [], []
+    for i in range(1, len(Ks) - 1):
+        for j in range(i + 1, len(Ks)):
+            hh = Ks[j] - Ks[i]
+            if Ks[i] - hh in g.index:
+                n_tr += 1
+                bm = m[Ks[i] - hh] - 2 * m[Ks[i]] + m[Ks[j]]
+                n_neg_mark += int(bm < 0)
+                if bm < 0:
+                    neg.append(float(bm)); spr.append(float(a[Ks[i]] - b[Ks[i]]))
+                if np.isfinite(a[Ks[i] - hh]) and np.isfinite(b[Ks[i]]) and np.isfinite(a[Ks[j]]) and b[Ks[i]] > 0:
+                    n_neg_exec += int(a[Ks[i] - hh] - 2 * b[Ks[i]] + a[Ks[j]] < 0)
+    out.update(n_triples=n_tr, n_neg_mark=n_neg_mark, n_neg_exec=n_neg_exec, worst_neg=float(min(neg)) if neg else 0.0,
+               spread_neg=float(np.median(spr)) if spr else 0.0)
+    return out
+
+
+def a2_implied_forward():
+    """Paritatea ca regresie: C - P = D F - D K pe toate preturile de exercitare cu call si put cotate (mid, USD)."""
+    c = deribit_chain()
+    g = c[(c['expiry'] == pd.Timestamp(BFLY_EXPIRY)) & (c['bid'] > 0) & (c['ask'] > 0)].copy()
+    F0 = float(g['forward'].iloc[0])
+    g['mid'] = 0.5 * (g['bid'] + g['ask']) * F0
+    p = g.pivot_table(index='strike', columns='type', values='mid').dropna()
+    y = p['call'] - p['put']
+    X = sm.add_constant(pd.Series(p.index.values, index=p.index, name='K'))
+    m = sm.OLS(y, X).fit(cov_type='HC1')
+    D = -m.params['K']
+    Fh = m.params['const'] / D
+    # metoda delta: F = -a / b
+    a_, b_ = m.params['const'], m.params['K']
+    grad = np.array([-1 / b_, a_ / b_ ** 2])
+    seF = float(np.sqrt(grad @ m.cov_params().values @ grad))
+    return dict(n=int(len(p)), D=float(D), D_se=float(m.bse['K']), F=float(Fh), F_se=seF, F_exch=F0,
+                kmin=float(p.index.min()), kmax=float(p.index.max()), r2=float(m.rsquared))
+
+
+def a4_crr_error():
+    """Eroarea CRR fata de Black-Scholes, inmultita cu N: oscilatie par/impar, ordinul 1/N."""
+    S, K, T, r, s = 100.0, 100.0, 1.0, 0.05, 0.20
+    bs = float(bs_price(S, K, T, r, s))
+    return {str(N): dict(price=float(crr_price(S, K, T, r, s, N)), nerr=float(N * (crr_price(S, K, T, r, s, N) - bs)))
+            for N in [50, 51, 100, 101, 200, 201, 400, 401]} | dict(bs=bs)
+
+
+def a8_lognormal_strip():
+    """Banda de optiuni pentru o distributie log-normala (sigma = 20%, 90 de zile, F = 100, r = 0): valoarea exacta
+    sigma^2 = 0.04; formula Cboe cu Delta K = 5 pe [80, 120]; grila densa pe [80, 120]; grila densa pe (0, infinit)."""
+    F, T, s = 100.0, 90 / 365, 0.20
+    q = lambda K: np.where(K < F, bs_price(F, K, T, 0.0, s, 'put'), bs_price(F, K, T, 0.0, s, 'call'))
+    K5 = np.arange(80.0, 120.1, 5.0)
+    Q5 = np.where(K5 == F, 0.5 * (bs_price(F, K5, T, 0.0, s, 'put') + bs_price(F, K5, T, 0.0, s, 'call')), q(K5))
+    v5 = variance_from_strip(K5, Q5, F, T)
+    Kd = np.linspace(80, 120, 40001)
+    vd = 2 / T * integrate.trapezoid(q(Kd) / Kd ** 2, Kd)
+    Kw = F * np.exp(np.linspace(-3, 3, 60001))
+    vw = 2 / T * integrate.trapezoid(q(Kw) / Kw ** 2, Kw)
+    return dict(exact=s ** 2, cboe=float(v5), dense=float(vd), wide=float(vw), vol_cboe=float(100 * np.sqrt(v5)),
+                vol_dense=float(100 * np.sqrt(vd)), vol_wide=float(100 * np.sqrt(vw)),
+                trunc=float(vd - s ** 2), disc=float(v5 - vd))
+
+
+def b8_rnd_band(days=90, B=300):
+    """Densitatea neutra la risc pentru scadenta BTC cea mai apropiata de 90 de zile: banda bootstrap pe perechi,
+    probabilitatile P(S_T < 0.8F) si P(S_T > 1.2F) cu intervale, fata de densitatea log-normala ATM."""
+    c, tab, t0 = btc_surface()
+    e = pick(tab, days); f = tab.loc[e]
+    F, T = float(f['F']), float(f['T'])
+    p0 = [float(f[x]) for x in ['a', 'b', 'rho', 'm', 's']]
+    K = F * np.exp(np.linspace(-1.5, 1.2, 2701))
+    g = c[c['expiry'] == e]
+    kq, wq = g['k'].values, g['w'].values
+    def probs(q):
+        A = integrate.trapezoid(q, K)
+        lo = integrate.trapezoid(q[K <= 0.8 * F], K[K <= 0.8 * F]) / A
+        hi = 1 - integrate.trapezoid(q[K <= 1.2 * F], K[K <= 1.2 * F]) / A
+        return lo, hi
+    q0 = rnd_from_svi(p0, F, T, K)
+    p80, p120 = probs(q0)
+    atm = np.sqrt(svi_w(0.0, *p0) / T)
+    ln = lambda x: float(stats.lognorm.cdf(x * F, s=atm * np.sqrt(T), scale=F * np.exp(-0.5 * atm ** 2 * T)))
+    rng = np.random.default_rng(SEED)
+    P80, P120 = [], []
+    while len(P80) < B:
+        i = rng.integers(0, len(kq), len(kq))
+        if len(np.unique(kq[i])) < 6:
+            continue
+        pb = svi_fit(kq[i], wq[i])
+        a_, b_ = probs(rnd_from_svi([pb[x] for x in ['a', 'b', 'rho', 'm', 's']], F, T, K))
+        P80.append(a_); P120.append(b_)
+    return dict(expiry=str(pd.Timestamp(e).date()), days=float(f['days']), n=int(len(kq)), atm=float(100 * atm),
+                p80=float(p80), p80_lo=float(np.quantile(P80, 0.025)), p80_hi=float(np.quantile(P80, 0.975)),
+                p120=float(p120), p120_lo=float(np.quantile(P120, 0.025)), p120_hi=float(np.quantile(P120, 0.975)),
+                ln80=ln(0.8), ln120=1 - ln(1.2), kf_min=float(np.exp(kq.min())), kf_max=float(np.exp(kq.max())))
 
 
 # =============================================================================
@@ -313,13 +434,15 @@ def c1_vrp_signal():
 
 if __name__ == '__main__':
     RES = dict(A1=a1_parity(), A2=a2_parity_div(), A3=a3_binomial(), A4=a4_american(), A5=a5_bs(), A6=a6_delta_gamma(),
-               A7=a7_newton(), A8=a8_strip())
+               A7=a7_newton(), A8=a8_strip(), A1b=a1_butterfly(), A2b=a2_implied_forward(), A4b=a4_crr_error(),
+               A8b=a8_lognormal_strip())
     RES['B1'] = b1_hedge_boot()
     RES['B2'] = b2_delta_hedged()
     RES['B3'] = b3_svi()
     RES['B5'] = b5_vrp()
     RES['B6'] = b6_mz()
     RES['B7'] = b7_vrp_btc()
+    RES['B8'] = b8_rnd_band()
     RES['C1'] = c1_vrp_signal()
     with open(os.path.join(HERE, 'sem12_results.json'), 'w') as f:
         json.dump(jsonable(RES), f, indent=1)

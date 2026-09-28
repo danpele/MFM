@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch8_comparative'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Comparative backtesting of VaR 2.5% and ES 2.5% forecasts with the FZ0 loss: average losses, pairwise Diebold-Mariano tests with Newey-West variance and the model confidence set (block bootstrap).'
+Description: 'Comparative backtesting of VaR 2.5% and ES 2.5% forecasts with the FZ0 loss: average losses, pairwise Diebold-Mariano tests with Newey-West variance, Giacomini-White conditional tests, Nolde-Ziegel three-zone comparison against historical simulation, the model confidence set (block bootstrap) and a Murphy diagram of elementary quantile scores (GARCH-t versus FHS, VaR 1%, S&P 500).'
 
 Keywords: 'comparative backtesting, FZ0 loss, Diebold-Mariano, model confidence set, HAC, expected shortfall'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
 
-Output: 'ch8_fz0.pdf, ch8_dm_matrix.pdf, ch8_mcs.pdf'
+Output: 'ch8_fz0.pdf, ch8_dm_matrix.pdf, ch8_mcs.pdf, ch8_murphy.pdf'

@@ -14,6 +14,7 @@ Conventii (ca in capitolele 0 si 1):
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """
 
+import io
 import os
 import re
 import urllib.request
@@ -96,3 +97,75 @@ def load_close(name, start=None, end=END):
 def log_returns(name, start=None, end=END):
     """Randamente log pe calendarul propriu al seriei."""
     return np.log(load_close(name, start, end)).diff().dropna().rename(name)
+
+
+# =============================================================================
+# SERII LUNARE PENTRU REGRESIILE PREDICTIVE (surse publice)
+# =============================================================================
+SHILLER_URLS = ['http://www.econ.yale.edu/~shiller/data/ie_data.xls']
+FRED = 'https://fred.stlouisfed.org/graph/fredgraph.csv?id='
+
+
+def _get(url, timeout=120, agent='Mozilla/5.0'):
+    return urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': agent}),
+                                  timeout=timeout).read()
+
+
+def shiller():
+    """S&P Composite lunar (datele publice ale lui Robert J. Shiller): P = media lunara a preturilor,
+    D = dividendele pe 12 luni (nominale)."""
+    if 'shiller' in _CACHE:
+        return _CACHE['shiller']
+    urls = []
+    try:
+        html = _get('https://shillerdata.com/', 60).decode('utf-8', 'ignore')
+        urls = ['https:' + u if u.startswith('//') else u for u in re.findall(r'href="([^"]*ie_data\.xls[^"]*)"', html)]
+    except Exception:
+        pass
+    raw = None
+    for url in urls + SHILLER_URLS:
+        try:
+            raw = _get(url)
+            break
+        except Exception:
+            continue
+    d = pd.read_excel(io.BytesIO(raw), sheet_name='Data', header=None, skiprows=8).iloc[:, [0, 1, 2]]
+    d.columns = ['date', 'P', 'D']
+    d = d[pd.to_numeric(d['date'], errors='coerce').notna()].copy()
+    yr = d['date'].astype(float)
+    year = np.floor(yr + 1e-9).astype(int)
+    month = np.round((yr - year) * 100).astype(int)
+    d.index = pd.to_datetime(dict(year=year, month=month, day=1)) + pd.offsets.MonthEnd(0)
+    d = d[['P', 'D']].apply(pd.to_numeric, errors='coerce').dropna()
+    _CACHE['shiller'] = d
+    return d
+
+
+def fred(series):
+    """Serie FRED (fara cheie), ca pd.Series cu indice la sfarsit de luna."""
+    d = pd.read_csv(io.BytesIO(_get(FRED + series, agent='Python-urllib')), index_col=0, parse_dates=True)
+    s = pd.to_numeric(d.iloc[:, 0], errors='coerce').dropna()
+    s.index = s.index + pd.offsets.MonthEnd(0)
+    return s.rename(series)
+
+
+def sp500_monthly(end='2026-08-31'):
+    """S&P 500 lunar, P (media lunara) si D (dividende pe 12 luni), prelungit pana la `end`.
+    Prelungire (splicing): P = media lunara a inchiderilor zilnice GSPC.INDX; D = dividendele pe 12 luni
+    ale SPY.US (din adjusted_close si close), scalate cu raportul mediu D_Shiller / D_SPY pe ultimele 12 luni comune."""
+    sh = shiller()
+    spx = read_market('GSPC.INDX')['close']
+    P_ext = spx.resample('ME').mean()
+    spy = read_market('SPY.US')
+    tr = spy['adjusted_close'] / spy['adjusted_close'].shift(1)
+    div = (tr * spy['close'].shift(1) - spy['close']).clip(lower=0)
+    div[div < 1e-3 * spy['close']] = 0.0                       # doar zilele ex-dividend
+    D_spy = div.resample('ME').sum().rolling(12).sum()
+    common = sh.index.intersection(D_spy.dropna().index)[-12:]
+    kP = float((sh.loc[common, 'P'] / P_ext.loc[common]).mean())
+    kD = float((sh.loc[common, 'D'] / D_spy.loc[common]).mean())
+    last = sh.index[-1]
+    ext = pd.DataFrame({'P': kP * P_ext, 'D': kD * D_spy}).loc[last + pd.offsets.MonthEnd(1):end]
+    out = pd.concat([sh, ext]).loc[:end]
+    out.attrs.update(shiller_last=str(last.date()), kP=kP, kD=kD)
+    return out

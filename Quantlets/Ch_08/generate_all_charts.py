@@ -584,6 +584,289 @@ def worked_examples():
     return out
 
 
+# =============================================================================
+# INFERENTA: testul DQ, marime si putere (Monte Carlo), riscul de estimare,
+# Giacomini-White, zonele Nolde-Ziegel, diagrama Murphy, testul multinomial
+# =============================================================================
+def dq_test(hit, var, a, lags=4):
+    """Testul Dynamic Quantile (Engle & Manganelli, 2004): Hit_t = I_t - a regresat pe
+    X_t = (1, Hit_{t-1..t-lags}, VaR_t); DQ = b'X'Xb / (a(1-a)) ~ chi2(k)."""
+    h = np.asarray(hit, float) - a
+    v = np.asarray(var, float)
+    y = h[lags:]
+    X = np.column_stack([np.ones(len(y))] + [h[lags - j:len(h) - j] for j in range(1, lags + 1)] + [v[lags:]])
+    b, *_ = np.linalg.lstsq(X, y, rcond=None)
+    dq = float(b @ X.T @ X @ b / (a * (1 - a)))
+    return dict(DQ=dq, df=X.shape[1], p=float(stats.chi2.sf(dq, X.shape[1])))
+
+
+def dq_table(col='VaR1', a=0.01):
+    out = {}
+    for n in M.ASSETS:
+        for m in M.MODELS:
+            df = fc(n)[0][m]
+            out[f'{n}|{m}'] = dq_test((df['L'] > df[col]).astype(int).values, df[col].values, a)
+    return out
+
+
+def fig_var_pvalues4(tab, dq):
+    """Harta valorilor p: Kupiec, CC, durate si DQ (VaR 1%)."""
+    fig, axs = plt.subplots(1, 4, figsize=(8.6, 2.7), sharey=True)
+    for ax, (key, title) in zip(axs, (('p_uc', 'Kupiec POF'), ('p_cc', 'Christoffersen CC'),
+                                      ('p_dur', 'Duration (Weibull)'), ('dq', 'Dynamic Quantile'))):
+        if key == 'dq':
+            P = pd.DataFrame({M.LABELS[n]: [dq[f'{n}|{m}']['p'] for m in M.MODELS] for n in M.ASSETS}, index=M.MODELS)
+        else:
+            P = pd.DataFrame({M.LABELS[n]: [(tab[f'{n}|{m}'] if f'{n}|{m}' in tab else tab[(n, m)])[key]
+                                            for m in M.MODELS] for n in M.ASSETS}, index=M.MODELS)
+        pv_heatmap(ax, P, title=title)
+        ax.tick_params(axis='x', rotation=30)
+    plt.tight_layout()
+    save_fig('ch8_var_pvalues')
+
+
+def pof_power(T, pis, a=0.01, level=0.05):
+    """Puterea exacta a testului Kupiec (LR, nivel 5%) sub Binomial(T, pi) si aproximarea locala
+    chi2 necentrala cu parametrul T (pi - a)^2 / (a(1-a))."""
+    x = np.arange(T + 1)
+    lr = np.array([M.kupiec(np.r_[np.ones(k), np.zeros(T - k)], a)['LR'] for k in x])
+    rej = lr > stats.chi2.ppf(1 - level, 1)
+    exact = np.array([stats.binom.pmf(x, T, p)[rej].sum() for p in pis])
+    lam = T * (pis - a) ** 2 / (a * (1 - a))
+    asym = stats.ncx2.sf(stats.chi2.ppf(1 - level, 1), 1, np.maximum(lam, 1e-12))
+    return exact, asym, rej
+
+
+def fig_pof_power():
+    pis = np.linspace(0.0, 0.04, 401)
+    fig, ax = plt.subplots(figsize=(6.4, 3.0))
+    out = {}
+    for T, col in ((250, MainBlue), (1000, IDAred)):
+        ex, asy, rej = pof_power(T, pis)
+        ax.plot(100 * pis, ex, color=col, lw=1.4, label=f'Exact power, T = {T}')
+        ax.plot(100 * pis, asy, color=col, lw=1.1, ls='--', label=f'Local asymptotic power, T = {T}')
+        up = pis > 0.01
+        half = float(pis[up][np.argmax(ex[up] >= 0.5)])
+        eighty = float(pis[up][np.argmax(ex[up] >= 0.8)])
+        i2 = int(np.argmin(abs(pis - 0.02)))
+        out[str(T)] = dict(pi50=half, pi80=eighty, pow2=float(ex[i2]), asy2=float(asy[i2]),
+                           size=float(ex[int(np.argmin(abs(pis - 0.01)))]))
+    ax.axhline(0.05, color=Gray, lw=0.7, ls=':')
+    ax.axvline(1.0, color=Gray, lw=0.7, ls=':')
+    ax.set_xlabel('True breach probability (%) of a VaR 1% forecast')
+    ax.set_ylabel('Rejection probability at 5%')
+    ax.set_ylim(0, 1.02)
+    legend_outside_bottom(ax, ncol=2, y=-0.2)
+    save_fig('ch8_pof_power')
+    return out
+
+
+def sim_garch_t(par, n, reps, rng, burn=500):
+    """Traiectorii GARCH(1,1)-t (inovatii t standardizate); intoarce randamentele si sigma_t."""
+    mu, om, a, b, nu = par
+    z = rng.standard_t(nu, size=(reps, n + burn)) * np.sqrt((nu - 2) / nu)
+    r = np.empty((reps, n + burn))
+    s2 = np.full(reps, om / (1 - a - b))
+    S = np.empty((reps, n + burn))
+    for t in range(n + burn):
+        S[:, t] = np.sqrt(s2)
+        r[:, t] = mu + S[:, t] * z[:, t]
+        s2 = om + a * (r[:, t] - mu) ** 2 + b * s2
+    return r[:, burn:], S[:, burn:]
+
+
+def mc_size_power(reps=1000, seed=8, Ts=(250, 1000, 5000), a=0.01, w=1000):
+    """Monte Carlo: DGP GARCH(1,1)-t cu parametrii estimati pe S&P 500 1990-2026.
+    Prognoze VaR 1%: modelul corect (parametri adevarati), Normal-GARCH (sigma adevarat, coada Normala), HS (1000 zile).
+    Rata de respingere la 5% pentru POF, CC, durate (Weibull) si DQ; p nedefinit (prea putine depasiri) = nerespingere."""
+    r = M.load_returns('sp500').values
+    par = M.garch_fit(r)
+    mu, om, al, be, nu = par
+    rng = np.random.default_rng(seed)
+    Tmax = max(Ts)
+    R, S = sim_garch_t(par, Tmax + w, reps, rng)
+    L = -R[:, w:]
+    q_t, q_n = M.t_std_q(nu, a), stats.norm.ppf(1 - a)
+    out = {}
+    for m in ('Correct', 'Normal-GARCH', 'HS'):
+        rej = {T: {k: 0 for k in ('POF', 'CC', 'DUR', 'DQ')} for T in Ts}
+        nan_dur = {T: 0 for T in Ts}
+        for i in range(reps):
+            if m == 'Correct':
+                v = -mu + S[i, w:] * q_t
+            elif m == 'Normal-GARCH':
+                v = -mu + S[i, w:] * q_n
+            else:
+                v = pd.Series(-R[i]).rolling(w).quantile(1 - a).shift(1).values[w:]
+            I = (L[i] > v).astype(int)
+            for T in Ts:
+                h, vv = I[:T], v[:T]
+                rej[T]['POF'] += M.kupiec(h, a)['p'] < 0.05
+                rej[T]['CC'] += M.christoffersen(h, a)['p_cc'] < 0.05 if h.sum() > 0 else 0
+                d = M.duration_test(h)['p']
+                nan_dur[T] += np.isnan(d)
+                rej[T]['DUR'] += (d < 0.05) if not np.isnan(d) else 0
+                rej[T]['DQ'] += dq_test(h, vv, a)['p'] < 0.05
+        out[m] = {str(T): dict({k: v / reps for k, v in rej[T].items()}, dur_nan=nan_dur[T] / reps) for T in Ts}
+    out['par'] = dict(mu=mu, omega=om, alpha=al, beta=be, nu=nu)
+    out['reps'] = reps
+    return out
+
+
+def mc_estimation_risk(reps=400, seed=9, Rw=1000, Ps=(250, 1000, 5000), a=0.01):
+    """Riscul de estimare: GARCH-t estimat o singura data pe R = 1000 de zile (schema fixa), VaR 1% pe P zile.
+    Rata de respingere POF la 5% cu parametri estimati versus parametri adevarati, pe aceleasi traiectorii."""
+    r0 = M.load_returns('sp500').values
+    par = M.garch_fit(r0)
+    rng = np.random.default_rng(seed)
+    Pm = max(Ps)
+    R, S = sim_garch_t(par, Rw + Pm, reps, rng)
+    mu0, _, _, _, nu0 = par
+    rej_est = {P: 0 for P in Ps}
+    rej_true = {P: 0 for P in Ps}
+    rate_est = {P: [] for P in Ps}
+    for i in range(reps):
+        x = R[i, :Rw]
+        mu, om, al, be, nu = M.garch_fit(x)
+        nu = max(nu, 2.2)
+        s2 = M.garch_filter(R[i], mu, om, al, be, np.var(x[:50]))
+        v_est = -mu + np.sqrt(s2[Rw:Rw + Pm]) * M.t_std_q(nu, a)
+        v_true = -mu0 + S[i, Rw:] * M.t_std_q(nu0, a)
+        L = -R[i, Rw:]
+        for P in Ps:
+            he = (L[:P] > v_est[:P]).astype(int)
+            ht = (L[:P] > v_true[:P]).astype(int)
+            rej_est[P] += M.kupiec(he, a)['p'] < 0.05
+            rej_true[P] += M.kupiec(ht, a)['p'] < 0.05
+            rate_est[P].append(he.mean())
+    return {str(P): dict(est=rej_est[P] / reps, true=rej_true[P] / reps,
+                         sd_rate=float(np.std(rate_est[P])), sd_binom=float(np.sqrt(a * (1 - a) / P)))
+            for P in Ps} | dict(reps=reps)
+
+
+def gw_test(la, lb):
+    """Testul de abilitate predictiva conditionala Giacomini-White (2006), orizont 1:
+    Z_t = h_{t-1} d_t cu h_{t-1} = (1, d_{t-1}); W = T Zbar' Omega^{-1} Zbar ~ chi2(2)."""
+    d = np.asarray(la) - np.asarray(lb)
+    Z = np.column_stack([d[1:], d[:-1] * d[1:]])
+    T = len(Z)
+    zb = Z.mean(0)
+    Om = Z.T @ Z / T
+    W = float(T * zb @ np.linalg.solve(Om, zb))
+    u = d.mean() / np.sqrt(np.mean(d ** 2) / len(d))
+    return dict(W=W, p=float(stats.chi2.sf(W, 2)), unc=float(u), p_unc=float(2 * stats.norm.sf(abs(u))))
+
+
+def gw_table():
+    Lf = fz_losses('sp500')
+    return {f'{a}|FHS': gw_test(Lf[a], Lf['FHS']) for a in ('GARCH-t', 'HS', 'GARCH-EVT', 'Normal')}
+
+
+def nz_zones(standard='HS', internals=('GARCH-t', 'FHS', 'GARCH-EVT'), level=0.05):
+    """Backtesting comparativ in trei zone (Nolde & Ziegel, 2017): doua teste unilaterale DM pe FZ0
+    ale modelului intern fata de modelul standard. Verde: intern semnificativ mai bun; rosu: semnificativ mai slab."""
+    z = stats.norm.ppf(1 - level)
+    out = {}
+    for n in M.ASSETS:
+        Lf = fz_losses(n)
+        for m in internals:
+            dm = M.diebold_mariano(Lf[m], Lf[standard])['DM']
+            out[f'{n}|{m}'] = dict(DM=float(dm), zone='green' if dm < -z else ('red' if dm > z else 'yellow'))
+    return out
+
+
+def elementary_scores(L, v, thetas, tau):
+    """Scorurile elementare pentru cuantila de ordin tau (Ehm et al., 2016):
+    S_theta(v, y) = (1{y < v} - tau)(1{theta < v} - 1{theta < y}); matrice T x len(thetas)."""
+    L = np.asarray(L)[:, None]
+    v = np.asarray(v)[:, None]
+    th = np.asarray(thetas)[None, :]
+    return ((L < v) - tau) * ((th < v).astype(float) - (th < L).astype(float))
+
+
+def murphy(name, mA, mB, col='VaR1', a=0.01, n=240):
+    F = fc(name)[0]
+    L = F[mA]['L'].values
+    lo, hi = np.nanquantile(np.r_[F[mA][col], F[mB][col]], [0.01, 0.99])   # zona in care se afla prognozele
+    th = np.linspace(0.8 * lo, hi, n)
+    SA = elementary_scores(L, F[mA][col].values, th, 1 - a)
+    SB = elementary_scores(L, F[mB][col].values, th, 1 - a)
+    D = SA - SB
+    se = np.array([np.sqrt(M.nw_var(D[:, j]) / len(D)) for j in range(n)])
+    return th, SA.mean(0), SB.mean(0), D.mean(0), se
+
+
+def fig_murphy(name='sp500', mA='GARCH-t', mB='FHS'):
+    th, a_, b_, d, se = murphy(name, mA, mB)
+    fig, axs = plt.subplots(1, 2, figsize=(7.4, 2.8))
+    axs[0].plot(100 * th, 1e4 * a_, color=MCOL[mA], lw=1.3, label=mA)
+    axs[0].plot(100 * th, 1e4 * b_, color=MCOL[mB], lw=1.3, label=mB)
+    axs[0].set_xlabel('Threshold θ (daily loss, %)')
+    axs[0].set_ylabel('Mean elementary score (×10⁴)')
+    axs[0].set_title('Murphy diagram, VaR 1%, S&P 500', fontsize=9)
+    axs[1].fill_between(100 * th, 1e4 * (d - 1.96 * se), 1e4 * (d + 1.96 * se), color=LightGray, alpha=0.8,
+                        label='95% pointwise band (HAC)')
+    axs[1].plot(100 * th, 1e4 * d, color=Purple, lw=1.3, label=f'{mA} minus {mB}')
+    axs[1].axhline(0, color=Gray, lw=0.7)
+    axs[1].set_xlabel('Threshold θ (daily loss, %)')
+    axs[1].set_ylabel('Score difference (×10⁴)')
+    axs[1].set_title('Difference: above 0 means FHS better', fontsize=9)
+    h0, l0 = axs[0].get_legend_handles_labels()
+    h1, l1 = axs[1].get_legend_handles_labels()
+    fig.legend(h0 + h1, l0 + l1, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=4, frameon=False)
+    plt.tight_layout()
+    save_fig('ch8_murphy')
+    sig_pos = (d - 1.96 * se) > 0
+    sig_neg = (d + 1.96 * se) < 0
+    lo5 = th < 0.05
+    return dict(neg_ge5=float(np.mean(d[~lo5] < 0)), zero_lt5=float(np.mean(~sig_pos[lo5] & ~sig_neg[lo5])), share_pos_lt5=float(np.mean(d[lo5] > 0)),
+                share_pos=float(np.mean(d > 0)), share_sig_pos=float(np.mean(sig_pos)),
+                share_sig_neg=float(np.mean(sig_neg)), share_neg=float(np.mean(d < 0)),
+                th_min=float(th[0]), th_max=float(th[-1]),
+                th_sig_lo=float(th[sig_pos].min()) if sig_pos.any() else None,
+                th_sig_hi=float(th[sig_pos].max()) if sig_pos.any() else None)
+
+
+def murphy_summary(name, mA, mB, col, a):
+    th, a_, b_, d, se = murphy(name, mA, mB, col, a)
+    return dict(share_pos=float(np.mean(d > 0)), share_neg=float(np.mean(d < 0)),
+                share_sig_pos=float(np.mean((d - 1.96 * se) > 0)), share_sig_neg=float(np.mean((d + 1.96 * se) < 0)),
+                crosses=bool((d > 0).any() and (d < 0).any()))
+
+
+def multinomial_table(N=4, a=0.025):
+    """Testul multinomial VaR (Kratz, Lok & McNeil, 2018), statistica Pearson, N = 4 niveluri de coada
+    a_j = a (1 - (j-1)/N): 2.5%, 1.875%, 1.25%, 0.625%; celulele se definesc prin PIT."""
+    lev = np.array([1 - a * (1 - j / N) for j in range(N)])      # 0.975, 0.98125, 0.9875, 0.99375
+    probs = np.diff(np.r_[0.0, lev, 1.0])
+    out = {}
+    for n in M.ASSETS:
+        for m in M.MODELS:
+            u = fc(n)[0][m]['pit'].values
+            cell = np.sum(u[:, None] > lev[None, :], axis=1)
+            O = np.bincount(cell, minlength=N + 1)
+            E = len(u) * probs
+            S = float(((O - E) ** 2 / E).sum())
+            out[f'{n}|{m}'] = dict(S=S, p=float(stats.chi2.sf(S, N)), O=O.tolist())
+    out['probs'] = probs.tolist()
+    return out
+
+
+def extras(R):
+    """Blocurile de inferenta adaugate cursului (DQ, putere, risc de estimare, GW, Nolde-Ziegel, Murphy, multinomial)."""
+    R['dq'] = dq_table()
+    fig_var_pvalues4(R['var99'], R['dq'])
+    R['pof_power'] = fig_pof_power()
+    R['gw'] = gw_table()
+    R['nz'] = nz_zones()
+    R['murphy'] = fig_murphy()
+    R['murphy_btc'] = murphy_summary('btc', 'HS', 'GARCH-EVT', 'VaR2.5', 0.025)
+    R['multinomial'] = multinomial_table()
+    R['mc'] = mc_size_power()
+    R['estrisk'] = mc_estimation_risk()
+    return R
+
+
 def to_py(o):
     if isinstance(o, dict):
         return {(k if isinstance(k, str) else '|'.join(map(str, k)) if isinstance(k, tuple) else str(k)): to_py(v)
@@ -597,7 +880,14 @@ def to_py(o):
     return o
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' and '--extras' in sys.argv:
+    # doar blocurile de inferenta, adaugate la rezultatele existente
+    R = json.load(open(os.path.join(HERE, 'ch8_results.json')))
+    extras(R)
+    with open(os.path.join(HERE, 'ch8_results.json'), 'w') as f:
+        json.dump(to_py(R), f, indent=1, default=str)
+    print('extras done')
+elif __name__ == '__main__':
     R = {}
     R['assets'] = fig_four_assets()
     R['sp500_var'] = fig_sp500_var()
@@ -628,6 +918,7 @@ if __name__ == '__main__':
     R['conf_path'] = fig_conformal_path()
     fig_conformal_regimes(R['conformal5'])
     R['worked'] = worked_examples()
+    extras(R)
     with open(os.path.join(HERE, 'ch8_results.json'), 'w') as f:
         json.dump(to_py(R), f, indent=1, default=str)
     print('done')

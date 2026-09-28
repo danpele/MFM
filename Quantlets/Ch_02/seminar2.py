@@ -77,12 +77,29 @@ def b_vr_table(names):
     return pd.DataFrame(rows).set_index('market')
 
 
-def b_rolling_dfa(k='sp500', window=500, step=21, n_null=300, seed=SEED):
+def b_rolling_dfa(k='sp500', window=500, step=21, n_boot=199, seed=SEED):
+    """DFA pe ferestre mobile; banda nula wild bootstrap (semne Rademacher) calculata pentru FIECARE fereastra:
+    pastreaza volatilitatea ferestrei (permisa sub RW3) si distruge autocorelatia randamentelor.
+    Pentru comparatie: banda i.i.d. Student-t4 (aceeasi pentru toate ferestrele)."""
     rng = np.random.default_rng(seed)
-    null = [dfa_hurst(rng.standard_t(4, window))[0] for _ in range(n_null)]
-    lo, hi = np.percentile(null, [2.5, 97.5])
-    h = rolling_stat(log_returns(k), lambda x: dfa_hurst(x)[0], window, step)
-    return dict(lo=lo, hi=hi, share_out=float(((h < lo) | (h > hi)).mean()), min=h.min(), max=h.max(),
+    null = [dfa_hurst(rng.standard_t(4, window))[0] for _ in range(300)]
+    lo_t, hi_t = np.percentile(null, [2.5, 97.5])
+    r = log_returns(k)
+    x = r.values
+    rows = []
+    for end in range(window, len(x) + 1, step):
+        e = x[end - window:end] - x[end - window:end].mean()
+        g = np.random.default_rng(seed + end)
+        sims = [dfa_hurst(e * g.choice([-1.0, 1.0], window))[0] for _ in range(n_boot)]
+        lo, hi = np.percentile(sims, [2.5, 97.5])
+        rows.append((r.index[end - 1], dfa_hurst(e)[0], lo, hi))
+    d = pd.DataFrame(rows, columns=['date', 'dfa', 'lo', 'hi']).set_index('date')
+    h = d['dfa']
+    return dict(lo_t=lo_t, hi_t=hi_t, share_t=float(((h < lo_t) | (h > hi_t)).mean()),
+                share_out=float(((h < d['lo']) | (h > d['hi'])).mean()), n=len(d),
+                band_lo_mean=float(d['lo'].mean()), band_hi_mean=float(d['hi'].mean()),
+                width_min=float((d['hi'] - d['lo']).min()), width_max=float((d['hi'] - d['lo']).max()),
+                argwide=(d['hi'] - d['lo']).idxmax().date(), min=h.min(), max=h.max(),
                 argmin=h.idxmin().date(), argmax=h.idxmax().date(), mean=h.mean())
 
 

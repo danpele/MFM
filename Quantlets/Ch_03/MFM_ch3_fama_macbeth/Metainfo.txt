@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch3_fama_macbeth'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Fama-MacBeth two-pass regressions of the CAPM, FF3 and FF5 on the 25 size x book-to-market portfolios (1963-2026) with Fama-MacBeth, Newey-West and Shanken standard errors; the same procedure on 16 sector and factor ETFs (Seminar 3, B5).'
+Description: 'Fama-MacBeth two-pass regressions of the CAPM, FF3 and FF5 on the 25 size x book-to-market portfolios (1963-2026) with Fama-MacBeth, Newey-West, Shanken and Kan-Robotti-Shanken (misspecification-robust) standard errors; the same procedure on 16 sector and factor ETFs (Seminar 3, B5).'
 
 Keywords: 'Fama-MacBeth, risk premia, Shanken correction, errors in variables, Newey-West, Fama-French'
 

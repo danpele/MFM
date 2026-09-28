@@ -109,12 +109,13 @@ def b_dcc_spy_tlt():
                 lr=2 * (full['loglik'] - full['ccc_loglik']), n=len(Z), P=P)
 
 
-def b_gauss_vs_t(W, U, B=200):
-    """B2: Gaussian vs t pentru S&P 500 / Euro Stoxx 50 saptamanal: ML, LR pentru nu, adecvare, IC bootstrap pentru lambda."""
+def b_gauss_vs_t(W, U, B=200, B_test=499):
+    """B2: Gaussian vs t pentru S&P 500 / Euro Stoxx 50 saptamanal: ML, LR pentru nu, adecvare, IC bootstrap pentru lambda.
+    Testele (adecvare si LR) folosesc B_test = 499 replicari, deci p-valoarea minima posibila este 1/500 = 0.002."""
     u, v = U[:, 0], U[:, 1]
     fg, ft = fit_copula('gaussian', u, v), fit_copula('t', u, v)
-    gg = gof_test('gaussian', u, v, B=B, seed=SEED, fit=fg)
-    gt = gof_test('t', u, v, B=100, seed=SEED, fit=ft)
+    gg = gof_test('gaussian', u, v, B=B_test, seed=SEED, fit=fg)
+    gt = gof_test('t', u, v, B=B_test, seed=SEED, fit=ft)
     lr = 2 * (ft['loglik'] - fg['loglik'])
     rng = np.random.default_rng(SEED)
     lam_b, nu_b = [], []
@@ -126,7 +127,7 @@ def b_gauss_vs_t(W, U, B=200):
     lam_b, nu_b = np.array(lam_b), np.array(nu_b)
     # p-valoarea LR prin bootstrap parametric sub H0 (copula Gaussiana), pentru ca nu = infinit e pe frontiera
     lr_b = []
-    for _ in range(100):
+    for _ in range(B_test):
         X = pseudo_obs(simulate('gaussian', fg['par'], len(u), rng))
         lr_b.append(2 * (fit_copula('t', X[:, 0], X[:, 1])['loglik'] - fit_copula('gaussian', X[:, 0], X[:, 1])['loglik']))
     lr_b = np.array(lr_b)

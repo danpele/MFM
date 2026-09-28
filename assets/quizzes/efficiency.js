@@ -8,30 +8,30 @@ window.MFM_DATA.quizzes['efficiency'] = {
     "draw": 20,
     "questions": [
         {
-            "correct": 1,
+            "correct": 2,
             "en": {
-                "title": "Weak-form efficiency",
-                "text": "Which information set defines weak-form market efficiency?",
+                "title": "BDS and weak-form efficiency",
+                "text": "The BDS test rejects i.i.d. for daily S&P 500 returns. Does this reject weak-form efficiency (RW3)?",
                 "options": [
-                    "All public information, including company reports",
-                    "Past prices and returns of the asset",
-                    "Private information held by insiders",
-                    "Forecasts published by central banks"
+                    "Yes, because BDS tests the martingale property",
+                    "Yes, as long as the p-value is below 0.01",
+                    "No: volatility clustering alone (e.g. GARCH) makes BDS reject, and RW3 allows it",
+                    "No, because BDS can only be applied to prices"
                 ],
-                "correctExplanation": "In the weak form, prices fully reflect the history of prices and returns, so past returns cannot predict future excess returns.",
-                "incorrectExplanation": "Weak-form efficiency concerns only past prices and returns; public news defines the semi-strong form and insider information the strong form."
+                "correctExplanation": "BDS tests independence and identical distribution. A GARCH process with unpredictable mean rejects BDS but satisfies RW3 and the martingale difference hypothesis.",
+                "incorrectExplanation": "BDS is a test of i.i.d. (RW1). Weak-form efficiency only restricts the conditional mean, so predictable volatility is enough for a BDS rejection without any inefficiency."
             },
             "ro": {
-                "title": "Eficiența în formă slabă",
-                "text": "Ce mulțime de informații definește eficiența pieței în formă slabă?",
+                "title": "BDS și eficiența slabă",
+                "text": "Testul BDS respinge ipoteza i.i.d. pentru randamentele zilnice S&P 500. Respinge aceasta eficiența slabă (RW3)?",
                 "options": [
-                    "Toată informația publică, inclusiv raportările companiilor",
-                    "Prețurile și randamentele trecute ale activului",
-                    "Informația privată deținută de cei din interior",
-                    "Prognozele publicate de băncile centrale"
+                    "Da, pentru că BDS testează proprietatea de martingală",
+                    "Da, dacă valoarea p este sub 0,01",
+                    "Nu: gruparea volatilității singură (de ex. GARCH) face BDS să respingă, iar RW3 o permite",
+                    "Nu, pentru că BDS se aplică doar prețurilor"
                 ],
-                "correctExplanation": "În forma slabă, prețurile reflectă complet istoria prețurilor și a randamentelor, deci randamentele trecute nu pot prezice randamentele în exces viitoare.",
-                "incorrectExplanation": "Eficiența slabă privește doar prețurile și randamentele trecute; știrile publice definesc forma semi-tare, iar informația din interior forma tare."
+                "correctExplanation": "BDS testează independența și distribuția identică. Un proces GARCH cu medie imprevizibilă respinge BDS, dar satisface RW3 și ipoteza diferenței de martingală.",
+                "incorrectExplanation": "BDS este un test al ipotezei i.i.d. (RW1). Eficiența slabă restricționează doar media condiționată, deci volatilitatea predictibilă ajunge pentru o respingere BDS fără nicio ineficiență."
             }
         },
         {
@@ -172,55 +172,55 @@ window.MFM_DATA.quizzes['efficiency'] = {
         {
             "correct": 0,
             "en": {
-                "title": "Variance ratio above one",
-                "text": "A variance ratio VR(20) = 1.38, as for the BET index, indicates:",
+                "title": "Null distribution of the variance ratio",
+                "text": "Under RW1, T = 6 714 daily returns and the estimated VR(2) = 0.901. What is the homoskedastic z statistic, approximately?",
                 "options": [
-                    "Positive autocorrelation: returns persist (momentum)",
-                    "Mean reversion",
-                    "A pure random walk",
-                    "Negative volatility"
+                    "−8.1, because the asymptotic variance of √T(VR(2) − 1) equals 1",
+                    "−0.099, the distance of VR(2) from one",
+                    "−2.8, the robust z*(5) of the lecture",
+                    "−0.012, the distance divided by √T"
                 ],
-                "correctExplanation": "VR(q) = 1 + 2Σ(1 − k/q)ρ_k; a value above one means the weighted sum of autocorrelations is positive, i.e. persistence.",
-                "incorrectExplanation": "VR(q) above one means positive autocorrelations (persistence); below one means mean reversion."
+                "correctExplanation": "For q = 2 the variance 2(2q − 1)(q − 1)/(3q) equals 1, so z(2) = √6714 × (0.901 − 1) ≈ 81.9 × (−0.099) ≈ −8.1.",
+                "incorrectExplanation": "By the delta method √T(VR(q) − 1) → N(0, 2(2q − 1)(q − 1)/(3q)) under RW1; for q = 2 this variance is 1, so z(2) = √T(VR(2) − 1)."
             },
             "ro": {
-                "title": "Raport al dispersiilor peste unu",
-                "text": "Un raport al dispersiilor VR(20) = 1,38, ca pentru indicele BET, indică:",
+                "title": "Distribuția nulă a raportului dispersiilor",
+                "text": "Sub RW1, T = 6 714 randamente zilnice și VR(2) estimat = 0,901. Cât este aproximativ statistica z omoscedastică?",
                 "options": [
-                    "Autocorelație pozitivă: randamentele persistă (momentum)",
-                    "Revenire la medie",
-                    "Un mers aleator pur",
-                    "Volatilitate negativă"
+                    "−8,1, pentru că dispersia asimptotică a lui √T(VR(2) − 1) este 1",
+                    "−0,099, distanța lui VR(2) față de unu",
+                    "−2,8, z*(5) robust din curs",
+                    "−0,012, distanța împărțită la √T"
                 ],
-                "correctExplanation": "VR(q) = 1 + 2Σ(1 − k/q)ρ_k; o valoare peste unu înseamnă că suma ponderată a autocorelațiilor este pozitivă, adică persistență.",
-                "incorrectExplanation": "VR(q) peste unu înseamnă autocorelații pozitive (persistență); sub unu înseamnă revenire la medie."
+                "correctExplanation": "Pentru q = 2 dispersia 2(2q − 1)(q − 1)/(3q) este 1, deci z(2) = √6714 × (0,901 − 1) ≈ 81,9 × (−0,099) ≈ −8,1.",
+                "incorrectExplanation": "Prin metoda delta √T(VR(q) − 1) → N(0, 2(2q − 1)(q − 1)/(3q)) sub RW1; pentru q = 2 această dispersie este 1, deci z(2) = √T(VR(2) − 1)."
             }
         },
         {
             "correct": 3,
             "en": {
-                "title": "VR(2) and autocorrelation",
-                "text": "The S&P 500 has a lag-1 autocorrelation of −0.099. What is the approximate VR(2)?",
+                "title": "Hurst exponent of a short-memory process",
+                "text": "For an AR(1) with ρ = −0.1, what does the implied Hurst exponent H(q) = 0.5 + ln VR(q)/(2 ln q) tend to as q → ∞?",
                 "options": [
-                    "1.099",
-                    "0.802",
-                    "1.000",
-                    "0.901"
+                    "0.45, the value at q = 20",
+                    "0, because the process is anti-persistent",
+                    "It diverges to minus infinity",
+                    "0.5, because VR(q) tends to the constant (1 + ρ)/(1 − ρ)"
                 ],
-                "correctExplanation": "VR(2) = 1 + ρ_1 = 1 − 0.099 = 0.901, which matches the estimated value.",
-                "incorrectExplanation": "For q = 2 the formula reduces to VR(2) = 1 + ρ_1."
+                "correctExplanation": "For short memory VR(q) → 1 + 2Σρ_k = (1 + ρ)/(1 − ρ) ≈ 0.818, a positive constant, so ln VR(q)/(2 ln q) → 0 and H(q) → 0.5.",
+                "incorrectExplanation": "VR(q) of any short-memory process converges to a positive constant, so the logarithm stays bounded while ln q grows: H(q) → 0.5. Values below 0.5 at finite q reflect short-run reversal, not long memory."
             },
             "ro": {
-                "title": "VR(2) și autocorelația",
-                "text": "S&P 500 are autocorelația de ordinul 1 egală cu −0,099. Care este aproximativ VR(2)?",
+                "title": "Exponentul Hurst al unui proces cu memorie scurtă",
+                "text": "Pentru un AR(1) cu ρ = −0,1, către ce tinde exponentul Hurst implicat H(q) = 0,5 + ln VR(q)/(2 ln q) când q → ∞?",
                 "options": [
-                    "1,099",
-                    "0,802",
-                    "1,000",
-                    "0,901"
+                    "0,45, valoarea la q = 20",
+                    "0, pentru că procesul este anti-persistent",
+                    "Diverge spre minus infinit",
+                    "0,5, pentru că VR(q) tinde la constanta (1 + ρ)/(1 − ρ)"
                 ],
-                "correctExplanation": "VR(2) = 1 + ρ_1 = 1 − 0,099 = 0,901, valoare egală cu cea estimată.",
-                "incorrectExplanation": "Pentru q = 2 formula se reduce la VR(2) = 1 + ρ_1."
+                "correctExplanation": "Pentru memorie scurtă VR(q) → 1 + 2Σρ_k = (1 + ρ)/(1 − ρ) ≈ 0,818, o constantă pozitivă, deci ln VR(q)/(2 ln q) → 0 și H(q) → 0,5.",
+                "incorrectExplanation": "VR(q) al oricărui proces cu memorie scurtă converge la o constantă pozitivă, deci logaritmul rămâne mărginit în timp ce ln q crește: H(q) → 0,5. Valorile sub 0,5 la q finit reflectă inversarea pe termen scurt, nu memoria lungă."
             }
         },
         {
@@ -305,30 +305,30 @@ window.MFM_DATA.quizzes['efficiency'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 1,
             "en": {
-                "title": "Hurst exponent",
-                "text": "What does a Hurst exponent H > 0.5 indicate for returns?",
+                "title": "Precision of the local Whittle estimator",
+                "text": "The local Whittle estimator of d = H − 0.5 uses m = 400 Fourier frequencies. What is its asymptotic standard error?",
                 "options": [
-                    "Anti-persistence",
-                    "Heavy tails",
-                    "No memory",
-                    "Persistence (long memory)"
+                    "0.05 = 1/√m",
+                    "0.025 = 1/(2√m)",
+                    "0.0025 = 1/m",
+                    "1/√T, as for an autocorrelation"
                 ],
-                "correctExplanation": "H = 0.5 means no memory; H > 0.5 persistence, with autocorrelations decaying like k^(2H−2); H < 0.5 anti-persistence.",
-                "incorrectExplanation": "H above 0.5 means persistence; heavy tails are a different property."
+                "correctExplanation": "Robinson (1995): √m(d̂ − d) → N(0, 1/4), so SE = 1/(2√m) = 1/40 = 0.025, whatever the distribution of returns.",
+                "incorrectExplanation": "The asymptotic variance of √m(d̂ − d) is 1/4, so the standard error is 1/(2√m); precision is driven by the number of frequencies m, not by T."
             },
             "ro": {
-                "title": "Exponentul Hurst",
-                "text": "Ce indică un exponent Hurst H > 0,5 pentru randamente?",
+                "title": "Precizia estimatorului Whittle local",
+                "text": "Estimatorul Whittle local al lui d = H − 0,5 folosește m = 400 de frecvențe Fourier. Care este eroarea lui standard asimptotică?",
                 "options": [
-                    "Anti-persistență",
-                    "Cozi grele",
-                    "Lipsa memoriei",
-                    "Persistență (memorie lungă)"
+                    "0,05 = 1/√m",
+                    "0,025 = 1/(2√m)",
+                    "0,0025 = 1/m",
+                    "1/√T, ca pentru o autocorelație"
                 ],
-                "correctExplanation": "H = 0,5 înseamnă lipsa memoriei; H > 0,5 persistență, cu autocorelații care scad ca k^(2H−2); H < 0,5 anti-persistență.",
-                "incorrectExplanation": "H peste 0,5 înseamnă persistență; cozile grele sunt o altă proprietate."
+                "correctExplanation": "Robinson (1995): √m(d̂ − d) → N(0, 1/4), deci SE = 1/(2√m) = 1/40 = 0,025, oricare ar fi distribuția randamentelor.",
+                "incorrectExplanation": "Dispersia asimptotică a lui √m(d̂ − d) este 1/4, deci eroarea standard este 1/(2√m); precizia depinde de numărul de frecvențe m, nu de T."
             }
         },
         {
@@ -413,30 +413,30 @@ window.MFM_DATA.quizzes['efficiency'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 0,
             "en": {
-                "title": "Adaptive Market Hypothesis",
-                "text": "What is the central prediction of Lo’s Adaptive Market Hypothesis?",
+                "title": "Out-of-sample R²",
+                "text": "A predictor has an in-sample R² of 2% but an out-of-sample R²_OS of −1.5% against the historical mean. What does this mean?",
                 "options": [
-                    "Markets are never efficient",
-                    "Investors are fully rational",
-                    "Prices follow a random walk at all times",
-                    "The degree of efficiency changes over time with competition and market conditions"
+                    "Its recursive forecasts have a larger mean squared error than the recursive historical mean",
+                    "The in-sample R² was computed incorrectly",
+                    "Returns are unpredictable even in sample",
+                    "A negative R² can only come from a coding error"
                 ],
-                "correctExplanation": "Under the AMH, markets are an ecology of adapting participants; profit opportunities appear and disappear, so efficiency is time-varying.",
-                "incorrectExplanation": "The AMH replaces “efficient or not” with a degree of efficiency that varies over time."
+                "correctExplanation": "R²_OS = 1 − Σ(r − r̂)²/Σ(r − r̄)² is negative when the model's forecasts lose to the historical mean out of sample, as for most predictors in Welch and Goyal (2008).",
+                "incorrectExplanation": "R²_OS compares forecast errors with those of the historical mean; it can be negative, and it often is when estimation error and instability outweigh the in-sample fit."
             },
             "ro": {
-                "title": "Ipoteza pieței adaptive",
-                "text": "Care este predicția centrală a ipotezei pieței adaptive a lui Lo?",
+                "title": "R² în afara selecției",
+                "text": "Un predictor are R² în selecție de 2%, dar R²_OS în afara selecției de −1,5% față de media istorică. Ce înseamnă?",
                 "options": [
-                    "Piețele nu sunt niciodată eficiente",
-                    "Investitorii sunt complet raționali",
-                    "Prețurile urmează în orice moment un mers aleator",
-                    "Gradul de eficiență se schimbă în timp, odată cu competiția și condițiile de piață"
+                    "Prognozele lui recursive au o eroare pătratică medie mai mare decât media istorică recursivă",
+                    "R² din selecție a fost calculat greșit",
+                    "Randamentele sunt imprevizibile chiar și în selecție",
+                    "Un R² negativ poate proveni doar dintr-o eroare de cod"
                 ],
-                "correctExplanation": "În AMH, piețele sunt o ecologie de participanți care se adaptează; oportunitățile de profit apar și dispar, deci eficiența variază în timp.",
-                "incorrectExplanation": "AMH înlocuiește „eficient sau nu” cu un grad de eficiență care variază în timp."
+                "correctExplanation": "R²_OS = 1 − Σ(r − r̂)²/Σ(r − r̄)² este negativ când prognozele modelului pierd în fața mediei istorice în afara selecției, ca la majoritatea predictorilor din Welch și Goyal (2008).",
+                "incorrectExplanation": "R²_OS compară erorile de prognoză cu cele ale mediei istorice; poate fi negativ și adesea este, când eroarea de estimare și instabilitatea depășesc potrivirea din selecție."
             }
         },
         {
@@ -496,28 +496,28 @@ window.MFM_DATA.quizzes['efficiency'] = {
         {
             "correct": 2,
             "en": {
-                "title": "Event study",
-                "text": "Under semi-strong efficiency, what pattern of abnormal returns should follow a public announcement?",
+                "title": "Clustered event days",
+                "text": "Two banks are hit by the same announcement on the same day. Why can a cross-sectional test that treats their abnormal returns as independent over-reject?",
                 "options": [
-                    "A slow drift over several weeks",
-                    "A reversal of the day-0 move in the next days",
-                    "A jump on the announcement day and no predictable drift or reversal afterwards",
-                    "No reaction at all"
+                    "Because such tests need at least 30 firms",
+                    "Because they ignore the estimation window",
+                    "Because the abnormal returns are cross-correlated, so the variance of their average is understated",
+                    "Because banks have betas above one"
                 ],
-                "correctExplanation": "Prices should absorb the news immediately; a drift or reversal after day 0 (as for the 2018 bank tax) points to under- or overreaction.",
-                "incorrectExplanation": "Efficiency predicts an immediate jump and no predictable movement afterwards."
+                "correctExplanation": "With a common event date the residuals are correlated (r̄ > 0); the variance of the mean abnormal return is larger than σ²/N. Kolari and Pynnönen (2010) adjust for this; a portfolio test does it automatically.",
+                "incorrectExplanation": "Cross-correlation of abnormal returns on a common event day inflates the variance of their average by (1 + (N − 1)r̄); ignoring it makes t too large."
             },
             "ro": {
-                "title": "Studiul de eveniment",
-                "text": "Sub eficiența semi-tare, ce tipar al randamentelor anormale ar trebui să urmeze unui anunț public?",
+                "title": "Zile de eveniment comune",
+                "text": "Două bănci sunt afectate de același anunț, în aceeași zi. De ce poate un test transversal care tratează randamentele lor anormale ca independente să respingă prea des?",
                 "options": [
-                    "O derivă lentă pe parcursul mai multor săptămâni",
-                    "O inversare a mișcării din ziua 0 în zilele următoare",
-                    "Un salt în ziua anunțului și nicio derivă sau inversare predictibilă după aceea",
-                    "Nicio reacție"
+                    "Pentru că astfel de teste cer cel puțin 30 de firme",
+                    "Pentru că ignoră fereastra de estimare",
+                    "Pentru că randamentele anormale sunt corelate transversal, deci dispersia mediei lor este subestimată",
+                    "Pentru că băncile au beta peste unu"
                 ],
-                "correctExplanation": "Prețurile ar trebui să absoarbă știrea imediat; o derivă sau o inversare după ziua 0 (ca la taxa bancară din 2018) indică sub- sau supra-reacție.",
-                "incorrectExplanation": "Eficiența prezice un salt imediat și nicio mișcare predictibilă după aceea."
+                "correctExplanation": "Cu o dată comună a evenimentului reziduurile sunt corelate (r̄ > 0); dispersia randamentului anormal mediu este mai mare decât σ²/N. Kolari și Pynnönen (2010) corectează pentru aceasta; un test pe portofoliu o face automat.",
+                "incorrectExplanation": "Corelația transversală a randamentelor anormale într-o zi comună umflă dispersia mediei lor cu (1 + (N − 1)r̄); ignorată, face t prea mare."
             }
         },
         {
@@ -550,28 +550,28 @@ window.MFM_DATA.quizzes['efficiency'] = {
         {
             "correct": 1,
             "en": {
-                "title": "Bonferroni",
-                "text": "Fifteen calendar tests are run at the 5% level. What is the Bonferroni threshold for each p-value?",
+                "title": "Clark–West test",
+                "text": "Why is the Diebold–Mariano test inappropriate for comparing a predictive regression with the historical mean (nested models)?",
                 "options": [
-                    "0.05",
-                    "0.0033",
-                    "0.0005",
-                    "0.75"
+                    "Because it requires Normal forecast errors",
+                    "Because under the null the larger model estimates a zero slope, which inflates its MSPE, so the test is undersized; Clark–West corrects this",
+                    "Because it needs non-overlapping samples",
+                    "Because nested models always give identical forecasts"
                 ],
-                "correctExplanation": "Bonferroni divides the level by the number of tests: 0.05 / 15 = 0.0033; this keeps the family-wise error rate below 5%.",
-                "incorrectExplanation": "The Bonferroni threshold is α/M = 0.05/15."
+                "correctExplanation": "Under H0 the extra parameter is pure estimation noise, adding (r̄ − r̂)² to the MSPE of the larger model; Clark and West (2007) add this term back and obtain an approximately Normal statistic.",
+                "incorrectExplanation": "With nested models the larger model's MSPE is inflated by estimation noise under the null, so Diebold–Mariano rejects too rarely; the Clark–West adjustment removes this bias."
             },
             "ro": {
-                "title": "Bonferroni",
-                "text": "Se rulează cincisprezece teste de calendar la nivelul de 5%. Care este pragul Bonferroni pentru fiecare valoare p?",
+                "title": "Testul Clark–West",
+                "text": "De ce testul Diebold–Mariano nu este potrivit pentru a compara o regresie predictivă cu media istorică (modele imbricate)?",
                 "options": [
-                    "0,05",
-                    "0,0033",
-                    "0,0005",
-                    "0,75"
+                    "Pentru că cere erori de prognoză din distribuția Normală",
+                    "Pentru că sub ipoteza nulă modelul mai mare estimează o pantă nulă, ceea ce îi umflă MSPE, deci testul respinge prea rar; Clark–West corectează acest lucru",
+                    "Pentru că cere selecții care nu se suprapun",
+                    "Pentru că modelele imbricate dau mereu prognoze identice"
                 ],
-                "correctExplanation": "Bonferroni împarte nivelul la numărul de teste: 0,05 / 15 = 0,0033; astfel rata erorii pe familia de teste rămâne sub 5%.",
-                "incorrectExplanation": "Pragul Bonferroni este α/M = 0,05/15."
+                "correctExplanation": "Sub H0 parametrul suplimentar este doar zgomot de estimare, care adaugă (r̄ − r̂)² la MSPE a modelului mai mare; Clark și West (2007) adaugă înapoi acest termen și obțin o statistică aproximativ Normală.",
+                "incorrectExplanation": "La modelele imbricate MSPE a modelului mai mare este umflată de zgomotul de estimare sub ipoteza nulă, deci Diebold–Mariano respinge prea rar; ajustarea Clark–West elimină această deplasare."
             }
         },
         {
@@ -602,30 +602,30 @@ window.MFM_DATA.quizzes['efficiency'] = {
             }
         },
         {
-            "correct": 2,
+            "correct": 3,
             "en": {
-                "title": "Limits to arbitrage",
-                "text": "According to Shleifer and Vishny (1997), why can mispricing persist?",
+                "title": "Stambaugh bias",
+                "text": "A predictor is very persistent (ρ = 0.99) and its innovations are strongly negatively correlated with return innovations. In small samples the OLS slope of returns on the lagged predictor is…",
                 "options": [
-                    "Because arbitrage is riskless",
-                    "Because investors are always rational",
-                    "Because arbitrage needs capital and bears noise-trader risk: mispricing can worsen before it corrects",
-                    "Because prices are set by regulators"
+                    "Unbiased, because OLS is BLUE",
+                    "Biased toward zero",
+                    "Inconsistent",
+                    "Biased upward"
                 ],
-                "correctExplanation": "Professional arbitrageurs face capital constraints and client withdrawals after losses, so they cannot always trade against mispricing.",
-                "incorrectExplanation": "Real arbitrage is risky and capital-constrained; this is the essence of the limits to arbitrage."
+                "correctExplanation": "E[β̂ − β] ≈ −(σ_uv/σ_v²)(1 + 3ρ)/T; with σ_uv < 0 the bias is positive, so predictability looks stronger than it is (Stambaugh, 1999).",
+                "incorrectExplanation": "The regressor is predetermined, not strictly exogenous, so OLS is biased: the downward bias of ρ̂ passes to β̂ through the negative correlation of the innovations and pushes it upward."
             },
             "ro": {
-                "title": "Limitele arbitrajului",
-                "text": "Conform lui Shleifer și Vishny (1997), de ce poate persista prețul greșit?",
+                "title": "Deplasarea Stambaugh",
+                "text": "Un predictor este foarte persistent (ρ = 0,99), iar inovațiile lui sunt puternic negativ corelate cu inovațiile randamentelor. În selecții mici, panta OLS a randamentelor pe predictorul decalat este…",
                 "options": [
-                    "Pentru că arbitrajul este fără risc",
-                    "Pentru că investitorii sunt întotdeauna raționali",
-                    "Pentru că arbitrajul cere capital și suportă riscul traderilor de zgomot: prețul greșit se poate înrăutăți înainte să se corecteze",
-                    "Pentru că prețurile sunt stabilite de autorități"
+                    "Nedeplasată, pentru că OLS este BLUE",
+                    "Deplasată spre zero",
+                    "Inconsistentă",
+                    "Deplasată în sus"
                 ],
-                "correctExplanation": "Arbitrajorii profesioniști au constrângeri de capital și pierd clienți după pierderi, deci nu pot tranzacționa mereu împotriva prețului greșit.",
-                "incorrectExplanation": "Arbitrajul real este riscant și limitat de capital; aceasta este esența limitelor arbitrajului."
+                "correctExplanation": "E[β̂ − β] ≈ −(σ_uv/σ_v²)(1 + 3ρ)/T; cu σ_uv < 0 deplasarea este pozitivă, deci predictibilitatea pare mai puternică decât este (Stambaugh, 1999).",
+                "incorrectExplanation": "Regresorul este predeterminat, nu strict exogen, deci OLS este deplasat: deplasarea în jos a lui ρ̂ trece în β̂ prin corelația negativă a inovațiilor și îl împinge în sus."
             }
         },
         {

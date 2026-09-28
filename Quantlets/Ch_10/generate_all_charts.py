@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import (ASSETS, GROUPS, LABELS, read_market, ohlc, returns, dollar_volume,  # noqa: E402
                       intraday_spy, intraday_btc)
 from micro import (roll_spread, cs_spread, ar_terms, amihud, walk_book, gm_quotes, gm_simulate,  # noqa: E402
-                   kyle, ac_trajectory, ac_frontier, zi_simulate)
+                   kyle, ac_trajectory, ac_frontier, zi_simulate, edge_spread, roll_mc, price_discovery)
 
 # Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
 plt.rcParams['figure.facecolor'] = 'none'
@@ -291,7 +291,9 @@ def intraday_spreads(s):
     for d, g in s.dropna(subset=['close', 'high', 'low']).groupby('date'):
         rs, cov = roll_spread(g['close'])
         rows[d] = dict(cov=cov, cs=cs_spread(g['high'], g['low']).mean(),
-                       ar2=ar_terms(g['close'], g['high'], g['low']).mean(), price=g['close'].mean())
+                       ar2=ar_terms(g['close'], g['high'], g['low']).mean(), price=g['close'].mean(),
+                       edge=edge_spread(g['open'], g['high'], g['low'], g['close']),
+                       var=np.var(np.diff(np.log(g['close'].values)), ddof=1))
     return pd.DataFrame(rows).T
 
 
@@ -302,6 +304,7 @@ def daily_spreads(key, start=START2):
     cs = cs_spread(d['high'], d['low'])
     ar2 = ar_terms(d['close'], d['high'], d['low'])
     return dict(roll=1e4 * rs if rs == rs else np.nan, roll_cov=float(cov), cs=1e4 * float(np.mean(cs)),
+                edge=1e4 * edge_spread(d['open'], d['high'], d['low'], d['close']),
                 ar=1e4 * float(np.sqrt(max(np.mean(ar2), 0))), ar_neg=bool(np.mean(ar2) <= 0), n=int(len(d)))
 
 
@@ -310,9 +313,11 @@ def fig_spread_frequency(E, sp_daily):
     roll5 = 1e4 * 2 * np.sqrt(max(-E['cov'].mean(), 0))
     cs5 = 1e4 * E['cs'].mean()
     ar5 = 1e4 * np.sqrt(max(E['ar2'].mean(), 0))
-    vals = {'Roll': (sp_daily['roll'], roll5), 'Corwin-Schultz': (sp_daily['cs'], cs5), 'Abdi-Ranaldo': (sp_daily['ar'], ar5)}
+    edge5 = 1e4 * E['edge'].mean()                  # media estimarilor EDGE cu semn (nedeplasata)
+    vals = {'Roll': (sp_daily['roll'], roll5), 'Corwin-Schultz': (sp_daily['cs'], cs5), 'Abdi-Ranaldo': (sp_daily['ar'], ar5),
+            'EDGE': (sp_daily['edge'], edge5)}
     fig, ax = plt.subplots(figsize=(6.8, 3.3))
-    x = np.arange(3)
+    x = np.arange(4)
     ax.bar(x - 0.2, [v[0] for v in vals.values()], 0.38, color=MainBlue, label='From daily bars (last two years)')
     ax.bar(x + 0.2, [v[1] for v in vals.values()], 0.38, color=Teal, label='From 5-minute bars (average over days)')
     ax.axhline(tick, color=IDAred, ls='--', lw=1.1, label=f'One tick (USD 0.01) relative to the price: {tick:.2f} bp')
@@ -322,8 +327,12 @@ def fig_spread_frequency(E, sp_daily):
     ax.set_ylabel('Estimated relative spread (bp, log scale)')
     legend_outside_bottom(ax, ncol=1, y=-0.14)
     save_fig('ch10_spread_frequency')
+    rng = np.random.default_rng(SEED)
+    ev = E['edge'].values
+    eb = [1e4 * ev[rng.integers(0, len(ev), len(ev))].mean() for _ in range(B_BOOT)]
     return dict(tick=float(tick), roll5=float(roll5), cs5=float(cs5), ar5=float(ar5), roll_d=float(sp_daily['roll']),
-                cs_d=float(sp_daily['cs']), ar_d=float(sp_daily['ar']),
+                cs_d=float(sp_daily['cs']), ar_d=float(sp_daily['ar']), edge5=float(edge5), edge_d=float(sp_daily['edge']),
+                edge5_lo=float(np.percentile(eb, 2.5)), edge5_hi=float(np.percentile(eb, 97.5)),
                 share_negcov=float((E['cov'] < 0).mean()), n_days=int(len(E)))
 
 
@@ -646,6 +655,65 @@ def fig_bvb_turnover():
                 h2o_share=float(m['H2O'].loc['2025'].sum() / m.loc['2025'].sum().sum()))
 
 
+# =============================================================================
+# 11. PROPRIETATILE DE SELECTIE ALE ESTIMATORULUI ROLL (Harris, 1990)
+# =============================================================================
+def roll_small_sample(E):
+    """Covarianta Roll pe zi (77 de randamente de 5 minute): ponderea zilelor cu covarianta pozitiva, observata si
+    simulata sub modelul Roll adevarat (spread de un pas de cotare; fara spread), si deplasarea din demediere."""
+    n = 77
+    v = E['var'].mean()
+    c_tick = (0.01 / E['price']).mean() / 2
+    out = dict(pos_obs=float((E['cov'] > 0).mean()), n_days=int(len(E)), sd_bar=float(1e4 * np.sqrt(v)),
+               c_tick=float(1e4 * c_tick))
+    for tag, c in [('tick', c_tick), ('zero', 0.0)]:
+        sig = np.sqrt(v - 2 * c ** 2)
+        cov = np.array([roll_mc(c, sig, T=n + 1, R=len(E), seed=SEED + b) for b in range(200)])
+        pos = (cov > 0).mean(axis=1)                        # 200 de "esantioane" de lungimea selectiei reale
+        pooled = 1e4 * 2 * np.sqrt(np.clip(-cov.mean(axis=1), 0, None))
+        out[f'pos_{tag}'] = float(pos.mean())
+        out[f'pos_{tag}_lo'], out[f'pos_{tag}_hi'] = (float(x) for x in np.percentile(pos, [2.5, 97.5]))
+        out[f'roll_{tag}'] = float(pooled.mean())
+        out[f'roll_{tag}_lo'], out[f'roll_{tag}_hi'] = (float(x) for x in np.percentile(pooled, [2.5, 97.5]))
+    # corectia deplasarii: E[cov_hat] ~ g1 - (g0 + 2 g1) / n  =>  g1 ~ (cov_mediu + var_medie / n) / (1 - 2 / n)
+    g1 = (E['cov'].mean() + v / n) / (1 - 2 / n)
+    out['roll_corr'] = float(1e4 * 2 * np.sqrt(max(-g1, 0)))
+    out['roll5'] = float(1e4 * 2 * np.sqrt(max(-E['cov'].mean(), 0)))
+    return out
+
+
+# =============================================================================
+# 12. DESCOPERIREA PRETULUI: ETF-UL PE BET SI INDICELE BET-TR (Hasbrouck, 1995; Gonzalo si Granger, 1995)
+# =============================================================================
+PD_START = START2
+
+
+def bet_etf_pair(start=PD_START):
+    """Logaritmul preturilor de inchidere: ETF-ul Patria-TVBETETF (zilele cu tranzactii) si indicele BET-TR, zile comune."""
+    e = read_market('TVBETETF.RO')
+    e = e[e['volume'] > 0]
+    idx = read_market('BETTR.INDX')
+    j = pd.concat([e['close'].rename('etf'), idx['close'].rename('idx')], axis=1, join='inner').dropna().loc[start:END_PD]
+    return np.log(j)
+
+
+END_PD = '2026-09-18'
+
+
+def price_discovery_bet():
+    from statsmodels.tsa.vector_ar.vecm import coint_johansen, select_order
+    y = bet_etf_pair()
+    p = int(select_order(y.values, maxlags=10, deterministic='ci').bic)
+    jo = coint_johansen(y.values, 0, max(p, 1))
+    r = price_discovery(y.values, max(p, 1))
+    sd = float(100 * (y['etf'] - y['idx']).std())
+    return dict(n=int(len(y)), p=max(p, 1), trace=float(jo.lr1[0]), cv=float(jo.cvt[0, 1]), trace1=float(jo.lr1[1]),
+                cv1=float(jo.cvt[1, 1]), a_etf=float(r['alpha'][0]), a_idx=float(r['alpha'][1]), t_etf=float(r['t'][0]),
+                t_idx=float(r['t'][1]), cs_etf=float(r['cs'][0]), cs_idx=float(r['cs'][1]), is_etf_lo=float(r['is_lo'][0]),
+                is_etf_hi=float(r['is_hi'][0]), is_idx_lo=float(r['is_lo'][1]), is_idx_hi=float(r['is_hi'][1]),
+                corr=r['corr'], sd_basis=sd, start=y.index[0].strftime('%Y-%m-%d'), end=y.index[-1].strftime('%Y-%m-%d'))
+
+
 def jsonable(o):
     if isinstance(o, dict):
         return {str(k): jsonable(v) for k, v in o.items()}
@@ -686,6 +754,8 @@ if __name__ == '__main__':
     RES['flash'] = fig_flash()
     RES['apr2025'] = fig_april2025(spy)
     RES['bvb'] = fig_bvb_turnover()
+    RES['roll_ss'] = roll_small_sample(E)
+    RES['pdisc'] = price_discovery_bet()
     with open(os.path.join(HERE, 'ch10_results.json'), 'w') as f:
         json.dump(jsonable(RES), f, indent=1)
     print('saved ch10_results.json')

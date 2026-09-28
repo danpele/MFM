@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch12_btc_rnd'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Risk-neutral density of Bitcoin (Breeden-Litzenberger) from the SVI smile of the expiry closest to 30 days, vs the log-normal density with the ATM volatility; tail probabilities.'
+Description: 'Risk-neutral density of Bitcoin (Breeden-Litzenberger) from the SVI smile of the expiry closest to 30 days, with a 95% pairs-bootstrap band and the range of quoted strikes, vs the log-normal density with the ATM volatility; tail probabilities with bootstrap intervals.'
 
 Keywords: 'risk-neutral density, Breeden-Litzenberger, SVI, Bitcoin, tail probability, pricing kernel'
 

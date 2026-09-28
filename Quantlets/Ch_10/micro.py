@@ -4,7 +4,11 @@ micro.py -- Estimatori de lichiditate si modele de microstructura (Capitolul 10,
   * roll_spread            -- Roll (1984): s = 2 sqrt(-Cov(dp_t, dp_{t-1}))
   * cs_spread              -- Corwin si Schultz (2012): din maximele si minimele a doua perioade consecutive
   * ar_spread              -- Abdi si Ranaldo (2017): din inchidere si mijlocul intervalului maxim-minim
+  * edge_spread            -- Ardia, Guidotti si Kroencke (2024): estimatorul EDGE din deschidere, maxim, minim, inchidere
   * amihud                 -- Amihud (2002): |r| / valoarea tranzactionata
+  * roll_mc                -- Harris (1990): distributia de selectie a covariantei Roll sub modelul adevarat
+  * price_discovery        -- Hasbrouck (1995), Gonzalo si Granger (1995): ponderile informationale dintr-un VECM
+  * pin_loglik             -- Easley, Kiefer, O'Hara si Paperman (1996): verosimilitatea PIN, factorizata (Lin si Ke, 2011)
   * walk_book              -- executia unui ordin la piata pe un registru de ordine dat
   * gm_quotes, gm_simulate -- Glosten si Milgrom (1985): cotatiile unui formator de piata care invata
   * kyle                   -- Kyle (1985): echilibrul cu un singur interval de tranzactionare
@@ -50,6 +54,89 @@ def ar_spread(close, high, low):
     """Spread-ul relativ Abdi-Ranaldo: sqrt(max(media termenilor, 0))."""
     m = np.mean(ar_terms(close, high, low))
     return np.sqrt(max(m, 0.0)), m
+
+
+def edge_spread(open_, high, low, close, sign=True):
+    """EDGE (Ardia, Guidotti si Kroencke, 2024, JFE 161, 103916): spread-ul relativ din preturile OHLC.
+    Transcrierea implementarii de referinta a autorilor (pachetul bidask, licenta MIT). sign=True pastreaza semnul
+    estimarii (recomandat cand se face media estimarilor pe mai multe ferestre: media ramane nedeplasata)."""
+    o, h, l, c = (np.log(np.asarray(x, float)) for x in (open_, high, low, close))
+    if len(o) < 3:
+        return np.nan
+    m = (h + l) / 2.
+    h1, l1, c1, m1 = h[:-1], l[:-1], c[:-1], m[:-1]
+    o, h, l, c, m = o[1:], h[1:], l[1:], c[1:], m[1:]
+    r1, r2, r3, r4, r5 = m - o, o - m1, m - c1, c1 - m1, o - c1
+    tau = np.where(np.isnan(h) | np.isnan(l) | np.isnan(c1), np.nan, (h != l) | (l != c1))
+    po1 = tau * np.where(np.isnan(o) | np.isnan(h), np.nan, o != h)
+    po2 = tau * np.where(np.isnan(o) | np.isnan(l), np.nan, o != l)
+    pc1 = tau * np.where(np.isnan(c1) | np.isnan(h1), np.nan, c1 != h1)
+    pc2 = tau * np.where(np.isnan(c1) | np.isnan(l1), np.nan, c1 != l1)
+    pt = np.nanmean(tau)
+    po = np.nanmean(po1) + np.nanmean(po2)
+    pc = np.nanmean(pc1) + np.nanmean(pc2)
+    if np.nansum(tau) < 2 or po == 0 or pc == 0:
+        return np.nan
+    d1 = r1 - np.nanmean(r1) / pt * tau
+    d3 = r3 - np.nanmean(r3) / pt * tau
+    d5 = r5 - np.nanmean(r5) / pt * tau
+    x1 = -4. / po * d1 * r2 - 4. / pc * d3 * r4
+    x2 = -4. / po * d1 * r5 - 4. / pc * d5 * r4
+    e1, e2 = np.nanmean(x1), np.nanmean(x2)
+    v1, v2 = np.nanmean(x1 ** 2) - e1 ** 2, np.nanmean(x2 ** 2) - e2 ** 2
+    vt = v1 + v2
+    s2 = (v2 * e1 + v1 * e2) / vt if vt > 0 else (e1 + e2) / 2.
+    s = np.sqrt(np.abs(s2))
+    return float(s * np.sign(s2)) if sign else float(s)
+
+
+def roll_mc(c, sigma, T=78, R=20000, seed=42):
+    """Harris (1990): simulam modelul Roll (m_t mers aleator cu pasi N(0, sigma^2), q_t = +-1 cu prob. 1/2)
+    pe T preturi si calculam covarianta de ordinul 1 a variatiilor (demediate), ca pe date reale."""
+    rng = np.random.default_rng(seed)
+    p = np.cumsum(rng.normal(0, sigma, (R, T)), axis=1) + c * np.where(rng.random((R, T)) < 0.5, 1, -1)
+    dp = np.diff(p, axis=1)
+    dm = dp - dp.mean(axis=1, keepdims=True)
+    return (dm[:, 1:] * dm[:, :-1]).mean(axis=1)
+
+
+def price_discovery(y, p=1):
+    """VECM bivariat cu vectorul de cointegrare (1, -1) impus: dy_t = a0 + alpha (y1 - y2)_{t-1} + sum Gamma_i dy_{t-i} + e_t.
+    Intoarce alpha, statisticile t, ponderea componentei Gonzalo-Granger (alpha_perp normalizat) si limitele
+    ponderii informationale Hasbrouck (cele doua ordonari Cholesky)."""
+    y = np.asarray(y, float)
+    dy = np.diff(y, axis=0)
+    z = (y[:, 0] - y[:, 1])[:-1]
+    X = np.array([[1.0, z[t]] + [v for i in range(1, p + 1) for v in dy[t - i]] for t in range(p, len(dy))])
+    Y = dy[p:]
+    B = np.linalg.lstsq(X, Y, rcond=None)[0]
+    U = Y - X @ B
+    Om = U.T @ U / (len(U) - X.shape[1])
+    alpha = B[1]
+    se = np.sqrt(np.linalg.inv(X.T @ X)[1, 1] * np.diag(Om))
+    ap = np.array([-alpha[1], alpha[0]])                       # alpha_perp: alpha' alpha_perp = 0
+    cs = ap / ap.sum()
+    psi = ap                                                    # randul comun al impactului pe termen lung (pana la o scala)
+    IS = []
+    for order in ([0, 1], [1, 0]):
+        F = np.linalg.cholesky(Om[np.ix_(order, order)])
+        v = (psi[order] @ F) ** 2 / (psi @ Om @ psi)
+        IS.append(v[np.argsort(order)])
+    IS = np.array(IS)
+    return dict(alpha=alpha, t=alpha / se, cs=cs, is_lo=IS.min(axis=0), is_hi=IS.max(axis=0),
+                corr=float(Om[0, 1] / np.sqrt(Om[0, 0] * Om[1, 1])), resid=U, n=len(U))
+
+
+def pin_loglik(B, S, alpha, delta, mu, eb, es):
+    """Log-verosimilitatea EKOP pentru o zi cu B cumparari si S vanzari, in forma factorizata care evita
+    depasirea numerica (Lin si Ke, 2011): ln L = -eb - es + B ln(mu + eb) + S ln(mu + es) - ln B! - ln S!
+    + ln[(1 - alpha) xb^B xs^S + alpha delta e^-mu xb^B + alpha (1 - delta) e^-mu xs^S], xb = eb / (mu + eb)."""
+    from scipy.special import gammaln, logsumexp
+    lxb, lxs = np.log(eb / (mu + eb)), np.log(es / (mu + es))
+    terms = [np.log(1 - alpha) + B * lxb + S * lxs, np.log(alpha * delta) - mu + B * lxb,
+             np.log(alpha * (1 - delta)) - mu + S * lxs]
+    base = -eb - es + B * np.log(mu + eb) + S * np.log(mu + es) - gammaln(B + 1) - gammaln(S + 1)
+    return float(base + logsumexp(terms)), terms
 
 
 def amihud(r, dv, scale=1e6):

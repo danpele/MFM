@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_two_pass_inference'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Lecture 3 and Seminar 3 (B9-B11): GRS as a Sharpe-ratio test, misspecification-robust two-pass standard errors (Kan-Robotti-Shanken), a useless-factor simulation (Kan-Zhang), cross-sectional OLS and GLS R2 with industry portfolios (Lewellen-Nagel-Shanken), the number of factors (Kaiser, Bai-Ng, Ahn-Horenstein), model comparison by maximum Sharpe ratios with a stationary bootstrap (Barillas-Shanken), and GRS with bootstrap and GMM Wald inference.'
+
+Keywords: 'two-pass regression, misspecification, useless factors, cross-sectional R2, number of factors, model comparison, Sharpe ratio, GRS, bootstrap, GMM'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: '25 and 100 size x book-to-market portfolios, 30 industry portfolios and factors, Kenneth French Data Library; sector ETFs (data/market)'
+
+Output: 'printed tables'

@@ -10,82 +10,82 @@ window.MFM_DATA.quizzes['markets'] = {
         {
             "correct": 2,
             "en": {
-                "title": "Price discovery",
-                "text": "Which function of financial markets is described as \"prices aggregate information that is dispersed among many participants\"?",
+                "title": "Precision of a mean return",
+                "text": "S&P 500 with dividends, 2015-2026: annualised volatility 17.5%, 11.7 years of daily data (about 2,944 days), iid returns. What is the approximate standard error of the annualised mean return?",
                 "options": [
-                    "Payments and settlement",
-                    "Capital allocation",
-                    "Price discovery",
-                    "Monitoring of managers"
+                    "0.32 pp: daily data make the mean very precise",
+                    "1.5 pp: sigma divided by the number of years",
+                    "5.1 pp: sigma divided by the square root of the number of years",
+                    "1.1 pp: sigma divided by sqrt(252)"
                 ],
-                "correctExplanation": "Price discovery: trading reveals and combines the private information of many participants into a single price.",
-                "incorrectExplanation": "The phrase describes price discovery, the way trading combines dispersed information into prices."
+                "correctExplanation": "SE = q sigma_d / sqrt(T) = sigma_a / sqrt(Y) = 17.5% / sqrt(11.7) = 5.1 pp (Merton, 1980): only the span of the sample matters, not the sampling frequency.",
+                "incorrectExplanation": "The standard error of an annualised mean is sigma_a / sqrt(Y) = 5.1 pp; sampling more often within the same 11.7 years does not help."
             },
             "ro": {
-                "title": "Descoperirea prețului",
-                "text": "Care funcție a piețelor financiare este descrisă de afirmația „prețurile agregă informația dispersată între mulți participanți”?",
+                "title": "Precizia unui randament mediu",
+                "text": "S&P 500 cu dividende, 2015-2026: volatilitate anualizată 17,5%, 11,7 ani de date zilnice (circa 2.944 de zile), randamente iid. Care este aproximativ eroarea standard a randamentului mediu anualizat?",
                 "options": [
-                    "Plăți și decontare",
-                    "Alocarea capitalului",
-                    "Descoperirea prețului",
-                    "Monitorizarea managerilor"
+                    "0,32 pp: datele zilnice fac media foarte precisă",
+                    "1,5 pp: sigma împărțit la numărul de ani",
+                    "5,1 pp: sigma împărțit la rădăcina pătrată a numărului de ani",
+                    "1,1 pp: sigma împărțit la sqrt(252)"
                 ],
-                "correctExplanation": "Descoperirea prețului: tranzacționarea dezvăluie și combină informația privată a multor participanți într-un singur preț.",
-                "incorrectExplanation": "Afirmația descrie descoperirea prețului, modul în care tranzacționarea combină informația dispersată în prețuri."
+                "correctExplanation": "SE = q sigma_d / sqrt(T) = sigma_a / sqrt(Y) = 17,5% / sqrt(11,7) = 5,1 pp (Merton, 1980): contează doar lungimea perioadei, nu frecvența eșantionării.",
+                "incorrectExplanation": "Eroarea standard a unei medii anualizate este sigma_a / sqrt(Y) = 5,1 pp; observațiile mai dese în aceiași 11,7 ani nu ajută."
             }
         },
         {
             "correct": 0,
             "en": {
-                "title": "Exchanges vs OTC",
-                "text": "Which asset classes trade mainly over the counter (OTC), through bilateral deals with dealers?",
+                "title": "Square-root-of-time under AR(1)",
+                "text": "EUR/RON (BNR fixing): daily lag-1 autocorrelation 0.17; the sqrt(252) rule gives an annual volatility of 4.4%. Assuming an AR(1), what is the corrected annual volatility?",
                 "options": [
-                    "Bonds, FX and swaps",
-                    "Large-cap stocks on NYSE",
-                    "Equity ETFs",
-                    "Bitcoin on centralised exchanges"
+                    "About 5.3%: factor sqrt(1.17/0.83)",
+                    "4.4%: autocorrelation does not affect annual volatility",
+                    "About 3.7%: factor sqrt(0.83/1.17)",
+                    "About 5.1%: factor 1.17"
                 ],
-                "correctExplanation": "Most bond, FX and swap trading is bilateral with dealers, with less pre-trade transparency than an exchange order book.",
-                "incorrectExplanation": "Bonds, FX and swaps are the classic OTC markets; stocks and ETFs trade mainly on exchanges."
+                "correctExplanation": "For an AR(1) the variance ratio tends to (1 + rho)/(1 - rho), so volatility is multiplied by sqrt(1.17/0.83) = 1.19: 4.4% becomes 5.3%.",
+                "incorrectExplanation": "Positive autocorrelation makes multi-day variance larger than h times the daily one: the factor is sqrt((1 + rho)/(1 - rho)) = 1.19, so about 5.3%."
             },
             "ro": {
-                "title": "Burse vs OTC",
-                "text": "Ce clase de active se tranzacționează în principal la ghișeu (OTC), prin tranzacții bilaterale cu dealeri?",
+                "title": "Regula rădăcinii pătrate a timpului pentru un AR(1)",
+                "text": "EUR/RON (fixing BNR): autocorelația zilnică de ordinul 1 este 0,17; regula sqrt(252) dă o volatilitate anuală de 4,4%. Presupunând un AR(1), care este volatilitatea anuală corectată?",
                 "options": [
-                    "Obligațiuni, valută și swap-uri",
-                    "Acțiunile mari de pe NYSE",
-                    "ETF-urile pe acțiuni",
-                    "Bitcoin pe exchange-uri centralizate"
+                    "Circa 5,3%: factorul sqrt(1,17/0,83)",
+                    "4,4%: autocorelația nu afectează volatilitatea anuală",
+                    "Circa 3,7%: factorul sqrt(0,83/1,17)",
+                    "Circa 5,1%: factorul 1,17"
                 ],
-                "correctExplanation": "Cea mai mare parte a tranzacțiilor cu obligațiuni, valută și swap-uri este bilaterală, cu dealeri, cu mai puțină transparență decât un registru de ordine.",
-                "incorrectExplanation": "Obligațiunile, valuta și swap-urile sunt piețele OTC clasice; acțiunile și ETF-urile se tranzacționează mai ales la bursă."
+                "correctExplanation": "Pentru un AR(1) raportul varianțelor tinde la (1 + rho)/(1 - rho), deci volatilitatea se înmulțește cu sqrt(1,17/0,83) = 1,19: 4,4% devine 5,3%.",
+                "incorrectExplanation": "Autocorelația pozitivă face varianța pe mai multe zile mai mare decât de h ori cea zilnică: factorul este sqrt((1 + rho)/(1 - rho)) = 1,19, deci circa 5,3%."
             }
         },
         {
-            "correct": 1,
+            "correct": 3,
             "en": {
-                "title": "Limit and market orders",
-                "text": "Which statement about order types is correct?",
+                "title": "Standard error of a Sharpe ratio",
+                "text": "An annualised Sharpe ratio of 0.82 is estimated from 11.7 years of daily returns, assumed iid Normal. What is its approximate standard error?",
                 "options": [
-                    "A market order waits in the book and provides liquidity",
-                    "A limit order waits in the book and provides liquidity; a market order consumes it",
-                    "A stop order always executes at the stop price",
-                    "Limit orders always execute immediately"
+                    "0.018: one over the square root of the number of days",
+                    "0.24: the Sharpe ratio divided by sqrt(Y)",
+                    "0.34: sqrt((1 + SR^2/2)/Y) with the annual SR",
+                    "0.29: about 1/sqrt(Y) when the SR is estimated from daily data"
                 ],
-                "correctExplanation": "Limit orders rest in the order book at a chosen price; market orders execute immediately against the best quotes and take that liquidity.",
-                "incorrectExplanation": "Limit orders provide liquidity by waiting in the book; market orders consume it by executing immediately."
+                "correctExplanation": "By the delta method Var(SR_a) = q(1 + SR_d^2/2)/T = (1 + SR_a^2/(2q))/Y, about 1/Y: SE = 0.29 (Lo, 2002, applied at the daily frequency).",
+                "incorrectExplanation": "With daily data the annualised SR has variance q(1 + SR_d^2/2)/T, about 1/Y, so the SE is about 0.29; the formula with the annual SR treats the sample as 11.7 annual observations."
             },
             "ro": {
-                "title": "Ordine limită și la piață",
-                "text": "Care afirmație despre tipurile de ordine este corectă?",
+                "title": "Eroarea standard a unui raport Sharpe",
+                "text": "Un raport Sharpe anualizat de 0,82 este estimat din 11,7 ani de randamente zilnice, presupuse iid cu distribuția Normală. Care este aproximativ eroarea lui standard?",
                 "options": [
-                    "Un ordin la piață așteaptă în registru și oferă lichiditate",
-                    "Un ordin limită așteaptă în registru și oferă lichiditate; un ordin la piață o consumă",
-                    "Un ordin stop se execută întotdeauna la prețul stop",
-                    "Ordinele limită se execută întotdeauna imediat"
+                    "0,018: unu supra rădăcina numărului de zile",
+                    "0,24: raportul Sharpe împărțit la sqrt(Y)",
+                    "0,34: sqrt((1 + SR^2/2)/Y) cu SR anual",
+                    "0,29: circa 1/sqrt(Y) când SR este estimat din date zilnice"
                 ],
-                "correctExplanation": "Ordinele limită stau în registru la un preț ales; ordinele la piață se execută imediat la cele mai bune cotații și consumă acea lichiditate.",
-                "incorrectExplanation": "Ordinele limită oferă lichiditate, așteptând în registru; ordinele la piață o consumă, executându-se imediat."
+                "correctExplanation": "Prin metoda delta Var(SR_a) = q(1 + SR_d^2/2)/T = (1 + SR_a^2/(2q))/Y, circa 1/Y: SE = 0,29 (Lo, 2002, aplicat la frecvența zilnică).",
+                "incorrectExplanation": "Cu date zilnice SR anualizat are varianța q(1 + SR_d^2/2)/T, circa 1/Y, deci SE este circa 0,29; formula cu SR anual tratează eșantionul ca 11,7 observații anuale."
             }
         },
         {
@@ -143,57 +143,57 @@ window.MFM_DATA.quizzes['markets'] = {
             }
         },
         {
-            "correct": 2,
+            "correct": 1,
             "en": {
-                "title": "Drawdown",
-                "text": "The S&P 500 drawdown reached its deepest point of 2000–2026 on 9 March 2009. How large was it?",
+                "title": "Maximum drawdown and the horizon",
+                "text": "The same driftless process is observed over 10 years and over 40 years. How does the expected maximum drawdown (log scale) of the 40-year sample compare?",
                 "options": [
-                    "About -34%",
-                    "About -25%",
-                    "About -57%",
-                    "About -91%"
+                    "It is the same: drawdown does not depend on the horizon",
+                    "About twice as large: it grows with sqrt(T)",
+                    "About four times as large: it grows with T",
+                    "Smaller: longer samples average out the losses"
                 ],
-                "correctExplanation": "Measured from the October 2007 peak, the S&P 500 lost about 57% by 9 March 2009 (Global Financial Crisis).",
-                "incorrectExplanation": "The Global Financial Crisis drawdown was about -57%; -34% was COVID-19 (March 2020) and -25% the 2022 inflation shock."
+                "correctExplanation": "For a driftless Brownian motion E[MDD] = sqrt(pi/2) sigma sqrt(T) (Magdon-Ismail et al., 2004): four times the horizon doubles the expected drawdown.",
+                "incorrectExplanation": "The expected maximum drawdown of a driftless Brownian motion grows with sqrt(T), so 40 years give about twice the 10-year value; drawdowns from samples of different length are not comparable."
             },
             "ro": {
-                "title": "Drawdown",
-                "text": "Drawdown-ul S&P 500 a atins cel mai adânc nivel din 2000–2026 pe 9 martie 2009. Cât a fost?",
+                "title": "Drawdown-ul maxim și orizontul",
+                "text": "Același proces fără drift este observat pe 10 ani și pe 40 de ani. Cum se compară drawdown-ul maxim așteptat (pe scară logaritmică) al eșantionului de 40 de ani?",
                 "options": [
-                    "Circa -34%",
-                    "Circa -25%",
-                    "Circa -57%",
-                    "Circa -91%"
+                    "Este același: drawdown-ul nu depinde de orizont",
+                    "Circa de două ori mai mare: crește cu sqrt(T)",
+                    "Circa de patru ori mai mare: crește cu T",
+                    "Mai mic: eșantioanele lungi compensează pierderile"
                 ],
-                "correctExplanation": "Măsurat de la maximul din octombrie 2007, S&P 500 a pierdut circa 57% până pe 9 martie 2009 (criza financiară globală).",
-                "incorrectExplanation": "Drawdown-ul crizei financiare globale a fost de circa -57%; -34% a fost COVID-19 (martie 2020), iar -25% șocul inflaționist din 2022."
+                "correctExplanation": "Pentru o mișcare browniană fără drift E[MDD] = sqrt(pi/2) sigma sqrt(T) (Magdon-Ismail et al., 2004): un orizont de patru ori mai lung dublează drawdown-ul așteptat.",
+                "incorrectExplanation": "Drawdown-ul maxim așteptat al unei mișcări browniene fără drift crește cu sqrt(T), deci 40 de ani dau circa dublul valorii pe 10 ani; drawdown-urile din eșantioane de lungimi diferite nu sunt comparabile."
             }
         },
         {
-            "correct": 1,
+            "correct": 2,
             "en": {
-                "title": "VIX regimes",
-                "text": "Since 2000, on roughly what share of trading days was the VIX below 20?",
+                "title": "VIX and realised volatility",
+                "text": "In 2000-2026 the VIX exceeded the S&P 500 volatility realised over the following 21 trading days on 83% of days. What is the main reason?",
                 "options": [
-                    "About 9%",
-                    "About 62%",
-                    "About 29%",
-                    "About 95%"
+                    "The VIX is annualised with 365 days, realised volatility with 252",
+                    "The VIX data contain errors in stress periods",
+                    "The VIX is a risk-neutral expectation that includes a variance risk premium",
+                    "Realised volatility ignores weekends"
                 ],
-                "correctExplanation": "The VIX was below 20 on about 62% of days and above 30 on only about 9%: calm most of the time, with short violent spikes.",
-                "incorrectExplanation": "In our data the VIX was below 20 on about 62% of days since 2000."
+                "correctExplanation": "VIX^2 approximates the risk-neutral expectation of future variance; investors pay a premium for insurance against volatility, so implied variance exceeds realised variance on average (Carr and Wu, 2009).",
+                "incorrectExplanation": "The gap is the variance risk premium: the VIX is computed from option prices under the risk-neutral measure, so it is a biased forecast of realised volatility."
             },
             "ro": {
-                "title": "Regimurile VIX",
-                "text": "Din 2000, în aproximativ ce proporție din zilele de tranzacționare a fost VIX sub 20?",
+                "title": "VIX și volatilitatea realizată",
+                "text": "În 2000-2026, VIX a depășit volatilitatea S&P 500 realizată în următoarele 21 de zile de tranzacționare în 83% din zile. Care este motivul principal?",
                 "options": [
-                    "Circa 9%",
-                    "Circa 62%",
-                    "Circa 29%",
-                    "Circa 95%"
+                    "VIX este anualizat cu 365 de zile, volatilitatea realizată cu 252",
+                    "Datele VIX conțin erori în perioadele de stres",
+                    "VIX este o așteptare neutră la risc care include o primă de risc de varianță",
+                    "Volatilitatea realizată ignoră weekendurile"
                 ],
-                "correctExplanation": "VIX a fost sub 20 în circa 62% din zile și peste 30 doar în circa 9%: calm în cea mai mare parte a timpului, cu vârfuri scurte și violente.",
-                "incorrectExplanation": "În datele noastre, VIX a fost sub 20 în circa 62% din zile din 2000."
+                "correctExplanation": "VIX^2 aproximează așteptarea neutră la risc a varianței viitoare; investitorii plătesc o primă pentru asigurarea împotriva volatilității, deci varianța implicită o depășește în medie pe cea realizată (Carr și Wu, 2009).",
+                "incorrectExplanation": "Diferența este prima de risc de varianță: VIX se calculează din prețurile opțiunilor sub măsura neutră la risc, deci este o prognoză deplasată a volatilității realizate."
             }
         },
         {
@@ -278,30 +278,30 @@ window.MFM_DATA.quizzes['markets'] = {
             }
         },
         {
-            "correct": 1,
+            "correct": 0,
             "en": {
-                "title": "Annualisation",
-                "text": "A daily volatility of 1% is annualised. Which pair of results is correct for an equity index and for Bitcoin?",
+                "title": "Correlation in turbulent periods",
+                "text": "The true correlation between two markets is constant, but you estimate it only on days when the variance of the source market is several times higher. What happens to the estimate?",
                 "options": [
-                    "15.87% for both",
-                    "15.87% for equities (252 days), 19.10% for Bitcoin (365 days)",
-                    "19.10% for equities, 15.87% for Bitcoin",
-                    "252% and 365%"
+                    "It is biased upward in absolute value (Forbes-Rigobon)",
+                    "It is unbiased, only noisier",
+                    "It is biased toward zero",
+                    "It is undefined because the variance changes"
                 ],
-                "correctExplanation": "Volatility scales with the square root of time: 1% x sqrt(252) = 15.87% for equities and 1% x sqrt(365) = 19.10% for crypto, which trades every day.",
-                "incorrectExplanation": "Use sqrt(252) for equities and sqrt(365) for crypto: 15.87% and 19.10%."
+                "correctExplanation": "Conditioning on high variance gives rho* = rho sqrt((1 + delta)/(1 + delta rho^2)), larger than rho in absolute value: Bitcoin-S&P 500 is 0.52 on high-VIX days but 0.27 after the adjustment.",
+                "incorrectExplanation": "Selecting high-variance days inflates the correlation even when the true one is constant: rho* = rho sqrt((1 + delta)/(1 + delta rho^2)) (Forbes and Rigobon, 2002)."
             },
             "ro": {
-                "title": "Anualizare",
-                "text": "O volatilitate zilnică de 1% este anualizată. Care pereche de rezultate este corectă pentru un indice de acțiuni și pentru Bitcoin?",
+                "title": "Corelația în perioade turbulente",
+                "text": "Corelația reală dintre două piețe este constantă, dar o estimați doar în zilele în care varianța pieței-sursă este de câteva ori mai mare. Ce se întâmplă cu estimația?",
                 "options": [
-                    "15,87% pentru ambele",
-                    "15,87% pentru acțiuni (252 de zile), 19,10% pentru Bitcoin (365 de zile)",
-                    "19,10% pentru acțiuni, 15,87% pentru Bitcoin",
-                    "252% și 365%"
+                    "Este deplasată în sus în valoare absolută (Forbes-Rigobon)",
+                    "Este nedeplasată, doar mai zgomotoasă",
+                    "Este deplasată spre zero",
+                    "Nu este definită, pentru că varianța se schimbă"
                 ],
-                "correctExplanation": "Volatilitatea crește cu rădăcina pătrată a timpului: 1% x sqrt(252) = 15,87% pentru acțiuni și 1% x sqrt(365) = 19,10% pentru cripto, care se tranzacționează zilnic.",
-                "incorrectExplanation": "Folosiți sqrt(252) pentru acțiuni și sqrt(365) pentru cripto: 15,87% și 19,10%."
+                "correctExplanation": "Condiționarea pe varianță mare dă rho* = rho sqrt((1 + delta)/(1 + delta rho^2)), mai mare decât rho în valoare absolută: Bitcoin-S&P 500 are 0,52 în zilele cu VIX ridicat, dar 0,27 după ajustare.",
+                "incorrectExplanation": "Selectarea zilelor cu varianță mare umflă corelația chiar dacă cea reală este constantă: rho* = rho sqrt((1 + delta)/(1 + delta rho^2)) (Forbes și Rigobon, 2002)."
             }
         },
         {
@@ -388,55 +388,55 @@ window.MFM_DATA.quizzes['markets'] = {
         {
             "correct": 3,
             "en": {
-                "title": "Spot Bitcoin ETFs",
-                "text": "When did the US SEC approve spot Bitcoin exchange-traded products?",
+                "title": "Fisher z under volatility clustering",
+                "text": "The stationary-bootstrap interval for the change in the stock-bond correlation is 1.54 times wider than the Fisher z interval. Why?",
                 "options": [
-                    "January 2009",
-                    "November 2021",
-                    "March 2020",
-                    "January 2024"
+                    "The bootstrap is biased and should not be used for correlations",
+                    "The factor 1/(n - 3) is too large for long samples",
+                    "Fisher z requires a positive correlation",
+                    "Fisher's variance 1/(n - 3) assumes iid pairs; volatility clustering raises the variance of the estimated correlation"
                 ],
-                "correctExplanation": "The SEC approved spot Bitcoin ETPs on 10 January 2024; IBIT started trading on 11 January 2024.",
-                "incorrectExplanation": "The approval came on 10 January 2024."
+                "correctExplanation": "atanh of the sample correlation has variance 1/(n - 3) only for iid Normal pairs; with dependent, heteroskedastic returns the sampling variance is larger, which the block bootstrap captures.",
+                "incorrectExplanation": "The iid Fisher formula ignores the dependence created by volatility clustering; the stationary bootstrap resamples blocks of days and keeps it, so its interval is wider."
             },
             "ro": {
-                "title": "ETF-uri pe Bitcoin spot",
-                "text": "Când a aprobat SEC produsele tranzacționate la bursă pe Bitcoin spot?",
+                "title": "Fisher z și gruparea volatilității",
+                "text": "Intervalul bootstrap staționar pentru schimbarea corelației acțiuni-obligațiuni este de 1,54 ori mai larg decât intervalul Fisher z. De ce?",
                 "options": [
-                    "Ianuarie 2009",
-                    "Noiembrie 2021",
-                    "Martie 2020",
-                    "Ianuarie 2024"
+                    "Bootstrap-ul este deplasat și nu trebuie folosit pentru corelații",
+                    "Factorul 1/(n - 3) este prea mare pentru eșantioane lungi",
+                    "Fisher z cere o corelație pozitivă",
+                    "Varianța 1/(n - 3) a lui Fisher presupune perechi iid; gruparea volatilității crește varianța corelației estimate"
                 ],
-                "correctExplanation": "SEC a aprobat ETP-urile pe Bitcoin spot pe 10 ianuarie 2024; IBIT a început tranzacționarea pe 11 ianuarie 2024.",
-                "incorrectExplanation": "Aprobarea a venit pe 10 ianuarie 2024."
+                "correctExplanation": "atanh din corelația de eșantion are varianța 1/(n - 3) doar pentru perechi iid cu distribuția Normală; cu randamente dependente și heteroscedastice varianța de eșantionare este mai mare, iar bootstrap-ul pe blocuri o surprinde.",
+                "incorrectExplanation": "Formula iid a lui Fisher ignoră dependența creată de gruparea volatilității; bootstrap-ul staționar reeșantionează blocuri de zile și o păstrează, deci intervalul lui este mai larg."
             }
         },
         {
-            "correct": 0,
+            "correct": 1,
             "en": {
-                "title": "IBIT",
-                "text": "Since its launch, what has been the median daily traded value (price x volume) of the IBIT spot Bitcoin ETF in our data?",
+                "title": "Effective number of stocks",
+                "text": "An index has five stocks with weights 0.40, 0.15, 0.15, 0.15 and 0.15. What is its effective number of stocks, N_eff = 1 / sum of squared weights?",
                 "options": [
-                    "About 2 bn USD",
-                    "About 20 million USD",
-                    "About 200 bn USD",
-                    "It is not traded on an exchange"
+                    "5: the number of stocks",
+                    "4.0",
+                    "2.5: one over the largest weight",
+                    "6.7: one over the smallest weight"
                 ],
-                "correctExplanation": "The median daily traded value was about 1.97 bn USD, with a peak of 10.3 bn USD on 5 February 2026.",
-                "incorrectExplanation": "In our data the median daily traded value is about 2 bn USD."
+                "correctExplanation": "Sum of squared weights = 0.16 + 4 x 0.0225 = 0.25, so N_eff = 1/0.25 = 4.0: concentration makes the index behave like fewer equally weighted stocks.",
+                "incorrectExplanation": "N_eff is the inverse Herfindahl index: 1/(0.40^2 + 4 x 0.15^2) = 1/0.25 = 4.0."
             },
             "ro": {
-                "title": "IBIT",
-                "text": "De la lansare, care a fost valoarea tranzacționată zilnică mediană (preț x volum) a ETF-ului spot pe Bitcoin IBIT în datele noastre?",
+                "title": "Numărul efectiv de acțiuni",
+                "text": "Un indice are cinci acțiuni cu ponderile 0,40, 0,15, 0,15, 0,15 și 0,15. Care este numărul efectiv de acțiuni, N_eff = 1 / suma pătratelor ponderilor?",
                 "options": [
-                    "Circa 2 mld. USD",
-                    "Circa 20 mil. USD",
-                    "Circa 200 mld. USD",
-                    "Nu se tranzacționează la bursă"
+                    "5: numărul de acțiuni",
+                    "4,0",
+                    "2,5: unu supra ponderea maximă",
+                    "6,7: unu supra ponderea minimă"
                 ],
-                "correctExplanation": "Valoarea tranzacționată zilnică mediană a fost de circa 1,97 mld. USD, cu un maxim de 10,3 mld. USD pe 5 februarie 2026.",
-                "incorrectExplanation": "În datele noastre, valoarea tranzacționată zilnică mediană este de circa 2 mld. USD."
+                "correctExplanation": "Suma pătratelor ponderilor = 0,16 + 4 x 0,0225 = 0,25, deci N_eff = 1/0,25 = 4,0: concentrarea face ca indicele să se comporte ca mai puține acțiuni cu ponderi egale.",
+                "incorrectExplanation": "N_eff este inversul indicelui Herfindahl: 1/(0,40^2 + 4 x 0,15^2) = 1/0,25 = 4,0."
             }
         },
         {
@@ -467,30 +467,30 @@ window.MFM_DATA.quizzes['markets'] = {
             }
         },
         {
-            "correct": 1,
+            "correct": 2,
             "en": {
-                "title": "MiCA",
-                "text": "What is MiCA?",
+                "title": "Daily versus weekly correlation",
+                "text": "Bitcoin vs S&P 500, 2022-2026: daily correlation 0.42, weekly 0.30. Which explanation is NOT consistent with the weekly value being lower?",
                 "options": [
-                    "A US law on spot Bitcoin ETFs",
-                    "The EU Regulation (EU) 2023/1114 on markets in crypto-assets",
-                    "A crypto exchange",
-                    "A stablecoin issued by the ECB"
+                    "Sampling noise of a 246-week estimate",
+                    "Negative lagged cross-covariances between the two daily series",
+                    "The Epps effect",
+                    "The choice of the weekday used to anchor weekly returns"
                 ],
-                "correctExplanation": "MiCA, Regulation (EU) 2023/1114, is the EU framework for crypto-asset issuers and service providers, including stablecoins.",
-                "incorrectExplanation": "MiCA is the EU crypto-asset regulation, Regulation (EU) 2023/1114."
+                "correctExplanation": "The Epps effect says correlations measured over short intervals are biased toward zero, so it predicts a weekly correlation above the daily one; the observed gap has the opposite sign.",
+                "incorrectExplanation": "Noise, negative lagged cross-covariances and the anchor day can all lower the weekly value; the Epps effect would raise it."
             },
             "ro": {
-                "title": "MiCA",
-                "text": "Ce este MiCA?",
+                "title": "Corelația zilnică versus cea săptămânală",
+                "text": "Bitcoin vs S&P 500, 2022-2026: corelația zilnică 0,42, cea săptămânală 0,30. Care explicație NU este compatibilă cu valoarea săptămânală mai mică?",
                 "options": [
-                    "O lege americană privind ETF-urile pe Bitcoin spot",
-                    "Regulamentul (UE) 2023/1114 privind piețele criptoactivelor",
-                    "Un exchange cripto",
-                    "Un stablecoin emis de BCE"
+                    "Zgomotul de eșantionare al unei estimații pe 246 de săptămâni",
+                    "Covarianțe încrucișate decalate negative între cele două serii zilnice",
+                    "Efectul Epps",
+                    "Alegerea zilei din săptămână pentru ancorarea randamentelor săptămânale"
                 ],
-                "correctExplanation": "MiCA, Regulamentul (UE) 2023/1114, este cadrul UE pentru emitenții și furnizorii de servicii de criptoactive, inclusiv stablecoins.",
-                "incorrectExplanation": "MiCA este regulamentul UE privind criptoactivele, Regulamentul (UE) 2023/1114."
+                "correctExplanation": "Efectul Epps spune că corelațiile măsurate pe intervale scurte sunt deplasate spre zero, deci prezice o corelație săptămânală peste cea zilnică; diferența observată are semnul opus.",
+                "incorrectExplanation": "Zgomotul, covarianțele încrucișate decalate negative și ziua de ancorare pot toate coborî valoarea săptămânală; efectul Epps ar ridica-o."
             }
         },
         {
@@ -658,28 +658,28 @@ window.MFM_DATA.quizzes['markets'] = {
         {
             "correct": 0,
             "en": {
-                "title": "History of the Bucharest Stock Exchange",
-                "text": "When did the Bucharest Stock Exchange first open, and when did it re-open after the communist period?",
+                "title": "Survivorship and selection",
+                "text": "An index of today's 100 largest coins, computed back to 2015, shows a CAGR of 70%. What is the main problem with this number?",
                 "options": [
-                    "1 December 1882; first session again on 20 November 1995",
-                    "1 December 1918; re-opened in 1990",
-                    "1929 (Madgearu law); re-opened in 1997 with BET",
-                    "1948; re-opened in 2010 on its own regulated market"
+                    "Survivorship and look-ahead selection: coins that failed are missing",
+                    "Volatility drag lowers the CAGR",
+                    "The Epps effect",
+                    "Non-synchronous trading across exchanges"
                 ],
-                "correctExplanation": "The exchange opened on 1 December 1882 under a royal decree, was closed in 1948 and held the first session of the re-established exchange on 20 November 1995 (905 shares of 6 companies).",
-                "incorrectExplanation": "1929 is the year of a new law on exchanges, 1997 the launch of BET and 2010 the listing of BVB itself; the opening was 1 December 1882 and the re-opening session 20 November 1995."
+                "correctExplanation": "Choosing constituents with today's information keeps only the winners; failed coins are excluded, so the back-computed return is biased upward (Brown et al., 1992).",
+                "incorrectExplanation": "The index is built from survivors known today, which biases past returns upward; the other effects do not explain a selection built with hindsight."
             },
             "ro": {
-                "title": "Istoria Bursei de Valori București",
-                "text": "Când s-a deschis pentru prima dată Bursa din București și când s-a redeschis după perioada comunistă?",
+                "title": "Supraviețuire și selecție",
+                "text": "Un indice al celor mai mari 100 de monede de azi, calculat retroactiv din 2015, arată un CAGR de 70%. Care este problema principală a acestei cifre?",
                 "options": [
-                    "1 decembrie 1882; prima ședință din nou pe 20 noiembrie 1995",
-                    "1 decembrie 1918; redeschisă în 1990",
-                    "1929 (legea Madgearu); redeschisă în 1997, odată cu BET",
-                    "1948; redeschisă în 2010 pe propria piață reglementată"
+                    "Supraviețuirea și selecția cu informație din viitor: lipsesc monedele eșuate",
+                    "Frâna volatilității scade CAGR",
+                    "Efectul Epps",
+                    "Tranzacționarea nesincronă între burse"
                 ],
-                "correctExplanation": "Bursa s-a deschis pe 1 decembrie 1882, în baza unui decret regal, a fost închisă în 1948, iar prima ședință a bursei reînființate a avut loc pe 20 noiembrie 1995 (905 acțiuni ale celor 6 companii).",
-                "incorrectExplanation": "1929 este anul unei noi legi a burselor, 1997 lansarea BET, iar 2010 listarea BVB; deschiderea a fost pe 1 decembrie 1882, iar ședința de redeschidere pe 20 noiembrie 1995."
+                "correctExplanation": "Alegerea componentelor cu informația de azi păstrează doar câștigătorii; monedele eșuate sunt excluse, deci randamentul calculat retroactiv este deplasat în sus (Brown et al., 1992).",
+                "incorrectExplanation": "Indicele este construit din supraviețuitorii cunoscuți azi, ceea ce deplasează în sus randamentele trecute; celelalte efecte nu explică o selecție făcută retroactiv."
             }
         },
         {

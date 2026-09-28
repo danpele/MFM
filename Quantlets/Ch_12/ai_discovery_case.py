@@ -51,7 +51,9 @@ def nw_t(x, lags):
     return np.sqrt(s / T)
 
 
-def main():
+def monthly_data():
+    """Date lunare BTZ (2009): IV = VIX^2/12, RV = suma randamentelor zilnice (%) la patrat, VRP = IV - RV (ex ante),
+    randamentul in exces = randamentul log lunar S&P 500 minus TB3MS/12 (FRED)."""
     spx, vix = read('GSPC.INDX'), read('VIX.INDX')
     px = pd.concat([spx, vix], axis=1, keys=['spx', 'vix']).dropna()
     r = 100 * np.log(px['spx']).diff().dropna()
@@ -64,6 +66,11 @@ def main():
     df = df[df.index >= '1990-01-31']
     df['vrp'] = df['iv'] - df['rv']
     df['ex'] = df['rm'] - df['rf']
+    return df
+
+
+def main():
+    df = monthly_data()
     ex = df['ex'].values
     # y_t = (12/h) * sum_{j=1..h} ex_{t+j}
     y = pd.Series([(12 / H) * ex[t + 1:t + 1 + H].sum() if t + H < len(ex) else np.nan for t in range(len(ex))],

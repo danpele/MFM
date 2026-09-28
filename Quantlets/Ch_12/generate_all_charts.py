@@ -513,35 +513,6 @@ def fig_btc_term(tab, dvol_now):
     save_fig('ch12_btc_term')
 
 
-def btc_rnd(tab, days=30):
-    """Densitatea neutra la risc (Breeden-Litzenberger) din SVI pentru scadenta cea mai apropiata de 30 de zile."""
-    e = pick(tab, days); f = tab.loc[e]
-    F, T = f['F'], f['T']
-    K = F * np.exp(np.linspace(-1.2, 1.0, 2201))
-    k = np.log(K / F)
-    sig = np.sqrt(svi_w(k, f['a'], f['b'], f['rho'], f['m'], f['s']) / T)
-    C = bs_price(F, K, T, 0.0, sig, 'call')        # Black-76 cu r = 0: F in locul lui S
-    q = np.gradient(np.gradient(C, K), K)
-    q = np.clip(q, 0, None)
-    atm = np.sqrt(svi_w(0.0, f['a'], f['b'], f['rho'], f['m'], f['s']) / T)
-    ln = stats.lognorm.pdf(K, s=atm * np.sqrt(T), scale=F * np.exp(-0.5 * atm ** 2 * T))
-    area = integrate.trapezoid(q, K)
-    below = lambda x: float(integrate.trapezoid(q[K <= x * F], K[K <= x * F]) / area)
-    lnb = lambda x: float(stats.lognorm.cdf(x * F, s=atm * np.sqrt(T), scale=F * np.exp(-0.5 * atm ** 2 * T)))
-    fig, ax = plt.subplots(figsize=(7.0, 3.2))
-    ax.plot(K / F, q * F, color=MainBlue, lw=1.6, label='Risk-neutral density implied by the SVI smile')
-    ax.plot(K / F, ln * F, color=Orange, lw=1.2, ls='--', label=f'Log-normal density with the ATM volatility ({100 * atm:.1f}%)')
-    ax.set_xlim(0.5, 1.6)
-    ax.set_xlabel('$S_T/F$ at expiry'); ax.set_ylabel('Density')
-    ax.set_title(f"Bitcoin, expiry {pd.Timestamp(e).strftime('%d %b %Y')} ({f['days']:.0f} days), forward {F:,.0f} USD",
-                 fontsize=8.5, loc='left')
-    legend_outside_bottom(ax, ncol=1, y=-0.2)
-    save_fig('ch12_btc_rnd')
-    return dict(expiry=str(pd.Timestamp(e).date()), days=float(f['days']), F=float(F), atm=float(100 * atm), area=float(area),
-                p80=below(0.8), p120=1 - below(1.2), ln80=lnb(0.8), ln120=1 - lnb(1.2),
-                p70=below(0.7), ln70=lnb(0.7))
-
-
 def btc_vix(c_all=None):
     """Indice de tip VIX pe 30 de zile din lantul BTC (formula Cboe, r = 0, preturi mid in USD)."""
     c = deribit_chain() if c_all is None else c_all
@@ -805,6 +776,344 @@ def fig_0dte_straddle(d, phi):
                 share_big=float((d['pay'] > 2 * d['prem']).mean()))
 
 
+# =============================================================================
+# 9. INFERENTA: CONSTRANGERI DE ARBITRAJ, BANDE PENTRU DENSITATE, VARIANTA FARA MODEL, PROGNOZA VIX, PREDICTIBILITATE
+# =============================================================================
+def svi_gk(k, a, b, rho, m, s):
+    """Functia g(k) a lui Gatheral-Jacquier (2014): fara arbitraj de tip fluture daca g(k) >= 0 si w > 0."""
+    W = svi_w(k, a, b, rho, m, s)
+    W1 = b * (rho + (k - m) / np.sqrt((k - m) ** 2 + s ** 2))
+    W2 = b * s ** 2 / ((k - m) ** 2 + s ** 2) ** 1.5
+    return (1 - k * W1 / (2 * W)) ** 2 - W1 ** 2 / 4 * (1 / W + 0.25) + W2 / 2
+
+
+def svi_no_arbitrage(tab):
+    """Verificarile de absenta a arbitrajului pentru fiecare SVI: panta aripilor (Lee, 2004), g(k) >= 0 si w(k) > 0
+    (Gatheral-Jacquier, 2014), si arbitrajul de calendar dw/dtau >= 0 intre scadente consecutive."""
+    kg = np.linspace(-1.5, 1.5, 3001)
+    rows = {}
+    for e, f in tab.iterrows():
+        p = [float(f[x]) for x in ['a', 'b', 'rho', 'm', 's']]
+        rows[str(pd.Timestamp(e).date())] = dict(days=float(f['days']), slope_left=p[1] * (1 - p[2]),
+                                                 slope_right=p[1] * (1 + p[2]), wmin=float(svi_w(kg, *p).min()),
+                                                 gmin=float(svi_gk(kg, *p).min()))
+    ex = list(tab.index)
+    kc = np.linspace(-0.5, 0.5, 201)
+    cal = []
+    for e1, e2 in zip(ex[:-1], ex[1:]):
+        p1 = [float(tab.loc[e1, x]) for x in ['a', 'b', 'rho', 'm', 's']]
+        p2 = [float(tab.loc[e2, x]) for x in ['a', 'b', 'rho', 'm', 's']]
+        dw = svi_w(kc, *p2) - svi_w(kc, *p1)
+        cal.append(dict(e1=str(pd.Timestamp(e1).date()), e2=str(pd.Timestamp(e2).date()), min_dw=float(dw.min()),
+                        share_viol=float((dw < 0).mean())))
+    lee = max(max(r['slope_left'], r['slope_right']) for r in rows.values())
+    return dict(per_expiry=rows, calendar=cal, max_slope=float(lee), n_exp=len(rows),
+                n_g_neg=int(sum(r['gmin'] < 0 for r in rows.values())),
+                n_w_neg=int(sum(r['wmin'] <= 0 for r in rows.values())),
+                n_cal_viol=int(sum(c['min_dw'] < 0 for c in cal)), n_pairs=len(cal))
+
+
+def rnd_from_svi(p, F, T, K):
+    """Densitatea neutra la risc (Breeden-Litzenberger) din parametrii SVI, pe grila de preturi de exercitare K."""
+    k = np.log(K / F)
+    sig = np.sqrt(np.clip(svi_w(k, *p), 1e-10, None) / T)
+    C = bs_price(F, K, T, 0.0, sig, 'call')
+    return np.clip(np.gradient(np.gradient(C, K), K), 0, None)
+
+
+def btc_rnd(tab, c=None, days=30, B=300):
+    """Densitatea neutra la risc (Breeden-Litzenberger) din SVI pentru scadenta cea mai apropiata de 30 de zile;
+    banda bootstrap pe perechi (reestimam SVI pe cotatii reesantionate) si intervalul cotatiilor observate."""
+    e = pick(tab, days); f = tab.loc[e]
+    F, T = f['F'], f['T']
+    p0 = [float(f[x]) for x in ['a', 'b', 'rho', 'm', 's']]
+    K = F * np.exp(np.linspace(-1.2, 1.0, 2201))
+    q = rnd_from_svi(p0, F, T, K)
+    atm = np.sqrt(svi_w(0.0, *p0) / T)
+    ln = stats.lognorm.pdf(K, s=atm * np.sqrt(T), scale=F * np.exp(-0.5 * atm ** 2 * T))
+    area = integrate.trapezoid(q, K)
+    below_q = lambda qq, x: float(integrate.trapezoid(qq[K <= x * F], K[K <= x * F]) / integrate.trapezoid(qq, K))
+    below = lambda x: below_q(q, x)
+    lnb = lambda x: float(stats.lognorm.cdf(x * F, s=atm * np.sqrt(T), scale=F * np.exp(-0.5 * atm ** 2 * T)))
+    out = dict(expiry=str(pd.Timestamp(e).date()), days=float(f['days']), F=float(F), atm=float(100 * atm), area=float(area),
+               p80=below(0.8), p120=1 - below(1.2), ln80=lnb(0.8), ln120=1 - lnb(1.2), p70=below(0.7), ln70=lnb(0.7))
+    band = None
+    if c is not None:
+        g = c[c['expiry'] == e]
+        kq, wq = g['k'].values, g['w'].values
+        rng = np.random.default_rng(SEED)
+        Q, P70, P80 = [], [], []
+        while len(Q) < B:
+            i = rng.integers(0, len(kq), len(kq))
+            if len(np.unique(kq[i])) < 6:
+                continue
+            pb = svi_fit(kq[i], wq[i])
+            qb = rnd_from_svi([pb[x] for x in ['a', 'b', 'rho', 'm', 's']], F, T, K)
+            Q.append(qb); P70.append(below_q(qb, 0.7)); P80.append(below_q(qb, 0.8))
+        Q = np.array(Q)
+        band = (np.quantile(Q, 0.025, axis=0), np.quantile(Q, 0.975, axis=0))
+        kmin, kmax = float(np.exp(kq.min())), float(np.exp(kq.max()))
+        out.update(B=int(B), p70_lo=float(np.quantile(P70, 0.025)), p70_hi=float(np.quantile(P70, 0.975)),
+                   p80_lo=float(np.quantile(P80, 0.025)), p80_hi=float(np.quantile(P80, 0.975)),
+                   kf_min=kmin, kf_max=kmax, n_quotes=int(len(kq)),
+                   width_centre=float((band[1] - band[0])[np.argmin(np.abs(K / F - 1))] / q[np.argmin(np.abs(K / F - 1))]),
+                   width_070=float((band[1] - band[0])[np.argmin(np.abs(K / F - 0.7))] / max(q[np.argmin(np.abs(K / F - 0.7))], 1e-30)))
+    fig, ax = plt.subplots(figsize=(7.0, 3.2))
+    if band is not None:
+        ax.fill_between(K / F, band[0] * F, band[1] * F, color=Teal, alpha=0.35, lw=0,
+                        label=f'95% pairs-bootstrap band ({B} SVI refits)')
+        ax.axvspan(0.3, out['kf_min'], color='#F5E6CC', alpha=0.7, lw=0,
+                   label=f"Outside the quoted strikes ({out['kf_min']:.2f}F to {out['kf_max']:.2f}F): SVI extrapolation")
+        ax.axvspan(out['kf_max'], 1.6, color='#F5E6CC', alpha=0.7, lw=0)
+    ax.plot(K / F, q * F, color=MainBlue, lw=1.6, label='Risk-neutral density implied by the SVI smile')
+    ax.plot(K / F, ln * F, color=Orange, lw=1.2, ls='--', label=f'Log-normal density with the ATM volatility ({100 * atm:.1f}%)')
+    ax.set_xlim(0.4 if band is not None else 0.5, 1.6)
+    ax.set_xlabel('$S_T/F$ at expiry'); ax.set_ylabel('Density')
+    ax.set_title(f"Bitcoin, expiry {pd.Timestamp(e).strftime('%d %b %Y')} ({f['days']:.0f} days), forward {F:,.0f} USD",
+                 fontsize=8.5, loc='left')
+    legend_outside_bottom(ax, ncol=2 if band is not None else 1, y=-0.2)
+    save_fig('ch12_btc_rnd')
+    return out
+
+
+def strip_variance(K, Q, F, T):
+    """Integrala 2/T * int Q(K)/K^2 dK (trapez) pe o grila densa de preturi OTM (F = K0, r = 0)."""
+    return 2 / T * integrate.trapezoid(Q / K ** 2, K)
+
+
+def btc_vix_bias(tab, c_all=None):
+    """Indicele de tip VIX pentru Bitcoin: efectul discretizarii si al trunchierii benzii de preturi de exercitare
+    (Jiang-Tian, 2005), cu preturi SVI in locul cotatiilor; plus diferenta salt vs variatia patratica intr-un model Merton."""
+    c = deribit_chain() if c_all is None else c_all
+    t0 = c['snapshot_utc'].iloc[0]
+    c = c.copy()
+    c['T'] = (c['expiry'] - t0).dt.total_seconds() / (365 * 86400)
+    c = c[(c['bid'] > 0) & (c['ask'] > 0)]
+    base = btc_vix(c_all)
+    res = {}
+    for tag in ['near', 'next']:
+        e = pd.Timestamp(base[tag]['expiry'] + ' 08:00:00')
+        g = c[c['expiry'] == e]
+        F = g['forward'].iloc[0]; T = g['T'].iloc[0]
+        otm = pd.concat([g[(g['type'] == 'put') & (g['strike'] < F)], g[(g['type'] == 'call') & (g['strike'] >= F)]])
+        f = tab.loc[e]
+        p = [float(f[x]) for x in ['a', 'b', 'rho', 'm', 's']]
+        def svi_q(K):
+            sig = np.sqrt(np.clip(svi_w(np.log(K / F), *p), 1e-10, None) / T)
+            return np.where(K < F, bs_price(F, K, T, 0.0, sig, 'put'), bs_price(F, K, T, 0.0, sig, 'call'))
+        Kq = np.sort(otm['strike'].values)
+        v_q = variance_from_strip(Kq, svi_q(Kq), F, T)                        # SVI la preturile cotate
+        Kd = np.linspace(Kq.min(), Kq.max(), 20001)
+        v_d = strip_variance(Kd, svi_q(Kd), F, T)                            # grila densa, acelasi interval
+        Kw = F * np.exp(np.linspace(-4, 4, 40001))
+        v_w = strip_variance(Kw, svi_q(Kw), F, T)                            # grila densa, interval extins
+        res[tag] = dict(days=float(T * 365), quoted=base[tag]['var'], svi_quoted=float(v_q), svi_dense=float(v_d),
+                        svi_wide=float(v_w), kf_min=float(Kq.min() / F), kf_max=float(Kq.max() / F))
+    T1, T2 = res['near']['days'], res['next']['days']
+    w1 = (T2 - 30) / (T2 - T1)
+    idx = lambda key: float(100 * np.sqrt((T1 * res['near'][key] * w1 + T2 * res['next'][key] * (1 - w1)) / 30))
+    out = dict(res, index_quoted=idx('quoted'), index_svi_quoted=idx('svi_quoted'), index_svi_dense=idx('svi_dense'),
+               index_svi_wide=idx('svi_wide'))
+    # salturi Merton (parametrii din graficul zambetelor): E^Q[-2 ln(S_T/F)] / T vs E^Q[QV] / T
+    sigma, lam, mu_j, sig_j = 0.14, 1.0, -0.08, 0.08
+    # sub masura de evaluare din merton_price: intensitate lam, salturi log ~ N(mu_j, sig_j^2)
+    lq, mq = lam, mu_j
+    EJ2 = mq ** 2 + sig_j ** 2
+    EeJ = np.exp(mq + 0.5 * sig_j ** 2)
+    qv = sigma ** 2 + lq * EJ2
+    strip = sigma ** 2 + 2 * lq * (EeJ - 1 - mq)
+    out['merton'] = dict(qv=float(qv), strip=float(strip), vol_qv=float(100 * np.sqrt(qv)), vol_strip=float(100 * np.sqrt(strip)),
+                         rel=float(strip / qv - 1))
+    return out
+
+
+def qlike(rv, f):
+    return rv / f - np.log(rv / f) - 1
+
+
+def hac_se(u, lags):
+    """Eroarea standard HAC (Newey-West, Bartlett) a mediei unei serii."""
+    u = np.asarray(u, float)
+    return nw_mean(u, lags)[1]
+
+
+def iv_gmm(y, X, Z, lags):
+    """Estimator IV exact identificat, b = (Z'X)^{-1} Z'y, cu varianta HAC (Newey-West) a momentelor Z u."""
+    b = np.linalg.solve(Z.T @ X, Z.T @ y)
+    u = y - X @ b
+    g = Z * u[:, None]
+    T = len(y)
+    S = g.T @ g / T
+    for L in range(1, lags + 1):
+        G = g[L:].T @ g[:-L] / T
+        S += (1 - L / (lags + 1)) * (G + G.T)
+    A = np.linalg.inv(Z.T @ X / T)
+    V = A @ S @ A.T / T
+    return b, np.sqrt(np.diag(V))
+
+
+def vix_forecast_inference():
+    """VIX ca prognoza a variantei realizate pe 21 de zile: test comun Mincer-Zarnowitz, specificatia in logaritmi,
+    erori in variabile (IV cu VIX^2 intarziat, Christensen-Prabhala), incluziune fata de HAR-RV (Corsi; Busch et al.)
+    si comparatie in afara esantionului cu pierderea QLIKE si testul Diebold-Mariano (Patton, 2011)."""
+    d = vrp_sp500().copy()
+    out = {}
+    L = 21
+    m = sm.OLS(d['rv'], sm.add_constant(d[['iv2']])).fit(cov_type='HAC', cov_kwds={'maxlags': L})
+    w = m.wald_test('const = 0, iv2 = 1', scalar=True)
+    cv = m.cov_params()
+    out['lev'] = dict(a=float(m.params['const']), b=float(m.params['iv2']), a_se=float(m.bse['const']), b_se=float(m.bse['iv2']),
+                      corr_ab=float(cv.loc['const', 'iv2'] / np.sqrt(cv.loc['const', 'const'] * cv.loc['iv2', 'iv2'])),
+                      wald=float(w.statistic), wald_p=float(w.pvalue), n=int(len(d)), r2=float(m.rsquared))
+    px = pd.concat([load_close('sp500'), load_close('vix')], axis=1, join='inner').dropna()
+    rd = (np.log(px['sp500']).diff() ** 2 * 252 * 1e4)
+    d['har_d'] = rd.reindex(d.index)
+    d['har_w'] = rd.rolling(5).mean().reindex(d.index)
+    d['har_m'] = rd.rolling(22).mean().reindex(d.index)
+    d['iv2_lag'] = d['iv2'].shift(21)
+    d = d.dropna()
+    ly, lx = np.log(d['rv']), np.log(d['iv2'])
+    ml = sm.OLS(ly, sm.add_constant(lx.rename('liv2'))).fit(cov_type='HAC', cov_kwds={'maxlags': L})
+    wl = ml.wald_test('liv2 = 1', scalar=True)
+    out['log'] = dict(a=float(ml.params['const']), b=float(ml.params['liv2']), a_se=float(ml.bse['const']),
+                      b_se=float(ml.bse['liv2']), r2=float(ml.rsquared), t_b1=float((ml.params['liv2'] - 1) / ml.bse['liv2']),
+                      wald_b1=float(wl.statistic), wald_b1_p=float(wl.pvalue))
+    X = np.column_stack([np.ones(len(d)), lx.values])
+    Z = np.column_stack([np.ones(len(d)), np.log(d['iv2_lag']).values])
+    b, se = iv_gmm(ly.values, X, Z, L)
+    fs = sm.OLS(lx, sm.add_constant(np.log(d['iv2_lag']).rename('z'))).fit(cov_type='HAC', cov_kwds={'maxlags': L})
+    out['iv'] = dict(a=float(b[0]), b=float(b[1]), a_se=float(se[0]), b_se=float(se[1]), t_b1=float((b[1] - 1) / se[1]),
+                     first_stage_t=float(fs.tvalues['z']), first_stage_r2=float(fs.rsquared))
+    # incluziune: log RV pe log VIX^2 si componentele HAR in logaritmi
+    for c_ in ['har_d', 'har_w', 'har_m']:
+        d['l' + c_] = np.log(d[c_].clip(lower=1e-2))
+    me = sm.OLS(ly, sm.add_constant(pd.concat([lx.rename('liv2'), d[['lhar_d', 'lhar_w', 'lhar_m']]], axis=1))).fit(
+        cov_type='HAC', cov_kwds={'maxlags': L})
+    mh = sm.OLS(ly, sm.add_constant(d[['lhar_d', 'lhar_w', 'lhar_m']])).fit(cov_type='HAC', cov_kwds={'maxlags': L})
+    wh = me.wald_test('lhar_d = 0, lhar_w = 0, lhar_m = 0', scalar=True)
+    out['enc'] = dict(b_iv=float(me.params['liv2']), b_iv_se=float(me.bse['liv2']), r2=float(me.rsquared),
+                      r2_har=float(mh.rsquared), r2_iv=float(ml.rsquared), wald_har=float(wh.statistic),
+                      wald_har_p=float(wh.pvalue), b_m=float(me.params['lhar_m']), b_m_se=float(me.bse['lhar_m']))
+    # in afara esantionului (din 2000): coeficienti reestimati la fiecare 21 de zile, doar cu tinte deja observate
+    idx = d.index
+    start = np.searchsorted(idx, pd.Timestamp('2000-01-03'))
+    F_raw, F_mz, F_har, RV = [], [], [], []
+    b_mz = b_har = None
+    Xh_all = sm.add_constant(d[['lhar_d', 'lhar_w', 'lhar_m']]).values
+    Xm_all = sm.add_constant(lx.rename('liv2')).values
+    for i in range(start, len(d)):
+        if (i - start) % 21 == 0:
+            tr = slice(0, i - 21)                       # tintele RV_{s, s+21} cunoscute la data i: s <= i - 21
+            b_har = np.linalg.lstsq(Xh_all[tr], ly.values[tr], rcond=None)[0]
+            b_mz = np.linalg.lstsq(Xm_all[tr], ly.values[tr], rcond=None)[0]
+            s2h = np.var(ly.values[tr] - Xh_all[tr] @ b_har)
+            s2m = np.var(ly.values[tr] - Xm_all[tr] @ b_mz)
+        F_raw.append(d['iv2'].values[i])
+        F_mz.append(np.exp(Xm_all[i] @ b_mz + 0.5 * s2m))   # prognoza in nivel din regresia in logaritmi
+        F_har.append(np.exp(Xh_all[i] @ b_har + 0.5 * s2h))
+        RV.append(d['rv'].values[i])
+    F_raw, F_mz, F_har, RV = map(np.array, (F_raw, F_mz, F_har, RV))
+    oos = dict(start=str(idx[start].date()), n=int(len(RV)))
+    for name, Fc in [('raw', F_raw), ('mz', F_mz)]:
+        for lname, lf in [('qlike', qlike), ('mse', lambda y, f: (y - f) ** 2)]:
+            dl = lf(RV, Fc) - lf(RV, F_har)          # < 0: VIX mai bun decat HAR
+            se = hac_se(dl, L)
+            oos[f'{name}_{lname}'] = dict(loss=float(lf(RV, Fc).mean()), loss_har=float(lf(RV, F_har).mean()),
+                                          ratio=float(lf(RV, Fc).mean() / lf(RV, F_har).mean()), dm=float(dl.mean() / se),
+                                          p=float(2 * (1 - stats.norm.cdf(abs(dl.mean() / se)))))
+    out['oos'] = oos
+    return out
+
+
+def vrp_monthly():
+    """Date lunare BTZ (2009): IV = VIX^2/12 la sfarsitul lunii, RV = suma randamentelor zilnice (%) la patrat din luna,
+    VRP = IV - RV (ex ante), randamentul in exces = randamentul log lunar S&P 500 minus TB3MS/12 (FRED)."""
+    spx, vix = read_market('GSPC.INDX')['close'], read_market('VIX.INDX')['close']
+    px = pd.concat([spx, vix], axis=1, keys=['spx', 'vix']).dropna()
+    r = 100 * np.log(px['spx']).diff().dropna()
+    rv = (r ** 2).resample('ME').sum()
+    iv = (px['vix'] ** 2 / 12).resample('ME').last()
+    rm = 100 * np.log(px['spx'].resample('ME').last()).diff()
+    tb = pd.read_csv('https://fred.stlouisfed.org/graph/fredgraph.csv?id=TB3MS', index_col=0, parse_dates=True).iloc[:, 0]
+    tb.index = tb.index + pd.offsets.MonthEnd(0)
+    df = pd.DataFrame({'iv': iv, 'rv': rv, 'rm': rm, 'rf': tb / 12}).dropna()
+    df = df[df.index >= '1990-01-31']
+    df['vrp'] = df['iv'] - df['rv']
+    df['ex'] = df['rm'] - df['rf']
+    return df
+
+
+def hodrick_t(y, X, e1, h):
+    """Erori standard Hodrick (1992) 1B pentru regresia cu randamente suprapuse (suma regresorilor trecuti)."""
+    T = len(y)
+    b = np.linalg.lstsq(X, y, rcond=None)[0]
+    Z = X.T @ X / T
+    S = np.zeros((X.shape[1], X.shape[1]))
+    for t in range(h - 1, T):
+        w = e1[t] * X[t - h + 1:t + 1].sum(axis=0)
+        S += np.outer(w, w)
+    S /= T
+    Zi = np.linalg.inv(Z)
+    V = Zi @ S @ Zi / T
+    return b, b / np.sqrt(np.diag(V))
+
+
+def vrp_predict(B=2000):
+    """Predictibilitatea randamentelor prin VRP ex ante (BTZ, 2009): regresii lunare suprapuse pe h = 1, 3, 6, 12 luni,
+    cu erori standard Newey-West (h lag-uri), Hansen-Hodrick (h - 1 lag-uri, nucleu uniform) si Hodrick (1992) 1B;
+    p-valoare bootstrap sub H0 (VRP ca AR(1), reziduuri reesantionate impreuna; Stambaugh, 1999)."""
+    df = vrp_monthly()
+    ex, v = df['ex'].values, df['vrp'].values
+    n = len(ex)
+
+    def stats_h(ex, v, h):
+        y = np.array([(12 / h) * ex[t + 1:t + 1 + h].sum() if t + h < n else np.nan for t in range(n)])
+        ok = ~np.isnan(y)
+        yy, vv = y[ok], v[ok]
+        X = np.column_stack([np.ones(len(yy)), vv])
+        e1 = (12 / h) * (np.append(ex[1:], np.nan)[ok] - np.nanmean(ex[1:]))
+        b, th = hodrick_t(yy, X, np.nan_to_num(e1), h)
+        u = yy - X @ b
+        T = len(yy)
+        g = X * u[:, None]
+        def lrv(lags, kern):
+            S = g.T @ g / T
+            for L_ in range(1, lags + 1):
+                G = g[L_:].T @ g[:-L_] / T
+                S += kern(L_, lags) * (G + G.T)
+            A = np.linalg.inv(X.T @ X / T)
+            return A @ S @ A / T
+        Vnw = lrv(h, lambda L_, m: 1 - L_ / (m + 1))
+        Vhh = lrv(h - 1, lambda L_, m: 1.0)
+        se_hh = np.sqrt(Vhh[1, 1]) if Vhh[1, 1] > 0 else np.nan
+        r2 = 1 - u.var() / yy.var()
+        return dict(b=float(b[1]), t_nw=float(b[1] / np.sqrt(Vnw[1, 1])), t_hh=float(b[1] / se_hh),
+                    t_hod=float(th[1]), r2=float(100 * r2), n=int(T))
+    out = {}
+    # AR(1) pentru VRP si randamente sub H0
+    phi = np.polyfit(v[:-1], v[1:], 1)
+    ev = v[1:] - np.polyval(phi, v[:-1])
+    er = ex[1:] - ex[1:].mean()
+    rng = np.random.default_rng(SEED)
+    for h in [1, 3, 6, 12]:
+        out[str(h)] = stats_h(ex, v, h)
+    tb = {h: [] for h in [1, 3, 6, 12]}
+    for _ in range(B):
+        j = rng.integers(0, len(ev), len(ev))
+        vb = np.empty(n); vb[0] = v[rng.integers(0, n)]
+        for t in range(1, n):
+            vb[t] = phi[1] + phi[0] * vb[t - 1] + ev[j[t - 1]]
+        xb = np.empty(n); xb[0] = ex.mean(); xb[1:] = ex[1:].mean() + er[j]
+        for h in [1, 3, 6, 12]:
+            tb[h].append(stats_h(xb, vb, h)['t_hod'])
+    for h in [1, 3, 6, 12]:
+        a = np.array(tb[h])
+        out[str(h)]['p_boot'] = float(np.mean(a >= out[str(h)]['t_hod']))
+        out[str(h)]['t_boot95'] = float(np.quantile(a, 0.95))
+    out['phi'] = float(phi[0]); out['start'] = df.index[0].strftime('%Y-%m'); out['end'] = df.index[-1].strftime('%Y-%m')
+    return out
+
+
 def jsonable(o):
     if isinstance(o, dict):
         return {str(k): jsonable(v) for k, v in o.items()}
@@ -842,14 +1151,18 @@ if __name__ == '__main__':
     fig_btc_term(tab, dv)
     RES['btc_svi'] = {str(pd.Timestamp(e).date()): {k: (float(v) if not isinstance(v, str) else v) for k, v in row.items()}
                       for e, row in tab.iterrows()}
-    RES['btc_rnd'] = btc_rnd(tab)
+    RES['btc_rnd'] = btc_rnd(tab, c)
+    RES['svi_arb'] = svi_no_arbitrage(tab)
     RES['btc_vix'] = btc_vix()
+    RES['btc_vix_bias'] = btc_vix_bias(tab)
     RES['vix'] = fig_vix_history()
     RES['term'] = fig_vix_term()
     RES['vvix'] = fig_vvix()
     vd = vrp_sp500()
     RES['vrp'] = fig_vrp(vd)
     RES['mz'] = fig_mz(vd)
+    RES['vix_inf'] = vix_forecast_inference()
+    RES['vrp_pred'] = vrp_predict()
     vb = vrp_btc()
     RES['vrp_btc'] = fig_vrp_btc(vb)
     RES['gamma0'] = fig_0dte_gamma()

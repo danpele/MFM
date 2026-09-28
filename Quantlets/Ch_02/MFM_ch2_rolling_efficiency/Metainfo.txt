@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch2_rolling_efficiency'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Adaptive Market Hypothesis: time-varying efficiency of the S&P 500, BET and Bitcoin measured by the variance-ratio statistic z*(5) and the DFA exponent on rolling 500-day windows, with a simulated null band.'
+Description: 'Adaptive Market Hypothesis: time-varying efficiency of the S&P 500, BET and Bitcoin measured by the variance-ratio statistic z*(5) and the DFA exponent on rolling 500-day windows, with a wild-bootstrap null band computed in each window.'
 
 Keywords: 'adaptive market hypothesis, time-varying efficiency, rolling window, variance ratio, DFA, Hurst'
 

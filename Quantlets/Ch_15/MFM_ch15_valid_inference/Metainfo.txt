@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch15_valid_inference'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Sentiment scores are estimates: attenuation of slopes from misclassification (Aigner, 1973), a one-factor model and instrumental variables with two scores, prediction-powered inference with a few human labels, calibration of LLM probabilities and temperature scaling, wild cluster bootstrap with 16 stocks and Holm adjustment, event-study differences, a specification curve with a sign-flip joint test, and the DeLong test of AUC before and after the release of the weights.'
+
+Keywords: 'measurement error, generated regressors, prediction-powered inference, calibration, wild cluster bootstrap, specification curve, multiple testing, DeLong test'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Financial PhraseBank v1.0 (Malo et al., 2014; CC BY-NC-SA 3.0) and Twitter Financial News Sentiment (MIT licence), both from the Hugging Face Hub; Loughran-McDonald and Harvard IV-4 word lists; FNSPID financial news headlines (Dong, Fan & Peng, 2024; CC BY-NC 4.0) for 16 US stocks; daily adjusted closes of the same stocks and SPY (data/market); S&P 500 (GSPC.INDX) and Apple (AAPL.US) daily closes (data/market)'
+
+Output: 'ch15_ppi.pdf, ch15_calibration.pdf, ch15_spec_curve.pdf'

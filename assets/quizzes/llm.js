@@ -10,28 +10,28 @@ window.MFM_DATA.quizzes['llm'] = {
         {
             "correct": 0,
             "en": {
-                "title": "Dictionary tone",
-                "text": "A headline contains 3 positive and 1 negative word from the Loughran-McDonald (LM) dictionary. What is its tone τ = (P − N)/(P + N) and its class?",
+                "title": "Attenuation from misclassification",
+                "text": "You regress next-day returns on a dummy equal to 1 when FinBERT labels a headline negative. On Twitter, FinBERT misses 23.9% of the truly negative headlines and calls 13.3% of the others negative (14.5% of headlines are negative). What happens to the slope?",
                 "options": [
-                    "τ = 0.50, positive",
-                    "τ = 2, positive",
-                    "τ = 0.25, neutral",
-                    "τ = −0.50, negative"
+                    "It is attenuated: its probability limit is about 0.45 times the true effect, so the true effect is about 2.2 times larger in absolute value",
+                    "It is unbiased but less precise, because the classification errors average out",
+                    "It is biased away from zero, because false negatives exaggerate the contrast",
+                    "It is unaffected, because misclassification only changes the intercept"
                 ],
-                "correctExplanation": "τ = (3 − 1)/(3 + 1) = 2/4 = 0.50 > 0, so the headline is classified as positive. The tone is bounded in [−1, 1].",
-                "incorrectExplanation": "The tone is the difference of the counts divided by their sum: (3 − 1)/(3 + 1) = 0.50, which lies in [−1, 1] and is positive."
+                "correctExplanation": "With a misclassified binary regressor (Aigner, 1973), plim b = β·π(1 − π)(1 − α0 − α1)/[p(1 − p)] = β·0.449 here. The sign is kept as long as α0 + α1 < 1, but the magnitude shrinks.",
+                "incorrectExplanation": "Measurement error in the regressor is a bias, not only a loss of precision: the covariance between the dummy and the true tone is π(1 − π)(1 − α0 − α1), smaller than the variance of the dummy, so the slope shrinks towards zero."
             },
             "ro": {
-                "title": "Tonul unui dicționar",
-                "text": "Un titlu conține 3 cuvinte pozitive și 1 cuvânt negativ din dicționarul Loughran-McDonald (LM). Care este tonul τ = (P − N)/(P + N) și clasa lui?",
+                "title": "Atenuarea prin clasificare greșită",
+                "text": "Regresați randamentele zilei următoare pe o variabilă egală cu 1 când FinBERT etichetează un titlu drept negativ. Pe Twitter, FinBERT ratează 23,9% din titlurile cu adevărat negative și numește negative 13,3% dintre celelalte (14,5% dintre titluri sunt negative). Ce se întâmplă cu panta?",
                 "options": [
-                    "τ = 0,50, pozitiv",
-                    "τ = 2, pozitiv",
-                    "τ = 0,25, neutru",
-                    "τ = −0,50, negativ"
+                    "Este atenuată: limita ei în probabilitate este de circa 0,45 ori efectul adevărat, deci efectul adevărat este de circa 2,2 ori mai mare în valoare absolută",
+                    "Este nedistorsionată, dar mai puțin precisă, pentru că erorile de clasificare se compensează",
+                    "Este distorsionată departe de zero, pentru că falsele negative exagerează contrastul",
+                    "Nu este afectată, pentru că clasificarea greșită schimbă doar termenul liber"
                 ],
-                "correctExplanation": "τ = (3 − 1)/(3 + 1) = 2/4 = 0,50 > 0, deci titlul este clasificat pozitiv. Tonul este mărginit în [−1, 1].",
-                "incorrectExplanation": "Tonul este diferența numărătorilor împărțită la suma lor: (3 − 1)/(3 + 1) = 0,50, valoare din [−1, 1] și pozitivă."
+                "correctExplanation": "Cu un regresor binar clasificat greșit (Aigner, 1973), plim b = β·π(1 − π)(1 − α0 − α1)/[p(1 − p)] = β·0,449 aici. Semnul se păstrează cât timp α0 + α1 < 1, dar mărimea scade.",
+                "incorrectExplanation": "Eroarea de măsurare din regresor este o distorsiune, nu doar o pierdere de precizie: covarianța dintre variabila binară și tonul adevărat este π(1 − π)(1 − α0 − α1), mai mică decât varianța variabilei, deci panta se apropie de zero."
             }
         },
         {
@@ -91,55 +91,55 @@ window.MFM_DATA.quizzes['llm'] = {
         {
             "correct": 3,
             "en": {
-                "title": "Accuracy versus macro-F1",
-                "text": "On the Twitter Financial News validation set, always predicting \"neutral\" gives 66% accuracy. Why does the lecture also report macro-F1 (the average of the F1 scores of the three classes)?",
+                "title": "Prediction-powered inference",
+                "text": "You have 100 000 headlines scored by an LLM and a random subset of 500 also labelled by humans. Which estimator of the mean true sentiment gives valid confidence intervals whatever the accuracy of the LLM, and uses all the scores?",
                 "options": [
-                    "Because macro-F1 is always higher than accuracy and makes the models look better",
-                    "Because accuracy cannot be computed when there are three classes",
-                    "Because macro-F1 does not depend on the number of texts in the test set",
-                    "Because a model can reach high accuracy by ignoring the rare classes; macro-F1 counts each class equally"
+                    "The mean of the LLM scores over the 100 000 headlines, with its usual standard error",
+                    "The mean of the human labels on the 500 headlines only",
+                    "The simple average of the LLM mean and the human-label mean",
+                    "The LLM mean over all headlines minus the mean LLM error (score minus label) estimated on the 500 labelled headlines"
                 ],
-                "correctExplanation": "\"Always neutral\" has 66% accuracy but a macro-F1 of only 26.4%: it gets F1 = 0 on the positive and negative classes. Macro-F1 exposes classifiers that never find the classes a trader cares about.",
-                "incorrectExplanation": "The majority-class benchmark shows the problem: high accuracy, yet no positive or negative headline is found. Macro-F1 gives the rare classes the same weight as the neutral one."
+                "correctExplanation": "Prediction-powered inference (Angelopoulos et al., 2023) corrects the model mean with a rectifier estimated on the labelled subset; its variance is Var(f)/N + Var(f − Y)/n. On Twitter the plain FinBERT mean even has the wrong sign (−0.014 against a true 0.054).",
+                "incorrectExplanation": "The plain LLM mean converges to the wrong number when the model is biased; the labels-only mean is valid but ignores the scores; an ad hoc average has no valid variance. The bias-corrected estimator combines both."
             },
             "ro": {
-                "title": "Acuratețe versus F1 macro",
-                "text": "Pe setul de validare Twitter Financial News, prognoza „mereu neutru” dă 66% acuratețe. De ce raportează cursul și F1 macro (media scorurilor F1 ale celor trei clase)?",
+                "title": "Prediction-powered inference",
+                "text": "Aveți 100 000 de titluri notate de un LLM și o submulțime aleatoare de 500 etichetate și de oameni. Ce estimator al sentimentului mediu adevărat dă intervale de încredere valide oricare ar fi acuratețea LLM-ului și folosește toate scorurile?",
                 "options": [
-                    "Pentru că F1 macro este mereu mai mare decât acuratețea și avantajează modelele",
-                    "Pentru că acuratețea nu poate fi calculată când există trei clase",
-                    "Pentru că F1 macro nu depinde de numărul de texte din setul de test",
-                    "Pentru că un model poate avea acuratețe mare ignorând clasele rare; F1 macro tratează fiecare clasă la fel"
+                    "Media scorurilor LLM pe cele 100 000 de titluri, cu eroarea ei standard obișnuită",
+                    "Media etichetelor umane doar pe cele 500 de titluri",
+                    "Media simplă dintre media LLM și media etichetelor umane",
+                    "Media LLM pe toate titlurile minus eroarea medie a LLM (scor minus etichetă) estimată pe cele 500 de titluri etichetate"
                 ],
-                "correctExplanation": "„Mereu neutru” are 66% acuratețe, dar un F1 macro de doar 26,4%: obține F1 = 0 pe clasele pozitivă și negativă. F1 macro scoate la iveală clasificatorii care nu găsesc niciodată clasele importante pentru un trader.",
-                "incorrectExplanation": "Reperul clasei majoritare arată problema: acuratețe mare, dar niciun titlu pozitiv sau negativ găsit. F1 macro dă claselor rare aceeași pondere ca celei neutre."
+                "correctExplanation": "Prediction-powered inference (Angelopoulos et al., 2023) corectează media modelului cu o corecție estimată pe submulțimea etichetată; varianța este Var(f)/N + Var(f − Y)/n. Pe Twitter, media simplă FinBERT are chiar semnul greșit (−0,014 față de 0,054 adevărat).",
+                "incorrectExplanation": "Media simplă a LLM converge la un număr greșit când modelul este distorsionat; media doar a etichetelor este validă, dar ignoră scorurile; o medie ad hoc nu are o varianță validă. Estimatorul corectat le combină pe amândouă."
             }
         },
         {
             "correct": 0,
             "en": {
-                "title": "McNemar test",
-                "text": "On 2 388 Twitter headlines, LM is wrong and FinBERT right in n01 = 539 cases, LM right and FinBERT wrong in n10 = 252 cases. Which texts does the exact McNemar test use?",
+                "title": "Two scores as instruments",
+                "text": "The daily FinBERT and Qwen2.5-7B scores correlate 0.66. Instrumenting Qwen with FinBERT gives a same-day slope of 59 bp; instrumenting Qwen with the LM dictionary gives 37 bp (difference z = 5.4). What do you conclude?",
                 "options": [
-                    "Only the 791 discordant texts: under equal accuracy, n01 ∼ Binomial(791, 0.5)",
-                    "All 2 388 texts, weighted by the confidence of each model",
-                    "Only the texts on which both models are right",
-                    "Only the texts that the annotators labelled positive or negative"
+                    "At least one instrument is invalid: the two LLM scores share measurement errors, so FinBERT is not independent of Qwen's error",
+                    "Instrumental variables always fail with correlations below 0.9",
+                    "Both estimates are valid; the difference is sampling noise",
+                    "The LM dictionary must be the better instrument because it is less correlated with Qwen"
                 ],
-                "correctExplanation": "Texts where the two classifiers agree carry no information about which is better. Under H0, each discordant text favours either model with probability 0.5; 539 versus 252 gives p < 0.001.",
-                "incorrectExplanation": "The paired test conditions on disagreements: n01 + n10 = 791 texts, with n01 ∼ Binomial(791, 0.5) under equal accuracy. Agreements do not enter the test."
+                "correctExplanation": "IV with a second noisy measurement is consistent only if the two measurement errors are independent of each other and of the return shock. Two valid instruments would give the same estimate; a 22 bp gap with z = 5.4 rejects that, as expected for models trained on overlapping text.",
+                "incorrectExplanation": "The strength of the correlation is not the issue; validity is. Two valid instruments must estimate the same coefficient, and the observed gap is far beyond sampling noise."
             },
             "ro": {
-                "title": "Testul McNemar",
-                "text": "Pe 2 388 de titluri Twitter, LM greșește și FinBERT are dreptate în n01 = 539 de cazuri, iar LM are dreptate și FinBERT greșește în n10 = 252 de cazuri. Ce texte folosește testul McNemar exact?",
+                "title": "Două scoruri ca instrumente",
+                "text": "Scorurile zilnice FinBERT și Qwen2.5-7B au corelația 0,66. Instrumentând Qwen cu FinBERT se obține o pantă în aceeași zi de 59 bp; instrumentând Qwen cu dicționarul LM, 37 bp (diferența z = 5,4). Ce concluzionați?",
                 "options": [
-                    "Doar cele 791 de texte discordante: la acuratețe egală, n01 ∼ Binomial(791; 0,5)",
-                    "Toate cele 2 388 de texte, ponderate cu încrederea fiecărui model",
-                    "Doar textele pe care ambele modele le clasifică corect",
-                    "Doar textele etichetate pozitiv sau negativ de adnotatori"
+                    "Cel puțin un instrument nu este valid: cele două scoruri LLM au erori de măsurare comune, deci FinBERT nu este independent de eroarea lui Qwen",
+                    "Variabilele instrumentale eșuează mereu la corelații sub 0,9",
+                    "Ambele estimări sunt valide; diferența este zgomot de eșantionare",
+                    "Dicționarul LM trebuie să fie instrumentul mai bun pentru că este mai puțin corelat cu Qwen"
                 ],
-                "correctExplanation": "Textele pe care cei doi clasificatori le tratează la fel nu spun nimic despre care este mai bun. Sub H0, fiecare text discordant favorizează un model cu probabilitatea 0,5; 539 față de 252 dă p < 0,001.",
-                "incorrectExplanation": "Testul pe perechi se bazează pe dezacorduri: n01 + n10 = 791 de texte, cu n01 ∼ Binomial(791; 0,5) la acuratețe egală. Acordurile nu intră în test."
+                "correctExplanation": "IV cu o a doua măsurătoare zgomotoasă este consistentă doar dacă cele două erori de măsurare sunt independente între ele și de șocul randamentului. Două instrumente valide ar da aceeași estimare; o diferență de 22 bp cu z = 5,4 respinge acest lucru, cum era de așteptat pentru modele antrenate pe texte care se suprapun.",
+                "incorrectExplanation": "Problema nu este mărimea corelației, ci validitatea. Două instrumente valide trebuie să estimeze același coeficient, iar diferența observată depășește cu mult zgomotul de eșantionare."
             }
         },
         {
@@ -207,7 +207,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "FinBERT has more parameters than Qwen2.5-7B and overfits short texts",
                     "FinBERT was fine-tuned on Financial PhraseBank, so part of its lead there is memory of its own training data"
                 ],
-                "correctExplanation": "The drop of about 16 percentage points is the in-sample trap: evaluate a language model only on texts it has never seen, as with out-of-sample testing in Chapters 8 and 13.",
+                "correctExplanation": "Qwen2.5-7B also drops, by 7.2 points, because Twitter headlines are harder; the difference in differences, 9.2 points (bootstrap CI [6.7; 11.9]), measures FinBERT's memory of its own training data. Evaluate a language model only on texts it has never seen.",
                 "incorrectExplanation": "The public FinBERT (ProsusAI/finbert) was fine-tuned on Financial PhraseBank itself; its score there is in-sample, not a fair comparison."
             },
             "ro": {
@@ -219,7 +219,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "FinBERT are mai mulți parametri decât Qwen2.5-7B și supraajustează textele scurte",
                     "FinBERT a fost ajustat fin pe Financial PhraseBank, deci o parte din avantajul său acolo este memoria propriilor date de antrenare"
                 ],
-                "correctExplanation": "Scăderea de circa 16 puncte procentuale este capcana evaluării în eșantion: evaluați un model de limbaj doar pe texte pe care nu le-a văzut niciodată, ca la testarea în afara eșantionului din capitolele 8 și 13.",
+                "correctExplanation": "Și Qwen2.5-7B scade, cu 7,2 puncte, pentru că titlurile Twitter sunt mai grele; diferența diferențelor, 9,2 puncte (CI bootstrap [6,7; 11,9]), măsoară memoria FinBERT a propriilor date de antrenare. Evaluați un model de limbaj doar pe texte pe care nu le-a văzut niciodată.",
                 "incorrectExplanation": "FinBERT-ul public (ProsusAI/finbert) a fost ajustat fin chiar pe Financial PhraseBank; scorul lui acolo este în eșantion, deci comparația nu este corectă."
             }
         },
@@ -253,28 +253,28 @@ window.MFM_DATA.quizzes['llm'] = {
         {
             "correct": 1,
             "en": {
-                "title": "Zero-shot scoring",
-                "text": "In the lecture, how is the zero-shot sentiment of a headline obtained from an instruction-tuned large language model (LLM)?",
+                "title": "Few clusters",
+                "text": "The FNSPID panel has 16 stocks. Clustering by stock, the Qwen2.5-7B slope at d + 2 has t = 2.41. What is the right reading?",
                 "options": [
-                    "By generating a paragraph of explanation and counting positive words in it",
-                    "From the logits of the tokens \"positive\", \"negative\", \"neutral\" at the first generated position: a softmax gives p_k, the label is arg max p_k and the score p_pos − p_neg",
-                    "By fine-tuning the LLM on Financial PhraseBank before scoring",
-                    "By averaging the embeddings of the headline and comparing them with a threshold"
+                    "It is significant at 1%, because t > 1.96 with 18 282 observations",
+                    "With 16 clusters the clustered SE is biased down and t is not N(0, 1): the wild cluster bootstrap gives p = 0.061, and 0.37 after Holm over the nine regressions",
+                    "Clustering by stock is always conservative, so the true p-value is even smaller",
+                    "Clustering is only needed when the regressor is a dummy"
                 ],
-                "correctExplanation": "No text is generated, so nothing needs parsing: the probabilities of the three answer words give both a label and a continuous score in [−1, 1].",
-                "incorrectExplanation": "Zero-shot means no labelled examples and no training: the prompt asks for one word, and the probabilities of the three answer tokens at the first position are read directly."
+                "correctExplanation": "Inference rests on 16 cluster sums, not on 18 282 observations: use t15 critical values or a wild cluster bootstrap with the null imposed (Cameron, Gelbach & Miller, 2008), and count all the regressions tried.",
+                "incorrectExplanation": "The number of independent units is the number of clusters. With 16 clusters the sandwich estimator underestimates the variance, and the normal approximation overstates significance."
             },
             "ro": {
-                "title": "Scorul zero-shot",
-                "text": "În curs, cum se obține sentimentul zero-shot al unui titlu de la un model mare de limbaj (LLM) ajustat pe instrucțiuni?",
+                "title": "Puține grupuri",
+                "text": "Panelul FNSPID are 16 acțiuni. Cu gruparea pe acțiuni, panta Qwen2.5-7B în d + 2 are t = 2,41. Care este interpretarea corectă?",
                 "options": [
-                    "Generând un paragraf de explicații și numărând cuvintele pozitive din el",
-                    "Din logiții tokenilor „positive”, „negative”, „neutral” la prima poziție generată: un softmax dă p_k, eticheta este arg max p_k, iar scorul p_pos − p_neg",
-                    "Ajustând fin LLM-ul pe Financial PhraseBank înainte de evaluare",
-                    "Făcând media vectorilor de embedding ai titlului și comparând-o cu un prag"
+                    "Este semnificativă la 1%, pentru că t > 1,96 cu 18 282 de observații",
+                    "Cu 16 grupuri SE grupată este subestimată și t nu este N(0, 1): wild cluster bootstrap dă p = 0,061, iar 0,37 după Holm pe cele nouă regresii",
+                    "Gruparea pe acțiuni este mereu conservatoare, deci valoarea p adevărată este și mai mică",
+                    "Gruparea este necesară doar când regresorul este o variabilă binară"
                 ],
-                "correctExplanation": "Nu se generează text, deci nu trebuie interpretat nimic: probabilitățile celor trei cuvinte-răspuns dau atât o etichetă, cât și un scor continuu în [−1, 1].",
-                "incorrectExplanation": "Zero-shot înseamnă fără exemple etichetate și fără antrenare: prompt-ul cere un singur cuvânt, iar probabilitățile celor trei tokeni-răspuns la prima poziție se citesc direct."
+                "correctExplanation": "Inferența se sprijină pe 16 sume pe grupuri, nu pe 18 282 de observații: folosiți valori critice t15 sau un wild cluster bootstrap cu ipoteza nulă impusă (Cameron, Gelbach & Miller, 2008) și numărați toate regresiile încercate.",
+                "incorrectExplanation": "Numărul unităților independente este numărul de grupuri. Cu 16 grupuri, estimatorul sandwich subestimează varianța, iar aproximarea normală exagerează semnificația."
             }
         },
         {
@@ -361,28 +361,28 @@ window.MFM_DATA.quizzes['llm'] = {
         {
             "correct": 1,
             "en": {
-                "title": "Embeddings and principal components",
-                "text": "The first two principal components of the 384-dimensional MiniLM embeddings of Twitter headlines separate topics (companies, macro news, crypto) rather than sentiment. Yet logistic regression on all 384 dimensions reaches 78.6% accuracy. Why?",
+                "title": "Did the memory vanish?",
+                "text": "For the monthly S&P 500 direction, Qwen2.5-14B has AUC 0.69 on 296 months before its release and 0.59 on 23 months after. A DeLong test of the difference gives z = 0.73. What can you conclude?",
                 "options": [
-                    "The embeddings contain no sentiment information, and the 78.6% is luck",
-                    "Principal component analysis (PCA) keeps the directions of largest variance, which need not be the sentiment direction; a supervised model finds that direction",
-                    "Logistic regression uses only the first two components",
-                    "Sentiment is always the first principal component of any text embedding"
+                    "The memory has vanished after the release, since 0.59 < 0.69",
+                    "Nothing about the memory: with 23 months the smallest drop detectable with 80% power is about 0.36, so a fall to 0.5 could not be detected",
+                    "The model remembers the post-release months as well, since 0.59 > 0.5",
+                    "AUC cannot be computed for months, so the test is invalid"
                 ],
-                "correctExplanation": "PCA is unsupervised: it ranks directions by variance. Sentiment is one direction among many, and the labels let the logistic regression find it.",
-                "incorrectExplanation": "Unsupervised PCA picks the largest-variance directions, here topic; the supervised classifier uses all 384 dimensions and the labels to find the sentiment direction."
+                "correctExplanation": "The post-release standard error of the AUC is about 0.12, so the test has little power; about 100 post-release months would be needed. Not rejecting equality is not evidence that the memory is gone.",
+                "incorrectExplanation": "Point estimates cannot be compared without their sampling error. The formal test does not reject, and its power against a fall to 0.5 is low: absence of evidence is not evidence of absence."
             },
             "ro": {
-                "title": "Embeddings și componente principale",
-                "text": "Primele două componente principale ale embedding-urilor MiniLM cu 384 de dimensiuni ale titlurilor Twitter separă subiecte (companii, știri macro, cripto), nu sentiment. Totuși, regresia logistică pe toate cele 384 de dimensiuni atinge 78,6% acuratețe. De ce?",
+                "title": "A dispărut memoria?",
+                "text": "Pentru direcția lunară a S&P 500, Qwen2.5-14B are AUC 0,69 pe 296 de luni dinainte de publicare și 0,59 pe 23 de luni după. Testul DeLong al diferenței dă z = 0,73. Ce puteți concluziona?",
                 "options": [
-                    "Embedding-urile nu conțin informație despre sentiment, iar 78,6% este noroc",
-                    "Analiza componentelor principale (PCA) păstrează direcțiile de varianță maximă, care nu sunt neapărat direcția sentimentului; un model supervizat găsește acea direcție",
-                    "Regresia logistică folosește doar primele două componente",
-                    "Sentimentul este întotdeauna prima componentă principală a oricărui embedding de text"
+                    "Memoria a dispărut după publicare, pentru că 0,59 < 0,69",
+                    "Nimic despre memorie: cu 23 de luni, cea mai mică scădere detectabilă cu puterea 80% este de circa 0,36, deci o cădere la 0,5 nu ar putea fi detectată",
+                    "Modelul își amintește și lunile de după publicare, pentru că 0,59 > 0,5",
+                    "AUC nu poate fi calculat pentru luni, deci testul nu este valid"
                 ],
-                "correctExplanation": "PCA este nesupervizată: ordonează direcțiile după varianță. Sentimentul este o direcție printre multe, iar etichetele permit regresiei logistice să o găsească.",
-                "incorrectExplanation": "PCA nesupervizată alege direcțiile cu varianță maximă, aici subiectul; clasificatorul supervizat folosește toate cele 384 de dimensiuni și etichetele pentru a găsi direcția sentimentului."
+                "correctExplanation": "Eroarea standard a AUC după publicare este de circa 0,12, deci testul are putere mică; ar fi nevoie de circa 100 de luni după publicare. Nerespingerea egalității nu dovedește că memoria a dispărut.",
+                "incorrectExplanation": "Estimările punctuale nu se pot compara fără eroarea lor de eșantionare. Testul formal nu respinge, iar puterea lui față de o cădere la 0,5 este mică: lipsa dovezilor nu este o dovadă a absenței."
             }
         },
         {
@@ -631,28 +631,28 @@ window.MFM_DATA.quizzes['llm'] = {
         {
             "correct": 3,
             "en": {
-                "title": "Risks of AI agents",
-                "text": "An AI agent, a large language model (LLM) in a loop that reads news, calls tools and can send orders through an API (Application Programming Interface), reads a fake press release that contains hidden instructions. What is this risk called, and which control fits?",
+                "title": "Specification curve",
+                "text": "Across 36 variants of the headline strategy (3 scores × 3 thresholds × 4 holding days), 3 have t > 1.96. Flipping the sign of each signal day's positions at random, the same flip for all variants, 3 or more such t occur with probability 0.095. What is the right report?",
                 "options": [
-                    "Look-ahead bias; test the agent only after its release date",
-                    "Survivorship bias; include delisted stocks",
-                    "Distraction bias; remove company names from the text",
-                    "Prompt injection; position limits, human approval for orders and logging of every step"
+                    "The best variant, since it has t > 1.96",
+                    "The three significant variants, since they confirm each other",
+                    "The average of the 36 t-statistics, since averaging removes noise",
+                    "The whole curve with the joint test: the evidence is compatible with no predictability at 5%"
                 ],
-                "correctExplanation": "A text read by the agent can carry instructions that manipulate it. Controls include position limits, human approval for orders, logging and tests after each model update; the IMF (2024) also warns that similar agents may trade alike in stress.",
-                "incorrectExplanation": "The hidden instructions in the text manipulate the agent itself: that is prompt injection, handled with limits, human approval and logging, not with backtest remedies."
+                "correctExplanation": "A specification curve (Simonsohn, Simmons & Nelson, 2020) reports all reasonable choices and tests them jointly under a null that keeps their dependence. Here the joint p-value is 0.095 and the median t is 0.50.",
+                "incorrectExplanation": "The variants share days and stocks, so their t-statistics are dependent; selecting or averaging them ignores the search. A joint test under a common null is needed."
             },
             "ro": {
-                "title": "Riscurile agenților AI",
-                "text": "Un agent AI, adică un model mare de limbaj (LLM) într-o buclă care citește știri, apelează instrumente și poate trimite ordine printr-un API (Application Programming Interface), citește un comunicat de presă fals care conține instrucțiuni ascunse. Cum se numește acest risc și ce control i se potrivește?",
+                "title": "Curba specificațiilor",
+                "text": "Din 36 de variante ale strategiei pe titluri (3 scoruri × 3 praguri × 4 zile de deținere), 3 au t > 1,96. Schimbând aleator semnul pozițiilor fiecărei zile de semnal, aceeași schimbare pentru toate variantele, 3 sau mai multe astfel de valori t apar cu probabilitatea 0,095. Ce este corect să raportați?",
                 "options": [
-                    "Privirea în viitor; testarea agentului doar după data publicării lui",
-                    "Distorsiunea de supraviețuire; includerea acțiunilor delistate",
-                    "Distorsiunea de distragere; eliminarea numelor de companii din text",
-                    "Prompt injection; limite de poziție, aprobare umană pentru ordine și jurnalizarea fiecărui pas"
+                    "Cea mai bună variantă, pentru că are t > 1,96",
+                    "Cele trei variante semnificative, pentru că se confirmă reciproc",
+                    "Media celor 36 de statistici t, pentru că media elimină zgomotul",
+                    "Întreaga curbă, cu testul comun: dovezile sunt compatibile cu lipsa predictibilității la 5%"
                 ],
-                "correctExplanation": "Un text citit de agent poate conține instrucțiuni care îl manipulează. Controalele includ limite de poziție, aprobare umană pentru ordine, jurnalizare și teste după fiecare actualizare a modelului; FMI (2024) avertizează și că agenți similari pot tranzacționa la fel în perioade de stres.",
-                "incorrectExplanation": "Instrucțiunile ascunse din text manipulează chiar agentul: este prompt injection, tratat cu limite, aprobare umană și jurnalizare, nu cu remedii pentru testarea istorică."
+                "correctExplanation": "O curbă a specificațiilor (Simonsohn, Simmons & Nelson, 2020) raportează toate alegerile rezonabile și le testează împreună sub un nul care păstrează dependența dintre ele. Aici valoarea p comună este 0,095, iar t median este 0,50.",
+                "incorrectExplanation": "Variantele folosesc aceleași zile și acțiuni, deci statisticile lor t sunt dependente; selecția sau media lor ignoră căutarea. Este nevoie de un test comun sub un nul comun."
             }
         },
         {

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_copula_inference'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Inference for copulas: the Hoeffding-projection standard error of Kendall tau, Genest-Ghoudi-Rivest sandwich standard errors for canonical maximum likelihood versus the inverse Hessian, a Monte Carlo illustration of Chen and Fan (2006) on GARCH residuals, a bootstrap test of tail symmetry, and a GAS (score-driven) t copula for JPMorgan Chase and Bank of America.'
+
+Keywords: 'Kendall tau, U-statistic, canonical maximum likelihood, sandwich standard errors, Chen-Fan, tail dependence, GAS, dynamic copula, score-driven model'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_gas_copula.pdf'

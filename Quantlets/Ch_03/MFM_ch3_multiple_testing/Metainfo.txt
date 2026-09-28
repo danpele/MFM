@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch3_multiple_testing'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 3, A3-A8 and B7: Vasicek and Blume betas, Bonferroni, Holm and Benjamini-Hochberg step by step, the 300-useless-factors calculation, PCA step by step, and multiple testing of the FF3 alphas of the 25 size x book-to-market portfolios.'
+Description: 'Seminar 3, Part A and B7: the Sharpe-ratio form of GRS, the empirical-Bayes Vasicek beta, Blume slope as a shrinkage weight, Bonferroni, Holm and Benjamini-Hochberg step by step, a useless factor in the second pass, errors in variables, and multiple testing of the FF3 alphas of the 25 size x book-to-market portfolios.'
 
 Keywords: 'multiple testing, Bonferroni, Holm, Benjamini-Hochberg, false discovery rate, FF3 alphas'
 

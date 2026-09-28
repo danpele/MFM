@@ -35,30 +35,30 @@ window.MFM_DATA.quizzes['garch'] = {
             }
         },
         {
-            correct: 0,
+            correct: 1,
             en: {
-                title: 'Conditional variance',
-                text: 'In the model r_t = mu + sigma_t z_t, what is sigma_t^2?',
+                title: "QMLE: consistency versus normality",
+                text: "For the Gaussian QMLE of a GARCH(1,1), which condition is needed for sqrt(n)-asymptotic normality but NOT for consistency?",
                 options: [
-                    'The variance of r_t given the information available at the end of day t-1',
-                    'The sample variance of all returns',
-                    'The variance of the innovation z_t',
-                    'The squared return of day t'
+                    "E eps_t^4 < infinity (a finite fourth moment of the returns)",
+                    "E z_t^4 < infinity (a finite fourth moment of the innovations)",
+                    "alpha + beta < 1 (covariance stationarity)",
+                    "Normally distributed innovations z_t"
                 ],
-                correctExplanation: 'sigma_t^2 = Var(r_t | F_{t-1}) is the conditional variance; it changes every day as new information arrives. The unconditional variance is its long-run average.',
-                incorrectExplanation: 'sigma_t^2 is the conditional variance, Var(r_t | F_{t-1}); z_t has unit variance and r_t^2 is only a noisy proxy.'
+                correctExplanation: "Consistency needs strict stationarity, identifiability and a compact parameter space, but no moments. Asymptotic normality adds an interior theta_0 and E z_t^4 < infinity, since the score variance is proportional to kappa_z - 1.",
+                incorrectExplanation: "No moment of the returns is needed, alpha + beta >= 1 is covered by Lumsdaine and by Jensen-Rahbek, and Normal z_t would make the estimator the MLE. The extra condition is a finite fourth moment of the innovations z_t."
             },
             ro: {
-                title: 'Dispersia condiționată',
-                text: 'În modelul r_t = mu + sigma_t z_t, ce este sigma_t^2?',
+                title: "QMLE: consistență și normalitate",
+                text: "Pentru QMLE Gaussian al unui GARCH(1,1), ce condiție este necesară pentru normalitatea asimptotică în sqrt(n), dar NU și pentru consistență?",
                 options: [
-                    'Dispersia lui r_t dată fiind informația disponibilă la sfârșitul zilei t-1',
-                    'Dispersia de selecție a tuturor randamentelor',
-                    'Dispersia inovației z_t',
-                    'Pătratul randamentului din ziua t'
+                    "E eps_t^4 < infinit (moment de ordin patru finit al randamentelor)",
+                    "E z_t^4 < infinit (moment de ordin patru finit al inovațiilor)",
+                    "alpha + beta < 1 (staționaritate în covarianță)",
+                    "Inovații z_t distribuite Normal"
                 ],
-                correctExplanation: 'sigma_t^2 = Var(r_t | F_{t-1}) este dispersia condiționată; se schimbă zilnic, pe măsură ce apare informație nouă. Dispersia necondiționată este media ei de termen lung.',
-                incorrectExplanation: 'sigma_t^2 este dispersia condiționată, Var(r_t | F_{t-1}); z_t are dispersia 1, iar r_t^2 este doar o aproximare zgomotoasă.'
+                correctExplanation: "Consistența cere staționaritate strictă, identificabilitate și un spațiu compact al parametrilor, dar niciun moment. Normalitatea asimptotică adaugă theta_0 interior și E z_t^4 < infinit, deoarece dispersia scorului este proporțională cu kappa_z - 1.",
+                incorrectExplanation: "Nu este necesar niciun moment al randamentelor, cazul alpha + beta >= 1 este acoperit de Lumsdaine și de Jensen-Rahbek, iar z_t Normal ar face din estimator MLE. Condiția suplimentară este momentul de ordin patru finit al inovațiilor z_t."
             }
         },
         {
@@ -89,84 +89,84 @@ window.MFM_DATA.quizzes['garch'] = {
             }
         },
         {
-            correct: 3,
+            correct: 0,
             en: {
-                title: 'Unconditional variance',
-                text: 'A GARCH(1,1) has omega = 0.05, alpha = 0.10, beta = 0.85 (returns in %). What is its long-run (unconditional) daily variance?',
+                title: "Boundary likelihood ratio",
+                text: "You test Normal innovations (1/nu = 0) against Student-t innovations with a likelihood ratio test. What is the 5% critical value?",
                 options: [
-                    '0.05',
-                    '0.50',
-                    '0.95',
-                    '1.00'
+                    "2.71, from the mixture 0.5 chi2(0) + 0.5 chi2(1)",
+                    "3.84, from chi2(1)",
+                    "5.99, from chi2(2)",
+                    "None: with nu = infinity only AIC or BIC can be used"
                 ],
-                correctExplanation: 'sigma^2 = omega / (1 - alpha - beta) = 0.05 / 0.05 = 1.00 (%^2 per day), i.e. a daily volatility of 1%.',
-                incorrectExplanation: 'Use sigma^2 = omega / (1 - alpha - beta) = 0.05 / 0.05 = 1.00.'
+                correctExplanation: "Since 1/nu >= 0, the null lies on the boundary. Half of the time the unrestricted estimate sits at the bound and LR = 0, so the limit is 0.5 chi2(0) + 0.5 chi2(1), whose 5% critical value is the 10% value of chi2(1), 2.71.",
+                incorrectExplanation: "The restriction 1/nu = 0 is on the boundary of 1/nu >= 0, so the LR statistic has the mixture limit 0.5 chi2(0) + 0.5 chi2(1) (Self and Liang), with critical value 2.71; a valid test exists."
             },
             ro: {
-                title: 'Dispersia necondiționată',
-                text: 'Un GARCH(1,1) are omega = 0,05, alpha = 0,10, beta = 0,85 (randamente în %). Care este dispersia zilnică de termen lung (necondiționată)?',
+                title: "Raportul de verosimilitate la frontieră",
+                text: "Testați inovații Normale (1/nu = 0) față de inovații Student-t cu un test al raportului de verosimilitate. Care este valoarea critică la 5%?",
                 options: [
-                    '0,05',
-                    '0,50',
-                    '0,95',
-                    '1,00'
+                    "2,71, din amestecul 0,5 chi2(0) + 0,5 chi2(1)",
+                    "3,84, din chi2(1)",
+                    "5,99, din chi2(2)",
+                    "Niciuna: cu nu = infinit se pot folosi doar AIC sau BIC"
                 ],
-                correctExplanation: 'sigma^2 = omega / (1 - alpha - beta) = 0,05 / 0,05 = 1,00 (%^2 pe zi), adică o volatilitate zilnică de 1%.',
-                incorrectExplanation: 'Folosiți sigma^2 = omega / (1 - alpha - beta) = 0,05 / 0,05 = 1,00.'
-            }
-        },
-        {
-            correct: 1,
-            en: {
-                title: 'Half-life',
-                text: 'With alpha + beta = 0.95, after how many days has half of a variance shock disappeared?',
-                options: [
-                    'About 5 days',
-                    'About 13.5 days',
-                    'About 69 days',
-                    'Never'
-                ],
-                correctExplanation: 'The half-life is ln(0.5) / ln(alpha + beta) = ln(0.5) / ln(0.95) = 13.5 days.',
-                incorrectExplanation: 'Solve (alpha + beta)^h = 0.5: h = ln(0.5) / ln(0.95) = 13.5 days.'
-            },
-            ro: {
-                title: 'Timpul de înjumătățire',
-                text: 'Cu alpha + beta = 0,95, după câte zile a dispărut jumătate dintr-un șoc de dispersie?',
-                options: [
-                    'Circa 5 zile',
-                    'Circa 13,5 zile',
-                    'Circa 69 de zile',
-                    'Niciodată'
-                ],
-                correctExplanation: 'Timpul de înjumătățire este ln(0,5) / ln(alpha + beta) = ln(0,5) / ln(0,95) = 13,5 zile.',
-                incorrectExplanation: 'Rezolvați (alpha + beta)^h = 0,5: h = ln(0,5) / ln(0,95) = 13,5 zile.'
+                correctExplanation: "Deoarece 1/nu >= 0, ipoteza nulă este pe frontieră. Jumătate din timp estimarea nerestricționată stă la limită și LR = 0, deci limita este 0,5 chi2(0) + 0,5 chi2(1), a cărei valoare critică la 5% este valoarea de 10% a lui chi2(1), 2,71.",
+                incorrectExplanation: "Restricția 1/nu = 0 este pe frontiera lui 1/nu >= 0, deci statistica LR are limita de tip amestec 0,5 chi2(0) + 0,5 chi2(1) (Self și Liang), cu valoarea critică 2,71; un test valid există."
             }
         },
         {
             correct: 2,
             en: {
-                title: 'One-step recursion',
-                text: 'omega = 0.05, alpha = 0.10, beta = 0.85, yesterday\'s variance 1.0 and yesterday\'s shock -2%. What is today\'s variance?',
+                title: "The sandwich factor",
+                text: "In a Gaussian QMLE of an ARCH(1) with known omega, the innovations have kurtosis kappa_z = 5. The ratio of the robust (sandwich) to the classical standard error of alpha-hat is about:",
                 options: [
-                    '0.90',
-                    '1.00',
-                    '1.30',
-                    '1.50'
+                    "1, because QMLE is consistent",
+                    "sqrt(5) = 2.24",
+                    "sqrt((5 - 1)/2) = 1.41",
+                    "5/3 = 1.67"
                 ],
-                correctExplanation: 'sigma_t^2 = 0.05 + 0.10 x 4 + 0.85 x 1.0 = 0.05 + 0.40 + 0.85 = 1.30.',
-                incorrectExplanation: 'Apply the recursion step by step: 0.05 + 0.10 x (-2)^2 + 0.85 x 1.0 = 1.30.'
+                correctExplanation: "With A = 0.5 E x_t^2 and B = 0.25 (kappa_z - 1) E x_t^2, the sandwich A^-1 B A^-1 equals (kappa_z - 1)/2 times the inverse Hessian A^-1, so the standard errors differ by sqrt((kappa_z - 1)/2) = 1.41.",
+                incorrectExplanation: "Consistency does not make the classical formula right. The score variance is proportional to kappa_z - 1 and the Hessian to 2, so the variance ratio is (kappa_z - 1)/2 = 2 and the standard error ratio is 1.41."
             },
             ro: {
-                title: 'Recursia pe un pas',
-                text: 'omega = 0,05, alpha = 0,10, beta = 0,85, dispersia de ieri 1,0 și șocul de ieri -2%. Care este dispersia de azi?',
+                title: "Factorul „sandviș”",
+                text: "Într-un QMLE Gaussian al unui ARCH(1) cu omega cunoscut, inovațiile au aplatizarea kappa_z = 5. Raportul dintre eroarea standard robustă („sandviș”) și cea clasică a lui alpha-hat este circa:",
                 options: [
-                    '0,90',
-                    '1,00',
-                    '1,30',
-                    '1,50'
+                    "1, deoarece QMLE este consistent",
+                    "sqrt(5) = 2,24",
+                    "sqrt((5 - 1)/2) = 1,41",
+                    "5/3 = 1,67"
                 ],
-                correctExplanation: 'sigma_t^2 = 0,05 + 0,10 x 4 + 0,85 x 1,0 = 0,05 + 0,40 + 0,85 = 1,30.',
-                incorrectExplanation: 'Aplicați recursia pas cu pas: 0,05 + 0,10 x (-2)^2 + 0,85 x 1,0 = 1,30.'
+                correctExplanation: "Cu A = 0,5 E x_t^2 și B = 0,25 (kappa_z - 1) E x_t^2, sandvișul A^-1 B A^-1 este de (kappa_z - 1)/2 ori inversa hessianei A^-1, deci erorile standard diferă prin factorul sqrt((kappa_z - 1)/2) = 1,41.",
+                incorrectExplanation: "Consistența nu face corectă formula clasică. Dispersia scorului este proporțională cu kappa_z - 1, iar hessiana cu 2, deci raportul dispersiilor este (kappa_z - 1)/2 = 2, iar cel al erorilor standard 1,41."
+            }
+        },
+        {
+            correct: 3,
+            en: {
+                title: "Portmanteau with estimated parameters",
+                text: "You apply Ljung-Box with 10 lags to the squared standardised residuals of an estimated GARCH(1,1) and use chi2(10) critical values. The test is:",
+                options: [
+                    "Exact, because the standardised residuals are i.i.d. under the model",
+                    "Correct with chi2(10 - 3) critical values, as for ARMA residuals",
+                    "Invalid for any GARCH model",
+                    "Not exactly chi2(10): estimation of the variance parameters changes the limit (Li and Mak), mostly at small lags"
+                ],
+                correctExplanation: "The residuals depend on the estimated parameters; the limit covariance of the squared-residual autocorrelations is I - H'J^-1 H/(kappa_z - 1). For the S&P 500 GARCH-N the corrected Q(10) is 19.1 (p = 0.038) against 16.4 (p = 0.089) for the naive test.",
+                incorrectExplanation: "Parameter estimation makes the naive chi2(10) test conservative; the ARMA rule of subtracting the number of parameters does not apply to squares, and Li and Mak give the correct limit, which remains usable."
+            },
+            ro: {
+                title: "Test portmanteau cu parametri estimați",
+                text: "Aplicați Ljung-Box cu 10 decalaje pe pătratele reziduurilor standardizate ale unui GARCH(1,1) estimat și folosiți valorile critice chi2(10). Testul este:",
+                options: [
+                    "Exact, deoarece reziduurile standardizate sunt i.i.d. sub model",
+                    "Corect cu valorile critice chi2(10 - 3), ca la reziduurile ARMA",
+                    "Invalid pentru orice model GARCH",
+                    "Nu exact chi2(10): estimarea parametrilor dispersiei schimbă limita (Li și Mak), mai ales la decalaje mici"
+                ],
+                correctExplanation: "Reziduurile depind de parametrii estimați; covarianța limită a autocorelațiilor pătratelor reziduurilor este I - H'J^-1 H/(kappa_z - 1). Pentru GARCH-N pe S&P 500, Q(10) corectat este 19,1 (p = 0,038), față de 16,4 (p = 0,089) pentru testul naiv.",
+                incorrectExplanation: "Estimarea parametrilor face testul naiv chi2(10) conservator; regula ARMA de scădere a numărului de parametri nu se aplică pătratelor, iar Li și Mak dau limita corectă, care rămâne utilizabilă."
             }
         },
         {
@@ -332,30 +332,30 @@ window.MFM_DATA.quizzes['garch'] = {
             }
         },
         {
-            correct: 1,
+            correct: 0,
             en: {
-                title: 'GJR-GARCH',
-                text: 'In GJR-GARCH, sigma_t^2 = omega + (alpha + gamma I_{t-1}) eps_{t-1}^2 + beta sigma_{t-1}^2 with I_{t-1} = 1 if eps_{t-1} < 0. What does gamma > 0 mean?',
+                title: "Autocorrelation of squared shocks",
+                text: "For a GARCH(1,1) with a finite fourth moment, the first autocorrelation of eps_t^2 is:",
                 options: [
-                    'Good news raises volatility more than bad news',
-                    'Negative shocks raise next-day variance more than positive shocks of the same size',
-                    'The variance is always constant',
-                    'The model is not stationary'
+                    "alpha (1 - beta^2 - alpha beta) / (1 - beta^2 - 2 alpha beta)",
+                    "alpha + beta",
+                    "alpha",
+                    "beta"
                 ],
-                correctExplanation: 'After a negative shock the slope is alpha + gamma, after a positive one only alpha: the leverage effect.',
-                incorrectExplanation: 'gamma is the extra slope for negative shocks, so gamma > 0 means bad news matters more (leverage effect).'
+                correctExplanation: "eps_t^2 is an ARMA(1,1) with phi = alpha + beta and theta = -beta; the ARMA(1,1) formula gives the expression, and later lags decay as rho_k = rho_1 (alpha + beta)^(k-1). For the S&P 500 GARCH-N it gives 0.356.",
+                incorrectExplanation: "alpha + beta is the rate of decay of the autocorrelations, not their level at lag 1; plugging phi = alpha + beta and theta = -beta into the ARMA(1,1) autocorrelation gives alpha (1 - beta^2 - alpha beta) / (1 - beta^2 - 2 alpha beta)."
             },
             ro: {
-                title: 'GJR-GARCH',
-                text: 'În GJR-GARCH, sigma_t^2 = omega + (alpha + gamma I_{t-1}) eps_{t-1}^2 + beta sigma_{t-1}^2 cu I_{t-1} = 1 dacă eps_{t-1} < 0. Ce înseamnă gamma > 0?',
+                title: "Autocorelația pătratelor șocurilor",
+                text: "Pentru un GARCH(1,1) cu moment de ordin patru finit, prima autocorelație a lui eps_t^2 este:",
                 options: [
-                    'Știrile bune cresc volatilitatea mai mult decât știrile proaste',
-                    'Șocurile negative cresc dispersia de a doua zi mai mult decât șocurile pozitive de aceeași mărime',
-                    'Dispersia este mereu constantă',
-                    'Modelul nu este staționar'
+                    "alpha (1 - beta^2 - alpha beta) / (1 - beta^2 - 2 alpha beta)",
+                    "alpha + beta",
+                    "alpha",
+                    "beta"
                 ],
-                correctExplanation: 'După un șoc negativ panta este alpha + gamma, după unul pozitiv doar alpha: efectul de levier.',
-                incorrectExplanation: 'gamma este panta suplimentară pentru șocurile negative, deci gamma > 0 înseamnă că știrile proaste contează mai mult (efectul de levier).'
+                correctExplanation: "eps_t^2 este un ARMA(1,1) cu phi = alpha + beta și theta = -beta; formula ARMA(1,1) dă expresia, iar decalajele următoare scad ca rho_k = rho_1 (alpha + beta)^(k-1). Pentru GARCH-N pe S&P 500 rezultă 0,356.",
+                incorrectExplanation: "alpha + beta este rata de scădere a autocorelațiilor, nu nivelul lor la decalajul 1; înlocuind phi = alpha + beta și theta = -beta în autocorelația ARMA(1,1) obținem alpha (1 - beta^2 - alpha beta) / (1 - beta^2 - 2 alpha beta)."
             }
         },
         {
@@ -413,30 +413,30 @@ window.MFM_DATA.quizzes['garch'] = {
             }
         },
         {
-            correct: 3,
+            correct: 1,
             en: {
-                title: 'News impact curve',
-                text: 'The news impact curve of Engle and Ng (1993) plots...',
+                title: "Comparing nested forecasting models",
+                text: "You compare GARCH-t with GJR-t (which nests it) using Diebold-Mariano on expanding-window forecasts with estimated parameters. What is the main problem?",
                 options: [
-                    'the price level against trading volume',
-                    'the autocorrelation of returns against the lag',
-                    'the implied volatility against the strike price',
-                    'next-day variance against yesterday\'s shock, holding the lagged variance fixed'
+                    "Diebold-Mariano requires Normally distributed losses",
+                    "Under the null the loss differential degenerates, so the N(0,1) limit is invalid; test the method with a rolling window (Giacomini-White)",
+                    "QLIKE is not robust to a noisy volatility proxy",
+                    "Diebold-Mariano cannot use HAC standard errors"
                 ],
-                correctExplanation: 'It isolates how a model turns one day of news into tomorrow\'s variance: symmetric parabola for GARCH, tilted for GJR and EGARCH.',
-                incorrectExplanation: 'The news impact curve is sigma_t^2 as a function of eps_{t-1} with sigma_{t-1}^2 held at a fixed level.'
+                correctExplanation: "With nested models and parameters estimated on an expanding window, both forecasts converge to the same one under the null, so the differential vanishes (West; Clark and McCracken). Giacomini and White test the forecasting method with a finite rolling window, where estimation noise persists.",
+                incorrectExplanation: "Normal losses are not required, QLIKE is Patton-robust, and HAC errors are standard in Diebold-Mariano. The issue is the degenerate loss differential of nested models with estimated parameters, which Giacomini-White avoid with a rolling window."
             },
             ro: {
-                title: 'Curba de impact a știrilor',
-                text: 'Curba de impact a știrilor a lui Engle și Ng (1993) reprezintă...',
+                title: "Compararea modelelor de prognoză imbricate",
+                text: "Comparați GARCH-t cu GJR-t (care îl include) cu testul Diebold-Mariano pe prognoze cu fereastră în expansiune și parametri estimați. Care este problema principală?",
                 options: [
-                    'nivelul prețului în funcție de volumul tranzacționat',
-                    'autocorelația randamentelor în funcție de decalaj',
-                    'volatilitatea implicită în funcție de prețul de exercitare',
-                    'dispersia de a doua zi în funcție de șocul de ieri, cu dispersia decalată ținută fixă'
+                    "Diebold-Mariano cere pierderi distribuite Normal",
+                    "Sub ipoteza nulă diferența de pierderi degenerează, deci limita N(0,1) nu este validă; testați metoda cu o fereastră mobilă (Giacomini-White)",
+                    "QLIKE nu este robustă la o aproximare zgomotoasă a volatilității",
+                    "Diebold-Mariano nu poate folosi erori standard HAC"
                 ],
-                correctExplanation: 'Ea izolează modul în care un model transformă o zi de știri în dispersia de mâine: parabolă simetrică la GARCH, înclinată la GJR și EGARCH.',
-                incorrectExplanation: 'Curba de impact a știrilor este sigma_t^2 în funcție de eps_{t-1}, cu sigma_{t-1}^2 ținut la un nivel fix.'
+                correctExplanation: "Cu modele imbricate și parametri estimați pe o fereastră în expansiune, sub ipoteza nulă cele două prognoze converg spre aceeași, deci diferența dispare (West; Clark și McCracken). Giacomini și White testează metoda de prognoză cu o fereastră mobilă finită, unde zgomotul estimării persistă.",
+                incorrectExplanation: "Pierderile Normale nu sunt necesare, QLIKE este robustă în sensul lui Patton, iar erorile HAC sunt standard în Diebold-Mariano. Problema este diferența degenerată a modelelor imbricate cu parametri estimați, pe care Giacomini-White o evită cu o fereastră mobilă."
             }
         },
         {
@@ -604,28 +604,28 @@ window.MFM_DATA.quizzes['garch'] = {
         {
             correct: 0,
             en: {
-                title: 'Uncertainty of the half-life',
-                text: 'For the S&P 500, alpha + beta = 0.9947 (half-life 131 days), and a parametric bootstrap gives a 95% interval of [0.984; 1.000]. What follows?',
+                title: "Uncertainty of the half-life",
+                text: "For the S&P 500, alpha + beta = 0.9947 (half-life 131 days); a parametric bootstrap from the fitted model gives [0.983; 1.000], and a bootstrap test simulated under IGARCH gives p = 0.17. What follows?",
                 options: [
-                    'The half-life is very imprecise: from about 43 days to infinity; IGARCH cannot be rejected',
-                    'The half-life is known to within a few days',
-                    'The bootstrap proves that volatility has no memory',
-                    'The interval for the half-life is symmetric around 131 days'
+                    "The half-life is very imprecise (about 41 days to infinity), and IGARCH is not rejected by the test under the null",
+                    "IGARCH is rejected, because the point estimate is below 1",
+                    "The interval reaching 1 is by itself a valid test that rejects IGARCH",
+                    "The half-life interval is symmetric around 131 days"
                 ],
-                correctExplanation: 'ln(0.5)/ln(x) explodes as x approaches 1, so a narrow interval for alpha + beta becomes a huge, skewed interval for the half-life.',
-                incorrectExplanation: 'Near 1, small changes in alpha + beta change the half-life enormously; the upper bound reaches 1, i.e. an infinite half-life.'
+                correctExplanation: "ln(0.5)/ln(x) explodes as x approaches 1, so the half-life interval is huge and skewed. The percentile interval is truncated by the constraint alpha + beta <= 1, so the IGARCH question needs a test simulated under the null, which gives p = 0.17.",
+                incorrectExplanation: "A truncated percentile interval is not a test (Andrews, 2000), a point estimate below 1 proves nothing, and the half-life interval is very skewed; the test simulated under IGARCH does not reject."
             },
             ro: {
-                title: 'Incertitudinea timpului de înjumătățire',
-                text: 'Pentru S&P 500, alpha + beta = 0,9947 (timp de înjumătățire 131 de zile), iar un bootstrap parametric dă intervalul de 95% [0,984; 1,000]. Ce rezultă?',
+                title: "Incertitudinea timpului de înjumătățire",
+                text: "Pentru S&P 500, alpha + beta = 0,9947 (timp de înjumătățire 131 de zile); un bootstrap parametric din modelul estimat dă [0,983; 1,000], iar un test bootstrap simulat sub IGARCH dă p = 0,17. Ce rezultă?",
                 options: [
-                    'Timpul de înjumătățire este foarte imprecis: de la circa 43 de zile la infinit; IGARCH nu poate fi respins',
-                    'Timpul de înjumătățire este cunoscut cu o precizie de câteva zile',
-                    'Bootstrap-ul dovedește că volatilitatea nu are memorie',
-                    'Intervalul pentru timpul de înjumătățire este simetric în jurul a 131 de zile'
+                    "Timpul de înjumătățire este foarte imprecis (de la circa 41 de zile la infinit), iar IGARCH nu este respins de testul sub ipoteza nulă",
+                    "IGARCH este respins, deoarece estimarea punctuală este sub 1",
+                    "Faptul că intervalul atinge 1 este în sine un test valid care respinge IGARCH",
+                    "Intervalul pentru timpul de înjumătățire este simetric în jurul a 131 de zile"
                 ],
-                correctExplanation: 'ln(0,5)/ln(x) explodează când x se apropie de 1, deci un interval îngust pentru alpha + beta devine unul uriaș și asimetric pentru timpul de înjumătățire.',
-                incorrectExplanation: 'Lângă 1, schimbări mici ale lui alpha + beta modifică enorm timpul de înjumătățire; limita superioară atinge 1, adică un timp de înjumătățire infinit.'
+                correctExplanation: "ln(0,5)/ln(x) explodează când x se apropie de 1, deci intervalul pentru timpul de înjumătățire este uriaș și asimetric. Intervalul percentile este trunchiat de restricția alpha + beta <= 1, deci întrebarea despre IGARCH cere un test simulat sub ipoteza nulă, care dă p = 0,17.",
+                incorrectExplanation: "Un interval percentile trunchiat nu este un test (Andrews, 2000), o estimare punctuală sub 1 nu dovedește nimic, iar intervalul pentru timpul de înjumătățire este foarte asimetric; testul simulat sub IGARCH nu respinge."
             }
         },
         {

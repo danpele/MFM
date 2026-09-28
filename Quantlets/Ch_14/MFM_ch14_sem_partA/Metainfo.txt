@@ -2,9 +2,9 @@ Name of QuantLet: 'MFM_ch14_sem_partA'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 14, Part A: LSTM parameter counts, gradient decay through a constant forget gate, Chronos tokenisation of a short context, and VaR 1% and ES 2.5% from a quantile grid.'
+Description: 'Seminar 14, Part A: gradients of a linearised RNN as VAR impulse responses, the LSTM cell state as an AR(1), Chronos mean scaling with a crash in the context, VaR 1% and ES 2.5% from a quantile grid and from a GPD tail, the exact power of the Kupiec test, and the QLIKE bias of median forecasts.'
 
-Keywords: 'LSTM, parameter count, forget gate, tokenisation, quantile grid, expected shortfall, exercises'
+Keywords: 'vanishing gradient, VAR, forget gate, tokenisation, quantile grid, GPD, Kupiec power, QLIKE, exercises'
 
 Author: 'Daniel Traian Pele'
 

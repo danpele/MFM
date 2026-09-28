@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch2_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 2 computations: variance ratio and runs test, step by step, Hurst exponent from a variance ratio, homoskedastic vs robust variance ratios on developed and emerging markets, rolling DFA with a simulated band, adaptive efficiency of Bitcoin with wild-bootstrap bands, turn of the month with OLS vs HAC errors, Bonferroni and Holm corrections for 15 calendar tests, crisis robustness of the S&P 500 autocorrelation, and the BVB before and after the 2020 FTSE Russell upgrade with a block bootstrap.'
+Description: 'Seminar 2 computations: variance ratio and runs test, step by step, Hurst exponent from a variance ratio, homoskedastic vs robust variance ratios on developed and emerging markets, rolling DFA with a per-window wild-bootstrap band, adaptive efficiency of Bitcoin with wild-bootstrap bands, turn of the month with OLS vs HAC errors, Bonferroni and Holm corrections for 15 calendar tests, crisis robustness of the S&P 500 autocorrelation, and the BVB before and after the 2020 FTSE Russell upgrade with a block bootstrap.'
 
 Keywords: 'variance ratio, runs test, Hurst, DFA, wild bootstrap, block bootstrap, adaptive market hypothesis, Bonferroni, Holm, HAC, FTSE reclassification, Bitcoin, BET'
 

@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch1_risk_measures'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Risk-adjusted performance across markets: underwater (drawdown) curves, CAGR, volatility, Sharpe, Sortino, maximum drawdown and Calmar ratios.'
+Description: 'Risk-adjusted performance across markets: underwater (drawdown) curves, CAGR, volatility, Sharpe ratios on simple returns with their i.i.d. (Lo) standard errors, Sortino, maximum drawdown and Calmar ratios.'
 
 Keywords: 'drawdown, maximum drawdown, Sharpe ratio, Sortino ratio, Calmar ratio, CAGR, risk-adjusted performance'
 

@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch11_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 11 computations: Ito's lemma, quadratic variation, Vasicek and Merton step by step; convergence orders; GBM tests on the S&P 500, BET and Bitcoin; Vasicek on the 3-month Treasury bill rate with the simulated bias of the mean-reversion speed; OU for the VIX; Merton with a parametric-bootstrap LR test; Lee-Mykland jumps in Bitcoin; Heston from the VIX; GBM, Merton and Heston against BET and Bitcoin.'
+Description: 'Seminar 11 computations: Girsanov for GBM, the Vasicek bond by Feynman-Kac, CIR moments, the VIX under Heston, Merton cumulants and Fisher information, AR(1) to OU with the delta method; convergence orders; GBM tests on the S&P 500, BET and Bitcoin; Vasicek on the 3-month Treasury bill rate with the simulated bias of the mean-reversion speed; OU for the VIX; Merton with a parametric-bootstrap LR test; Lee-Mykland jumps in Bitcoin; Heston from the VIX; exact CIR and CKLS likelihoods; profile likelihood of Merton; rho from realised variance; nonparametric diffusion; GBM, Merton and Heston against BET and Bitcoin.'
 
 Keywords: 'Ito's lemma, Vasicek, Merton, Heston, bootstrap, likelihood-ratio test, bias correction, BET, Bitcoin'
 

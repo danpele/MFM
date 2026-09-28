@@ -10,28 +10,28 @@ window.MFM_DATA.quizzes['realized-vol'] = {
         {
             "correct": 0,
             "en": {
-                "title": "Definition of realised variance",
-                "text": "What is the daily realised variance RV_t?",
+                "title": "Stable convergence and the feasible CLT",
+                "text": "Integrated quarticity IQ_t is random. Why may we still divide RV_t − IV_t by sqrt(2 RQ_t / M) and use N(0,1) quantiles?",
                 "options": [
-                    "The sum of the squared intraday returns of day t",
-                    "The squared daily close-to-close return",
-                    "The variance forecast of a GARCH model for day t",
-                    "The average of the absolute intraday returns"
+                    "Because the limit is mixed normal and the convergence is stable, so studentising by a consistent estimate of the random variance gives N(0,1)",
+                    "Because integrated quarticity is constant within the day",
+                    "Because intraday returns are Normal and independent of volatility",
+                    "Because RQ_t is an unbiased estimator of IQ_t"
                 ],
-                "correctExplanation": "RV_t = sum of r_{t,i}^2 over the M intraday intervals; it measures the day's variance without a model.",
-                "incorrectExplanation": "Realised variance adds up the squares of all intraday returns of the day; the squared daily return is the special case with a single return, and a GARCH forecast is a model output."
+                "correctExplanation": "Barndorff-Nielsen and Shephard: sqrt(M)(RV − IV) converges stably to MN(0, 2 IQ); stable convergence allows dividing by RQ, which converges to the random IQ.",
+                "incorrectExplanation": "The argument needs neither constant volatility nor Normal returns nor unbiasedness of RQ: it rests on a mixed-normal limit that holds stably, jointly with the path of volatility."
             },
             "ro": {
-                "title": "Definiția varianței realizate",
-                "text": "Ce este varianța realizată zilnică RV_t?",
+                "title": "Convergența stabilă și TLC fezabilă",
+                "text": "Cvarticitatea integrată IQ_t este aleatoare. De ce putem totuși împărți RV_t − IV_t la sqrt(2 RQ_t / M) și folosi cuantilele N(0,1)?",
                 "options": [
-                    "Suma pătratelor randamentelor intraday din ziua t",
-                    "Randamentul zilnic închidere-închidere la pătrat",
-                    "Prognoza de varianță a unui model GARCH pentru ziua t",
-                    "Media randamentelor intraday în valoare absolută"
+                    "Deoarece limita este Normală mixtă, iar convergența este stabilă, deci studentizarea cu o estimare consistentă a varianței aleatoare dă N(0,1)",
+                    "Deoarece cvarticitatea integrată este constantă în cursul zilei",
+                    "Deoarece randamentele intraday sunt Normale și independente de volatilitate",
+                    "Deoarece RQ_t este un estimator nedeplasat al lui IQ_t"
                 ],
-                "correctExplanation": "RV_t = suma lui r_{t,i}^2 pe cele M intervale intraday; măsoară varianța zilei fără model.",
-                "incorrectExplanation": "Varianța realizată adună pătratele tuturor randamentelor intraday ale zilei; randamentul zilnic la pătrat este cazul particular cu un singur randament, iar prognoza GARCH este rezultatul unui model."
+                "correctExplanation": "Barndorff-Nielsen și Shephard: sqrt(M)(RV − IV) converge stabil la MN(0, 2 IQ); convergența stabilă permite împărțirea la RQ, care converge la IQ aleator.",
+                "incorrectExplanation": "Argumentul nu cere volatilitate constantă, randamente Normale sau un RQ nedeplasat: se bazează pe o limită Normală mixtă valabilă stabil, împreună cu traiectoria volatilității."
             }
         },
         {
@@ -91,55 +91,55 @@ window.MFM_DATA.quizzes['realized-vol'] = {
         {
             "correct": 3,
             "en": {
-                "title": "Overnight returns",
-                "text": "In the chapter, what share of SPY's daily variance comes from the overnight return (close to next open)?",
+                "title": "Roughness: how to read the estimate",
+                "text": "The scaling estimator applied to daily realised volatility gives Ĥ = 0.11 for SPY. Which statement is most defensible?",
                 "options": [
-                    "About 2%",
-                    "About 80%",
-                    "Exactly 0, since the market is closed",
-                    "About 38%"
+                    "H = 0.11 is proved for SPY volatility",
+                    "Measurement noise in RV biases Ĥ upwards, so volatility is even rougher than 0.11",
+                    "The Hurst exponent is irrelevant for volatility forecasting",
+                    "Measurement error in RV pushes Ĥ down and the estimator is inconsistent on noisy proxies, so 0.11 may overstate the roughness"
                 ],
-                "correctExplanation": "Overnight returns carry about 38% of the daily variance of SPY in 2020-2026, so daily risk uses RV plus the squared overnight return.",
-                "incorrectExplanation": "News accumulates while the market is closed and is priced at the open; in the data this is about 38% of the daily variance."
+                "correctExplanation": "Noise adds a constant to the increment moments and flattens the scaling slope; Fukasawa, Takabatake and Westphal show that consistency requires high-frequency asymptotics.",
+                "incorrectExplanation": "An estimate from a noisy proxy is not a proof, the bias from measurement error goes towards smaller H, and H drives both option skews and forecast weights."
             },
             "ro": {
-                "title": "Randamentele peste noapte",
-                "text": "În capitol, ce parte din varianța zilnică SPY provine din randamentul peste noapte (de la închidere la deschiderea următoare)?",
+                "title": "Asprimea: cum citim estimarea",
+                "text": "Estimatorul de scalare aplicat volatilității realizate zilnice dă Ĥ = 0,11 pentru SPY. Ce afirmație este cea mai ușor de susținut?",
                 "options": [
-                    "Aproximativ 2%",
-                    "Aproximativ 80%",
-                    "Exact 0, deoarece piața este închisă",
-                    "Aproximativ 38%"
+                    "H = 0,11 este demonstrat pentru volatilitatea SPY",
+                    "Zgomotul de măsurare din RV deplasează Ĥ în sus, deci volatilitatea este și mai aspră decât 0,11",
+                    "Exponentul Hurst este irelevant pentru prognoza volatilității",
+                    "Eroarea de măsurare din RV coboară Ĥ, iar estimatorul este inconsistent pe indicatori zgomotoși, deci 0,11 poate exagera asprimea"
                 ],
-                "correctExplanation": "Randamentele peste noapte aduc aproximativ 38% din varianța zilnică SPY în 2020-2026, deci riscul zilnic folosește RV plus randamentul peste noapte la pătrat.",
-                "incorrectExplanation": "Știrile se acumulează cât piața este închisă și sunt încorporate în preț la deschidere; în date aceasta înseamnă aproximativ 38% din varianța zilnică."
+                "correctExplanation": "Zgomotul adaugă o constantă la momentele incrementelor și aplatizează panta de scalare; Fukasawa, Takabatake și Westphal arată că pentru consistență e nevoie de asimptotica de înaltă frecvență.",
+                "incorrectExplanation": "O estimare dintr-un indicator zgomotos nu este o demonstrație, deplasarea din eroarea de măsurare merge spre un H mai mic, iar H influențează atât panta zâmbetului, cât și ponderile prognozei."
             }
         },
         {
             "correct": 0,
             "en": {
-                "title": "Intraday pattern of SPY",
-                "text": "How does the volatility of SPY 5-minute returns vary during the trading day?",
+                "title": "Rates of convergence under noise",
+                "text": "With i.i.d. microstructure noise and n observations per day, which estimator attains the optimal rate n^(-1/4)?",
                 "options": [
-                    "U-shape: highest at the open and at the close, lowest around midday",
-                    "It is constant during the day",
-                    "It rises steadily from the open to the close",
-                    "It is highest around midday"
+                    "Pre-averaging (as do multi-scale RV and flat-top realised kernels)",
+                    "Two-scale RV",
+                    "RV computed from all ticks",
+                    "RV on a fixed 5-minute grid"
                 ],
-                "correctExplanation": "The first 5 minutes are about twice as volatile as midday, with a second peak at the close.",
-                "incorrectExplanation": "The open prices overnight news and the close concentrates rebalancing: the pattern is a U-shape."
+                "correctExplanation": "Jacod et al. (2009): pre-averaging over windows of order sqrt(n) returns converges at n^(-1/4), the optimal rate with noise.",
+                "incorrectExplanation": "Two-scale RV converges only at n^(-1/6), all-tick RV is inconsistent because its bias 2nω² grows, and a fixed 5-minute grid does not use the extra observations at all."
             },
             "ro": {
-                "title": "Tiparul intraday pentru SPY",
-                "text": "Cum variază volatilitatea randamentelor SPY de 5 minute în cursul zilei?",
+                "title": "Rate de convergență în prezența zgomotului",
+                "text": "Cu zgomot de microstructură i.i.d. și n observații pe zi, ce estimator atinge rata optimă n^(-1/4)?",
                 "options": [
-                    "Formă de U: cea mai mare la deschidere și la închidere, cea mai mică la prânz",
-                    "Este constantă în cursul zilei",
-                    "Crește constant de la deschidere la închidere",
-                    "Este cea mai mare la prânz"
+                    "Pre-medierea (la fel RV pe mai multe scări și nucleele realizate flat-top)",
+                    "RV pe două scări",
+                    "RV calculată din toate tranzacțiile",
+                    "RV pe o grilă fixă de 5 minute"
                 ],
-                "correctExplanation": "Primele 5 minute sunt de aproximativ două ori mai volatile decât prânzul, cu un al doilea vârf la închidere.",
-                "incorrectExplanation": "Deschiderea încorporează știrile de peste noapte, iar închiderea concentrează reechilibrările: tiparul are formă de U."
+                "correctExplanation": "Jacod et al. (2009): pre-medierea pe ferestre de ordinul sqrt(n) randamente converge cu rata n^(-1/4), optimă în prezența zgomotului.",
+                "incorrectExplanation": "RV pe două scări converge doar cu rata n^(-1/6), RV din toate tranzacțiile este inconsistentă deoarece deplasarea 2nω² crește, iar o grilă fixă de 5 minute nu folosește deloc observațiile suplimentare."
             }
         },
         {
@@ -280,28 +280,28 @@ window.MFM_DATA.quizzes['realized-vol'] = {
         {
             "correct": 2,
             "en": {
-                "title": "Jumps in SPY",
-                "text": "At the 0.1% level, what did the jump test find for SPY in 2020-2026?",
+                "title": "False discovery rate for jump days",
+                "text": "The daily jump test on 1,489 SPY days at 5% gives 235 rejections. Which procedure controls the expected share of false jump days among the rejected days?",
                 "options": [
-                    "Half of the days have a jump",
-                    "No day has a significant jump",
-                    "About 2% of days have a significant jump, and jumps are about 3% of total realised variance",
-                    "Jumps are about 50% of total variance"
+                    "Bonferroni at 5%",
+                    "Raising the number of intraday returns M",
+                    "Benjamini–Hochberg at a 5% false discovery rate",
+                    "Replacing RV by BV in the numerator of the statistic"
                 ],
-                "correctExplanation": "35 of 1,489 days are jump days; the jump part is 2.8% of the sum of RV.",
-                "incorrectExplanation": "Jumps are rare and carry a small share of variance: 35 jump days, 2.8% of total realised variance."
+                "correctExplanation": "Benjamini–Hochberg controls the FDR, the expected proportion of false rejections; in the chapter it leaves 42 SPY jump days (17 after the periodicity correction).",
+                "incorrectExplanation": "Bonferroni controls the probability of any false rejection (FWER) and is much stricter, a larger M changes power but not multiplicity, and the numerator must contrast RV with BV."
             },
             "ro": {
-                "title": "Salturi în SPY",
-                "text": "La nivelul de 0,1%, ce a găsit testul de salturi pentru SPY în 2020-2026?",
+                "title": "Rata descoperirilor false pentru zilele cu salt",
+                "text": "Testul zilnic de salturi pe 1.489 de zile SPY la 5% dă 235 de respingeri. Ce procedură controlează ponderea așteptată a zilelor cu salt false printre zilele respinse?",
                 "options": [
-                    "Jumătate dintre zile au un salt",
-                    "Nicio zi nu are un salt semnificativ",
-                    "Aproximativ 2% din zile au un salt semnificativ, iar salturile reprezintă aproximativ 3% din varianța realizată totală",
-                    "Salturile reprezintă aproximativ 50% din varianța totală"
+                    "Bonferroni la 5%",
+                    "Creșterea numărului de randamente intraday M",
+                    "Benjamini–Hochberg la o rată a descoperirilor false de 5%",
+                    "Înlocuirea lui RV cu BV la numărătorul statisticii"
                 ],
-                "correctExplanation": "35 din 1.489 de zile sunt zile cu salt; partea de salt este 2,8% din suma RV.",
-                "incorrectExplanation": "Salturile sunt rare și aduc o parte mică din varianță: 35 de zile cu salt, 2,8% din varianța realizată totală."
+                "correctExplanation": "Benjamini–Hochberg controlează FDR, proporția așteptată a respingerilor false; în capitol lasă 42 de zile SPY cu salt (17 după corecția de periodicitate).",
+                "incorrectExplanation": "Bonferroni controlează probabilitatea oricărei respingeri false (FWER) și este mult mai strict, un M mai mare schimbă puterea, dar nu multiplicitatea, iar numărătorul trebuie să compare RV cu BV."
             }
         },
         {
@@ -334,55 +334,55 @@ window.MFM_DATA.quizzes['realized-vol'] = {
         {
             "correct": 0,
             "en": {
-                "title": "Standardised returns",
-                "text": "What happens to the kurtosis of SPY open-to-close returns when they are divided by the square root of RV?",
+                "title": "HAR as a restricted AR(22)",
+                "text": "Viewed as an AR(22) for log RV, how many linear restrictions does the HAR model impose on the lag coefficients?",
                 "options": [
-                    "It falls from about 16 to about 2.7, close to the Normal value",
-                    "It rises from 3 to 16",
-                    "It stays at about 16",
-                    "It becomes negative"
+                    "19: equal coefficients on lags 2–5 (3 restrictions) and on lags 6–22 (16 restrictions)",
+                    "3, one for each component",
+                    "21, all lags beyond the first",
+                    "None: HAR is an unrestricted AR(22)"
                 ],
-                "correctExplanation": "Scaling by realised volatility removes almost all excess kurtosis: heavy tails come from changing volatility.",
-                "incorrectExplanation": "Returns are close to a mixture of Normal distributions with daily variances IV_t; dividing by the square root of RV undoes the mixture."
+                "correctExplanation": "The staircase fixes φ2 = … = φ5 and φ6 = … = φ22; for SPY the Wald test of the 19 restrictions gives p = 0.51.",
+                "incorrectExplanation": "HAR has 3 free slopes out of 22 lag coefficients, so 22 − 3 = 19 restrictions: equalities inside the weekly and monthly blocks, not zero lags."
             },
             "ro": {
-                "title": "Randamente standardizate",
-                "text": "Ce se întâmplă cu aplatizarea randamentelor SPY deschidere-închidere când sunt împărțite la rădăcina pătrată a RV?",
+                "title": "HAR ca AR(22) restricționat",
+                "text": "Privit ca un AR(22) pentru log RV, câte restricții liniare impune modelul HAR asupra coeficienților întârzierilor?",
                 "options": [
-                    "Scade de la aproximativ 16 la aproximativ 2,7, aproape de valoarea Normală",
-                    "Crește de la 3 la 16",
-                    "Rămâne la aproximativ 16",
-                    "Devine negativă"
+                    "19: coeficienți egali pe întârzierile 2–5 (3 restricții) și pe întârzierile 6–22 (16 restricții)",
+                    "3, câte una pentru fiecare componentă",
+                    "21, toate întârzierile după prima",
+                    "Niciuna: HAR este un AR(22) nerestricționat"
                 ],
-                "correctExplanation": "Scalarea cu volatilitatea realizată elimină aproape toată aplatizarea în exces: cozile grele provin din volatilitatea variabilă.",
-                "incorrectExplanation": "Randamentele sunt aproape un amestec de distribuții Normale cu varianțele zilnice IV_t; împărțirea la rădăcina pătrată a RV anulează amestecul."
+                "correctExplanation": "Scara fixează φ2 = … = φ5 și φ6 = … = φ22; pentru SPY testul Wald al celor 19 restricții dă p = 0,51.",
+                "incorrectExplanation": "HAR are 3 pante libere din 22 de coeficienți ai întârzierilor, deci 22 − 3 = 19 restricții: egalități în blocurile săptămânal și lunar, nu întârzieri nule."
             }
         },
         {
             "correct": 1,
             "en": {
-                "title": "Distribution of RV",
-                "text": "Which transformation of realised variance is close to a Normal distribution?",
+                "title": "Estimating the noise variance",
+                "text": "Under i.i.d. microstructure noise, observed returns at the highest frequency have first-order autocovariance −0.0004 (%²). What is the implied noise variance ω²?",
                 "options": [
-                    "RV itself",
-                    "The logarithm of RV",
-                    "The square of RV",
-                    "The inverse of RV"
+                    "0.0002",
+                    "0.0004",
+                    "0.0008",
+                    "It cannot be identified from returns"
                 ],
-                "correctExplanation": "RV has skewness about 20 and kurtosis above 500; log RV has skewness 0.3 and kurtosis 3.2.",
-                "incorrectExplanation": "RV is extremely right-skewed; its logarithm is nearly Normal, which is why the chapter models volatility in logs."
+                "correctExplanation": "r_i = r*_i + ε_i − ε_{i−1}, so cov(r_i, r_{i−1}) = −Var(ε) = −ω²: ω² = 0.0004.",
+                "incorrectExplanation": "Only ε_{i−1} is shared by adjacent returns, so the autocovariance equals −ω² exactly; 2ω² is the bias added per return to RV, not the autocovariance."
             },
             "ro": {
-                "title": "Distribuția RV",
-                "text": "Ce transformare a varianței realizate este aproape de o distribuție Normală?",
+                "title": "Estimarea varianței zgomotului",
+                "text": "Cu zgomot de microstructură i.i.d., randamentele observate la frecvența cea mai mare au autocovarianța de ordinul 1 egală cu −0,0004 (%²). Care este varianța zgomotului ω² implicată?",
                 "options": [
-                    "RV însăși",
-                    "Logaritmul RV",
-                    "Pătratul RV",
-                    "Inversul RV"
+                    "0,0002",
+                    "0,0004",
+                    "0,0008",
+                    "Nu poate fi identificată din randamente"
                 ],
-                "correctExplanation": "RV are asimetrie de aproximativ 20 și aplatizare peste 500; log RV are asimetrie 0,3 și aplatizare 3,2.",
-                "incorrectExplanation": "RV este extrem de asimetrică la dreapta; logaritmul ei este aproape Normal, de aceea capitolul modelează volatilitatea pe log."
+                "correctExplanation": "r_i = r*_i + ε_i − ε_{i−1}, deci cov(r_i, r_{i−1}) = −Var(ε) = −ω²: ω² = 0,0004.",
+                "incorrectExplanation": "Doar ε_{i−1} este comun randamentelor alăturate, deci autocovarianța este exact −ω²; 2ω² este deplasarea adăugată la RV de fiecare randament, nu autocovarianța."
             }
         },
         {
@@ -415,28 +415,28 @@ window.MFM_DATA.quizzes['realized-vol'] = {
         {
             "correct": 3,
             "en": {
-                "title": "Bitcoin weekly cycle",
-                "text": "What pattern did the chapter find in Bitcoin realised volatility?",
+                "title": "Truncated realised variance",
+                "text": "Why is truncated RV, the sum of r² over returns with |r| ≤ c·Δ^ϖ and 0 < ϖ < 1/2, robust to jumps?",
                 "options": [
-                    "No calendar pattern, because Bitcoin trades every day",
-                    "Weekends are twice as volatile as weekdays",
-                    "Volatility is highest at midnight UTC every day",
-                    "A weekly cycle: weekend RV is about 40% of weekday RV"
+                    "Because an exponent ϖ above 1/2 keeps all diffusive returns",
+                    "Because the threshold stays fixed as Δ shrinks",
+                    "Because it multiplies adjacent absolute returns",
+                    "Because diffusive increments are of order Δ^(1/2) and end up below the threshold, while jumps are of order 1 and are cut off"
                 ],
-                "correctExplanation": "The autocorrelation of log RV peaks at 7, 14, 21 days; Saturday volatility is about 27% p.a. vs 48% on Wednesday.",
-                "incorrectExplanation": "Bitcoin trades 24/7, but weekends lack equity and macro news and institutional traders: they are much calmer."
+                "correctExplanation": "Mancini (2009): with ϖ < 1/2 the threshold shrinks more slowly than the diffusive increments but still goes to zero, so jumps are removed asymptotically.",
+                "incorrectExplanation": "The threshold must shrink with Δ, but more slowly than Δ^(1/2); multiplying adjacent returns is bipower variation, a different estimator."
             },
             "ro": {
-                "title": "Ciclul săptămânal Bitcoin",
-                "text": "Ce tipar a găsit capitolul în volatilitatea realizată Bitcoin?",
+                "title": "Varianța realizată trunchiată",
+                "text": "De ce este RV trunchiată, suma lui r² pe randamentele cu |r| ≤ c·Δ^ϖ și 0 < ϖ < 1/2, robustă la salturi?",
                 "options": [
-                    "Niciun tipar de calendar, deoarece Bitcoin se tranzacționează zilnic",
-                    "Weekendurile sunt de două ori mai volatile decât zilele lucrătoare",
-                    "Volatilitatea este cea mai mare la miezul nopții UTC în fiecare zi",
-                    "Un ciclu săptămânal: RV de weekend este aproximativ 40% din RV din zilele lucrătoare"
+                    "Deoarece un exponent ϖ peste 1/2 păstrează toate randamentele difuzive",
+                    "Deoarece pragul rămâne fix când Δ scade",
+                    "Deoarece înmulțește randamentele absolute alăturate",
+                    "Deoarece incrementele difuzive sunt de ordinul Δ^(1/2) și ajung sub prag, în timp ce salturile sunt de ordinul 1 și sunt eliminate"
                 ],
-                "correctExplanation": "Autocorelația log RV are vârfuri la 7, 14, 21 de zile; volatilitatea de sâmbătă este aproximativ 27% pe an față de 48% miercurea.",
-                "incorrectExplanation": "Bitcoin se tranzacționează non-stop, dar weekendurile nu au știri bursiere sau macro și investitori instituționali: sunt mult mai calme."
+                "correctExplanation": "Mancini (2009): cu ϖ < 1/2 pragul scade mai lent decât incrementele difuzive, dar tot tinde la zero, deci salturile sunt eliminate asimptotic.",
+                "incorrectExplanation": "Pragul trebuie să scadă odată cu Δ, dar mai lent decât Δ^(1/2); înmulțirea randamentelor alăturate este variația bipower, un alt estimator."
             }
         },
         {
@@ -469,28 +469,28 @@ window.MFM_DATA.quizzes['realized-vol'] = {
         {
             "correct": 1,
             "en": {
-                "title": "HAR-RV",
-                "text": "In the HAR-RV model of Corsi, tomorrow's RV is regressed on:",
+                "title": "Attenuation in HAR and HARQ",
+                "text": "Why should the weight on yesterday's RV in a HAR forecast be smaller on days with high realised quarticity?",
                 "options": [
-                    "Only today's squared return",
-                    "Today's RV and the averages of RV over the last week and the last month",
-                    "The last 22 daily RVs, each with its own free coefficient",
-                    "The VIX index only"
+                    "Leverage: negative returns raise future RV",
+                    "RV_t measures IV_t with an error whose variance is proportional to IQ_t, and error in a regressor attenuates its slope",
+                    "Jumps are more frequent on those days",
+                    "The weekly component absorbs the daily effect"
                 ],
-                "correctExplanation": "HAR uses three regressors (day, week, month): a restricted AR(22) that mimics long memory.",
-                "incorrectExplanation": "The heterogeneous market idea: traders at daily, weekly and monthly horizons; three averages of past RV."
+                "correctExplanation": "Bollerslev, Patton and Quaedvlieg (2016): the signal-to-noise ratio of RV_t falls when IQ_t is high, so HARQ uses β_d + β_Q sqrt(RQ_t) with β_Q < 0.",
+                "incorrectExplanation": "The mechanism is errors in variables: the CLT gives Var(RV − IV) = 2 IQ/M, so a noisier regressor deserves less weight; leverage and jumps are separate extensions."
             },
             "ro": {
-                "title": "HAR-RV",
-                "text": "În modelul HAR-RV al lui Corsi, RV de mâine este regresată pe:",
+                "title": "Atenuarea în HAR și HARQ",
+                "text": "De ce ar trebui ca ponderea RV de ieri într-o prognoză HAR să fie mai mică în zilele cu cvarticitate realizată mare?",
                 "options": [
-                    "Doar randamentul de azi la pătrat",
-                    "RV de azi și mediile RV din ultima săptămână și din ultima lună",
-                    "Ultimele 22 de valori RV zilnice, fiecare cu propriul coeficient liber",
-                    "Doar indicele VIX"
+                    "Efectul de pârghie: randamentele negative cresc RV viitoare",
+                    "RV_t măsoară IV_t cu o eroare a cărei varianță este proporțională cu IQ_t, iar eroarea dintr-un regresor îi atenuează panta",
+                    "Salturile sunt mai frecvente în acele zile",
+                    "Componenta săptămânală preia efectul zilnic"
                 ],
-                "correctExplanation": "HAR folosește trei regresori (zi, săptămână, lună): un AR(22) restricționat care imită memoria lungă.",
-                "incorrectExplanation": "Ideea pieței eterogene: investitori pe orizonturi zilnice, săptămânale și lunare; trei medii ale RV trecute."
+                "correctExplanation": "Bollerslev, Patton și Quaedvlieg (2016): raportul semnal/zgomot al lui RV_t scade când IQ_t este mare, deci HARQ folosește β_d + β_Q sqrt(RQ_t) cu β_Q < 0.",
+                "incorrectExplanation": "Mecanismul este cel al erorilor în variabile: TLC dă Var(RV − IV) = 2 IQ/M, deci un regresor mai zgomotos merită o pondere mai mică; efectul de pârghie și salturile sunt extensii separate."
             }
         },
         {
@@ -523,28 +523,28 @@ window.MFM_DATA.quizzes['realized-vol'] = {
         {
             "correct": 3,
             "en": {
-                "title": "Robust loss functions",
-                "text": "Why is QLIKE (or MSE on variance) used to compare volatility forecasts against RV?",
+                "title": "Which loss survives a noisy proxy",
+                "text": "Forecasts are evaluated against RV, an unbiased but noisy proxy of the true variance. Which loss ranks the forecasts as the true variance would?",
                 "options": [
-                    "They are the only losses that are always positive",
-                    "They ignore the largest days",
-                    "They do not require a proxy",
-                    "They rank forecasts the same way with a noisy unbiased proxy as with the true variance"
+                    "MSE on volatility, (sqrt(RV) − sqrt(F))²",
+                    "Mean absolute error on variance",
+                    "Mean absolute percentage error",
+                    "QLIKE on variance, RV/F − ln(RV/F) − 1"
                 ],
-                "correctExplanation": "Patton (2011): QLIKE and MSE on variance are robust to noise in the proxy; MAE or MSE on volatility are not.",
-                "incorrectExplanation": "True variance is unobserved; only robust losses give a correct ranking when RV replaces it."
+                "correctExplanation": "Patton (2011): the expected QLIKE is minimised at F = E[RV | past] = E[IV | past], so a noisy unbiased proxy does not change the ranking.",
+                "incorrectExplanation": "Losses on volatility or absolute errors are minimised by a forecast other than the conditional variance (by Jensen, (E sqrt(RV))² is below E RV), so proxy noise distorts the ranking."
             },
             "ro": {
-                "title": "Funcții de pierdere robuste",
-                "text": "De ce se folosește QLIKE (sau MSE pe varianță) pentru a compara prognozele de volatilitate cu RV?",
+                "title": "Ce funcție de pierdere rezistă unui proxy zgomotos",
+                "text": "Prognozele sunt evaluate față de RV, un proxy nedeplasat, dar zgomotos, al varianței adevărate. Ce funcție de pierdere ordonează prognozele la fel ca varianța adevărată?",
                 "options": [
-                    "Sunt singurele funcții de pierdere întotdeauna pozitive",
-                    "Ignoră zilele cele mai mari",
-                    "Nu necesită un proxy",
-                    "Ordonează prognozele la fel cu un proxy zgomotos nedeplasat ca și cu varianța adevărată"
+                    "MSE pe volatilitate, (sqrt(RV) − sqrt(F))²",
+                    "Eroarea absolută medie pe varianță",
+                    "Eroarea procentuală absolută medie",
+                    "QLIKE pe varianță, RV/F − ln(RV/F) − 1"
                 ],
-                "correctExplanation": "Patton (2011): QLIKE și MSE pe varianță sunt robuste la zgomotul din proxy; MAE sau MSE pe volatilitate nu sunt.",
-                "incorrectExplanation": "Varianța adevărată nu este observată; doar funcțiile de pierdere robuste dau o ordonare corectă când RV o înlocuiește."
+                "correctExplanation": "Patton (2011): QLIKE așteptată este minimă în F = E[RV | trecut] = E[IV | trecut], deci un proxy zgomotos nedeplasat nu schimbă ordonarea.",
+                "incorrectExplanation": "Funcțiile de pierdere pe volatilitate sau cu erori absolute sunt minimizate de altă prognoză decât varianța condiționată (din Jensen, (E sqrt(RV))² este sub E RV), deci zgomotul proxy-ului distorsionează ordonarea."
             }
         },
         {
@@ -577,55 +577,55 @@ window.MFM_DATA.quizzes['realized-vol'] = {
         {
             "correct": 1,
             "en": {
-                "title": "HAR vs GARCH for SPY",
-                "text": "Out of sample for SPY in 2022-2026, how did log-HAR compare with GARCH(1,1)-t?",
+                "title": "Model confidence set",
+                "text": "For SPY one-day forecasts from 2022, the 90% model confidence set contains log-HAR and SHAR. What does this mean?",
                 "options": [
-                    "GARCH was significantly better on every loss",
-                    "log-HAR had about 10% lower QLIKE, significant at 5% (DM t about -2.3)",
-                    "They were identical",
-                    "log-HAR was better only on MSE, significantly"
+                    "SHAR is significantly better than log-HAR",
+                    "The data cannot separate the two, and the set contains the best model with probability at least 90%",
+                    "Every other model has a QLIKE above 0.5",
+                    "Each surviving model passed 21 separate Diebold–Mariano tests at 5%"
                 ],
-                "correctExplanation": "QLIKE 0.310 vs 0.343; the MSE difference was not significant.",
-                "incorrectExplanation": "Intraday information helps: log-HAR beats GARCH under QLIKE; MSE rankings depend on a few crisis days."
+                "correctExplanation": "Hansen, Lunde and Nason (2011): models are eliminated sequentially until equal predictive ability is not rejected; the survivors form a confidence set for the best model.",
+                "incorrectExplanation": "The MCS is a set-valued statement with multiplicity control, not a ranking between the survivors and not a sequence of unadjusted pairwise tests."
             },
             "ro": {
-                "title": "HAR vs GARCH pentru SPY",
-                "text": "În afara eșantionului pentru SPY în 2022-2026, cum s-a comparat log-HAR cu GARCH(1,1)-t?",
+                "title": "Mulțimea de încredere a modelelor",
+                "text": "Pentru prognozele SPY pe o zi din 2022, mulțimea de încredere a modelelor la 90% conține log-HAR și SHAR. Ce înseamnă aceasta?",
                 "options": [
-                    "GARCH a fost semnificativ mai bun după fiecare funcție de pierdere",
-                    "log-HAR a avut un QLIKE cu aproximativ 10% mai mic, semnificativ la 5% (DM t aproximativ -2,3)",
-                    "Au fost identice",
-                    "log-HAR a fost mai bun doar după MSE, semnificativ"
+                    "SHAR este semnificativ mai bun decât log-HAR",
+                    "Datele nu le pot separa, iar mulțimea conține cel mai bun model cu probabilitate de cel puțin 90%",
+                    "Toate celelalte modele au QLIKE peste 0,5",
+                    "Fiecare model rămas a trecut 21 de teste Diebold–Mariano separate la 5%"
                 ],
-                "correctExplanation": "QLIKE 0,310 față de 0,343; diferența MSE nu a fost semnificativă.",
-                "incorrectExplanation": "Informația intraday ajută: log-HAR întrece GARCH după QLIKE; clasamentele după MSE depind de câteva zile de criză."
+                "correctExplanation": "Hansen, Lunde și Nason (2011): modelele sunt eliminate succesiv până când egalitatea capacității predictive nu mai este respinsă; cele rămase formează o mulțime de încredere pentru cel mai bun model.",
+                "incorrectExplanation": "MCS este o afirmație despre o mulțime, cu controlul multiplicității, nu un clasament între modelele rămase și nici un șir de teste pe perechi neajustate."
             }
         },
         {
             "correct": 2,
             "en": {
-                "title": "Mincer-Zarnowitz regression",
-                "text": "In the regression RV_t = a + b F_t + u_t, an unbiased forecast has:",
+                "title": "Joint test in Mincer–Zarnowitz",
+                "text": "In the MZ regression for GARCH, â = 0.24 (SE 0.23), b̂ = 0.70 (SE 0.24) and corr(â, b̂) = −0.98. How should unbiasedness, (a, b) = (0, 1), be tested?",
                 "options": [
-                    "a = 1 and b = 0",
-                    "a = 0 and b = 0",
-                    "a = 0 and b = 1",
-                    "R^2 = 1"
+                    "Two separate t-tests, rejecting if either rejects",
+                    "Test b = 1 only, because the intercept is irrelevant",
+                    "A joint Wald test using the full HAC covariance matrix of (â, b̂)",
+                    "Compare the R² of the regression with 1"
                 ],
-                "correctExplanation": "Unbiasedness means the realised value equals the forecast on average for every level of the forecast.",
-                "incorrectExplanation": "The joint Wald test of a = 0, b = 1 checks bias; R^2 measures informativeness and is capped by noise in RV."
+                "correctExplanation": "With strongly correlated estimates only the joint Wald statistic has the right size; here W = 2.07, p = 0.35.",
+                "incorrectExplanation": "Separate t-tests ignore the correlation and have the wrong joint size, the intercept is part of the hypothesis, and R² is capped below 1 by the noise in RV."
             },
             "ro": {
-                "title": "Regresia Mincer-Zarnowitz",
-                "text": "În regresia RV_t = a + b F_t + u_t, o prognoză nedeplasată are:",
+                "title": "Testul comun în Mincer–Zarnowitz",
+                "text": "În regresia MZ pentru GARCH, â = 0,24 (SE 0,23), b̂ = 0,70 (SE 0,24) și corr(â, b̂) = −0,98. Cum trebuie testată nedeplasarea, (a, b) = (0, 1)?",
                 "options": [
-                    "a = 1 și b = 0",
-                    "a = 0 și b = 0",
-                    "a = 0 și b = 1",
-                    "R^2 = 1"
+                    "Două teste t separate, respingând dacă oricare respinge",
+                    "Doar testul b = 1, deoarece termenul liber este irelevant",
+                    "Un test Wald comun, cu matricea de covarianță HAC completă a lui (â, b̂)",
+                    "Comparând R² al regresiei cu 1"
                 ],
-                "correctExplanation": "Nedeplasarea înseamnă că valoarea realizată este în medie egală cu prognoza pentru orice nivel al prognozei.",
-                "incorrectExplanation": "Testul Wald comun a = 0, b = 1 verifică deplasarea; R^2 măsoară conținutul informațional și este limitat de zgomotul din RV."
+                "correctExplanation": "Cu estimări puternic corelate doar statistica Wald comună are mărimea corectă; aici W = 2,07, p = 0,35.",
+                "incorrectExplanation": "Testele t separate ignoră corelația și au mărimea comună greșită, termenul liber face parte din ipoteză, iar R² este limitat sub 1 de zgomotul din RV."
             }
         },
         {

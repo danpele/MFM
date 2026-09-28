@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch8_sem_partA'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 8, Part A: Kupiec and Christoffersen tests step by step, traffic-light zones from the Binomial distribution, FZ0 losses of three forecasts, Acerbi-Szekely Z1 and Z2, and a conformal quantile with one adaptive conformal step.'
+Description: 'Seminar 8, Part A: local and exact power of the Kupiec test, days needed for a given power, the Christoffersen Markov-chain likelihood, the DQ statistic with a constant as the score form of Kupiec, traffic-light zones, numerical check of the consistency of the pinball and FZ0 losses, a counterexample to the elicitability of ES, Acerbi-Szekely Z1 and Z2, moments of the Du-Escanciano cumulative violation, and a conformal quantile with one adaptive conformal step.'
 
 Keywords: 'Kupiec, Christoffersen, traffic light, FZ0, Acerbi-Szekely, conformal prediction, exercises'
 

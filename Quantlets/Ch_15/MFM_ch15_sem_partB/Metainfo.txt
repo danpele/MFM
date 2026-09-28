@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Financial PhraseBank v1.0 (Malo et al., 2014; CC BY-NC-SA 3.0) and Twitter Financial News Sentiment (MIT licence), both from the Hugging Face Hub; Loughran-McDonald and Harvard IV-4 word lists; FNSPID financial news headlines (Dong, Fan & Peng, 2024; CC BY-NC 4.0) for 17 US stocks; daily adjusted closes of the same stocks and SPY (data/market); S&P 500 (GSPC.INDX) and Apple (AAPL.US) daily closes (data/market)'
+Datafile: 'Financial PhraseBank v1.0 (Malo et al., 2014; CC BY-NC-SA 3.0) and Twitter Financial News Sentiment (MIT licence), both from the Hugging Face Hub; Loughran-McDonald and Harvard IV-4 word lists; FNSPID financial news headlines (Dong, Fan & Peng, 2024; CC BY-NC 4.0) for 16 US stocks; daily adjusted closes of the same stocks and SPY (data/market); S&P 500 (GSPC.INDX) and Apple (AAPL.US) daily closes (data/market)'
 
 Output: 'ch15_sem_cluster.pdf'

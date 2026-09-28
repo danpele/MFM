@@ -6,6 +6,8 @@ generatorul de grafice, de Quantlet-uri si de notebook-uri:
 
   * load_data            -- date zilnice de piata din data/market (local sau din repo)
   * frac_diff_ffd        -- diferentiere fractionara cu fereastra fixa (FFD)
+  * local_whittle, exact_local_whittle -- estimarea parametrului de memorie d
+    (Robinson 1995; Shimotsu & Phillips 2005; Shimotsu 2010), SE = 1/(2 sqrt(m))
   * get_daily_vol        -- volatilitate EWMA a randamentelor zilnice
   * triple_barrier       -- etichetare prin metoda celor trei bariere
   * PurgedKFold          -- validare incrucisata cu purjare + embargo
@@ -61,6 +63,50 @@ def frac_diff_ffd(series, d, threshold=1e-4):
     x = series.dropna().values
     out = np.convolve(x, w, mode='valid')          # out[j] = sum_k w_k x[j+width-1-k]
     return pd.Series(out, index=series.dropna().index[width - 1:])
+
+
+# =============================================================================
+# ESTIMAREA PARAMETRULUI DE MEMORIE d (LOCAL WHITTLE)
+# =============================================================================
+def _periodogram(x, m):
+    n = len(x)
+    w = np.fft.fft(x)[1:m + 1]
+    lam = 2 * np.pi * np.arange(1, m + 1) / n
+    return lam, np.abs(w) ** 2 / (2 * np.pi * n)
+
+
+def local_whittle(x, m=None, alpha=0.65):
+    """Estimatorul local Whittle al lui d (Robinson, 1995), cu m = n^alpha frecvente Fourier.
+    Intoarce (d_hat, se), se = 1/(2 sqrt(m))."""
+    from scipy.optimize import minimize_scalar
+    x = np.asarray(x, float)
+    m = m or int(len(x) ** alpha)
+    lam, I = _periodogram(x - x.mean(), m)
+    R = lambda d: np.log(np.mean(lam ** (2 * d) * I)) - 2 * d * np.mean(np.log(lam))
+    return minimize_scalar(R, bounds=(-0.49, 1.99), method='bounded').x, 1 / (2 * np.sqrt(m))
+
+
+def _frac_diff_full(x, d):
+    """(1-L)^d x_t cu x_t = 0 pentru t <= 0 (fara trunchiere), prin FFT."""
+    n = len(x)
+    k = np.arange(1, n)
+    pi = np.concatenate([[1.0], np.cumprod((k - 1 - d) / k)])
+    L = 2 ** int(np.ceil(np.log2(2 * n)))
+    return np.fft.irfft(np.fft.rfft(x, L) * np.fft.rfft(pi, L), L)[:n]
+
+
+def exact_local_whittle(x, m=None, alpha=0.65):
+    """Exact local Whittle (Shimotsu & Phillips, 2005), valid si pentru serii nestationare (d >= 0.5);
+    media necunoscuta tratata prin scaderea valorii initiale (Shimotsu, 2010). Intoarce (d_hat, se)."""
+    from scipy.optimize import minimize_scalar
+    x = np.asarray(x, float)
+    x = x - x[0]
+    m = m or int(len(x) ** alpha)
+    lam = 2 * np.pi * np.arange(1, m + 1) / len(x)
+    def R(d):
+        _, I = _periodogram(_frac_diff_full(x, d), m)
+        return np.log(np.mean(I)) - 2 * d * np.mean(np.log(lam))
+    return minimize_scalar(R, bounds=(-0.49, 1.99), method='bounded').x, 1 / (2 * np.sqrt(m))
 
 
 # =============================================================================

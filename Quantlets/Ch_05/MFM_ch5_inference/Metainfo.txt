@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch5_inference'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Asymptotic inference for GARCH models on the S&P 500, Bitcoin and the BET: efficiency of the Gaussian QMLE (robust versus classical standard errors and sqrt((kappa_z - 1)/2)), boundary likelihood ratio tests (Normal versus Student-t), delta-method standard errors of long-run volatility and half-life, moments and autocorrelation of squared shocks, the squared-residual portmanteau with estimated parameters (Li-Mak), GJR persistence under skewed-t innovations, and Giacomini-White tests (rolling 1000-day window) with the Model Confidence Set on QLIKE.'
+
+Keywords: 'QMLE, sandwich standard errors, boundary, mixture chi-square, delta method, half-life, Li-Mak, Giacomini-White, Model Confidence Set, QLIKE'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
+
+Output: 'ch5_inference.json'

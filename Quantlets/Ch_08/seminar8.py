@@ -92,6 +92,75 @@ def a8_conformal(a=0.10, gamma=0.02):
                 k_nohit=int(np.ceil((n + 1) * (1 - a_next_nohit))))
 
 
+# --- derivari (partea A, varianta de master) ---
+def a1_pof_power(T=250, pi=0.02, a=0.01):
+    """Puterea locala (chi2 necentrala) si exacta (Binomiala) a testului Kupiec la 5%; marimea exacta."""
+    lam = T * (pi - a) ** 2 / (a * (1 - a))
+    crit = stats.chi2.ppf(0.95, 1)
+    ex, asy, rej = g.pof_power(T, np.array([pi, a]), a)
+    return dict(T=T, pi=pi, a=a, lam=float(lam), asym=float(stats.ncx2.sf(crit, 1, lam)), exact=float(ex[0]),
+                size=float(ex[1]), accept=[int(k) for k in np.flatnonzero(~rej)[[0, -1]]])
+
+
+def a2_days_for_power(pi=0.05, a=0.025, power=0.80):
+    """Numarul de zile pentru o putere data: din lambda* (asimptotic) si prin cautare exacta."""
+    from scipy.optimize import brentq
+    crit = stats.chi2.ppf(0.95, 1)
+    lam = brentq(lambda l: stats.ncx2.sf(crit, 1, l) - power, 0.1, 50)
+    T_asy = lam * a * (1 - a) / (pi - a) ** 2
+    T_ex = next(T for T in range(20, 2000) if g.pof_power(T, np.array([pi]), a)[0][0] >= power)
+    return dict(lam=float(lam), T_asy=float(T_asy), T_exact=int(T_ex))
+
+
+def a4_dq_constant(T=250, x=7, a=0.01):
+    """DQ cu X_t = 1: forma scor (Wald cu dispersia de sub H0) a testului Kupiec, fata de LR."""
+    ph = x / T
+    dq = T * (ph - a) ** 2 / (a * (1 - a))
+    k = a1_kupiec(T, x, a)
+    return dict(DQ=float(dq), p=float(stats.chi2.sf(dq, 1)), LR=float(k['LR']), p_LR=float(k['pval']))
+
+
+def a6_consistency(nu=4, a=0.025, n=1_000_000, seed=5):
+    """Verificare numerica: minimul pierderii pinball medii si al FZ0 medii pe pierderi t(nu) cu dispersie 1."""
+    from scipy.optimize import minimize, minimize_scalar
+    rng = np.random.default_rng(seed)
+    L = rng.standard_t(nu, n) * np.sqrt((nu - 2) / nu)
+    v_pin = minimize_scalar(lambda v: M.pinball(L, v, a).mean(), bounds=(0.5, 5), method='bounded').x
+    r = minimize(lambda p: M.fz0(L, p[0], p[1], a).mean() if p[1] >= p[0] > 0 else 1e9, [2.0, 2.5],
+                 method='Nelder-Mead', options=dict(xatol=1e-5, fatol=1e-9))
+    return dict(v_pin=float(v_pin), v_fz=float(r.x[0]), e_fz=float(r.x[1]),
+                VaR=float(M.t_std_q(nu, a)), ES=float(M.t_std_es(nu, a)))
+
+
+def es_discrete(vals, probs, a):
+    """ES la probabilitatea de coada a pentru o distributie discreta a pierderilor."""
+    o = np.argsort(vals)[::-1]
+    v, p = np.asarray(vals, float)[o], np.asarray(probs, float)[o]
+    take = np.minimum(p, np.maximum(a - np.r_[0, np.cumsum(p)[:-1]], 0))
+    return float((v * take).sum() / a)
+
+
+def a9_es_not_elicitable(a=0.025):
+    """Doua distributii cu acelasi ES a caror mixtura are alt ES: multimile de nivel nu sunt convexe."""
+    F0 = ([1.0], [1.0])
+    F1 = ([2.0, 0.0], [a / 2, 1 - a / 2])
+    mix = ([2.0, 1.0, 0.0], [a / 4, 0.5, 0.5 - a / 4])
+    return dict(es0=es_discrete(*F0, a), es1=es_discrete(*F1, a), es_mix=es_discrete(*mix, a))
+
+
+def a10_de_moments(a=0.025, n=4_000_000, seed=6, T=250):
+    """Momentele violarii cumulate H = (u - (1 - a))/a 1{u > 1 - a} sub H0 (u uniform)."""
+    u = np.random.default_rng(seed).uniform(size=n)
+    H = (u - (1 - a)) / a * (u > 1 - a)
+    return dict(mean=float(H.mean()), var=float(H.var()), mean_th=a / 2, var_th=a * (1 / 3 - a / 4),
+                se_T=float(np.sqrt(a * (1 / 3 - a / 4) / T)))
+
+
+def part_a_extras():
+    return dict(a1p=a1_pof_power(), a2p=a1_pof_power(250, 0.05, 0.025), a2T=a2_days_for_power(),
+                a4dq=a4_dq_constant(), a6c=a6_consistency(), a9=a9_es_not_elicitable(), a10=a10_de_moments())
+
+
 def part_a():
     return dict(a1=a1_kupiec(), a2=a1_kupiec(250, 11, 0.025), a3=a3_counts('bet', 'HS'), a4=a3_counts('bet', 'GARCH-t'),
                 a5=a5_traffic(), a6=a6_fz0(), a7=a7_z2(), a8=a8_conformal())
@@ -322,13 +391,47 @@ def part_c():
     return out
 
 
+# --- partea B: inferenta suplimentara ---
+def b1_dq_sp500():
+    """Testul DQ (Engle & Manganelli, 2004) pentru cele sase modele VaR 1% pe S&P 500."""
+    F = g.fc('sp500')[0]
+    return {m: g.dq_test((F[m]['L'] > F[m]['VaR1']).astype(int).values, F[m]['VaR1'].values, 0.01) for m in M.MODELS}
+
+
+def b5_gw_sp500():
+    """Testul Giacomini-White conditional pe diferentele FZ0 fata de FHS."""
+    Lf = g.fz_losses('sp500')
+    return {f'{a}|FHS': g.gw_test(Lf[a], Lf['FHS']) for a in ('GARCH-t', 'HS', 'GARCH-EVT')}
+
+
+def b6_murphy_btc():
+    """Diagrama Murphy pe Bitcoin, VaR 2.5%: HS fata de GARCH-EVT (scoruri elementare)."""
+    return g.murphy_summary('btc', 'HS', 'GARCH-EVT', 'VaR2.5', 0.025)
+
+
+def b9_estimation_risk(reps=400):
+    """Bootstrap parametric sub riscul de estimare: GARCH-t reestimat pe fiecare traiectorie simulata."""
+    return g.mc_estimation_risk(reps=reps)
+
+
+def part_b_extras():
+    return dict(b1dq=b1_dq_sp500(), b5gw=b5_gw_sp500(), b6mu=b6_murphy_btc(), b9=b9_estimation_risk())
+
+
 def run_all():
-    R = dict(A=part_a(), b1=b1_sp500_var(), b2=b2_traffic_bet(), b3=b3_es_sp500(), b4=b4_z2_bet_btc(),
+    R = dict(A=part_a(), AX=part_a_extras(), BX=part_b_extras(), b1=b1_sp500_var(), b2=b2_traffic_bet(), b3=b3_es_sp500(), b4=b4_z2_bet_btc(),
              b5=b5_dm_sp500(), b6=b6_dm_btc_eurron(), b7=b7_conformal_sp500(), b8=b8_conformal_bet_btc(), C=part_c())
     return R
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' and '--extras' in sys.argv:
+    R = json.load(open(os.path.join(HERE, 'sem8_results.json')))
+    R['AX'] = part_a_extras()
+    R['BX'] = part_b_extras()
+    with open(os.path.join(HERE, 'sem8_results.json'), 'w') as f:
+        json.dump(g.to_py(R), f, indent=1, default=str)
+    print(json.dumps(g.to_py(dict(AX=R['AX'], BX={k: v for k, v in R['BX'].items() if k != 'b9'})), indent=1))
+elif __name__ == '__main__':
     R = run_all()
     with open(os.path.join(HERE, 'sem8_results.json'), 'w') as f:
         json.dump(g.to_py(R), f, indent=1, default=str)

@@ -8,57 +8,57 @@ window.MFM_DATA.quizzes['options'] = {
     "draw": 20,
     "questions": [
         {
-            "correct": 0,
+            "correct": 1,
             "en": {
-                "title": "Put-call parity",
-                "text": "For European options on a stock without dividends, which relation always holds?",
+                "title": "Jump bias of the VIX",
+                "text": "If S&P 500 prices can jump, the squared VIX (a strip of OTM options weighted by 1/K^2) is the risk-neutral expectation of which quantity?",
                 "options": [
-                    "C - P = S - K e^{-r tau}",
-                    "C + P = S + K",
-                    "C = P for at-the-money options with any interest rate",
-                    "C - P = K - S"
+                    "Expected quadratic variation E^Q[QV], exactly, in any model",
+                    "E^Q[-2 ln(S_T/F)], which differs from expected quadratic variation by a jump term",
+                    "The squared at-the-money implied volatility",
+                    "E^P[RV], the expected realised variance under the real-world probability"
                 ],
-                "correctExplanation": "Call plus cash K e^{-r tau} and put plus one share pay max(S_T, K) in every state, so they cost the same today.",
-                "incorrectExplanation": "Parity compares two portfolios with identical pay-offs: a call plus the present value of K, and a put plus the share."
+                "correctExplanation": "Itô's lemma makes the log contract equal to integrated variance only for continuous paths; with jumps J the gap is 2E^Q[sum(e^J - 1 - J - J^2/2)], about E^Q[sum J^3]/3, negative for crashes (-2.0% of variance in the lecture's Merton example).",
+                "incorrectExplanation": "The strip prices the log contract. It equals expected quadratic variation only without jumps, and it is an expectation under the pricing measure Q, not under the real-world measure."
             },
             "ro": {
-                "title": "Paritatea put-call",
-                "text": "Pentru opțiuni europene pe o acțiune fără dividende, ce relație este mereu adevărată?",
+                "title": "Deplasarea VIX din salturi",
+                "text": "Dacă prețurile S&P 500 pot avea salturi, pătratul VIX (o bandă de opțiuni OTM ponderate cu 1/K^2) este speranța neutră la risc a cărei mărimi?",
                 "options": [
-                    "C - P = S - K e^{-r tau}",
-                    "C + P = S + K",
-                    "C = P pentru opțiuni la bani, cu orice rată a dobânzii",
-                    "C - P = K - S"
+                    "Variația pătratică așteptată E^Q[QV], exact, în orice model",
+                    "E^Q[-2 ln(S_T/F)], care diferă de variația pătratică așteptată printr-un termen de salt",
+                    "Pătratul volatilității implicite la bani",
+                    "E^P[RV], varianța realizată așteptată sub probabilitatea reală"
                 ],
-                "correctExplanation": "Call-ul plus numerarul K e^{-r tau} și put-ul plus o acțiune plătesc max(S_T, K) în orice stare, deci costă la fel azi.",
-                "incorrectExplanation": "Paritatea compară două portofolii cu plăți identice: un call plus valoarea actualizată a lui K și un put plus acțiunea."
+                "correctExplanation": "Lema lui Itô face contractul logaritmic egal cu varianța integrată doar pentru traiectorii continue; cu salturi J diferența este 2E^Q[sum(e^J - 1 - J - J^2/2)], aproximativ E^Q[sum J^3]/3, negativă pentru prăbușiri (-2,0% din varianță în exemplul Merton din curs).",
+                "incorrectExplanation": "Banda evaluează contractul logaritmic. Acesta este egal cu variația pătratică așteptată doar fără salturi și este o speranță sub măsura de evaluare Q, nu sub măsura reală."
             }
         },
         {
             "correct": 2,
             "en": {
-                "title": "Risk-neutral probability",
-                "text": "In a one-period binomial tree with S = 100, uS = 120, dS = 90 and gross risk-free return R = 1.05, what is the risk-neutral probability of the up move?",
+                "title": "Lee's moment formula",
+                "text": "An SVI fit of the total implied variance w(k) has a right-wing slope b(1 + rho) = 2.4. What is wrong?",
                 "options": [
-                    "0.60",
-                    "0.35",
-                    "0.50",
-                    "It depends on the investors' expected return"
+                    "Nothing: SVI wings must be linear in k",
+                    "The wing slope must be exactly 2",
+                    "It violates Lee's bound: w(k)/|k| cannot exceed 2 at extreme strikes, so the fitted smile admits arbitrage there",
+                    "Nothing: only the left wing is constrained by no arbitrage"
                 ],
-                "correctExplanation": "q = (R - d)/(u - d) = (1.05 - 0.9)/(1.2 - 0.9) = 0.5; under q the stock earns exactly the risk-free rate.",
-                "incorrectExplanation": "The risk-neutral probability is fixed by no-arbitrage, q = (R - d)/(u - d); the real probability and expected return do not enter."
+                "correctExplanation": "Lee (2004): limsup w(k)/|k| lies in [0, 2] in both wings, and the slope fixes the number of finite moments of S_T; the fits in the lecture have slopes of at most 0.39.",
+                "incorrectExplanation": "No arbitrage allows at most linear growth of total variance, with slope no larger than 2, in both wings; linear is allowed, steeper than 2 is not."
             },
             "ro": {
-                "title": "Probabilitatea neutră la risc",
-                "text": "Într-un arbore binomial cu o perioadă, cu S = 100, uS = 120, dS = 90 și randamentul brut fără risc R = 1,05, care este probabilitatea neutră la risc a creșterii?",
+                "title": "Formula momentelor a lui Lee",
+                "text": "O estimare SVI a varianței implicite totale w(k) are panta aripii drepte b(1 + rho) = 2,4. Ce este greșit?",
                 "options": [
-                    "0,60",
-                    "0,35",
-                    "0,50",
-                    "Depinde de randamentul așteptat al investitorilor"
+                    "Nimic: aripile SVI trebuie să fie liniare în k",
+                    "Panta aripii trebuie să fie exact 2",
+                    "Încalcă limita lui Lee: w(k)/|k| nu poate depăși 2 la prețuri de exercitare extreme, deci zâmbetul estimat admite arbitraj acolo",
+                    "Nimic: doar aripa stângă este constrânsă de absența arbitrajului"
                 ],
-                "correctExplanation": "q = (R - d)/(u - d) = (1,05 - 0,9)/(1,2 - 0,9) = 0,5; sub q acțiunea câștigă exact rata fără risc.",
-                "incorrectExplanation": "Probabilitatea neutră la risc este fixată de absența arbitrajului, q = (R - d)/(u - d); probabilitatea reală și randamentul așteptat nu intervin."
+                "correctExplanation": "Lee (2004): limsup w(k)/|k| este în [0, 2] în ambele aripi, iar panta fixează numărul de momente finite ale lui S_T; estimările din curs au pante de cel mult 0,39.",
+                "incorrectExplanation": "Absența arbitrajului permite cel mult o creștere liniară a varianței totale, cu panta cel mult 2, în ambele aripi; liniar este permis, mai abrupt decât 2 nu."
             }
         },
         {
@@ -91,28 +91,28 @@ window.MFM_DATA.quizzes['options'] = {
         {
             "correct": 1,
             "en": {
-                "title": "Reading N(d2)",
-                "text": "In the Black-Scholes call formula C = S N(d1) - K e^{-r tau} N(d2), what is N(d2)?",
+                "title": "Joint versus individual tests",
+                "text": "Mincer-Zarnowitz regression of 21-day realised variance on VIX^2: intercept -51.7 (s.e. 34.4), slope 0.86 (s.e. 0.10), joint Wald statistic 41.5 with 2 degrees of freedom. What do you conclude?",
                 "options": [
-                    "The real-world probability that the call ends in the money",
-                    "The risk-neutral probability that the call ends in the money",
-                    "The delta of the call",
-                    "The probability that the stock price doubles"
+                    "Unbiasedness is not rejected, because both t-statistics are below 2",
+                    "Unbiasedness is rejected jointly, although neither coefficient alone differs significantly from (0, 1): the two estimates are strongly negatively correlated",
+                    "Unbiasedness is rejected because R^2 is below 1",
+                    "The VIX is unbiased because the slope is close to 1"
                 ],
-                "correctExplanation": "N(d2) is the risk-neutral probability of exercise; N(d1) is the delta.",
-                "incorrectExplanation": "Black-Scholes prices under the risk-neutral measure, so N(d2) is a risk-neutral probability, not a forecast; the delta is N(d1)."
+                "correctExplanation": "The t-statistics are -1.50 and -1.34, but the estimates are correlated -0.90, so the confidence ellipse is thin and tilted and (0, 1) lies far outside it (p below 10^-9).",
+                "incorrectExplanation": "A hypothesis on two parameters needs the joint test, which uses their covariance; two individual t-tests ignore it, and R^2 says nothing about bias."
             },
             "ro": {
-                "title": "Citirea lui N(d2)",
-                "text": "În formula call-ului Black-Scholes C = S N(d1) - K e^{-r tau} N(d2), ce este N(d2)?",
+                "title": "Teste comune și teste individuale",
+                "text": "Regresia Mincer-Zarnowitz a varianței realizate pe 21 de zile pe VIX^2: termenul liber -51,7 (e.s. 34,4), panta 0,86 (e.s. 0,10), statistica Wald comună 41,5 cu 2 grade de libertate. Ce concluzionați?",
                 "options": [
-                    "Probabilitatea reală ca call-ul să se termine în bani",
-                    "Probabilitatea neutră la risc ca call-ul să se termine în bani",
-                    "Delta call-ului",
-                    "Probabilitatea ca prețul acțiunii să se dubleze"
+                    "Prognoza nedeplasată nu este respinsă, pentru că ambele statistici t sunt sub 2",
+                    "Prognoza nedeplasată este respinsă împreună, deși niciun coeficient luat separat nu diferă semnificativ de (0, 1): cele două estimări sunt puternic corelate negativ",
+                    "Prognoza nedeplasată este respinsă pentru că R^2 este sub 1",
+                    "VIX este nedeplasat pentru că panta este aproape de 1"
                 ],
-                "correctExplanation": "N(d2) este probabilitatea neutră la risc de exercitare; N(d1) este delta.",
-                "incorrectExplanation": "Black-Scholes evaluează sub măsura neutră la risc, deci N(d2) este o probabilitate neutră la risc, nu o prognoză; delta este N(d1)."
+                "correctExplanation": "Statisticile t sunt -1,50 și -1,34, dar estimările sunt corelate -0,90, deci elipsa de încredere este îngustă și înclinată, iar (0, 1) este mult în afara ei (p sub 10^-9).",
+                "incorrectExplanation": "O ipoteză asupra a doi parametri cere testul comun, care folosește covarianța lor; două teste t separate o ignoră, iar R^2 nu spune nimic despre deplasare."
             }
         },
         {
@@ -251,30 +251,30 @@ window.MFM_DATA.quizzes['options'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 2,
             "en": {
-                "title": "Implied volatility",
-                "text": "What is the implied volatility of an option?",
+                "title": "Errors in variables",
+                "text": "Why can OLS in RV = alpha + beta VIX^2 + e understate beta?",
                 "options": [
-                    "The historical standard deviation of the underlying",
-                    "The volatility forecast of a GARCH model",
-                    "The average volatility of all options on the same asset",
-                    "The sigma that makes the Black-Scholes price equal to the market price"
+                    "Heteroskedastic errors bias the OLS slope towards 0",
+                    "Overlapping 21-day windows bias the OLS slope",
+                    "VIX^2 measures the true expected variance with error, which attenuates the slope; instrumenting it with the lagged VIX^2 corrects this",
+                    "Non-normal residuals bias the OLS slope"
                 ],
-                "correctExplanation": "Implied volatility inverts the Black-Scholes formula; it is unique because the price increases in sigma (vega > 0).",
-                "incorrectExplanation": "Implied volatility is read from the market price of the option, not estimated from past returns."
+                "correctExplanation": "Classical measurement error in a regressor biases OLS towards 0 (Christensen and Prabhala, 1998); a lagged value is a valid instrument if its error is uncorrelated with today's. In the lecture data the correction is small: 1.06 (OLS) and 1.02 (instruments) in logs.",
+                "incorrectExplanation": "Heteroskedasticity, overlap and non-normality affect the standard errors, not the consistency of OLS; attenuation comes from error in the regressor."
             },
             "ro": {
-                "title": "Volatilitatea implicită",
-                "text": "Ce este volatilitatea implicită a unei opțiuni?",
+                "title": "Erori în variabile",
+                "text": "De ce poate OLS în RV = alpha + beta VIX^2 + e să subestimeze beta?",
                 "options": [
-                    "Abaterea standard istorică a activului suport",
-                    "Prognoza de volatilitate a unui model GARCH",
-                    "Volatilitatea medie a tuturor opțiunilor pe același activ",
-                    "Acel sigma pentru care prețul Black-Scholes este egal cu prețul de piață"
+                    "Erorile heteroscedastice deplasează panta OLS spre 0",
+                    "Ferestrele suprapuse de 21 de zile deplasează panta OLS",
+                    "VIX^2 măsoară cu eroare varianța așteptată adevărată, ceea ce atenuează panta; instrumentarea cu VIX^2 întârziat corectează acest lucru",
+                    "Reziduurile care nu urmează distribuția Normală deplasează panta OLS"
                 ],
-                "correctExplanation": "Volatilitatea implicită inversează formula Black-Scholes; este unică pentru că prețul crește în sigma (vega > 0).",
-                "incorrectExplanation": "Volatilitatea implicită se citește din prețul de piață al opțiunii, nu se estimează din randamentele trecute."
+                "correctExplanation": "Eroarea clasică de măsurare într-un regresor deplasează OLS spre 0 (Christensen și Prabhala, 1998); o valoare întârziată este un instrument valid dacă eroarea ei este necorelată cu cea de azi. În datele cursului corecția este mică: 1,06 (OLS) și 1,02 (instrumente), în logaritmi.",
+                "incorrectExplanation": "Heteroscedasticitatea, suprapunerea și abaterile de la distribuția Normală afectează erorile standard, nu consistența OLS; atenuarea vine din eroarea din regresor."
             }
         },
         {
@@ -305,84 +305,84 @@ window.MFM_DATA.quizzes['options'] = {
             }
         },
         {
-            "correct": 1,
+            "correct": 0,
             "en": {
-                "title": "Leverage effect",
-                "text": "The daily correlation between S&P 500 returns and VIX changes was -0.79 over 1990-2026. What does it mean?",
+                "title": "Where the hedging P&L comes from",
+                "text": "A delta-hedged long option earns (1/2) Gamma S^2 (sigma_real^2 - sigma_imp^2) dt. Where is its P&L concentrated?",
                 "options": [
-                    "Implied volatility is independent of prices",
-                    "Implied volatility tends to rise when the market falls",
-                    "The VIX predicts next month's return",
-                    "The VIX rises when the market rises"
+                    "Near the strike and near expiry, where gamma is large, so the price path matters and not only total realised variance",
+                    "It depends only on total realised variance over the life, like a variance swap",
+                    "It depends only on the drift mu of the underlying",
+                    "Only on the expiry date"
                 ],
-                "correctExplanation": "A strongly negative correlation: falling prices come with rising volatility, the negative rho of the Heston model.",
-                "incorrectExplanation": "The sign is negative: the VIX goes up on down days, which is why puts hedge both the fall and the volatility spike."
+                "correctExplanation": "The variance difference is weighted by Gamma S^2, which peaks at the money and near expiry; a variance swap has constant weights, a delta-hedged option random ones.",
+                "incorrectExplanation": "The drift drops out of the hedged P&L; what remains is the variance gap weighted by gamma along the path."
             },
             "ro": {
-                "title": "Efectul de levier",
-                "text": "Corelația zilnică dintre randamentele S&P 500 și variațiile VIX a fost -0,79 în 1990-2026. Ce înseamnă?",
+                "title": "De unde vine rezultatul acoperirii",
+                "text": "O opțiune cumpărată și acoperită delta câștigă (1/2) Gamma S^2 (sigma_real^2 - sigma_imp^2) dt. Unde se concentrează rezultatul?",
                 "options": [
-                    "Volatilitatea implicită este independentă de prețuri",
-                    "Volatilitatea implicită tinde să crească atunci când piața scade",
-                    "VIX prognozează randamentul lunii următoare",
-                    "VIX crește când piața crește"
+                    "Aproape de prețul de exercitare și de scadență, unde gamma este mare, deci contează traiectoria prețului, nu doar varianța realizată totală",
+                    "Depinde doar de varianța realizată totală pe durata opțiunii, ca un swap de varianță",
+                    "Depinde doar de tendința mu a activului suport",
+                    "Doar de data scadenței"
                 ],
-                "correctExplanation": "O corelație puternic negativă: prețurile în scădere vin cu volatilitate în creștere, rho negativ din modelul Heston.",
-                "incorrectExplanation": "Semnul este negativ: VIX crește în zilele de scădere, motiv pentru care put-urile acoperă și scăderea, și saltul volatilității."
-            }
-        },
-        {
-            "correct": 2,
-            "en": {
-                "title": "Bitcoin smile",
-                "text": "In the Deribit snapshot of the lecture, how does the Bitcoin smile differ from the typical equity-index skew?",
-                "options": [
-                    "It is perfectly flat",
-                    "Only calls have high implied volatility",
-                    "Both wings rise: out-of-the-money calls and puts are both expensive",
-                    "Implied volatility falls for all strikes away from the money"
-                ],
-                "correctExplanation": "Bitcoin can jump up as well as down, so the smile has two rising wings; the equity skew is mostly one-sided.",
-                "incorrectExplanation": "The Bitcoin smile is a true smile, with both wings above the at-the-money level, unlike the one-sided equity skew."
-            },
-            "ro": {
-                "title": "Zâmbetul Bitcoin",
-                "text": "În instantaneul Deribit din curs, cum diferă zâmbetul Bitcoin de asimetria tipică a indicilor bursieri?",
-                "options": [
-                    "Este perfect plat",
-                    "Doar call-urile au volatilitate implicită mare",
-                    "Ambele aripi cresc: atât call-urile, cât și put-urile în afara banilor sunt scumpe",
-                    "Volatilitatea implicită scade pentru toate prețurile de exercitare depărtate de bani"
-                ],
-                "correctExplanation": "Bitcoin poate sări atât în sus, cât și în jos, deci zâmbetul are două aripi crescătoare; asimetria acțiunilor este în mare parte unilaterală.",
-                "incorrectExplanation": "Zâmbetul Bitcoin este un zâmbet adevărat, cu ambele aripi peste nivelul la bani, spre deosebire de asimetria unilaterală a acțiunilor."
+                "correctExplanation": "Diferența de varianță este ponderată cu Gamma S^2, maximă la bani și aproape de scadență; un swap de varianță are ponderi constante, o opțiune acoperită delta are ponderi aleatoare.",
+                "incorrectExplanation": "Tendința dispare din rezultatul acoperit; rămâne diferența de varianță ponderată cu gamma de-a lungul traiectoriei."
             }
         },
         {
             "correct": 3,
             "en": {
-                "title": "SVI",
-                "text": "What does the SVI parameterisation model?",
+                "title": "Estimating the risk-neutral density",
+                "text": "Why do risk-neutral densities obtained with Breeden-Litzenberger need smoothing and shape constraints?",
                 "options": [
-                    "The price of the underlying",
-                    "The risk-free rate curve",
-                    "The volatility of the VIX",
-                    "The total implied variance w(k) = sigma^2 tau as a function of log-moneyness"
+                    "Because index calls are American",
+                    "Because the interest rate is not zero",
+                    "Because the log-normal distribution is the true density",
+                    "Because differentiating quotes twice amplifies their noise, and without convexity in K the estimated density can be negative"
                 ],
-                "correctExplanation": "SVI gives w(k) = a + b(rho(k - m) + sqrt((k - m)^2 + s^2)) for each expiry, with linear wings.",
-                "incorrectExplanation": "SVI is a five-parameter description of one smile in total-variance form; it has no dynamics for the underlying."
+                "correctExplanation": "q = e^{r tau} d^2C/dK^2 is an ill-posed inverse problem; in the lecture's Deribit chain 7 of 732 mark butterflies are negative, all within the bid-ask spread.",
+                "incorrectExplanation": "The issue is statistical: a second derivative of noisy, discrete prices, which must be convex in the strike to give a non-negative density."
             },
             "ro": {
-                "title": "SVI",
-                "text": "Ce modelează parametrizarea SVI?",
+                "title": "Estimarea densității neutre la risc",
+                "text": "De ce au nevoie densitățile neutre la risc obținute cu Breeden-Litzenberger de netezire și de constrângeri de formă?",
                 "options": [
-                    "Prețul activului suport",
-                    "Curba ratei fără risc",
-                    "Volatilitatea indicelui VIX",
-                    "Varianța implicită totală w(k) = sigma^2 tau ca funcție de log-moneyness"
+                    "Pentru că opțiunile call pe indici sunt americane",
+                    "Pentru că rata dobânzii nu este zero",
+                    "Pentru că distribuția log-normală este densitatea adevărată",
+                    "Pentru că derivarea de două ori a cotațiilor le amplifică zgomotul, iar fără convexitate în K densitatea estimată poate fi negativă"
                 ],
-                "correctExplanation": "SVI dă w(k) = a + b(rho(k - m) + sqrt((k - m)^2 + s^2)) pentru fiecare scadență, cu aripi liniare.",
-                "incorrectExplanation": "SVI este o descriere cu cinci parametri a unui zâmbet, în formă de varianță totală; nu are dinamică pentru activul suport."
+                "correctExplanation": "q = e^{r tau} d^2C/dK^2 este o problemă inversă prost condiționată; în lanțul Deribit din curs 7 din 732 de fluturi de marcare sunt negativi, toți în interiorul marjei dintre cotații.",
+                "incorrectExplanation": "Problema este statistică: o derivată a doua a unor prețuri discrete și zgomotoase, care trebuie să fie convexe în prețul de exercitare pentru a da o densitate nenegativă."
+            }
+        },
+        {
+            "correct": 1,
+            "en": {
+                "title": "Overlapping predictive regressions",
+                "text": "You regress 12-month excess returns on the monthly variance risk premium, sampled monthly, so the return windows overlap. Which standard errors?",
+                "options": [
+                    "White heteroskedasticity-robust (HC0) standard errors",
+                    "Hodrick (1992) or Hansen-Hodrick standard errors, or Newey-West with at least h - 1 lags, plus a bootstrap for the bias of a persistent regressor",
+                    "Standard errors clustered by calendar year",
+                    "None needed: OLS is unbiased, so the usual standard errors are fine"
+                ],
+                "correctExplanation": "Overlap makes the errors MA(11); HC0 ignores it and overstates t. In the lecture no horizon of 1-12 months is significant on 1990-2026 with any of these corrections.",
+                "incorrectExplanation": "Consecutive 12-month windows share 11 months, so the errors are autocorrelated; the correction must span the overlap, and a persistent predictor adds small-sample bias."
+            },
+            "ro": {
+                "title": "Regresii predictive suprapuse",
+                "text": "Regresați randamentele în exces pe 12 luni pe prima de risc a varianței lunară, eșantionate lunar, deci ferestrele de randament se suprapun. Ce erori standard folosiți?",
+                "options": [
+                    "Erori standard White robuste la heteroscedasticitate (HC0)",
+                    "Erori standard Hodrick (1992) sau Hansen-Hodrick, ori Newey-West cu cel puțin h - 1 lag-uri, plus un bootstrap pentru deplasarea dată de un regresor persistent",
+                    "Erori standard grupate pe ani calendaristici",
+                    "Niciuna: OLS este nedeplasat, deci erorile standard obișnuite sunt suficiente"
+                ],
+                "correctExplanation": "Suprapunerea face erorile MA(11); HC0 o ignoră și supraestimează t. În curs niciun orizont de 1-12 luni nu este semnificativ pe 1990-2026, cu oricare dintre aceste corecții.",
+                "incorrectExplanation": "Ferestrele consecutive de 12 luni au 11 luni în comun, deci erorile sunt autocorelate; corecția trebuie să acopere suprapunerea, iar un predictor persistent adaugă deplasare în eșantion mic."
             }
         },
         {
@@ -558,7 +558,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "The VIX is too high on average, most of all when it is high: it contains a risk premium",
                     "The VIX has no information about future volatility"
                 ],
-                "correctExplanation": "An unbiased forecast needs intercept 0 and slope 1; the VIX overstates realised variance, yet it explains more (R^2 0.37) than past variance (0.29).",
+                "correctExplanation": "An unbiased forecast needs intercept 0 and slope 1; neither t-statistic alone rejects, but the joint Wald test does (41.5, p below 10^-9): the VIX overstates realised variance, yet explains more (R^2 0.37) than past variance (0.29).",
                 "incorrectExplanation": "The regression shows an upward bias from the risk premium, but the VIX remains informative about future volatility."
             },
             "ro": {
@@ -570,35 +570,35 @@ window.MFM_DATA.quizzes['options'] = {
                     "VIX este prea mare în medie, cel mai mult când este mare: conține o primă de risc",
                     "VIX nu conține informație despre volatilitatea viitoare"
                 ],
-                "correctExplanation": "O prognoză nedeplasată cere termen liber 0 și pantă 1; VIX supraestimează varianța realizată, dar explică mai mult (R^2 0,37) decât varianța trecută (0,29).",
+                "correctExplanation": "O prognoză nedeplasată cere termen liber 0 și pantă 1; nicio statistică t separată nu respinge, dar testul Wald comun respinge (41,5, p sub 10^-9): VIX supraestimează varianța realizată, dar explică mai mult (R^2 0,37) decât varianța trecută (0,29).",
                 "incorrectExplanation": "Regresia arată o deplasare în sus dată de prima de risc, dar VIX rămâne informativ pentru volatilitatea viitoare."
             }
         },
         {
-            "correct": 3,
+            "correct": 2,
             "en": {
-                "title": "0DTE options",
-                "text": "What characterises options with zero days to expiry (0DTE)?",
+                "title": "Ex-ante and ex-post variance premium",
+                "text": "What distinguishes the ex-ante from the ex-post variance risk premium?",
                 "options": [
-                    "Low gamma and slow time decay",
-                    "They cannot be delta-hedged",
-                    "They are only traded on Bitcoin",
-                    "Very high gamma and time decay at the money: small premia and sudden large losses for sellers"
+                    "They are the same quantity measured in different units",
+                    "The ex-post premium uses past realised variance, the ex-ante premium future realised variance",
+                    "The ex-ante premium (VIX^2 minus past realised variance) is known at t and can predict returns; the ex-post premium uses future realised variance and is the realised P&L of a variance swap",
+                    "Only the ex-post premium can be tested with Newey-West errors"
                 ],
-                "correctExplanation": "In the stylised same-day straddle test the seller won on 75% of days but lost 8.25% of the price on the worst day, about 11 premia.",
-                "incorrectExplanation": "Near expiry gamma and theta explode at the money, so 0DTE positions change value very quickly."
+                "correctExplanation": "A predictor must be known at the forecast date; VIX_t^2 - RV_{t,t+21} is known only at t+21 and measures what a variance-swap seller earned, not what an investor could see.",
+                "incorrectExplanation": "The two differ in timing: the ex-post version subtracts variance realised after t, so it cannot be used as a predictor at t."
             },
             "ro": {
-                "title": "Opțiunile 0DTE",
-                "text": "Ce caracterizează opțiunile cu zero zile până la scadență (0DTE)?",
+                "title": "Prima de varianță ex ante și ex post",
+                "text": "Ce deosebește prima de risc a varianței ex ante de cea ex post?",
                 "options": [
-                    "Gamma mică și erodare lentă în timp",
-                    "Nu pot fi acoperite delta",
-                    "Se tranzacționează doar pe Bitcoin",
-                    "Gamma și erodarea în timp foarte mari la bani: prime mici și pierderi bruște și mari pentru vânzători"
+                    "Sunt aceeași mărime, măsurată în unități diferite",
+                    "Prima ex post folosește varianța realizată trecută, cea ex ante varianța realizată viitoare",
+                    "Prima ex ante (VIX^2 minus varianța realizată trecută) este cunoscută la t și poate prognoza randamente; prima ex post folosește varianța realizată viitoare și este rezultatul realizat al unui swap de varianță",
+                    "Doar prima ex post poate fi testată cu erori Newey-West"
                 ],
-                "correctExplanation": "În testul stilizat cu straddle în aceeași zi vânzătorul a câștigat în 75% din zile, dar a pierdut 8,25% din preț în cea mai rea zi, aproximativ 11 prime.",
-                "incorrectExplanation": "Aproape de scadență gamma și theta explodează la bani, deci pozițiile 0DTE își schimbă valoarea foarte repede."
+                "correctExplanation": "Un predictor trebuie să fie cunoscut la data prognozei; VIX_t^2 - RV_{t,t+21} este cunoscută abia la t+21 și măsoară ce a câștigat vânzătorul unui swap de varianță, nu ce putea vedea un investitor.",
+                "incorrectExplanation": "Cele două diferă prin moment: versiunea ex post scade varianța realizată după t, deci nu poate fi folosită ca predictor la t."
             }
         },
         {

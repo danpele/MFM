@@ -18,7 +18,7 @@ from statsmodels.stats.diagnostic import acorr_ljungbox
 from mfm_data import read_market
 from generate_all_charts import (closes, rets, spx_ohlc, LABELS, COLORS, PERIODS, MainBlue, IDAred,
                                  Forest, Amber, Gray, LightGray, save_fig, legend_outside_bottom,
-                                 hill_estimator, leverage_corr)
+                                 hill_estimator, leverage_corr, cusum_squares_break, local_whittle)
 
 SEED = 42
 
@@ -287,15 +287,16 @@ def leverage_regression(asset, n_controls=5):
 # =============================================================================
 def bettr_vs_sp500(n_boot=2000, block=21):
     px = pd.concat([closes['bettr'], closes['sp500']], axis=1, keys=['bet', 'spx']).dropna()   # join pe PRETURI
-    r = np.log(px).diff().dropna()
+    r = np.log(px).diff().dropna()                            # randamente log: corelatii
+    R = px.pct_change().dropna()                              # randamente simple: Sharpe (definitia cursului)
     T = len(r)
-    sr = r.mean() / r.std()                                   # Sharpe zilnic, r_f = 0
-    rho = r['bet'].corr(r['spx'])
+    sr = R.mean() / R.std()                                   # Sharpe zilnic, r_f = 0
+    rho = R['bet'].corr(R['spx'])
     theta = 2 - 2 * rho + 0.5 * (sr['bet'] ** 2 + sr['spx'] ** 2 - 2 * sr['bet'] * sr['spx'] * rho ** 2)
     z_jkm = (sr['bet'] - sr['spx']) / np.sqrt(theta / T)
     # bootstrap pe blocuri (blocuri circulare de 21 de zile) pentru diferenta Sharpe anualizata
     rng = np.random.default_rng(SEED)
-    vals = r.values
+    vals = R.values
     nb = int(np.ceil(T / block))
     diffs = []
     for _ in range(n_boot):
@@ -315,7 +316,8 @@ def bettr_vs_sp500(n_boot=2000, block=21):
                 diff_ann=d_obs, rho=rho, z_jkm=z_jkm, p_jkm=2 * stats.norm.sf(abs(z_jkm)),
                 boot_ci=(np.quantile(diffs, 0.025), np.quantile(diffs, 0.975)),
                 boot_p=2 * min((diffs <= 0).mean(), (diffs >= 0).mean()),
-                corr_lag0=rho, corr_lag1=lag1, corr_lead1=lead1, corr_sw=rho + lag1,
+                corr_lag0=r['bet'].corr(r['spx']), corr_lag1=lag1, corr_lead1=lead1,
+                corr_sw=r['bet'].corr(r['spx']) + lag1,
                 corr_weekly=wk['bet'].corr(wk['spx']))
 
 
@@ -328,6 +330,8 @@ def garch_check(n_paths=200, lags=(1, 20, 100), frac=0.02):
     r = 100 * rets['sp500']
     am = arch_model(r, mean='Constant', vol='GARCH', p=1, q=1, dist='t')
     res = am.fit(disp='off')
+    from arch.univariate import StudentsT
+    am.distribution = StudentsT(seed=np.random.default_rng(SEED))   # simulari reproductibile
     n = len(r)
     k = int(frac * n)
 
@@ -437,6 +441,65 @@ def fig_bettr_rolling_acf(window=250, split='2020-09-21'):
                 corr_rho_liquidity=corr_liq, tv_median_pre_mn=tv_pre / 1e6, tv_median_post_mn=tv_post / 1e6)
 
 
+# =============================================================================
+# A4: drawdown-ul maxim asteptat al unei miscari browniene fara drift (Magdon-Ismail et al. 2004)
+# =============================================================================
+def mdd_brownian(assets=('gold', 'sp500', 'btc')):
+    """E[MDD] = sqrt(pi/2) sigma sqrt(T) pentru log-pret, mu = 0; comparat cu MDD observat (log)."""
+    rows = []
+    for a in assets:
+        c = closes[a]
+        Y = (c.index[-1] - c.index[0]).days / 365.25
+        sig = rets[a].std() * np.sqrt(PERIODS[a])
+        e = np.sqrt(np.pi / 2) * sig * np.sqrt(Y)
+        mdd = float(np.log(c / c.cummax()).min())
+        rows.append({'asset': LABELS[a], 'years': Y, 'sigma': sig, 'mu_log': rets[a].mean() * PERIODS[a],
+                     'E_mdd_log': e, 'E_mdd_pct': 100 * (1 - np.exp(-e)), 'mdd_log': mdd,
+                     'mdd_pct': 100 * (np.exp(mdd) - 1)})
+    return pd.DataFrame(rows).set_index('asset')
+
+
+# =============================================================================
+# B6: EUR/RON pe regimuri -- ruptura de varianta si testul egalitatii lui rho_1 (EE robuste)
+# =============================================================================
+def eurron_regimes(periods=(('2005-07-01', '2011-12-31'), ('2012-01-01', '2019-12-31'), ('2020-01-01', '2026-12-31'))):
+    r = rets['eurron']
+    rows = []
+    for a, b in periods:
+        x = (r[a:b] - r[a:b].mean()).values
+        s2 = np.sum(x ** 2)
+        rho = np.sum(x[1:] * x[:-1]) / s2
+        rows.append({'period': f'{a[:4]}-{b[:4]}', 'rho1': rho, 'se_robust': np.sqrt(np.sum(x[1:] ** 2 * x[:-1] ** 2)) / s2,
+                     'se_iid': 1 / np.sqrt(len(x)), 'vol_pct': 100 * x.std() * np.sqrt(252),
+                     'exkurt': stats.kurtosis(x)})
+    t = pd.DataFrame(rows).set_index('period')
+    w = 1 / t['se_robust'] ** 2
+    rbar = np.sum(w * t['rho1']) / np.sum(w)
+    wald = float(np.sum(w * (t['rho1'] - rbar) ** 2))
+    j, it = cusum_squares_break(r.values)
+    return dict(table=t, wald=wald, wald_p=float(stats.chi2.sf(wald, len(t) - 1)),
+                break_date=r.index[j].date(), it_stat=it)
+
+
+# =============================================================================
+# B15: parametrul de memorie d al lui |r_t| (Whittle local), inainte si dupa ruptura de varianta
+# =============================================================================
+def memory_before_after(assets=('sp500', 'bettr', 'btc'), power=0.65):
+    rows = []
+    for a in assets:
+        r = rets[a]
+        x = np.abs(r.values)
+        d, se = local_whittle(x, int(len(x) ** power))
+        j, _ = cusum_squares_break(r.values)
+        d1, s1 = local_whittle(x[:j + 1], int((j + 1) ** power))
+        d2, s2 = local_whittle(x[j + 1:], int((len(x) - j - 1) ** power))
+        rows.append({'asset': LABELS[a], 'm': int(len(x) ** power), 'd': d, 'se': se,
+                     'ci': (d - 1.96 * se, d + 1.96 * se), 'break': r.index[j].date(),
+                     'd_before': d1, 'se_before': s1, 'd_after': d2, 'se_after': s2,
+                     'z_change': (d2 - d1) / np.sqrt(s1 ** 2 + s2 ** 2)})
+    return pd.DataFrame(rows).set_index('asset')
+
+
 if __name__ == '__main__':
     import pprint
     pd.set_option('display.width', 200)
@@ -452,3 +515,6 @@ if __name__ == '__main__':
     print('B13'); pprint.pprint(bettr_vs_sp500())
     print('B14'); gc = garch_check(); print(gc['params'], gc['persistence']); print(gc['table'].round(3))
     print('C1'); pprint.pprint(fig_bettr_rolling_acf())
+    print('A4 MDD'); print(mdd_brownian().round(3))
+    print('B6'); pprint.pprint(eurron_regimes())
+    print('B15'); print(memory_before_after().round(3).T)

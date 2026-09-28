@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_caviar'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'CAViaR with symmetric absolute value (Engle and Manganelli, 2004) for the S&P 500 at 1%: parameters estimated on 2000-2015 by minimising the pinball loss (10^4 random starts, simplex and quasi-Newton refinement); one-day-ahead VaR 1% out of sample 2016-2026 compared with filtered historical simulation.'
+
+Keywords: 'CAViaR, quantile regression, pinball loss, value-at-risk, filtered historical simulation, S&P 500'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_caviar.pdf'

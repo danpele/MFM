@@ -8,30 +8,30 @@ window.MFM_DATA.quizzes['continuous-time'] = {
     "draw": 20,
     "questions": [
         {
-            "correct": 1,
+            "correct": 0,
             "en": {
-                "title": "Scaling a random walk",
-                "text": "To obtain Brownian motion as the limit of a random walk with n steps on [0, 1], the time step is 1/n. What is the space step?",
+                "title": "Girsanov: what changes",
+                "text": "A diffusion dX = a dt + b dW is moved from the real-world measure P to an equivalent measure Q by Girsanov's theorem. What can change?",
                 "options": [
-                    "1/n",
-                    "1/sqrt(n)",
-                    "1",
-                    "log(n)/n"
+                    "Only the drift; the diffusion coefficient, and hence the quadratic variation, is the same under P and Q",
+                    "Only the volatility; the drift is fixed by the data",
+                    "Both the drift and the volatility",
+                    "Nothing, because equivalent measures give the same expectations"
                 ],
-                "correctExplanation": "With steps of size 1/sqrt(n) the variance at time t stays equal to t for every n, the only scaling with a non-trivial limit.",
-                "incorrectExplanation": "Steps of 1/n make the walk collapse to zero, steps of 1 make it explode; only 1/sqrt(n) keeps the variance at t."
+                "correctExplanation": "Under Q, W becomes W~ + drift shift, so dX = (a - b theta) dt + b dW~: the drift moves, b and the quadratic variation do not. This is why realised variance measures the same sigma that prices options.",
+                "incorrectExplanation": "Quadratic variation is a path property, identical under equivalent measures, so the volatility cannot change; equivalent measures share null events, not expectations, so the drift does change."
             },
             "ro": {
-                "title": "Scalarea unui mers aleator",
-                "text": "Pentru a obține mișcarea browniană ca limită a unui mers aleator cu n pași pe [0, 1], pasul de timp este 1/n. Care este pasul de spațiu?",
+                "title": "Girsanov: ce se schimbă",
+                "text": "O difuzie dX = a dt + b dW este trecută de la măsura reală P la o măsură echivalentă Q prin teorema lui Girsanov. Ce se poate schimba?",
                 "options": [
-                    "1/n",
-                    "1/sqrt(n)",
-                    "1",
-                    "log(n)/n"
+                    "Doar driftul; coeficientul de difuzie, deci și variația pătratică, este același sub P și Q",
+                    "Doar volatilitatea; driftul este fixat de date",
+                    "Atât driftul, cât și volatilitatea",
+                    "Nimic, deoarece măsurile echivalente dau aceleași valori așteptate"
                 ],
-                "correctExplanation": "Cu pași de mărime 1/sqrt(n), dispersia la momentul t rămâne egală cu t pentru orice n: singura scalare cu o limită netrivială.",
-                "incorrectExplanation": "Pașii de 1/n fac mersul să se reducă la zero, pașii de 1 îl fac să explodeze; doar 1/sqrt(n) păstrează dispersia egală cu t."
+                "correctExplanation": "Sub Q, W devine W~ plus o deplasare de drift, deci dX = (a - b theta) dt + b dW~: driftul se mută, b și variația pătratică nu. De aceea varianța realizată măsoară același sigma care evaluează opțiunile.",
+                "incorrectExplanation": "Variația pătratică este o proprietate a traiectoriei, identică sub măsuri echivalente, deci volatilitatea nu se poate schimba; măsurile echivalente au aceleași evenimente de probabilitate zero, nu aceleași valori așteptate, deci driftul se schimbă."
             }
         },
         {
@@ -62,57 +62,57 @@ window.MFM_DATA.quizzes['continuous-time'] = {
             }
         },
         {
-            "correct": 0,
+            "correct": 2,
             "en": {
-                "title": "Brownian increments",
-                "text": "For a standard Brownian motion and s < t, what is the distribution of W_t - W_s?",
+                "title": "Infill versus long span",
+                "text": "An OU process is observed every second over a fixed 5-year window, so n grows without bound while T = 5 stays fixed. Which parameter is estimated consistently?",
                 "options": [
-                    "Normal with mean 0 and variance t - s, independent of the path up to s",
-                    "Normal with mean 0 and variance t",
-                    "Uniform on [-(t - s), t - s]",
-                    "Normal with mean W_s and variance 1"
+                    "The speed of mean reversion kappa",
+                    "The long-run mean theta",
+                    "The volatility sigma",
+                    "All three, because n tends to infinity"
                 ],
-                "correctExplanation": "Brownian increments are independent of the past and Normal with variance equal to the elapsed time.",
-                "incorrectExplanation": "The variance of an increment equals the length of the interval, not the total time, and the mean is zero."
+                "correctExplanation": "Infill asymptotics: the sum of squared increments converges to the integrated variance, so sigma is identified without error; kappa and theta are drift parameters whose information grows only with T.",
+                "incorrectExplanation": "Drift parameters (kappa, theta) are identified by the calendar span T, not by the number of observations: Var(kappa-hat) is about 2 kappa / T at any sampling step."
             },
             "ro": {
-                "title": "Creșterile browniene",
-                "text": "Pentru o mișcare browniană standard și s < t, care este distribuția lui W_t - W_s?",
+                "title": "Infill versus orizont lung",
+                "text": "Un proces OU este observat în fiecare secundă pe o fereastră fixă de 5 ani, deci n crește nelimitat, iar T = 5 rămâne fix. Ce parametru se estimează consistent?",
                 "options": [
-                    "Normală cu media 0 și dispersia t - s, independentă de traiectoria până la s",
-                    "Normală cu media 0 și dispersia t",
-                    "Uniformă pe [-(t - s), t - s]",
-                    "Normală cu media W_s și dispersia 1"
+                    "Viteza de revenire la medie kappa",
+                    "Media pe termen lung theta",
+                    "Volatilitatea sigma",
+                    "Toți trei, deoarece n tinde la infinit"
                 ],
-                "correctExplanation": "Creșterile browniene sunt independente de trecut și Normale, cu dispersia egală cu timpul scurs.",
-                "incorrectExplanation": "Dispersia unei creșteri este egală cu lungimea intervalului, nu cu timpul total, iar media este zero."
+                "correctExplanation": "Asimptotica infill: suma pătratelor creșterilor converge la varianța integrată, deci sigma este identificat fără eroare; kappa și theta sunt parametri de drift, a căror informație crește doar cu T.",
+                "incorrectExplanation": "Parametrii de drift (kappa, theta) sunt identificați de durata calendaristică T, nu de numărul de observații: Var(kappa estimat) este circa 2 kappa / T la orice pas de eșantionare."
             }
         },
         {
-            "correct": 2,
+            "correct": 1,
             "en": {
-                "title": "Quadratic variation",
-                "text": "What is the limit of the sum of squared Brownian increments over [0, T] as the grid becomes finer?",
+                "title": "The VIX in the Heston model",
+                "text": "In the Heston model, what is (VIX_t / 100)^2, the 30-day risk-neutral expected variance?",
                 "options": [
-                    "0",
-                    "Infinity",
-                    "T",
-                    "W_T squared"
+                    "Equal to the instantaneous variance v_t",
+                    "An affine function a + b v_t of v_t, with risk-neutral parameters and b < 1",
+                    "Equal to the long-run variance theta",
+                    "Independent of v_t"
                 ],
-                "correctExplanation": "The quadratic variation of Brownian motion is deterministic and equals T; this is the origin of (dW)^2 = dt.",
-                "incorrectExplanation": "The total variation (sum of absolute increments) diverges, but the sum of squares converges to T, not to 0 or W_T squared."
+                "correctExplanation": "Integrating E^Q[v_s | v_t] = theta^Q + (v_t - theta^Q) exp(-kappa^Q (s - t)) over 30 days gives a + b v_t with b = (1 - exp(-kappa^Q tau)) / (kappa^Q tau) < 1: a regression on VIX^2 attenuates the volatility of volatility by b.",
+                "incorrectExplanation": "The VIX averages expected variance over the next 30 days under Q; mean reversion pulls this average towards theta^Q, so it depends on v_t, but with a slope below one."
             },
             "ro": {
-                "title": "Variația pătratică",
-                "text": "Care este limita sumei pătratelor creșterilor browniene pe [0, T] când grila devine tot mai fină?",
+                "title": "VIX în modelul Heston",
+                "text": "În modelul Heston, ce este (VIX_t / 100)^2, varianța așteptată neutră la risc pe 30 de zile?",
                 "options": [
-                    "0",
-                    "Infinit",
-                    "T",
-                    "W_T la pătrat"
+                    "Egal cu varianța instantanee v_t",
+                    "O funcție afină a + b v_t de v_t, cu parametri neutri la risc și b < 1",
+                    "Egal cu varianța pe termen lung theta",
+                    "Independent de v_t"
                 ],
-                "correctExplanation": "Variația pătratică a mișcării browniene este deterministă și egală cu T; de aici provine (dW)^2 = dt.",
-                "incorrectExplanation": "Variația totală (suma creșterilor în valoare absolută) diverge, dar suma pătratelor converge la T, nu la 0 sau la W_T la pătrat."
+                "correctExplanation": "Integrând E^Q[v_s | v_t] = theta^Q + (v_t - theta^Q) exp(-kappa^Q (s - t)) pe 30 de zile obținem a + b v_t, cu b = (1 - exp(-kappa^Q tau)) / (kappa^Q tau) < 1: o regresie pe VIX^2 atenuează volatilitatea volatilității cu factorul b.",
+                "incorrectExplanation": "VIX mediază varianța așteptată în următoarele 30 de zile sub Q; revenirea la medie trage această medie spre theta^Q, deci depinde de v_t, dar cu o pantă sub unu."
             }
         },
         {
@@ -224,30 +224,30 @@ window.MFM_DATA.quizzes['continuous-time'] = {
             }
         },
         {
-            "correct": 0,
+            "correct": 3,
             "en": {
-                "title": "Mean versus median",
-                "text": "Under GBM with the S&P 500 parameters, the 10-year mean gross return is 2.71 and the median 2.30. What share of paths ends below the mean?",
+                "title": "Feynman-Kac",
+                "text": "Let u(t, x) = E^Q[exp(-r (T - t)) g(X_T) | X_t = x] with dX = a(X) dt + b(X) dW~ under Q and a constant rate r. Which equation does u solve?",
                 "options": [
-                    "About 61%",
-                    "Exactly 50%",
-                    "About 7%",
-                    "About 90%"
+                    "u_t + a u_x + b^2 u_xx - r u = 0",
+                    "u_t + a u_x + (1/2) b^2 u_xx + r u = 0",
+                    "u_t + (1/2) u_xx = 0, whatever the drift",
+                    "u_t + a u_x + (1/2) b^2 u_xx - r u = 0, with u(T, x) = g(x)"
                 ],
-                "correctExplanation": "P(S_T < E[S_T]) = Phi(sigma sqrt(T)/2), about 61% here: the mean is pulled up by a few very large outcomes.",
-                "incorrectExplanation": "Half of the paths end below the median, not the mean; the 7% figure is the probability of ending below today's level."
+                "correctExplanation": "Discounted u(t, X_t) is a Q-martingale; Itô's lemma gives the drift u_t + a u_x + (1/2) b^2 u_xx - r u, which must vanish. The Vasicek bond and the Black-Scholes equation are special cases.",
+                "incorrectExplanation": "The second-order Itô term carries the factor one half, discounting enters with a minus sign, and the drift a of X appears in the first-order term."
             },
             "ro": {
-                "title": "Media și mediana",
-                "text": "Sub GBM cu parametrii S&P 500, randamentul brut mediu pe 10 ani este 2,71, iar mediana 2,30. Ce proporție dintre traiectorii se încheie sub medie?",
+                "title": "Feynman-Kac",
+                "text": "Fie u(t, x) = E^Q[exp(-r (T - t)) g(X_T) | X_t = x], cu dX = a(X) dt + b(X) dW~ sub Q și o rată constantă r. Ce ecuație satisface u?",
                 "options": [
-                    "Circa 61%",
-                    "Exact 50%",
-                    "Circa 7%",
-                    "Circa 90%"
+                    "u_t + a u_x + b^2 u_xx - r u = 0",
+                    "u_t + a u_x + (1/2) b^2 u_xx + r u = 0",
+                    "u_t + (1/2) u_xx = 0, oricare ar fi driftul",
+                    "u_t + a u_x + (1/2) b^2 u_xx - r u = 0, cu u(T, x) = g(x)"
                 ],
-                "correctExplanation": "P(S_T < E[S_T]) = Phi(sigma sqrt(T)/2), circa 61% aici: media este trasă în sus de câteva rezultate foarte mari.",
-                "incorrectExplanation": "Jumătate dintre traiectorii se încheie sub mediană, nu sub medie; cifra de 7% este probabilitatea de a încheia sub nivelul de azi."
+                "correctExplanation": "Valoarea actualizată u(t, X_t) este o Q-martingală; lema lui Itô dă driftul u_t + a u_x + (1/2) b^2 u_xx - r u, care trebuie să fie zero. Obligațiunea Vasicek și ecuația Black-Scholes sunt cazuri particulare.",
+                "incorrectExplanation": "Termenul Itô de ordinul doi are factorul o jumătate, actualizarea intră cu semnul minus, iar driftul a al lui X apare în termenul de ordinul întâi."
             }
         },
         {
@@ -332,84 +332,84 @@ window.MFM_DATA.quizzes['continuous-time'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 0,
             "en": {
-                "title": "Monte Carlo and weak error",
-                "text": "With 20,000 paths the Monte Carlo estimate of the weak error stops decreasing at small step sizes. Why?",
+                "title": "The CIR transition law",
+                "text": "For the CIR process dr = kappa (theta - r) dt + sigma sqrt(r) dW, what is the exact law of r_{t + Delta} given r_t?",
                 "options": [
-                    "Euler-Maruyama has no weak convergence",
-                    "The random numbers repeat",
-                    "The exact mean of X_T is unknown",
-                    "The Monte Carlo standard error, about 0.07, exceeds the true weak error"
+                    "A scaled noncentral chi-squared with 4 kappa theta / sigma^2 degrees of freedom",
+                    "Normal, as for Vasicek",
+                    "Lognormal",
+                    "A Poisson mixture of Normal distributions"
                 ],
-                "correctExplanation": "The standard deviation of X_T is about 9.7, so 20,000 paths give a standard error near 0.07, ten times the weak error at the finest step.",
-                "incorrectExplanation": "The weak order of Euler-Maruyama is 1 and the exact mean e^2 is known; the flattening is sampling noise."
+                "correctExplanation": "2c r_{t + Delta} given r_t is noncentral chi-squared with 4 kappa theta / sigma^2 degrees of freedom and noncentrality 2c r_t exp(-kappa Delta), c = 2 kappa / (sigma^2 (1 - exp(-kappa Delta))): the exact likelihood is available, and Feller holds when the degrees of freedom are at least 2.",
+                "incorrectExplanation": "The square-root diffusion keeps the rate non-negative and skews its law to the right; the Normal distribution belongs to Vasicek and the Poisson mixture belongs to the Merton jump model."
             },
             "ro": {
-                "title": "Monte Carlo și eroarea slabă",
-                "text": "Cu 20.000 de traiectorii, estimarea Monte Carlo a erorii slabe nu mai scade la pași mici. De ce?",
+                "title": "Legea de tranziție CIR",
+                "text": "Pentru procesul CIR dr = kappa (theta - r) dt + sigma sqrt(r) dW, care este legea exactă a lui r_{t + Delta} condiționat de r_t?",
                 "options": [
-                    "Euler-Maruyama nu are convergență slabă",
-                    "Numerele aleatoare se repetă",
-                    "Media exactă a lui X_T este necunoscută",
-                    "Eroarea standard Monte Carlo, circa 0,07, depășește eroarea slabă reală"
+                    "Un chi-pătrat necentral scalat, cu 4 kappa theta / sigma^2 grade de libertate",
+                    "Normală, ca la Vasicek",
+                    "Lognormală",
+                    "O mixtură Poisson de distribuții Normale"
                 ],
-                "correctExplanation": "Abaterea standard a lui X_T este circa 9,7, deci 20.000 de traiectorii dau o eroare standard de circa 0,07, de zece ori eroarea slabă la pasul cel mai fin.",
-                "incorrectExplanation": "Ordinul slab al schemei Euler-Maruyama este 1, iar media exactă e^2 este cunoscută; aplatizarea este zgomot de selecție."
-            }
-        },
-        {
-            "correct": 1,
-            "en": {
-                "title": "Half-life",
-                "text": "For an Ornstein-Uhlenbeck process with speed kappa, what is the half-life of a deviation from the long-run mean?",
-                "options": [
-                    "1 / kappa",
-                    "ln 2 / kappa",
-                    "kappa / 2",
-                    "ln 2 * kappa"
-                ],
-                "correctExplanation": "The expected deviation decays like exp(-kappa t), which halves after ln 2 / kappa.",
-                "incorrectExplanation": "1/kappa is the mean lifetime (decay to 1/e), not the half-life."
-            },
-            "ro": {
-                "title": "Timpul de înjumătățire",
-                "text": "Pentru un proces Ornstein-Uhlenbeck cu viteza kappa, care este timpul de înjumătățire al unei abateri de la media pe termen lung?",
-                "options": [
-                    "1 / kappa",
-                    "ln 2 / kappa",
-                    "kappa / 2",
-                    "ln 2 * kappa"
-                ],
-                "correctExplanation": "Abaterea așteptată scade ca exp(-kappa t), care se înjumătățește după ln 2 / kappa.",
-                "incorrectExplanation": "1/kappa este durata medie (scădere la 1/e), nu timpul de înjumătățire."
+                "correctExplanation": "2c r_{t + Delta} condiționat de r_t este chi-pătrat necentral cu 4 kappa theta / sigma^2 grade de libertate și parametrul de necentralitate 2c r_t exp(-kappa Delta), c = 2 kappa / (sigma^2 (1 - exp(-kappa Delta))): verosimilitatea exactă este disponibilă, iar condiția Feller este îndeplinită când gradele de libertate sunt cel puțin 2.",
+                "incorrectExplanation": "Difuzia de tip rădăcină pătrată menține rata nenegativă și face legea asimetrică la dreapta; legea Normală este cea Vasicek, iar mixtura Poisson aparține modelului Merton cu salturi."
             }
         },
         {
             "correct": 2,
             "en": {
-                "title": "OU in discrete time",
-                "text": "Sampled every Delta t, an Ornstein-Uhlenbeck process is exactly",
+                "title": "LR test for jumps on the boundary",
+                "text": "You test Merton (lambda > 0) against GBM (lambda = 0) with a likelihood-ratio statistic. What about the chi-squared(3) critical value?",
                 "options": [
-                    "A random walk",
-                    "An AR(1) with coefficient kappa",
-                    "An AR(1) with coefficient b = exp(-kappa Delta t)",
-                    "A moving average of order 1"
+                    "It is valid, because Merton adds three parameters",
+                    "It is valid with chi-squared(1), because only lambda is tested",
+                    "It is invalid: lambda = 0 lies on the boundary and mu_J, sigma_J are unidentified under the null; use a parametric bootstrap",
+                    "It is valid if the sample is longer than ten years"
                 ],
-                "correctExplanation": "The exact transition is Normal with mean theta + (x - theta) exp(-kappa Delta t): an AR(1), so maximum likelihood is OLS.",
-                "incorrectExplanation": "The AR coefficient depends on the sampling step through exp(-kappa Delta t); kappa itself is a rate per year."
+                "correctExplanation": "Wilks' theorem needs an interior null and identified parameters; both fail here, so the null distribution is obtained by simulating GBM samples and refitting both models (Seminar B6).",
+                "incorrectExplanation": "Neither counting parameters nor a longer sample repairs a boundary null with unidentified nuisance parameters: the chi-squared reference distribution does not apply."
             },
             "ro": {
-                "title": "OU în timp discret",
-                "text": "Eșantionat la fiecare Delta t, un proces Ornstein-Uhlenbeck este exact",
+                "title": "Testul LR pentru salturi pe frontieră",
+                "text": "Testați Merton (lambda > 0) față de GBM (lambda = 0) cu statistica raportului de verosimilitate. Ce se întâmplă cu valoarea critică chi-pătrat(3)?",
                 "options": [
-                    "Un mers aleator",
-                    "Un AR(1) cu coeficientul kappa",
-                    "Un AR(1) cu coeficientul b = exp(-kappa Delta t)",
-                    "O medie mobilă de ordinul 1"
+                    "Este validă, deoarece Merton adaugă trei parametri",
+                    "Este validă cu chi-pătrat(1), deoarece se testează doar lambda",
+                    "Nu este validă: lambda = 0 se află pe frontieră, iar mu_J, sigma_J nu sunt identificați sub ipoteza nulă; folosiți un bootstrap parametric",
+                    "Este validă dacă eșantionul depășește zece ani"
                 ],
-                "correctExplanation": "Tranziția exactă este Normală cu media theta + (x - theta) exp(-kappa Delta t): un AR(1), deci verosimilitatea maximă este OLS.",
-                "incorrectExplanation": "Coeficientul AR depinde de pasul de eșantionare prin exp(-kappa Delta t); kappa este o rată pe an."
+                "correctExplanation": "Teorema lui Wilks cere o ipoteză nulă interioară și parametri identificați; ambele condiții lipsesc aici, deci distribuția sub ipoteza nulă se obține simulând eșantioane GBM și reestimând ambele modele (Seminarul B6).",
+                "incorrectExplanation": "Nici numărarea parametrilor, nici un eșantion mai lung nu repară o ipoteză nulă pe frontieră cu parametri de perturbare neidentificați: distribuția chi-pătrat de referință nu se aplică."
+            }
+        },
+        {
+            "correct": 1,
+            "en": {
+                "title": "Multivariate Itô formula",
+                "text": "Under Heston, dS = mu S dt + sqrt(v) S dW1 and dv = kappa (theta - v) dt + xi sqrt(v) dW2 with Corr(dW1, dW2) = rho. Which cross term appears in d(S_t v_t)?",
+                "options": [
+                    "None, the product rule has no extra term",
+                    "rho xi v_t S_t dt",
+                    "rho dt",
+                    "xi S_t dt"
+                ],
+                "correctExplanation": "d(Sv) = S dv + v dS + d[S, v], and d[S, v] = (sqrt(v) S)(xi sqrt(v)) rho dt = rho xi v S dt: the correlation enters the drift of the product.",
+                "incorrectExplanation": "The quadratic covariation of the two diffusion terms is the product of their coefficients times rho dt; it does not vanish when the Brownian motions are correlated."
+            },
+            "ro": {
+                "title": "Formula Itô multivariată",
+                "text": "Sub Heston, dS = mu S dt + sqrt(v) S dW1 și dv = kappa (theta - v) dt + xi sqrt(v) dW2, cu Corr(dW1, dW2) = rho. Ce termen încrucișat apare în d(S_t v_t)?",
+                "options": [
+                    "Niciunul, regula produsului nu are termen suplimentar",
+                    "rho xi v_t S_t dt",
+                    "rho dt",
+                    "xi S_t dt"
+                ],
+                "correctExplanation": "d(Sv) = S dv + v dS + d[S, v], iar d[S, v] = (sqrt(v) S)(xi sqrt(v)) rho dt = rho xi v S dt: corelația intră în driftul produsului.",
+                "incorrectExplanation": "Covariația pătratică a celor doi termeni de difuzie este produsul coeficienților lor înmulțit cu rho dt; nu dispare când mișcările browniene sunt corelate."
             }
         },
         {
@@ -575,30 +575,30 @@ window.MFM_DATA.quizzes['continuous-time'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 0,
             "en": {
-                "title": "Feller condition",
-                "text": "What does the Feller condition 2 kappa theta >= xi^2 guarantee in the Heston model?",
+                "title": "GARCH and its diffusion limit",
+                "text": "GARCH(1,1) converges weakly to a stochastic-volatility diffusion as the time step shrinks (Nelson, 1990). Does it follow that statistical inference is the same in both models?",
                 "options": [
-                    "Returns are Normal",
-                    "The volatility smile is flat",
-                    "The model has no leverage effect",
-                    "The variance never reaches zero"
+                    "No: the two are not asymptotically equivalent experiments, because GARCH has one noise source and the diffusion has two",
+                    "Yes, weak convergence implies equivalent inference",
+                    "Yes, whenever alpha + beta < 1",
+                    "Only for the drift parameters"
                 ],
-                "correctExplanation": "When the pull towards theta is strong enough relative to the volatility of variance, the CIR variance stays strictly positive.",
-                "incorrectExplanation": "The condition concerns only the variance process; it says nothing about the return distribution, the smile or rho."
+                "correctExplanation": "Wang (2002) shows that GARCH and its diffusion limit are asymptotically non-equivalent: likelihood-based inference can differ even as the step tends to zero.",
+                "incorrectExplanation": "Weak convergence of the processes concerns their distributions, not the information in the observed data; stationarity conditions do not change this."
             },
             "ro": {
-                "title": "Condiția Feller",
-                "text": "Ce garantează condiția Feller 2 kappa theta >= xi^2 în modelul Heston?",
+                "title": "GARCH și limita sa de difuzie",
+                "text": "GARCH(1,1) converge slab la o difuzie cu volatilitate stochastică când pasul de timp scade (Nelson, 1990). Rezultă că inferența statistică este aceeași în cele două modele?",
                 "options": [
-                    "Randamentele sunt Normale",
-                    "Zâmbetul volatilității este plat",
-                    "Modelul nu are efect de levier",
-                    "Varianța nu atinge niciodată zero"
+                    "Nu: cele două nu sunt experimente asimptotic echivalente, deoarece GARCH are o singură sursă de zgomot, iar difuzia are două",
+                    "Da, convergența slabă implică inferență echivalentă",
+                    "Da, oricând alpha + beta < 1",
+                    "Doar pentru parametrii de drift"
                 ],
-                "correctExplanation": "Când atracția spre theta este suficient de puternică în raport cu volatilitatea varianței, varianța CIR rămâne strict pozitivă.",
-                "incorrectExplanation": "Condiția privește doar procesul varianței; nu spune nimic despre distribuția randamentelor, zâmbet sau rho."
+                "correctExplanation": "Wang (2002) arată că GARCH și limita sa de difuzie nu sunt asimptotic echivalente: inferența bazată pe verosimilitate poate diferi chiar când pasul tinde la zero.",
+                "incorrectExplanation": "Convergența slabă a proceselor privește distribuțiile lor, nu informația din datele observate; condițiile de staționaritate nu schimbă acest lucru."
             }
         },
         {

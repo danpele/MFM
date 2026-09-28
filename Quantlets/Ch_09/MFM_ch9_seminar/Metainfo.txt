@@ -2,9 +2,9 @@ Name of QuantLet: 'MFM_ch9_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 9 computations: realised and bipower variation step by step, jump test, microstructure noise and optimal sampling, two-scale RV, log-HAR forecasts, QLIKE and MSE, Diebold-Mariano; jump tests on SPY and Bitcoin, sampling frequency with block bootstrap intervals, returns standardised by RV, log-HAR with Newey-West errors, 5-day forecasts, HAR-CJ, roughness with bootstrap intervals, and whether Bitcoin volatility is more predictable than that of the S&P 500 ETF.'
+Description: 'Seminar 9 computations: realised and bipower variation step by step, jump test, microstructure noise and optimal sampling, two-scale RV, log-HAR forecasts, QLIKE and MSE, Diebold-Mariano; jump tests on SPY and Bitcoin, sampling frequency with block bootstrap intervals, returns standardised by RV, log-HAR with Newey-West errors, 5-day forecasts, HAR-CJ, roughness with bootstrap intervals, and whether Bitcoin volatility is more predictable than that of the S&P 500 ETF; jump inference with Benjamini-Hochberg FDR control, intraday periodicity, Lee-Mykland, truncated RV and MedRV; Wald test of HAR as a restricted AR(22); HARQ, SHAR and the model confidence set; Giacomini-White test; realised kernel ratio with bootstrap CI.'
 
-Keywords: 'realised variance, bipower variation, jumps, microstructure noise, HAR-RV, GARCH, block bootstrap, rough volatility, SPY, Bitcoin'
+Keywords: 'realised variance, bipower variation, jumps, false discovery rate, microstructure noise, HAR-RV, HARQ, model confidence set, GARCH, block bootstrap, rough volatility, SPY, Bitcoin'
 
 Author: 'Daniel Traian Pele'
 

@@ -8,138 +8,138 @@ window.MFM_DATA.quizzes['microstructure'] = {
     "draw": 20,
     "questions": [
         {
-            "correct": 1,
-            "en": {
-                "title": "Limit and market orders",
-                "text": "Which statement about limit and market orders is correct?",
-                "options": [
-                    "Market orders supply liquidity; limit orders consume it",
-                    "Limit orders supply liquidity; market orders consume it",
-                    "Both supply liquidity",
-                    "Both consume liquidity"
-                ],
-                "correctExplanation": "A limit order waits in the book and offers liquidity to others; a market order executes immediately against standing limit orders.",
-                "incorrectExplanation": "Standing limit orders are the liquidity in the book; a market order removes them."
-            },
-            "ro": {
-                "title": "Ordine limită și ordine la piață",
-                "text": "Care afirmație despre ordinele limită și ordinele la piață este corectă?",
-                "options": [
-                    "Ordinele la piață oferă lichiditate; ordinele limită o consumă",
-                    "Ordinele limită oferă lichiditate; ordinele la piață o consumă",
-                    "Ambele oferă lichiditate",
-                    "Ambele consumă lichiditate"
-                ],
-                "correctExplanation": "Un ordin limită așteaptă în registru și oferă lichiditate altora; un ordin la piață se execută imediat pe ordinele limită existente.",
-                "incorrectExplanation": "Ordinele limită în așteptare sunt lichiditatea din registru; un ordin la piață le consumă."
-            }
-        },
-        {
             "correct": 2,
             "en": {
-                "title": "Walking the book",
-                "text": "Asks: 300 at 100.02 and 500 at 100.03; mid-price 100.00. A market order buys 800 shares. What is its average price?",
+                "title": "Roll with autocorrelated order flow",
+                "text": "In the Roll model, trade signs have Corr(q_t, q_{t-1}) = 0.5 (split orders) and carry no information. Relative to the true half-spread c, the Roll estimator sqrt(-Cov(dp_t, dp_{t-1}))...",
                 "options": [
-                    "100.020",
-                    "100.025",
-                    "100.026 (rounded)",
-                    "100.030"
+                    "...overestimates c, because persistent flow adds negative autocorrelation",
+                    "...is unbiased, because the efficient price is still a random walk",
+                    "...underestimates c: it converges to c(1 - 0.5) = 0.5c",
+                    "...is undefined, because the covariance becomes positive"
                 ],
-                "correctExplanation": "(300 x 100.02 + 500 x 100.03) / 800 = 100.02625.",
-                "incorrectExplanation": "Weight each price by the quantity executed there: 300 shares at 100.02 and 500 at 100.03."
+                "correctExplanation": "With Corr(q_t, q_{t-k}) = rho^k, Cov(dp_t, dp_{t-1}) = c^2 Cov(q_t - q_{t-1}, q_{t-1} - q_{t-2}) = -c^2 (1 - rho)^2, so the estimator returns c(1 - rho).",
+                "incorrectExplanation": "Persistent signs make consecutive changes in q_t less likely to reverse, which shrinks the bounce: Cov = -c^2 (1 - rho)^2, still negative but smaller."
             },
             "ro": {
-                "title": "Parcurgerea registrului",
-                "text": "Oferte de vânzare: 300 la 100,02 și 500 la 100,03; prețul de mijloc 100,00. Un ordin la piață cumpără 800 de acțiuni. Care este prețul mediu?",
+                "title": "Roll cu flux de ordine autocorelat",
+                "text": "În modelul Roll, semnele tranzacțiilor au Corr(q_t, q_{t-1}) = 0,5 (ordine împărțite) și nu conțin informație. Față de jumătatea adevărată de spread c, estimatorul Roll sqrt(-Cov(dp_t, dp_{t-1}))...",
                 "options": [
-                    "100,020",
-                    "100,025",
-                    "100,026 (rotunjit)",
-                    "100,030"
+                    "...supraestimează c, fiindcă fluxul persistent adaugă autocorelație negativă",
+                    "...este nedeplasat, fiindcă prețul eficient rămâne un mers aleator",
+                    "...subestimează c: converge la c(1 - 0,5) = 0,5c",
+                    "...nu este definit, fiindcă covarianța devine pozitivă"
                 ],
-                "correctExplanation": "(300 x 100,02 + 500 x 100,03) / 800 = 100,02625.",
-                "incorrectExplanation": "Ponderați fiecare preț cu cantitatea executată la el: 300 de acțiuni la 100,02 și 500 la 100,03."
+                "correctExplanation": "Cu Corr(q_t, q_{t-k}) = rho^k, Cov(dp_t, dp_{t-1}) = c^2 Cov(q_t - q_{t-1}, q_{t-1} - q_{t-2}) = -c^2 (1 - rho)^2, deci estimatorul dă c(1 - rho).",
+                "incorrectExplanation": "Semnele persistente fac mai puțin probabilă inversarea lui q_t, ceea ce micșorează oscilația: Cov = -c^2 (1 - rho)^2, tot negativă, dar mai mică."
             }
         },
         {
             "correct": 0,
             "en": {
-                "title": "Relative spread",
-                "text": "Best bid 99.98, best ask 100.02. What is the relative quoted spread?",
+                "title": "Kyle: the insider's intensity",
+                "text": "In the Kyle model the market maker sets p = p_0 + lambda y. Maximising E[(v - p) x | v] over x gives the insider's intensity beta in x = beta (v - p_0) equal to...",
                 "options": [
-                    "4 basis points",
-                    "2 basis points",
-                    "0.4%",
-                    "40 basis points"
+                    "1/(2 lambda)",
+                    "1/lambda",
+                    "lambda",
+                    "sigma_v/sigma_u"
                 ],
-                "correctExplanation": "Spread 0.04 divided by the mid-price 100.00 is 0.04%, i.e. 4 basis points.",
-                "incorrectExplanation": "The relative spread is (ask - bid) / mid = 0.04 / 100 = 0.04% = 4 bp."
+                "correctExplanation": "The objective is (v - p_0) x - lambda x^2; the first-order condition gives x = (v - p_0)/(2 lambda). In equilibrium this equals sigma_u/sigma_v.",
+                "incorrectExplanation": "The insider's own order moves the price by lambda x, so the objective is quadratic, (v - p_0) x - lambda x^2; setting the derivative to zero halves the naive intensity."
             },
             "ro": {
-                "title": "Spread-ul relativ",
-                "text": "Cel mai bun bid 99,98, cel mai bun ask 100,02. Care este spread-ul relativ cotat?",
+                "title": "Kyle: intensitatea investitorului din interior",
+                "text": "În modelul Kyle formatorul de piață stabilește p = p_0 + lambda y. Maximizând E[(v - p) x | v] după x, intensitatea beta din x = beta (v - p_0) este...",
                 "options": [
-                    "4 puncte de bază",
-                    "2 puncte de bază",
-                    "0,4%",
-                    "40 de puncte de bază"
+                    "1/(2 lambda)",
+                    "1/lambda",
+                    "lambda",
+                    "sigma_v/sigma_u"
                 ],
-                "correctExplanation": "Spread-ul 0,04 împărțit la prețul de mijloc 100,00 este 0,04%, adică 4 puncte de bază.",
-                "incorrectExplanation": "Spread-ul relativ este (ask - bid) / mijloc = 0,04 / 100 = 0,04% = 4 pb."
+                "correctExplanation": "Obiectivul este (v - p_0) x - lambda x^2; condiția de ordinul întâi dă x = (v - p_0)/(2 lambda). La echilibru aceasta este sigma_u/sigma_v.",
+                "incorrectExplanation": "Propriul ordin mișcă prețul cu lambda x, deci obiectivul este pătratic, (v - p_0) x - lambda x^2; anularea derivatei înjumătățește intensitatea naivă."
             }
         },
         {
             "correct": 3,
             "en": {
-                "title": "Time priority",
-                "text": "Two limit buy orders sit at the same price. Which one is executed first by a price-time priority matching engine?",
+                "title": "Lambda as a regression slope",
+                "text": "In a Kyle economy with sigma_v = 2 and sigma_u = 10,000, you regress p - p_0 on the signed order flow y across many independent auctions. The population slope is...",
                 "options": [
-                    "The larger one",
-                    "The smaller one",
-                    "A random one",
-                    "The one that arrived first"
+                    "beta = 5,000",
+                    "sigma_v/sigma_u = 0.0002",
+                    "1/lambda = 10,000",
+                    "lambda = sigma_v/(2 sigma_u) = 0.0001"
                 ],
-                "correctExplanation": "At equal prices the queue is served in order of arrival.",
-                "incorrectExplanation": "Price priority decides between different prices; at the same price, time of arrival decides."
+                "correctExplanation": "p - p_0 = lambda y exactly, and lambda = Cov(v, y)/Var(y) is the market maker's own linear projection: sigma_v/(2 sigma_u) = 0.0001.",
+                "incorrectExplanation": "The pricing rule is linear in y with coefficient lambda, which is the projection coefficient Cov(v, y)/Var(y) = sigma_v/(2 sigma_u)."
             },
             "ro": {
-                "title": "Prioritatea de timp",
-                "text": "Două ordine limită de cumpărare stau la același preț. Care se execută primul într-un motor cu prioritate preț-timp?",
+                "title": "Lambda ca pantă de regresie",
+                "text": "Într-o economie Kyle cu sigma_v = 2 și sigma_u = 10.000, regresați p - p_0 pe fluxul de ordine cu semn y, pe multe licitații independente. Panta în populație este...",
                 "options": [
-                    "Cel mai mare",
-                    "Cel mai mic",
-                    "Unul ales aleator",
-                    "Cel care a sosit primul"
+                    "beta = 5.000",
+                    "sigma_v/sigma_u = 0,0002",
+                    "1/lambda = 10.000",
+                    "lambda = sigma_v/(2 sigma_u) = 0,0001"
                 ],
-                "correctExplanation": "La prețuri egale, coada este servită în ordinea sosirii.",
-                "incorrectExplanation": "Prioritatea de preț decide între prețuri diferite; la același preț decide momentul sosirii."
+                "correctExplanation": "p - p_0 = lambda y exact, iar lambda = Cov(v, y)/Var(y) este chiar proiecția liniară a formatorului: sigma_v/(2 sigma_u) = 0,0001.",
+                "incorrectExplanation": "Regula de preț este liniară în y cu coeficientul lambda, care este coeficientul de proiecție Cov(v, y)/Var(y) = sigma_v/(2 sigma_u)."
             }
         },
         {
             "correct": 1,
             "en": {
-                "title": "Components of the spread",
-                "text": "Which component of the bid-ask spread exists because some traders know more than the liquidity provider?",
+                "title": "Information-share bounds",
+                "text": "Two venues' prices of one asset are cointegrated. The Hasbrouck information share of venue 1 is reported as the interval [0.55, 0.80]. Why an interval and not a number?",
                 "options": [
-                    "Order processing cost",
-                    "Adverse selection",
-                    "Inventory cost",
-                    "Tick size"
+                    "It is a 95% confidence interval from the sampling error",
+                    "The share depends on the Cholesky ordering when the VECM innovations are correlated",
+                    "There are two cointegrating vectors",
+                    "Prices are non-stationary, so the share is not identified"
                 ],
-                "correctExplanation": "The liquidity provider loses to informed traders and recovers it through the spread: adverse selection.",
-                "incorrectExplanation": "Processing and inventory costs exist even without private information; the tick size is a market rule."
+                "correctExplanation": "The information share uses a Cholesky factor of the innovation covariance; with correlated innovations the two orderings give different shares, which are reported as bounds.",
+                "incorrectExplanation": "The interval comes from identification, not sampling: the contemporaneous correlation of the innovations is attributed to one venue or the other depending on the ordering."
             },
             "ro": {
-                "title": "Componentele spread-ului",
-                "text": "Ce componentă a spread-ului bid-ask există pentru că unii investitori știu mai mult decât furnizorul de lichiditate?",
+                "title": "Limitele ponderii informaționale",
+                "text": "Prețurile aceluiași activ pe două platforme sunt cointegrate. Ponderea informațională Hasbrouck a platformei 1 este raportată ca intervalul [0,55; 0,80]. De ce un interval și nu un număr?",
                 "options": [
-                    "Costul procesării ordinelor",
-                    "Selecția adversă",
-                    "Costul de stoc",
-                    "Pasul de cotare"
+                    "Este un interval de încredere de 95% din eroarea de selecție",
+                    "Ponderea depinde de ordonarea Cholesky când inovațiile VECM sunt corelate",
+                    "Există doi vectori de cointegrare",
+                    "Prețurile sunt nestaționare, deci ponderea nu este identificată"
                 ],
-                "correctExplanation": "Furnizorul de lichiditate pierde în fața investitorilor informați și recuperează prin spread: selecția adversă.",
-                "incorrectExplanation": "Costurile de procesare și de stoc există și fără informație privată; pasul de cotare este o regulă a pieței."
+                "correctExplanation": "Ponderea informațională folosește un factor Cholesky al covarianței inovațiilor; cu inovații corelate, cele două ordonări dau ponderi diferite, raportate ca limite.",
+                "incorrectExplanation": "Intervalul vine din identificare, nu din selecție: corelația contemporană a inovațiilor este atribuită uneia sau alteia dintre platforme, după ordonare."
+            }
+        },
+        {
+            "correct": 0,
+            "en": {
+                "title": "MRR: adverse-selection share",
+                "text": "In the Madhavan-Richardson-Roomans model the estimates are theta = 0.03 (permanent impact of the order-flow surprise) and phi = 0.01 (transitory cost). What share of the effective half-spread is adverse selection?",
+                "options": [
+                    "75%",
+                    "25%",
+                    "50%",
+                    "3%"
+                ],
+                "correctExplanation": "The implied half-spread is phi + theta = 0.04; the adverse-selection share is theta/(phi + theta) = 0.03/0.04 = 75%.",
+                "incorrectExplanation": "Adverse selection is the permanent part theta; divide it by the whole half-spread phi + theta."
+            },
+            "ro": {
+                "title": "MRR: ponderea selecției adverse",
+                "text": "În modelul Madhavan-Richardson-Roomans estimările sunt theta = 0,03 (impactul permanent al surprizei din fluxul de ordine) și phi = 0,01 (costul tranzitoriu). Ce parte din jumătatea de spread efectiv este selecție adversă?",
+                "options": [
+                    "75%",
+                    "25%",
+                    "50%",
+                    "3%"
+                ],
+                "correctExplanation": "Jumătatea de spread implicată este phi + theta = 0,04; ponderea selecției adverse este theta/(phi + theta) = 0,03/0,04 = 75%.",
+                "incorrectExplanation": "Selecția adversă este partea permanentă theta; împărțiți-o la întreaga jumătate de spread phi + theta."
             }
         },
         {
@@ -332,57 +332,57 @@ window.MFM_DATA.quizzes['microstructure'] = {
             }
         },
         {
-            "correct": 1,
+            "correct": 2,
             "en": {
-                "title": "Intraday U-shape",
-                "text": "How are volume and volatility of SPY distributed over the trading day?",
+                "title": "Estimating PIN",
+                "text": "Maximum-likelihood PIN estimates for very liquid stocks (thousands of trades a day) often pile up at boundary values. The main computational reason is...",
                 "options": [
-                    "Highest at midday",
-                    "Highest at the open and the close (U-shape)",
-                    "Constant through the day",
-                    "Highest in the last minute only"
+                    "PIN is not identified for any stock",
+                    "Informed trading is absent in liquid stocks",
+                    "Terms like exp(-eps) eps^B / B! under- or overflow for large B; the likelihood must be factorised and evaluated with log-sum-exp",
+                    "Too few trading days in a year"
                 ],
-                "correctExplanation": "Volume and mean absolute returns peak at the open and the close and are lowest at midday.",
-                "incorrectExplanation": "Both follow a U-shape: overnight news at the open, index and ETF trading at the close."
+                "correctExplanation": "Lin and Ke (2011) show a computing bias: with large daily counts the Poisson terms leave floating-point range; factoring out common terms and working in logs removes it.",
+                "incorrectExplanation": "The problem appears only with large counts and is numerical: exp(-1000) is 0 and 1000^1450 is infinite in double precision."
             },
             "ro": {
-                "title": "Forma de U intrazilnică",
-                "text": "Cum sunt distribuite volumul și volatilitatea SPY în cursul zilei?",
+                "title": "Estimarea PIN",
+                "text": "Estimările PIN prin verosimilitate maximă pentru acțiuni foarte lichide (mii de tranzacții pe zi) se adună adesea la valori de frontieră. Motivul numeric principal este...",
                 "options": [
-                    "Maxime la prânz",
-                    "Maxime la deschidere și la închidere (forma de U)",
-                    "Constante în cursul zilei",
-                    "Maxime doar în ultimul minut"
+                    "PIN nu este identificată pentru nicio acțiune",
+                    "Tranzacționarea informată lipsește la acțiunile lichide",
+                    "Termeni precum exp(-eps) eps^B / B! depășesc domeniul numeric pentru B mare; verosimilitatea trebuie factorizată și evaluată cu log-sum-exp",
+                    "Prea puține zile de tranzacționare într-un an"
                 ],
-                "correctExplanation": "Volumul și randamentele absolute medii ating maximul la deschidere și la închidere și minimul la prânz.",
-                "incorrectExplanation": "Ambele urmează o formă de U: știrile din timpul nopții la deschidere, tranzacționarea fondurilor pe indici și a ETF-urilor la închidere."
+                "correctExplanation": "Lin și Ke (2011) arată o deplasare de calcul: cu numere zilnice mari, termenii Poisson ies din domeniul virgulei mobile; scoaterea factorilor comuni și lucrul în logaritmi o elimină.",
+                "incorrectExplanation": "Problema apare doar la numere mari și este numerică: exp(-1000) este 0, iar 1000^1450 este infinit în dublă precizie."
             }
         },
         {
-            "correct": 2,
+            "correct": 3,
             "en": {
-                "title": "Bitcoin clock",
-                "text": "When are Bitcoin 5-minute returns largest on average?",
+                "title": "Simultaneity",
+                "text": "Regressing log |r| on log relative volume across SPY 5-minute bars gives a slope of about 0.3. Why is this not the causal price-impact elasticity?",
                 "options": [
-                    "At weekends",
-                    "During Asian night hours",
-                    "During US trading hours on weekdays",
-                    "At midnight UTC"
+                    "The residuals are heteroskedastic",
+                    "The intraday U-shape biases the slope",
+                    "Prices are rounded to one tick",
+                    "News moves both volume and |r| (simultaneity), and opposite trades in a bar net out"
                 ],
-                "correctExplanation": "The weekday peak falls at 14:00 UTC, when US markets open; weekends are about 1.7 times calmer.",
-                "incorrectExplanation": "Although Bitcoin trades 24/7, its activity follows the clock of US investors and news."
+                "correctExplanation": "Volume is not exogenous: news raises both trading and price moves, and a bar mixes buyers and sellers, so the slope is not the effect of one trader's net order.",
+                "incorrectExplanation": "Heteroskedasticity affects standard errors, not the meaning of the slope; the problem is endogeneity of volume and netting of opposite trades."
             },
             "ro": {
-                "title": "Ceasul Bitcoin",
-                "text": "Când sunt cele mai mari, în medie, randamentele Bitcoin pe 5 minute?",
+                "title": "Simultaneitatea",
+                "text": "Regresia lui log |r| pe log volumul relativ, pe barele SPY de 5 minute, dă o pantă de circa 0,3. De ce nu este aceasta elasticitatea cauzală a impactului?",
                 "options": [
-                    "În weekend",
-                    "În orele de noapte din Asia",
-                    "În orele de tranzacționare americane din zilele lucrătoare",
-                    "La miezul nopții UTC"
+                    "Reziduurile sunt heteroscedastice",
+                    "Forma de U intrazilnică deplasează panta",
+                    "Prețurile sunt rotunjite la un pas de cotare",
+                    "Știrile mișcă și volumul, și |r| (simultaneitate), iar tranzacțiile opuse dintr-o bară se anulează"
                 ],
-                "correctExplanation": "Maximul din zilele lucrătoare cade la 14:00 UTC, la deschiderea piețelor americane; weekendurile sunt de circa 1,7 ori mai calme.",
-                "incorrectExplanation": "Deși Bitcoin se tranzacționează 24/7, activitatea sa urmează ceasul investitorilor și al știrilor americane."
+                "correctExplanation": "Volumul nu este exogen: știrile cresc atât tranzacționarea, cât și mișcările de preț, iar o bară amestecă cumpărători și vânzători, deci panta nu este efectul ordinului net al unui investitor.",
+                "incorrectExplanation": "Heteroscedasticitatea afectează erorile standard, nu sensul pantei; problema este endogenitatea volumului și anularea tranzacțiilor opuse."
             }
         },
         {
@@ -575,57 +575,57 @@ window.MFM_DATA.quizzes['microstructure'] = {
             }
         },
         {
-            "correct": 0,
+            "correct": 1,
             "en": {
-                "title": "Flash Crash",
-                "text": "What started the selling pressure of 6 May 2010, according to the CFTC-SEC report?",
+                "title": "Avellaneda-Stoikov inventory",
+                "text": "An Avellaneda-Stoikov market maker is long inventory (q > 0). Her reservation price r = s - q gamma sigma^2 (T - t) is...",
                 "options": [
-                    "An algorithm selling 75,000 E-Mini contracts at 9% of volume, regardless of price or time",
-                    "A cyber attack on the NYSE",
-                    "A central bank announcement",
-                    "A crash of the Bitcoin market"
+                    "above the mid-price, so she raises both quotes",
+                    "below the mid-price, so she skews both quotes down to sell",
+                    "equal to the mid-price, since the spread is symmetric",
+                    "independent of volatility sigma"
                 ],
-                "correctExplanation": "A mutual fund complex used a sell algorithm that targeted 9% of the previous minute's volume without regard to price or time.",
-                "incorrectExplanation": "The report traces the start of the decline to a large, price-insensitive sell program in E-Mini futures."
+                "correctExplanation": "With q > 0, r < s: holding more of the risky asset lowers its value to her, so both quotes shift down to attract buyers and deter sellers.",
+                "incorrectExplanation": "The inventory term q gamma sigma^2 (T - t) is subtracted from the mid-price and grows with volatility and the time left."
             },
             "ro": {
-                "title": "Prăbușirea fulger",
-                "text": "Ce a declanșat presiunea vânzărilor din 6 mai 2010, conform raportului CFTC-SEC?",
+                "title": "Stocul în Avellaneda-Stoikov",
+                "text": "Un formator de piață Avellaneda-Stoikov are stoc pozitiv (q > 0). Prețul său de rezervă r = s - q gamma sigma^2 (T - t) este...",
                 "options": [
-                    "Un algoritm care vindea 75.000 de contracte E-Mini la 9% din volum, fără a ține cont de preț sau de timp",
-                    "Un atac cibernetic asupra NYSE",
-                    "Un anunț al unei bănci centrale",
-                    "O prăbușire a pieței Bitcoin"
+                    "peste prețul de mijloc, deci ridică ambele cotații",
+                    "sub prețul de mijloc, deci coboară ambele cotații ca să vândă",
+                    "egal cu prețul de mijloc, fiindcă spread-ul este simetric",
+                    "independent de volatilitatea sigma"
                 ],
-                "correctExplanation": "Un grup de fonduri mutuale a folosit un algoritm de vânzare care viza 9% din volumul minutului anterior, fără a ține cont de preț sau de timp.",
-                "incorrectExplanation": "Raportul leagă începutul scăderii de un program mare de vânzare, insensibil la preț, pe contractele futures E-Mini."
+                "correctExplanation": "Cu q > 0, r < s: deținerea a mai mult activ riscant îi scade valoarea pentru ea, deci ambele cotații coboară, ca să atragă cumpărători și să descurajeze vânzătorii.",
+                "incorrectExplanation": "Termenul de stoc q gamma sigma^2 (T - t) se scade din prețul de mijloc și crește cu volatilitatea și cu timpul rămas."
             }
         },
         {
-            "correct": 3,
+            "correct": 2,
             "en": {
-                "title": "Frequent batch auctions",
-                "text": "What do Budish, Cramton and Shim propose against the high-frequency speed race?",
+                "title": "Roll in small samples",
+                "text": "For SPY 5-minute bars (77 returns a day) the within-day Roll covariance is positive on about 41% of days. Under the Roll model with a one-tick spread, a Monte Carlo gives about 45%. What follows?",
                 "options": [
-                    "Banning limit orders",
-                    "A minimum holding period of one day",
-                    "A tax on every trade",
-                    "Frequent batch auctions at discrete intervals, e.g. every second"
+                    "The Roll model is rejected, since a true bounce gives negative covariances",
+                    "The market is inefficient on 41% of days",
+                    "Positive days are not evidence against Roll: with c/sigma near 0.01 the covariance is almost as often positive as negative",
+                    "The spread of SPY is about 41% of a tick"
                 ],
-                "correctExplanation": "Uniform-price batch auctions every second turn competition on speed into competition on price.",
-                "incorrectExplanation": "Their proposal changes the market design from a continuous book to frequent discrete auctions."
+                "correctExplanation": "Harris (1990): when c^2 is small relative to sigma^2 / sqrt(T), P(Cov-hat > 0) is close to one half even if the model holds; demeaning adds a further negative bias.",
+                "incorrectExplanation": "Compare the observed share with the sampling distribution under the null: a tiny bounce relative to volatility gives little power in 77 observations."
             },
             "ro": {
-                "title": "Licitații periodice frecvente",
-                "text": "Ce propun Budish, Cramton și Shim împotriva cursei vitezei în tranzacționarea de înaltă frecvență?",
+                "title": "Roll în eșantioane mici",
+                "text": "Pentru barele SPY de 5 minute (77 de randamente pe zi), covarianța Roll din cursul zilei este pozitivă în circa 41% din zile. Sub modelul Roll cu un spread de un pas, o simulare Monte Carlo dă circa 45%. Ce rezultă?",
                 "options": [
-                    "Interzicerea ordinelor limită",
-                    "O perioadă minimă de deținere de o zi",
-                    "O taxă pe fiecare tranzacție",
-                    "Licitații periodice frecvente la intervale discrete, de exemplu la fiecare secundă"
+                    "Modelul Roll este respins, fiindcă o oscilație adevărată dă covarianțe negative",
+                    "Piața este ineficientă în 41% din zile",
+                    "Zilele pozitive nu sunt o dovadă împotriva Roll: cu c/sigma aproape de 0,01, covarianța este aproape la fel de des pozitivă ca negativă",
+                    "Spread-ul SPY este circa 41% dintr-un pas"
                 ],
-                "correctExplanation": "Licitațiile la preț unic la fiecare secundă transformă concurența pe viteză în concurență pe preț.",
-                "incorrectExplanation": "Propunerea lor schimbă designul pieței de la un registru continuu la licitații discrete frecvente."
+                "correctExplanation": "Harris (1990): când c^2 este mic față de sigma^2 / sqrt(T), P(Cov-estimat > 0) este aproape de o jumătate chiar dacă modelul este adevărat; demedierea adaugă o deplasare negativă.",
+                "incorrectExplanation": "Comparați ponderea observată cu distribuția de selecție sub ipoteza nulă: o oscilație minusculă față de volatilitate dă putere mică în 77 de observații."
             }
         },
         {

@@ -8,30 +8,30 @@ window.MFM_DATA.quizzes['backtesting'] = {
     "draw": 20,
     "questions": [
         {
-            "correct": 1,
+            "correct": 2,
             "en": {
-                "title": "The hit sequence",
-                "text": "What does the hit sequence I_t of a VaR backtest record?",
+                "title": "Local power of the POF test",
+                "text": "At T = 250 and alpha = 1%, roughly which true breach probability gives the Kupiec test (5% level) about 50% power?",
                 "options": [
-                    "The daily return of the portfolio",
-                    "Whether the loss on day t exceeded the VaR forecast for day t",
-                    "The number of models that passed the test",
-                    "The volatility forecast of a GARCH model"
+                    "About 1.1%: any excess over 1% is detected quickly",
+                    "About 1.5%",
+                    "About 2.5-3%",
+                    "Any rate above 1%, because the LR test is consistent"
                 ],
-                "correctExplanation": "I_t = 1 when the realised loss exceeds the VaR forecast and 0 otherwise; all coverage tests are built on this 0/1 sequence.",
-                "incorrectExplanation": "The hit sequence is the 0/1 indicator of a breach, L_t > VaR_t, on each day."
+                "correctExplanation": "The exact Binomial power first reaches 50% near a true rate of 2.7%; the local approximation uses lambda = T(pi - alpha)^2/(alpha(1 - alpha)), and with alpha T = 2.5 the discreteness of x keeps power low.",
+                "incorrectExplanation": "Consistency is an asymptotic property; with only 2.5 expected breaches in a year, the true rate must be close to three times the target before the test rejects half of the time."
             },
             "ro": {
-                "title": "Șirul depășirilor",
-                "text": "Ce înregistrează șirul depășirilor I_t într-un backtest VaR?",
+                "title": "Puterea locală a testului POF",
+                "text": "La T = 250 și alpha = 1%, aproximativ ce probabilitate reală de depășire dă testului Kupiec (nivel 5%) o putere de circa 50%?",
                 "options": [
-                    "Randamentul zilnic al portofoliului",
-                    "Dacă pierderea din ziua t a depășit prognoza VaR pentru ziua t",
-                    "Numărul de modele care au trecut testul",
-                    "Prognoza de volatilitate a unui model GARCH"
+                    "Circa 1,1%: orice exces peste 1% este detectat repede",
+                    "Circa 1,5%",
+                    "Circa 2,5-3%",
+                    "Orice rată peste 1%, pentru că testul LR este consistent"
                 ],
-                "correctExplanation": "I_t = 1 când pierderea realizată depășește prognoza VaR și 0 altfel; toate testele de acoperire se construiesc pe acest șir 0/1.",
-                "incorrectExplanation": "Șirul depășirilor este indicatorul 0/1 al unei depășiri, L_t > VaR_t, în fiecare zi."
+                "correctExplanation": "Puterea Binomială exactă atinge prima dată 50% în jurul unei rate reale de 2,7%; aproximarea locală folosește lambda = T(pi - alpha)^2/(alpha(1 - alpha)), iar cu alpha T = 2,5 caracterul discret al lui x ține puterea jos.",
+                "incorrectExplanation": "Consistența este o proprietate asimptotică; cu doar 2,5 depășiri așteptate într-un an, rata reală trebuie să fie aproape de trei ori ținta pentru ca testul să respingă în jumătate din cazuri."
             }
         },
         {
@@ -116,30 +116,30 @@ window.MFM_DATA.quizzes['backtesting'] = {
             }
         },
         {
-            "correct": 2,
+            "correct": 0,
             "en": {
-                "title": "Christoffersen independence",
-                "text": "In the Christoffersen independence test, what is compared?",
+                "title": "Estimation risk in backtests",
+                "text": "The lecture's Kupiec p-values use chi-square(1) limits with an estimation window R = 1000 and P of about 5000 out-of-sample days. Which statement is correct?",
                 "options": [
-                    "The mean and variance of the losses",
-                    "The ES forecasts of two models",
-                    "The probability of a breach after a breach (pi_11) with that after no breach (pi_01)",
-                    "The breach rates of VaR 1% and VaR 2.5%"
+                    "The chi-square limit ignores parameter uncertainty, which does not vanish because P/R does not go to 0; the size can be badly distorted",
+                    "The chi-square limit is exact for Bernoulli data, so estimation plays no role",
+                    "Estimation risk matters only for ES backtests, not for VaR",
+                    "A larger P always removes estimation risk"
                 ],
-                "correctExplanation": "The hits are modelled as a first-order Markov chain; H0 states pi_01 = pi_11, i.e. yesterday's breach does not change today's breach probability.",
-                "incorrectExplanation": "The test compares the transition probabilities pi_01 and pi_11 of the breach Markov chain."
+                "correctExplanation": "Out-of-sample hits depend on the estimated parameters; the extra term is of order sqrt(P/R). In the lecture's Monte Carlo a correct GARCH-t is rejected in about 27% of samples at P = 5000 with estimated parameters.",
+                "incorrectExplanation": "Estimation error enters the hits through VaR_t(theta-hat); its effect grows with P/R, so a larger evaluation sample makes it worse, not better."
             },
             "ro": {
-                "title": "Independența Christoffersen",
-                "text": "Ce se compară în testul de independență Christoffersen?",
+                "title": "Riscul de estimare în backtesting",
+                "text": "Valorile p Kupiec din curs folosesc limite hi-pătrat(1), cu fereastra de estimare R = 1000 și aproximativ P = 5000 de zile în afara eșantionului. Care afirmație este corectă?",
                 "options": [
-                    "Media și dispersia pierderilor",
-                    "Prognozele ES a două modele",
-                    "Probabilitatea unei depășiri după o depășire (pi_11) cu cea după o zi fără depășire (pi_01)",
-                    "Ratele de depășire ale VaR 1% și VaR 2,5%"
+                    "Limita hi-pătrat ignoră incertitudinea parametrilor, care nu dispare pentru că P/R nu tinde la 0; mărimea poate fi puternic distorsionată",
+                    "Limita hi-pătrat este exactă pentru date Bernoulli, deci estimarea nu contează",
+                    "Riscul de estimare contează doar pentru testele ES, nu pentru VaR",
+                    "Un P mai mare elimină întotdeauna riscul de estimare"
                 ],
-                "correctExplanation": "Depășirile sunt modelate ca lanț Markov de ordinul întâi; H0 afirmă pi_01 = pi_11, adică depășirea de ieri nu schimbă probabilitatea de azi.",
-                "incorrectExplanation": "Testul compară probabilitățile de tranziție pi_01 și pi_11 ale lanțului Markov al depășirilor."
+                "correctExplanation": "Depășirile din afara eșantionului depind de parametrii estimați; termenul suplimentar este de ordinul sqrt(P/R). În simularea Monte Carlo din curs, un GARCH-t corect este respins în circa 27% din eșantioane la P = 5000 cu parametri estimați.",
+                "incorrectExplanation": "Eroarea de estimare intră în depășiri prin VaR_t(theta estimat); efectul ei crește cu P/R, deci un eșantion de evaluare mai mare o agravează, nu o elimină."
             }
         },
         {
@@ -197,57 +197,57 @@ window.MFM_DATA.quizzes['backtesting'] = {
             }
         },
         {
-            "correct": 1,
+            "correct": 3,
             "en": {
-                "title": "Traffic light zones",
-                "text": "Where does the Basel traffic light for 250 days of VaR 1% place a bank with 6 exceptions?",
+                "title": "DQ versus Christoffersen",
+                "text": "A model's breaches occur about five days after each large loss and never on consecutive days. Which test is designed to detect this?",
                 "options": [
-                    "Green zone",
-                    "Yellow (amber) zone",
-                    "Red zone",
-                    "The rule only applies to ES"
+                    "Christoffersen's first-order Markov independence test",
+                    "The Kupiec POF test",
+                    "The Basel traffic light",
+                    "The DQ test with lagged hits up to lag 5 (or the duration test)"
                 ],
-                "correctExplanation": "Green is 0-4, yellow 5-9, red 10 or more exceptions; the boundaries come from the Binomial(250, 0.01) cumulative probabilities 95% and 99.99%.",
-                "incorrectExplanation": "Six exceptions fall in the yellow zone (5 to 9 exceptions)."
+                "correctExplanation": "The DQ regression of Hit_t on lagged hits and the VaR level detects predictability at any included lag; the duration test also sees the unusual spacing. A first-order chain only compares yesterday with today.",
+                "incorrectExplanation": "Coverage counts and the traffic light ignore timing, and the Markov test looks only one day back, so a pattern at lag 5 escapes all three."
             },
             "ro": {
-                "title": "Zonele semaforului",
-                "text": "Unde plasează semaforul Basel, pentru 250 de zile de VaR 1%, o bancă cu 6 excepții?",
+                "title": "DQ versus Christoffersen",
+                "text": "Depășirile unui model apar la circa cinci zile după fiecare pierdere mare și niciodată în zile consecutive. Ce test este construit să detecteze aceasta?",
                 "options": [
-                    "Zona verde",
-                    "Zona galbenă",
-                    "Zona roșie",
-                    "Regula se aplică doar pentru ES"
+                    "Testul de independență Christoffersen, cu lanț Markov de ordinul întâi",
+                    "Testul POF Kupiec",
+                    "Semaforul Basel",
+                    "Testul DQ cu depășiri întârziate până la decalajul 5 (sau testul de durată)"
                 ],
-                "correctExplanation": "Verde înseamnă 0-4, galben 5-9, roșu 10 sau mai multe excepții; pragurile provin din probabilitățile cumulate Binomiale(250; 0,01) de 95% și 99,99%.",
-                "incorrectExplanation": "Șase excepții cad în zona galbenă (5-9 excepții)."
+                "correctExplanation": "Regresia DQ a lui Hit_t pe depășirile întârziate și pe nivelul VaR detectează previzibilitatea la orice decalaj inclus; testul de durată vede și el distanțele neobișnuite. Un lanț de ordinul întâi compară doar ziua de ieri cu cea de azi.",
+                "incorrectExplanation": "Numărările de acoperire și semaforul ignoră momentul depășirilor, iar testul Markov privește doar o zi înapoi, deci un tipar la decalajul 5 le scapă tuturor."
             }
         },
         {
-            "correct": 2,
+            "correct": 1,
             "en": {
-                "title": "FRTB",
-                "text": "Under the FRTB (BCBS 2019), which statement is correct?",
+                "title": "Size of backtests in one year",
+                "text": "In the lecture's Monte Carlo (correct GARCH-t VaR 1%, T = 250), which statement about the 5% tests is correct?",
                 "options": [
-                    "Capital is based on VaR 1% and backtesting on ES",
-                    "Backtesting has been abolished",
-                    "Capital is based on ES 2.5%, while backtesting still uses VaR 1% and VaR 2.5%",
-                    "Capital and backtesting both use VaR 5%"
+                    "All four tests reject in about 5% of samples",
+                    "The Kupiec test rejects in about 10% of samples, mostly because zero breaches already falls in its rejection region",
+                    "The duration test is always computable and exactly sized",
+                    "The Christoffersen conditional coverage test is oversized"
                 ],
-                "correctExplanation": "The FRTB computes capital from ES 2.5% but backtests VaR: bank-wide VaR 1%, and per desk VaR 1% (12 exceptions) and VaR 2.5% (30 exceptions).",
-                "incorrectExplanation": "FRTB separates the two: ES 2.5% for capital, VaR 1% and VaR 2.5% for backtesting."
+                "correctExplanation": "At T = 250, P(x = 0) = 0.99^250 = 8.1% already lies in the Kupiec rejection region, so the exact size is about 9.5%; the duration test is undefined in 28% of samples and oversized, CC is undersized.",
+                "incorrectExplanation": "With only 2.5 expected breaches, the asymptotic chi-square levels are not attained: size must be simulated at the sample length used."
             },
             "ro": {
-                "title": "FRTB",
-                "text": "Conform FRTB (BCBS 2019), care afirmație este corectă?",
+                "title": "Mărimea testelor pe un an",
+                "text": "În simularea Monte Carlo din curs (VaR 1% GARCH-t corect, T = 250), care afirmație despre testele la 5% este corectă?",
                 "options": [
-                    "Capitalul se bazează pe VaR 1%, iar backtesting-ul pe ES",
-                    "Backtesting-ul a fost eliminat",
-                    "Capitalul se bazează pe ES 2,5%, iar backtesting-ul folosește în continuare VaR 1% și VaR 2,5%",
-                    "Capitalul și backtesting-ul folosesc ambele VaR 5%"
+                    "Toate cele patru teste resping în circa 5% din eșantioane",
+                    "Testul Kupiec respinge în circa 10% din eșantioane, mai ales pentru că zero depășiri cade deja în regiunea lui de respingere",
+                    "Testul de durată este mereu calculabil și are exact mărimea nominală",
+                    "Testul de acoperire condiționată Christoffersen este supradimensionat"
                 ],
-                "correctExplanation": "FRTB calculează capitalul din ES 2,5%, dar testează VaR: la nivelul băncii VaR 1%, pe mese VaR 1% (12 excepții) și VaR 2,5% (30 de excepții).",
-                "incorrectExplanation": "FRTB le separă: ES 2,5% pentru capital, VaR 1% și VaR 2,5% pentru backtesting."
+                "correctExplanation": "La T = 250, P(x = 0) = 0,99^250 = 8,1% se află deja în regiunea de respingere Kupiec, deci mărimea exactă este de circa 9,5%; testul de durată nu este definit în 28% din eșantioane și este supradimensionat, iar CC este subdimensionat.",
+                "incorrectExplanation": "Cu doar 2,5 depășiri așteptate, nivelurile asimptotice hi-pătrat nu sunt atinse: mărimea trebuie simulată la lungimea eșantionului folosit."
             }
         },
         {
@@ -278,84 +278,84 @@ window.MFM_DATA.quizzes['backtesting'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 2,
             "en": {
-                "title": "McNeil-Frey residuals",
-                "text": "The McNeil-Frey test uses the exceedance residuals (L_t - ES_t)/sigma_t on breach days. Under a correct ES they have",
+                "title": "Why E[Z2] = 0",
+                "text": "Under a correct forecast distribution, which identity gives E[Z2] = 0 for the Acerbi-Szekely statistic Z2 = 1 - (1/(T alpha)) sum L_t I_t / ES_t?",
                 "options": [
-                    "variance zero",
-                    "a Normal distribution",
-                    "a positive mean",
-                    "mean zero"
+                    "E[I_t] = alpha, on its own",
+                    "E[L_t] = 0",
+                    "E[L_t 1{L_t > VaR_t} | F_{t-1}] = alpha ES_t",
+                    "ES_t = VaR_t"
                 ],
-                "correctExplanation": "If ES is correct, E[L_t - ES_t | L_t > VaR_t] = 0; a positive mean signals underestimated ES. The p-value is usually obtained by bootstrap.",
-                "incorrectExplanation": "The null hypothesis is a zero mean of the exceedance residuals; a positive mean means ES is too low."
+                "correctExplanation": "E[L_t I_t | F_{t-1}] = P(breach) E[L_t | breach] = alpha ES_t; since ES_t is known at t-1, each ratio has mean alpha and the known denominator T alpha makes the mean exactly zero.",
+                "incorrectExplanation": "The coverage identity alone says nothing about the size of tail losses; the proof needs the tail expectation on breach days to equal alpha times ES."
             },
             "ro": {
-                "title": "Reziduurile McNeil-Frey",
-                "text": "Testul McNeil-Frey folosește reziduurile de depășire (L_t - ES_t)/sigma_t în zilele cu depășire. Pentru un ES corect, acestea au",
+                "title": "De ce E[Z2] = 0",
+                "text": "Pentru o distribuție prognozată corectă, ce identitate dă E[Z2] = 0 pentru statistica Acerbi-Szekely Z2 = 1 - (1/(T alpha)) sum L_t I_t / ES_t?",
                 "options": [
-                    "dispersia zero",
-                    "o distribuție Normală",
-                    "o medie pozitivă",
-                    "media zero"
+                    "E[I_t] = alpha, singură",
+                    "E[L_t] = 0",
+                    "E[L_t 1{L_t > VaR_t} | F_{t-1}] = alpha ES_t",
+                    "ES_t = VaR_t"
                 ],
-                "correctExplanation": "Dacă ES este corect, E[L_t - ES_t | L_t > VaR_t] = 0; o medie pozitivă semnalează un ES subestimat. Valoarea p se obține de obicei prin bootstrap.",
-                "incorrectExplanation": "Ipoteza nulă este media zero a reziduurilor de depășire; o medie pozitivă înseamnă că ES este prea mic."
+                "correctExplanation": "E[L_t I_t | F_{t-1}] = P(depășire) E[L_t | depășire] = alpha ES_t; cum ES_t este cunoscut la t-1, fiecare raport are media alpha, iar numitorul cunoscut T alpha face media exact zero.",
+                "incorrectExplanation": "Identitatea de acoperire singură nu spune nimic despre mărimea pierderilor din coadă; demonstrația cere ca media pierderilor din zilele cu depășire să fie alpha ori ES."
+            }
+        },
+        {
+            "correct": 0,
+            "en": {
+                "title": "Ranking ES by squared error",
+                "text": "Ranking ES forecasts by the mean of (L_t - ES_t)^2 over breach days",
+                "options": [
+                    "can favour a wrong forecast, because this score is not consistent for ES",
+                    "is consistent, because ES is a conditional mean",
+                    "is consistent if T is large enough",
+                    "is equivalent to ranking by Z1"
+                ],
+                "correctExplanation": "ES alone is not elicitable: its level sets are not convex, so no score of ES alone rewards the true value; the breach days also depend on the VaR forecast. Consistent ranking needs a joint (VaR, ES) score such as FZ0.",
+                "incorrectExplanation": "A larger sample does not repair an inconsistent score; ES is a conditional mean only given the VaR, which the squared error does not score."
+            },
+            "ro": {
+                "title": "Clasificarea ES după eroarea pătratică",
+                "text": "Clasificarea prognozelor ES după media lui (L_t - ES_t)^2 în zilele cu depășire",
+                "options": [
+                    "poate favoriza o prognoză greșită, pentru că acest scor nu este consistent pentru ES",
+                    "este consistentă, pentru că ES este o medie condiționată",
+                    "este consistentă dacă T este suficient de mare",
+                    "este echivalentă cu clasificarea după Z1"
+                ],
+                "correctExplanation": "ES singur nu este elicitabil: mulțimile lui de nivel nu sunt convexe, deci niciun scor care depinde doar de ES nu recompensează valoarea adevărată; în plus, zilele cu depășire depind de prognoza VaR. Clasificarea consistentă cere un scor comun (VaR, ES), precum FZ0.",
+                "incorrectExplanation": "Un eșantion mai mare nu repară un scor inconsistent; ES este o medie condiționată doar dat fiind VaR, pe care eroarea pătratică nu îl punctează."
             }
         },
         {
             "correct": 1,
             "en": {
-                "title": "Acerbi-Szekely Z2",
-                "text": "For T = 250 and alpha = 2.5%, Acerbi and Szekely report 5% and 0.01% thresholds for Z2 close to",
+                "title": "Why the pinball loss is consistent",
+                "text": "Differentiating E[(1{L > v} - alpha)(L - v)] with respect to v gives F(v) - (1 - alpha). What follows?",
                 "options": [
-                    "+0.70 and +1.8",
-                    "-0.70 and -1.8",
-                    "-1.96 and -3.09",
-                    "0 and -1"
+                    "The minimiser is the mean of L",
+                    "The minimiser satisfies F(v) = 1 - alpha, i.e. v = VaR_alpha, and the second derivative f(v) > 0 makes it a minimum",
+                    "The minimiser is ES_alpha",
+                    "The pinball loss has no unique minimiser for continuous F"
                 ],
-                "correctExplanation": "Z2 has expectation zero under H0 and becomes negative when risk is underestimated; its critical values are stable across distributions, near -0.70 (5%) and -1.8 (0.01%).",
-                "incorrectExplanation": "Underestimated risk pushes Z2 below zero; the fixed thresholds are about -0.70 and -1.8."
+                "correctExplanation": "The first-order condition identifies the (1 - alpha)-quantile of the loss, which is VaR_alpha; the identification function 1{L <= v} - (1 - alpha) has mean zero only there.",
+                "incorrectExplanation": "Set the derivative to zero: P(L > v) = alpha, which is the definition of the VaR, not of the mean or of ES."
             },
             "ro": {
-                "title": "Z2 Acerbi-Szekely",
-                "text": "Pentru T = 250 și alpha = 2,5%, Acerbi și Szekely raportează praguri de 5% și 0,01% pentru Z2 apropiate de",
+                "title": "De ce este consistentă pierderea pinball",
+                "text": "Derivând E[(1{L > v} - alpha)(L - v)] în raport cu v obținem F(v) - (1 - alpha). Ce rezultă?",
                 "options": [
-                    "+0,70 și +1,8",
-                    "-0,70 și -1,8",
-                    "-1,96 și -3,09",
-                    "0 și -1"
+                    "Punctul de minim este media lui L",
+                    "Punctul de minim satisface F(v) = 1 - alpha, adică v = VaR_alpha, iar derivata a doua f(v) > 0 îl face minim",
+                    "Punctul de minim este ES_alpha",
+                    "Pierderea pinball nu are un minim unic pentru F continuă"
                 ],
-                "correctExplanation": "Z2 are media zero sub H0 și devine negativ când riscul este subestimat; valorile critice sunt stabile între distribuții, în jur de -0,70 (5%) și -1,8 (0,01%).",
-                "incorrectExplanation": "Riscul subestimat împinge Z2 sub zero; pragurile fixe sunt aproximativ -0,70 și -1,8."
-            }
-        },
-        {
-            "correct": 3,
-            "en": {
-                "title": "Elicitability",
-                "text": "A statistic is elicitable when",
-                "options": [
-                    "it can be estimated by maximum likelihood",
-                    "it is always positive",
-                    "it has a closed-form formula",
-                    "some scoring function is minimised in expectation exactly by its true value"
-                ],
-                "correctExplanation": "Elicitability (Gneiting, 2011) means a consistent scoring function exists: the mean with squared error, a quantile (VaR) with the pinball loss.",
-                "incorrectExplanation": "Elicitable means there is a scoring function whose expected value is minimised by the true value of the statistic."
-            },
-            "ro": {
-                "title": "Elicitabilitate",
-                "text": "O statistică este elicitabilă atunci când",
-                "options": [
-                    "poate fi estimată prin verosimilitate maximă",
-                    "este întotdeauna pozitivă",
-                    "are o formulă explicită",
-                    "o funcție de scor este minimizată în medie exact de valoarea ei adevărată"
-                ],
-                "correctExplanation": "Elicitabilitatea (Gneiting, 2011) înseamnă că există o funcție de scor consistentă: media cu eroarea pătratică, o cuantilă (VaR) cu pierderea pinball.",
-                "incorrectExplanation": "Elicitabil înseamnă că există o funcție de scor a cărei valoare așteptată este minimizată de valoarea adevărată a statisticii."
+                "correctExplanation": "Condiția de ordinul întâi identifică cuantila de ordin 1 - alpha a pierderii, adică VaR_alpha; funcția de identificare 1{L <= v} - (1 - alpha) are media zero doar acolo.",
+                "incorrectExplanation": "Egalați derivata cu zero: P(L > v) = alpha, care este chiar definiția VaR, nu a mediei sau a ES."
             }
         },
         {
@@ -467,30 +467,30 @@ window.MFM_DATA.quizzes['backtesting'] = {
             }
         },
         {
-            "correct": 1,
+            "correct": 3,
             "en": {
-                "title": "Split conformal",
-                "text": "With n = 250 calibration scores and alpha = 1%, which order statistic gives the split conformal VaR quantile?",
+                "title": "Conformal coverage beyond exchangeability",
+                "text": "Split conformal VaR 5% breaches on about 7% of S&P 500 crisis days. Without exchangeability, the coverage gap of split conformal is bounded by",
                 "options": [
-                    "The 248th",
-                    "The 249th, since k = ceil(251 x 0.99)",
-                    "The 250th",
-                    "The median"
+                    "1/(n + 1)",
+                    "the ACI step size gamma",
+                    "zero, by the finite-sample guarantee",
+                    "weighted total-variation distances between the calibration scores and the test score (Barber et al., 2023)"
                 ],
-                "correctExplanation": "k = ceil((n+1)(1-alpha)) = ceil(248.49) = 249, the second largest score; under exchangeability the breach probability is then between about 0.60% and 1%.",
-                "incorrectExplanation": "The index is k = ceil((n+1)(1-alpha)) = 249."
+                "correctExplanation": "Barber, Candès, Ramdas and Tibshirani (2023) bound the coverage loss by weighted total-variation distances; volatility clustering makes these distances large right after turbulent periods.",
+                "incorrectExplanation": "The finite-sample guarantee requires exchangeability; 1/(n + 1) is only the upper slack of coverage under exchangeability, and gamma belongs to ACI."
             },
             "ro": {
-                "title": "Conformal split",
-                "text": "Cu n = 250 de scoruri de calibrare și alpha = 1%, ce statistică de ordine dă cuantila VaR conformală split?",
+                "title": "Acoperirea conformală fără schimbabilitate",
+                "text": "VaR 5% conformal split este depășit în circa 7% dintre zilele de criză S&P 500. Fără schimbabilitate, abaterea acoperirii conformale split este mărginită de",
                 "options": [
-                    "A 248-a",
-                    "A 249-a, deoarece k = ceil(251 x 0,99)",
-                    "A 250-a",
-                    "Mediana"
+                    "1/(n + 1)",
+                    "pasul ACI gamma",
+                    "zero, datorită garanției în eșantion finit",
+                    "distanțe ponderate în variație totală între scorurile de calibrare și scorul de test (Barber et al., 2023)"
                 ],
-                "correctExplanation": "k = ceil((n+1)(1-alpha)) = ceil(248,49) = 249, al doilea cel mai mare scor; sub schimbabilitate, probabilitatea de depășire este apoi între circa 0,60% și 1%.",
-                "incorrectExplanation": "Indicele este k = ceil((n+1)(1-alpha)) = 249."
+                "correctExplanation": "Barber, Candès, Ramdas și Tibshirani (2023) mărginesc pierderea de acoperire prin distanțe ponderate în variație totală; gruparea volatilității face aceste distanțe mari imediat după perioade agitate.",
+                "incorrectExplanation": "Garanția în eșantion finit cere schimbabilitate; 1/(n + 1) este doar marja superioară a acoperirii sub schimbabilitate, iar gamma ține de ACI."
             }
         },
         {
@@ -523,28 +523,28 @@ window.MFM_DATA.quizzes['backtesting'] = {
         {
             "correct": 0,
             "en": {
-                "title": "Adaptive conformal inference",
-                "text": "What is the update rule of adaptive conformal inference (Gibbs and Candès, 2021)?",
+                "title": "Giacomini-White versus Diebold-Mariano",
+                "text": "Forecasts come from rolling 1000-day windows with re-estimated GARCH parameters. Which test of equal predictive accuracy has a valid asymptotic justification for comparing them?",
                 "options": [
-                    "alpha_{t+1} = alpha_t + gamma (alpha - err_t)",
-                    "alpha_{t+1} = alpha_t x err_t",
-                    "alpha_{t+1} = alpha (constant)",
-                    "alpha_{t+1} = 1 - alpha_t"
+                    "The Giacomini-White test of (conditional) predictive ability of the forecasting methods",
+                    "The Diebold-Mariano test with an i.i.d. variance",
+                    "A Kupiec test on the loss differential",
+                    "A Mincer-Zarnowitz regression of losses on forecasts"
                 ],
-                "correctExplanation": "After a breach (err_t = 1) the working level falls and the VaR rises; after quiet days it drifts back. The long-run breach rate converges to alpha for any sequence.",
-                "incorrectExplanation": "ACI moves the working level by gamma times the gap between the target and the latest error."
+                "correctExplanation": "Giacomini and White (2006) test the forecasting method, including its estimation, and allow a finite rolling window where estimation error never vanishes; with a constant test function the statistic has the DM form.",
+                "incorrectExplanation": "The DM justification targets population model accuracy; with finite rolling windows the object compared is the method, and the i.i.d. variance also ignores autocorrelated losses."
             },
             "ro": {
-                "title": "Inferența conformală adaptivă",
-                "text": "Care este regula de actualizare a inferenței conformale adaptive (Gibbs și Candès, 2021)?",
+                "title": "Giacomini-White versus Diebold-Mariano",
+                "text": "Prognozele provin din ferestre mobile de 1000 de zile, cu parametri GARCH reestimați. Ce test de acuratețe predictivă egală are o justificare asimptotică validă pentru compararea lor?",
                 "options": [
-                    "alpha_{t+1} = alpha_t + gamma (alpha - err_t)",
-                    "alpha_{t+1} = alpha_t x err_t",
-                    "alpha_{t+1} = alpha (constant)",
-                    "alpha_{t+1} = 1 - alpha_t"
+                    "Testul Giacomini-White al abilității predictive (condiționate) a metodelor de prognoză",
+                    "Testul Diebold-Mariano cu dispersie i.i.d.",
+                    "Un test Kupiec pe diferența de pierdere",
+                    "O regresie Mincer-Zarnowitz a pierderilor pe prognoze"
                 ],
-                "correctExplanation": "După o depășire (err_t = 1) nivelul de lucru scade și VaR crește; după zile liniștite revine treptat. Rata de depășire pe termen lung converge la alpha pentru orice șir.",
-                "incorrectExplanation": "ACI mută nivelul de lucru cu gamma ori diferența dintre țintă și ultima eroare."
+                "correctExplanation": "Giacomini și White (2006) testează metoda de prognoză, inclusiv estimarea ei, și permit o fereastră mobilă finită, în care eroarea de estimare nu dispare; cu o funcție test constantă, statistica are forma DM.",
+                "incorrectExplanation": "Justificarea DM vizează acuratețea populațională a modelelor; cu ferestre mobile finite, obiectul comparat este metoda, iar dispersia i.i.d. ignoră și autocorelația pierderilor."
             }
         },
         {
@@ -577,28 +577,28 @@ window.MFM_DATA.quizzes['backtesting'] = {
         {
             "correct": 2,
             "en": {
-                "title": "Which model wins?",
-                "text": "Across the S&P 500, BET, Bitcoin and EUR/RON, which models pass the Z2 test and stay in the 90% model confidence set everywhere?",
+                "title": "Reading a Murphy diagram",
+                "text": "For VaR 1% on the S&P 500 the mean elementary-score curves of GARCH-t and FHS cross several times. What follows?",
                 "options": [
-                    "HS and the Normal distribution",
-                    "Student-t and GARCH-t",
-                    "FHS and GARCH-EVT",
-                    "Only the Normal distribution"
+                    "FHS dominates GARCH-t under every consistent score",
+                    "Both forecasts are miscalibrated",
+                    "Some consistent scoring functions rank GARCH-t first and others FHS: the pinball ranking is score-specific",
+                    "The Diebold-Mariano test is invalid for these forecasts"
                 ],
-                "correctExplanation": "A GARCH volatility filter plus a flexible tail (empirical or generalised Pareto) passes all ES tests and stays in the MCS in all four markets.",
-                "incorrectExplanation": "The winners combine a GARCH filter with a flexible tail: FHS and GARCH-EVT."
+                "correctExplanation": "Every consistent quantile score is a mixture of elementary scores; one forecast dominates only if its curve is lower at every threshold. Crossing curves mean the ranking depends on the weights, for example on how much crisis thresholds matter.",
+                "incorrectExplanation": "Dominance needs one curve below the other everywhere; crossing curves say nothing about calibration or about the validity of a test on a chosen score."
             },
             "ro": {
-                "title": "Ce model câștigă?",
-                "text": "Pe S&P 500, BET, Bitcoin și EUR/RON, ce modele trec testul Z2 și rămân peste tot în mulțimea de modele de încredere de 90%?",
+                "title": "Citirea unei diagrame Murphy",
+                "text": "Pentru VaR 1% pe S&P 500, curbele scorurilor elementare medii ale GARCH-t și FHS se intersectează de mai multe ori. Ce rezultă?",
                 "options": [
-                    "HS și distribuția Normală",
-                    "Student-t și GARCH-t",
-                    "FHS și GARCH-EVT",
-                    "Doar distribuția Normală"
+                    "FHS domină GARCH-t sub orice scor consistent",
+                    "Ambele prognoze sunt decalibrate",
+                    "Unele funcții de scor consistente pun GARCH-t pe primul loc, altele FHS: clasamentul după pierderea pinball depinde de scor",
+                    "Testul Diebold-Mariano nu este valid pentru aceste prognoze"
                 ],
-                "correctExplanation": "Un filtru de volatilitate GARCH plus o coadă flexibilă (empirică sau Pareto generalizată) trece toate testele ES și rămâne în MCS pe toate cele patru piețe.",
-                "incorrectExplanation": "Câștigătorii combină un filtru GARCH cu o coadă flexibilă: FHS și GARCH-EVT."
+                "correctExplanation": "Orice scor consistent pentru cuantile este o mixtură de scoruri elementare; o prognoză domină doar dacă curba ei este mai jos la fiecare prag. Curbele care se intersectează arată că clasamentul depinde de ponderi, de exemplu de cât contează pragurile de criză.",
+                "incorrectExplanation": "Dominanța cere ca o curbă să fie sub cealaltă peste tot; intersecția curbelor nu spune nimic despre calibrare sau despre validitatea unui test pe un scor ales."
             }
         },
         {

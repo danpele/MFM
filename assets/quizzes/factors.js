@@ -8,84 +8,84 @@ window.MFM_DATA.quizzes['factors'] = {
     draw: 20,
     questions: [
         {
-            correct: 2,
+            correct: 1,
             en: {
-                title: "CAPM prediction",
-                text: "What does the CAPM predict about expected excess returns?",
+                title: "GRS in Sharpe-ratio form",
+                text: "With maximum-likelihood moments, the GRS quadratic form α̂′Σ̂⁻¹α̂ equals…",
                 options: [
-                    "They depend on total volatility",
-                    "They depend on firm size and book-to-market",
-                    "They are proportional to the market beta",
-                    "They are equal for all assets"
+                    "The average squared alpha across the test assets",
+                    "SR²(factors + test assets) − SR²(factors): the gain in the maximum squared Sharpe ratio from adding the test assets",
+                    "The average R² of the time-series regressions",
+                    "The squared Sharpe ratio of the factors, SR²(factors)"
                 ],
-                correctExplanation: "Under the CAPM, E[R_i] − R_f = β_i (E[R_m] − R_f): only exposure to market risk is rewarded.",
-                incorrectExplanation: "Only beta is priced in the CAPM; total volatility, size or value should not matter."
+                correctExplanation: "By the partitioned inverse of the covariance of (f, R), μ′V⁻¹μ = SR²(f) + α′Σ⁻¹α. On the 25 portfolios the monthly Sharpe ratio rises from 0.134 to 0.405, and GRS = 4.20.",
+                incorrectExplanation: "The quadratic form weights the alphas by Σ̂⁻¹ and equals the increase in the tangency Sharpe ratio squared when the test assets are added to the factors."
             },
             ro: {
-                title: "Predicția CAPM",
-                text: "Ce prezice CAPM despre randamentele în exces așteptate?",
+                title: "GRS în forma raportului Sharpe",
+                text: "Cu momente de verosimilitate maximă, forma pătratică GRS α̂′Σ̂⁻¹α̂ este egală cu…",
                 options: [
-                    "Depind de volatilitatea totală",
-                    "Depind de mărimea firmei și de raportul book-to-market",
-                    "Sunt proporționale cu beta de piață",
-                    "Sunt egale pentru toate activele"
+                    "Media pătratelor valorilor alfa ale activelor de test",
+                    "SR²(factori + active de test) − SR²(factori): câștigul de raport Sharpe maxim la pătrat adus de activele de test",
+                    "Media R² a regresiilor în serii de timp",
+                    "Pătratul raportului Sharpe al factorilor, SR²(factori)"
                 ],
-                correctExplanation: "Conform CAPM, E[R_i] − R_f = β_i (E[R_m] − R_f): doar expunerea la riscul de piață este remunerată.",
-                incorrectExplanation: "În CAPM doar beta este remunerat; volatilitatea totală, mărimea sau valoarea nu ar trebui să conteze."
+                correctExplanation: "Din inversa partiționată a covarianței lui (f, R), μ′V⁻¹μ = SR²(f) + α′Σ⁻¹α. Pe cele 25 de portofolii, raportul Sharpe lunar crește de la 0,134 la 0,405, iar GRS = 4,20.",
+                incorrectExplanation: "Forma pătratică ponderează valorile alfa cu Σ̂⁻¹ și este egală cu creșterea pătratului raportului Sharpe tangent când activele de test se adaugă la factori."
+            }
+        },
+        {
+            correct: 3,
+            en: {
+                title: "A skeptical appraisal of R²",
+                text: "A new three-factor model reaches a cross-sectional R² of 80% on the 25 size × B/M portfolios. Why is this weak evidence (Lewellen, Nagel and Shanken, 2010)?",
+                options: [
+                    "Because 25 portfolios are too many test assets",
+                    "Because a credible R² must exceed 95%",
+                    "Because the OLS R² is always 80% on these portfolios",
+                    "Because these portfolios have a strong factor structure, so any factors correlated with SMB and HML fit them; add other test assets and report the GLS R² with confidence intervals"
+                ],
+                correctExplanation: "In the lecture FF3 has an OLS R² of 0.66 on the 25 portfolios but 0.21 once 30 industries are added, and its GLS R² is at most 0.20.",
+                incorrectExplanation: "A high OLS R² on the 25 size × B/M portfolios is a low hurdle: the assets are spanned by three factors, and many unrelated factor sets fit them."
+            },
+            ro: {
+                title: "O evaluare sceptică a lui R²",
+                text: "Un nou model cu trei factori atinge un R² transversal de 80% pe cele 25 de portofolii mărime × B/M. De ce este o dovadă slabă (Lewellen, Nagel și Shanken, 2010)?",
+                options: [
+                    "Pentru că 25 de portofolii sunt prea multe active de test",
+                    "Pentru că un R² credibil trebuie să depășească 95%",
+                    "Pentru că R² OLS este mereu 80% pe aceste portofolii",
+                    "Pentru că aceste portofolii au o structură factorială puternică, deci orice factori corelați cu SMB și HML le potrivesc; adăugați alte active de test și raportați R² GLS cu intervale de încredere"
+                ],
+                correctExplanation: "În curs, FF3 are R² OLS 0,66 pe cele 25 de portofolii, dar 0,21 după adăugarea a 30 de industrii, iar R² GLS este cel mult 0,20.",
+                incorrectExplanation: "Un R² OLS mare pe cele 25 de portofolii mărime × B/M este un prag jos: activele sunt acoperite de trei factori și multe seturi de factori fără legătură le potrivesc."
             }
         },
         {
             correct: 0,
             en: {
-                title: "CML versus SML",
-                text: "Which statement correctly distinguishes the CML from the SML?",
+                title: "Useless factor",
+                text: "A macroeconomic factor is statistically independent of all returns. In a two-pass regression with a misspecified model, its estimated premium λ̂…",
                 options: [
-                    "The CML contains only efficient portfolios in (volatility, mean); the SML contains every asset in (beta, mean)",
-                    "The CML uses beta on the horizontal axis; the SML uses volatility",
-                    "Both lines contain every individual asset",
-                    "The SML only exists when there is no risk-free asset"
+                    "Can look significant: the Fama–MacBeth t-test over-rejects, because the betas on the factor are pure noise of order T^(−1/2)",
+                    "Is exactly zero",
+                    "Is always insignificant",
+                    "Equals the time-series mean of the factor"
                 ],
-                correctExplanation: "The CML plots efficient combinations of the risk-free asset and the tangency portfolio against volatility; the SML plots every asset against beta if the CAPM holds.",
-                incorrectExplanation: "The CML is in (volatility, mean) and holds only for efficient portfolios; the SML is in (beta, mean) and holds for all assets."
+                correctExplanation: "Kan and Zhang (1999): pass 2 divides by noise, so λ̂ does not converge to zero. In the lecture simulation λ = 0 was rejected in 60% of the replications with Fama–MacBeth errors at the 5% level.",
+                incorrectExplanation: "Independence from returns does not protect pass 2: the betas are estimated with noise and the premium estimate inherits a non-vanishing error; test the first-pass betas first."
             },
             ro: {
-                title: "CML versus SML",
-                text: "Care afirmație distinge corect CML de SML?",
+                title: "Factor inutil",
+                text: "Un factor macroeconomic este statistic independent de toate randamentele. Într-o regresie în două etape cu un model greșit specificat, prima lui estimată λ̂…",
                 options: [
-                    "CML conține doar portofolii eficiente în (volatilitate, medie); SML conține orice activ în (beta, medie)",
-                    "CML are beta pe axa orizontală; SML are volatilitatea",
-                    "Ambele drepte conțin orice activ individual",
-                    "SML există doar când nu există activ fără risc"
+                    "Poate părea semnificativă: testul t Fama–MacBeth respinge prea des, pentru că valorile beta pe acest factor sunt doar zgomot de ordinul T^(−1/2)",
+                    "Este exact zero",
+                    "Este mereu nesemnificativă",
+                    "Este egală cu media factorului în timp"
                 ],
-                correctExplanation: "CML reprezintă combinațiile eficiente dintre activul fără risc și portofoliul tangent în funcție de volatilitate; SML reprezintă orice activ în funcție de beta, dacă CAPM este adevărat.",
-                incorrectExplanation: "CML este în (volatilitate, medie) și este valabilă doar pentru portofolii eficiente; SML este în (beta, medie) și este valabilă pentru toate activele."
-            }
-        },
-        {
-            correct: 1,
-            en: {
-                title: "Tangency portfolio",
-                text: "Which portfolio maximises the Sharpe ratio among risky portfolios?",
-                options: [
-                    "The minimum-variance portfolio",
-                    "The tangency portfolio, with weights proportional to Σ⁻¹μ",
-                    "The equally weighted portfolio",
-                    "The portfolio with the highest expected return"
-                ],
-                correctExplanation: "The tangency portfolio w ∝ Σ⁻¹μ (normalised to sum to one) has the highest excess return per unit of volatility.",
-                incorrectExplanation: "The maximum Sharpe ratio is reached by the tangency portfolio, not by minimum variance, equal weights or maximum return."
-            },
-            ro: {
-                title: "Portofoliul tangent",
-                text: "Ce portofoliu maximizează raportul Sharpe dintre portofoliile riscante?",
-                options: [
-                    "Portofoliul de varianță minimă",
-                    "Portofoliul tangent, cu ponderi proporționale cu Σ⁻¹μ",
-                    "Portofoliul cu ponderi egale",
-                    "Portofoliul cu cel mai mare randament așteptat"
-                ],
-                correctExplanation: "Portofoliul tangent w ∝ Σ⁻¹μ (normalizat la suma unu) are cel mai mare randament în exces pe unitatea de volatilitate.",
-                incorrectExplanation: "Raportul Sharpe maxim este atins de portofoliul tangent, nu de varianța minimă, de ponderile egale sau de randamentul maxim."
+                correctExplanation: "Kan și Zhang (1999): etapa 2 împarte la zgomot, deci λ̂ nu converge la zero. În simularea din curs, λ = 0 a fost respins în 60% din replicări cu erori Fama–MacBeth, la nivelul de 5%.",
+                incorrectExplanation: "Independența față de randamente nu protejează etapa 2: valorile beta sunt estimate cu zgomot, iar prima estimată moștenește o eroare care nu dispare; testați întâi valorile beta din prima etapă."
             }
         },
         {
@@ -116,111 +116,111 @@ window.MFM_DATA.quizzes['factors'] = {
             }
         },
         {
-            correct: 1,
-            en: {
-                title: "Blume adjustment",
-                text: "Why are adjusted betas such as Blume’s 0.33 + 0.67β̂ used in practice?",
-                options: [
-                    "Because betas are always equal to one",
-                    "Because extreme estimated betas contain noise and tend to move towards one in later periods",
-                    "Because OLS betas are always too small",
-                    "Because regulators require it"
-                ],
-                correctExplanation: "Regression to the mean: part of an extreme estimate is estimation error, so shrinking towards one improves forecasts; in the sector ETFs the RMSE fell from 0.135 to 0.109.",
-                incorrectExplanation: "The adjustment exploits regression to the mean of noisy estimates; betas are not all equal to one."
-            },
-            ro: {
-                title: "Ajustarea Blume",
-                text: "De ce se folosesc în practică beta ajustate, precum regula Blume 0,33 + 0,67β̂?",
-                options: [
-                    "Pentru că beta este întotdeauna egal cu unu",
-                    "Pentru că valorile beta extreme estimate conțin zgomot și tind spre unu în perioadele următoare",
-                    "Pentru că beta OLS este mereu prea mic",
-                    "Pentru că autoritățile de reglementare o cer"
-                ],
-                correctExplanation: "Regresia spre medie: o parte dintr-o estimație extremă este eroare, deci ajustarea spre unu îmbunătățește prognozele; la ETF-urile sectoriale RMSE a scăzut de la 0,135 la 0,109.",
-                incorrectExplanation: "Ajustarea exploatează regresia spre medie a estimațiilor zgomotoase; valorile beta nu sunt toate egale cu unu."
-            }
-        },
-        {
             correct: 2,
             en: {
-                title: "BVB betas",
-                text: "Which Bucharest Stock Exchange blue chip had the highest CAPM beta against BET in 2015–2026?",
+                title: "Vasicek: empirical-Bayes prior",
+                text: "The estimated betas of 9 sectors have a cross-sectional variance of 0.116, and their average squared standard error is 0.02. Which prior variance σ²_β should the Vasicek estimator use?",
                 options: [
-                    "Digi",
-                    "Transelectrica",
-                    "Banca Transilvania",
-                    "Hidroelectrica"
+                    "0.116",
+                    "0.136",
+                    "0.096",
+                    "0.02"
                 ],
-                correctExplanation: "Banca Transilvania had a beta of 1.25 (R² 0.59); banks were the most market-sensitive stocks, while Digi had 0.67.",
-                incorrectExplanation: "The banks had the highest betas: Banca Transilvania 1.25 and BRD 1.13; utilities and telecom had the lowest."
+                correctExplanation: "Var_cs(β̂) = σ²_β + mean se², because estimation noise adds to the dispersion of the true betas; hence σ²_β = 0.116 − 0.02 = 0.096.",
+                incorrectExplanation: "The variance of the estimated betas includes their sampling noise; the prior must describe the true betas, so subtract the average squared standard error."
             },
             ro: {
-                title: "Beta la BVB",
-                text: "Care blue chip de la Bursa de Valori București a avut cel mai mare beta CAPM față de BET în 2015–2026?",
+                title: "Vasicek: informația a priori Bayes empirică",
+                text: "Valorile beta estimate pentru 9 sectoare au varianța transversală 0,116, iar media pătratelor erorilor lor standard este 0,02. Ce varianță a priori σ²_β trebuie să folosească estimatorul Vasicek?",
                 options: [
-                    "Digi",
-                    "Transelectrica",
-                    "Banca Transilvania",
-                    "Hidroelectrica"
+                    "0,116",
+                    "0,136",
+                    "0,096",
+                    "0,02"
                 ],
-                correctExplanation: "Banca Transilvania a avut beta 1,25 (R² 0,59); băncile au fost cele mai sensibile la piață, iar Digi a avut 0,67.",
-                incorrectExplanation: "Băncile au avut cele mai mari valori beta: Banca Transilvania 1,25 și BRD 1,13; utilitățile și telecomul au avut cele mai mici."
+                correctExplanation: "Var_cs(β̂) = σ²_β + media se², pentru că zgomotul de estimare se adaugă dispersiei valorilor beta adevărate; deci σ²_β = 0,116 − 0,02 = 0,096.",
+                incorrectExplanation: "Varianța valorilor beta estimate include zgomotul de eșantionare; informația a priori trebuie să descrie valorile beta adevărate, deci se scade media pătratelor erorilor standard."
             }
         },
         {
             correct: 1,
             en: {
-                title: "Jensen’s alpha",
-                text: "What is Jensen’s alpha?",
+                title: "Nonsynchronous trading",
+                text: "Daily OLS betas of thinly traded Bucharest Stock Exchange stocks on the BET index are…",
                 options: [
-                    "The slope of the market model",
-                    "The intercept of the regression of excess returns on market excess returns",
-                    "The Sharpe ratio of an asset",
-                    "The difference between two betas"
+                    "Biased upwards",
+                    "Biased towards zero; the Dimson sum of slopes on lagged, current and leading BET returns corrects most of it",
+                    "Unbiased, because OLS is unbiased",
+                    "Undefined when a stock does not trade"
                 ],
-                correctExplanation: "In R^e_i = α_i + β_i R^e_m + ε, α_i is the average return not explained by market risk; the CAPM implies α_i = 0.",
-                incorrectExplanation: "Alpha is the intercept of the market model, not a slope or a Sharpe ratio."
+                correctExplanation: "Stale prices spread the reaction to market news over several days. In the seminar the Dimson beta of Nuclearelectrica rises from 0.80 to 0.94 and that of Digi from 0.67 to 0.75.",
+                incorrectExplanation: "A stock that trades late reacts to today's market move tomorrow, so the contemporaneous covariance understates its beta; sum the lead and lag slopes."
             },
             ro: {
-                title: "Alfa lui Jensen",
-                text: "Ce este alfa lui Jensen?",
+                title: "Tranzacționare asincronă",
+                text: "Valorile beta OLS zilnice ale acțiunilor puțin lichide de la Bursa de Valori București față de indicele BET sunt…",
                 options: [
-                    "Panta modelului de piață",
-                    "Termenul liber al regresiei randamentelor în exces pe randamentele în exces ale pieței",
-                    "Raportul Sharpe al unui activ",
-                    "Diferența dintre două valori beta"
+                    "Deplasate în sus",
+                    "Deplasate spre zero; suma Dimson a pantelor pe randamentele BET întârziate, curente și anticipate corectează cea mai mare parte",
+                    "Nedeplasate, pentru că OLS este nedeplasat",
+                    "Nedefinite când o acțiune nu se tranzacționează"
                 ],
-                correctExplanation: "În R^e_i = α_i + β_i R^e_m + ε, α_i este randamentul mediu neexplicat de riscul de piață; CAPM implică α_i = 0.",
-                incorrectExplanation: "Alfa este termenul liber al modelului de piață, nu o pantă sau un raport Sharpe."
+                correctExplanation: "Prețurile vechi împrăștie reacția la știrile pieței pe mai multe zile. În seminar, beta Dimson al Nuclearelectrica crește de la 0,80 la 0,94, iar al Digi de la 0,67 la 0,75.",
+                incorrectExplanation: "O acțiune care se tranzacționează cu întârziere reacționează mâine la mișcarea de azi a pieței, deci covarianța contemporană subestimează beta; adunați pantele anticipate și întârziate."
+            }
+        },
+        {
+            correct: 3,
+            en: {
+                title: "Traded-factor premium",
+                text: "For a traded factor, the two-pass premium λ̂ is far from the factor's time-series mean (market: −6.6% vs +7.2% a year on the 25 portfolios). What does this indicate?",
+                options: [
+                    "That the factor is not traded",
+                    "That the time-series mean is biased",
+                    "That the Shanken errors are too small",
+                    "Misspecification of the model for these test assets, or weak identification of the premium when betas barely vary"
+                ],
+                correctExplanation: "A traded factor prices itself, so λ should equal E[f]. Market betas span only 0.86–1.42 on the 25 portfolios, so the intercept absorbs the level and λ_m is weakly identified.",
+                incorrectExplanation: "The gap is a diagnostic about the model and the test assets, not about the factor mean or the standard errors."
+            },
+            ro: {
+                title: "Prima unui factor tranzacționat",
+                text: "Pentru un factor tranzacționat, prima λ̂ din cele două etape este departe de media factorului în timp (piața: −6,6% față de +7,2% pe an pe cele 25 de portofolii). Ce indică acest lucru?",
+                options: [
+                    "Că factorul nu este tranzacționat",
+                    "Că media în timp este deplasată",
+                    "Că erorile Shanken sunt prea mici",
+                    "Specificarea greșită a modelului pentru aceste active de test sau identificarea slabă a primei când valorile beta variază foarte puțin"
+                ],
+                correctExplanation: "Un factor tranzacționat se evaluează pe sine, deci λ ar trebui să fie egal cu E[f]. Valorile beta de piață acoperă doar 0,86–1,42 pe cele 25 de portofolii, deci termenul liber absoarbe nivelul, iar λ_m este slab identificat.",
+                incorrectExplanation: "Diferența este un diagnostic despre model și activele de test, nu despre media factorului sau erorile standard."
             }
         },
         {
             correct: 0,
             en: {
-                title: "GRS test",
-                text: "What does the Gibbons–Ross–Shanken (GRS) test examine?",
+                title: "Large-N alpha test",
+                text: "You want to test the alphas of N = 100 portfolios using T = 96 monthly returns. What happens to the GRS test?",
                 options: [
-                    "Whether all N alphas are jointly zero",
-                    "Whether each beta equals one",
-                    "Whether returns follow the Normal distribution",
-                    "Whether the market premium is positive"
+                    "It cannot be computed: the residual covariance matrix has rank at most T − 2 < N, so it is singular; use a large-N test such as Pesaran–Yamagata",
+                    "It is valid but has low power",
+                    "It is valid if the residuals follow the Normal distribution",
+                    "It is valid with Newey–West errors"
                 ],
-                correctExplanation: "GRS is a joint F-test of H0: α_1 = … = α_N = 0 that accounts for the correlation of residuals across assets.",
-                incorrectExplanation: "GRS tests the alphas jointly; it is not a test of betas, normality or the sign of the premium."
+                correctExplanation: "Σ̂ is built from T residual vectors with two estimated parameters, so its rank is at most T − 2 = 94 < 100 and Σ̂⁻¹ does not exist.",
+                incorrectExplanation: "The problem is not power or normality: Σ̂⁻¹ does not exist when N ≥ T − 1, and GRS needs it."
             },
             ro: {
-                title: "Testul GRS",
-                text: "Ce verifică testul Gibbons–Ross–Shanken (GRS)?",
+                title: "Test de alfa pentru N mare",
+                text: "Vreți să testați valorile alfa pentru N = 100 de portofolii cu T = 96 de randamente lunare. Ce se întâmplă cu testul GRS?",
                 options: [
-                    "Dacă toate cele N valori alfa sunt simultan zero",
-                    "Dacă fiecare beta este egal cu unu",
-                    "Dacă randamentele urmează distribuția Normală",
-                    "Dacă prima pieței este pozitivă"
+                    "Nu se poate calcula: matricea de covarianță a reziduurilor are rangul cel mult T − 2 < N, deci este singulară; folosiți un test pentru N mare, precum Pesaran–Yamagata",
+                    "Este valid, dar are putere mică",
+                    "Este valid dacă reziduurile urmează distribuția Normală",
+                    "Este valid cu erori Newey–West"
                 ],
-                correctExplanation: "GRS este un test F comun pentru H0: α_1 = … = α_N = 0, care ține cont de corelația reziduurilor între active.",
-                incorrectExplanation: "GRS testează valorile alfa împreună; nu este un test pentru beta, normalitate sau semnul primei."
+                correctExplanation: "Σ̂ este construită din T vectori de reziduuri cu doi parametri estimați, deci rangul ei este cel mult T − 2 = 94 < 100, iar Σ̂⁻¹ nu există.",
+                incorrectExplanation: "Problema nu este puterea sau normalitatea: Σ̂⁻¹ nu există când N ≥ T − 1, iar GRS are nevoie de ea."
             }
         },
         {
@@ -369,7 +369,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "To correct for non-Normal distributions of returns",
                     "Because betas are estimated, not known (errors in variables), which makes the usual errors too small"
                 ],
-                correctExplanation: "The Shanken variance multiplies the Fama–MacBeth variance by (1 + λ′Σ_f⁻¹λ) and adds Σ_f/T; for HML in FF3 the t-statistic fell from 2.98 to 2.12.",
+                correctExplanation: "Var_Sh = (1 + c)(Var_FM − Σ_f/T) + Σ_f/T with c = λ′Σ_f⁻¹λ: only the errors-in-variables part is scaled. With monthly traded factors c is small (0.03 for FF3), so HML keeps t ≈ 2.99.",
                 incorrectExplanation: "The correction addresses the estimation error in the betas used in the second pass."
             },
             ro: {
@@ -381,62 +381,62 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Pentru a corecta distribuțiile non-Normale ale randamentelor",
                     "Pentru că valorile beta sunt estimate, nu cunoscute (erori în variabile), ceea ce face erorile obișnuite prea mici"
                 ],
-                correctExplanation: "Varianța Shanken înmulțește varianța Fama–MacBeth cu (1 + λ′Σ_f⁻¹λ) și adaugă Σ_f/T; pentru HML în FF3, statistica t a scăzut de la 2,98 la 2,12.",
+                correctExplanation: "Var_Sh = (1 + c)(Var_FM − Σ_f/T) + Σ_f/T, cu c = λ′Σ_f⁻¹λ: doar partea datorată erorilor în variabile este scalată. Pentru factori tranzacționați lunari c este mic (0,03 pentru FF3), deci HML păstrează t ≈ 2,99.",
                 incorrectExplanation: "Corecția tratează eroarea de estimare a valorilor beta folosite în a doua etapă."
-            }
-        },
-        {
-            correct: 1,
-            en: {
-                title: "Fama–French factors",
-                text: "What do RMW and CMA measure in the Fama–French five-factor model?",
-                options: [
-                    "Momentum and market beta",
-                    "Profitability (robust minus weak) and investment (conservative minus aggressive)",
-                    "Size and book-to-market",
-                    "Liquidity and volatility"
-                ],
-                correctExplanation: "RMW is high minus low operating profitability; CMA is low minus high asset growth. FF5 adds them to market, SMB and HML.",
-                incorrectExplanation: "Size and value are SMB and HML; RMW and CMA are profitability and investment."
-            },
-            ro: {
-                title: "Factorii Fama–French",
-                text: "Ce măsoară RMW și CMA în modelul Fama–French cu cinci factori?",
-                options: [
-                    "Momentum și beta de piață",
-                    "Profitabilitatea (robust minus weak) și investițiile (conservative minus aggressive)",
-                    "Mărimea și book-to-market",
-                    "Lichiditatea și volatilitatea"
-                ],
-                correctExplanation: "RMW este profitabilitate operațională mare minus mică; CMA este creștere mică minus mare a activelor. FF5 îi adaugă la piață, SMB și HML.",
-                incorrectExplanation: "Mărimea și valoarea sunt SMB și HML; RMW și CMA sunt profitabilitatea și investițiile."
             }
         },
         {
             correct: 2,
             en: {
-                title: "Momentum",
-                text: "How is the momentum factor (MOM) typically formed?",
+                title: "Number of factors",
+                text: "Which estimator chooses the number of factors k by maximising the ratio of consecutive eigenvalues μ_k/μ_(k+1) of the sample covariance matrix?",
                 options: [
-                    "Long stocks with the lowest past-month return",
-                    "Long stocks with high book-to-market",
-                    "Long past winners and short past losers, using returns from month t−12 to t−2",
-                    "Long the stocks with the lowest beta"
+                    "Kaiser's rule",
+                    "Bai and Ng's information criterion",
+                    "Ahn and Horenstein's eigenvalue ratio",
+                    "The elbow of the scree plot, judged by eye"
                 ],
-                correctExplanation: "Momentum (Jegadeesh and Titman, 1993; Carhart, 1997) sorts on the past year’s return, skipping the most recent month.",
-                incorrectExplanation: "Momentum sorts on past returns over roughly the previous year, not on value or beta."
+                correctExplanation: "Ahn and Horenstein (2013) maximise μ_k/μ_(k+1); Bai and Ng (2002) minimise a penalised residual variance; Kaiser keeps eigenvalues above 1 and is not consistent.",
+                incorrectExplanation: "The eigenvalue-ratio estimator needs no penalty; the information criterion and Kaiser's rule use other principles."
             },
             ro: {
-                title: "Momentum",
-                text: "Cum se construiește de obicei factorul momentum (MOM)?",
+                title: "Numărul de factori",
+                text: "Ce estimator alege numărul de factori k maximizând raportul valorilor proprii consecutive μ_k/μ_(k+1) ale matricei de covarianță de selecție?",
                 options: [
-                    "Long acțiunile cu cel mai mic randament în luna trecută",
-                    "Long acțiunile cu book-to-market mare",
-                    "Long câștigătorii trecuți și short perdanții trecuți, după randamentele din luna t−12 până în t−2",
-                    "Long acțiunile cu cel mai mic beta"
+                    "Regula Kaiser",
+                    "Criteriul informațional Bai–Ng",
+                    "Raportul valorilor proprii Ahn–Horenstein",
+                    "Cotul graficului scree, judecat din ochi"
                 ],
-                correctExplanation: "Momentum (Jegadeesh și Titman, 1993; Carhart, 1997) sortează după randamentul ultimului an, sărind peste luna cea mai recentă.",
-                incorrectExplanation: "Momentum sortează după randamentele din aproximativ ultimul an, nu după valoare sau beta."
+                correctExplanation: "Ahn și Horenstein (2013) maximizează μ_k/μ_(k+1); Bai și Ng (2002) minimizează o varianță reziduală penalizată; Kaiser păstrează valorile proprii peste 1 și nu este consistent.",
+                incorrectExplanation: "Estimatorul prin raportul valorilor proprii nu are nevoie de penalizare; criteriul informațional și regula Kaiser folosesc alte principii."
+            }
+        },
+        {
+            correct: 1,
+            en: {
+                title: "Comparing models",
+                text: "Barillas and Shanken (2018): which test assets are needed to compare two factor models?",
+                options: [
+                    "The 25 size × B/M portfolios",
+                    "None beyond the factors themselves: compare the maximum squared Sharpe ratios of the two factor sets",
+                    "Industry portfolios",
+                    "All individual stocks"
+                ],
+                correctExplanation: "A model's ability to price any asset is summarised by SR²(f) of its factors. In the lecture FF5 and Carhart both reach an annual Sharpe ratio of 0.97 over 1963–2026.",
+                incorrectExplanation: "The comparison is done on the factors: test assets add the same information to both models and cancel out."
+            },
+            ro: {
+                title: "Compararea modelelor",
+                text: "Barillas și Shanken (2018): ce active de test sunt necesare pentru a compara două modele factoriale?",
+                options: [
+                    "Cele 25 de portofolii mărime × B/M",
+                    "Niciunul în afara factorilor înșiși: se compară rapoartele Sharpe maxime la pătrat ale celor două seturi de factori",
+                    "Portofoliile pe industrii",
+                    "Toate acțiunile individuale"
+                ],
+                correctExplanation: "Capacitatea unui model de a evalua orice activ este rezumată de SR²(f) al factorilor săi. În curs, FF5 și Carhart ating amândouă un raport Sharpe anual de 0,97 în 1963–2026.",
+                incorrectExplanation: "Comparația se face pe factori: activele de test adaugă aceeași informație ambelor modele și se anulează."
             }
         },
         {
@@ -550,28 +550,28 @@ window.MFM_DATA.quizzes['factors'] = {
         {
             correct: 3,
             en: {
-                title: "PCA share",
-                text: "Two standardised returns have correlation 0.6. What share of the total variance does the first principal component explain?",
+                title: "Size of the Shanken correction",
+                text: "One traded factor with a monthly premium λ = 0.5% and monthly volatility σ_f = 4.5%. By how much does Shanken's factor (1 + c), c = λ²/σ_f², inflate the errors-in-variables part of the Fama–MacBeth variance?",
                 options: [
-                    "60%",
-                    "50%",
-                    "40%",
-                    "80%"
+                    "By about 11%",
+                    "By about 0.5%",
+                    "By about 50%",
+                    "By about 1.2%"
                 ],
-                correctExplanation: "The eigenvalues are 1 ± ρ = 1.6 and 0.4; the first explains 1.6/2 = 80%.",
-                incorrectExplanation: "For two assets the first eigenvalue is 1 + ρ, and its share is (1 + ρ)/2."
+                correctExplanation: "c = (0.005/0.045)² = 0.012: with monthly traded factors the correction is small; the lecture finds c = 0.03 for FF3, and HML's standard error barely changes.",
+                incorrectExplanation: "c is the squared Sharpe ratio of the premium per period, not the Sharpe ratio itself; monthly Sharpe ratios are small, so c is small."
             },
             ro: {
-                title: "Ponderea PCA",
-                text: "Două randamente standardizate au corelația 0,6. Ce pondere din varianța totală explică prima componentă principală?",
+                title: "Mărimea corecției Shanken",
+                text: "Un factor tranzacționat are prima lunară λ = 0,5% și volatilitatea lunară σ_f = 4,5%. Cu cât mărește factorul Shanken (1 + c), c = λ²/σ_f², partea din varianța Fama–MacBeth datorată erorilor în variabile?",
                 options: [
-                    "60%",
-                    "50%",
-                    "40%",
-                    "80%"
+                    "Cu aproximativ 11%",
+                    "Cu aproximativ 0,5%",
+                    "Cu aproximativ 50%",
+                    "Cu aproximativ 1,2%"
                 ],
-                correctExplanation: "Valorile proprii sunt 1 ± ρ = 1,6 și 0,4; prima explică 1,6/2 = 80%.",
-                incorrectExplanation: "Pentru două active prima valoare proprie este 1 + ρ, iar ponderea ei este (1 + ρ)/2."
+                correctExplanation: "c = (0,005/0,045)² = 0,012: pentru factori tranzacționați lunari corecția este mică; cursul găsește c = 0,03 pentru FF3, iar eroarea standard a HML abia se schimbă.",
+                incorrectExplanation: "c este pătratul raportului Sharpe al primei pe perioadă, nu raportul Sharpe însuși; rapoartele Sharpe lunare sunt mici, deci c este mic."
             }
         },
         {

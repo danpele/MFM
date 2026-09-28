@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch6_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 6 computations: Gaussian versus t tail dependence, Kendall tau and copula parameters, DCC for SPY and TLT with subsamples and a Fisher test for a break, Gaussian versus t copula with bootstrap likelihood ratio and intervals, Clayton versus Gumbel for joint losses of BET and Euro Stoxx 50, Forbes-Rigobon for 2008 and 2020, a residual-bootstrap band for the Bitcoin-S&P 500 DCC and the integration of BET with the Euro Stoxx 50 after 2020.'
+Description: 'Seminar 6 computations: Gaussian versus t tail dependence, Kendall tau and copula parameters, DCC for SPY and TLT with subsamples, Gaussian versus t copula with bootstrap likelihood ratio and intervals, Clayton versus Gumbel for joint losses of BET and Euro Stoxx 50, Forbes-Rigobon for 2008 and 2020, a residual-bootstrap band for the Bitcoin-S&P 500 DCC and the integration of BET with the Euro Stoxx 50 after 2020.'
 
 Keywords: 'tail dependence, copula goodness of fit, DCC, bootstrap, Forbes-Rigobon, contagion, Bitcoin, BET, market integration'
 
