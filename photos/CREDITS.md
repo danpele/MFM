@@ -172,3 +172,13 @@
 | ch17_sornette.jpg | https://commons.wikimedia.org/wiki/File:Didier_Sornette.jpg | Didier Sornette | CC BY-SA 3.0 DE | 2012-03-09 |
 | ch17_petscom_puppet.jpg | https://commons.wikimedia.org/wiki/File:Pets.com_Sock_Puppet_(12935451763).jpg | Atomic Taco | CC BY-SA 2.0 | 2013-09-19 |
 | ch17_gamestop_2021.jpg | https://commons.wikimedia.org/wiki/File:GameStop_Retail_Store_-_Vallejo_-_California_(50906730711).jpg | Will Buckner | CC BY 2.0 | 2021-02-03 |
+
+## Chapter 20 (special chapter: path signatures and realised volatility; licences checked via the Commons API)
+
+| File | Source (Wikimedia Commons) | Author | Licence | Date |
+|---|---|---|---|---|
+| ch20_fidi_march_2020.jpg | https://commons.wikimedia.org/wiki/File:Subdued_FiDi_(50063555551).jpg | Billie Grace Ward | CC BY 2.0 | 2020-03-25 |
+| ch20_messina_university.jpg | https://commons.wikimedia.org/wiki/File:University_of_Messina_01.JPG | Superchilum | CC BY-SA 3.0 | 2013-11-29 |
+| ch20_terry_lyons_2024.jpg | https://commons.wikimedia.org/wiki/File:Terence_J._Lyons,_Xue-Mei_Li_Oberwolfach_2024.jpg | Katrin Schmid | CC BY-SA 2.0 DE | 2024 |
+| ch20_paul_levy.jpg | https://commons.wikimedia.org/wiki/File:Paul_Pierre_Levy_1886-1971.jpg | Konrad Jacobs | CC BY-SA 2.0 DE | undated |
+| ch20_freight_truck.jpg | https://commons.wikimedia.org/wiki/File:NB_Amazon_Prime_Container_Truck_@_WPB_Service_Plaza.jpg | DanTD | CC BY 4.0 | 2025-03-04 |

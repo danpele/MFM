@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch20_case_study'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'The method of Gu, Guo, Jacobs, Kaminsky and Li (KDD 2024) transferred to realised variance: time-augmented path signatures of log RV and returns, two-step LASSO with BIC, signature-kernel weights; rolling forecasts at 1, 5 and 22 days for 50 VOLARE assets against HAR, log-HAR, HARQ and SHAR; QLIKE and MSE, Diebold-Mariano and Giacomini-White tests, model confidence sets, Holm and Benjamini-Hochberg counts, subperiods, ablations and robustness.'
+
+Keywords: 'realised variance, HAR, HARQ, SHAR, path signature, LASSO, signature kernel, forecast evaluation, QLIKE, Diebold-Mariano, model confidence set, VOLARE'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 28 September 2026'
+
+Datafile: 'VOLARE realised measures (Cipollini et al., 2026, arXiv:2602.19732), free for research at http://volare.unime.it: realized_variance_stocks.csv, realized_variance_futures.csv, realized_variance_forex.csv (not redistributed)'
+
+Output: 'ch20_volare_rv.pdf, ch20_qlike_ratio.pdf, ch20_mcs.pdf, ch20_dm_heat.pdf, ch20_subperiod.pdf, ch20_ablation.pdf, ch20_covid_forecasts.pdf, ch20_robustness.pdf, ch20_selection.pdf, ch20_weights_2020.pdf, ch20_weights_2025.pdf, ch20_hv_share.pdf, ch20_results.json'

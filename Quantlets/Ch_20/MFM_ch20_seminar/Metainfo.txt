@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch20_seminar'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 20: signatures step by step (levels 1-2, Levy area, Chen), HAR as a restricted AR(22), QLIKE, kernel weights and effective sample size; the Levy area of (return, log RV) as a predictor with HAC errors; HAR, SHAR and HARQ with HAC errors; Sig-LK vs log-HAR with DM, GW and a stationary-bootstrap CI; Holm and BH over 50 assets; a basepoint (level-aware) signature kernel as project seed.'
+
+Keywords: 'path signature, Levy area, HAR, SHAR, HARQ, HAC, Diebold-Mariano, Giacomini-White, bootstrap, multiple testing, signature kernel, VOLARE'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 28 September 2026'
+
+Datafile: 'VOLARE realised measures (Cipollini et al., 2026, arXiv:2602.19732), free for research at http://volare.unime.it: realized_variance_stocks.csv, realized_variance_futures.csv, realized_variance_forex.csv (not redistributed)'
+
+Output: 'ch20_sem_cumloss.pdf, ch20_sem_basepoint.pdf, sem20_results.json'

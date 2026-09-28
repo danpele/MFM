@@ -80,6 +80,10 @@
           tex: String.raw`$$\begin{gathered} df = \big(f_t + \mu f_x + \tfrac12\sigma^2 f_{xx}\big)dt + \sigma f_x\,dW_t \\ S_T = S_0 \exp\!\big((\mu - \sigma^2/2)T + \sigma W_T\big) \end{gathered}$$` },
         { g: 'hf', ch: 'continuous-time', en: 'Ornstein–Uhlenbeck (Vasicek)', ro: 'Ornstein–Uhlenbeck (Vasicek)',
           tex: String.raw`$$\begin{gathered} dX_t = \kappa(\theta - X_t)\,dt + \sigma\,dW_t \\ X_{t+\Delta} \mid X_t \sim N\!\Big(\theta + (X_t-\theta)e^{-\kappa\Delta},\; \tfrac{\sigma^2}{2\kappa}\big(1-e^{-2\kappa\Delta}\big)\Big) \end{gathered}$$` },
+        { g: 'hf', ch: 'signatures', en: 'Path signature and Chen\'s identity', ro: 'Signatura unei căi și identitatea lui Chen',
+          tex: String.raw`$$S(X)^{i_1\dots i_k}_{s,t} = \int_{s<u_1<\dots<u_k<t} dX^{i_1}_{u_1}\cdots dX^{i_k}_{u_k}, \qquad S(X * Y) = S(X) \otimes S(Y)$$` },
+        { g: 'hf', ch: 'signatures', en: 'Signature-kernel weights', ro: 'Ponderi din nucleul signaturii',
+          tex: String.raw`$$w_\tau \propto \exp\!\Big(-\gamma\,\big\|\mathrm{Sig}^N(X_{\tau-l:\tau}) - \mathrm{Sig}^N(X_{t-l:t})\big\|^2\Big)$$` },
         // ---- options
         { g: 'options', ch: 'options', en: 'Black–Scholes call', ro: 'Call Black–Scholes',
           tex: String.raw`$$C = S\,\Phi(d_1) - K e^{-rT}\Phi(d_2), \qquad d_{1,2} = \frac{\ln(S/K) + (r \pm \sigma^2/2)T}{\sigma\sqrt{T}}$$` },
@@ -130,6 +134,7 @@
         'digital-assets': { src: 'charts/ch16_ust_collapse.png', en: 'The collapse of TerraUSD, May 2022', ro: 'Prăbușirea TerraUSD, mai 2022' },
         'bubbles': { src: 'charts/ch17_lppls_btc2017.png', en: 'LPPLS on the 2017 Bitcoin bubble', ro: 'LPPLS pe bula Bitcoin din 2017' },
         'systemic': { src: 'charts/ch18_spill_network.png', en: 'Volatility spillover network of US, European and Romanian banks', ro: 'Rețeaua de contagiune a volatilității: bănci din SUA, Europa și România' },
+        'signatures': { src: 'charts/ch20_qlike_ratio.png', en: 'Out-of-sample QLIKE relative to HAR across 50 VOLARE assets', ro: 'QLIKE în afara eșantionului față de HAR pe 50 de active VOLARE' },
         'wrap-up': { src: 'charts/ch19_bet_var.png', en: 'Case study: VaR 1% models on the BET index', ro: 'Studiu de caz: modele VaR 1% pe indicele BET' }
     };
 })();

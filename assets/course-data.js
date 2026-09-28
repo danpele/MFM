@@ -285,6 +285,24 @@
         ]
     };
 
+    // Links of the chapter id 'signatures' (special chapter 20)
+    const signaturesLinks = {
+        en: [
+            { type: 'slides', href: 'EN/Courses/chapter20_signatures_realized_volatility.pdf' },
+            { type: 'seminar', href: 'EN/Seminars/seminar20_signatures_realized_volatility.pdf' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter20_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter20_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter20_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter20_seminar_notebook.ipynb' },
+            { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_20' }
+        ],
+        ro: [
+            { type: 'slides', href: 'RO/Cursuri/capitol20_signaturi_volatilitate_realizata.pdf' },
+            { type: 'seminar', href: 'RO/Seminarii/seminar20_signaturi_volatilitate_realizata_ro.pdf' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter20_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter20_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter20_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter20_seminar_notebook.ipynb' },
+            { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_20' }
+        ]
+    };
+
     // Links of the chapter id 'continuous-time'
     const continuousTimeLinks = {
         en: [
@@ -792,6 +810,16 @@
                 },
                 links: wrapUpLinks,
                 quantinar: q('sfm')
+            },
+            {
+                id: 'signatures', num: 20, selfStudy: false, available: true,
+                title: { en: 'Special Chapter: Path Signatures and Realised Volatility', ro: 'Capitol special: signaturi de căi și volatilitate realizată' },
+                topics: {
+                    en: ['Path signatures, Chen\'s identity, Lévy area, signature kernel', 'Replicating an ML paper (Gu et al., KDD 2024) on the VOLARE database', 'HAR, log-HAR, HARQ, SHAR against signature LASSO with kernel weights', 'QLIKE, DM, Giacomini–White, Model Confidence Set, Holm/BH across 50 assets'],
+                    ro: ['Signaturi de căi, identitatea lui Chen, aria Lévy, nucleul signaturii', 'Replicarea unui articol de ML (Gu et al., KDD 2024) pe baza de date VOLARE', 'HAR, log-HAR, HARQ, SHAR față de LASSO pe signaturi cu ponderi kernel', 'QLIKE, DM, Giacomini–White, Model Confidence Set, Holm/BH pe 50 de active']
+                },
+                links: signaturesLinks,
+                quantinar: []
             }
         ],
 

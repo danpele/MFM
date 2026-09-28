@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch20_signatures'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Path signatures in numpy: truncated signatures of piecewise-linear paths by the identity of Chen, the Levy area, the truncated signature kernel and distance, and two 22-day windows of JPM (log realised variance and cumulative open-to-close return) in a calm and a stress period; number of signature terms by dimension and depth.'
+
+Keywords: 'path signature, Chen identity, Levy area, signature kernel, time augmentation, rough paths, realised variance, VOLARE'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 28 September 2026'
+
+Datafile: 'VOLARE realised measures (Cipollini et al., 2026, arXiv:2602.19732), free for research at http://volare.unime.it: realized_variance_stocks.csv, realized_variance_futures.csv, realized_variance_forex.csv (not redistributed)'
+
+Output: 'ch20_signature_demo.pdf, ch20_sig_dimension.pdf'
