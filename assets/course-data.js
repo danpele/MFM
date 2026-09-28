@@ -63,8 +63,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol0_piete_financiare.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar0_piete_financiare_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol0_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol0_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol0_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol0_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter0_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter0_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter0_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter0_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_00' }
         ]
     };
@@ -81,8 +81,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol1_fapte_stilizate.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar1_fapte_stilizate_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol1_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol1_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol1_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol1_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter1_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter1_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter1_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter1_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_01' }
         ]
     };
@@ -99,8 +99,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol2_eficienta_pietei.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar2_eficienta_pietei_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol2_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol2_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol2_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol2_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter2_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter2_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter2_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter2_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_02' }
         ]
     };
@@ -117,8 +117,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol3_modele_factoriale.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar3_modele_factoriale_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol3_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol3_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol3_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol3_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter3_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter3_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter3_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter3_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_03' }
         ]
     };
@@ -135,8 +135,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol7_var_expected_shortfall.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar7_var_expected_shortfall_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol7_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol7_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol7_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol7_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter7_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter7_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter7_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter7_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_07' }
         ]
     };
@@ -153,8 +153,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol5_modele_garch.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar5_modele_garch_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol5_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol5_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol5_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol5_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter5_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter5_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter5_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter5_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_05' }
         ]
     };
@@ -171,8 +171,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol4_optimizarea_portofoliului.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar4_optimizarea_portofoliului_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol4_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol4_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol4_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol4_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter4_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter4_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter4_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter4_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_04' }
         ]
     };
@@ -189,8 +189,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol8_backtesting_risc.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar8_backtesting_risc_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol8_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol8_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol8_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol8_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter8_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter8_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter8_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter8_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_08' }
         ]
     };
@@ -207,8 +207,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol6_dependenta_multivariata.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar6_dependenta_multivariata_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol6_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol6_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol6_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol6_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter6_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter6_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter6_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter6_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_06' }
         ]
     };
@@ -225,8 +225,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol9_volatilitate_realizata.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar9_volatilitate_realizata_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol9_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol9_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol9_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol9_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter9_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter9_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter9_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter9_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_09' }
         ]
     };
@@ -243,8 +243,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol10_microstructura_pietei.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar10_microstructura_pietei_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol10_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol10_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol10_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol10_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter10_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter10_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter10_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter10_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_10' }
         ]
     };
@@ -261,8 +261,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar14_deep_learning_modele_fundationale_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol14_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol14_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol14_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol14_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter14_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter14_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter14_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter14_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_14' }
         ]
     };
@@ -279,8 +279,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol15_llm_sentiment.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar15_llm_sentiment_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol15_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol15_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol15_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol15_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter15_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter15_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter15_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter15_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_15' }
         ]
     };
@@ -297,8 +297,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol11_timp_continuu.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar11_timp_continuu_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol11_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol11_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol11_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol11_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter11_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter11_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter11_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter11_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_11' }
         ]
     };
@@ -315,8 +315,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol12_optiuni_suprafata_volatilitate.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar12_optiuni_suprafata_volatilitate_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol12_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol12_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol12_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol12_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter12_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter12_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter12_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter12_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_12' }
         ]
     };
@@ -333,8 +333,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol19_recapitulare_proiecte.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar19_recapitulare_proiecte_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol19_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol19_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol19_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol19_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter19_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter19_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter19_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter19_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_19' }
         ]
     };
@@ -351,8 +351,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol16_active_digitale_defi.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar16_active_digitale_defi_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol16_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol16_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol16_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol16_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter16_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter16_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter16_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter16_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_16' }
         ]
     };
@@ -369,8 +369,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol18_risc_sistemic_retele.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar18_risc_sistemic_retele_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol18_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol18_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol18_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol18_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter18_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter18_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter18_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter18_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_18' }
         ]
     };
@@ -387,8 +387,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol17_bule_crahuri.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar17_bule_crahuri_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol17_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol17_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol17_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol17_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter17_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter17_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter17_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter17_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_17' }
         ]
     };
@@ -405,8 +405,8 @@
         ro: [
             { type: 'slides', href: 'RO/Cursuri/capitol13_machine_learning.pdf' },
             { type: 'seminar', href: 'RO/Seminarii/seminar13_machine_learning_ro.pdf' },
-            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/RO/capitol13_notebook_curs.ipynb', colab: COLAB + 'notebooks/RO/capitol13_notebook_curs.ipynb' },
-            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/RO/capitol13_notebook_seminar.ipynb', colab: COLAB + 'notebooks/RO/capitol13_notebook_seminar.ipynb' },
+            { type: 'lectureNb', href: REPO + '/blob/main/notebooks/EN/chapter13_lecture_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter13_lecture_notebook.ipynb' },
+            { type: 'seminarNb', href: REPO + '/blob/main/notebooks/EN/chapter13_seminar_notebook.ipynb', colab: COLAB + 'notebooks/EN/chapter13_seminar_notebook.ipynb' },
             { type: 'quantlets', href: REPO + '/tree/main/Quantlets/Ch_13' }
         ]
     };

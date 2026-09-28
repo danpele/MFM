@@ -32,3 +32,6 @@ g.html
 latex/
 notebooks/*.py
 Quantlets/Ch_*/build_quantlets.py
+
+# notebooks are published in English only (RO versions stay local)
+notebooks/RO/
