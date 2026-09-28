@@ -25,7 +25,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from mfm_data import log_returns, read_market, sp500_monthly, fred   # noqa: E402
+from mfm_data import log_returns, read_market, sp500_monthly, fred, complete_months   # noqa: E402
 from eff_tests import variance_ratio, rolling_stat                    # noqa: E402
 from generate_all_charts import plt, MainBlue, IDAred, Gray, save_fig   # noqa: E402  (stilul MFM)
 
@@ -159,7 +159,7 @@ def el_autoportmanteau(x, d_max=10, q=2.4):
     rt = np.array(rt)
     Q = T * np.cumsum(rt)
     p = np.arange(1, d_max + 1)
-    pen = p * np.log(T) if np.max(np.sqrt(T) * np.abs(rho_raw)) <= np.sqrt(q * np.log(T)) else 2 * p
+    pen = p * np.log(T) if np.sqrt(T * np.max(rt)) <= np.sqrt(q * np.log(T)) else 2 * p   # comutare pe corelatiile robuste
     L = Q - pen
     pt = int(p[np.argmax(L)])
     AQ = Q[pt - 1]
@@ -195,18 +195,21 @@ def event_study_bank_tax(event='2018-12-19', est=(-250, -11), win=(0, 5)):
         V = s2 * (np.eye(len(rm)) + Xs @ np.linalg.inv(XE.T @ XE) @ Xs.T)
         out[k] = dict(beta=f.params['BET'], sigma=np.sqrt(s2), ar0=ar.iloc[0], t0_naive=ar.iloc[0] / np.sqrt(s2),
                       t0=ar.iloc[0] / np.sqrt(pe.iloc[0]), infl0=pe.iloc[0] / s2, car=car,
-                      t_car=car / np.sqrt(V.sum()), t_car_naive=car / np.sqrt(s2 * len(rm)))
+                      t_car=car / np.sqrt(V.sum()), t_car_naive=car / np.sqrt(s2 * len(rm)),
+                      var_car=V.sum(), car_post=ar.iloc[1:].sum(), t_car_post=ar.iloc[1:].sum() / np.sqrt(V[1:, 1:].sum()))
     rbar = np.corrcoef(resid['TLV'], resid['BRD'])[0, 1]
     # test comun presupunand independenta: media AR0 / (sqrt(s1^2 + s2^2)/2)
-    s_ind = np.sqrt(out['TLV']['sigma'] ** 2 + out['BRD']['sigma'] ** 2) / 2
+    # sub independenta: aceleasi dispersii ale erorii de predictie ca la portofoliu, fara covarianta intre firme
+    s_ind = np.sqrt(out['TLV']['sigma'] ** 2 * out['TLV']['infl0'] + out['BRD']['sigma'] ** 2 * out['BRD']['infl0']) / 2
     ar0_mean = (out['TLV']['ar0'] + out['BRD']['ar0']) / 2
     car_mean = (out['TLV']['car'] + out['BRD']['car']) / 2
-    L = win[1] - win[0] + 1
+    s_car_ind = np.sqrt(out['TLV']['var_car'] + out['BRD']['var_car']) / 2
     return dict(event=event, rm0=float(rm.iloc[0]), T0=T0, rbar=rbar, firms=out,
                 ar0_mean=ar0_mean, t_indep=ar0_mean / s_ind, t_port=out['PORT']['t0'],
-                car_mean=car_mean, tcar_indep=car_mean / (s_ind * np.sqrt(L)), tcar_port=out['PORT']['t_car'],
+                car_mean=car_mean, tcar_indep=car_mean / s_car_ind, tcar_port=out['PORT']['t_car'],
                 kp_factor=np.sqrt((1 - rbar) / (1 + rbar)),
-                kp_inflation10=(1 + 9 * rbar) / (1 - rbar))
+                varmean10=1 + 9 * rbar,                       # Var(media a 10 AR) / Var sub independenta
+                kp_inflation10=(1 + 9 * rbar) / (1 - rbar))  # supra-evaluarea dispersiei statisticii transversale
 
 
 # =============================================================================
@@ -240,7 +243,7 @@ def _cal_est(r, dow, month):
     X = np.column_stack([np.ones(len(r)), tom])
     bt = np.linalg.lstsq(X, r, rcond=None)[0]
     Vt = _nw_se(X, r - X @ bt, 5)
-    ms = pd.Series(r).groupby(month).sum()
+    ms = np.expm1(pd.Series(r).groupby(month).sum())          # randamente lunare simple, ca in january_regression
     jan = (np.asarray(ms.index) % 100 == 1).astype(float)
     Xm = np.column_stack([np.ones(len(ms)), jan])
     bj = np.linalg.lstsq(Xm, ms.values, rcond=None)[0]
@@ -269,8 +272,8 @@ def stepm_calendar(n_boot=999, block=3, alpha=0.05, seed=SEED):
     """Romano-Wolf StepM cu statistica min-p: se reeșantionează ACELEASI blocuri de luni calendaristice pentru
     toate pietele (pastreaza dependenta intre piete si structura calendarului in interiorul lunii);
     statisticile bootstrap sunt centrate in estimatiile originale."""
-    rets = {k: log_returns(k) for k in CAL_MARKETS}
-    months = pd.period_range('2000-01', '2026-09', freq='M')
+    rets = {k: complete_months(log_returns(k)) for k in CAL_MARKETS}
+    months = pd.period_range('2000-01', max(r.index[-1] for r in rets.values()).to_period('M'), freq='M')
     orig, p0, pos = {}, {}, {}
     for k, r in rets.items():
         mlab = r.index.to_period('M')

@@ -94,6 +94,15 @@ def load_close(name, start=None, end=END):
     return s.rename(name)
 
 
+def complete_months(x):
+    """Elimina luna finala incompleta (ultima observatie inainte de ultima zi lucratoare a lunii):
+    analizele lunare si efectul schimbarii lunii folosesc doar luni complete."""
+    last = x.index[-1]
+    if last + pd.offsets.BMonthEnd(0) != last:
+        x = x[x.index < last.to_period('M').start_time]
+    return x
+
+
 def log_returns(name, start=None, end=END):
     """Randamente log pe calendarul propriu al seriei."""
     return np.log(load_close(name, start, end)).diff().dropna().rename(name)

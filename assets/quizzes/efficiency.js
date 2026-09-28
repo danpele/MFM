@@ -11,7 +11,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
             "correct": 2,
             "en": {
                 "title": "BDS and weak-form efficiency",
-                "text": "The BDS test rejects i.i.d. for daily S&P 500 returns. Does this reject weak-form efficiency (RW3)?",
+                "text": "The BDS test rejects i.i.d. for daily S&P 500 returns. Does this reject weak-form efficiency, as tested through RW3 or the martingale difference hypothesis?",
                 "options": [
                     "Yes, because BDS tests the martingale property",
                     "Yes, as long as the p-value is below 0.01",
@@ -19,11 +19,11 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "No, because BDS can only be applied to prices"
                 ],
                 "correctExplanation": "BDS tests independence and identical distribution. A GARCH process with unpredictable mean rejects BDS but satisfies RW3 and the martingale difference hypothesis.",
-                "incorrectExplanation": "BDS is a test of i.i.d. (RW1). Weak-form efficiency only restricts the conditional mean, so predictable volatility is enough for a BDS rejection without any inefficiency."
+                "incorrectExplanation": "BDS is a test of i.i.d. (RW1). The martingale difference hypothesis restricts only the conditional mean and RW3 only the autocorrelations, so predictable volatility is enough for a BDS rejection without any inefficiency."
             },
             "ro": {
                 "title": "BDS și eficiența slabă",
-                "text": "Testul BDS respinge ipoteza i.i.d. pentru randamentele zilnice S&P 500. Respinge aceasta eficiența slabă (RW3)?",
+                "text": "Testul BDS respinge ipoteza i.i.d. pentru randamentele zilnice S&P 500. Respinge aceasta eficiența slabă, testată prin RW3 sau prin ipoteza diferenței de martingală?",
                 "options": [
                     "Da, pentru că BDS testează proprietatea de martingală",
                     "Da, dacă valoarea p este sub 0,01",
@@ -31,7 +31,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Nu, pentru că BDS se aplică doar prețurilor"
                 ],
                 "correctExplanation": "BDS testează independența și distribuția identică. Un proces GARCH cu medie imprevizibilă respinge BDS, dar satisface RW3 și ipoteza diferenței de martingală.",
-                "incorrectExplanation": "BDS este un test al ipotezei i.i.d. (RW1). Eficiența slabă restricționează doar media condiționată, deci volatilitatea predictibilă ajunge pentru o respingere BDS fără nicio ineficiență."
+                "incorrectExplanation": "BDS este un test al ipotezei i.i.d. (RW1). Ipoteza diferenței de martingală restricționează doar media condiționată, iar RW3 doar autocorelațiile, deci volatilitatea predictibilă ajunge pentru o respingere BDS fără nicio ineficiență."
             }
         },
         {
@@ -73,7 +73,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Volatility must be constant over time"
                 ],
                 "correctExplanation": "A martingale restricts only the conditional mean; volatility clustering (predictable variance) is compatible with efficiency.",
-                "incorrectExplanation": "The fair-game property says nothing about the variance: RW3 allows volatility clustering, only the conditional mean is unpredictable."
+                "incorrectExplanation": "The fair-game property restricts only the conditional mean; with finite variance it implies zero autocorrelations (RW3), but RW3 does not imply it. Volatility may still be predictable."
             },
             "ro": {
                 "title": "Martingala și volatilitatea",
@@ -85,34 +85,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Volatilitatea trebuie să fie constantă în timp"
                 ],
                 "correctExplanation": "Martingala restricționează doar media condiționată; gruparea volatilității (dispersie predictibilă) este compatibilă cu eficiența.",
-                "incorrectExplanation": "Proprietatea de joc echitabil nu spune nimic despre dispersie: RW3 permite gruparea volatilității, doar media condiționată este imprevizibilă."
-            }
-        },
-        {
-            "correct": 3,
-            "en": {
-                "title": "RW1, RW2, RW3",
-                "text": "Which random walk hypothesis is the relevant one to test on real daily returns?",
-                "options": [
-                    "RW1, because returns are i.i.d.",
-                    "RW2, because returns are identically distributed",
-                    "None, because prices are not random",
-                    "RW3, uncorrelated increments with time-varying volatility allowed"
-                ],
-                "correctExplanation": "Volatility clustering already rejects RW1; RW3 (uncorrelated increments) is the hypothesis compatible with the stylised facts, tested with heteroskedasticity-robust statistics.",
-                "incorrectExplanation": "RW1 is rejected by volatility clustering; the hypothesis worth testing is RW3, with robust inference."
-            },
-            "ro": {
-                "title": "RW1, RW2, RW3",
-                "text": "Care ipoteză de mers aleator este relevantă pentru testare pe randamente zilnice reale?",
-                "options": [
-                    "RW1, pentru că randamentele sunt i.i.d.",
-                    "RW2, pentru că randamentele sunt identic distribuite",
-                    "Niciuna, pentru că prețurile nu sunt aleatoare",
-                    "RW3, creșteri necorelate, cu volatilitate variabilă în timp permisă"
-                ],
-                "correctExplanation": "Gruparea volatilității respinge deja RW1; RW3 (creșteri necorelate) este ipoteza compatibilă cu faptele stilizate, testată cu statistici robuste la heteroscedasticitate.",
-                "incorrectExplanation": "RW1 este respinsă de gruparea volatilității; ipoteza care merită testată este RW3, cu inferență robustă."
+                "incorrectExplanation": "Proprietatea de joc echitabil restricționează doar media condiționată; cu dispersie finită implică autocorelații nule (RW3), dar RW3 nu o implică. Volatilitatea poate fi totuși predictibilă."
             }
         },
         {
@@ -207,8 +180,8 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "It diverges to minus infinity",
                     "0.5, because VR(q) tends to the constant (1 + ρ)/(1 − ρ)"
                 ],
-                "correctExplanation": "For short memory VR(q) → 1 + 2Σρ_k = (1 + ρ)/(1 − ρ) ≈ 0.818, a positive constant, so ln VR(q)/(2 ln q) → 0 and H(q) → 0.5.",
-                "incorrectExplanation": "VR(q) of any short-memory process converges to a positive constant, so the logarithm stays bounded while ln q grows: H(q) → 0.5. Values below 0.5 at finite q reflect short-run reversal, not long memory."
+                "correctExplanation": "For short memory with positive long-run variance VR(q) → 1 + 2Σρ_k = (1 + ρ)/(1 − ρ) ≈ 0.818, a positive constant, so ln VR(q)/(2 ln q) → 0 and H(q) → 0.5.",
+                "incorrectExplanation": "VR(q) of a short-memory process with positive long-run variance, like this AR(1), converges to a positive constant, so the logarithm stays bounded while ln q grows: H(q) → 0.5. Values below 0.5 at finite q reflect short-run reversal, not long memory."
             },
             "ro": {
                 "title": "Exponentul Hurst al unui proces cu memorie scurtă",
@@ -219,8 +192,8 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Diverge spre minus infinit",
                     "0,5, pentru că VR(q) tinde la constanta (1 + ρ)/(1 − ρ)"
                 ],
-                "correctExplanation": "Pentru memorie scurtă VR(q) → 1 + 2Σρ_k = (1 + ρ)/(1 − ρ) ≈ 0,818, o constantă pozitivă, deci ln VR(q)/(2 ln q) → 0 și H(q) → 0,5.",
-                "incorrectExplanation": "VR(q) al oricărui proces cu memorie scurtă converge la o constantă pozitivă, deci logaritmul rămâne mărginit în timp ce ln q crește: H(q) → 0,5. Valorile sub 0,5 la q finit reflectă inversarea pe termen scurt, nu memoria lungă."
+                "correctExplanation": "Pentru memorie scurtă cu dispersie pe termen lung pozitivă VR(q) → 1 + 2Σρ_k = (1 + ρ)/(1 − ρ) ≈ 0,818, o constantă pozitivă, deci ln VR(q)/(2 ln q) → 0 și H(q) → 0,5.",
+                "incorrectExplanation": "VR(q) al unui proces cu memorie scurtă și dispersie pe termen lung pozitivă, precum acest AR(1), converge la o constantă pozitivă, deci logaritmul rămâne mărginit în timp ce ln q crește: H(q) → 0,5. Valorile sub 0,5 la q finit reflectă inversarea pe termen scurt, nu memoria lungă."
             }
         },
         {
@@ -283,24 +256,24 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "title": "Runs test",
                 "text": "The BET index has a runs-test statistic z = −6.05. What does it mean?",
                 "options": [
-                    "Fewer runs than expected: signs persist, consistent with positive autocorrelation",
+                    "Fewer runs than expected: signs persist (positive dependence of signs)",
                     "More runs than expected: frequent reversals",
                     "Returns are normally distributed",
                     "The test cannot be applied to indices"
                 ],
-                "correctExplanation": "Too few runs means long sequences of equal signs, i.e. persistence, in line with BET’s positive lag-1 autocorrelation.",
+                "correctExplanation": "Too few runs means long sequences of equal signs, i.e. persistence of signs, in line with BET’s positive lag-1 autocorrelation; the runs test concerns signs, not the size of returns.",
                 "incorrectExplanation": "A negative z means too few runs, hence persistence of signs."
             },
             "ro": {
                 "title": "Testul secvențelor",
                 "text": "Indicele BET are statistica testului secvențelor z = −6,05. Ce înseamnă?",
                 "options": [
-                    "Mai puține secvențe decât ne-am aștepta: semnele persistă, în acord cu o autocorelație pozitivă",
+                    "Mai puține secvențe decât ne-am aștepta: semnele persistă (dependență pozitivă a semnelor)",
                     "Mai multe secvențe decât ne-am aștepta: inversări frecvente",
                     "Randamentele urmează distribuția Normală",
                     "Testul nu se poate aplica indicilor"
                 ],
-                "correctExplanation": "Prea puține secvențe înseamnă șiruri lungi de semne egale, adică persistență, în acord cu autocorelația pozitivă de ordinul 1 a BET.",
+                "correctExplanation": "Prea puține secvențe înseamnă șiruri lungi de semne egale, adică persistența semnelor, în acord cu autocorelația pozitivă de ordinul 1 a BET; testul privește semnele, nu mărimea randamentelor.",
                 "incorrectExplanation": "Un z negativ înseamnă prea puține secvențe, deci persistența semnelor."
             }
         },
@@ -315,7 +288,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "0.0025 = 1/m",
                     "1/√T, as for an autocorrelation"
                 ],
-                "correctExplanation": "Robinson (1995): √m(d̂ − d) → N(0, 1/4), so SE = 1/(2√m) = 1/40 = 0.025, whatever the distribution of returns.",
+                "correctExplanation": "Robinson (1995): √m(d̂ − d) → N(0, 1/4), so SE = 1/(2√m) = 1/40 = 0.025, under Robinson’s regularity conditions (|d| < 1/2, m → ∞, m/T → 0); Gaussianity is not needed.",
                 "incorrectExplanation": "The asymptotic variance of √m(d̂ − d) is 1/4, so the standard error is 1/(2√m); precision is driven by the number of frequencies m, not by T."
             },
             "ro": {
@@ -327,7 +300,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "0,0025 = 1/m",
                     "1/√T, ca pentru o autocorelație"
                 ],
-                "correctExplanation": "Robinson (1995): √m(d̂ − d) → N(0, 1/4), deci SE = 1/(2√m) = 1/40 = 0,025, oricare ar fi distribuția randamentelor.",
+                "correctExplanation": "Robinson (1995): √m(d̂ − d) → N(0, 1/4), deci SE = 1/(2√m) = 1/40 = 0,025, în condițiile de regularitate ale lui Robinson (|d| < 1/2, m → ∞, m/T → 0); nu este necesară distribuția Normală.",
                 "incorrectExplanation": "Dispersia asimptotică a lui √m(d̂ − d) este 1/4, deci eroarea standard este 1/(2√m); precizia depinde de numărul de frecvențe m, nu de T."
             }
         },
@@ -338,24 +311,24 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "text": "Why is the classical R/S Hurst estimate corrected with the Anis–Lloyd expectation?",
                 "options": [
                     "To remove the mean return",
-                    "Because R/S is biased upward in small windows, even for i.i.d. returns",
+                    "Because the R/S-based slope (Hurst estimate) is biased upward over small windows, even for i.i.d. returns",
                     "To make the estimate robust to heavy tails",
                     "To annualise the estimate"
                 ],
                 "correctExplanation": "For the S&P 500 the raw estimate is 0.530 but the corrected one 0.486: the uncorrected slope overstates memory.",
-                "incorrectExplanation": "The correction removes the small-sample upward bias of R/S under i.i.d. returns."
+                "incorrectExplanation": "The correction removes the small-sample upward bias of the R/S-based Hurst slope under i.i.d. returns."
             },
             "ro": {
                 "title": "Corecția Anis–Lloyd",
                 "text": "De ce estimarea Hurst R/S clasică se corectează cu așteptarea Anis–Lloyd?",
                 "options": [
                     "Pentru a elimina randamentul mediu",
-                    "Pentru că R/S este deplasat în sus pe ferestre mici, chiar pentru randamente i.i.d.",
+                    "Pentru că panta bazată pe R/S (estimarea Hurst) este deplasată în sus pe ferestre mici, chiar pentru randamente i.i.d.",
                     "Pentru a face estimarea robustă la cozi grele",
                     "Pentru a anualiza estimarea"
                 ],
                 "correctExplanation": "Pentru S&P 500 estimarea brută este 0,530, iar cea corectată 0,486: panta necorectată supraestimează memoria.",
-                "incorrectExplanation": "Corecția elimină deplasarea în sus a R/S în selecții mici sub randamente i.i.d."
+                "incorrectExplanation": "Corecția elimină deplasarea în sus a pantei Hurst bazate pe R/S în selecții mici, sub randamente i.i.d."
             }
         },
         {
@@ -632,24 +605,24 @@ window.MFM_DATA.quizzes['efficiency'] = {
             "correct": 3,
             "en": {
                 "title": "Statistical versus economic significance",
-                "text": "Time-series momentum on BET has a HAC t-statistic of 2.56, but its Sharpe ratio is 0.62 against 0.61 for buy-and-hold. What does this show?",
+                "text": "Time-series momentum on BET has a HAC t-statistic of 2.68, but its Sharpe ratio is 0.65 against 0.75 for buy-and-hold. What does this show?",
                 "options": [
                     "BET is extremely inefficient",
                     "The t-statistic is wrong",
                     "Momentum always beats buy-and-hold",
-                    "A statistically significant pattern can add little economic value over a simple benchmark"
+                    "A statistically significant pattern need not add economic value over a simple benchmark"
                 ],
                 "correctExplanation": "Much of the momentum return is the equity premium earned while long; significance against zero is not significance against buy-and-hold.",
                 "incorrectExplanation": "Statistical rejection is not the same as an exploitable improvement: compare with the relevant benchmark and costs."
             },
             "ro": {
                 "title": "Semnificație statistică versus economică",
-                "text": "Momentum-ul pe serii de timp pe BET are statistica t HAC egală cu 2,56, dar raportul Sharpe este 0,62 față de 0,61 pentru cumpără-și-păstrează. Ce arată acest lucru?",
+                "text": "Momentum-ul pe serii de timp pe BET are statistica t HAC egală cu 2,68, dar raportul Sharpe este 0,65 față de 0,75 pentru cumpără-și-păstrează. Ce arată acest lucru?",
                 "options": [
                     "BET este extrem de ineficient",
                     "Statistica t este greșită",
                     "Momentum-ul bate întotdeauna strategia cumpără-și-păstrează",
-                    "Un tipar semnificativ statistic poate adăuga puțină valoare economică față de un reper simplu"
+                    "Un tipar semnificativ statistic nu adaugă neapărat valoare economică față de un reper simplu"
                 ],
                 "correctExplanation": "O mare parte din randamentul momentum este prima de risc a acțiunilor câștigată pe pozițiile lungi; semnificația față de zero nu este semnificație față de cumpără-și-păstrează.",
                 "incorrectExplanation": "Respingerea statistică nu este același lucru cu o îmbunătățire exploatabilă: comparați cu reperul relevant și cu costurile."
@@ -680,33 +653,6 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 ],
                 "correctExplanation": "Pentru q = 2 singura pondere este 1 − 1/2, deci VR(2) = 1 + 2 · ½ · ρ₁ = 1 + ρ₁ și ρ₁ ≈ 0,90 − 1 = −0,10.",
                 "incorrectExplanation": "Lipsesc ponderile (1 − k/q): pentru q = 2, VR(2) = 1 + ρ₁, deci ρ₁ ≈ −0,10, dublul valorii date de AI."
-            }
-        },
-        {
-            "correct": 2,
-            "en": {
-                "title": "Spot the AI error: reading a variance ratio",
-                "text": "An AI assistant writes: \"The 5-day variance ratio of the index is 0.83, significantly below 1. This means positive autocorrelation: momentum, so buy after up days.\" What is wrong?",
-                "options": [
-                    "A variance ratio below 1 proves that the market is efficient",
-                    "Variance ratios are always below 1 for daily data, so nothing can be concluded",
-                    "VR < 1 means negative autocorrelation (reversal), not momentum; and a rejection is not yet a profitable trading rule",
-                    "The variance ratio measures volatility clustering, not autocorrelation"
-                ],
-                "correctExplanation": "VR(q) − 1 = 2 Σ (1 − k/q) ρ_k: a value below 1 needs negative autocorrelations, i.e. short-run reversal. Even then, transaction costs and risk decide whether a strategy pays.",
-                "incorrectExplanation": "Below 1 the weighted autocorrelations are negative, which is reversal, not momentum; a statistical rejection says nothing yet about profits after costs."
-            },
-            "ro": {
-                "title": "Găsiți eroarea AI: interpretarea raportului dispersiilor",
-                "text": "Un asistent AI scrie: „Raportul dispersiilor pe 5 zile al indicelui este 0,83, semnificativ sub 1. Asta înseamnă autocorelație pozitivă: momentum, deci cumpărați după zilele de creștere.” Ce este greșit?",
-                "options": [
-                    "Un raport al dispersiilor sub 1 dovedește că piața este eficientă",
-                    "Rapoartele dispersiilor sunt mereu sub 1 pentru date zilnice, deci nu se poate trage nicio concluzie",
-                    "VR < 1 înseamnă autocorelație negativă (inversare), nu momentum; iar o respingere nu este încă o regulă de tranzacționare profitabilă",
-                    "Raportul dispersiilor măsoară gruparea volatilității, nu autocorelația"
-                ],
-                "correctExplanation": "VR(q) − 1 = 2 Σ (1 − k/q) ρ_k: o valoare sub 1 cere autocorelații negative, adică inversare pe termen scurt. Chiar și atunci, costurile de tranzacționare și riscul decid dacă o strategie aduce profit.",
-                "incorrectExplanation": "Sub 1 autocorelațiile ponderate sunt negative, adică inversare, nu momentum; o respingere statistică nu spune încă nimic despre profitul după costuri."
             }
         }
     ]

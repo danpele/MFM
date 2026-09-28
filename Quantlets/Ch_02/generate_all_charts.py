@@ -17,7 +17,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from mfm_data import MARKETS, LABELS, GROUPS, load_close, log_returns   # noqa: E402
+from mfm_data import MARKETS, LABELS, GROUPS, load_close, log_returns, complete_months   # noqa: E402
 from eff_tests import (variance_ratio, chow_denning, runs_test, robust_ljung_box, rs_hurst,  # noqa: E402
                        lo_modified_rs, dfa_hurst, rolling_stat)
 
@@ -393,6 +393,7 @@ DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
 
 def dow_regression(r):
     """Randament zilnic pe variabile dummy pentru zilele saptamanii (fara constanta), erori Newey-West."""
+    r = complete_months(r)
     X = pd.get_dummies(r.index.dayofweek).astype(float)
     X.columns = DAYS
     X.index = r.index
@@ -406,7 +407,7 @@ def dow_regression(r):
 
 
 def january_regression(r):
-    m = np.exp(r.groupby(pd.Grouper(freq='ME')).sum()) - 1
+    m = np.exp(complete_months(r).groupby(pd.Grouper(freq='ME')).sum()) - 1
     X = sm.add_constant(pd.Series((m.index.month == 1).astype(float), index=m.index, name='January'))
     res = sm.OLS(m * 100, X).fit(cov_type='HAC', cov_kwds={'maxlags': 3})
     return res
@@ -414,7 +415,7 @@ def january_regression(r):
 
 def turn_of_month(r):
     """Dummy pentru ultima zi de tranzactionare a lunii si primele trei zile ale lunii urmatoare (Ariel, 1987)."""
-    d = pd.DataFrame({'r': r * 1e4})
+    d = pd.DataFrame({'r': complete_months(r) * 1e4})
     ym = d.index.to_period('M')
     rank = d.groupby(ym).cumcount()
     rank_end = d.groupby(ym).cumcount(ascending=False)
@@ -495,12 +496,14 @@ def fig_multiple_testing(n_rules=2000, seed=SEED):
 def tsmom_table():
     rows = []
     for k in [m for m in ORDER if m != 'eurron']:
-        p = load_close(k)
-        m = np.log(p.resample('ME').last()).diff().dropna()
+        p = complete_months(load_close(k))
+        pm = p.resample('ME').last()
+        m = np.log(pm).diff().dropna()                          # randamente log lunare: doar pentru semnal
+        R = pm.pct_change().dropna()                            # randamente simple: castigul pozitiei
         sig = np.sign(m.rolling(12).sum().shift(1))            # semnul randamentului pe ultimele 12 luni
-        s = (sig * m).dropna()
+        s = (sig * R).dropna()                                  # long +1 / short -1, inainte de finantare si costuri
         res = sm.OLS(s * 100, np.ones(len(s))).fit(cov_type='HAC', cov_kwds={'maxlags': 6})
-        bh = m.loc[s.index]
+        bh = R.loc[s.index]
         rows.append(dict(market=LABELS[k], group=GROUPS[k], months=len(s),
                          tsmom_mean_pct=res.params.iloc[0], t_hac=res.tvalues.iloc[0],
                          sharpe_tsmom=np.sqrt(12) * s.mean() / s.std(), sharpe_bh=np.sqrt(12) * bh.mean() / bh.std(),

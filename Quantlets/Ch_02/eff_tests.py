@@ -129,7 +129,7 @@ def lo_modified_rs(r, q=None):
     e = x - x.mean()
     if q is None:                                   # latimea de banda Andrews (1991) pentru AR(1)
         rho = np.corrcoef(e[1:], e[:-1])[0, 1]
-        q = int(np.floor((3 * T / 2) ** (1 / 3) * (2 * rho / (1 - rho ** 2)) ** (2 / 3))) if rho > 0 else 0
+        q = int(np.floor((3 * T / 2) ** (1 / 3) * abs(2 * rho / (1 - rho ** 2)) ** (2 / 3)))
     s2 = (e ** 2).mean()
     for j in range(1, q + 1):
         w = 1 - j / (q + 1)

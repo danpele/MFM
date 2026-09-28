@@ -252,37 +252,37 @@
  },
  "B5": {
   "sp500": {
-   "N": 6714,
-   "share_tom": 0.19124218051831993,
-   "const": 1.8355834734178764,
-   "beta": 3.3271274858594686,
-   "se_ols": 3.764321552645578,
-   "t_ols": 0.8838584694023156,
-   "se_hac": 3.4850090406718826,
-   "t_hac": 0.954696945411087,
-   "p_hac": 0.33973097504166927,
-   "mean_tom": 5.162710959277122,
-   "mean_other": 1.835583473417929
+   "N": 6701,
+   "share_tom": 0.19101626622892107,
+   "const": 1.8649977955817918,
+   "beta": 3.2384855452832775,
+   "se_ols": 3.772269692711653,
+   "t_ols": 0.8584978829960933,
+   "se_hac": 3.4935359643518895,
+   "t_hac": 0.926993618594126,
+   "p_hac": 0.3539298475525614,
+   "mean_tom": 5.103483340865002,
+   "mean_other": 1.86499779558181
   },
   "bet": {
-   "N": 6670,
-   "share_tom": 0.19250374812593704,
-   "const": 2.9626924067655005,
-   "beta": 17.8200848837981,
-   "se_ols": 4.338469685987152,
-   "t_ols": 4.1074586602172865,
-   "se_hac": 4.7693145441347005,
-   "t_hac": 3.736403778549944,
-   "p_hac": 0.00018667083348574,
-   "mean_tom": 20.782777290562997,
-   "mean_other": 2.962692406765646
+   "N": 6656,
+   "share_tom": 0.19230769230769232,
+   "const": 3.119561784623337,
+   "beta": 17.324122077308147,
+   "se_ols": 4.345035030803633,
+   "t_ols": 3.9871075732395136,
+   "se_hac": 4.781317924620495,
+   "t_hac": 3.6232943197733927,
+   "p_hac": 0.00029087451944493953,
+   "mean_tom": 20.44368386193187,
+   "mean_other": 3.1195617846232304
   }
  },
  "B6": [
   {
    "market": "S&P 500 (US)",
    "effect": "day of week (equal means)",
-   "p": 0.8426436112595044,
+   "p": 0.8263343912438967,
    "bonferroni_reject": false,
    "holm_reject": false,
    "raw_reject": false
@@ -290,7 +290,7 @@
   {
    "market": "S&P 500 (US)",
    "effect": "January",
-   "p": 0.4282630311678215,
+   "p": 0.42571883086109263,
    "bonferroni_reject": false,
    "holm_reject": false,
    "raw_reject": false
@@ -298,7 +298,7 @@
   {
    "market": "S&P 500 (US)",
    "effect": "turn of month",
-   "p": 0.33973097504166927,
+   "p": 0.3539298475525614,
    "bonferroni_reject": false,
    "holm_reject": false,
    "raw_reject": false
@@ -306,7 +306,7 @@
   {
    "market": "BET (Romania)",
    "effect": "day of week (equal means)",
-   "p": 0.2894997651225682,
+   "p": 0.30516320622792,
    "bonferroni_reject": false,
    "holm_reject": false,
    "raw_reject": false
@@ -314,7 +314,7 @@
   {
    "market": "BET (Romania)",
    "effect": "January",
-   "p": 0.1351370259251703,
+   "p": 0.13679580596917362,
    "bonferroni_reject": false,
    "holm_reject": false,
    "raw_reject": false
@@ -322,7 +322,7 @@
   {
    "market": "BET (Romania)",
    "effect": "turn of month",
-   "p": 0.00018667083348574,
+   "p": 0.00029087451944493953,
    "bonferroni_reject": true,
    "holm_reject": true,
    "raw_reject": true
@@ -330,7 +330,7 @@
   {
    "market": "Euro Stoxx 50",
    "effect": "day of week (equal means)",
-   "p": 0.6329303288741097,
+   "p": 0.6318710968155532,
    "bonferroni_reject": false,
    "holm_reject": false,
    "raw_reject": false
@@ -338,7 +338,7 @@
   {
    "market": "Euro Stoxx 50",
    "effect": "January",
-   "p": 0.7814962102788863,
+   "p": 0.7737917093784683,
    "bonferroni_reject": false,
    "holm_reject": false,
    "raw_reject": false
@@ -346,7 +346,7 @@
   {
    "market": "Euro Stoxx 50",
    "effect": "turn of month",
-   "p": 0.23976706921786817,
+   "p": 0.2266165872779211,
    "bonferroni_reject": false,
    "holm_reject": false,
    "raw_reject": false
@@ -354,7 +354,7 @@
   {
    "market": "WIG20 (Poland)",
    "effect": "day of week (equal means)",
-   "p": 0.22747130287990347,
+   "p": 0.22624288397562473,
    "bonferroni_reject": false,
    "holm_reject": false,
    "raw_reject": false
@@ -362,7 +362,7 @@
   {
    "market": "WIG20 (Poland)",
    "effect": "January",
-   "p": 0.690364661495867,
+   "p": 0.686481915554463,
    "bonferroni_reject": false,
    "holm_reject": false,
    "raw_reject": false
@@ -370,7 +370,7 @@
   {
    "market": "WIG20 (Poland)",
    "effect": "turn of month",
-   "p": 0.08661239292043113,
+   "p": 0.08410064702846867,
    "bonferroni_reject": false,
    "holm_reject": false,
    "raw_reject": false
@@ -378,7 +378,7 @@
   {
    "market": "BUX (Hungary)",
    "effect": "day of week (equal means)",
-   "p": 0.940468416957324,
+   "p": 0.9327419357677904,
    "bonferroni_reject": false,
    "holm_reject": false,
    "raw_reject": false
@@ -386,7 +386,7 @@
   {
    "market": "BUX (Hungary)",
    "effect": "January",
-   "p": 0.024705455280797928,
+   "p": 0.024456409246446764,
    "bonferroni_reject": false,
    "holm_reject": false,
    "raw_reject": true
@@ -394,7 +394,7 @@
   {
    "market": "BUX (Hungary)",
    "effect": "turn of month",
-   "p": 0.00034157801716193923,
+   "p": 0.000280852139875575,
    "bonferroni_reject": true,
    "holm_reject": true,
    "raw_reject": true
@@ -403,17 +403,21 @@
  "B7": {
   "all days": {
    "N": 6714.0,
-   "rho1": -0.09865785288466188,
-   "t_iid": -8.083925975479922,
-   "t_robust": -3.627624825746986,
-   "zstar5": -2.772423501843443
+   "rho1": -0.09858040590252938,
+   "t_iid": -8.077580047079113,
+   "t_robust": -3.6247771193876,
+   "zstar5": -2.7724235018434427,
+   "n_pairs": 6713.0,
+   "n_windows": 6710.0
   },
   "without 2008-09 and 2020 crises": {
    "N": 6411.0,
-   "rho1": -0.04268288340032456,
-   "t_iid": -3.4175638604464313,
-   "t_robust": -2.3485752628137173,
-   "zstar5": -2.6194550667559753
+   "rho1": -0.04256149880636803,
+   "t_iid": -3.40784475132182,
+   "t_robust": -2.3419211617914755,
+   "zstar5": -2.6330366410231183,
+   "n_pairs": 6408.0,
+   "n_windows": 6399.0
   }
  },
  "C1": {
@@ -433,8 +437,43 @@
   ],
   "diff": 0.08931148955578372,
   "ci": [
-   -0.029570082194168134,
-   0.19425487562567612
+   -0.03114745013041411,
+   0.19393184918003217
   ]
+ },
+ "B2c": {
+  "BET, full sample": {
+   "start": "2000-01-06",
+   "N": 6670,
+   "rho1": 0.10894644190136601,
+   "VR2": 1.108075772912243,
+   "z2": 8.82655571818136,
+   "zstar2": 3.835849972888246,
+   "zstar5": 2.9801065347007767,
+   "CD": 3.835849972888246,
+   "CD_p": 0.0005004291794026283
+  },
+  "BET, BET-TR period": {
+   "start": "2014-09-24",
+   "N": 2992,
+   "rho1": 0.05429441587715938,
+   "VR2": 1.0541498119927917,
+   "z2": 2.9619501682933858,
+   "zstar2": 1.4010678607975549,
+   "zstar5": 2.0375233478205366,
+   "CD": 2.0375233478205366,
+   "CD_p": 0.15629324610945272
+  },
+  "BET-TR": {
+   "start": "2014-09-24",
+   "N": 2992,
+   "rho1": 0.060949362245092766,
+   "VR2": 1.0608106091766099,
+   "z2": 3.3262902945749815,
+   "zstar2": 1.5940139120095997,
+   "zstar5": 2.3984860864289996,
+   "CD": 2.3984860864289996,
+   "CD_p": 0.06424359954065206
+  }
  }
 }

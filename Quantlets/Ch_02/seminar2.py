@@ -18,7 +18,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from mfm_data import MARKETS, LABELS, load_close, log_returns, read_market   # noqa: E402
+from mfm_data import MARKETS, LABELS, load_close, log_returns, read_market, complete_months   # noqa: E402
 from eff_tests import variance_ratio, chow_denning, runs_test, dfa_hurst, rolling_stat   # noqa: E402
 
 from generate_all_charts import (plt, MainBlue, IDAred, Amber, Gray, LightGray, save_fig,  # noqa: E402
@@ -127,7 +127,7 @@ def b_amh_bitcoin(window=365, step=30, q=5, seed=SEED):
 
 def b_tom_ols_hac(k='sp500'):
     """Efectul turn-of-month: aceeasi regresie cu erori OLS clasice si cu erori HAC (Newey-West, 5 decalaje)."""
-    r = log_returns(k) * 1e4
+    r = complete_months(log_returns(k)) * 1e4
     d = pd.DataFrame({'r': r})
     ym = d.index.to_period('M')
     rank = d.groupby(ym).cumcount()
@@ -164,18 +164,58 @@ def b_calendar_multiple(t):
     return d
 
 
+def _segment_stats(x, keep, q=5):
+    """rho1, tau1 si z*(q) Lo-MacKinlay calculate DOAR in segmentele contigue pastrate:
+    perechile (t, t-k) si sumele pe q zile care traverseaza o perioada eliminata nu sunt folosite.
+    Cu keep = True peste tot, rezultatul coincide cu variance_ratio(x, q)."""
+    x = np.asarray(x, dtype=float)
+    keep = np.asarray(keep, dtype=bool)
+    T = keep.sum()
+    mu = x[keep].mean()
+    e = np.where(keep, x - mu, 0.0)
+    s2 = (e ** 2).sum()
+
+    def pair(k):                          # ambele capete pastrate si toate zilele dintre ele pastrate
+        ok = np.convolve(keep.astype(int), np.ones(k + 1, dtype=int), mode='valid') == k + 1
+        return ok, e[k:] * ok, e[:-k] * ok
+    ok1, a1, b1 = pair(1)
+    rho1 = (a1 * b1).sum() / s2
+    tau1 = (a1 ** 2 * b1 ** 2).sum() / s2 ** 2
+    okq = np.convolve(keep.astype(int), np.ones(q, dtype=int), mode='valid') == q
+    agg = (np.convolve(np.where(keep, x, 0.0), np.ones(q), mode='valid') - q * mu)[okq]
+    m = q * len(agg) * (1 - q / T)
+    vr = ((agg ** 2).sum() / m) / (s2 / (T - 1))
+    theta = 0.0
+    for j in range(1, q):
+        _, a, b = pair(j)
+        theta += (2 * (q - j) / q) ** 2 * T * (a ** 2 * b ** 2).sum() / s2 ** 2
+    return dict(N=int(T), rho1=rho1, t_iid=rho1 * np.sqrt(T), t_robust=rho1 / np.sqrt(tau1),
+                zstar5=np.sqrt(T) * (vr - 1) / np.sqrt(theta), n_pairs=int(ok1.sum()), n_windows=int(okq.sum()))
+
+
 def b_crisis_robustness():
-    """Autocorelatia S&P 500 cu si fara 2008-2009 si 2020."""
+    """Autocorelatia S&P 500 cu si fara 2008-2009 si 2020; fara crize, statisticile se calculeaza doar in
+    segmentele contigue ramase (nicio pereche de zile si nicio suma pe 5 zile nu traverseaza o criza eliminata)."""
     r = log_returns('sp500')
     mask = ~(((r.index >= '2008-09-01') & (r.index <= '2009-06-30')) |
              ((r.index >= '2020-02-15') & (r.index <= '2020-06-30')))
-    out = {}
-    for lab, x in [('all days', r), ('without 2008-09 and 2020 crises', r[mask])]:
-        e = x - x.mean()
-        tau = (e.values[1:] ** 2 * e.values[:-1] ** 2).sum() / (e ** 2).sum() ** 2
-        out[lab] = dict(N=len(x), rho1=x.autocorr(1), t_iid=x.autocorr(1) * np.sqrt(len(x)),
-                        t_robust=x.autocorr(1) / np.sqrt(tau), zstar5=variance_ratio(x, 5)[2])
+    out = {'all days': _segment_stats(r.values, np.ones(len(r), bool)),
+           'without 2008-09 and 2020 crises': _segment_stats(r.values, mask)}
     return pd.DataFrame(out).T
+
+
+def b_bet_common_period():
+    """BET vs BET-TR pe perioada comuna (de la inceputul BET-TR): separa efectul selectiei de cel al dividendelor."""
+    tr = np.log(read_market('BETTR.INDX')['close']).diff().dropna()
+    b = log_returns('bet')
+    out = {}
+    for lab, r in [('BET, full sample', b), ('BET, BET-TR period', b.loc[tr.index[0]:tr.index[-1]]),
+                   ('BET-TR', tr)]:
+        v2 = variance_ratio(r, 2)
+        cd = chow_denning(r)
+        out[lab] = dict(start=str(r.index[0].date()), N=len(r), rho1=r.autocorr(1), VR2=v2[0], z2=v2[1],
+                        zstar2=v2[2], zstar5=variance_ratio(r, 5)[2], CD=cd[0], CD_p=cd[1])
+    return out
 
 
 # -----------------------------------------------------------------------------
@@ -191,7 +231,7 @@ def c_bvb_before_after(split='2020-09-21', years=5, n_boot=999, block=20, seed=S
 
     def block_boot(x):
         n = len(x)
-        starts = rng.integers(0, n - block, int(np.ceil(n / block)))
+        starts = rng.integers(0, n - block + 1, int(np.ceil(n / block)))
         return np.concatenate([x[s0:s0 + block] for s0 in starts])[:n]
 
     def rho1(x):
@@ -286,6 +326,7 @@ if __name__ == '__main__':
     cm.to_csv(os.path.join(HERE, 'ch2_sem_calendar_multiple.csv'), index=False)
     S['B6'] = cm.to_dict(orient='records')
     S['B7'] = b_crisis_robustness().to_dict(orient='index')
+    S['B2c'] = b_bet_common_period()
     S['C1'] = c_bvb_before_after()
     S = _clean(S)
     with open(os.path.join(HERE, 'ch2_seminar_numbers.json'), 'w') as f:
