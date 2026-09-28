@@ -1,0 +1,273 @@
+{
+  "n_variants": 36,
+  "base_mean_bp": 5.639072701360172,
+  "base_t": 2.2632905277833695,
+  "n_sig": 5,
+  "n_sig_pos": 3,
+  "expected_false": 1.8,
+  "n_holm": 0,
+  "n_bh": 0,
+  "n_t3": 0,
+  "best": {
+    "score": "qwen",
+    "band": 0.0,
+    "day": 2.0,
+    "mean_bp": 5.639072701360172,
+    "t": 2.2632905277833695
+  },
+  "bonf_crit": 3.1969502291312546,
+  "grid": [
+    {
+      "score": "lm",
+      "band": 0.0,
+      "day": 2,
+      "mean_bp": -0.208,
+      "t": -0.071
+    },
+    {
+      "score": "lm",
+      "band": 0.0,
+      "day": 3,
+      "mean_bp": -2.346,
+      "t": -0.973
+    },
+    {
+      "score": "lm",
+      "band": 0.0,
+      "day": 4,
+      "mean_bp": 3.08,
+      "t": 1.219
+    },
+    {
+      "score": "lm",
+      "band": 0.0,
+      "day": 5,
+      "mean_bp": 1.119,
+      "t": 0.5
+    },
+    {
+      "score": "lm",
+      "band": 0.25,
+      "day": 2,
+      "mean_bp": -0.691,
+      "t": -0.281
+    },
+    {
+      "score": "lm",
+      "band": 0.25,
+      "day": 3,
+      "mean_bp": -5.06,
+      "t": -2.008
+    },
+    {
+      "score": "lm",
+      "band": 0.25,
+      "day": 4,
+      "mean_bp": -2.437,
+      "t": -1.011
+    },
+    {
+      "score": "lm",
+      "band": 0.25,
+      "day": 5,
+      "mean_bp": -0.027,
+      "t": -0.01
+    },
+    {
+      "score": "lm",
+      "band": 0.5,
+      "day": 2,
+      "mean_bp": -0.034,
+      "t": -0.017
+    },
+    {
+      "score": "lm",
+      "band": 0.5,
+      "day": 3,
+      "mean_bp": -2.858,
+      "t": -1.522
+    },
+    {
+      "score": "lm",
+      "band": 0.5,
+      "day": 4,
+      "mean_bp": -2.316,
+      "t": -1.204
+    },
+    {
+      "score": "lm",
+      "band": 0.5,
+      "day": 5,
+      "mean_bp": 0.441,
+      "t": 0.225
+    },
+    {
+      "score": "finbert",
+      "band": 0.0,
+      "day": 2,
+      "mean_bp": 3.27,
+      "t": 1.273
+    },
+    {
+      "score": "finbert",
+      "band": 0.0,
+      "day": 3,
+      "mean_bp": -0.668,
+      "t": -0.336
+    },
+    {
+      "score": "finbert",
+      "band": 0.0,
+      "day": 4,
+      "mean_bp": 1.603,
+      "t": 0.718
+    },
+    {
+      "score": "finbert",
+      "band": 0.0,
+      "day": 5,
+      "mean_bp": 3.725,
+      "t": 1.362
+    },
+    {
+      "score": "finbert",
+      "band": 0.25,
+      "day": 2,
+      "mean_bp": 1.79,
+      "t": 0.631
+    },
+    {
+      "score": "finbert",
+      "band": 0.25,
+      "day": 3,
+      "mean_bp": -2.709,
+      "t": -0.891
+    },
+    {
+      "score": "finbert",
+      "band": 0.25,
+      "day": 4,
+      "mean_bp": 5.198,
+      "t": 1.308
+    },
+    {
+      "score": "finbert",
+      "band": 0.25,
+      "day": 5,
+      "mean_bp": 5.079,
+      "t": 0.914
+    },
+    {
+      "score": "finbert",
+      "band": 0.5,
+      "day": 2,
+      "mean_bp": -2.528,
+      "t": -1.092
+    },
+    {
+      "score": "finbert",
+      "band": 0.5,
+      "day": 3,
+      "mean_bp": -5.108,
+      "t": -2.041
+    },
+    {
+      "score": "finbert",
+      "band": 0.5,
+      "day": 4,
+      "mean_bp": -0.01,
+      "t": -0.004
+    },
+    {
+      "score": "finbert",
+      "band": 0.5,
+      "day": 5,
+      "mean_bp": 0.703,
+      "t": 0.282
+    },
+    {
+      "score": "qwen",
+      "band": 0.0,
+      "day": 2,
+      "mean_bp": 5.639,
+      "t": 2.263
+    },
+    {
+      "score": "qwen",
+      "band": 0.0,
+      "day": 3,
+      "mean_bp": 0.11,
+      "t": 0.043
+    },
+    {
+      "score": "qwen",
+      "band": 0.0,
+      "day": 4,
+      "mean_bp": 1.728,
+      "t": 0.63
+    },
+    {
+      "score": "qwen",
+      "band": 0.0,
+      "day": 5,
+      "mean_bp": 4.235,
+      "t": 1.696
+    },
+    {
+      "score": "qwen",
+      "band": 0.25,
+      "day": 2,
+      "mean_bp": 5.743,
+      "t": 2.103
+    },
+    {
+      "score": "qwen",
+      "band": 0.25,
+      "day": 3,
+      "mean_bp": 2.859,
+      "t": 0.774
+    },
+    {
+      "score": "qwen",
+      "band": 0.25,
+      "day": 4,
+      "mean_bp": 5.43,
+      "t": 1.706
+    },
+    {
+      "score": "qwen",
+      "band": 0.25,
+      "day": 5,
+      "mean_bp": 6.137,
+      "t": 1.963
+    },
+    {
+      "score": "qwen",
+      "band": 0.5,
+      "day": 2,
+      "mean_bp": 5.69,
+      "t": 1.878
+    },
+    {
+      "score": "qwen",
+      "band": 0.5,
+      "day": 3,
+      "mean_bp": 5.158,
+      "t": 1.274
+    },
+    {
+      "score": "qwen",
+      "band": 0.5,
+      "day": 4,
+      "mean_bp": 8.315,
+      "t": 1.62
+    },
+    {
+      "score": "qwen",
+      "band": 0.5,
+      "day": 5,
+      "mean_bp": 1.352,
+      "t": 0.504
+    }
+  ]
+}
