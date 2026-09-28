@@ -28,9 +28,30 @@
 
     function typeset(el) {
         if (window.MathJax && MathJax.typesetPromise) {
-            MathJax.typesetPromise(el ? [el] : undefined).catch(() => {});
+            MathJax.typesetPromise(el ? [el] : undefined).then(() => fitMath()).catch(() => {});
         }
     }
+
+    // shrink display formulas that are wider than their box, so no sideways scrolling is needed
+    function fitMath(root) {
+        (root || document).querySelectorAll('.cf-tex, .formula-tex').forEach(box => {
+            const m = box.querySelector('mjx-container');
+            if (!m || !box.clientWidth) return;
+            m.style.fontSize = '';
+            const w = m.scrollWidth, avail = box.clientWidth - 4;
+            if (w > avail) m.style.fontSize = Math.max(55, Math.floor(100 * avail / w)) + '%';
+        });
+    }
+    let fitTimer;
+    window.addEventListener('resize', () => { clearTimeout(fitTimer); fitTimer = setTimeout(() => fitMath(), 150); });
+    document.addEventListener('toggle', e => {
+        if (e.target.classList && e.target.classList.contains('chapter-formulas') && e.target.open) fitMath(e.target);
+    }, true);
+
+    // on the narrow chapter cards, put the parts of a two-part formula on separate lines
+    const stackTex = tex => /\\qquad/.test(tex) && !/\\begin\{/.test(tex)
+        ? '$$\\begin{gathered}' + tex.slice(2, -2).replace(/,?\s*\\qquad\s*/g, () => ' \\\\ ') + '\\end{gathered}$$'
+        : tex;
 
     // ------------------------------------------------------------
     // STATIC TEXT (header, nav, section titles)
@@ -110,7 +131,7 @@
             const fs = (D.formulas || []).filter(f => f.ch === ch.id);
             const formulas = fs.length
                 ? `<details class="chapter-formulas"><summary>${T.formulas} (${fs.length})</summary>` +
-                  fs.map(f => `<div class="cf"><h5>${f[LANG]}</h5><div class="cf-tex">${f.tex}</div></div>`).join('') +
+                  fs.map(f => `<div class="cf"><h5>${f[LANG]}</h5><div class="cf-tex">${stackTex(f.tex)}</div></div>`).join('') +
                   '</details>'
                 : '';
             return `<div class="chapter-card${ch.available ? '' : ' soon'}${ch.selfStudy ? ' self-study' : ''}" id="chapter-${ch.id}">

@@ -24,7 +24,7 @@
         { g: 'returns', ch: 'markets', en: 'Maximum drawdown', ro: 'Scăderea maximă (maximum drawdown)',
           tex: String.raw`$$\mathrm{MDD}_T = \max_{t \le T}\Big(1 - \frac{P_t}{\max_{s \le t} P_s}\Big)$$` },
         { g: 'ml', ch: 'wrap-up', en: 'Minimum detectable effect', ro: 'Efectul minim detectabil',
-          tex: String.raw`$$\mathrm{MDE} = \big(z_{1-\alpha/2} + z_{1-\beta}\big)\,\operatorname{se}(\hat\theta) \approx 2.8\,\operatorname{se}(\hat\theta) \quad (\alpha = 5\%,\ 1-\beta = 80\%)$$` },
+          tex: String.raw`$$\mathrm{MDE} = \big(z_{1-\alpha/2} + z_{1-\beta}\big)\,\operatorname{se}(\hat\theta) \approx 2.8\,\operatorname{se}(\hat\theta), \qquad (\alpha = 5\%,\ 1-\beta = 80\%)$$` },
         { g: 'ml', ch: 'wrap-up', en: 'Benjamini–Hochberg (false discovery rate)', ro: 'Benjamini–Hochberg (rata descoperirilor false)',
           tex: String.raw`$$\text{reject } H_{(1)},\dots,H_{(k)}, \qquad k = \max\Big\{i : p_{(i)} \le \frac{i}{m}\,q\Big\}$$` },
         // ---- returns and efficiency
