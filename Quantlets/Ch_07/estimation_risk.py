@@ -292,7 +292,8 @@ def fig_caviar(v, fhs, name='sp500', title='S&P 500', start='2016-01-01'):
 # =============================================================================
 def extremal_index(L, tail=0.05):
     """Estimatorul pe intervale: timpii dintre depasiri T_i; declusterizare cu cei mai mari C - 1 timpi,
-    C = floor(theta N) + 1; GPD pe maximele clusterelor."""
+    C = floor(theta N) + 1 (cel mult N); la egalitati, C scade pana cand T_(C-1) > T_(C) (Ferro & Segers, 2003,
+    Sectiunea 4); GPD pe maximele clusterelor."""
     L = np.asarray(L, float)
     u = np.quantile(L, 1 - tail)
     S = np.flatnonzero(L > u)
@@ -303,7 +304,7 @@ def extremal_index(L, tail=0.05):
     else:
         th = 2 * (T - 1).sum() ** 2 / ((N - 1) * ((T - 1) * (T - 2)).sum())
     th = min(1.0, th)
-    C = int(np.floor(th * N)) + 1
+    C = min(int(np.floor(th * N)) + 1, N)                        # cel mult un cluster pe depasire
     cut = np.sort(T)[::-1][C - 2] if C > 1 else np.inf           # al (C-1)-lea cel mai mare timp
     breaks = np.flatnonzero(T > cut) if np.sum(T >= cut) > C - 1 else np.flatnonzero(T >= cut)
     groups = np.split(np.arange(N), breaks + 1)
@@ -391,7 +392,7 @@ elif __name__ == '__main__':
     L_bet = (-100 * log_returns('bet')).values
     OUT['se'] = {'sp500_full': var_es_se(L_sp), 'sp500_w500': var_es_se(L_sp[-500:]),
                  'bet_full': var_es_se(L_bet), 'bet_w500': var_es_se(L_bet[-500:])}
-    OUT['se_theory'] = {'n500': se_theory(n=500), 'n6670': se_theory(n=6670), 'n6714': se_theory(n=6714)}
+    OUT['se_theory'] = {'n500': se_theory(n=500), 'n6670': se_theory(n=6670), 'n6714': se_theory(n=len(L_sp))}
     OUT['ru'] = ru_check(L_sp, 0.025)
     OUT['agg'] = aggregation()
     print('aggregation', OUT['agg'])

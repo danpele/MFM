@@ -7,8 +7,9 @@ mfm_data.py -- Incarcarea datelor pentru Capitolul 7 (MFM): VaR si Expected Shor
   * MARKETS             -- S&P 500, BET, Bitcoin, EUR/RON, aur; ETF-uri si actiuni BVB pentru portofolii
 
 Conventii (ca in capitolele 0-2):
-  * indicii bursieri: doar zilele lucratoare; zilele cu inchidere identica cu ziua precedenta
-    (sarbatori completate cu ultimul pret) sunt eliminate;
+  * indicii bursieri: doar zilele lucratoare; se elimina doar inregistrarile de sarbatoare completate cu
+    pretul anterior (inchidere neschimbata SI volum zero sau lipsa); inchiderile neschimbate din zilele
+    reale de tranzactionare (volum pozitiv) raman in selectie ca randamente zero;
   * aurul (XAU/USD): fara cotatiile de weekend; anualizare cu frecventa reala;
   * cripto: 7 zile din 7;
   * ETF-uri si actiuni: pretul ajustat (dividende, split-uri); indici, FX, cripto: pretul de inchidere;
@@ -82,12 +83,14 @@ def load_close(name, start=None, end=END):
     start = start or start0
     if symbol.startswith('REF:'):
         return read_reference_rate(symbol.split(':')[1], start=start, end=end).rename(name)
-    s = read_market(symbol)['close'].loc[start:end]
-    s = s[s > 0].dropna()
+    d = read_market(symbol).loc[start:end]
+    d = d[d['close'] > 0].dropna(subset=['close'])
     if kind != 'crypto':
-        s = s[s.index.dayofweek < 5]          # fara cotatii de weekend
-    if kind == 'index':
-        s = s[s.diff() != 0]                  # fara sarbatori completate cu pretul anterior
+        d = d[d.index.dayofweek < 5]          # fara cotatii de weekend
+    s = d['close']
+    if kind == 'index' and 'volume' in d:
+        # fara sarbatori completate cu pretul anterior: inchidere neschimbata si volum zero/lipsa
+        s = s[~((s.diff() == 0) & (d['volume'].fillna(0) <= 0))]
     return s.rename(name)
 
 

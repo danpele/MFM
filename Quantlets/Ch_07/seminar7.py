@@ -46,7 +46,7 @@ def a1_normal(mu=0.04, sigma=1.2, position=1_000_000):
         out[f'k{tag}'] = phi / a
         out[f'var{tag}'] = -(mu + sigma * z)
         out[f'es{tag}'] = -mu + sigma * phi / a
-    out['var1_10'] = -np.sqrt(10) * sigma * out['z1']
+    out['var1_10'] = -10 * mu - np.sqrt(10) * sigma * out['z1']   # 10 zile, randamente i.i.d. aditive
     return out
 
 
@@ -187,7 +187,7 @@ def b2_bet_gpd():
     ax = axes[0]
     xs = np.sort(L[L > f['u']])
     emp = (1 - np.arange(len(xs)) / len(xs)) * f['nu'] / f['n']
-    ax.loglog(xs, emp, 'o', ms=2.5, color=MainBlue, label='Empirical P(L > x)')
+    ax.loglog(xs, emp, 'o', ms=2.5, color=MainBlue, label='Empirical P(L >= x)')
     xx = np.linspace(f['u'], xs[-1] * 1.3, 200)
     ax.loglog(xx, f['nu'] / f['n'] * stats.genpareto.sf(xx - f['u'], f['xi'], scale=f['beta']), color=IDAred,
               label=f"GPD fit, xi = {f['xi']:.2f}")
@@ -289,44 +289,59 @@ BVB = ['TLV', 'SNP', 'BRD', 'TGN', 'SNG', 'SNN', 'EL', 'TEL']
 C_START = '2016-09-19'                  # ultimii zece ani
 
 
-def c1_capital(position=1_000_000):
+def c1_capital(position=1_000_000, B=B_BOOT):
+    """Ilustratie simplificata inspirata de FRTB (nu capitalul reglementat complet).
+    Randamente SIMPLE zilnice (in %): cosul BVB cu ponderi egale rebalansat zilnic, SPY.
+    Pierderea pe h zile = 100 (1 - prod(1 + R_t)) (compunere), deci ES in % din pozitie se transforma exact in bani.
+    Fereastra de stres: cele 250 de zile consecutive cu cel mai mare ES 2,5% ISTORIC PE O ZI; ES de stres pe 10 zile =
+    ES de stres pe o zi x sqrt(10); orizontul de lichiditate de 20 de zile: x sqrt(20/10) (MAR33). Capital = 1,5 x ES de stres.
+    Incertitudine: bootstrap pe blocuri mobile (20 de zile), fereastra de stres tinuta FIXA."""
     lr_b = joint_returns(BVB, start=C_START)
     lr_b = lr_b[(lr_b != 0).any(axis=1)]                # fara zilele in care nicio actiune nu s-a schimbat
     start = str(lr_b.index[0].date())
     Rb = 100 * (np.exp(lr_b) - 1)
-    rb = np.log(1 + Rb.mean(axis=1) / 100) * 100          # portofoliu cu ponderi egale, rebalansat zilnic
-    rs = 100 * joint_returns(['SPY']).loc[start:]['SPY']
+    Rp_b = Rb.mean(axis=1)                               # randamentul simplu al cosului, ponderi egale, rebalansat zilnic
+    Rp_s = 100 * (np.exp(joint_returns(['SPY']).loc[start:]['SPY']) - 1)
     out = dict(start=start, stocks=BVB)
-    series = {'bvb': rb, 'spy': rs}
-    for k, r in series.items():
-        L = -r
+    series = {'bvb': Rp_b, 'spy': Rp_s}
+    es25 = lambda y: hs_var_es(y, 0.025)[1]              # noqa: E731
+    for k, R in series.items():
+        L = -R
         v1, e1 = hs_var_es(L, 0.025)
-        L10 = -r.rolling(10).sum().dropna()
+        L10 = 100 * (1 - (1 + R / 100).rolling(10).apply(np.prod, raw=True)).dropna()   # pierderi compuse pe 10 zile
         e10 = hs_var_es(L10, 0.025)[1]
-        # perioada de stres: fereastra de 250 de zile cu cel mai mare ES 2,5%
-        roll = pd.Series([hs_var_es(L.iloc[i - 250:i], 0.025)[1] for i in range(250, len(L) + 1)],
-                         index=L.index[249:])
+        roll = pd.Series([es25(L.iloc[i - 250:i]) for i in range(250, len(L) + 1)], index=L.index[249:])
         es_stress = roll.max()
         end_s = roll.idxmax()
-        start_s = L.index[L.index.get_loc(end_s) - 249]
+        i_end = L.index.get_loc(end_s)
+        start_s = L.index[i_end - 249]
+        Ls = L.iloc[i_end - 249:i_end + 1].values
+        # FHS: AR(1)-GARCH(1,1) pe randamentele log ale portofoliului; fiecare traiectorie convertita exact
+        r = 100 * np.log(1 + R / 100)
         params, mu, sig = garch_filter(r)
         z = ((r - mu) / sig).dropna().values
         m1, s1 = garch_next(r, params)
-        nz = -z
-        q = np.quantile(nz, 1 - 0.025)
-        fhs1 = -m1 + s1 * nz[nz >= q].mean()
-        sim = fhs_mc(r, params, z, 10, n_paths=100_000, seed=SEED)
-        fhs10 = hs_var_es(sim, 0.025)[1]
-        out[k] = dict(N=len(r), sd=r.std(), es1=e1, var1=v1, es10_sqrt=np.sqrt(10) * e1, es10_hs=e10,
-                      es_stress1=es_stress, es_stress10=np.sqrt(10) * es_stress, stress_from=str(start_s.date()),
-                      stress_to=str(end_s.date()), fhs1=fhs1, fhs10=fhs10, sigma_now=s1,
+        sim_log = fhs_mc(r, params, z, 10, n_paths=100_000, seed=SEED)      # pierderi log pe 10 zile
+        fhs10 = hs_var_es(100 * (1 - np.exp(-sim_log / 100)), 0.025)[1]
+        # incertitudine: bootstrap pe blocuri mobile de 20 de zile
+        ci1, _ = boot_ci(L.values, es25, B=B, block=20)
+        ci_s, _ = boot_ci(Ls, es25, B=B, block=20)
+        out[k] = dict(N=len(R), sd=R.std(), es1=e1, var1=v1, es10_sqrt=np.sqrt(10) * e1, es10_hs=e10,
+                      rho1=float(R.autocorr(1)),
+                      es_stress1=es_stress, es_stress10=np.sqrt(10) * es_stress, es_stress20=np.sqrt(20) * es_stress,
+                      stress_from=str(start_s.date()), stress_to=str(end_s.date()), fhs10=fhs10, sigma_now=s1,
+                      es1_lo=ci1[0], es1_hi=ci1[1], es_stress1_lo=ci_s[0], es_stress1_hi=ci_s[1],
                       cap_hs=np.sqrt(10) * e1 / 100 * position, cap_stress=np.sqrt(10) * es_stress / 100 * position,
                       cap_stress_lh20=np.sqrt(20) * es_stress / 100 * position,
+                      ima10=1.5 * np.sqrt(10) * es_stress / 100 * position,
+                      ima20=1.5 * np.sqrt(20) * es_stress / 100 * position,
                       cap_fhs=fhs10 / 100 * position, zero_share=float((Rb == 0).mean().mean()) if k == 'bvb' else 0.0)
-    out['corr_bvb_spy'] = float(pd.concat([rb, rs], axis=1, join='inner').corr().iloc[0, 1])
+    # corelatia: intai join pe valorile portofoliilor (indice de avere BVB, pret SPY) in zilele comune, apoi randamente
+    W = pd.concat([(1 + Rp_b / 100).cumprod(), (1 + Rp_s / 100).cumprod()], axis=1, join='inner')
+    out['corr_bvb_spy'] = float(W.pct_change().dropna().corr().iloc[0, 1])
     # grafic
     fig, ax = plt.subplots(figsize=(8.5, 3.3))
-    labs = ['HS, sqrt(10) x 1-day', 'HS, 10-day sums', 'Stressed 250 days, sqrt(10)', 'FHS Monte Carlo, 10-day']
+    labs = ['HS, sqrt(10) x 1-day', 'HS, 10-day compounded', 'Stressed 250 days, sqrt(10)', 'FHS Monte Carlo, 10-day']
     keys = ['es10_sqrt', 'es10_hs', 'es_stress10', 'fhs10']
     xx = np.arange(len(labs))
     vb = [out['bvb'][c] for c in keys]

@@ -15,7 +15,7 @@ Modelarea Pietelor Financiare - Daniel Traian PELE
 
 import numpy as np
 import pandas as pd
-from scipy import stats, integrate
+from scipy import stats, integrate, signal
 from arch import arch_model
 
 
@@ -88,16 +88,37 @@ def mean_excess(L, us):
     return np.array([(L[L > u] - u).mean() for u in us]), np.array([(L > u).sum() for u in us])
 
 
+def garch_backcast(x):
+    """Valoarea initiala a dispersiei (ca in arch): media EWMA (0,94) a primelor 75 de reziduuri patratice
+    ale unui AR(1) estimat prin OLS, calculata DOAR pe esantionul de estimare x."""
+    x = np.asarray(x, float)
+    X = np.column_stack([np.ones(len(x) - 1), x[:-1]])
+    e = x[1:] - X @ np.linalg.lstsq(X, x[1:], rcond=None)[0]
+    tau = min(75, len(e))
+    w = 0.94 ** np.arange(tau)
+    return float((w / w.sum()) @ e[:tau] ** 2)
+
+
 def garch_filter(r, params=None, last_obs=None):
     """AR(1)-GARCH(1,1) cu QML Normal (Capitolul 5); r in %.
-    Intoarce modelul estimat (pana la last_obs) si seriile mu_t, sigma_t pentru toata selectia."""
-    am = arch_model(r, mean='AR', lags=1, vol='GARCH', p=1, q=1, dist='normal', rescale=False)
+    Parametrii se estimeaza pe datele de dinainte de last_obs; filtrul este cauzal: mu_t si sigma_t folosesc
+    doar r_1..r_{t-1}, iar valoarea initiala a dispersiei vine doar din esantionul de estimare.
+    Intoarce parametrii si seriile mu_t, sigma_t pentru toata selectia."""
     if params is None:
+        am = arch_model(r, mean='AR', lags=1, vol='GARCH', p=1, q=1, dist='normal', rescale=False)
         params = am.fit(disp='off', last_obs=last_obs).params
-    fx = am.fix(params)
-    sig = fx.conditional_volatility
-    mu = r - fx.resid
-    return params, mu, sig
+    est = r if last_obs is None else r.loc[r.index < pd.Timestamp(last_obs)]
+    c, phi, om, al, be = params.values[:5]
+    x = np.asarray(r, float)
+    mu = np.full(len(x), np.nan)
+    mu[1:] = c + phi * x[:-1]
+    e = x - mu
+    u = np.empty(len(x) - 1)
+    u[0] = om + (al + be) * garch_backcast(np.asarray(est, float))
+    u[1:] = om + al * e[1:-1] ** 2
+    s2 = np.full(len(x), np.nan)
+    s2[1:] = signal.lfilter([1.0], [1.0, -be], u)
+    return params, pd.Series(mu, index=r.index), pd.Series(np.sqrt(s2), index=r.index)
 
 
 def garch_next(r, params):

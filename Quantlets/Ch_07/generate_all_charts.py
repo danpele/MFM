@@ -452,7 +452,7 @@ def fig_gpd_tail(t):
         xs = np.sort(L[L > f['u']])
         emp = 1 - np.arange(len(xs)) / len(xs)
         emp = emp * f['nu'] / f['n']
-        ax.loglog(xs, emp, 'o', ms=2.5, color=MainBlue, label='Empirical tail P(L > x)')
+        ax.loglog(xs, emp, 'o', ms=2.5, color=MainBlue, label='Empirical tail P(L >= x)')
         xx = np.linspace(f['u'], xs[-1] * 1.3, 200)
         gp = f['nu'] / f['n'] * stats.genpareto.sf(xx - f['u'], f['xi'], scale=f['beta'])
         ax.loglog(xx, gp, color=IDAred, label=f"GPD, xi = {f['xi']:.2f}")
@@ -538,7 +538,7 @@ SPREAD_MEAN, SPREAD_SD, SPREAD_A = 0.5, 0.3, 3.0     # ipoteze ilustrative pentr
 
 def liquidity(sym='TLV', position=1_000_000):
     """VaR 1% istoric pe ultimii doi ani pentru o actiune BVB + costul iesirii din pozitie la jumatate de spread."""
-    r = 100 * joint_returns([sym]).loc['2024-09-18':][sym]
+    r = 100 * (np.exp(joint_returns([sym]).loc['2024-09-18':][sym]) - 1)   # randamente simple: pierderea in bani exacta
     v = hs_var_es(-r, 0.01)[0]
     col = 0.5 * (SPREAD_MEAN + SPREAD_A * SPREAD_SD)
     return dict(sym=sym, N=len(r), var1=v, col=col, lvar=v + col, ratio=(v + col) / v,

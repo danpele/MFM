@@ -45,7 +45,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "ES_alpha(L) = E[L | L > VaR_alpha(L)] for every discrete L",
                     "ES_alpha(L) = max over v of { v + E[(L - v)+] / alpha }"
                 ],
-                "correctExplanation": "The objective v + E[(L - v)+]/alpha is convex in v with derivative 1 - P(L > v)/alpha, which vanishes at VaR_alpha; its minimum value is ES_alpha, also when L has atoms.",
+                "correctExplanation": "The objective v + E[(L - v)+]/alpha is convex in v, with right derivative 1 - P(L > v)/alpha and left derivative 1 - P(L >= v)/alpha; v minimises it when P(L > v) <= alpha <= P(L >= v), which holds at VaR_alpha (an ordinary zero derivative only for continuous L). The minimum value is ES_alpha, also when L has atoms.",
                 "incorrectExplanation": "The representation is a minimum, not a maximum (the objective is convex and unbounded above); the conditional mean beyond VaR fails when the distribution has atoms, and no volatility add-on is involved."
             },
             "ro": {
@@ -57,7 +57,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "ES_alpha(L) = E[L | L > VaR_alpha(L)] pentru orice L discret",
                     "ES_alpha(L) = maximul după v al { v + E[(L - v)+] / alpha }"
                 ],
-                "correctExplanation": "Funcția obiectiv v + E[(L - v)+]/alpha este convexă în v, cu derivata 1 - P(L > v)/alpha, nulă în VaR_alpha; valoarea minimă este ES_alpha, inclusiv când L are atomi.",
+                "correctExplanation": "Funcția obiectiv v + E[(L - v)+]/alpha este convexă în v, cu derivata la dreapta 1 - P(L > v)/alpha și derivata la stânga 1 - P(L >= v)/alpha; v o minimizează când P(L > v) <= alpha <= P(L >= v), condiție îndeplinită în VaR_alpha (derivată obișnuită nulă doar pentru L continuă). Valoarea minimă este ES_alpha, inclusiv când L are atomi.",
                 "incorrectExplanation": "Reprezentarea este un minim, nu un maxim (funcția obiectiv este convexă și nemărginită superior); media condiționată dincolo de VaR eșuează când distribuția are atomi, iar nu apare niciun adaos de volatilitate."
             }
         },
@@ -443,26 +443,26 @@ window.MFM_DATA.quizzes['var-es'] = {
             "correct": 3,
             "en": {
                 "title": "Mean excess plot",
-                "text": "What pattern in the mean excess plot supports a GPD tail with xi > 0?",
+                "text": "What pattern in the mean excess plot supports a GPD tail with 0 < xi < 1?",
                 "options": [
                     "A flat line",
                     "A decreasing line",
                     "Random scatter around zero",
                     "An approximately linear increase with the threshold"
                 ],
-                "correctExplanation": "For a GPD tail e(u) is linear in u with slope xi/(1 - xi): upward sloping when xi > 0.",
+                "correctExplanation": "For a GPD tail with xi < 1 (finite mean) e(u) is linear in u with slope xi/(1 - xi): upward sloping when 0 < xi < 1.",
                 "incorrectExplanation": "A flat mean excess indicates an exponential tail, a decreasing one a bounded tail; heavy tails give an upward line."
             },
             "ro": {
                 "title": "Graficul excesului mediu",
-                "text": "Ce tipar în graficul excesului mediu susține o coadă GPD cu xi > 0?",
+                "text": "Ce tipar în graficul excesului mediu susține o coadă GPD cu 0 < xi < 1?",
                 "options": [
                     "O linie orizontală",
                     "O linie descrescătoare",
                     "O împrăștiere aleatoare în jurul lui zero",
                     "O creștere aproximativ liniară cu pragul"
                 ],
-                "correctExplanation": "Pentru o coadă GPD, e(u) este liniară în u cu panta xi/(1 - xi): crescătoare când xi > 0.",
+                "correctExplanation": "Pentru o coadă GPD cu xi < 1 (medie finită), e(u) este liniară în u cu panta xi/(1 - xi): crescătoare când 0 < xi < 1.",
                 "incorrectExplanation": "Un exces mediu constant indică o coadă exponențială, unul descrescător o coadă mărginită; cozile grele dau o linie crescătoare."
             }
         },
@@ -532,7 +532,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "It is bounded by the VaR under a Gaussian copula"
                 ],
                 "correctExplanation": "VaR is not subadditive, so a dependence structure that concentrates the tail mass can push the VaR of the sum above the comonotone sum; the rearrangement algorithm computes this worst case.",
-                "incorrectExplanation": "Comonotonicity maximises VaR only for subadditive measures; for VaR the worst case is found by rearranging the tails and is typically above the comonotone sum, far above independence or a Gaussian copula."
+                "incorrectExplanation": "For VaR the comonotone sum need not be the worst case: the worst case is found by rearranging the tails and is often above it, far above independence or a Gaussian copula. The comonotone sum is the worst case for ES, which is subadditive and comonotone additive."
             },
             "ro": {
                 "title": "VaR sub incertitudinea dependenței",
@@ -544,7 +544,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Este mărginit de VaR sub o copulă Gaussiană"
                 ],
                 "correctExplanation": "VaR nu este subaditiv, deci o structură de dependență care concentrează masa din coadă poate împinge VaR-ul sumei peste suma comonotonă; algoritmul de rearanjare calculează acest caz cel mai rău.",
-                "incorrectExplanation": "Comonotonia maximizează VaR doar pentru măsuri subaditive; pentru VaR cazul cel mai rău se găsește rearanjând cozile și este de regulă peste suma comonotonă, mult peste independență sau o copulă Gaussiană."
+                "incorrectExplanation": "Pentru VaR, suma comonotonă nu este neapărat cazul cel mai rău: acesta se găsește rearanjând cozile și este adesea peste ea, mult peste independență sau o copulă Gaussiană. Suma comonotonă este cazul cel mai rău pentru ES, care este subaditiv și aditiv comonoton."
             }
         },
         {
@@ -609,10 +609,10 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "options": [
                     "500",
                     "50",
-                    "About 12",
+                    "About 12.5 (n alpha)",
                     "About 2"
                 ],
-                "correctExplanation": "n alpha = 500 x 0.025 = 12.5: the estimate is very noisy, as bootstrap intervals about 2 percentage points wide show.",
+                "correctExplanation": "n alpha = 500 x 0.025 = 12.5 (the course's tail mean averages the 13 losses at or above the interpolated VaR): the estimate is very noisy, as bootstrap intervals about 2 percentage points wide show.",
                 "incorrectExplanation": "Only the worst 2.5% of days enter the average: 2.5% of 500 days."
             },
             "ro": {
@@ -621,10 +621,10 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "options": [
                     "500",
                     "50",
-                    "Aproximativ 12",
+                    "Aproximativ 12,5 (n alfa)",
                     "Aproximativ 2"
                 ],
-                "correctExplanation": "n alfa = 500 x 0,025 = 12,5: estimarea este foarte zgomotoasă, așa cum arată intervalele bootstrap largi de aproximativ 2 puncte procentuale.",
+                "correctExplanation": "n alfa = 500 x 0,025 = 12,5 (media din coadă folosită în curs mediază cele 13 pierderi mai mari sau egale cu VaR interpolat): estimarea este foarte zgomotoasă, așa cum arată intervalele bootstrap largi de aproximativ 2 puncte procentuale.",
                 "incorrectExplanation": "În medie intră doar cele mai rele 2,5% dintre zile: 2,5% din 500 de zile."
             }
         },
