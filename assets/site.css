@@ -578,3 +578,7 @@ body.no-scroll { overflow: hidden; }
 .quiz-login p { margin-bottom: 0.6rem; }
 .login-msg { color: var(--ida-red); font-size: 0.9rem; min-height: 1.2em; }
 .save-status { font-size: 0.9rem; color: var(--forest); min-height: 1.2em; }
+
+.hero-teachers { margin-top: 1rem; font-size: 0.85rem; opacity: 0.85; }
+.hero-teachers a { color: white; text-decoration: underline; }
+.hero-teachers[hidden] { display: none; }

@@ -406,6 +406,11 @@
             $('attendance-btn').href = CFG.ATTENDANCE_FORM_URL;
             $('attendance-btn').hidden = false;
         }
+        if (isConfigured(CFG.ATTENDANCE_QR_URL)) {
+            $('qr-lecture').href = CFG.ATTENDANCE_QR_URL + '?t=curs';
+            $('qr-seminar').href = CFG.ATTENDANCE_QR_URL + '?t=seminar';
+            $('qr-teachers').hidden = false;
+        }
         renderChapters();
         renderProject();
         renderResources();
