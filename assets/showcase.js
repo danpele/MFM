@@ -51,7 +51,7 @@
           tex: String.raw`$$\mathrm{DSR} = \Phi\!\left(\frac{(\widehat{SR} - SR_0)\sqrt{T-1}}{\sqrt{1 - \hat\gamma_3\widehat{SR} + \frac{\hat\gamma_4 - 1}{4}\widehat{SR}^2}}\right)$$` },
         // ---- volatility and dependence
         { g: 'vol', ch: 'garch', en: 'GJR-GARCH(1,1)', ro: 'GJR-GARCH(1,1)',
-          tex: String.raw`$$\sigma_t^2 = \omega + \big(\alpha + \gamma\,\mathbf 1\{\varepsilon_{t-1}<0\}\big)\varepsilon_{t-1}^2 + \beta\,\sigma_{t-1}^2$$` },
+          tex: String.raw`$$\sigma_t^2 = \omega + \big(\alpha + \gamma\,\mathbf 1\{\varepsilon_{t-1} \lt 0\}\big)\varepsilon_{t-1}^2 + \beta\,\sigma_{t-1}^2$$` },
         { g: 'vol', ch: 'garch', en: 'Volatility forecast and half-life', ro: 'Prognoza volatilității și timpul de înjumătățire',
           tex: String.raw`$$E_t[\sigma^2_{t+h}] = \bar\sigma^2 + (\alpha+\beta)^{h-1}\big(\sigma^2_{t+1} - \bar\sigma^2\big), \quad h_{1/2} = \frac{\ln 0.5}{\ln(\alpha+\beta)}$$` },
         { g: 'vol', ch: 'dependence', en: 'DCC correlations', ro: 'Corelații DCC',
@@ -62,11 +62,11 @@
         { g: 'risk', ch: 'var-es', en: 'VaR and Expected Shortfall', ro: 'VaR și Expected Shortfall',
           tex: String.raw`$$\mathrm{VaR}_\alpha = -q_\alpha(X), \qquad \mathrm{ES}_\alpha = -\frac{1}{\alpha}\int_0^\alpha q_u(X)\,du$$` },
         { g: 'risk', ch: 'var-es', en: 'Generalised Pareto tail', ro: 'Coada Pareto generalizată',
-          tex: String.raw`$$\begin{gathered} P(L > u + y \mid L > u) = \Big(1 + \frac{\xi y}{\beta}\Big)^{-1/\xi} \\ \mathrm{VaR}_\alpha = u + \frac{\beta}{\xi}\Big[\Big(\frac{n\alpha}{N_u}\Big)^{-\xi} - 1\Big] \end{gathered}$$` },
+          tex: String.raw`$$\begin{gathered} P(L  \gt  u + y \mid L  \gt  u) = \Big(1 + \frac{\xi y}{\beta}\Big)^{-1/\xi} \\ \mathrm{VaR}_\alpha = u + \frac{\beta}{\xi}\Big[\Big(\frac{n\alpha}{N_u}\Big)^{-\xi} - 1\Big] \end{gathered}$$` },
         { g: 'risk', ch: 'backtesting', en: 'Kupiec unconditional coverage', ro: 'Acoperirea necondiționată Kupiec',
           tex: String.raw`$$LR_{uc} = -2\ln\frac{(1-\alpha)^{T-x}\alpha^{x}}{(1-\hat\pi)^{T-x}\hat\pi^{x}} \;\xrightarrow{d}\; \chi^2_1, \qquad \hat\pi = \frac{x}{T}$$` },
         { g: 'risk', ch: 'backtesting', en: 'FZ0 joint score for (VaR, ES)', ro: 'Scorul comun FZ0 pentru (VaR, ES)',
-          tex: String.raw`$$S(v,e;y) = -\frac{1}{\alpha e}\,\mathbf 1\{y \le v\}(v - y) + \frac{v}{e} + \ln(-e) - 1, \quad v, e < 0$$` },
+          tex: String.raw`$$S(v,e;y) = -\frac{1}{\alpha e}\,\mathbf 1\{y \le v\}(v - y) + \frac{v}{e} + \ln(-e) - 1, \quad v, e  \lt  0$$` },
         { g: 'risk', ch: 'tsfm', en: 'Diebold–Mariano test', ro: 'Testul Diebold–Mariano',
           tex: String.raw`$$d_t = L(e_{1,t}) - L(e_{2,t}), \qquad DM = \frac{\bar d}{\sqrt{\widehat{\mathrm{LRV}}(d_t)/T}} \;\xrightarrow{d}\; N(0,1)$$` },
         // ---- high frequency and continuous time
@@ -81,7 +81,7 @@
         { g: 'hf', ch: 'continuous-time', en: 'Ornstein–Uhlenbeck (Vasicek)', ro: 'Ornstein–Uhlenbeck (Vasicek)',
           tex: String.raw`$$\begin{gathered} dX_t = \kappa(\theta - X_t)\,dt + \sigma\,dW_t \\ X_{t+\Delta} \mid X_t \sim N\!\Big(\theta + (X_t-\theta)e^{-\kappa\Delta},\; \tfrac{\sigma^2}{2\kappa}\big(1-e^{-2\kappa\Delta}\big)\Big) \end{gathered}$$` },
         { g: 'hf', ch: 'signatures', en: 'Path signature and Chen\'s identity', ro: 'Signatura unei căi și identitatea lui Chen',
-          tex: String.raw`$$S(X)^{i_1\dots i_k}_{s,t} = \int_{s<u_1<\dots<u_k<t} dX^{i_1}_{u_1}\cdots dX^{i_k}_{u_k}, \qquad S(X * Y) = S(X) \otimes S(Y)$$` },
+          tex: String.raw`$$S(X)^{i_1\dots i_k}_{s,t} = \int_{s \lt u_1 \lt \dots \lt u_k \lt t} dX^{i_1}_{u_1}\cdots dX^{i_k}_{u_k}, \qquad S(X * Y) = S(X) \otimes S(Y)$$` },
         { g: 'hf', ch: 'signatures', en: 'Signature-kernel weights', ro: 'Ponderi din nucleul signaturii',
           tex: String.raw`$$w_\tau \propto \exp\!\Big(-\gamma\,\big\|\mathrm{Sig}^N(X_{\tau-l:\tau}) - \mathrm{Sig}^N(X_{t-l:t})\big\|^2\Big)$$` },
         // ---- options
