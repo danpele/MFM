@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch19_seminar'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 19 (project workshop): stylised facts of BET and Bitcoin with robust inference, GARCH-t and GJR-GARCH-t for BET with a delta-method CI for the half-life, rolling VaR 1% backtests for Bitcoin, the calendar-join pitfall for Bitcoin and SPY, and a reference analysis of BET tail risk before and after the 2020 FTSE reclassification.'
+
+Keywords: 'GARCH, GJR-GARCH, half-life, delta method, value-at-risk, backtesting, Bitcoin, calendar alignment, FTSE reclassification, BET'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): BET index (official closing values), Bitcoin, SPY'
+
+Output: 'ch19_sem_btc_var.pdf, ch19_sem_join.pdf, sem19_results.json'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_har'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'HAR-RV model of Corsi in levels and in logs for SPY (daily variance with the overnight return) and Bitcoin: coefficients with Newey-West standard errors, implied lag weights and in-sample fit.'
+
+Keywords: 'HAR-RV, heterogeneous autoregressive model, long memory, Newey-West, realised variance'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_har.pdf'

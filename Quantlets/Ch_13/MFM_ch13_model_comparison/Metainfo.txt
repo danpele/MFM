@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch13_model_comparison'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Comparison of logistic regression, random forest, gradient boosting and a neural network for S&P 500 5-day direction with purged 5-fold CV (accuracy and ROC AUC versus the "always up" benchmark), and autocorrelation of returns versus absolute returns.'
+
+Keywords: 'machine learning, return prediction, gradient boosting, neural network, purged CV, signal-to-noise, S&P 500'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'S&P 500 and VIX daily close (2000-2026)'
+
+Output: 'ch13_model_comparison.pdf, ch13_signal_to_noise.pdf'

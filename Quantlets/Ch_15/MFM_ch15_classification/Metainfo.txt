@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch15_classification'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Accuracy with bootstrap intervals, macro-F1, confusion matrices and McNemar tests of eleven sentiment classifiers on Financial PhraseBank and Twitter Financial News; accuracy by annotator agreement.'
+
+Keywords: 'sentiment classification, accuracy, macro-F1, confusion matrix, McNemar test, FinBERT, LLM'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Financial PhraseBank v1.0 (Malo et al., 2014; CC BY-NC-SA 3.0) and Twitter Financial News Sentiment (MIT licence), both from the Hugging Face Hub; Loughran-McDonald and Harvard IV-4 word lists'
+
+Output: 'ch15_accuracy.pdf, ch15_agreement.pdf, ch15_confusion.pdf'

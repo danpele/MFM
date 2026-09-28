@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch1_volatility_clustering'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Volatility clustering and long memory: ACF of returns, absolute and squared returns for the S&P 500, slow decay of the ACF of absolute returns across markets, 63-day rolling volatility and the Taylor effect.'
+
+Keywords: 'volatility clustering, long memory, autocorrelation, absolute returns, Taylor effect, rolling volatility'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET-TR, Bitcoin, gold; EUR/RON official reference rate'
+
+Output: 'ch1_acf_sp500.pdf, ch1_acf_abs_assets.pdf, ch1_rolling_vol.pdf, ch1_taylor_effect.pdf'

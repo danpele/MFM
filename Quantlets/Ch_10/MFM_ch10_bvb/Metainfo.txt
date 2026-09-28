@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch10_bvb'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Monthly traded value of ten Bucharest Stock Exchange blue chips in USD, 2017-2026, with the Hidroelectrica listing of July 2023.'
+
+Keywords: 'Bucharest Stock Exchange, traded value, liquidity, Banca Transilvania, Hidroelectrica, BET'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'SPY and Bitcoin 5-minute bars (data/market/intraday); daily open, high, low, close and volume for US stocks, Bucharest Stock Exchange stocks and crypto-assets (data/market); CBOE VIX; BET-TR; USD/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch10_bvb_turnover.pdf'

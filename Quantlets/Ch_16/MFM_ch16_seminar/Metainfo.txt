@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch16_seminar'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 16 computations: a three-coin index and its divisor, constituent replacement, swaps and arbitrage in a constant-product pool, impermanent loss and fees, stablecoin and ETF arbitrage bands; block-bootstrap volatility and weekend effect for Bitcoin, Ether and Solana; AR(1) peg dynamics of USD Coin, Tether and Dai; IBIT and ETHA tracking; Strategy and Coinbase betas; hedge and safe-haven tests for Bitcoin before and after the spot ETFs.'
+
+Keywords: 'cryptocurrency index, automated market maker, stablecoin, block bootstrap, spot ETF, hedge, safe haven'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama'
+
+Output: 'ch16_sem_weekend.pdf, ch16_sem_usdc.pdf, ch16_sem_hedge.pdf'

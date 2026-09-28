@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_seminar'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 11 computations: Ito's lemma, quadratic variation, Vasicek and Merton step by step; convergence orders; GBM tests on the S&P 500, BET and Bitcoin; Vasicek on the 3-month Treasury bill rate with the simulated bias of the mean-reversion speed; OU for the VIX; Merton with a parametric-bootstrap LR test; Lee-Mykland jumps in Bitcoin; Heston from the VIX; GBM, Merton and Heston against BET and Bitcoin.'
+
+Keywords: 'Ito's lemma, Vasicek, Merton, Heston, bootstrap, likelihood-ratio test, bias correction, BET, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_sem_kappa_bias.pdf, ch11_sem_lr_boot.pdf, ch11_sem_partC.pdf'

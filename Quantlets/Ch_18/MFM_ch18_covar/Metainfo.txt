@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch18_covar'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'CoVaR and Delta-CoVaR at 1% for eleven US and European banks by quantile regression (system: the other banks of the region), moving-block bootstrap intervals, VaR versus Delta-CoVaR and exposure CoVaR.'
+
+Keywords: 'CoVaR, Delta-CoVaR, quantile regression, exposure CoVaR, systemic risk contribution, bootstrap'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market), January 2010 - September 2026: JPMorgan Chase, Bank of America, Citigroup, Goldman Sachs, Morgan Stanley, Wells Fargo, Deutsche Bank, BNP Paribas, Santander, ING, HSBC, Banca Transilvania, BRD-Groupe Societe Generale; S&P 500, Euro Stoxx 50, BET and VIX indices'
+
+Output: 'ch18_covar_qr.pdf, ch18_dcovar.pdf, ch18_var_vs_dcovar.pdf, ch18_exposure.pdf'

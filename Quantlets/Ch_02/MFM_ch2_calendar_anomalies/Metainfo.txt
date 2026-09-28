@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch2_calendar_anomalies'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Calendar anomalies with Newey-West (HAC) standard errors: day-of-the-week, January and turn-of-the-month effects for the S&P 500, BET, Euro Stoxx 50, WIG20 and BUX.'
+
+Keywords: 'calendar anomalies, weekend effect, January effect, turn of the month, Newey-West, HAC, dummy regression'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, Euro Stoxx 50, Nikkei 225, Hang Seng, BET, WIG20, BUX, PX, BIST 100, Bovespa, IPC, Nifty 50, Shanghai, Bitcoin, Ethereum; EUR/RON official reference rate'
+
+Output: 'ch2_calendar.pdf, ch2_calendar_table.csv'

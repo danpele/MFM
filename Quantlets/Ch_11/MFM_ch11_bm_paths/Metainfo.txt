@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_bm_paths'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Five standard Brownian motion paths with the band +/-1.96 sqrt(t), and self-similarity: the first 1% of a path stretched 100 times in time and 10 times in space.'
+
+Keywords: 'Brownian motion, Wiener process, self-similarity, square-root-of-time, simulation'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_bm_paths.pdf'

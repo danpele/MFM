@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch10_roll'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Roll (1984) model simulated: efficient random-walk price plus bid-ask bounce; negative first-order autocorrelation of trade price changes and the Roll spread estimator.'
+
+Keywords: 'Roll estimator, bid-ask bounce, effective spread, autocorrelation, market microstructure noise'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'SPY and Bitcoin 5-minute bars (data/market/intraday); daily open, high, low, close and volume for US stocks, Bucharest Stock Exchange stocks and crypto-assets (data/market); CBOE VIX; BET-TR; USD/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch10_roll_bounce.pdf'

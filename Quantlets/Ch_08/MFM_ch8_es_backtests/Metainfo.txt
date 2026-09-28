@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_es_backtests'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Expected shortfall backtests of six models in four markets: McNeil-Frey exceedance residuals (bootstrap), Acerbi-Szekely Z1 and Z2 with p-values simulated from each forecast distribution, Du-Escanciano cumulative violation tests; rolling 250-day Z2 for the S&P 500.'
+
+Keywords: 'expected shortfall, backtesting, McNeil-Frey, Acerbi-Szekely, Z2, Du-Escanciano, bootstrap'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
+
+Output: 'ch8_es_pvalues.pdf, ch8_z2_rolling.pdf, ch8_mf_residuals.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch15_dictionaries'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Words that the generic Harvard IV-4 dictionary lists as negative but the finance-specific Loughran-McDonald dictionary does not, ranked by how many Financial PhraseBank sentences contain them, split by the sentiment label of the sentence.'
+
+Keywords: 'textual analysis, sentiment dictionary, Loughran-McDonald, Harvard General Inquirer, misclassification'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Financial PhraseBank v1.0 (Malo et al., 2014; CC BY-NC-SA 3.0) and Twitter Financial News Sentiment (MIT licence), both from the Hugging Face Hub; Loughran-McDonald and Harvard IV-4 word lists'
+
+Output: 'ch15_dict_words.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_cond_evt'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Conditional extreme value theory (McNeil and Frey): AR(1)-GARCH(1,1) filter plus a GPD tail on the standardised residuals; one-day-ahead VaR 1% for the S&P 500, 2018-2026, vs GARCH with Normal shocks and historical simulation.'
+
+Keywords: 'conditional EVT, McNeil-Frey, GARCH, generalized Pareto distribution, value-at-risk, S&P 500'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_cond_evt.pdf'

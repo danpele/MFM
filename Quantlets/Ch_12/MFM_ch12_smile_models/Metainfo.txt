@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch12_smile_models'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'One-month implied volatility smiles from the historical distribution of S&P 500 monthly returns (made risk-neutral), the Merton jump-diffusion model and the Heston stochastic-volatility model.'
+
+Keywords: 'volatility smile, implied volatility, fat tails, Merton jump diffusion, Heston model, skew'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, SPY, Bitcoin, VIX, VIX9D, VIX3M, VVIX; Bitcoin option chain (Deribit, snapshot of 22 September 2026, ch12_deribit_snapshot.csv) and the DVOL index (Deribit)'
+
+Output: 'ch12_smile_models.pdf'

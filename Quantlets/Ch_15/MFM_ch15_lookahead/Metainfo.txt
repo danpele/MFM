@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch15_lookahead'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Does a language model already know what markets did? Qwen2.5 models are asked, without any context, whether the S&P 500 rose or fell in each month since 2000 and whether Apple rose or fell on single days; AUC before and after the release of the weights.'
+
+Keywords: 'look-ahead bias, memorisation, large language model, knowledge cutoff, AUC, backtesting'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'S&P 500 (GSPC.INDX) and Apple (AAPL.US) daily closes (data/market)'
+
+Output: 'ch15_memory_timeline.pdf, ch15_memory_auc.pdf'

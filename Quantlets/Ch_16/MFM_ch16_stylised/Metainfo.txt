@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch16_stylised'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Stylised facts of Bitcoin, Ethereum, Solana and Dogecoin against the S&P 500 and gold, 2018-2026: volatility, skewness, kurtosis, drawdowns, volatility clustering, Hill tail index, VaR 1% and ES 2.5%; rolling one-year volatility and drawdowns.'
+
+Keywords: 'stylised facts, cryptocurrency, volatility, drawdown, heavy tails, Hill estimator, value-at-risk, expected shortfall'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama'
+
+Output: 'ch16_rolling_vol.pdf, ch16_drawdowns.pdf, ch16_stylised_facts.csv'

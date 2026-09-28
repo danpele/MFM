@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch18_frm'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Financial Risk Meter for 13 banks: L1-penalized quantile regression at 5% on 63-day windows, penalty chosen by generalized approximate cross-validation (GACV); GACV curves in a calm and a crisis window, the average penalty over time and the share of active tail links at a fixed penalty.'
+
+Keywords: 'Financial Risk Meter, FRM, lasso quantile regression, GACV, tail network, systemic risk'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market), January 2010 - September 2026: JPMorgan Chase, Bank of America, Citigroup, Goldman Sachs, Morgan Stanley, Wells Fargo, Deutsche Bank, BNP Paribas, Santander, ING, HSBC, Banca Transilvania, BRD-Groupe Societe Generale; S&P 500, Euro Stoxx 50, BET and VIX indices'
+
+Output: 'ch18_frm_gacv.pdf, ch18_frm_rolling.pdf'

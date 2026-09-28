@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch10_impact'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Relation between relative volume and absolute returns of SPY 5-minute bars on log-log axes, compared with the square-root law of price impact.'
+
+Keywords: 'square-root law, price impact, metaorders, trading volume, high-frequency data, SPY'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'SPY and Bitcoin 5-minute bars (data/market/intraday); daily open, high, low, close and volume for US stocks, Bucharest Stock Exchange stocks and crypto-assets (data/market); CBOE VIX; BET-TR; USD/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch10_sqrt_law.pdf'

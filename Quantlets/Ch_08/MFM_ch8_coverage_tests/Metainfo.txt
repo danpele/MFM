@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_coverage_tests'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Kupiec, Christoffersen conditional coverage and Christoffersen-Pelletier Weibull duration tests for six VaR models in four markets; breach timeline and duration survival functions for the S&P 500.'
+
+Keywords: 'Christoffersen test, independence, conditional coverage, duration test, Weibull, breach clustering'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
+
+Output: 'ch8_var_pvalues.pdf, ch8_breach_timeline.pdf, ch8_durations.pdf'

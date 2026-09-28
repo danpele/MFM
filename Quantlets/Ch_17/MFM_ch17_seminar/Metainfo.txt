@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch17_seminar'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 17 computations: present value and rational bubbles, the Blanchard-Watson bubble, the right-tailed ADF step by step, PSY windows, Markov-switching filter steps, LPPLS diagnostics; GSADF on the Shiller price-dividend ratio with three minimum windows, SADF vs GSADF, Bitcoin with Monte Carlo vs wild bootstrap critical values, BET and BET-FI, LPPLS critical-time dispersion, the Nasdaq 100 confidence indicator, Markov-switching for the S&P 500 and Bitcoin, and the AI-bubble question for NVIDIA and the Nasdaq 100.'
+
+Keywords: 'bubbles, GSADF, wild bootstrap, LPPLS, Markov switching, BET, BET-FI, Bitcoin, NVIDIA, Cisco, AI bubble'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Nasdaq 100, S&P 500, BET, BET-FI, Bitcoin, Ethereum, Dogecoin, NVIDIA, Cisco, Tesla, GameStop, Strategy; S&P Composite monthly since 1871 (Robert J. Shiller); 49 US industry portfolios (Kenneth French Data Library)'
+
+Output: 'ch17_sem_btc_wild.pdf, ch17_sem_bvb.pdf, ch17_sem_tc_windows.pdf, ch17_sem_ci_ndx.pdf, ch17_sem_ms_sp.pdf, ch17_sem_ms_btc3.pdf, ch17_sem_ai.pdf, ch17_lppls_ci_ndx.csv'

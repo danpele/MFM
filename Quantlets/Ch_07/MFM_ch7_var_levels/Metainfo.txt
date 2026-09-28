@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_var_levels'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'VaR and Expected Shortfall of S&P 500 daily losses for tail probabilities from 5% down to 0.1%: historical simulation, Normal distribution, Student-t, Cornish-Fisher expansion and generalised Pareto tail.'
+
+Keywords: 'value-at-risk, expected shortfall, Cornish-Fisher, Student-t, generalized Pareto distribution, tail probability'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_var_levels.pdf'

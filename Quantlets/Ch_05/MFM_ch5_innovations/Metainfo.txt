@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch5_innovations'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Innovations and diagnostics: density and QQ plot of GARCH standardised residuals against the Normal and Student-t, Ljung-Box, LM and Engle-Ng sign-bias tests for five models and six series, and the autocorrelation of squared returns before and after GJR-GARCH-t.'
+
+Keywords: 'standardised residuals, QQ plot, Student-t, skewed-t, Ljung-Box, ARCH-LM, sign bias test, diagnostics'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
+
+Output: 'ch5_innovations.pdf, ch5_diag_acf.pdf, ch5_diagnostics.csv'

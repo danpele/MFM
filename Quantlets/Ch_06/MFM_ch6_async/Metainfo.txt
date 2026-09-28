@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_async'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Asynchronous trading: daily, 2-day and weekly correlations of SPY, Euro Stoxx 50 and BET on common trading days, with Fisher intervals and lead-lag correlations.'
+
+Keywords: 'asynchronous trading, non-synchronous prices, time zones, weekly returns, lead-lag correlation'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_async.pdf, ch6_async_table.csv'

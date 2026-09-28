@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_false_discoveries'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Simulation of 300 useless factors: the number of false discoveries at |t| > 1.96 and the distribution of the largest |t|, with the Bonferroni threshold and the t = 3 hurdle.'
+
+Keywords: 'multiple testing, factor zoo, false discoveries, Bonferroni, data mining, simulation'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Simulated data'
+
+Output: 'ch3_false_discoveries.pdf'

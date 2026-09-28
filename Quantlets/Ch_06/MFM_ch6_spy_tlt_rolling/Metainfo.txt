@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_spy_tlt_rolling'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: '252-day rolling correlation of daily SPY and TLT returns (2002-2026) with Fisher confidence intervals and stress windows: the stock-bond correlation changed sign in 2022.'
+
+Keywords: 'rolling correlation, Fisher transformation, stock-bond correlation, regime change'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_spy_tlt_rolling.pdf'

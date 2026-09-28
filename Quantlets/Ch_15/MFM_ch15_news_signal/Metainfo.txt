@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch15_news_signal'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'From headline sentiment to a trading signal: same-day versus next-day regressions with standard errors clustered by day, an event study around news days, and a daily long-short strategy with and without transaction costs, for Loughran-McDonald, FinBERT and Qwen2.5-7B scores.'
+
+Keywords: 'news sentiment, event study, clustered standard errors, trading strategy, transaction costs'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'FNSPID financial news headlines (Dong, Fan & Peng, 2024; CC BY-NC 4.0) for 17 US stocks; daily adjusted closes of the same stocks and SPY (data/market)'
+
+Output: 'ch15_contemp_next.pdf, ch15_event_study.pdf, ch15_strategy.pdf, ch15_subperiods.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_ou_paths'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Ornstein-Uhlenbeck paths with the same shocks and mean-reversion speeds 0.2, 1 and 5 per year (exact simulation); half-lives and stationary standard deviations.'
+
+Keywords: 'Ornstein-Uhlenbeck, mean reversion, half-life, exact simulation, AR(1)'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_ou_paths.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch13_ffd'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Fractional differentiation with a fixed-width window (FFD) of the S&P 500 log price: weights w_k for several orders d, ADF statistic and correlation with the original series as a function of d, and the minimum d* that makes the series stationary while preserving memory.'
+
+Keywords: 'fractional differentiation, FFD, stationarity, memory, ADF test, S&P 500, Lopez de Prado'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'S&P 500 daily close (2000-2026)'
+
+Output: 'ch13_ffd_weights.pdf, ch13_ffd_adf.pdf, ch13_ffd_series.pdf'

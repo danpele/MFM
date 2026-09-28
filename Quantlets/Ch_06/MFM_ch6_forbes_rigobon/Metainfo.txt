@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_forbes_rigobon'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Forbes-Rigobon (2002) test for the 2008 crisis: correlations of 2-day returns of the Euro Stoxx 50 and BET with the S&P 500 in the calm year and in the crisis, raw and adjusted for the rise in S&P 500 variance, with one-sided Fisher z tests.'
+
+Keywords: 'contagion, interdependence, Forbes-Rigobon, heteroskedasticity bias, crisis correlation, 2008'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_forbes_rigobon.pdf, ch6_forbes_rigobon_2008.csv'

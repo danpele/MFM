@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch14_vanishing_gradient'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Gradient of the last hidden state with respect to past inputs, by automatic differentiation, for a simple tanh RNN and for LSTMs with forget-gate bias 0 and 3 (16 hidden units, 50 random initialisations).'
+
+Keywords: 'recurrent neural network, LSTM, vanishing gradient, backpropagation through time, forget gate'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Simulated inputs'
+
+Output: 'ch14_vanishing_gradient.pdf'

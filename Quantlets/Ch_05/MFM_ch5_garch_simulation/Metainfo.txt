@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch5_garch_simulation'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Why GARCH produces volatility clustering: a simulated GARCH(1,1) path next to i.i.d. Normal returns with the same unconditional variance, and the kurtosis and autocorrelation of squared returns on a long simulated path.'
+
+Keywords: 'GARCH(1,1), simulation, volatility clustering, kurtosis, heavy tails'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
+
+Output: 'ch5_simulation.pdf'

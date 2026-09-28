@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_quadratic_variation'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Quadratic and total variation of a Brownian path on finer grids, and the realised quadratic variation (cumulative squared daily log returns) of the S&P 500, 1990-2026, against the straight line of geometric Brownian motion.'
+
+Keywords: 'quadratic variation, total variation, Brownian motion, realised variance, S&P 500, stochastic volatility'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_quadratic_variation.pdf'

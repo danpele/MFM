@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_oos_backtest'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Out-of-sample backtest of eight portfolio rules (1/N, MV, long-only MV, GMV, long-only GMV, Ledoit-Wolf GMV, ERC, HRP) on three universes, 60-month rolling window, monthly rebalancing: cumulative returns, Sharpe ratios, turnover and the rolling weights of MV and Ledoit-Wolf GMV.'
+
+Keywords: 'out-of-sample, backtest, rolling window, 1/N, Markowitz, risk parity, HRP, turnover'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): sector and multi-asset ETFs; risk-free rate from the Kenneth French Data Library'
+
+Output: 'ch4_oos_cum.pdf, ch4_oos_sharpe.pdf, ch4_rolling_weights.pdf'

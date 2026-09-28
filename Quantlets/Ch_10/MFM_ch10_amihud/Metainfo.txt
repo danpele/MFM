@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch10_amihud'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Amihud (2002) illiquidity ratio for 25 assets (US stocks, Bucharest Stock Exchange stocks, crypto-assets), September 2024 - September 2026, and monthly group medians 2017-2026; BVB values converted to USD at the BNR reference rate.'
+
+Keywords: 'Amihud illiquidity, price impact, traded value, liquidity, Bucharest Stock Exchange, cryptocurrency'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'SPY and Bitcoin 5-minute bars (data/market/intraday); daily open, high, low, close and volume for US stocks, Bucharest Stock Exchange stocks and crypto-assets (data/market); CBOE VIX; BET-TR; USD/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch10_amihud.pdf, ch10_amihud_time.pdf'

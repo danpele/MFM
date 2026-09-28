@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch10_information'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Glosten-Milgrom (1985) spread as a function of the share of informed traders and a simulated learning path of quotes; Kyle (1985) price impact lambda and insider profit.'
+
+Keywords: 'Glosten-Milgrom, Kyle lambda, adverse selection, informed trading, price discovery, market depth'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'SPY and Bitcoin 5-minute bars (data/market/intraday); daily open, high, low, close and volume for US stocks, Bucharest Stock Exchange stocks and crypto-assets (data/market); CBOE VIX; BET-TR; USD/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch10_glosten_milgrom.pdf, ch10_kyle.pdf'

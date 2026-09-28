@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_jumps'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Jumps detected by the Lee-Mykland test (1% level, window K = 16) in S&P 500 and Bitcoin daily log returns.'
+
+Keywords: 'jump test, Lee-Mykland, bipower variation, jumps, S&P 500, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_jumps.pdf'

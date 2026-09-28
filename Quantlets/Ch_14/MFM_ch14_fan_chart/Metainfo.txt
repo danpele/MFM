@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch14_fan_chart'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Zero-shot 22-day forecast of SPY realised volatility with Chronos-2 on log realised variance (512-day context): median and 5%-95% and 25%-75% bands.'
+
+Keywords: 'Chronos-2, zero-shot forecasting, quantile forecast, fan chart, realised volatility'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'SPY 5-minute bars (data/market/intraday/SPY.US_5m.csv) and SPY daily adjusted closes (data/market)'
+
+Output: 'ch14_fan_chart.pdf'

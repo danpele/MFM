@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_factor_tstats'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Newey-West t-statistics of the mean factor returns before and after 2000: the decay of momentum and value premia and the persistence of profitability.'
+
+Keywords: 'factor premia, t-statistic, Newey-West, momentum, value, post-publication decay'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Fama-French five factors and momentum, Kenneth French Data Library'
+
+Output: 'ch3_factor_tstats.pdf'

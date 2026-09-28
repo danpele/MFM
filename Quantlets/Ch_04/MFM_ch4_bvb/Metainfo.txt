@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_bvb'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Optimised portfolios of eight Bucharest Stock Exchange blue chips in RON (36-month window, monthly rebalancing, 2017-2026) versus the BET-TR and BET indices, with Sharpe ratio tests.'
+
+Keywords: 'Bucharest Stock Exchange, BET, BET-TR, risk parity, HRP, Ledoit-Wolf, portfolio optimisation, Romania'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): BVB blue chips, BET-TR and BET'
+
+Output: 'ch4_bvb.pdf'

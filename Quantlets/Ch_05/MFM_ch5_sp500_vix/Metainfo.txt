@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch5_sp500_vix'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'S&P 500 conditional volatility from GARCH(1,1)-t compared with the VIX (2000-2026), and a zoom on the COVID-19 crash of 2020 with GARCH-t, GJR-GARCH-t and the VIX.'
+
+Keywords: 'conditional volatility, VIX, implied volatility, variance risk premium, COVID-19, GJR-GARCH'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
+
+Output: 'ch5_sp500_vol.pdf, ch5_covid.pdf'

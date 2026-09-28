@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_dcc_btc_spy'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'DCC(1,1) conditional correlation of Bitcoin and SPY on common trading days (2014-2026) versus the 252-day rolling correlation: from about zero before 2020 to clearly positive afterwards.'
+
+Keywords: 'Bitcoin, cryptocurrency, DCC, equity correlation, diversification, digital assets'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_dcc_btc_spy.pdf'

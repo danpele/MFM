@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch1_summary_statistics'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Descriptive statistics and tests for daily log returns of five markets: mean, volatility, skewness, excess kurtosis, Jarque-Bera, Ljung-Box Q(10) on returns and squared returns, and ARCH-LM.'
+
+Keywords: 'descriptive statistics, skewness, kurtosis, Jarque-Bera, Ljung-Box, ARCH-LM, stylised facts'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET-TR, Bitcoin, gold; EUR/RON official reference rate'
+
+Output: 'ch1_summary_statistics.csv'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch17_nasdaq'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Nasdaq 100, monthly 1990-2026: GSADF date-stamping vs the recursive ADF of Phillips, Wu and Yu (2011), with real-time signal dates, peaks and subsequent drawdowns.'
+
+Keywords: 'Nasdaq 100, dot-com bubble, GSADF, SADF, date-stamping, real-time monitoring, AI'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Nasdaq 100, S&P 500, BET, BET-FI, Bitcoin, Ethereum, Dogecoin, NVIDIA, Cisco, Tesla, GameStop, Strategy; S&P Composite monthly since 1871 (Robert J. Shiller); 49 US industry portfolios (Kenneth French Data Library)'
+
+Output: 'ch17_ndx.pdf'

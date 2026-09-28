@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch15_llm_zero_shot'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Zero-shot sentiment classification with Qwen2.5-Instruct models from 0.5 to 14 billion parameters: macro-F1 against model size (FinBERT as reference) and sensitivity to the wording of the prompt.'
+
+Keywords: 'large language model, zero-shot, prompt sensitivity, model size, Qwen2.5, FinBERT'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Financial PhraseBank v1.0 (Malo et al., 2014; CC BY-NC-SA 3.0) and Twitter Financial News Sentiment (MIT licence), both from the Hugging Face Hub; Loughran-McDonald and Harvard IV-4 word lists'
+
+Output: 'ch15_llm_size.pdf, ch15_prompts.pdf'

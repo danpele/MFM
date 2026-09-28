@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_conformal'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Split conformal and adaptive conformal (ACI) VaR with volatility-scaled scores: the S&P 500 through COVID-19 and breach rates in calm and high-volatility periods for four markets, versus GARCH-t.'
+
+Keywords: 'conformal prediction, adaptive conformal inference, exchangeability, value at risk, coverage'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
+
+Output: 'ch8_conformal_path.pdf, ch8_conformal_regimes.pdf'

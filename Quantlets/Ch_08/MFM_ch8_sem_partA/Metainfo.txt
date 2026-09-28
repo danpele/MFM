@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_sem_partA'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 8, Part A: Kupiec and Christoffersen tests step by step, traffic-light zones from the Binomial distribution, FZ0 losses of three forecasts, Acerbi-Szekely Z1 and Z2, and a conformal quantile with one adaptive conformal step.'
+
+Keywords: 'Kupiec, Christoffersen, traffic light, FZ0, Acerbi-Szekely, conformal prediction, exercises'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
+
+Output: 'printed tables'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch15_sem_partA'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 15, Part A: dictionary tone of two PhraseBank sentences, classification metrics from confusion matrices, LLM label probabilities and temperature, the majority-class benchmark.'
+
+Keywords: 'sentiment dictionary, confusion matrix, precision, recall, F1, softmax, temperature, exercises'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Financial PhraseBank v1.0 (Malo et al., 2014; CC BY-NC-SA 3.0) and Twitter Financial News Sentiment (MIT licence), both from the Hugging Face Hub; Loughran-McDonald and Harvard IV-4 word lists'
+
+Output: 'printed tables'

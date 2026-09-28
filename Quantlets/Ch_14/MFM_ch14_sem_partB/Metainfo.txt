@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch14_sem_partB'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 14, B1-B7: out-of-sample R-squared of return forecasts with block-bootstrap intervals and Diebold-Mariano tests; QLIKE, Diebold-Mariano and model confidence sets for SPY realised variance; median versus mean forecasts and context length; VaR 1% and ES 2.5% backtests; VaR 10% of the foundation models; LSTM seed-to-seed variation.'
+
+Keywords: 'out-of-sample R-squared, QLIKE, model confidence set, VaR backtest, FZ0, LSTM seeds, exercises'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), Bitcoin (BTC-USD.CC), BET; SPY 5-minute bars (data/market/intraday/SPY.US_5m.csv) and SPY daily adjusted closes (data/market)'
+
+Output: 'printed tables'

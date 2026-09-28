@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_overnight'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'SPY daily variance by year split into intraday realised variance (09:30-16:00) and the squared overnight return from the close to the next open.'
+
+Keywords: 'overnight returns, realised variance, SPY, trading hours, variance decomposition'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_overnight.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_var_forecasts'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'S&P 500, 2007-2026: VaR 1% of historical simulation and GARCH-t with breaches; the COVID-19 crash (February-June 2020) for six models; breach rates of the six models in four markets.'
+
+Keywords: 'value at risk, historical simulation, GARCH-t, filtered historical simulation, breach rate, COVID-19'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
+
+Output: 'ch8_sp500_var.pdf, ch8_covid_zoom.pdf, ch8_breach_rates.pdf'

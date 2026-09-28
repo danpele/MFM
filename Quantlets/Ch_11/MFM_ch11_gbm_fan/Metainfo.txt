@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_gbm_fan'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Ten years of simulated S&P 500 paths under geometric Brownian motion fitted to 1990-2026: mean, median and 5%-95% band.'
+
+Keywords: 'geometric Brownian motion, simulation, fan chart, S&P 500, mean vs median'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_gbm_fan.pdf'

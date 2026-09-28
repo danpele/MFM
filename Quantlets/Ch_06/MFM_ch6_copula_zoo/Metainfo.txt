@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_copula_zoo'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Gaussian, Student t, Clayton, Gumbel and Frank copulas with the same Kendall tau of 0.5, simulated and shown on Normal-score margins, with their tail-dependence coefficients.'
+
+Keywords: 'copula, Sklar theorem, Gaussian copula, t copula, Clayton, Gumbel, Frank, Kendall tau, tail dependence'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_copula_zoo.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_costs'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Transaction costs: net Sharpe ratios of the eight portfolio rules on 16 ETFs for costs of 0 to 100 basis points per unit of turnover, and the mean monthly turnover.'
+
+Keywords: 'transaction costs, turnover, net Sharpe ratio, portfolio rebalancing, backtest'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): sector and multi-asset ETFs; risk-free rate from the Kenneth French Data Library'
+
+Output: 'ch4_costs.pdf'

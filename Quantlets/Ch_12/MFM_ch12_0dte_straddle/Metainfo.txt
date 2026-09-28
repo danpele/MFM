@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch12_0dte_straddle'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Stylised same-day straddle on SPY, 2011-2026: sell an ATM straddle at the open priced with the previous VIX9D scaled to the trading session, settle at the close.'
+
+Keywords: '0DTE options, straddle, SPY, VIX9D, variance risk premium, tail risk'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, SPY, Bitcoin, VIX, VIX9D, VIX3M, VVIX; Bitcoin option chain (Deribit, snapshot of 22 September 2026, ch12_deribit_snapshot.csv) and the DVOL index (Deribit)'
+
+Output: 'ch12_0dte_straddle.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch0_cross_asset'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Growth of 1 USD invested in January 2015, all in USD: S&P 500 with dividends reinvested (SPY), Euro Stoxx 50 and Nikkei 225 price indices converted to USD with FRED exchange rates, gold, long US Treasuries (TLT, total return) and Bitcoin; the risk-return scatter (CAGR versus annualised volatility) for these assets plus Ethereum, EUR/USD and EUR/RON, 2015-2026; and the dividend gap between the S&P 500 total-return and price series.'
+
+Keywords: 'asset classes, CAGR, volatility, risk-return, equities, gold, Treasuries, Bitcoin, Ethereum, FX'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market in the MFM repository); FRED EUR/USD and USD/JPY exchange rates and BNR official EUR/RON reference rate'
+
+Output: 'ch0_cross_asset_growth.pdf, ch0_risk_return.pdf'

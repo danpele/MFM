@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_seminar'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 7 computations: Normal and Student-t VaR/ES step by step, discrete losses and the failure of subadditivity, component VaR, Cornish-Fisher, historical VaR/ES on BET with bootstrap intervals, GPD fit and EVT-VaR on BET, filtered vs historical simulation on Bitcoin, Cornish-Fisher vs empirical quantiles, Euler contributions for a four-asset portfolio, i.i.d. and block bootstrap intervals for ES, and the ES 2.5% capital of a BVB blue-chip portfolio versus an S&P 500 portfolio.'
+
+Keywords: 'value-at-risk, expected shortfall, bootstrap, block bootstrap, generalized Pareto distribution, filtered historical simulation, Euler allocation, FRTB, BET, Bucharest Stock Exchange, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_sem_bet_hs.pdf, ch7_sem_bet_gpd.pdf, ch7_sem_btc_fhs.pdf, ch7_sem_capital.pdf, ch7_var_es_table.csv, ch7_rolling_btc.csv'

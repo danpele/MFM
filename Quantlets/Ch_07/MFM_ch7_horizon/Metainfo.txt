@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_horizon'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Square-root-of-time rule: empirical h-day VaR 1% relative to sqrt(h) times the one-day VaR for five markets, and a 10-day filtered Monte Carlo loss distribution for the S&P 500 (200,000 paths).'
+
+Keywords: 'square-root-of-time rule, horizon scaling, Monte Carlo, filtered historical simulation, GARCH, autocorrelation'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_horizon.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_pca'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Principal component analysis of eleven US sector ETFs (daily log returns, 2018-2026): scree plot, loadings of the first three components and the correlation of PC1 with SPY.'
+
+Keywords: 'PCA, principal components, latent factors, eigenvalues, sector ETFs, market factor'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): 11 sector ETFs and SPY'
+
+Output: 'ch3_pca.pdf'

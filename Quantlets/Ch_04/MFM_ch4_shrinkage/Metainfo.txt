@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_shrinkage'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Ledoit-Wolf shrinkage of the covariance matrix towards the constant-correlation target: eigenvalues of the sample and shrunk matrices and the rolling 60-month shrinkage intensity for nine sector ETFs.'
+
+Keywords: 'Ledoit-Wolf, covariance shrinkage, constant correlation, eigenvalues, condition number'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): nine sector ETFs; risk-free rate from the Kenneth French Data Library'
+
+Output: 'ch4_shrinkage.pdf'

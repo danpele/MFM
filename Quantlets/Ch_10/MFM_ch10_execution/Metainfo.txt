@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch10_execution'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Almgren-Chriss (2001) optimal execution: trading trajectories for several risk aversions and the efficient frontier of expected cost versus risk.'
+
+Keywords: 'optimal execution, Almgren-Chriss, market impact, implementation shortfall, TWAP, risk aversion'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'SPY and Bitcoin 5-minute bars (data/market/intraday); daily open, high, low, close and volume for US stocks, Bucharest Stock Exchange stocks and crypto-assets (data/market); CBOE VIX; BET-TR; USD/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch10_almgren_chriss.pdf'

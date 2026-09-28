@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch12_seminar'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 12 computations: put-call parity arbitrage, binomial trees, Black-Scholes and the Greeks, delta-gamma hedging, implied volatility by Newton, variance from an option strip, hedging error with bootstrap intervals, SVI fit of a Bitcoin smile, variance risk premium of the S&P 500 and Bitcoin with Newey-West errors, Mincer-Zarnowitz regression and a synthetic variance swap strategy.'
+
+Keywords: 'options, put-call parity, binomial tree, Black-Scholes, Greeks, implied volatility, SVI, VIX, variance risk premium, variance swap, bootstrap, Newey-West, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, SPY, Bitcoin, VIX, VIX9D, VIX3M, VVIX; Bitcoin option chain (Deribit, snapshot of 22 September 2026, ch12_deribit_snapshot.csv) and the DVOL index (Deribit)'
+
+Output: 'ch12_sem_hedge.pdf, ch12_sem_svi.pdf, ch12_sem_vrp_signal.pdf'

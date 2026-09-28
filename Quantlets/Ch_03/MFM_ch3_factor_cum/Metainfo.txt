@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_factor_cum'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Cumulative growth of the long-short factors Mkt-RF, SMB, HML, RMW, CMA and momentum, July 1963 - 2026.'
+
+Keywords: 'Fama-French factors, momentum, SMB, HML, RMW, CMA, factor returns'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Fama-French five factors and momentum, Kenneth French Data Library'
+
+Output: 'ch3_factor_cum.pdf'

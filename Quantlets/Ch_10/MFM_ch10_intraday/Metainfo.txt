@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch10_intraday'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Intraday patterns: U-shape of volume and volatility of SPY 5-minute bars, the hour-of-day and weekend pattern of Bitcoin, and SPY intraday illiquidity against the VIX.'
+
+Keywords: 'intraday seasonality, U-shape, trading volume, Bitcoin, weekend effect, VIX, illiquidity'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'SPY and Bitcoin 5-minute bars (data/market/intraday); daily open, high, low, close and volume for US stocks, Bucharest Stock Exchange stocks and crypto-assets (data/market); CBOE VIX; BET-TR; USD/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch10_spy_intraday.pdf, ch10_btc_hours.pdf, ch10_spy_illiq_vix.pdf'

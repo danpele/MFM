@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_gpd_tail'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Tails of S&P 500 and Bitcoin daily losses (largest 5%) on a log-log scale: empirical, generalised Pareto, Normal and Student-t fits.'
+
+Keywords: 'generalized Pareto distribution, peaks over threshold, tail index, extreme value theory, Pickands-Balkema-de Haan'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_gpd_tail.pdf'

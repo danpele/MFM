@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_sem_conformal'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 8, B7-B8: split conformal VaR on the S&P 500 versus exchangeable simulated data; split, ACI and GARCH-t VaR 5% on the BET and Bitcoin in calm and high-volatility periods.'
+
+Keywords: 'conformal prediction, ACI, exchangeability, coverage, BET, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
+
+Output: 'ch8_sem_conformal.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_bvb_betas'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'CAPM betas of eleven Bucharest Stock Exchange blue chips against the BET index (daily log returns, 2015-2026 or since listing), with Newey-West confidence intervals and Vasicek-adjusted betas; days with unadjusted capital events are removed.'
+
+Keywords: 'CAPM, beta, Bucharest Stock Exchange, BET, Newey-West, Vasicek, Romania'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): BVB blue chips and the BET index'
+
+Output: 'ch3_bvb_betas.pdf'

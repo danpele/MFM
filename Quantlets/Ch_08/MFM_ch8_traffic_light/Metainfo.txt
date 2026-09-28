@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_traffic_light'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Basel traffic light: exceptions of VaR 1% in rolling 250-day windows for four models on the S&P 500, with the green, yellow and red zones.'
+
+Keywords: 'Basel traffic light, backtesting, exceptions, capital multiplier, FRTB, S&P 500'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
+
+Output: 'ch8_traffic_light.pdf'

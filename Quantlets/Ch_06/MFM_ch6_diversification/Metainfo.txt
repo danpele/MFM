@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_diversification'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Volatility of a 60/40 SPY-TLT portfolio as a function of the stock-bond correlation, with the correlations measured in 2002-2021 and 2022-2026.'
+
+Keywords: 'diversification, portfolio variance, correlation, stock-bond correlation, SPY, TLT'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_diversification.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch18_mes_srisk'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Marginal Expected Shortfall (MES 5%) of 13 banks against their market index with moving-block bootstrap intervals, long-run MES and the break-even leverage above which SRISK is positive.'
+
+Keywords: 'marginal expected shortfall, MES, LRMES, SRISK, capital shortfall, leverage, block bootstrap'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market), January 2010 - September 2026: JPMorgan Chase, Bank of America, Citigroup, Goldman Sachs, Morgan Stanley, Wells Fargo, Deutsche Bank, BNP Paribas, Santander, ING, HSBC, Banca Transilvania, BRD-Groupe Societe Generale; S&P 500, Euro Stoxx 50, BET and VIX indices'
+
+Output: 'ch18_mes.pdf, ch18_srisk.pdf'

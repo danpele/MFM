@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_mean_excess'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Mean excess plot of S&P 500 daily losses with the line implied by a generalised Pareto fit to the largest 5% of losses.'
+
+Keywords: 'mean excess function, peaks over threshold, generalized Pareto distribution, threshold choice, extreme value theory'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_mean_excess.pdf'

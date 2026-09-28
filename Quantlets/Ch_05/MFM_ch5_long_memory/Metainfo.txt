@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch5_long_memory'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Limits of GARCH: GARCH-in-mean for the S&P 500, and the autocorrelation of absolute returns in the data versus long paths simulated from fitted GARCH(1,1)-t and FIGARCH(1,d,1)-t models.'
+
+Keywords: 'GARCH-in-mean, risk premium, long memory, FIGARCH, autocorrelation of absolute returns'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
+
+Output: 'ch5_long_memory.pdf'

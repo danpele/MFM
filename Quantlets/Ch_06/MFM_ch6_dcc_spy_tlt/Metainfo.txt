@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_dcc_spy_tlt'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Two-step DCC(1,1) (Engle, 2002) for SPY and TLT: univariate GARCH(1,1), maximum likelihood for (a, b) with correlation targeting, standard errors, likelihood ratio against constant correlation and the conditional correlation path 2002-2026.'
+
+Keywords: 'DCC, dynamic conditional correlation, multivariate GARCH, CCC, two-step estimation, likelihood ratio'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_dcc_spy_tlt.pdf'

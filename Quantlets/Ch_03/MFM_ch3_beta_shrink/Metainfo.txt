@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_beta_shrink'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Regression of betas towards one: sector betas 1999-2012 versus 2013-2026, the Blume adjustment and the Vasicek Bayesian shrinkage, with forecast errors (RMSE).'
+
+Keywords: 'beta shrinkage, Blume adjustment, Vasicek, Bayesian beta, regression to the mean, sector ETFs'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): sector ETFs and SPY; risk-free rate from the Kenneth French Data Library'
+
+Output: 'ch3_beta_shrink.pdf'

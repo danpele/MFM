@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch13_backtest_overfitting'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Backtest overfitting: expected maximum Sharpe ratio of zero-skill strategies (False Strategy Theorem) versus Monte Carlo, in-sample versus out-of-sample Sharpe of a BTC moving-average grid search, and the Deflated Sharpe Ratio as a function of the number of trials.'
+
+Keywords: 'backtest overfitting, multiple testing, False Strategy Theorem, Deflated Sharpe Ratio, Probabilistic Sharpe Ratio, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Bitcoin daily close (2014-2026); Monte Carlo'
+
+Output: 'ch13_expected_max_sharpe.pdf, ch13_is_vs_oos.pdf, ch13_deflated_sharpe.pdf'

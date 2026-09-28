@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_copula_banks'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Copulas for JPMorgan Chase and Bank of America (daily, 2010-2026): GARCH filtering, pseudo-observations, canonical maximum likelihood for five families, AIC, Rosenblatt Cramer-von Mises goodness-of-fit tests with parametric bootstrap and empirical tail dependence against the fitted t copula.'
+
+Keywords: 'copula estimation, pseudo-observations, canonical maximum likelihood, goodness of fit, Rosenblatt transform, parametric bootstrap, tail dependence, banks'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_pseudo_obs.pdf, ch6_copula_fit.pdf, ch6_tail_dep.pdf, ch6_copula_jpm_bac.csv'

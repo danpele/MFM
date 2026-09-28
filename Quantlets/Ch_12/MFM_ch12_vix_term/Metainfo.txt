@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch12_vix_term'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'VIX term structure 2011-2026: VIX9D, VIX and VIX3M; contango, backwardation and the S&P 500 return and realised volatility over the following 21 days.'
+
+Keywords: 'VIX term structure, VIX9D, VIX3M, contango, backwardation, volatility'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, SPY, Bitcoin, VIX, VIX9D, VIX3M, VVIX; Bitcoin option chain (Deribit, snapshot of 22 September 2026, ch12_deribit_snapshot.csv) and the DVOL index (Deribit)'
+
+Output: 'ch12_vix_term.pdf'

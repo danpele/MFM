@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_jumps'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Bipower variation and the ratio jump test of Huang and Tauchen at the 0.1% level: days with significant jumps for SPY and Bitcoin, share of jump days and jump share of total variation.'
+
+Keywords: 'jumps, bipower variation, tripower quarticity, jump test, SPY, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_jumps.pdf'

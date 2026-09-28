@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_sml'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Security market line on the 25 size x book-to-market portfolios (1963-2026): CAPM betas versus average excess returns, CAPM alphas and the Gibbons-Ross-Shanken test.'
+
+Keywords: 'CAPM, security market line, beta, Jensen alpha, GRS test, size, book-to-market, Fama-French portfolios'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: '25 size x book-to-market portfolios and factors, Kenneth French Data Library'
+
+Output: 'ch3_sml.pdf'

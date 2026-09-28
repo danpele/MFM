@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch18_bank_indices'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Equal-weighted, daily rebalanced portfolios of US, European and Romanian banks, 2010-2026, with the largest peak-to-trough falls and annualised volatilities.'
+
+Keywords: 'banking system, bank stocks, drawdown, volatility, systemic risk, Bucharest Stock Exchange'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market), January 2010 - September 2026: JPMorgan Chase, Bank of America, Citigroup, Goldman Sachs, Morgan Stanley, Wells Fargo, Deutsche Bank, BNP Paribas, Santander, ING, HSBC, Banca Transilvania, BRD-Groupe Societe Generale; S&P 500, Euro Stoxx 50, BET and VIX indices'
+
+Output: 'ch18_bank_indices.pdf'

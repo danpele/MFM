@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch14_realised_vol'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'One-day-ahead forecasts of SPY realised variance (October 2022 - September 2026): QLIKE losses, Diebold-Mariano tests against log-HAR, model confidence set, the window after 3 November 2025 and the effect of the Chronos-2 context length.'
+
+Keywords: 'realised variance, HAR, QLIKE, Chronos-2, TimesFM, model confidence set, context length'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'SPY 5-minute bars (data/market/intraday/SPY.US_5m.csv) and SPY daily adjusted closes (data/market)'
+
+Output: 'ch14_rv_forecasts.pdf, ch14_qlike.pdf, ch14_context_length.pdf'

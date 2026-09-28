@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_gbm_vs_data'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Testing geometric Brownian motion on S&P 500 daily log returns: QQ plot against the Normal distribution and ACF of absolute returns against 200 GBM samples.'
+
+Keywords: 'geometric Brownian motion, stylised facts, heavy tails, volatility clustering, QQ plot, ACF'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_gbm_vs_data.pdf'

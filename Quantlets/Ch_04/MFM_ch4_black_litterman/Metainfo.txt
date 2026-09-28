@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_black_litterman'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Black-Litterman on nine sector ETFs (2016-2026): implied returns from a 1/N benchmark, one relative view (XLK minus XLU = 3% a year), posterior returns and weights versus mean-variance on sample means.'
+
+Keywords: 'Black-Litterman, implied returns, views, Bayesian, reverse optimisation, sector ETFs'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): nine sector ETFs; risk-free rate from the Kenneth French Data Library'
+
+Output: 'ch4_black_litterman.pdf'

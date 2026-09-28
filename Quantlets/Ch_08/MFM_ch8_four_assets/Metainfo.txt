@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_four_assets'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Rolling one-day-ahead VaR 1% of the GARCH-EVT model (GARCH(1,1)-t filter and a generalised Pareto tail on the largest 10% of standardised losses) for the S&P 500, BET, Bitcoin and EUR/RON, with breaches.'
+
+Keywords: 'value at risk, GARCH-EVT, peaks over threshold, rolling forecast, backtesting, BET, Bitcoin, EUR/RON'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
+
+Output: 'ch8_four_assets.pdf'

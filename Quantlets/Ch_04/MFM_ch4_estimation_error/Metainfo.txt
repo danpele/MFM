@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_estimation_error'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Estimation error in mean-variance optimisation: 25 simulated 60-month samples with the sector ETF parameters; estimated (in-sample) versus realised frontiers, and the in-sample versus true Sharpe ratio of 2000 estimated tangency portfolios.'
+
+Keywords: 'estimation error, error maximisation, Michaud, simulation, efficient frontier, Sharpe ratio'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): nine sector ETFs; risk-free rate from the Kenneth French Data Library (simulation parameters)'
+
+Output: 'ch4_estimation_error.pdf'

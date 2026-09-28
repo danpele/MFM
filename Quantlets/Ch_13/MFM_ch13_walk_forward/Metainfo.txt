@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch13_walk_forward'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Walk-forward backtest 2010-2026 of a gradient boosting long/cash signal on the S&P 500 with yearly refits, purged training windows and 5 bp transaction costs, compared with buy-and-hold.'
+
+Keywords: 'walk-forward, backtest, gradient boosting, transaction costs, Sharpe ratio, S&P 500'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'S&P 500 and VIX daily close (2000-2026)'
+
+Output: 'ch13_walk_forward_backtest.pdf'

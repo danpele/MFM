@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch18_stress'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Stress tests for a bank portfolio: worst 10-day losses in seven historical episodes (2008-2025) and a reverse stress test (most plausible factor scenario for a 25% loss in four weeks) with a three-factor model.'
+
+Keywords: 'stress testing, historical scenario, reverse stress test, Mahalanobis distance, factor model, banks'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market), January 2010 - September 2026: JPMorgan Chase, Bank of America, Citigroup, Goldman Sachs, Morgan Stanley, Wells Fargo, Deutsche Bank, BNP Paribas, Santander, ING, HSBC, Banca Transilvania, BRD-Groupe Societe Generale; S&P 500, Euro Stoxx 50, BET and VIX indices'
+
+Output: 'ch18_stress_hist.pdf, ch18_reverse_stress.pdf'

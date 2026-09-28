@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_banks'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Correlations of weekly returns of six banks (JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD), their 52-week averages within and across regions, and a minimum spanning tree (Mantegna, 1999).'
+
+Keywords: 'bank correlations, financial network, minimum spanning tree, systemic risk, Romania, contagion'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_banks_heatmap.pdf, ch6_banks_avgcorr.pdf, ch6_banks_mst.pdf, ch6_banks_corr.csv'

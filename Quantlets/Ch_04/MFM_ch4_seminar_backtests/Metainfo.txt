@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_seminar_backtests'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 4, Part B: 1/N versus Markowitz on sector ETFs, Ledoit-Wolf shrinkage and out-of-sample GMV volatility, ERC and HRP, HRP versus GMV, break-even costs, risk parity with Bitcoin, and Black-Litterman on a multi-asset set.'
+
+Keywords: 'out-of-sample, shrinkage, risk parity, HRP, Bitcoin, Black-Litterman, bootstrap, seminar'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): sector and multi-asset ETFs, Bitcoin; risk-free rate from the Kenneth French Data Library'
+
+Output: 'printed tables'

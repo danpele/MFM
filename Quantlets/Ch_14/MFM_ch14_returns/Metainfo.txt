@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch14_returns'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Out-of-sample forecasts of daily returns (S&P 500 from 2016, Bitcoin from 2019, BET from 2016): R-squared against the zero forecast with block-bootstrap intervals, Diebold-Mariano tests, sign tests, cumulative squared-error differences, LSTM training curve and seed-to-seed variation.'
+
+Keywords: 'return predictability, out-of-sample R-squared, LSTM, Chronos-2, TimesFM, Diebold-Mariano'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), Bitcoin (BTC-USD.CC), BET'
+
+Output: 'ch14_return_r2.pdf, ch14_cum_sse.pdf, ch14_lstm_training.pdf, ch14_lstm_seeds.pdf'

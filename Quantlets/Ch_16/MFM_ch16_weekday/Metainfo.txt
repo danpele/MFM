@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch16_weekday'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Bitcoin daily return variation by day of the week, before and after the start of spot Bitcoin ETF trading (11 January 2024); weekend to weekday variance ratio.'
+
+Keywords: 'Bitcoin, weekend effect, day-of-week, volatility, spot ETF'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama'
+
+Output: 'ch16_weekday.pdf'

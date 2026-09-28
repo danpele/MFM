@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_forecasts'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'One-day-ahead variance forecasts out of sample: log-HAR, HAR, GARCH(1,1)-t, EWMA and yesterday's RV for SPY (2022-2026) and Bitcoin (2025-2026); QLIKE and MSE losses, Diebold-Mariano tests and Mincer-Zarnowitz regressions.'
+
+Keywords: 'volatility forecasting, HAR-RV, GARCH, QLIKE, Diebold-Mariano, Mincer-Zarnowitz, SPY, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_oos.pdf, ch9_mz.pdf'

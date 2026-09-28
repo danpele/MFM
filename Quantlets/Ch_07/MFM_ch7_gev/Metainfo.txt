@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_gev'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Block maxima: monthly maximum daily losses of the S&P 500 (2000-2026) with a GEV fit, return levels and the implied daily VaR.'
+
+Keywords: 'block maxima, generalized extreme value distribution, return level, Fisher-Tippett-Gnedenko, Gumbel'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_gev.pdf'

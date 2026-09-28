@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_merton_density'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Merton jump-diffusion fitted by maximum likelihood to S&P 500, BET and Bitcoin daily log returns; densities on a log scale against the Normal distribution.'
+
+Keywords: 'Merton model, jump-diffusion, compound Poisson, maximum likelihood, heavy tails, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_merton_density.pdf'

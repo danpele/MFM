@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_vix'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'VIX vs SPY realised volatility over the following 21 trading days (with the overnight return): the variance risk premium and the Mincer-Zarnowitz regression of future variance on VIX squared.'
+
+Keywords: 'VIX, implied volatility, variance risk premium, realised volatility, SPY'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_vix.pdf'

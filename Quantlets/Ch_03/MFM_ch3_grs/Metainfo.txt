@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_grs'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 3, B2: Gibbons-Ross-Shanken test of the CAPM on nine US sector ETFs (monthly, 1999-2026).'
+
+Keywords: 'GRS test, CAPM, alpha, joint test, sector ETFs'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): sector ETFs; factors from the Kenneth French Data Library'
+
+Output: 'printed tables'

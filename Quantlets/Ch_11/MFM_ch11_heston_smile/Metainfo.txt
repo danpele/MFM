@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_heston_smile'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Black-Scholes implied volatilities of Monte Carlo Heston call prices: effect of the correlation rho at three months and of the maturity with the VIX-based parameters.'
+
+Keywords: 'Heston model, implied volatility, volatility smile, skew, Monte Carlo, option pricing'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_heston_smile.pdf'

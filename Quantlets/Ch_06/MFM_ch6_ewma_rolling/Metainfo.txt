@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_ewma_rolling'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'EWMA (RiskMetrics, lambda 0.94 and 0.97) versus 60- and 250-day rolling correlations of SPY and TLT, with a step-by-step EWMA covariance update and the dates at which each estimator turned positive in 2022.'
+
+Keywords: 'EWMA, RiskMetrics, exponential smoothing, rolling window, covariance matrix, half-life'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_ewma_rolling.pdf'

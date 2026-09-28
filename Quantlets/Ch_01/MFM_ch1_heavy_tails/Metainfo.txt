@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch1_heavy_tails'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Heavy tails, gain/loss asymmetry and aggregational Gaussianity: histograms and QQ-plots of standardised returns with Normal-distribution and Student-t fits, survival functions of gains and losses, 1% tail quantiles across markets, excess kurtosis of non-overlapping h-day returns, and Hill plots of the tail index of absolute returns.'
+
+Keywords: 'heavy tails, Student-t, QQ-plot, gain/loss asymmetry, aggregational Gaussianity, kurtosis, Hill estimator, tail index'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET-TR, Bitcoin, gold; EUR/RON official reference rate'
+
+Output: 'ch1_hist_qq.pdf, ch1_gain_loss.pdf, ch1_aggregation_kurtosis.pdf, ch1_hill_plot.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch2_hurst'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Long memory in returns: rescaled-range (R/S) analysis with the Anis-Lloyd expectation for the S&P 500 and BET, and DFA exponents across markets with 95% bands from shuffled series.'
+
+Keywords: 'Hurst exponent, rescaled range, Anis-Lloyd correction, detrended fluctuation analysis, long memory, shuffling'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, Euro Stoxx 50, Nikkei 225, Hang Seng, BET, WIG20, BUX, PX, BIST 100, Bovespa, IPC, Nifty 50, Shanghai, Bitcoin, Ethereum; EUR/RON official reference rate'
+
+Output: 'ch2_hurst_rs.pdf, ch2_hurst_markets.pdf, ch2_hurst_bands.csv'

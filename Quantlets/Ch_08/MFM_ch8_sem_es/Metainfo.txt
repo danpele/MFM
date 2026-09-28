@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_sem_es'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 8, B3-B4: McNeil-Frey test with bootstrap and Acerbi-Szekely Z2 with 5000 simulated paths for the S&P 500, the BET and Bitcoin, full sample and last 250 days.'
+
+Keywords: 'expected shortfall backtest, Z2, simulation, bootstrap, BET, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
+
+Output: 'ch8_sem_z2_sim.pdf'

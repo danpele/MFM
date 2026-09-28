@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_elicitability'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Elicitability: expected pinball loss of a VaR forecast and expected FZ0 loss of a (VaR, ES) pair for Student-t losses, both minimised at the true values.'
+
+Keywords: 'elicitability, scoring function, pinball loss, FZ0 loss, Fissler-Ziegel, expected shortfall'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Simulated data'
+
+Output: 'ch8_elicitability.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch2_efficiency_table'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Weak-form efficiency tests for 16 series (developed and emerging equity indices, Bitcoin, Ethereum, EUR/RON): lag-1 autocorrelation with i.i.d. and robust standard errors, Lo-MacKinlay variance ratios with z and z*, Chow-Denning, runs test, classical and robust Ljung-Box, R/S Hurst with the Anis-Lloyd correction, Lo modified R/S and DFA.'
+
+Keywords: 'efficient market hypothesis, random walk, variance ratio, Chow-Denning, runs test, Ljung-Box, Hurst exponent, R/S, modified R/S, DFA, emerging markets'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, Euro Stoxx 50, Nikkei 225, Hang Seng, BET, WIG20, BUX, PX, BIST 100, Bovespa, IPC, Nifty 50, Shanghai, Bitcoin, Ethereum; EUR/RON official reference rate'
+
+Output: 'ch2_efficiency_table.csv'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_two_asset'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Two-asset mean-variance frontier of SPY and TLT (monthly, 2002-2026) for the actual and for hypothetical correlations, with the global minimum-variance (GMV) portfolio in closed form.'
+
+Keywords: 'Markowitz, two-asset frontier, correlation, diversification, global minimum variance, SPY, TLT'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): SPY, TLT; risk-free rate from the Kenneth French Data Library'
+
+Output: 'ch4_two_asset.pdf'

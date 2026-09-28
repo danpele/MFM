@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch14_tokenization'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'How time-series foundation models read a series: Chronos mean scaling and uniform quantisation of the last 512 S&P 500 returns into 4,093 bins, and the split of the context into patches of 16 days (Chronos-2) and 32 days (TimesFM-2.5).'
+
+Keywords: 'Chronos, tokenisation, mean scaling, quantisation, patching, TimesFM, foundation model'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), Bitcoin (BTC-USD.CC), BET'
+
+Output: 'ch14_tokenization.pdf, ch14_patching.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch13_purged_cv'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Purged K-Fold cross-validation with embargo: schematic of train/test/purge/embargo sets and a leakage experiment on a pure random walk with overlapping labels, where shuffled K-Fold reports spurious accuracy while purged K-Fold returns to a coin flip.'
+
+Keywords: 'purged cross-validation, embargo, leakage, overlapping labels, K-Fold, backtest'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Simulated random walk (Monte Carlo)'
+
+Output: 'ch13_purged_cv_scheme.pdf, ch13_leakage_experiment.pdf'

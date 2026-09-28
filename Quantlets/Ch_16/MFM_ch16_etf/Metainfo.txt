@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch16_etf'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Spot crypto ETFs: IBIT against Bitcoin and ETHA against Ether; daily and weekly tracking regressions with Newey-West errors, tracking error and the annual fee drift of the ETF/coin price ratio.'
+
+Keywords: 'spot Bitcoin ETF, IBIT, ETHA, tracking error, net asset value, sponsor fee'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama'
+
+Output: 'ch16_etf_tracking.pdf, ch16_etf_timing.pdf'

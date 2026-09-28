@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_donsker'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Donsker invariance principle: scaled random walks with 5, 50 and 5000 steps, and the probability that the path maximum on [0, 1] exceeds 1, compared with the reflection-principle value 2(1 - Phi(1)).'
+
+Keywords: 'random walk, Brownian motion, Donsker theorem, invariance principle, reflection principle, simulation'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_donsker.pdf'

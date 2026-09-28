@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch0_romania'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'The Romanian market: BET-TR and BVB blue chips (dividend-adjusted) since 2015, the EUR/RON BNR reference rate since the 2005 redenomination, and Romanian versus German 10-year government yields; plus a data-quality check of EUR/RON bad ticks.'
+
+Keywords: 'Bucharest Stock Exchange, BET-TR, Banca Transilvania, EUR/RON, Romania 10-year yield, data cleaning'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market in the MFM repository); BNR official EUR/RON reference rate'
+
+Output: 'ch0_romania.pdf'

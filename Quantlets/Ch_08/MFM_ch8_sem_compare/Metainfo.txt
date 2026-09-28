@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_sem_compare'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 8, B5-B6: Diebold-Mariano tests on FZ0 losses with Newey-West variance versus the naive t-test (S&P 500); DM tests and model confidence sets for Bitcoin and EUR/RON.'
+
+Keywords: 'Diebold-Mariano, HAC, FZ0 loss, model confidence set, Bitcoin, EUR/RON'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
+
+Output: 'printed tables'

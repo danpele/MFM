@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_dcc_minvar'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Daily minimum-variance SPY-TLT weights from GARCH volatilities with DCC or constant correlation, and the annualised volatility of the resulting portfolios versus a fixed 60/40 mix (in-sample illustration).'
+
+Keywords: 'minimum-variance portfolio, DCC, dynamic hedging, portfolio volatility, GARCH'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_dcc_minvar.pdf'

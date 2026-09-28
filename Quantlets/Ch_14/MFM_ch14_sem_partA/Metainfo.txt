@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch14_sem_partA'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 14, Part A: LSTM parameter counts, gradient decay through a constant forget gate, Chronos tokenisation of a short context, and VaR 1% and ES 2.5% from a quantile grid.'
+
+Keywords: 'LSTM, parameter count, forget gate, tokenisation, quantile grid, expected shortfall, exercises'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), Bitcoin (BTC-USD.CC), BET'
+
+Output: 'printed tables'

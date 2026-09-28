@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch12_greeks'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Black-Scholes Greeks of a call (delta, gamma, vega, theta) across underlying prices for three maturities, and a worked pricing example.'
+
+Keywords: 'Black-Scholes, Greeks, delta, gamma, vega, theta, option sensitivities'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, SPY, Bitcoin, VIX, VIX9D, VIX3M, VVIX; Bitcoin option chain (Deribit, snapshot of 22 September 2026, ch12_deribit_snapshot.csv) and the DVOL index (Deribit)'
+
+Output: 'ch12_greeks.pdf'

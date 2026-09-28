@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_heston_paths'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Heston stochastic volatility: parameters from the VIX (discretised CIR regression), long-run variance set to the realised S&P 500 variance, and three simulated five-year paths of price and volatility.'
+
+Keywords: 'Heston model, stochastic volatility, CIR, VIX, leverage effect, full truncation'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_heston_paths.pdf'

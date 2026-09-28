@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_vix_ou'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'The log VIX as an Ornstein-Uhlenbeck process, 1990-2026: long-run level, half-life and the sample ACF against the exponential decay implied by the model.'
+
+Keywords: 'VIX, volatility, mean reversion, Ornstein-Uhlenbeck, half-life, long memory'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_vix_ou.pdf'

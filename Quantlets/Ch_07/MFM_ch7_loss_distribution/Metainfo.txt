@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_loss_distribution'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Daily losses of the S&P 500 (2000-2026) with historical VaR and Expected Shortfall at 1% and 2.5%, compared with the Normal distribution of the same mean and standard deviation.'
+
+Keywords: 'value-at-risk, expected shortfall, loss distribution, heavy tails, historical simulation, S&P 500'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_loss_distribution.pdf'

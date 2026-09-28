@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_kupiec'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Kupiec proportion-of-failures likelihood ratio as a function of the number of breaches for 250 and 1000 days of VaR 1%, with the 5% acceptance region.'
+
+Keywords: 'Kupiec test, proportion of failures, unconditional coverage, likelihood ratio, power'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'No data (analytical calculation)'
+
+Output: 'ch8_kupiec_curve.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch5_forecast_evaluation'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Out-of-sample volatility forecasts for the S&P 500, 2016-2026, with yearly re-estimation: GARCH-N, GARCH-t, GJR-t, EGARCH-t, EWMA and 20-day historical variance; QLIKE and MSE losses, Diebold-Mariano tests and Mincer-Zarnowitz regressions at one-day and one-month horizons.'
+
+Keywords: 'volatility forecasting, out-of-sample, QLIKE, Patton, Diebold-Mariano, Mincer-Zarnowitz, EWMA, RiskMetrics'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
+
+Output: 'ch5_forecast_oos.pdf, ch5_qlike.pdf, ch5_mz.pdf, ch5_forecast_eval.csv, ch5_forecast_eval_22d.csv'

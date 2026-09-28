@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch1_vol_estimators'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Range-based volatility estimators on S&P 500 OHLC data (2008-2026): close-to-close, Parkinson, Garman-Klass, Rogers-Satchell and Yang-Zhang, around the COVID-19 crash, and the relative smoothness of their daily updates; stale opens of the S&P 500 index compared with the SPY ETF.'
+
+Keywords: 'volatility estimators, Parkinson, Garman-Klass, Rogers-Satchell, Yang-Zhang, OHLC, range, stale prices'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500 index and SPY ETF open, high, low, close'
+
+Output: 'ch1_vol_estimators.pdf'

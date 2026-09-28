@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_sem_var'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 8, B1-B2: VaR backtests of six models on the S&P 500 with asymptotic and exact p-values; Basel traffic light and FRTB desk check for the GARCH-t VaR on the BET index.'
+
+Keywords: 'VaR backtesting, Kupiec, Christoffersen, duration test, traffic light, BET, FRTB'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
+
+Output: 'ch8_sem_traffic_bet.pdf'

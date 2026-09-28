@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch1_returns'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Simple versus log returns: the approximation r = ln(1+R), the failure of adding simple returns over time (Bitcoin 2014-2026), and prices versus daily log returns for the S&P 500, BET-TR, Bitcoin, EUR/RON and gold.'
+
+Keywords: 'simple returns, log returns, compounding, time additivity, S&P 500, BET-TR, Bitcoin, EUR/RON, gold'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET-TR, Bitcoin, gold; EUR/RON official reference rate'
+
+Output: 'ch1_simple_vs_log.pdf, ch1_prices_returns.pdf'

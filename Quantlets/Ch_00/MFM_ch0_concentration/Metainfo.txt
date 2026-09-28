@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch0_concentration'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Market concentration in the S&P 500: total-return growth of the cap-weighted SPY versus the equal-weighted RSP since 2003 and the SPY/RSP relative-performance ratio.'
+
+Keywords: 'market concentration, ETF, cap-weighted, equal-weighted, SPY, RSP, passive investing'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market in the MFM repository)'
+
+Output: 'ch0_concentration.pdf'

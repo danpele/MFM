@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_distributions'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Log realised variance of SPY against the Normal distribution, and open-to-close returns standardised by their standard deviation vs by the square root of daily realised variance.'
+
+Keywords: 'log realised variance, standardised returns, mixture of distributions, kurtosis, Andersen Bollerslev Diebold Labys'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_distributions.pdf'

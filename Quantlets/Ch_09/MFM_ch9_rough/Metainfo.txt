@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_rough'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Rough volatility: moments m(q, Delta) of increments of log volatility (SPY, Bitcoin) and the scaling exponents zeta_q = q H; estimated Hurst exponent H.'
+
+Keywords: 'rough volatility, Hurst exponent, fractional Brownian motion, scaling, realised variance'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_rough.pdf'

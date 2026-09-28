@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelling Financial Markets - Course Website</title>
+    <meta name="description" content="Modelling Financial Markets - Master's programme Applied Statistics and Data Science, Bucharest University of Economic Studies">
+    <link rel="icon" href="logos/ida_square.png">
+    <link rel="stylesheet" href="assets/site.css">
+
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Page language: 'en' here, 'ro' in index_ro.html. Everything else is shared. -->
+    <script>window.MFM_LANG = 'en';</script>
+    <script src="assets/config.js"></script>
+    <script src="assets/course-data.js"></script>
+    <script src="assets/quizzes/markets.js"></script>
+    <script src="assets/quizzes/stylized.js"></script>
+    <script src="assets/quizzes/efficiency.js"></script>
+    <script src="assets/quizzes/factors.js"></script>
+    <script src="assets/quizzes/var-es.js"></script>
+    <script src="assets/quizzes/garch.js"></script>
+    <script src="assets/quizzes/portfolio.js"></script>
+    <script src="assets/quizzes/backtesting.js"></script>
+    <script src="assets/quizzes/dependence.js"></script>
+    <script src="assets/quizzes/realized-vol.js"></script>
+    <script src="assets/quizzes/microstructure.js"></script>
+    <script src="assets/quizzes/tsfm.js"></script>
+    <script src="assets/quizzes/llm.js"></script>
+    <script src="assets/quizzes/continuous-time.js"></script>
+    <script src="assets/quizzes/options.js"></script>
+    <script src="assets/quizzes/wrap-up.js"></script>
+    <script src="assets/quizzes/digital-assets.js"></script>
+    <script src="assets/quizzes/systemic.js"></script>
+    <script src="assets/quizzes/bubbles.js"></script>
+    <script src="assets/quizzes/ml.js"></script>
+    <script src="assets/site.js"></script>
+</head>
+<body>
+
+    <header>
+        <div class="header-inner">
+            <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="logos/ase_logo.png" alt="ASE"></a>
+            <div class="header-title">
+                <h1 data-t="courseTitle">Modelling Financial Markets</h1>
+                <p data-t="subtitle"></p>
+            </div>
+            <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="logos/ida_logo.png" alt="IDA"></a>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#home" data-t="nav.home">Home</a></li>
+            <li><a href="#chapters" data-t="nav.chapters">Chapters</a></li>
+            <li><a href="#project" data-t="nav.project">Project</a></li>
+            <li><a href="#quizzes" data-t="nav.quizzes">Quizzes</a></li>
+            <li><a href="#resources" data-t="nav.resources">Resources</a></li>
+            <li><a href="#contact" data-t="nav.contact">Contact</a></li>
+            <li class="lang-switcher">
+                <a href="index.html" class="lang-btn active">EN</a>
+                <a href="index_ro.html" class="lang-btn">RO</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="home">
+            <h2 data-t="overview"></h2>
+            <div class="course-info" id="overview-cards"></div>
+            <h3 class="sub" data-t="objectives"></h3>
+            <ul class="objectives" id="objectives-list"></ul>
+            <h3 class="sub" data-t="formulas"></h3>
+            <div class="formula-grid" id="formula-grid"></div>
+        </section>
+
+        <section id="chapters">
+            <h2 data-t="chapters"></h2>
+            <div class="chapters-grid" id="chapters-grid"></div>
+        </section>
+
+        <section id="project">
+            <h2 data-t="projectTitle"></h2>
+            <div class="course-info" id="project-cards"></div>
+            <h3 class="sub" data-t="aiTitle"></h3>
+            <ul class="objectives" id="ai-policy"></ul>
+            <h3 class="sub" data-t="templates"></h3>
+            <ul class="data-sources" id="project-templates"></ul>
+        </section>
+
+        <section id="quizzes">
+            <h2 data-t="quizzes"></h2>
+            <div id="github-login" style="display: none;"></div>
+            <div class="quiz-tabs" id="quiz-tabs"></div>
+            <div class="quiz-container" id="quiz-container"></div>
+        </section>
+
+        <section id="resources">
+            <h2 data-t="resources"></h2>
+            <div class="resources-list" id="resources-list"></div>
+            <h3 class="sub" data-t="dataSources"></h3>
+            <ul class="data-sources" id="data-sources"></ul>
+            <h3 class="sub" data-t="bibliography"></h3>
+            <ol class="biblio" id="bibliography"></ol>
+        </section>
+
+        <section id="contact">
+            <h2 data-t="contact"></h2>
+            <div class="course-info" id="contact-cards"></div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-logos" id="footer-logos"></div>
+        <p id="footer-text"></p>
+    </footer>
+
+    <noscript><p style="text-align:center;padding:1rem">This page needs JavaScript. / Această pagină necesită JavaScript.</p></noscript>
+</body>
+</html>

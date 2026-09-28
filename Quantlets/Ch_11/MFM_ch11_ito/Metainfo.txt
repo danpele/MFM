@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_ito'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Ito's formula W_t^2 = 2 int W dW + t on one simulated path, and the difference between Stratonovich and Ito sums over 5,000 paths.'
+
+Keywords: 'Ito integral, Ito's lemma, Stratonovich integral, quadratic variation, stochastic calculus'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_ito.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch12_binomial'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Cox-Ross-Rubinstein binomial tree: convergence of the European call price to Black-Scholes and the value of early exercise for an American put; put-call parity example.'
+
+Keywords: 'binomial tree, Cox-Ross-Rubinstein, American option, early exercise, put-call parity, convergence'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, SPY, Bitcoin, VIX, VIX9D, VIX3M, VVIX; Bitcoin option chain (Deribit, snapshot of 22 September 2026, ch12_deribit_snapshot.csv) and the DVOL index (Deribit)'
+
+Output: 'ch12_binomial.pdf'

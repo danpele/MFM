@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch16_crix'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'A CRIX-style market-value weighted Laspeyres index with monthly reallocation and a divisor; top-k indices, equal weights, tracking error and the AIC rule for the number of constituents (Trimborn and Hardle, 2018).'
+
+Keywords: 'CRIX, cryptocurrency index, Laspeyres index, divisor, Akaike information criterion, tracking error'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama'
+
+Output: 'ch16_crix_index.pdf, ch16_crix_aic.pdf, ch16_crix_weights.pdf'

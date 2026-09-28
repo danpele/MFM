@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch15_embeddings'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Sentence embeddings as features: first two principal components of MiniLM embeddings of financial tweets, and the learning curve of logistic regression on embeddings and on TF-IDF features.'
+
+Keywords: 'sentence embeddings, MiniLM, TF-IDF, logistic regression, learning curve, principal components'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Financial PhraseBank v1.0 (Malo et al., 2014; CC BY-NC-SA 3.0) and Twitter Financial News Sentiment (MIT licence), both from the Hugging Face Hub; Loughran-McDonald and Harvard IV-4 word lists'
+
+Output: 'ch15_embeddings.pdf, ch15_learning_curve.pdf'

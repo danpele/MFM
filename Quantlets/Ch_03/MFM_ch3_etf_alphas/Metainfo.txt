@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_etf_alphas'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Daily FF5 + momentum regressions of seven factor ETFs, each on its own trading calendar: annualised alphas with Newey-West intervals and the factor loadings.'
+
+Keywords: 'factor ETFs, alpha, Fama-French five factors, momentum, factor loadings, Newey-West'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): factor ETFs; daily factors from the Kenneth French Data Library'
+
+Output: 'ch3_etf_alphas.pdf'

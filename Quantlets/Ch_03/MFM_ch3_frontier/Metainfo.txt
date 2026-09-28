@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_frontier'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Mean-variance efficient frontier of nine US sector ETFs (monthly excess returns, 1999-2026), the tangency portfolio, the capital market line and the position of the S&P 500 (SPY).'
+
+Keywords: 'Markowitz, efficient frontier, tangency portfolio, capital market line, Sharpe ratio, sector ETFs'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): sector ETFs and SPY; risk-free rate from the Kenneth French Data Library'
+
+Output: 'ch3_frontier.pdf'

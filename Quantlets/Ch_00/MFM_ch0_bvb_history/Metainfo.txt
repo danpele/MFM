@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch0_bvb_history'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'The BET index of the Bucharest Stock Exchange, official closing values from its launch on 19 September 1997 to September 2026, on a log scale, with the 1999 low, the 2007 peak, the 2009 trough, the December 2018 bank-tax announcement, COVID-19 and the 2023 Hidroelectrica IPO.'
+
+Keywords: 'Bucharest Stock Exchange, BET, market history, log scale, drawdown'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market in the MFM repository)'
+
+Output: 'ch0_bvb_history.pdf'

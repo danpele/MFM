@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch2_tsmom'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Index-level time-series momentum: long after a positive 12-month return, short otherwise; HAC t-statistics, Sharpe ratios versus buy-and-hold and monthly autocorrelation for 15 markets.'
+
+Keywords: 'time-series momentum, trend following, HAC, Sharpe ratio, anomalies'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, Euro Stoxx 50, Nikkei 225, Hang Seng, BET, WIG20, BUX, PX, BIST 100, Bovespa, IPC, Nifty 50, Shanghai, Bitcoin, Ethereum; EUR/RON official reference rate'
+
+Output: 'ch2_tsmom.pdf, ch2_tsmom_table.csv'

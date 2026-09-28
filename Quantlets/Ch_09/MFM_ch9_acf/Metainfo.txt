@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_acf'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Autocorrelation functions up to 100 days: log realised variance of SPY and Bitcoin and squared daily SPY returns; long memory and the weekly cycle of Bitcoin volatility.'
+
+Keywords: 'long memory, autocorrelation, realised variance, Bitcoin, weekend effect'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_acf.pdf'

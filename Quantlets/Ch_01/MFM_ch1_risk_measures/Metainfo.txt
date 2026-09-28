@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch1_risk_measures'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Risk-adjusted performance across markets: underwater (drawdown) curves, CAGR, volatility, Sharpe, Sortino, maximum drawdown and Calmar ratios.'
+
+Keywords: 'drawdown, maximum drawdown, Sharpe ratio, Sortino ratio, Calmar ratio, CAGR, risk-adjusted performance'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET-TR, Bitcoin, gold; EUR/RON official reference rate'
+
+Output: 'ch1_drawdowns.pdf, ch1_risk_return.pdf, ch1_risk_measures.csv'

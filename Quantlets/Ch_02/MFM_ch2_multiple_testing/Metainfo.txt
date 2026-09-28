@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch2_multiple_testing'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'How many anomalies does pure chance produce? 2000 random calendar rules on the S&P 500 and the share with |t| > 1.96 and |t| > 3.'
+
+Keywords: 'multiple testing, data snooping, false discoveries, t-statistic threshold, Harvey-Liu-Zhu'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, Euro Stoxx 50, Nikkei 225, Hang Seng, BET, WIG20, BUX, PX, BIST 100, Bovespa, IPC, Nifty 50, Shanghai, Bitcoin, Ethereum; EUR/RON official reference rate'
+
+Output: 'ch2_multiple_testing.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch18_spillover_rolling'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Rolling Diebold-Yilmaz total connectedness of 13 banks (250-day windows, every 5 days) and net spillovers by region, 2011-2026.'
+
+Keywords: 'rolling connectedness, spillover index, Diebold-Yilmaz, crisis, COVID-19, net transmitter'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market), January 2010 - September 2026: JPMorgan Chase, Bank of America, Citigroup, Goldman Sachs, Morgan Stanley, Wells Fargo, Deutsche Bank, BNP Paribas, Santander, ING, HSBC, Banca Transilvania, BRD-Groupe Societe Generale; S&P 500, Euro Stoxx 50, BET and VIX indices'
+
+Output: 'ch18_spill_rolling.pdf'

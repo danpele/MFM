@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_hs_fhs_btc'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'One-day-ahead VaR 1% for Bitcoin, 2017-2026: historical simulation on 500 days vs filtered historical simulation (AR(1)-GARCH(1,1), re-estimated every January); exceedance frequencies.'
+
+Keywords: 'filtered historical simulation, GARCH, value-at-risk, Bitcoin, cryptocurrency risk'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_hs_fhs_btc.pdf'

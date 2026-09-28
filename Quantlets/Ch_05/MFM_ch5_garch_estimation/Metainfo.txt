@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch5_garch_estimation'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Maximum likelihood estimation of GARCH, GJR-GARCH and EGARCH with Normal, Student-t, skewed-t and GED innovations on six series; robust (Bollerslev-Wooldridge) and classical standard errors, persistence, half-life, long-run volatility, AIC/BIC, and a step-by-step one-day and ten-day variance forecast.'
+
+Keywords: 'GARCH, GJR-GARCH, EGARCH, maximum likelihood, quasi-maximum likelihood, robust standard errors, Student-t, skewed-t, GED, BIC, half-life, variance forecast'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
+
+Output: 'ch5_model_grid.csv, ch5_garch_table.csv, ch5_asym_table.csv'

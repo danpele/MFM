@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_seasonality'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Intraday volatility pattern: mean absolute 5-minute return of SPY by time of day (U-shape) and of Bitcoin by UTC hour.'
+
+Keywords: 'intraday seasonality, U-shape, periodicity, SPY, Bitcoin, trading hours'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_seasonality.pdf'

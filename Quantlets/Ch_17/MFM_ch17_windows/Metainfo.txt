@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch17_windows'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'The windows behind ADF, SADF (Phillips, Wu and Yu 2011) and GSADF (Phillips, Shi and Yu 2015), and the Monte Carlo null distributions of the three statistics for T = 440.'
+
+Keywords: 'SADF, GSADF, recursive windows, rolling windows, critical values, Monte Carlo, explosive root'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Nasdaq 100, S&P 500, BET, BET-FI, Bitcoin, Ethereum, Dogecoin, NVIDIA, Cisco, Tesla, GameStop, Strategy; S&P Composite monthly since 1871 (Robert J. Shiller); 49 US industry portfolios (Kenneth French Data Library)'
+
+Output: 'ch17_windows.pdf, ch17_null.pdf'

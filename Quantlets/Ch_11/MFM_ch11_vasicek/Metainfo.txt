@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_vasicek'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Vasicek model on the 3-month US Treasury bill rate (FRED DTB3), 1954-2026: exact AR(1) maximum likelihood, long-run mean and speed of mean reversion by subperiod with 95% CIs.'
+
+Keywords: 'Vasicek, short rate, Ornstein-Uhlenbeck, mean reversion, maximum likelihood, interest rates'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_vasicek.pdf'

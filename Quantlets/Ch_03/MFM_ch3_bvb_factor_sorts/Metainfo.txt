@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_bvb_factor_sorts'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 3, Part C (reference analysis): monthly momentum (12-1) and low-beta long-short portfolios built from Bucharest Stock Exchange blue chips, with Newey-West t-statistics.'
+
+Keywords: 'momentum, low beta, factor premia, long-short portfolio, Bucharest Stock Exchange, Romania'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): BVB blue chips and the BET index'
+
+Output: 'ch3_sem_bvb_factors.pdf'

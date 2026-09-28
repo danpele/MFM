@@ -1,0 +1,16 @@
+,market,group,months,tsmom_mean_pct,t_hac,sharpe_tsmom,sharpe_bh,rho1_monthly
+sp500,S&P 500 (US),Developed,308,0.602315,2.18754,0.476392,0.441854,0.0256621
+stoxx,Euro Stoxx 50,Developed,308,0.182648,0.571694,0.121381,0.0573563,0.0447096
+nikkei,Nikkei 225 (Japan),Developed,308,0.596134,1.81193,0.374145,0.314673,0.0868789
+hsi,Hang Seng (HK),Developed,308,0.21834,0.642795,0.123802,0.0791113,0.0440416
+bet,BET (Romania),Emerging/frontier,308,1.32606,2.56498,0.622029,0.607818,0.189987
+wig20,WIG20 (Poland),Emerging/frontier,308,0.700267,1.94336,0.377557,0.147056,0.0191599
+bux,BUX (Hungary),Emerging/frontier,308,0.726767,1.80393,0.403942,0.531576,0.103027
+px,PX (Czechia),Emerging/frontier,308,0.397974,1.04686,0.248076,0.342907,0.102743
+xu100,BIST 100 (Turkey),Emerging/frontier,308,0.883877,1.68318,0.331681,0.593474,-0.0834165
+bvsp,Bovespa (Brazil),Emerging/frontier,308,0.272968,0.655675,0.138869,0.390236,0.107014
+mxx,IPC (Mexico),Emerging/frontier,308,0.431435,1.39449,0.307107,0.530488,0.0361553
+nsei,Nifty 50 (India),Emerging/frontier,308,0.461408,1.21945,0.256148,0.515099,0.0217646
+ssec,Shanghai (China),Emerging/frontier,308,0.548299,1.24289,0.272889,0.102917,0.0838494
+btc,Bitcoin,Crypto,132,3.42,1.76534,0.603907,0.78898,0.13154
+eth,Ethereum,Crypto,116,3.66038,1.08312,0.418859,0.544763,0.157498

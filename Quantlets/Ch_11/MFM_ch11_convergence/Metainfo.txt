@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_convergence'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Strong and weak convergence of the Euler-Maruyama and Milstein schemes for the test equation dX = 2X dt + X dW (Higham, 2001): errors against the step size and estimated orders with 95% CIs.'
+
+Keywords: 'stochastic differential equation, Euler-Maruyama, Milstein, strong convergence, weak convergence, Monte Carlo'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_convergence.pdf, ch11_convergence.csv'

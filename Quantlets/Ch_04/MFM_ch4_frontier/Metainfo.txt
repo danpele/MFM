@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_frontier'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'In-sample efficient frontier of nine US sector ETFs (monthly excess returns, 1999-2026) with and without short sales, the GMV, tangency and 1/N portfolios and their Sharpe ratios.'
+
+Keywords: 'efficient frontier, tangency portfolio, long-only constraint, 1/N, Sharpe ratio, sector ETFs'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): nine sector ETFs; risk-free rate from the Kenneth French Data Library'
+
+Output: 'ch4_frontier.pdf'

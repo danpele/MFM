@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_basel'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'From Basel 1996 to FRTB: historical VaR 1% vs ES 2.5% of daily losses for five markets and their ratio.'
+
+Keywords: 'Basel, FRTB, expected shortfall, value-at-risk, regulatory capital, market risk'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_basel.pdf'

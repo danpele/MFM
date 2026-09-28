@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_signature'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Empirical volatility signature plots for SPY (5 to 130 minutes) and Bitcoin (5 to 360 minutes): sparse sampling on one grid vs subsampling over shifted grids; two-scale RV and realised kernel on SPY.'
+
+Keywords: 'signature plot, sampling frequency, subsampling, microstructure noise, realised kernel, SPY, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_signature.pdf'

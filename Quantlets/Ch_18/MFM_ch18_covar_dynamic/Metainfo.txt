@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch18_covar_dynamic'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Time-varying Delta-CoVaR at 1% with lagged state variables (log VIX, regional index and system returns) for six US and European banks, 2010-2026.'
+
+Keywords: 'time-varying CoVaR, state variables, quantile regression, VIX, systemic risk'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market), January 2010 - September 2026: JPMorgan Chase, Bank of America, Citigroup, Goldman Sachs, Morgan Stanley, Wells Fargo, Deutsche Bank, BNP Paribas, Santander, ING, HSBC, Banca Transilvania, BRD-Groupe Societe Generale; S&P 500, Euro Stoxx 50, BET and VIX indices'
+
+Output: 'ch18_dcovar_dynamic.pdf'

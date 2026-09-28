@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_components'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Portfolio of SPY, TLT, GLD and Bitcoin (40/30/20/10): Normal VaR 1%, marginal and component VaR, and historical ES 2.5% contributions by Euler allocation, 2014-2026.'
+
+Keywords: 'component VaR, marginal VaR, Euler allocation, expected shortfall contributions, diversification, portfolio risk'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_components.pdf'

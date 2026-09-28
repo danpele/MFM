@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch19_case_study'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Integrated case study on the BET index (official closing values, 2000-2026): stylised facts with a block-bootstrap CI for kurtosis, GARCH(1,1) with Student-t innovations, one-day-ahead VaR 1% from historical simulation, the Normal distribution, GARCH-t and filtered historical simulation (2005-2026), Kupiec and Christoffersen backtests, Basel traffic-light zones and the look-ahead trap.'
+
+Keywords: 'stylised facts, GARCH, value-at-risk, filtered historical simulation, backtesting, Kupiec, Christoffersen, look-ahead bias, BET, Bucharest Stock Exchange'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): BET index (official closing values), Bitcoin, SPY'
+
+Output: 'ch19_bet_facts.pdf, ch19_bet_garch.pdf, ch19_bet_var.pdf, ch19_breach_rates.pdf, ch19_rolling_breaches.pdf, ch19_lookahead.pdf, ch19_results.json'

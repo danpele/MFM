@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_rv_series'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Daily realised volatility from 5-minute returns: SPY regular US session (2020-2026) and Bitcoin 24-hour UTC days (2024-2026), annualised.'
+
+Keywords: 'realised volatility, high-frequency data, SPY, Bitcoin, volatility clustering'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_rv_series.pdf'

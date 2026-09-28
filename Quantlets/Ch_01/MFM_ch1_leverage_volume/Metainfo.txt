@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch1_leverage_volume'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Leverage effect, corr(r_t, |r_{t+k}|) for the S&P 500 and Bitcoin, and the relation between abnormal trading volume and absolute returns.'
+
+Keywords: 'leverage effect, volatility asymmetry, trading volume, mixture of distributions, S&P 500, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500 and Bitcoin close and volume'
+
+Output: 'ch1_leverage.pdf, ch1_volume_volatility.pdf'

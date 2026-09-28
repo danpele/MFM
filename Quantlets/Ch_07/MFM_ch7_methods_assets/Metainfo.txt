@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_methods_assets'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'VaR 1% and ES 2.5% of daily losses by method (historical, Normal, Student-t, Cornish-Fisher, EVT) for the S&P 500, BET, Bitcoin, EUR/RON and gold.'
+
+Keywords: 'value-at-risk, expected shortfall, model comparison, BET, Bitcoin, EUR/RON, gold, heavy tails'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_methods_assets.pdf, ch7_var_es_table.csv'

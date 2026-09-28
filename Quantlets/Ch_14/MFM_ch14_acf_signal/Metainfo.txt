@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch14_acf_signal'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Autocorrelation of daily S&P 500 returns and absolute returns since 2000, lags 1-50, with the 95% band under independence: little signal in the mean, persistent signal in the size of moves.'
+
+Keywords: 'autocorrelation, volatility clustering, signal-to-noise, S&P 500, forecastability'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), Bitcoin (BTC-USD.CC), BET'
+
+Output: 'ch14_acf_signal.pdf'

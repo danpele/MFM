@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch14_tail_risk'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'VaR 1% and ES 2.5% forecasts of HS, GARCH-t, FHS, raw Chronos-2 quantiles and FHS with Chronos-2 or TimesFM volatility for the S&P 500, Bitcoin and BET: breach rates, Kupiec and Christoffersen tests, FZ0 losses and model confidence sets; VaR 10% of all three foundation models.'
+
+Keywords: 'value at risk, expected shortfall, foundation model, backtesting, FZ0, model confidence set'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), Bitcoin (BTC-USD.CC), BET'
+
+Output: 'ch14_breach_rates.pdf, ch14_var_path.pdf, ch14_var10.pdf, ch14_mcs.pdf'

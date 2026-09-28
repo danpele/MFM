@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch14_sem_leakage'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 14, B8: an LSTM for log realised variance with time-ordered versus shuffled validation windows; validation loss against the loss on the next 250 days, with log-HAR as reference.'
+
+Keywords: 'data leakage, validation, early stopping, LSTM, realised variance, HAR'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'SPY 5-minute bars (data/market/intraday/SPY.US_5m.csv) and SPY daily adjusted closes (data/market)'
+
+Output: 'ch14_sem_leakage.pdf'

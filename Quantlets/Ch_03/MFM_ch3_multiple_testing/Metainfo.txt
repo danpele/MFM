@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_multiple_testing'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 3, A3-A8 and B7: Vasicek and Blume betas, Bonferroni, Holm and Benjamini-Hochberg step by step, the 300-useless-factors calculation, PCA step by step, and multiple testing of the FF3 alphas of the 25 size x book-to-market portfolios.'
+
+Keywords: 'multiple testing, Bonferroni, Holm, Benjamini-Hochberg, false discovery rate, FF3 alphas'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: '25 portfolios and factors from the Kenneth French Data Library; sector ETFs (data/market)'
+
+Output: 'printed tables'

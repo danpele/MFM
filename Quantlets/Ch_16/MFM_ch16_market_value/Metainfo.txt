@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch16_market_value'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Market value (price times coins in circulation) of Bitcoin, Ethereum, Dogecoin, Cardano and Litecoin, 2018-2026, Bitcoin share and the Herfindahl-Hirschman concentration index.'
+
+Keywords: 'cryptocurrency, market capitalisation, Bitcoin dominance, concentration, Herfindahl-Hirschman index'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama'
+
+Output: 'ch16_market_value.pdf'

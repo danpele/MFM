@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch17_bubbles_for_fama'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Bubbles for Fama (Greenwood, Shleifer and You 2019) on 49 US industries, 1926-2026: probability of a 40% drawdown and mean return over the two years after a two-year run-up above a threshold, raw and net of the market, with 95% bootstrap intervals by calendar year.'
+
+Keywords: 'bubbles for Fama, industry run-ups, crash probability, return predictability, Kenneth French data, bootstrap'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Nasdaq 100, S&P 500, BET, BET-FI, Bitcoin, Ethereum, Dogecoin, NVIDIA, Cisco, Tesla, GameStop, Strategy; S&P Composite monthly since 1871 (Robert J. Shiller); 49 US industry portfolios (Kenneth French Data Library)'
+
+Output: 'ch17_gsy.pdf'

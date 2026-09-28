@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_hrp'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Hierarchical Risk Parity on 16 ETFs (nine sectors and seven multi-asset ETFs): single-linkage tree on the correlation distance and HRP weights versus long-only GMV weights.'
+
+Keywords: 'hierarchical risk parity, HRP, hierarchical clustering, single linkage, dendrogram, Lopez de Prado'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): sector and multi-asset ETFs; risk-free rate from the Kenneth French Data Library'
+
+Output: 'ch4_hrp.pdf'

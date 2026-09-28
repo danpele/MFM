@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_fr_bias'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'How much volatility alone raises a measured correlation: rho_c = rho sqrt((1+delta)/(1+delta rho^2)) for three true correlations, with the 2008 S&P 500 variance ratio marked.'
+
+Keywords: 'Forbes-Rigobon, heteroskedasticity bias, conditional correlation, contagion'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_fr_bias.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_subadditivity'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Counterexample to the subadditivity of VaR: two independent bonds with default probability 0.9%; VaR 1% of the portfolio exceeds the sum of stand-alone VaRs, while Expected Shortfall stays subadditive.'
+
+Keywords: 'coherent risk measures, subadditivity, value-at-risk, expected shortfall, diversification, credit risk'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_subadditivity.pdf'

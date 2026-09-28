@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_intraday_day'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'SPY on 7 April 2025 on 5-minute bars: the intraday price path and the cumulative sum of squared 5-minute returns, i.e. how daily realised variance builds up during a turbulent session.'
+
+Keywords: 'realised variance, intraday returns, high-frequency data, SPY, quadratic variation'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_intraday_day.pdf'

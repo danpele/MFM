@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch12_0dte_gamma'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Options close to expiry: gamma one day, one week and one month before expiry, and the daily time decay of an at-the-money call.'
+
+Keywords: '0DTE options, gamma, theta, time decay, expiry'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, SPY, Bitcoin, VIX, VIX9D, VIX3M, VVIX; Bitcoin option chain (Deribit, snapshot of 22 September 2026, ch12_deribit_snapshot.csv) and the DVOL index (Deribit)'
+
+Output: 'ch12_0dte_gamma.pdf'

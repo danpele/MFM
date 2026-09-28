@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_factor_etfs'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Total-return growth of US factor ETFs (momentum, value, quality, minimum volatility, small caps, large value and large growth) versus SPY, 2013-2026, and their CAGR.'
+
+Keywords: 'factor ETFs, smart beta, momentum, value, quality, minimum volatility, CAGR'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): MTUM, VLUE, QUAL, USMV, IWM, IWD, IWF, SPY'
+
+Output: 'ch3_factor_etfs.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_exceedance'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Exceedance correlations (Longin and Solnik, 2001) of weekly S&P 500 and Euro Stoxx 50 returns, 2000-2026, against the bivariate Normal benchmark with the same correlation.'
+
+Keywords: 'exceedance correlation, asymmetric dependence, tail dependence, bivariate Normal'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_exceedance.pdf, ch6_exceedance.csv'

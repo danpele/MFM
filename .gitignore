@@ -1,0 +1,25 @@
+.DS_Store
+.claude/settings.local.json
+**/.claude/settings.local.json
+__pycache__/
+.ipynb_checkpoints/
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+.env
+*.env
+
+# instructor versions (not published)
+*_solutions.tex
+*_solutions.pdf
+*_solutions.ipynb
+
+# stray file, not part of the site
+g.html

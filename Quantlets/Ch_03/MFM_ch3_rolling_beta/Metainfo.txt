@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_rolling_beta'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Rolling one-year (252-day) CAPM betas of four US sector ETFs against SPY, daily log returns.'
+
+Keywords: 'rolling beta, time-varying beta, CAPM, sector ETFs, SPY'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): XLK, XLU, XLF, XLE, SPY'
+
+Output: 'ch3_rolling_beta.pdf'

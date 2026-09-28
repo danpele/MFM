@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch12_strategies'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Profit at expiry of four option strategies: long straddle, protective put, covered call and bull call spread.'
+
+Keywords: 'option strategies, straddle, protective put, covered call, bull spread, pay-off diagram'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, SPY, Bitcoin, VIX, VIX9D, VIX3M, VVIX; Bitcoin option chain (Deribit, snapshot of 22 September 2026, ch12_deribit_snapshot.csv) and the DVOL index (Deribit)'
+
+Output: 'ch12_strategies.pdf'

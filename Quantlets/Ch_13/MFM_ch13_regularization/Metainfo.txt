@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch13_regularization'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Regularisation and model complexity on S&P 500 5-day direction: LASSO-logistic coefficient path and the bias-variance trade-off of decision trees versus random forests under purged cross-validation.'
+
+Keywords: 'LASSO, L1 regularisation, logistic regression, decision tree, random forest, bias-variance, overfitting'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'S&P 500 and VIX daily close (2000-2026)'
+
+Output: 'ch13_lasso_path.pdf, ch13_tree_complexity.pdf'

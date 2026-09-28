@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_window_length'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'How long must the estimation window be for Markowitz to beat 1/N? Median true Sharpe ratio of estimated MV, long-only MV, GMV, Ledoit-Wolf GMV and ERC portfolios for windows of 36 to 3840 months.'
+
+Keywords: '1/N, DeMiguel Garlappi Uppal, estimation window, simulation, mean-variance, shrinkage'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): nine sector ETFs; risk-free rate from the Kenneth French Data Library (simulation parameters)'
+
+Output: 'ch4_window_length.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch16_amm'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Constant-product automated market maker: slippage by trade size and fee, impermanent loss, and a simulated Ether/USD liquidity position since January 2024 compared with holding and with daily rebalancing (loss-versus-rebalancing sigma^2/8).'
+
+Keywords: 'automated market maker, Uniswap, constant product, slippage, impermanent loss, loss-versus-rebalancing'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama'
+
+Output: 'ch16_amm_theory.pdf, ch16_lp_vs_hodl.pdf'

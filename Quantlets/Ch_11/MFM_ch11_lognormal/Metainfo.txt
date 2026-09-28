@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_lognormal'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Lognormal distribution of the 10-year gross return under geometric Brownian motion with S&P 500 parameters: mode, median and mean, probability of a loss.'
+
+Keywords: 'geometric Brownian motion, lognormal distribution, mean, median, mode, long-horizon returns'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_lognormal.pdf'

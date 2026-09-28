@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_beta_inference'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 3, B1 and B6: alpha and beta of XLK with classical, Newey-West and moving-block bootstrap inference; FF5 + momentum alphas of MTUM and QUAL with bootstrap confidence intervals.'
+
+Keywords: 'beta, alpha, Newey-West, block bootstrap, factor ETFs, inference'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): XLK, SPY, MTUM, QUAL; factors from the Kenneth French Data Library'
+
+Output: 'printed tables'

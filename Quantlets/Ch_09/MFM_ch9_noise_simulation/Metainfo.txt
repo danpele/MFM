@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_noise_simulation'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Simulated one-second prices with i.i.d. microstructure noise: volatility signature plot of realised variance, and the two-scale realised variance and Parzen realised kernel as noise-robust estimators.'
+
+Keywords: 'microstructure noise, signature plot, two-scale realised variance, realised kernel, simulation'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_noise_simulation.pdf'

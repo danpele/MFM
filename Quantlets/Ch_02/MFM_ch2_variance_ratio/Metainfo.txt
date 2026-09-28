@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch2_variance_ratio'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Lo-MacKinlay variance-ratio profiles VR(q), q = 2..60, with robust bands for the S&P 500, BET, Bitcoin and EUR/RON, and the robust z*(5) statistic across 16 markets.'
+
+Keywords: 'variance ratio, Lo-MacKinlay, heteroskedasticity-robust test, mean reversion, momentum'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, Euro Stoxx 50, Nikkei 225, Hang Seng, BET, WIG20, BUX, PX, BIST 100, Bovespa, IPC, Nifty 50, Shanghai, Bitcoin, Ethereum; EUR/RON official reference rate'
+
+Output: 'ch2_vr_profile.pdf, ch2_vr_markets.pdf'

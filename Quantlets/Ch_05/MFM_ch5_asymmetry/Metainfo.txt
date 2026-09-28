@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch5_asymmetry'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Asymmetric volatility: news impact curves of GARCH, GJR-GARCH and EGARCH for the S&P 500, and GJR/EGARCH asymmetry parameters with likelihood ratio tests for six series.'
+
+Keywords: 'leverage effect, news impact curve, GJR-GARCH, EGARCH, asymmetry, likelihood ratio test'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
+
+Output: 'ch5_nic.pdf, ch5_asym_table.csv'

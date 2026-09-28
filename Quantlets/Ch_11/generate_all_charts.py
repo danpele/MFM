@@ -1,0 +1,724 @@
+"""
+Generator pentru toate graficele si cifrele din Capitolul 11: modele in timp continuu
+====================================================================================
+Toate graficele: fundal transparent, etichete ENG, legenda in afara, jos; seriile de timp in culori din paleta.
+Date zilnice de piata (data/market): S&P 500 (1990-2026), BET (2000-2026), Bitcoin (2014-2026), VIX (1990-2026);
+randamentul titlurilor de stat americane pe 3 luni (FRED, DTB3, 1954-2026).
+Cifrele sunt salvate in ch11_results.json (folosite de generatoarele de slide-uri).
+Modelarea Pietelor Financiare - Daniel Traian PELE
+"""
+
+import os
+import sys
+import json
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy import stats
+import warnings
+warnings.filterwarnings('ignore')
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from mfm_data import LABELS, log_returns, load_close, load_vix, read_fred, periods_per_year  # noqa: E402
+from ct_models import (scaled_random_walk, bm_paths, quadratic_variation, total_variation, ito_stratonovich,  # noqa: E402
+                       max_prob, convergence_study, slope_ci, gbm_paths, gbm_mle, gbm_simulate_returns,
+                       ou_exact_path, ou_mle, merton_logpdf, merton_mle, merton_moments, merton_simulate_returns,
+                       lee_mykland, heston_paths, heston_from_vix, heston_simulate_returns, heston_smile, acf,
+                       stylised)
+
+# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+plt.rcParams['figure.facecolor'] = 'none'
+plt.rcParams['axes.facecolor'] = 'none'
+plt.rcParams['savefig.facecolor'] = 'none'
+plt.rcParams['savefig.transparent'] = True
+plt.rcParams['axes.grid'] = False
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.sans-serif'] = ['Helvetica', 'Arial', 'DejaVu Sans']
+plt.rcParams['font.size'] = 9
+plt.rcParams['axes.labelsize'] = 10
+plt.rcParams['axes.titlesize'] = 10
+plt.rcParams['axes.spines.top'] = False
+plt.rcParams['axes.spines.right'] = False
+plt.rcParams['axes.linewidth'] = 0.6
+plt.rcParams['lines.linewidth'] = 1.1
+plt.rcParams['legend.facecolor'] = 'none'
+plt.rcParams['legend.framealpha'] = 0
+plt.rcParams['legend.fontsize'] = 8
+
+# Culori brand
+MainBlue = '#1A3A6E'
+IDAred   = '#CD0000'
+Forest   = '#2E7D32'
+Amber    = '#B5853F'
+Orange   = '#E67E22'
+Purple   = '#8E44AD'
+Crimson  = '#DC3545'
+Teal     = '#17A2B8'
+Gray     = '#7F7F7F'   # doar linii de referinta, benzi, grila
+LightGray = '#DADADA'
+MODEL_COL = {'Data': MainBlue, 'GBM': Orange, 'Merton': Purple, 'Heston': Forest}
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
+SEED = 42
+DT = 1 / 252
+
+
+def save_fig(name):
+    """Salveaza figura ca PDF si PNG transparent."""
+    os.makedirs(CHART_DIR, exist_ok=True)
+    plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
+    plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
+    plt.close()
+    print(f"   saved {name}")
+
+
+def legend_outside_bottom(ax, ncol=2, y=-0.22):
+    """Plaseaza legenda in afara graficului, jos-centru."""
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
+
+
+def fig_legend_bottom(fig, handles=None, labels=None, ncol=4, y=0.0):
+    """O singura legenda pentru o figura cu mai multe panouri, sub figura."""
+    if handles is None:
+        handles, labels = [], []
+        for ax in fig.axes:
+            h, l = ax.get_legend_handles_labels()
+            for hh, ll in zip(h, l):
+                if ll not in labels and not ll.startswith('_'):
+                    handles.append(hh)
+                    labels.append(ll)
+    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
+
+
+def jsonable(x):
+    if isinstance(x, dict):
+        return {str(k): jsonable(v) for k, v in x.items()}
+    if isinstance(x, (list, tuple)):
+        return [jsonable(v) for v in x]
+    if isinstance(x, (np.floating, np.integer)):
+        return x.item()
+    if isinstance(x, np.ndarray):
+        return [jsonable(v) for v in x.tolist()]
+    if isinstance(x, pd.Timestamp):
+        return str(x.date())
+    return x
+
+
+# =============================================================================
+# DATE: randamente log zilnice (nu in %), fiecare serie pe calendarul ei
+# =============================================================================
+rets = {k: log_returns(k) for k in ['sp500', 'bet', 'btc']}
+DTS = {'sp500': 1 / 252, 'bet': 1 / 252, 'btc': 1 / 365}
+
+
+# =============================================================================
+# 1. DE LA MERSUL ALEATOR LA MISCAREA BROWNIANA
+# =============================================================================
+def fig_donsker():
+    """Mersul aleator scalat pentru n = 5, 50, 5000 si probabilitatea P(max W > 1) (principiul reflexiei)."""
+    rng = np.random.default_rng(SEED)
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.4), gridspec_kw={'width_ratios': [1.5, 1]})
+    for n, c in zip([5, 50, 5000], [IDAred, Amber, MainBlue]):
+        t, W = scaled_random_walk(n, 1, rng)
+        axes[0].step(t, W[0], where='post', color=c, lw=1.2 if n < 5000 else 0.8, label=f'n = {n}')
+    axes[0].axhline(0, color=Gray, lw=0.5)
+    axes[0].set_xlabel('Time t')
+    axes[0].set_ylabel(r'$S_{\lfloor nt \rfloor}/\sqrt{n}$')
+    axes[0].set_title('Scaled random walks', loc='left')
+    ns = [5, 10, 20, 50, 100, 200, 500, 1000, 2000]
+    M = 20000
+    out = {'n': ns, 'p': [], 'se': []}
+    for n in ns:
+        _, W = scaled_random_walk(n, M, rng)
+        p = max_prob(W, 1.0)
+        out['p'].append(p)
+        out['se'].append(np.sqrt(p * (1 - p) / M))
+    exact = 2 * (1 - stats.norm.cdf(1.0))
+    axes[1].errorbar(ns, out['p'], yerr=1.96 * np.array(out['se']), fmt='o-', color=MainBlue, ms=4, capsize=2,
+                     label='Random walk, 20,000 paths (95% CI)')
+    axes[1].axhline(exact, color=IDAred, ls='--', lw=1, label=f'Brownian motion: 2(1 - Φ(1)) = {exact:.4f}')
+    axes[1].set_xscale('log')
+    axes[1].set_xlabel('Number of steps n')
+    axes[1].set_ylabel(r'$P(\max_{t \leq 1} W_n(t) > 1)$')
+    axes[1].set_title('A path functional converges too', loc='left')
+    legend_outside_bottom(axes[0], ncol=3, y=-0.2)
+    legend_outside_bottom(axes[1], ncol=1, y=-0.2)
+    plt.tight_layout()
+    save_fig('ch11_donsker')
+    out['exact'] = exact
+    return out
+
+
+def fig_bm_paths():
+    """Traiectorii browniene cu banda +-1.96 sqrt(t) si autosimilaritatea (zoom de 100x in timp, 10x in spatiu)."""
+    rng = np.random.default_rng(SEED + 1)
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
+    t, W = bm_paths(5, 2000, 1.0, rng)
+    axes[0].fill_between(t, -1.96 * np.sqrt(t), 1.96 * np.sqrt(t), color=LightGray, alpha=0.8, lw=0,
+                         label=r'$\pm 1.96\sqrt{t}$ (95% of paths at each t)')
+    for w, c in zip(W, [MainBlue, IDAred, Forest, Amber, Purple]):
+        axes[0].plot(t, w, color=c, lw=0.8)
+    axes[0].set_xlabel('Time t')
+    axes[0].set_ylabel(r'$W_t$')
+    axes[0].set_title('Five Brownian paths on [0, 1]', loc='left')
+    t2, W2 = bm_paths(1, 100000, 1.0, rng)
+    w = W2[0]
+    axes[1].plot(t2, w, color=MainBlue, lw=0.5, label='Path on [0, 1]')
+    k = 1000                                             # [0, 0.01] rescalat: timp x100, spatiu x10
+    axes[1].plot(t2[:k + 1] * 100, w[:k + 1] * 10, color=IDAred, lw=0.5,
+                 label=r'Its first 1% of time, rescaled: $10\,W_{t/100}$')
+    axes[1].set_xlabel('Time t')
+    axes[1].set_title('Self-similarity: zoom in and the path looks the same', loc='left')
+    legend_outside_bottom(axes[0], ncol=1, y=-0.2)
+    legend_outside_bottom(axes[1], ncol=1, y=-0.2)
+    plt.tight_layout()
+    save_fig('ch11_bm_paths')
+
+
+def fig_quadratic_variation():
+    """Variatia patratica si totala pe grile tot mai fine; variatia patratica realizata a S&P 500."""
+    rng = np.random.default_rng(SEED + 2)
+    N = 2 ** 16
+    _, W = bm_paths(1, N, 1.0, rng)
+    w = W[0]
+    ns = [2 ** k for k in range(4, 17)]
+    qv = [quadratic_variation(w[::N // n]) for n in ns]
+    tv = [total_variation(w[::N // n]) for n in ns]
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
+    axes[0].plot(ns, qv, 'o-', color=MainBlue, ms=3.5, label=r'Quadratic variation $\sum (\Delta W)^2$')
+    axes[0].plot(ns, tv, 's-', color=IDAred, ms=3.5, label=r'Total variation $\sum |\Delta W|$')
+    axes[0].plot(ns, np.sqrt(2 * np.array(ns) / np.pi), color=Gray, ls=':', lw=0.9, label=r'$\sqrt{2n/\pi}$')
+    axes[0].axhline(1.0, color=Gray, ls='--', lw=0.8, label='T = 1')
+    axes[0].set_xscale('log')
+    axes[0].set_yscale('log')
+    axes[0].set_xlabel('Number of intervals n on [0, 1]')
+    axes[0].set_title('One Brownian path, finer and finer grids', loc='left')
+    r = rets['sp500']
+    cum = (r ** 2).cumsum()
+    years = (r.index - r.index[0]).days / 365.25
+    lin = cum.iloc[-1] * years / years[-1]
+    axes[1].plot(r.index, cum, color=MainBlue, lw=1.1, label=r'S&P 500: $\sum_{s \leq t} r_s^2$')
+    axes[1].plot(r.index, lin, color=Orange, ls='--', lw=1.1, label=r'GBM: $\sigma^2 t$ (same end point)')
+    axes[1].set_ylabel('Cumulative squared returns')
+    axes[1].set_title('Realised quadratic variation, 1990-2026', loc='left')
+    legend_outside_bottom(axes[0], ncol=2, y=-0.2)
+    legend_outside_bottom(axes[1], ncol=1, y=-0.2)
+    plt.tight_layout()
+    save_fig('ch11_quadratic_variation')
+    gaps = {}
+    for a, b in [('2008-09-01', '2009-03-31'), ('2020-02-20', '2020-04-30')]:
+        seg = r.loc[a:b]
+        gaps[a[:4]] = dict(share_qv=float((seg ** 2).sum() / cum.iloc[-1]), share_time=len(seg) / len(r))
+    return dict(qv=dict(zip(map(str, ns), qv)), tv=dict(zip(map(str, ns), tv)), total_qv=float(cum.iloc[-1]),
+                sigma_implied=float(np.sqrt(cum.iloc[-1] / years[-1])), crises=gaps)
+
+
+def fig_ito():
+    """W_t^2 = 2 int W dW + t pe o traiectorie; diferenta Stratonovich - Ito pe 5000 de traiectorii."""
+    rng = np.random.default_rng(SEED + 3)
+    n = 2000
+    t, W = bm_paths(1, n, 1.0, rng)
+    w = W[0]
+    dW = np.diff(w)
+    ito_path = np.concatenate([[0], np.cumsum(w[:-1] * dW)])
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
+    axes[0].plot(t, w ** 2, color=MainBlue, lw=1.2, label=r'$W_t^2$')
+    axes[0].plot(t, 2 * ito_path, color=IDAred, lw=0.9, label=r'$2\int_0^t W_s\,dW_s$ (Itô, left end points)')
+    axes[0].plot(t, 2 * ito_path + t, color=Amber, lw=0.9, ls='--', label=r'$2\int_0^t W_s\,dW_s + t$')
+    axes[0].set_xlabel('Time t')
+    axes[0].set_title("Itô's formula on one path", loc='left')
+    _, Wm = bm_paths(5000, 1000, 1.0, rng)
+    ito, strat = ito_stratonovich(Wm)
+    exact = 0.5 * (Wm[:, -1] ** 2 - 1.0)
+    diff = strat - ito
+    axes[1].hist(diff, bins=50, color=Teal, alpha=0.85, label='Stratonovich sum - Itô sum (5,000 paths)')
+    axes[1].axvline(0.5, color=IDAred, ls='--', lw=1, label='T/2 = 0.5')
+    axes[1].set_xlabel('Difference between the two Riemann-type sums, n = 1,000')
+    axes[1].set_title('The evaluation point matters', loc='left')
+    legend_outside_bottom(axes[0], ncol=2, y=-0.2)
+    legend_outside_bottom(axes[1], ncol=1, y=-0.2)
+    plt.tight_layout()
+    save_fig('ch11_ito')
+    return dict(diff_mean=float(diff.mean()), diff_sd=float(diff.std()), ito_err_mean=float(np.mean(ito - exact)),
+                ito_err_sd=float(np.std(ito - exact)), ito_mean=float(ito.mean()), ito_var=float(ito.var()))
+
+
+def fig_convergence():
+    """Erorile tare si slabe ale schemelor Euler-Maruyama si Milstein pentru ecuatia de test a lui Higham."""
+    rng = np.random.default_rng(SEED + 4)
+    d = convergence_study(rng)
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
+    axes[0].errorbar(d['dt'], d['strong_em'], yerr=1.96 * d['strong_em_se'], fmt='o-', color=MainBlue, ms=4,
+                     capsize=2, label='Euler-Maruyama')
+    axes[0].errorbar(d['dt'], d['strong_mil'], yerr=1.96 * d['strong_mil_se'], fmt='s-', color=IDAred, ms=4,
+                     capsize=2, label='Milstein')
+    x = d['dt'].values
+    axes[0].plot(x, d['strong_em'].iloc[0] * (x / x[0]) ** 0.5, color=Gray, ls=':', label='Slope 1/2')
+    axes[0].plot(x, d['strong_mil'].iloc[0] * (x / x[0]) ** 1.0, color=Gray, ls='--', label='Slope 1')
+    axes[0].set_title(r'Strong error $E|X_T - X^{\Delta t}_T|$', loc='left')
+    axes[1].plot(x, d['weak_em_exact'], 'o-', color=MainBlue, ms=4, label=r'Euler-Maruyama (exact $E X^{\Delta t}_T$)')
+    axes[1].plot(x, d['weak_em_mc'], 'x', color=Teal, ms=6, label='Euler-Maruyama (Monte Carlo)')
+    axes[1].plot(x, d['weak_em_exact'].iloc[0] * (x / x[0]), color=Gray, ls='--', label='Slope 1')
+    axes[1].set_title(r'Weak error $|E X^{\Delta t}_T - E X_T|$', loc='left')
+    for ax in axes:
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        ax.set_xlabel(r'Step size $\Delta t$')
+    legend_outside_bottom(axes[0], ncol=2, y=-0.2)
+    legend_outside_bottom(axes[1], ncol=2, y=-0.2)
+    plt.tight_layout()
+    save_fig('ch11_convergence')
+    se = slope_ci(d['dt'], d['strong_em'])
+    sm = slope_ci(d['dt'], d['strong_mil'])
+    we = slope_ci(d['dt'], d['weak_em_exact'])
+    d.to_csv(os.path.join(HERE, 'ch11_convergence.csv'), index=False)
+    return dict(table=d.to_dict('list'), slope_em=se, slope_mil=sm, slope_weak=we)
+
+
+# =============================================================================
+# 2. MISCAREA BROWNIANA GEOMETRICA
+# =============================================================================
+def gbm_estimates():
+    """Estimatori GBM pentru S&P 500, BET, Bitcoin."""
+    out = {}
+    for k, r in rets.items():
+        g = gbm_mle(r.values, DTS[k])
+        g['start'] = str(r.index[0].date())
+        g['ppy'] = periods_per_year(r)
+        out[k] = g
+    return out
+
+
+def fig_gbm_fan(g):
+    """Zece ani de traiectorii GBM pentru S&P 500 pornind de la ultima inchidere: media vs mediana."""
+    rng = np.random.default_rng(SEED + 5)
+    S0 = float(load_close('sp500').iloc[-1])
+    T, n = 10.0, 2520
+    mu, sigma = g['mu'], g['sigma']
+    t, S = gbm_paths(S0, mu, sigma, T, n, 20000, rng)
+    fig, ax = plt.subplots(figsize=(9, 3.6))
+    q05, q95 = np.quantile(S, [0.05, 0.95], axis=0)
+    ax.fill_between(t, q05, q95, color=LightGray, alpha=0.8, lw=0, label='5%-95% band of 20,000 paths')
+    cols = [Teal, Purple, Amber, Crimson, Forest]
+    for i in range(5):
+        ax.plot(t, S[i], color=cols[i], lw=0.6)
+    ax.plot(t, S0 * np.exp(mu * t), color=IDAred, lw=1.6, label=r'Mean $S_0 e^{\mu t}$')
+    ax.plot(t, S0 * np.exp((mu - 0.5 * sigma ** 2) * t), color=MainBlue, lw=1.6, ls='--',
+            label=r'Median $S_0 e^{(\mu - \sigma^2/2) t}$')
+    ax.set_yscale('log')
+    ticks = [4000, 6000, 8000, 10000, 15000, 20000, 30000, 40000]
+    ax.set_yticks(ticks)
+    ax.set_yticklabels([f'{v:,}' for v in ticks])
+    ax.minorticks_off()
+    ax.set_xlabel('Years after 18 September 2026')
+    ax.set_ylabel('S&P 500 level (log scale)')
+    legend_outside_bottom(ax, ncol=3)
+    save_fig('ch11_gbm_fan')
+    ST = S[:, -1]
+    return dict(S0=S0, mean_T=float(S0 * np.exp(mu * T)), median_T=float(S0 * np.exp((mu - 0.5 * sigma ** 2) * T)),
+                q05=float(np.quantile(ST, 0.05)), q95=float(np.quantile(ST, 0.95)),
+                p_below=float(np.mean(ST < S0)), p_below_exact=float(stats.norm.cdf(-(mu - 0.5 * sigma ** 2) * np.sqrt(T) / sigma)),
+                mean_sim=float(ST.mean()), share_below_mean=float(np.mean(ST < S0 * np.exp(mu * T))))
+
+
+def fig_lognormal(g):
+    """Distributia lognormala a lui S_T / S_0 dupa 10 ani: modul < mediana < media."""
+    mu, sigma, T = g['mu'], g['sigma'], 10.0
+    m, s = (mu - 0.5 * sigma ** 2) * T, sigma * np.sqrt(T)
+    rng = np.random.default_rng(SEED + 6)
+    x = np.exp(m + s * rng.standard_normal(200000))
+    fig, ax = plt.subplots(figsize=(8, 3.4))
+    ax.hist(x, bins=np.linspace(0, 12, 121), density=True, color=Teal, alpha=0.7, label='Simulated $S_T/S_0$ (200,000 draws)')
+    xx = np.linspace(0.01, 12, 600)
+    ax.plot(xx, stats.lognorm.pdf(xx, s, scale=np.exp(m)), color=MainBlue, lw=1.4, label='Lognormal density')
+    mode, med, mean = np.exp(m - s ** 2), np.exp(m), np.exp(m + 0.5 * s ** 2)
+    for v, c, lab in [(mode, Forest, 'Mode'), (med, Amber, 'Median'), (mean, IDAred, 'Mean')]:
+        ax.axvline(v, color=c, lw=1.3, ls='--', label=f'{lab} = {v:.2f}')
+    ax.set_xlabel('Gross return over 10 years, $S_T / S_0$')
+    ax.set_ylabel('Density')
+    legend_outside_bottom(ax, ncol=3)
+    save_fig('ch11_lognormal')
+    return dict(mode=float(mode), median=float(med), mean=float(mean), p_below1=float(stats.norm.cdf(-m / s)),
+                p_below_mean=float(stats.norm.cdf(0.5 * s)))
+
+
+def fig_gbm_vs_data(g):
+    """S&P 500: graficul QQ fata de distributia Normala si autocorelatia lui |r| fata de GBM simulat."""
+    r = rets['sp500'].values
+    z = (r - r.mean()) / r.std()
+    n = len(z)
+    q = stats.norm.ppf((np.arange(1, n + 1) - 0.5) / n)
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.5))
+    axes[0].scatter(q, np.sort(z), s=4, color=MainBlue, label='S&P 500 daily log returns, standardised')
+    axes[0].plot([-5, 5], [-5, 5], color=Gray, lw=0.8, label='45-degree line (Normal distribution)')
+    axes[0].set_xlabel('Quantiles of the standard Normal distribution')
+    axes[0].set_ylabel('Sample quantiles')
+    axes[0].set_title('Tails: returns are not Normal', loc='left')
+    lags = np.arange(1, 51)
+    rng = np.random.default_rng(SEED + 7)
+    sims = np.array([acf(np.abs(gbm_simulate_returns(g['m'], g['sigma'], n, DT, rng)), lags) for _ in range(200)])
+    lo, hi = np.quantile(sims, [0.025, 0.975], axis=0)
+    a = acf(np.abs(r), lags)
+    axes[1].fill_between(lags, lo, hi, color=LightGray, alpha=0.9, lw=0, label='GBM: 95% range of 200 simulations')
+    axes[1].bar(lags, a, color=MainBlue, width=0.7, label='S&P 500: ACF of |r|')
+    axes[1].set_xlabel('Lag (trading days)')
+    axes[1].set_title('Clustering: |r| is autocorrelated', loc='left')
+    legend_outside_bottom(axes[0], ncol=1, y=-0.2)
+    legend_outside_bottom(axes[1], ncol=1, y=-0.2)
+    plt.tight_layout()
+    save_fig('ch11_gbm_vs_data')
+    s = stylised(r)
+    jb = stats.jarque_bera(r)
+    return dict(exkurt=s['exkurt'], skew=s['skew'], acf1=float(a[0]), acf50=float(a[-1]), band_hi=float(hi.max()),
+                n_out=int(np.sum(np.abs(z) > 4)), n_out_exp=float(n * 2 * stats.norm.sf(4)), jb=float(jb.statistic),
+                zmin=float(z.min()))
+
+
+def fig_drift_precision(g):
+    """Precizia estimarii drift-ului: latimea intervalului de 95% vs durata; estimari pe ferestre de 10 ani."""
+    years = np.linspace(1, 100, 200)
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
+    for k, c in [('sp500', MainBlue), ('btc', Amber)]:
+        s = g[k]['sigma']
+        axes[0].plot(years, 1.96 * s / np.sqrt(years) * 100, color=c, lw=1.4,
+                     label=f"{LABELS[k]} ($\\sigma$ = {100 * s:.0f}%)")
+    axes[0].axhline(1.0, color=Gray, ls='--', lw=0.8, label='+/- 1 percentage point')
+    axes[0].set_xlabel('Years of data T')
+    axes[0].set_ylabel('Half-width of 95% CI for the drift (pp)')
+    axes[0].set_yscale('log')
+    axes[0].set_title(r'Drift precision depends only on T: $1.96\,\sigma/\sqrt{T}$', loc='left')
+    r = rets['sp500']
+    w = 2520
+    m = r.rolling(w).mean() / DT
+    s = r.rolling(w).std() / np.sqrt(DT)
+    ci = 1.96 * s / np.sqrt(w * DT)
+    axes[1].fill_between(m.index, 100 * (m - ci), 100 * (m + ci), color=LightGray, alpha=0.8, lw=0,
+                         label='95% CI for the log drift')
+    axes[1].plot(m.index, 100 * m, color=MainBlue, lw=1.2, label=r'Log drift $\hat m = \hat\mu - \hat\sigma^2/2$ (% p.a.)')
+    axes[1].plot(s.index, 100 * s, color=IDAred, lw=1.2, label=r'Volatility $\hat\sigma$ (% p.a.)')
+    axes[1].axhline(0, color=Gray, lw=0.5)
+    axes[1].set_title('S&P 500, rolling 10-year windows', loc='left')
+    legend_outside_bottom(axes[0], ncol=2, y=-0.2)
+    legend_outside_bottom(axes[1], ncol=2, y=-0.2)
+    plt.tight_layout()
+    save_fig('ch11_drift_precision')
+    mm = m.dropna()
+    ss = s.dropna()
+    return dict(T_1pp_sp=float((1.96 * g['sp500']['sigma'] / 0.01) ** 2), T_1pp_btc=float((1.96 * g['btc']['sigma'] / 0.01) ** 2),
+                m_min=float(mm.min()), m_max=float(mm.max()), m_min_date=str(mm.idxmin().date()), m_max_date=str(mm.idxmax().date()),
+                s_min=float(ss.min()), s_max=float(ss.max()))
+
+
+# =============================================================================
+# 3. ORNSTEIN-UHLENBECK
+# =============================================================================
+def fig_ou_paths():
+    """Trei procese OU cu aceleasi socuri si viteze de revenire diferite."""
+    rng = np.random.default_rng(SEED + 8)
+    dt, n = 1 / 252, 252 * 10
+    z = rng.standard_normal(n)
+    theta, sigma, x0 = 0.03, 0.01, 0.08
+    fig, ax = plt.subplots(figsize=(9, 3.5))
+    t = np.arange(n + 1) * dt
+    out = {}
+    for kappa, c in [(0.2, MainBlue), (1.0, Amber), (5.0, IDAred)]:
+        x = ou_exact_path(x0, kappa, theta, sigma, dt, n, rng, z=z)
+        ax.plot(t, 100 * x, color=c, lw=0.9, label=f'$\\kappa$ = {kappa}: half-life {np.log(2) / kappa:.2f} years')
+        out[str(kappa)] = dict(half_life=np.log(2) / kappa, stat_sd=sigma / np.sqrt(2 * kappa))
+    ax.axhline(100 * theta, color=Gray, ls='--', lw=0.8, label=r'Long-run mean $\theta$ = 3%')
+    ax.set_xlabel('Years')
+    ax.set_ylabel('x (%)')
+    legend_outside_bottom(ax, ncol=2)
+    save_fig('ch11_ou_paths')
+    return out
+
+
+def fig_vasicek():
+    """Randamentul titlurilor de stat pe 3 luni (FRED, DTB3): estimari Vasicek pe intreaga perioada si pe subperioade."""
+    tb = read_fred('DTB3') / 100
+    full = ou_mle(tb.values, DT)
+    subs = [('1954', '1979'), ('1980', '2007'), ('2008', '2026')]
+    res = {'1954-2026': full}
+    for a, b in subs:
+        res[f'{a}-{b}'] = ou_mle(tb.loc[a:b].values, DT)
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.4), gridspec_kw={'width_ratios': [1.6, 1]})
+    axes[0].plot(tb.index, 100 * tb, color=MainBlue, lw=0.8, label='3-month Treasury bill rate (% p.a.)')
+    axes[0].axhline(100 * full['theta'], color=IDAred, ls='--', lw=1, label=rf"Vasicek $\hat\theta$ = {100 * full['theta']:.2f}%")
+    axes[0].fill_between(tb.index, 100 * (full['theta'] - 2 * full['stat_sd']), 100 * (full['theta'] + 2 * full['stat_sd']),
+                         color=LightGray, alpha=0.45, lw=0, label=r'$\hat\theta \pm 2$ stationary s.d.')
+    axes[0].axhline(0, color=Gray, lw=0.5)
+    axes[0].set_title('Short rate, 1954-2026', loc='left')
+    labs = list(res)
+    k = np.array([res[l]['kappa'] for l in labs])
+    se = np.array([res[l]['se_kappa'] for l in labs])
+    cols = [MainBlue, Amber, Forest, Purple]
+    for i, (l, c) in enumerate(zip(labs, cols)):
+        axes[1].errorbar(i, k[i], yerr=1.96 * se[i], fmt='o', color=c, capsize=4, ms=6)
+    axes[1].axhline(0, color=Gray, lw=0.6)
+    axes[1].set_xticks(range(len(labs)))
+    axes[1].set_xticklabels(labs, fontsize=8)
+    axes[1].set_ylabel(r'$\hat\kappa$ with 95% CI (per year)')
+    axes[1].set_title('Speed of mean reversion', loc='left')
+    legend_outside_bottom(axes[0], ncol=2, y=-0.15)
+    plt.tight_layout()
+    save_fig('ch11_vasicek')
+    out = {k2: {c: float(v) for c, v in d.items()} for k2, d in res.items()}
+    out['last'] = float(tb.iloc[-1])
+    out['min'] = float(tb.min())
+    out['min_date'] = str(tb.idxmin().date())
+    out['max'] = float(tb.max())
+    out['max_date'] = str(tb.idxmax().date())
+    out['share_zero'] = float(np.mean(tb < 0.0005))
+    out['p_neg'] = float(stats.norm.cdf(-full['theta'] / full['stat_sd']))
+    return out
+
+
+def fig_vix_ou():
+    """Logaritmul VIX ca proces OU: nivelul pe termen lung, timpul de injumatatire, autocorelatia."""
+    vix = load_vix()
+    x = np.log(vix)
+    f = ou_mle(x.values, DT)
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.4), gridspec_kw={'width_ratios': [1.6, 1]})
+    axes[0].plot(vix.index, vix, color=MainBlue, lw=0.7, label='VIX (% p.a.)')
+    axes[0].axhline(np.exp(f['theta']), color=IDAred, ls='--', lw=1, label=rf"$e^{{\hat\theta}}$ = {np.exp(f['theta']):.1f}")
+    axes[0].set_yscale('log')
+    axes[0].set_yticks([10, 20, 40, 80])
+    axes[0].set_yticklabels(['10', '20', '40', '80'])
+    axes[0].minorticks_off()
+    axes[0].set_title('VIX, 1990-2026 (log scale)', loc='left')
+    lags = np.arange(1, 121)
+    a = acf(x.values, lags)
+    axes[1].plot(lags, a, color=MainBlue, lw=1.3, label='Sample ACF of ln VIX')
+    axes[1].plot(lags, f['b'] ** lags, color=IDAred, ls='--', lw=1.2, label=r'OU: $e^{-\hat\kappa\,k\,\Delta t}$')
+    axes[1].set_xlabel('Lag k (trading days)')
+    axes[1].set_title('Memory decays more slowly than OU', loc='left')
+    legend_outside_bottom(axes[0], ncol=2, y=-0.15)
+    legend_outside_bottom(axes[1], ncol=1, y=-0.2)
+    plt.tight_layout()
+    save_fig('ch11_vix_ou')
+    out = {c: float(v) for c, v in f.items()}
+    out.update(hl_days=float(f['half_life'] * 252), level=float(np.exp(f['theta'])), acf60=float(a[59]), ou60=float(f['b'] ** 60),
+               vix_last=float(vix.iloc[-1]), vix_max=float(vix.max()), vix_max_date=str(vix.idxmax().date()))
+    return out
+
+
+# =============================================================================
+# 4. SALTURI: MERTON
+# =============================================================================
+def merton_estimates():
+    out = {}
+    for k in ['sp500', 'btc', 'bet']:
+        r = rets[k].values
+        mf = merton_mle(r, DTS[k])
+        mo = merton_moments(DTS[k], mf['sigma'], mf['lam'], mf['mu_j'], mf['s_j'], mf['m'])
+        ll0 = float(stats.norm.logpdf(r, r.mean(), r.std()).sum())
+        tot = mf['sigma'] ** 2 + mf['lam'] * (mf['mu_j'] ** 2 + mf['s_j'] ** 2)
+        out[k] = dict(mf, moments=mo, ll_gbm=ll0, lr=2 * (mf['loglik'] - ll0), jump_share=mf['lam'] * (mf['mu_j'] ** 2 + mf['s_j'] ** 2) / tot,
+                      data_exkurt=float(stats.kurtosis(r)), data_skew=float(stats.skew(r)))
+    return out
+
+
+def fig_merton_density(me):
+    """Densitatea randamentelor (scara log): date, distributia Normala, Merton."""
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.5))
+    for ax, k in zip(axes, ['sp500', 'btc']):
+        r = rets[k].values
+        dt = DTS[k]
+        mf = me[k]
+        h, e = np.histogram(r, bins=120, density=True)
+        c = 0.5 * (e[1:] + e[:-1])
+        ok = h > 0
+        ax.plot(c[ok], h[ok], 'o', ms=3, color=MainBlue, label='Data (histogram)')
+        xx = np.linspace(e[0], e[-1], 800)
+        ax.plot(xx, stats.norm.pdf(xx, r.mean(), r.std()), color=Orange, lw=1.3, label='Normal distribution (GBM)')
+        ax.plot(xx, np.exp(merton_logpdf(xx, dt, mf['m'], mf['sigma'], mf['lam'], mf['mu_j'], mf['s_j'])), color=IDAred,
+                lw=1.3, label='Merton jump-diffusion (maximum likelihood)')
+        ax.set_yscale('log')
+        ax.set_ylim(h[ok].min() / 3, h.max() * 3)
+        ax.set_xlabel('Daily log return')
+        ax.set_title(LABELS[k], loc='left')
+    fig_legend_bottom(plt.gcf(), ncol=3, y=0.02)
+    plt.tight_layout(rect=(0, 0.08, 1, 1))
+    save_fig('ch11_merton_density')
+
+
+def fig_jumps():
+    """Salturi detectate cu testul Lee-Mykland (alpha = 1%) pentru S&P 500 si Bitcoin."""
+    fig, axes = plt.subplots(2, 1, figsize=(10, 4.6), sharex=False)
+    out = {}
+    for ax, k in zip(axes, ['sp500', 'btc']):
+        d, crit = lee_mykland(rets[k], K=16, alpha=0.01)
+        ax.plot(d.index, 100 * d['r'], color=MainBlue, lw=0.4, label='Daily log return (%)')
+        j = d[d['jump']]
+        ax.scatter(j.index, 100 * j['r'], s=14, color=IDAred, zorder=3, label='Jump detected (Lee-Mykland, 1% level)')
+        ax.set_title(LABELS[k], loc='left')
+        years = (d.index[-1] - d.index[0]).days / 365.25
+        big = d['r'].abs().sort_values(ascending=False).head(10)
+        out[k] = dict(n=int(len(d)), n_jumps=int(d['jump'].sum()), per_year=float(d['jump'].sum() / years), crit=float(crit),
+                      share_neg=float((j['r'] < 0).mean()), top10_detected=int(d.loc[big.index, 'jump'].sum()),
+                      largest=float(j['r'].abs().max()), smallest=float(j['r'].abs().min()),
+                      smallest_date=str(j['r'].abs().idxmin().date()),
+                      dates=[str(x.date()) for x in j.index])
+    fig_legend_bottom(fig, ncol=2, y=0.02)
+    plt.tight_layout(rect=(0, 0.06, 1, 1))
+    save_fig('ch11_jumps')
+    return out
+
+
+# =============================================================================
+# 5. HESTON
+# =============================================================================
+def heston_estimates():
+    hp = heston_from_vix(load_vix(), rets['sp500'], DT)
+    return hp
+
+
+def fig_heston_paths(hp, g):
+    """Trei traiectorii Heston cu parametrii estimati din VIX (media pe termen lung = varianta realizata)."""
+    rng = np.random.default_rng(SEED + 9)
+    t, S, V = heston_paths(100.0, hp['theta_p'], g['mu'], hp['kappa'], hp['theta_p'], hp['xi'], hp['rho'], 5.0, 1260, 3, rng)
+    fig, axes = plt.subplots(2, 1, figsize=(9, 4.4), sharex=True, gridspec_kw={'height_ratios': [1.3, 1]})
+    for i, c in enumerate([MainBlue, IDAred, Forest]):
+        axes[0].plot(t, S[:, i], color=c, lw=0.8, label=f'Path {i + 1}')
+        axes[1].plot(t, 100 * np.sqrt(V[:, i]), color=c, lw=0.8)
+    axes[1].axhline(100 * np.sqrt(hp['theta_p']), color=Gray, ls='--', lw=0.8, label=r'$\sqrt{\theta}$ (long-run volatility)')
+    axes[0].set_ylabel('Price')
+    axes[1].set_ylabel(r'$\sqrt{v_t}$ (% p.a.)')
+    axes[1].set_xlabel('Years')
+    axes[0].set_title(rf"Heston: $\kappa$ = {hp['kappa']:.2f}, $\sqrt{{\theta}}$ = {100 * np.sqrt(hp['theta_p']):.1f}%, "
+                      rf"$\xi$ = {hp['xi']:.2f}, $\rho$ = {hp['rho']:.2f}", loc='left')
+    fig_legend_bottom(fig, ncol=4, y=0.02)
+    plt.tight_layout(rect=(0, 0.06, 1, 1))
+    save_fig('ch11_heston_paths')
+    lr = np.diff(np.log(S), axis=0)
+    dv = np.diff(V, axis=0)
+    return dict(corr_sim=float(np.corrcoef(lr.ravel(), dv.ravel())[0, 1]))
+
+
+def fig_heston_smile(hp):
+    """Volatilitatea implicita Black-Scholes a preturilor Heston: efectul lui rho si al scadentei."""
+    rng = np.random.default_rng(SEED + 10)
+    K = np.linspace(0.80, 1.20, 17)
+    base = dict(kappa=hp['kappa'], theta=hp['theta'], xi=hp['xi'], rho=hp['rho'], v0=hp['theta'])
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.5))
+    out = {'K': K}
+    for rho, c in [(hp['rho'], IDAred), (0.0, MainBlue), (0.5, Forest)]:
+        p = dict(base, rho=rho)
+        iv = heston_smile(p, 0.25, K, rng, n_paths=100000, n_steps=63)
+        axes[0].plot(K, 100 * iv, 'o-', ms=3, color=c, label=rf'$\rho$ = {rho:.2f}')
+        out[f'rho_{rho:.2f}'] = iv
+    axes[0].axhline(100 * np.sqrt(hp['theta']), color=Gray, ls='--', lw=0.8, label=r'Black-Scholes: flat at $\sqrt{\theta}$')
+    axes[0].set_title('Three months: the sign of the smile follows $\\rho$', loc='left')
+    for T, c in [(1 / 12, Teal), (0.25, IDAred), (1.0, Purple)]:
+        iv = heston_smile(base, T, K, rng, n_paths=100000, n_steps=max(int(252 * T), 21))
+        axes[1].plot(K, 100 * iv, 'o-', ms=3, color=c, label=f'T = {"1 month" if T < 0.1 else ("3 months" if T < 0.5 else "1 year")}')
+        out[f'T_{T:.3f}'] = iv
+    axes[1].set_title(rf'Fitted $\rho$ = {hp["rho"]:.2f}: the skew flattens with maturity', loc='left')
+    for ax in axes:
+        ax.set_xlabel('Strike / spot, K/S')
+        ax.set_ylabel('Implied volatility (%)')
+    legend_outside_bottom(axes[0], ncol=2, y=-0.2)
+    legend_outside_bottom(axes[1], ncol=3, y=-0.2)
+    plt.tight_layout()
+    save_fig('ch11_heston_smile')
+    return out
+
+
+# =============================================================================
+# 6. MODELE VS DATE
+# =============================================================================
+def simulate_stats(model, p, n, dt, n_sim, rng, mu=0.0):
+    out = []
+    for _ in range(n_sim):
+        if model == 'GBM':
+            x = gbm_simulate_returns(p['m'], p['sigma'], n, dt, rng)
+        elif model == 'Merton':
+            x = merton_simulate_returns(p['m'], p['sigma'], p['lam'], p['mu_j'], p['s_j'], n, dt, rng)
+        else:
+            x = heston_simulate_returns(p, n, dt, rng, mu=mu)
+        out.append(stylised(x))
+    return out
+
+
+def fig_models_vs_data(g, me, hp):
+    """ACF |r|, aplatizare si indicele de coada: S&P 500 vs GBM, Merton, Heston (100 de simulari fiecare)."""
+    rng = np.random.default_rng(SEED + 11)
+    r = rets['sp500'].values
+    n = len(r)
+    hpp = dict(hp, theta=hp['theta_p'])
+    S = {'GBM': simulate_stats('GBM', g['sp500'], n, DT, 100, rng),
+         'Merton': simulate_stats('Merton', me['sp500'], n, DT, 100, rng),
+         'Heston': simulate_stats('Heston', hpp, n, DT, 100, rng, mu=g['sp500']['mu'])}
+    d = stylised(r)
+    lags = np.arange(1, 51)
+    fig, axes = plt.subplots(1, 3, figsize=(11, 3.4), gridspec_kw={'width_ratios': [1.6, 1, 1]})
+    axes[0].plot(lags, d['acf_abs'], color=MODEL_COL['Data'], lw=1.8, label='S&P 500 data')
+    for m, s in S.items():
+        axes[0].plot(lags, np.median([x['acf_abs'] for x in s], axis=0), color=MODEL_COL[m], lw=1.3, label=m)
+    axes[0].axhline(0, color=Gray, lw=0.5)
+    axes[0].set_xlabel('Lag (trading days)')
+    axes[0].set_title('ACF of |r| (median of 100 simulations)', loc='left')
+    summ = {}
+    for ax, key, title in [(axes[1], 'exkurt', 'Excess kurtosis'), (axes[2], 'hill', 'Hill tail index (5% of losses)')]:
+        names = ['Data'] + list(S)
+        vals, lo, hi = [d[key]], [0], [0]
+        for m in S:
+            v = np.array([x[key] for x in S[m]])
+            med = np.median(v)
+            vals.append(med)
+            lo.append(med - np.quantile(v, 0.05))
+            hi.append(np.quantile(v, 0.95) - med)
+        ax.bar(range(4), vals, color=[MODEL_COL[nm] for nm in names], yerr=[lo, hi], capsize=3, width=0.65)
+        ax.set_xticks(range(4))
+        ax.set_xticklabels(names, fontsize=8)
+        ax.set_title(title, loc='left')
+    fig_legend_bottom(fig, ncol=4, y=0.02)
+    plt.tight_layout(rect=(0, 0.07, 1, 1))
+    save_fig('ch11_models_vs_data')
+    for m in S:
+        summ[m] = {k: dict(med=float(np.median([x[k] for x in S[m]])), lo=float(np.quantile([x[k] for x in S[m]], 0.05)),
+                           hi=float(np.quantile([x[k] for x in S[m]], 0.95)),
+                           p_ge=float(np.mean([x[k] >= d[k] for x in S[m]])))
+                   for k in ['exkurt', 'skew', 'hill', 'acf_abs1', 'acf_abs_sum20']}
+    summ['Data'] = {k: float(d[k]) for k in ['exkurt', 'skew', 'hill', 'acf_abs1', 'acf_abs_sum20']}
+    return summ
+
+
+# =============================================================================
+if __name__ == '__main__':
+    R = {}
+    print('1. Brownian motion')
+    R['donsker'] = fig_donsker()
+    fig_bm_paths()
+    R['qv'] = fig_quadratic_variation()
+    R['ito'] = fig_ito()
+    R['conv'] = fig_convergence()
+    print('2. GBM')
+    g = gbm_estimates()
+    R['gbm'] = g
+    R['fan'] = fig_gbm_fan(g['sp500'])
+    R['lognormal'] = fig_lognormal(g['sp500'])
+    R['gbm_data'] = fig_gbm_vs_data(g['sp500'])
+    R['drift'] = fig_drift_precision(g)
+    print('3. OU')
+    R['ou'] = fig_ou_paths()
+    R['vasicek'] = fig_vasicek()
+    R['vix'] = fig_vix_ou()
+    print('4. Merton')
+    me = merton_estimates()
+    R['merton'] = me
+    fig_merton_density(me)
+    R['jumps'] = fig_jumps()
+    print('5. Heston')
+    hp = heston_estimates()
+    hp['theta_p'] = hp['real_var']
+    R['heston'] = hp
+    R['heston_sim'] = fig_heston_paths(hp, g['sp500'])
+    R['smile'] = fig_heston_smile(hp)
+    print('6. Models vs data')
+    R['compare'] = fig_models_vs_data(g, me, hp)
+    R['data'] = {k: dict(n=len(v), start=str(v.index[0].date()), end=str(v.index[-1].date())) for k, v in rets.items()}
+    with open(os.path.join(HERE, 'ch11_results.json'), 'w') as f:
+        json.dump(jsonable(R), f, indent=1)
+    print('saved ch11_results.json')

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch13_feature_importance'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Feature importance for S&P 500 direction models: in-sample MDI of a random forest, out-of-sample MDA (permutation, change in AUC) and mean absolute SHAP values of a gradient boosting model.'
+
+Keywords: 'feature importance, MDI, MDA, permutation importance, SHAP, explainable AI, random forest'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'S&P 500 and VIX daily close (2000-2026)'
+
+Output: 'ch13_feature_importance.pdf'

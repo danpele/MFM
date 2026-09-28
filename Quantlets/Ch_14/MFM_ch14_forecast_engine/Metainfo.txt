@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch14_forecast_engine'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Rolling one-day-ahead forecasts used in Chapter 14: historical mean, AR(1), LSTM, Chronos-2, Chronos-Bolt and TimesFM-2.5 for returns; HS, GARCH-t, FHS, FHS with foundation-model volatility and raw model quantiles for VaR 1% and ES 2.5%; RW, HAR, log-HAR, GARCH-t, LSTM and the three foundation models for SPY realised variance.'
+
+Keywords: 'rolling forecast, LSTM, Chronos-2, TimesFM, GARCH-t, HAR, filtered historical simulation'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), Bitcoin (BTC-USD.CC), BET; SPY 5-minute bars (data/market/intraday/SPY.US_5m.csv) and SPY daily adjusted closes (data/market)'
+
+Output: 'printed tables'

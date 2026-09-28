@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch5_markets'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'GJR-GARCH-t conditional volatility of the BET, Bitcoin, EUR/RON (BNR reference rate) and gold, annualised with the actual frequency of each series.'
+
+Keywords: 'conditional volatility, BET, Bitcoin, EUR/RON, gold, GJR-GARCH'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
+
+Output: 'ch5_markets_vol.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_rv_ci'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Daily realised volatility of SPY, March-May 2025, with the 95% confidence interval for integrated volatility from the asymptotic theory of Barndorff-Nielsen and Shephard (realised quarticity).'
+
+Keywords: 'realised variance, confidence interval, realised quarticity, Barndorff-Nielsen, Shephard'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+
+Output: 'ch9_rv_ci.pdf'

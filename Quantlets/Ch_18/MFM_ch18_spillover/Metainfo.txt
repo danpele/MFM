@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch18_spillover'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Diebold-Yilmaz connectedness of 13 banks: VAR on log Parkinson volatility, generalized forecast error variance decomposition at 10 days, connectedness table and the network of net pairwise spillovers.'
+
+Keywords: 'Diebold-Yilmaz, connectedness, spillover index, generalized variance decomposition, VAR, network'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market), January 2010 - September 2026: JPMorgan Chase, Bank of America, Citigroup, Goldman Sachs, Morgan Stanley, Wells Fargo, Deutsche Bank, BNP Paribas, Santander, ING, HSBC, Banca Transilvania, BRD-Groupe Societe Generale; S&P 500, Euro Stoxx 50, BET and VIX indices'
+
+Output: 'ch18_spill_table.pdf, ch18_spill_network.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch0_rates'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'US 10-year and 2-year Treasury yields and the effective federal funds rate, 2000-2026, and the 10y-2y spread with periods of yield-curve inversion.'
+
+Keywords: 'interest rates, yield curve, inversion, Treasury, federal funds, FRED'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'FRED series DGS10, DGS2, FEDFUNDS'
+
+Output: 'ch0_rates.pdf'

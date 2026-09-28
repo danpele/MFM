@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch10_seminar'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 10 computations: walking the order book, the Roll model, Glosten-Milgrom quotes, the Kyle equilibrium, Almgren-Chriss schedules; intraday U-shape with day-block bootstrap, spread estimators at two frequencies, spread and Amihud measures across 25 assets, illiquidity and the VIX with HAC errors, the volume-price relation, the Bitcoin clock and the time-series illiquidity premium on the BVB, US and crypto markets.'
+
+Keywords: 'market microstructure, bid-ask spread, Amihud illiquidity, bootstrap, HAC, liquidity premium, Bucharest Stock Exchange, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'SPY and Bitcoin 5-minute bars (data/market/intraday); daily open, high, low, close and volume for US stocks, Bucharest Stock Exchange stocks and crypto-assets (data/market); CBOE VIX; BET-TR; USD/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch10_sem_ushape.pdf, ch10_sem_cross.pdf, ch10_sem_premium.pdf'

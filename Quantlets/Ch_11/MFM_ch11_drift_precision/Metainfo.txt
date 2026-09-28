@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_drift_precision'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Precision of the drift of geometric Brownian motion: half-width of the 95% CI against the length of the sample, and S&P 500 drift and volatility on rolling 10-year windows.'
+
+Keywords: 'drift estimation, maximum likelihood, standard error, geometric Brownian motion, S&P 500, Bitcoin'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
+
+Output: 'ch11_drift_precision.pdf'

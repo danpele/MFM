@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch5_arch_effects'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Volatility clustering and ARCH effects: daily returns of the S&P 500, BET and Bitcoin, autocorrelations of returns and squared returns, and Ljung-Box and Engle LM tests on six series (S&P 500, BET, BET-TR, Bitcoin, EUR/RON, gold).'
+
+Keywords: 'volatility clustering, ARCH effects, Ljung-Box, Lagrange multiplier test, squared returns, autocorrelation'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
+
+Output: 'ch5_clustering.pdf, ch5_acf_r_r2.pdf, ch5_arch_effects.csv'

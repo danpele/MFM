@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch1_seminar_tests'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 1 inference and model checks: classical vs heteroskedasticity-robust Ljung-Box, expanding-window kurtosis vs simulated Student-t bands, Hill plots on both tails (BET-TR, Bitcoin), leverage correlations and the leverage regression with Newey-West errors, the BET-TR vs S&P 500 Sharpe difference test with non-synchronous trading, a GARCH(1,1)-t simulation check of stylised facts, and the BET-TR autocorrelation before and after the 2020 FTSE Russell reclassification.'
+
+Keywords: 'robust Ljung-Box, kurtosis, Hill estimator, tail asymmetry, leverage effect, Newey-West, Sharpe ratio test, Jobson-Korkie, block bootstrap, non-synchronous trading, GARCH, BET-TR, Bitcoin, S&P 500'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET-TR, Bitcoin, BVB blue chips; EUR/RON official reference rate'
+
+Output: 'ch1_sem_robust_acf.pdf, ch1_sem_kurtosis_expanding.pdf, ch1_sem_hill_tails.pdf, ch1_sem_leverage_ro_crypto.pdf, ch1_sem_garch_check.pdf, ch1_sem_bettr_rolling_acf.pdf'

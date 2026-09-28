@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_integration'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Integration of US, euro-area and Romanian equity markets: 104-week rolling correlations of weekly S&P 500, Euro Stoxx 50 and BET returns, 2000-2026.'
+
+Keywords: 'market integration, emerging markets, BET, Euro Stoxx 50, rolling correlation, weekly returns'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+
+Output: 'ch6_integration.pdf'

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch12_delta_hedged_sp500'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'S&P 500, 1990-2026: every 21 trading days sell a one-month at-the-money call priced with the VIX and hedge it daily; monthly P&L, Newey-West t-statistic, worst months.'
+
+Keywords: 'delta-hedged option, volatility risk premium, VIX, S&P 500, Newey-West, back-test'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, SPY, Bitcoin, VIX, VIX9D, VIX3M, VVIX; Bitcoin option chain (Deribit, snapshot of 22 September 2026, ch12_deribit_snapshot.csv) and the DVOL index (Deribit)'
+
+Output: 'ch12_delta_hedged_sp500.pdf, ch12_delta_hedged_sp500.csv'
