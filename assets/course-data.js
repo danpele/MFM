@@ -425,6 +425,16 @@
                 nav: { home: 'Home', chapters: 'Chapters', project: 'Project &amp; AI', quizzes: 'Quizzes', resources: 'Resources', contact: 'Contact' },
                 overview: 'Course Overview',
                 objectives: 'Learning Objectives',
+                heroTag: 'A research-grade course on financial markets: econometrics, risk, derivatives, machine learning and AI, on real data, with reproducible code.',
+                heroCta1: 'Explore the chapters',
+                heroCta2: 'Project and AI policy',
+                stats: { chapters: 'chapters', slides: 'lecture slides', seminar: 'seminar pages', quantlets: 'Quantlets', quiz: 'quiz questions', charts: 'charts' },
+                gallery: 'From the Lectures',
+                galleryIntro: 'A selection of charts from the course, all built from real data with the code published as Quantlets. Click to enlarge.',
+                formulasIntro: 'The core results of the course, grouped by theme. Each formula links to the chapter that derives it and tests it on data.',
+                allFormulas: 'All',
+                toChapter: 'Chapter',
+                close: 'Close',
                 formulas: 'Key Formulas',
                 chapters: 'Course Chapters',
                 chapter: 'Chapter',
@@ -476,6 +486,16 @@
                 nav: { home: 'Acasă', chapters: 'Capitole', project: 'Proiect și AI', quizzes: 'Quiz-uri', resources: 'Resurse', contact: 'Contact' },
                 overview: 'Prezentarea cursului',
                 objectives: 'Obiective de învățare',
+                heroTag: 'Un curs de nivel de cercetare despre piețele financiare: econometrie, risc, derivate, machine learning și AI, pe date reale, cu cod reproductibil.',
+                heroCta1: 'Explorați capitolele',
+                heroCta2: 'Proiectul și politica AI',
+                stats: { chapters: 'capitole', slides: 'slide-uri de curs', seminar: 'pagini de seminar', quantlets: 'Quantlets', quiz: 'întrebări de quiz', charts: 'grafice' },
+                gallery: 'Din cursuri',
+                galleryIntro: 'O selecție de grafice din curs, construite din date reale, cu codul publicat ca Quantlets. Click pentru mărire.',
+                formulasIntro: 'Rezultatele centrale ale cursului, grupate pe teme. Fiecare formulă trimite la capitolul care o derivă și o testează pe date.',
+                allFormulas: 'Toate',
+                toChapter: 'Capitolul',
+                close: 'Închide',
                 formulas: 'Formule cheie',
                 chapters: 'Capitolele cursului',
                 chapter: 'Capitolul',
@@ -561,15 +581,6 @@
             ]
         },
 
-        formulas: [
-            { en: 'Log return', ro: 'Randament logaritmic', tex: '$$r_t = \\ln P_t - \\ln P_{t-1}$$' },
-            { en: 'Sharpe ratio', ro: 'Raportul Sharpe', tex: '$$SR = \\frac{E[R - R_f]}{\\sigma(R - R_f)}$$' },
-            { en: 'CAPM', ro: 'CAPM', tex: '$$E[R_i] - R_f = \\beta_i\\,(E[R_m] - R_f)$$' },
-            { en: 'GARCH(1,1)', ro: 'GARCH(1,1)', tex: '$$\\sigma_t^2 = \\omega + \\alpha\\,\\varepsilon_{t-1}^2 + \\beta\\,\\sigma_{t-1}^2$$' },
-            { en: 'Black-Scholes call', ro: 'Call Black-Scholes', tex: '$$\\begin{gathered} C = S\\,\\Phi(d_1) - K e^{-rT}\\Phi(d_2) \\\\ d_{1,2} = \\frac{\\ln(S/K) + (r \\pm \\sigma^2/2)T}{\\sigma\\sqrt{T}} \\end{gathered}$$' },
-            { en: 'VaR and Expected Shortfall', ro: 'VaR și Expected Shortfall', tex: '$$\\begin{gathered} \\mathrm{VaR}_\\alpha = -\\inf\\{x : P(R \\le x) > \\alpha\\} \\\\ \\mathrm{ES}_\\alpha = -E[R \\mid R \\le -\\mathrm{VaR}_\\alpha] \\end{gathered}$$' },
-            { en: 'Deflated Sharpe Ratio', ro: 'Deflated Sharpe Ratio', tex: '$$\\mathrm{DSR} = \\Phi\\!\\left(\\frac{(\\widehat{SR} - SR_0)\\sqrt{T-1}}{\\sqrt{1 - \\hat\\gamma_3\\widehat{SR} + \\frac{\\hat\\gamma_4 - 1}{4}\\widehat{SR}^2}}\\right)$$' }
-        ],
 
         // ---------------------------------------------------------------
         // Chapters 0-19. `id` is the stable key (quizzes, anchors, tabs);

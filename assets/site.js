@@ -54,9 +54,85 @@
             `<div class="info-card"><h3>${c.h}</h3>${c.p.map(p => `<p>${p}</p>`).join('')}</div>`
         ).join('');
         $('objectives-list').innerHTML = D.objectives[LANG].map(o => `<li>${o}</li>`).join('');
-        $('formula-grid').innerHTML = D.formulas.map(f =>
-            `<div class="formula-card"><h4>${f[LANG]}</h4>${f.tex}</div>`
+    }
+
+    // ------------------------------------------------------------
+    // HERO STATS
+    // ------------------------------------------------------------
+    function renderHero() {
+        const S = window.MFM_STATS || {};
+        const quiz = Object.values(D.quizzes).reduce((n, b) => n + b.questions.length, 0);
+        const fmt = n => Number(n).toLocaleString(LANG === 'ro' ? 'ro-RO' : 'en-GB');
+        const items = [
+            ['chapters', S.chapters || D.chapters.length],
+            ['slides', S.slides], ['seminar', S.seminar],
+            ['quantlets', S.quantlets], ['quiz', quiz], ['charts', S.charts]
+        ].filter(([, v]) => v);
+        $('hero-stats').innerHTML = items.map(([k, v]) =>
+            `<div class="stat"><span class="stat-num">${fmt(v)}</span><span class="stat-label">${T.stats[k]}</span></div>`
         ).join('');
+    }
+
+    // ------------------------------------------------------------
+    // GALLERY (+ lightbox)
+    // ------------------------------------------------------------
+    function chapterOf(id) { return D.chapters.find(c => c.id === id); }
+
+    function renderGallery() {
+        $('gallery').innerHTML = D.gallery.map((g, i) => {
+            const ch = chapterOf(g.ch);
+            return `<figure class="gallery-item">
+                <button type="button" class="gallery-open" data-i="${i}" aria-label="${esc(g[LANG])}">
+                    <img src="${g.src}" alt="${esc(g[LANG])}" loading="lazy">
+                </button>
+                <figcaption>${g[LANG]}${ch ? ` <a href="#chapter-${ch.id}">${T.toChapter} ${ch.num}</a>` : ''}</figcaption>
+            </figure>`;
+        }).join('');
+        const box = $('lightbox');
+        const close = () => { box.hidden = true; document.body.classList.remove('no-scroll'); };
+        $('gallery').querySelectorAll('.gallery-open').forEach(b => {
+            b.onclick = () => {
+                const g = D.gallery[+b.dataset.i];
+                $('lightbox-img').src = g.src;
+                $('lightbox-img').alt = g[LANG];
+                $('lightbox-cap').textContent = g[LANG];
+                box.hidden = false;
+                document.body.classList.add('no-scroll');
+                $('lightbox-close').focus();
+            };
+        });
+        $('lightbox-close').setAttribute('aria-label', T.close);
+        $('lightbox-close').onclick = close;
+        box.onclick = e => { if (e.target === box) close(); };
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && !box.hidden) close(); });
+    }
+
+    // ------------------------------------------------------------
+    // FORMULAS (grouped, filterable)
+    // ------------------------------------------------------------
+    function renderFormulas() {
+        const groups = [{ id: 'all', en: T.allFormulas, ro: T.allFormulas }].concat(D.formulaGroups);
+        $('formula-filters').innerHTML = groups.map(g =>
+            `<button type="button" class="chip${g.id === 'all' ? ' active' : ''}" data-g="${g.id}" role="tab">${g[LANG]}</button>`
+        ).join('');
+        const gname = id => (D.formulaGroups.find(g => g.id === id) || {})[LANG] || '';
+        $('formula-grid').innerHTML = D.formulas.map(f => {
+            const ch = chapterOf(f.ch);
+            return `<div class="formula-card" data-g="${f.g}">
+                <div class="formula-head"><h4>${f[LANG]}</h4><span class="formula-group">${gname(f.g)}</span></div>
+                <div class="formula-tex">${f.tex}</div>
+                ${ch ? `<a class="formula-link" href="#chapter-${ch.id}">${T.toChapter} ${ch.num}: ${ch.title[LANG]} &rarr;</a>` : ''}
+            </div>`;
+        }).join('');
+        $('formula-filters').querySelectorAll('.chip').forEach(c => {
+            c.onclick = () => {
+                const g = c.dataset.g;
+                $('formula-filters').querySelectorAll('.chip').forEach(x => x.classList.toggle('active', x === c));
+                $('formula-grid').querySelectorAll('.formula-card').forEach(card => {
+                    card.hidden = !(g === 'all' || card.dataset.g === g);
+                });
+            };
+        });
     }
 
     // ------------------------------------------------------------
@@ -341,6 +417,9 @@
     function init() {
         renderStatic();
         renderOverview();
+        renderHero();
+        renderGallery();
+        renderFormulas();
         renderChapters();
         renderProject();
         renderResources();
