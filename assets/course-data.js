@@ -448,8 +448,6 @@
                 },
                 projectTitle: 'Team Project and the Use of AI',
                 aiTitle: 'Using AI in this course',
-                templates: 'Templates for your repository',
-                attendanceForm: 'Attendance form (fill it in during each lecture and seminar, with the code on the board)',
                 quizzes: 'Self-Assessment Quizzes',
                 quizIntro: 'Each attempt draws 20 questions at random from the chapter bank and shuffles the answers. An answer is locked once selected.',
                 loginPrompt: 'Log in with GitHub to record your quiz scores:',
@@ -509,8 +507,6 @@
                 },
                 projectTitle: 'Proiectul de echipă și utilizarea AI',
                 aiTitle: 'Utilizarea AI în acest curs',
-                templates: 'Șabloane pentru repository-ul vostru',
-                attendanceForm: 'Formularul de prezență (se completează la fiecare curs și seminar, cu codul de pe tablă)',
                 quizzes: 'Quiz-uri de autoevaluare',
                 quizIntro: 'La fiecare încercare se extrag aleator 20 de întrebări din banca de întrebări a capitolului, iar variantele de răspuns sunt amestecate. Răspunsul se blochează după selectare.',
                 loginPrompt: 'Autentifică-te cu GitHub pentru a înregistra scorurile:',
@@ -796,13 +792,13 @@
             en: [
                 { h: '1. Replicate', p: ['Start by reproducing one published number: a table, a coefficient or a backtest result from a paper or from the lecture.', 'An AI assistant cannot guess an exact published figure. Matching it shows that your data and code are right.'] },
                 { h: '2. Extend', p: ['Apply the method to new data, a new market (for example BVB or crypto) or a more recent sample.', 'State one clear question and answer it with a test, not only with a chart.'] },
-                { h: '3. Deliver on GitHub', p: ['A public repository with code, data description and a README that reproduces every result.', 'The files <code>AI_USE.md</code> and <code>AI_ERRORS.md</code> (templates below) are mandatory.'] },
+                { h: '3. Deliver on GitHub', p: ['A public repository with code, data description and a README that reproduces every result.', 'The files <code>AI_USE.md</code> and <code>AI_ERRORS.md</code> are mandatory.'] },
                 { h: '4. Present and defend', p: ['Team presentation, then a 10-minute oral defence.', 'Each member explains one result and answers a "what changes if..." question. Grades can differ between team members.'] }
             ],
             ro: [
                 { h: '1. Replicați', p: ['Începeți prin a reproduce un rezultat publicat: un tabel, un coeficient sau un rezultat de backtest dintr-un articol sau din curs.', 'Un asistent AI nu poate ghici o cifră publicată exactă. Dacă o obțineți, datele și codul vostru sunt corecte.'] },
                 { h: '2. Extindeți', p: ['Aplicați metoda pe date noi, pe altă piață (de exemplu BVB sau cripto) sau pe un eșantion mai recent.', 'Formulați o întrebare clară și răspundeți cu un test, nu doar cu un grafic.'] },
-                { h: '3. Livrați pe GitHub', p: ['Un repository public cu cod, descrierea datelor și un README care reproduce fiecare rezultat.', 'Fișierele <code>AI_USE.md</code> și <code>AI_ERRORS.md</code> (șabloanele de mai jos) sunt obligatorii.'] },
+                { h: '3. Livrați pe GitHub', p: ['Un repository public cu cod, descrierea datelor și un README care reproduce fiecare rezultat.', 'Fișierele <code>AI_USE.md</code> și <code>AI_ERRORS.md</code> sunt obligatorii.'] },
                 { h: '4. Prezentați și susțineți', p: ['Prezentarea echipei, apoi o susținere orală de 10 minute.', 'Fiecare membru explică un rezultat și răspunde la o întrebare de tipul „ce se schimbă dacă...”. Notele pot diferi între membrii echipei.'] }
             ]
         },
@@ -828,12 +824,6 @@
             ]
         },
 
-        projectTemplates: [
-            { href: REPO + '/blob/main/project/EN/AI_USE.md', en: 'AI_USE.md: AI use declaration (EN)', ro: 'AI_USE.md: declarația de utilizare AI (EN)', lang: 'en' },
-            { href: REPO + '/blob/main/project/EN/AI_ERRORS.md', en: 'AI_ERRORS.md: log of AI errors (EN)', ro: 'AI_ERRORS.md: jurnalul erorilor AI (EN)', lang: 'en' },
-            { href: REPO + '/blob/main/project/RO/AI_USE.md', en: 'AI_USE.md: AI use declaration (RO)', ro: 'AI_USE.md: declarația de utilizare AI (RO)', lang: 'ro' },
-            { href: REPO + '/blob/main/project/RO/AI_ERRORS.md', en: 'AI_ERRORS.md: log of AI errors (RO)', ro: 'AI_ERRORS.md: jurnalul erorilor AI (RO)', lang: 'ro' }
-        ],
 
         // ---------------------------------------------------------------
         // Resources
