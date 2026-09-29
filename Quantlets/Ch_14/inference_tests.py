@@ -44,7 +44,7 @@ def nw_se(x):
 
 
 def stationary_idx(T, B, block, rng):
-    """Indicii bootstrap-ului stationar (Politis & Romano): lungimi geometrice de medie `block`."""
+    """Indices of the stationary bootstrap (Politis & Romano): geometric block lengths with mean `block`."""
     idx = np.empty((B, T), int)
     for b in range(B):
         t = rng.integers(T)
@@ -58,8 +58,8 @@ def stationary_idx(T, B, block, rng):
 
 
 def romano_wolf(D, B=2000, block=20, seed=7):
-    """Valori p ajustate Romano--Wolf (pas cu pas, statistici studentizate) pentru H0_k: E[d_k] <= 0,
-    d_k = pierderea reperului - pierderea modelului k (pozitiv = modelul k mai bun)."""
+    """Romano--Wolf stepwise adjusted p-values (studentised statistics) for H0_k: E[d_k] <= 0,
+    d_k = benchmark loss - loss of model k (positive = model k better)."""
     D = np.asarray(D, float)
     T, K = D.shape
     rng = np.random.default_rng(seed)
@@ -80,9 +80,9 @@ def romano_wolf(D, B=2000, block=20, seed=7):
 
 
 def spa_consistent(D, B=2000, block=20, seed=11):
-    """Testul SPA al lui Hansen (2005), varianta consistenta: H0: niciun model nu bate reperul.
-    d_k = pierderea reperului - pierderea modelului k; modelele mult mai slabe (t_k <= -sqrt(2 log log n)) nu sunt
-    recentrate la zero."""
+    """Hansen's (2005) SPA test, consistent version: H0: no model beats the benchmark.
+    d_k = benchmark loss - loss of model k; much worse models (t_k <= -sqrt(2 log log n)) are not
+    recentred at zero."""
     D = np.asarray(D, float)
     T, K = D.shape
     rng = np.random.default_rng(seed)
@@ -109,7 +109,7 @@ def holm(p):
 
 
 # =============================================================================
-# 1. RANDAMENTE: CLARK-WEST, DM UNILATERAL, HOLM, ROMANO-WOLF, SPA
+# 1. RETURNS: CLARK-WEST, ONE-SIDED DM, HOLM, ROMANO-WOLF, SPA
 # =============================================================================
 def returns_inference():
     res, allp, keys = {}, [], []
@@ -122,18 +122,23 @@ def returns_inference():
             f = d[k].values
             l0, l1 = y ** 2, (y - f) ** 2
             dm = (l1 - l0).mean() / nw_se(l1 - l0)
-            adj = l0 - (l1 - f ** 2)               # Clark--West: MSPE ajustat, reper = prognoza zero
+            adj = l0 - (l1 - f ** 2)               # Clark--West: adjusted MSPE, benchmark = zero forecast
             cw = adj.mean() / nw_se(adj)
+            # with the zero benchmark adj = 2 y f: Clark--West tests the martingale-difference null E[y_t f_t] = 0,
+            # valid for any forecast built from past data (Clark & West, 2006), including fixed pretrained models
             r[k] = dict(dm=float(dm), p_dm1=float(stats.norm.cdf(dm)), cw=float(cw), p_cw=float(stats.norm.sf(cw)))
             Dm.append(l0 - l1)
             allp.append(r[k]['p_dm1'])
             keys.append((a, k))
         Dm = np.column_stack(Dm)
+        # mean forecasts from the quantile grids (trapezoid, tails held constant) instead of the medians
+        r['r2_gridmean'] = {fm: float(100 * M.r2_oos(y, M.grid_mean(lv, d[[f'{fm}_q{u:.2f}' for u in lv]].values)))
+                            for fm, lv in (('chronos2', M.C2_LEVELS), ('timesfm', M.DEC_LEVELS))}
         t, padj = romano_wolf(Dm)
         for j, k in enumerate(RET):
             r[k]['rw'] = float(padj[j])
         r['spa'] = spa_consistent(Dm)
-        # AR(1) pe BET: panta medie si contributia anuala la castigul de eroare patratica
+        # AR(1) on the BET: mean slope and the yearly contribution to the squared-error gain
         if a == 'bet':
             x = M.load_returns('bet')
             pos = x.index.get_indexer(d.index)
@@ -175,7 +180,7 @@ def nonsync():
     betr = d['y']
     f = d['lstm']
     j = pd.concat([rr, f.rename('f')], axis=1, join='inner').dropna()
-    # executie cu o zi intarziere: semnalul format la inchiderea t-1 este aplicat randamentului din ziua t+1
+    # one-day execution lag: the signal formed at the close of t-1 is applied to the return of day t+1
     j['etf_next'] = j['etf'].shift(-1)
     j2 = j.dropna()
     etf_nz = (j['etf'] != 0).mean()
@@ -228,10 +233,10 @@ def kupiec_power():
 
 
 # =============================================================================
-# 4. CALIBRARE: PIT, BERKOWITZ CENZURAT, SCORUL CUANTILIC
+# 4. CALIBRATION: PIT, CENSORED BERKOWITZ, QUANTILE SCORE
 # =============================================================================
 def garch_grid(a, dates):
-    """GARCH-t si FHS pe aceleasi origini ca in ch14_risk_*: PIT si grila de 21 de cuantile."""
+    """GARCH-t and FHS on the same origins as in ch14_risk_*: PIT and the 21-quantile grid."""
     r = M.load_returns(a)
     x = r.values
     org = r.index.get_indexer(dates)
@@ -247,7 +252,7 @@ def garch_grid(a, dates):
 
 
 def pit_grid(y, Q):
-    """PIT prin interpolare liniara intre cuantilele grilei; NaN in afara [q_1%, q_99%] (cenzurat)."""
+    """PIT by linear interpolation between the grid quantiles; NaN outside [q_1%, q_99%] (censored)."""
     u = np.full(len(y), np.nan)
     lo = y < Q[:, 0]
     hi = y > Q[:, -1]
@@ -258,7 +263,7 @@ def pit_grid(y, Q):
 
 
 def berkowitz_cens(u, lo, hi):
-    """LR pentru mu = 0, sigma = 1 in z = Phi^{-1}(u), cu cenzurare sub 1% si peste 99% (Berkowitz, 2001)."""
+    """LR for mu = 0, sigma = 1 in z = Phi^{-1}(u), censored below 1% and above 99% (Berkowitz, 2001)."""
     cL, cH = stats.norm.ppf(0.01), stats.norm.ppf(0.99)
     z = stats.norm.ppf(np.clip(u[np.isfinite(u)], 1e-9, 1 - 1e-9))
     nL, nH = int(lo.sum()), int(hi.sum())
@@ -274,7 +279,7 @@ def berkowitz_cens(u, lo, hi):
 
 
 def qscore(y, Q, idx=None):
-    """Scorul cuantilic mediu pe grila (2/K) sum_k pinball_k: aproximarea CRPS pe grila de 21 de niveluri."""
+    """Equally weighted quantile score on the grid, (2/K) sum_k pinball_k (a grid analogue of the CRPS)."""
     idx = np.arange(len(LV)) if idx is None else np.asarray(idx)
     s = np.zeros(len(y))
     for k in idx:
@@ -304,17 +309,15 @@ def calibration():
         dates = rk.index
         d = d.loc[dates]
         Qc = d[[f'chronos2_q{u:.2f}' for u in LV]].values
-        y, (u_t, Qt), (u_f, Qf) = garch_grid(a, dates)
+        y, (_, Qt), (_, Qf) = garch_grid(a, dates)
         assert np.allclose(y, d['y'].values)
-        # verificare: VaR 1% FHS din grila recalculata = cel din ch14_risk_*.csv
+        # check: the FHS VaR 1% of the recomputed grid equals the one in ch14_risk_*.csv
         assert np.allclose(-Qf[:, 0], rk['FHS|VaR1'].values, atol=1e-6)
         r = {}
-        for nm, (uu, Q) in (('C2', (None, Qc)), ('GARCH-t', (u_t, Qt)), ('FHS', (u_f, Qf))):
-            if uu is None:
-                u, lo, hi = pit_grid(y, Q)
-            else:
-                lo, hi = uu < 0.01, uu > 0.99
-                u = np.where(lo | hi, np.nan, uu)
+        # one convention for all models: PIT by linear interpolation on the 21-level grid, censored outside
+        # [q_1%, q_99%]; a return below q_1% is exactly a VaR 1% breach
+        for nm, Q in (('C2', Qc), ('GARCH-t', Qt), ('FHS', Qf)):
+            u, lo, hi = pit_grid(y, Q)
             c, w = bins_of(u, lo, hi)
             chi = float(np.sum((c - len(y) * w) ** 2 / (len(y) * w)))
             bk = berkowitz_cens(u, lo, hi)
@@ -335,7 +338,7 @@ def calibration():
         pits[a] = {nm: r[nm]['dens'] for nm in r}
         res[a]['n'] = int(len(y))
     OUT['calib'] = res
-    # grafic: densitatea relativa a PIT pe intervalele grilei (1 = calibrare perfecta)
+    # chart: relative PIT density on the grid intervals (1 = perfect calibration)
     fig, axs = plt.subplots(1, 3, figsize=(7.4, 2.5), sharey=True)
     edges = np.r_[0, LV, 1]
     hs = []
@@ -357,7 +360,7 @@ def calibration():
 
 
 # =============================================================================
-# 5. TESTUL DQ (ENGLE & MANGANELLI, 2004)
+# 5. THE DQ TEST (ENGLE & MANGANELLI, 2004)
 # =============================================================================
 def dq_test(L, var, a=0.01, lags=4):
     hit = (L > var).astype(float) - a
@@ -384,9 +387,12 @@ def backtests():
 # =============================================================================
 # 6. INFERENTA CONFORMALA ADAPTIVA (GIBBS & CANDES, 2021)
 # =============================================================================
-def aci(y, q, alpha, gamma=0.005, n_cal=250):
-    """Limita inferioara corectata L_t = q_t - Qhat_{1-alpha_t}(E), E_i = q_i - y_i pe ultimele n_cal zile;
-    alpha_{t+1} = alpha_t + gamma (alpha - err_t) (Gibbs & Candes, 2021). gamma = 0: conformal simplu."""
+def aci(y, q, alpha, gamma=0.001, n_cal=250):
+    """Adaptive conformal inference (Gibbs & Candes, 2021) for a lower quantile q_t of level alpha.
+    Scores E_i = q_i - y_i on the last n_cal days; corrected quantile q_t - Qhat_t, where Qhat_t is the
+    ceil((1 - alpha_t)(n_cal + 1))-th smallest score. Published boundary rule: if alpha_t <= 0 or that rank exceeds
+    n_cal, Qhat_t = +inf (the interval is the whole real line: VaR = +inf, no breach possible); if alpha_t >= 1,
+    Qhat_t = -inf. Update alpha_{t+1} = alpha_t + gamma (alpha - err_t); gamma = 0: split conformal."""
     T = len(y)
     E = q - y
     at = alpha
@@ -395,14 +401,13 @@ def aci(y, q, alpha, gamma=0.005, n_cal=250):
     alphas = np.full(T, np.nan)
     for t in range(n_cal, T):
         cal = np.sort(E[t - n_cal:t])
-        lev = 1 - at
-        if lev >= 1:
-            Qh = cal[-1]            # multimea infinita: se foloseste cel mai mare scor de calibrare
-        elif lev <= 0:
-            Qh = cal[0]
+        k = int(np.ceil((1 - at) * (n_cal + 1)))
+        if at <= 0 or k > n_cal:
+            Qh = np.inf
+        elif at >= 1 or k < 1:
+            Qh = -np.inf
         else:
-            k = int(np.ceil(lev * (n_cal + 1))) - 1
-            Qh = cal[min(max(k, 0), n_cal - 1)]
+            Qh = cal[k - 1]
         shift[t] = Qh
         alphas[t] = at
         err[t] = float(y[t] < q[t] - Qh)
@@ -421,9 +426,14 @@ def conformal():
         q1 = Qc[:, 0]
         q25 = M.quantile_at(M.C2_LEVELS, Qc, 0.025)
         out = {}
-        for nm, g in (('C2-ACI', 0.005), ('C2-SCP', 0.0)):
+        # with gamma = 0.005 (the step of Gibbs & Candes' 10% experiments) the level alpha_t falls below the smallest
+        # attainable rank and the published rule returns VaR = +inf: count those days
+        s_big, _ = aci(y, q1, 0.01, 0.005)
+        n_inf_005 = int(np.isinf(s_big[250:]).sum())
+        for nm, g in (('C2-ACI', 0.001), ('C2-SCP', 0.0)):
             s1, al1 = aci(y, q1, 0.01, g)
             s25, _ = aci(y, q25, 0.025, g)
+            assert np.isfinite(s1[250:]).all() and np.isfinite(s25[250:]).all(), (a, nm)
             v1 = -(q1 - s1)
             v25 = -(q25 - s25)
             es = np.maximum(rk['C2-raw|ES2.5'].values + s25, v25)
@@ -432,7 +442,8 @@ def conformal():
                 aci_path = pd.DataFrame({'alpha_t': al1, 'VaR_aci': v1, 'VaR_raw': -q1, 'FHS': rk['FHS|VaR1'].values,
                                          'loss': L}, index=rk.index)
         keep = np.arange(250, len(y))
-        r = {'n': int(len(keep)), 'start': str(rk.index[keep[0]].date())}
+        r = {'n': int(len(keep)), 'start': str(rk.index[keep[0]].date()), 'inf_005': n_inf_005,
+             'bound': float((0.99 + 0.001) / (0.001 * len(keep)))}
         Fz = {}
         models = ['FHS', 'GARCH-t', 'C2-raw', 'C2-FHS', 'C2-SCP', 'C2-ACI']
         for m in models:
@@ -457,7 +468,7 @@ def conformal():
         if a == 'sp500':
             path = aci_path
     OUT['conf'] = res
-    # grafic: nivelul adaptiv alpha_t si VaR 1% (S&P 500)
+    # chart: adaptive level alpha_t and VaR 1% (S&P 500)
     p = path.iloc[250:]
     fig, axs = plt.subplots(2, 1, figsize=(7.0, 3.6), sharex=True, gridspec_kw=dict(height_ratios=[1, 1.4]))
     h1, = axs[0].plot(p.index, 100 * p['alpha_t'], color=Purple, lw=0.9)

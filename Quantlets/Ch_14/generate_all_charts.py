@@ -23,7 +23,7 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mfm_tsfm as M   # noqa: E402
 
-# Stil standard MFM: transparent + ENG + legenda jos
+# Standard MFM style: transparent, English labels, legend at the bottom
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -53,8 +53,8 @@ Crimson = '#DC3545'
 Teal = '#17A2B8'
 Magenta = '#D63384'
 Brown = '#795548'
-Gray = '#7F7F7F'          # doar linii de referinta
-LightGray = '#DADADA'     # doar benzi
+Gray = '#7F7F7F'          # reference lines only
+LightGray = '#DADADA'     # bands only
 PV_CMAP = LinearSegmentedColormap.from_list('pv', [IDAred, '#F4B6B6', '#FFFFFF', '#BFD8BF', Forest])
 
 RET_MODELS = {'hist': 'Historical mean', 'ar1': 'AR(1)', 'lstm': 'LSTM (5 seeds)',
@@ -79,7 +79,7 @@ RES = {}
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -88,12 +88,12 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22, **kw):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False, **kw)
 
 
 def fig_legend_bottom(fig, handles, labels, ncol=3, y=0.0):
-    """O singura legenda pentru toata figura, sub panouri."""
+    """One legend for the whole figure, below the panels."""
     fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
@@ -102,7 +102,7 @@ def load_csv(name):
 
 
 # =============================================================================
-# FIG 1: gradientul care dispare (RNN vs LSTM), calculat prin diferentiere automata
+# FIG 1: vanishing gradient (RNN vs LSTM) by automatic differentiation
 # =============================================================================
 def fig_vanishing(T=150, H=16, seeds=50):
     import torch
@@ -119,7 +119,7 @@ def fig_vanishing(T=150, H=16, seeds=50):
         h, _ = net(x)
         h[0, -1].sum().backward()
         return x.grad[0, :, 0].abs().numpy()[::-1]
-    cases = [('rnn', None, 'Simple RNN (tanh)', MainBlue), ('lstm', None, 'LSTM, forget-gate bias 0', Orange),
+    cases = [('rnn', None, 'Simple RNN (tanh)', MainBlue), ('lstm', 0.0, 'LSTM, forget-gate bias 0', Orange),
              ('lstm', 3.0, 'LSTM, forget-gate bias 3', IDAred)]
     fig, ax = plt.subplots(figsize=(6.6, 3.0))
     out = {}
@@ -137,7 +137,7 @@ def fig_vanishing(T=150, H=16, seeds=50):
 
 
 # =============================================================================
-# FIG 2: autocorelatia randamentelor si a randamentelor absolute (de ce volatilitatea e previzibila)
+# FIG 2: autocorrelation of returns and absolute returns (why volatility is forecastable)
 # =============================================================================
 def fig_acf():
     r = M.load_returns('sp500')
@@ -171,7 +171,7 @@ def fig_tokenization():
     ctx = r.values[-512:]
     s = np.mean(np.abs(ctx))
     z = ctx / s
-    delta = 30 / 4092                           # 4093 de centre echidistante in [-15, 15] (Chronos: MeanScaleUniformBins)
+    delta = 30 / 4092                           # 4093 equally spaced centres in [-15, 15] (Chronos: MeanScaleUniformBins)
     tok = np.round((np.clip(z, -15, 15) + 15) / delta).astype(int)
     used = len(np.unique(tok))
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.8), gridspec_kw={'width_ratios': [1.5, 1]})
@@ -201,7 +201,7 @@ def fig_tokenization():
 
 
 # =============================================================================
-# FIG 4: impartirea contextului in patch-uri (Chronos-2: 16 zile, TimesFM-2.5: 32 de zile)
+# FIG 4: patching the context (Chronos-2: 16 days, TimesFM-2.5: 32 days)
 # =============================================================================
 def fig_patching():
     r = M.load_returns('sp500')
@@ -225,7 +225,7 @@ def fig_patching():
 
 
 # =============================================================================
-# FIG 5: evantai de prognoza Chronos-2 pentru log RV (22 de zile) din ultima zi a esantionului
+# FIG 5: Chronos-2 fan chart for log RV (22 days) from the last day of the sample
 # =============================================================================
 def fig_fan():
     rv = M.load_rv()
@@ -235,7 +235,7 @@ def fig_fan():
     q, _ = m.predict_quantiles([torch.tensor(lx[-512:], dtype=torch.float32)[None, :]], prediction_length=22,
                                quantile_levels=M.C2_LEVELS)
     Q = q[0][0].numpy()                         # 22 x 21
-    ann = lambda v: np.sqrt(252 * np.exp(v))    # volatilitate anualizata (%) din log RV zilnic
+    ann = lambda v: np.sqrt(252 * np.exp(v))    # annualised volatility (%) from daily log RV
     hist = rv.iloc[-120:]
     fut = pd.bdate_range(rv.index[-1] + pd.Timedelta(days=1), periods=22)
     lv = M.C2_LEVELS
@@ -257,7 +257,7 @@ def fig_fan():
 
 
 # =============================================================================
-# EVALUARE: randamente (prognoza punctuala)
+# EVALUATION: returns (point forecasts)
 # =============================================================================
 def eval_returns():
     out, series = {}, {}
@@ -452,7 +452,7 @@ def eval_risk():
             dm = M.diebold_mariano(F[m], F['FHS']) if m != 'FHS' else dict(DM=np.nan, p=np.nan)
             res[m]['dm_fhs'] = float(dm['DM'])
             res[m]['p_dm_fhs'] = float(dm['p'])
-        # cuantile directe la 1% pentru Bolt si TimesFM (limitate la decila 10%) si VaR 10%
+        # raw 1% quantiles for Bolt and TimesFM (clamped at the 10% decile) and VaR 10%
         for fm in ('bolt', 'timesfm'):
             h = (L > d[f'{fm}-raw|VaR1'].values).astype(int)
             res[f'{fm}-raw'] = dict(rate=100 * h.mean(), x=int(h.sum()))

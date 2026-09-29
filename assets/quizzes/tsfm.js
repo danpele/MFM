@@ -41,24 +41,24 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "text": "In an LSTM, the cell state evolves as c_t = f_t ⊙ c_{t-1} + i_t ⊙ g_t. What does this imply for learning long memory?",
                     "options": [
                         "The output gate alone decides how far back the gradient can travel",
-                        "The derivative of c_T with respect to c_{T-k} is the product of the forget gates, so memory survives when the forget gate stays close to 1",
+                        "Along the direct cell-state path (gates and candidate held fixed), the derivative of c_T with respect to c_{T-k} is the product of the forget gates, so memory survives when the forget gate stays close to 1",
                         "The candidate g_t must be zero for the network to remember",
                         "The cell state is reset to zero at every step, so there is no long memory"
                     ],
-                    "correctExplanation": "Along the cell-state path the only multiplier is the forget gate: the gradient is ∏ f_t, which decays slowly when f_t is near 1.",
-                    "incorrectExplanation": "The key path is the additive cell-state update; its gradient is the product of the forget gates."
+                    "correctExplanation": "Along the cell-state path the only multiplier is the forget gate: this path contributes ∏ f_t to the gradient, which decays slowly when f_t is near 1; the gates and the candidate add further paths through h_{t-1}.",
+                    "incorrectExplanation": "The key path is the additive cell-state update; along it the gradient is the product of the forget gates."
                 },
                 "ro": {
                     "title": "Starea celulei LSTM",
                     "text": "Într-un LSTM, starea celulei evoluează după c_t = f_t ⊙ c_{t-1} + i_t ⊙ g_t. Ce implică acest lucru pentru învățarea memoriei lungi?",
                     "options": [
                         "Doar poarta de ieșire decide cât de departe în urmă poate ajunge gradientul",
-                        "Derivata lui c_T în raport cu c_{T-k} este produsul porților de uitare, deci memoria supraviețuiește când poarta de uitare rămâne aproape de 1",
+                        "Pe drumul direct al stării celulei (cu porțile și candidatul fixate), derivata lui c_T în raport cu c_{T-k} este produsul porților de uitare, deci memoria supraviețuiește când poarta de uitare rămâne aproape de 1",
                         "Candidatul g_t trebuie să fie zero pentru ca rețeaua să-și amintească",
                         "Starea celulei este resetată la zero la fiecare pas, deci nu există memorie lungă"
                     ],
-                    "correctExplanation": "Pe drumul stării celulei singurul multiplicator este poarta de uitare: gradientul este ∏ f_t, care scade încet când f_t este aproape de 1.",
-                    "incorrectExplanation": "Drumul esențial este actualizarea aditivă a stării celulei; gradientul ei este produsul porților de uitare."
+                    "correctExplanation": "Pe drumul stării celulei singurul multiplicator este poarta de uitare: acest drum contribuie la gradient cu ∏ f_t, care scade încet când f_t este aproape de 1; porțile și candidatul adaugă alte drumuri, prin h_{t-1}.",
+                    "incorrectExplanation": "Drumul esențial este actualizarea aditivă a stării celulei; pe acest drum gradientul este produsul porților de uitare."
                 }
             },
             {
@@ -281,26 +281,26 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 "correct": 2,
                 "en": {
                     "title": "ES from a quantile grid",
-                    "text": "A model gives quantiles at 1%, 5%, 10%, ... You compute ES 2.5% by integrating the quantile function from 0 to 2.5%, keeping it constant below 1%. What is the direction of the error?",
+                    "text": "A model gives quantiles at 1%, 5%, 10%, ... You compute ES 2.5% by integrating the quantile function from 0 to 2.5%, keeping it constant below 1%. Assuming the quantile function is exact between 1% and 2.5%, what is the direction of the error caused by this clamping?",
                     "options": [
                         "ES is overestimated, because the grid is too coarse",
                         "There is no error: ES depends only on the 2.5% quantile",
                         "ES is underestimated, because the true quantiles below 1% are more negative than the 1% quantile",
                         "ES becomes negative"
                     ],
-                    "correctExplanation": "Holding the quantile at its 1% value below 1% cuts off the most extreme part of the tail, so the average tail loss is too small.",
+                    "correctExplanation": "Holding the quantile at its 1% value below 1% cuts off the most extreme part of the tail, so the average tail loss is too small; interpolation between grid levels would add an error of either sign.",
                     "incorrectExplanation": "The cut-off tail below the lowest level makes the computed ES too small."
                 },
                 "ro": {
                     "title": "ES dintr-o grilă de cuantile",
-                    "text": "Un model dă cuantile la 1%, 5%, 10%, ... Calculați ES 2,5% integrând funcția cuantilă de la 0 la 2,5% și păstrând-o constantă sub 1%. În ce sens este eroarea?",
+                    "text": "Un model dă cuantile la 1%, 5%, 10%, ... Calculați ES 2,5% integrând funcția cuantilă de la 0 la 2,5% și păstrând-o constantă sub 1%. Presupunând că funcția cuantilă este exactă între 1% și 2,5%, în ce sens este eroarea produsă de această limitare?",
                     "options": [
                         "ES este supraestimat, pentru că grila este prea rară",
                         "Nu există eroare: ES depinde doar de cuantila de 2,5%",
                         "ES este subestimat, pentru că adevăratele cuantile sub 1% sunt mai negative decât cuantila de 1%",
                         "ES devine negativ"
                     ],
-                    "correctExplanation": "Păstrarea cuantilei la valoarea de 1% sub nivelul de 1% taie partea cea mai extremă a cozii, deci pierderea medie din coadă iese prea mică.",
+                    "correctExplanation": "Păstrarea cuantilei la valoarea de 1% sub nivelul de 1% taie partea cea mai extremă a cozii, deci pierderea medie din coadă iese prea mică; interpolarea între nivelurile grilei ar adăuga o eroare de orice semn.",
                     "incorrectExplanation": "Coada tăiată sub cel mai mic nivel face ca ES calculat să fie prea mic."
                 }
             },
@@ -327,7 +327,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Pentru că modelele zero-shot nu pot fi evaluate cu funcții de scor",
                         "Corpusul lui de pre-antrenare poate conține aceleași serii sau serii înrudite din perioada de test, deci testul nu este cu adevărat în afara eșantionului"
                     ],
-                    "correctExplanation": "Dacă perioada de test se suprapune cu datele de pre-antrenare, modelul poate fi văzut deja răspunsurile; o fereastră de după publicarea ponderilor elimină acest risc.",
+                    "correctExplanation": "Dacă perioada de test se suprapune cu datele de pre-antrenare, modelul poate să fi văzut deja răspunsurile; o fereastră de după publicarea ponderilor elimină acest risc.",
                     "incorrectExplanation": "Problema este informația din perioada de test care intră prin datele de pre-antrenare."
                 }
             },
@@ -369,7 +369,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "A VaR that is always smaller than the FHS VaR",
                         "Consistency of the ES estimate below the 1% quantile"
                     ],
-                    "correctExplanation": "The level update α_{t+1} = α_t + γ(α − err_t) bounds the gap between the average breach rate and α by (max(α_1, 1 − α_1) + γ)/(γT). In the chapter it fixes coverage in all three markets, but the wider VaR loses the FZ0 comparison with FHS.",
+                    "correctExplanation": "The level update α_{t+1} = α_t + γ(α − err_t) bounds the gap between the average breach rate and α by (max(α_1, 1 − α_1) + γ)/(γT). In the chapter it brings coverage near 1% in all three markets, but DQ still rejects on the S&P 500 and the BET and the wider VaR loses the FZ0 comparison with FHS.",
                     "incorrectExplanation": "The guarantee is about the long-run average breach rate only; sharpness, daily coverage and ES are not controlled."
                 },
                 "ro": {
@@ -381,7 +381,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Un VaR mereu mai mic decât VaR-ul FHS",
                         "Consistența estimării ES sub cuantila de 1%"
                     ],
-                    "correctExplanation": "Actualizarea nivelului α_{t+1} = α_t + γ(α − err_t) limitează diferența dintre rata medie de depășire și α la (max(α_1, 1 − α_1) + γ)/(γT). În capitol repară acoperirea pe toate cele trei piețe, dar VaR-ul mai larg pierde comparația FZ0 cu FHS.",
+                    "correctExplanation": "Actualizarea nivelului α_{t+1} = α_t + γ(α − err_t) limitează diferența dintre rata medie de depășire și α la (max(α_1, 1 − α_1) + γ)/(γT). În capitol aduce acoperirea aproape de 1% pe toate cele trei piețe, dar DQ încă respinge pe S&P 500 și BET, iar VaR-ul mai larg pierde comparația FZ0 cu FHS.",
                     "incorrectExplanation": "Garanția privește doar rata medie de depășire pe termen lung; precizia, acoperirea zilnică și ES nu sunt controlate."
                 }
             },
@@ -393,11 +393,11 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "options": [
                         "It is always smaller than the MSE",
                         "It does not require the forecasts to be positive",
-                        "It ranks forecasts consistently even when realised variance is a noisy proxy of the true variance, and it is less dominated by a few extreme days",
+                        "Like the MSE it ranks forecasts correctly when realised variance is a conditionally unbiased proxy, but it depends on the ratio of realisation to forecast and is less dominated by a few extreme days",
                         "It ignores under-prediction of volatility"
                     ],
-                    "correctExplanation": "QLIKE = y/f − log(y/f) − 1 is robust to proxy noise (Patton, 2011) and depends on the ratio y/f rather than on squared levels.",
-                    "incorrectExplanation": "The reason is robustness to the noisy proxy and to extreme days; QLIKE requires positive forecasts and penalises under-prediction strongly."
+                    "correctExplanation": "Patton (2011): both MSE and QLIKE keep the ranking of the true variance when E[RV | F] = σ²; QLIKE = y/f − log(y/f) − 1 penalises relative errors y/f, so a few high-variance days do not dominate the comparison.",
+                    "incorrectExplanation": "Proxy robustness is shared with the MSE; the reason to prefer QLIKE is its relative-error scale; it requires positive forecasts and penalises under-prediction strongly."
                 },
                 "ro": {
                     "title": "Pierderea QLIKE",
@@ -405,11 +405,11 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "options": [
                         "Este întotdeauna mai mică decât MSE",
                         "Nu cere ca prognozele să fie pozitive",
-                        "Clasifică prognozele consecvent chiar și când varianța realizată este o aproximare zgomotoasă a varianței adevărate și este mai puțin dominată de câteva zile extreme",
+                        "La fel ca MSE, ierarhizează corect prognozele când varianța realizată este o aproximare condiționat nedeplasată, dar depinde de raportul dintre realizare și prognoză și este mai puțin dominată de câteva zile extreme",
                         "Ignoră subestimarea volatilității"
                     ],
-                    "correctExplanation": "QLIKE = y/f − log(y/f) − 1 este robustă la zgomotul aproximării (Patton, 2011) și depinde de raportul y/f, nu de nivelurile la pătrat.",
-                    "incorrectExplanation": "Motivul este robustețea la aproximarea zgomotoasă și la zilele extreme; QLIKE cere prognoze pozitive și penalizează puternic subestimarea."
+                    "correctExplanation": "Patton (2011): atât MSE, cât și QLIKE păstrează ierarhia varianței adevărate când E[RV | F] = σ²; QLIKE = y/f − log(y/f) − 1 penalizează erorile relative y/f, astfel încât câteva zile cu varianță mare nu domină comparația.",
+                    "incorrectExplanation": "Robustețea la aproximare este comună cu MSE; motivul pentru QLIKE este scala erorilor relative; QLIKE cere prognoze pozitive și penalizează puternic subestimarea."
                 }
             },
             {
@@ -477,7 +477,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Because foundation models always output the exact standard deviation",
                         "Because the empirical quantile of standardised returns is always −2.33"
                     ],
-                    "correctExplanation": "VaR = σ̂_t × q_α(r/σ̂); replacing σ̂ by cσ̂ multiplies the first factor by c and divides the second by c.",
+                    "correctExplanation": "VaR = −σ̂_t × q_α(r/σ̂); replacing σ̂ by cσ̂ multiplies the first factor by c and divides the second by c.",
                     "incorrectExplanation": "In filtered historical simulation a constant factor in σ̂ cancels; only the relative dynamics of σ̂ matter."
                 },
                 "ro": {
@@ -489,7 +489,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Pentru că modelele fundaționale dau mereu abaterea standard exactă",
                         "Pentru că cuantila empirică a randamentelor standardizate este mereu −2,33"
                     ],
-                    "correctExplanation": "VaR = σ̂_t × q_α(r/σ̂); înlocuirea lui σ̂ cu cσ̂ înmulțește primul factor cu c și îl împarte pe al doilea la c.",
+                    "correctExplanation": "VaR = −σ̂_t × q_α(r/σ̂); înlocuirea lui σ̂ cu cσ̂ înmulțește primul factor cu c și îl împarte pe al doilea la c.",
                     "incorrectExplanation": "În simularea istorică filtrată, un factor constant din σ̂ se anulează; contează doar dinamica relativă a lui σ̂."
                 }
             },

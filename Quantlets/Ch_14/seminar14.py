@@ -34,13 +34,13 @@ def part_a():
                    head=17, total=M.lstm_param_count(1, 16) + 17)
     S['A2'] = dict(d=5, h=32, l1=M.lstm_param_count(5, 32), l2=M.lstm_param_count(32, 32), head=33,
                    total=M.lstm_param_count(5, 32) + M.lstm_param_count(32, 32) + 33)
-    # A3/A4: memoria unei celule LSTM cu poarta de uitare constanta
+    # A3/A4: memory of an LSTM cell with a constant forget gate
     sig = lambda b: 1 / (1 + np.exp(-b))
     S['A3'] = dict(w=0.9, w20=0.9 ** 20, w50=0.9 ** 50, f0=sig(0), f3=sig(3), f0_50=sig(0) ** 50, f3_50=sig(3) ** 50,
                    half3=np.log(0.5) / np.log(sig(3)))
     S['A4'] = dict(f1=sig(1), half1=np.log(0.5) / np.log(sig(1)), half99=np.log(0.5) / np.log(0.99),
                    b99=np.log(0.99 / 0.01), f5=sig(5), f5_250=sig(5) ** 250)
-    # A5/A6: tokenizarea Chronos (scalare prin media valorilor absolute, 4093 de centre in [-15, 15])
+    # A5/A6: Chronos tokenisation (mean absolute scaling, 4093 centres in [-15, 15])
     x = np.array([0.8, -1.2, 0.4, 2.0])
     s = np.mean(np.abs(x))
     delta = 30 / 4092
@@ -52,7 +52,7 @@ def part_a():
     z6 = x6 / s6
     S['A6'] = dict(x=x6.tolist(), s=s6, z=z6.tolist(), j=np.round((z6 + 15) / delta).astype(int).tolist(),
                    z_small=float(0.4 / s6), z_small0=float(0.4 / s))
-    # A7/A8: VaR si ES din grila de cuantile a ultimei prognoze Chronos-2 pentru S&P 500
+    # A7/A8: VaR and ES from the quantile grid of the last Chronos-2 forecast for the S&P 500
     d = load_csv('ch14_returns_sp500.csv')
     last = d.iloc[-1]
     q = {u: float(last[f'chronos2_q{u:.2f}']) for u in M.C2_LEVELS}
@@ -64,21 +64,23 @@ def part_a():
     sd = (b[0.5] - b[0.1]) / stats.norm.ppf(0.9)
     S['A8'] = dict(q10=b[0.1], q50=b[0.5], sd=sd, var1=-(b[0.5] + sd * stats.norm.ppf(0.01)),
                    es25=-(b[0.5] - sd * stats.norm.pdf(stats.norm.ppf(0.025)) / 0.025), clamp=-b[0.1])
-    # V1: RNN liniarizata = VAR(1); W cu raza spectrala < 1 dar norma spectrala > 1 (D = I in h* = 0 pentru tanh)
+    # V1: linearised RNN = VAR(1); W with spectral radius < 1 but spectral norm > 1 (D = I at h* = 0 for tanh)
     W = np.array([[0.5, 0.8], [0.0, 0.5]])
     S['V1'] = dict(rho=float(max(abs(np.linalg.eigvals(W)))), norm=float(np.linalg.norm(W, 2)),
                    n1=float(np.linalg.norm(W, 2)), n5=float(np.linalg.norm(np.linalg.matrix_power(W, 5), 2)),
                    n20=float(np.linalg.norm(np.linalg.matrix_power(W, 20), 2)),
                    n50=float(np.linalg.norm(np.linalg.matrix_power(W, 50), 2)),
                    bound20=float(np.linalg.norm(W, 2) ** 20))
-    # V2: scalarea Chronos prin media valorilor absolute; contextul S&P 500 de 512 zile inainte si dupa 16.03.2020
+    # V2: Chronos mean absolute scaling; the 512-day S&P 500 context before and after 16.03.2020
     r = M.load_returns('sp500')
     t = r.index.get_loc(pd.Timestamp('2020-03-16'))
     x = r.values
     s_old, s_new = np.abs(x[t - 512:t]).mean(), np.abs(x[t - 511:t + 1]).mean()
     S['V2'] = dict(s_old=s_old, s_new=s_new, crash=x[t], drop=x[t - 512], factor=s_old / s_new,
-                   check=s_old + (abs(x[t]) - abs(x[t - 512])) / 512)
-    # V3: coada GPD pentru pierderile S&P 500 (ultimele 1000 de zile, prag = cuantila de 95% a pierderilor)
+                   check=s_old + (abs(x[t]) - abs(x[t - 512])) / 512,
+                   # Chronos-2 standardises by the context mean and standard deviation (then arcsinh)
+                   sd_old=float(x[t - 512:t].std()), sd_new=float(x[t - 511:t + 1].std()))
+    # V3: GPD tail for S&P 500 losses (last 1000 days, threshold = 95% quantile of the losses)
     L = -x[-1000:]
     u = np.quantile(L, 0.95)
     exc = L[L > u] - u
@@ -88,7 +90,7 @@ def part_a():
     var25 = u + beta / xi * ((n / Nu * 0.025) ** (-xi) - 1)
     S['V3'] = dict(u=u, xi=xi, beta=beta, Nu=Nu, n=n, var1=var1, var25=var25,
                    es25=var25 / (1 - xi) + (beta - xi * u) / (1 - xi), date=str(r.index[-1].date()))
-    # V4: puterea exacta a testului Kupiec la T = 220 (regiunea de respingere)
+    # V4: exact power of the Kupiec test at T = 220 (rejection region)
     crit = stats.chi2.ppf(0.95, 1)
     T = 220
     rej = [k for k in range(0, 40) if M.kupiec(np.r_[np.ones(k), np.zeros(T - k)], 0.01)['LR'] > crit]
@@ -100,7 +102,7 @@ def part_a():
                    p0_1=float(stats.binom.pmf(0, T, 0.0167)), phi_1=float(stats.binom.sf(k_hi - 1, T, 0.0167)),
                    lr_lo=M.kupiec(np.r_[np.ones(k_hi - 1), np.zeros(T - k_hi + 1)], 0.01)['LR'],
                    lr_hi=M.kupiec(np.r_[np.ones(k_hi), np.zeros(T - k_hi)], 0.01)['LR'])
-    # V5: QLIKE si media; raportul mediana/media din grila Chronos-2 pentru RV (lognormal: exp(-s^2/2))
+    # V5: QLIKE and the mean; median/mean ratio from the Chronos-2 grid for RV (lognormal: exp(-s^2/2))
     d = load_csv('ch14_rv.csv')
     ratio = (d['Chronos-2|median'] / d['Chronos-2']).mean()
     s5 = float(np.sqrt(-2 * np.log(ratio)))
@@ -111,8 +113,8 @@ def part_a():
 # PARTEA B
 # =============================================================================
 def b_returns(asset):
-    """R^2 in afara esantionului fata de prognoza zero (interval bootstrap pe blocuri de 20 de zile), testul DM pe
-    erorile patratice (varianta Newey-West) si rata semnelor corecte, pentru fiecare model."""
+    """Out-of-sample R^2 against the zero forecast (block-bootstrap interval, blocks of 20 days), DM test on
+    squared errors (Newey-West variance) and the share of correct signs, for each model."""
     d = load_csv(f'ch14_returns_{asset}.csv')
     y = d['y'].values
     rows = {}
@@ -129,7 +131,7 @@ def b_returns(asset):
 
 
 def b_rv(post=False):
-    """QLIKE medie, testul DM fata de log-HAR si valorile p ale MCS pentru prognozele varianței realizate SPY."""
+    """Mean QLIKE, DM test against log-HAR and MCS p-values for the SPY realised-variance forecasts."""
     d = load_csv('ch14_rv.csv')
     if post:
         d = d[d.index >= M.POST_FROM]
@@ -145,7 +147,7 @@ def b_rv(post=False):
 
 
 def b_median():
-    """Media din grila de cuantile vs exp(mediana) si efectul lungimii contextului (Chronos-2)."""
+    """Grid mean versus exp(median), and the effect of the context length (Chronos-2)."""
     d = load_csv('ch14_rv.csv')
     rows = {}
     for m in ('Chronos-2', 'TimesFM-2.5'):
@@ -158,7 +160,7 @@ def b_median():
 
 
 def b_risk(asset, post=False):
-    """VaR 1%: depasiri, testele Kupiec si Christoffersen; (VaR 2.5%, ES 2.5%): FZ0, DM fata de FHS, MCS."""
+    """VaR 1%: breaches, Kupiec and Christoffersen tests; (VaR 2.5%, ES 2.5%): FZ0, DM against FHS, MCS."""
     d = load_csv(f'ch14_risk_{asset}.csv')
     if post:
         d = d[d.index >= M.POST_FROM]
@@ -177,7 +179,7 @@ def b_risk(asset, post=False):
 
 
 def b_var10(asset):
-    """VaR 10%: cuantilele directe ale celor trei modele fundationale fata de HS si FHS."""
+    """VaR 10%: raw quantiles of the three foundation models against HS and FHS."""
     d = load_csv(f'ch14_risk_{asset}.csv')
     L = -d['y'].values
     rows = {}
@@ -191,7 +193,7 @@ def b_var10(asset):
 
 
 def b_seeds():
-    """R^2 in afara esantionului pentru fiecare dintre cele 5 seminte LSTM si pentru media lor."""
+    """Out-of-sample R^2 of each of the 5 LSTM seeds and of their average."""
     rows = {}
     for a in M.ASSETS:
         d = load_csv(f'ch14_returns_{a}.csv')
@@ -203,8 +205,8 @@ def b_seeds():
 
 
 def b8_leakage():
-    """Scurgerea de informatie prin privirea in viitor: log-HAR cu mediile pe 5 si 22 de zile care includ si ziua
-    prognozata (gresit) fata de log-HAR corect (medii pana la ziua precedenta). SPY, aceleasi zile de test."""
+    """Look-ahead leakage: log-HAR with 5- and 22-day averages that include the forecast day (wrong)
+    against the correct log-HAR (averages up to the previous day). SPY, same test days."""
     d = load_csv('ch14_rv.csv')
     rv = M.load_rv()
     y = np.log(rv.values)
@@ -263,7 +265,7 @@ def part_c():
     S['C_ret'] = b_returns('bet').to_dict('index')
     d = load_csv('ch14_risk_bet.csv')
     L = -d['y']
-    # zonele semaforului Basel pe ferestre de 250 de zile (fara suprapunere)
+    # Basel traffic-light zones on non-overlapping 250-day windows
     tl = {}
     for m in ('HS', 'GARCH-t', 'FHS', 'C2-raw', 'C2-FHS', 'TFM-FHS'):
         h = (L > d[f'{m}|VaR1']).astype(int).values
