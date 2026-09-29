@@ -159,7 +159,7 @@ def part_nse():
                         table=df.round(4).to_dict('records'))
 
     # --- grafic 1: multiversul, estimarile grupate dupa bifurcatia modelului ---
-    fig, axes = plt.subplots(1, 2, figsize=(8.0, 3.4), sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(7.6, 4.3), sharey=True)
     mcol = dict(zip(MEASURES, [MainBlue, Forest, IDAred]))
     mmark = dict(zip(OUTLIERS, ['o', 's', '^']))
     off = dict(zip(OUTLIERS, [-0.22, 0.0, 0.22]))
@@ -190,7 +190,7 @@ def part_nse():
     save_nse_fig('ch19_nse_multiverse')
 
     # --- grafic 2: ordinea bifurcatiilor (Anderson-Darling cu k esantioane) ---
-    fig, ax = plt.subplots(figsize=(6.8, 2.8))
+    fig, ax = plt.subplots(figsize=(6.4, 3.9))
     forks = ['model', 'measure', 'outlier']
     names = ['Model (trend, log, relative)', 'Measure (VR(5), VR(21), AR(1) R$^2$)', 'Outliers (none, winsorised, trimmed)']
     y = np.arange(len(forks))

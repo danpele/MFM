@@ -109,7 +109,7 @@ def part_facts():
     lags = np.arange(1, 51)
     a_r, a_abs = acf(r.values, 50), acf(np.abs(r.values), 50)
     band = 1.96 / np.sqrt(len(r))
-    fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.4))
+    fig, axes = plt.subplots(1, 2, figsize=(7.6, 4.3))
     ax = axes[0]
     ax.scatter(zn, z, s=4, color=MainBlue, label='BET standardised daily log returns')
     ax.plot([-5, 5], [-5, 5], color=Gray, lw=0.8, ls='--', label='Normal distribution (45-degree line)')
@@ -138,14 +138,14 @@ def part_garch():
     RES['garch'] = g
     RES['garch']['profile'] = profile_ci(r.values, res)   # CI profil pentru alpha + beta, restrans la < 1
     sig = res.conditional_volatility
-    fig, ax = plt.subplots(figsize=(9.6, 3.2))
+    fig, ax = plt.subplots(figsize=(7.6, 4.2))
     ax.plot(r.index, r.values, color=MainBlue, lw=0.4, label='BET daily log return (%)')
     ax.plot(sig.index, 2 * sig.values, color=IDAred, lw=0.7, label=r'$\pm 2\hat\sigma_t$, GARCH(1,1)-t')
     ax.plot(sig.index, -2 * sig.values, color=IDAred, lw=0.7)
     ax.axhline(0, color=Gray, lw=0.4)
     ax.set_xlim(r.index[0], r.index[-1])
     ax.set_ylabel('%')
-    legend_outside_bottom(ax, ncol=2, y=-0.14)
+    legend_outside_bottom(ax, ncol=2, y=-0.1)
     save_fig('ch19_bet_garch')
     s = sig.copy()
     RES['garch']['sigma_last'] = float(s.iloc[-1])                                   # sigma_T
@@ -173,7 +173,7 @@ def part_var(full_res):
     pw = {f'{T}_{p1}': kupiec_power(T, p1)[0] for T in (250, 1000, len(fc)) for p1 in (0.013, 0.015, 0.02)}
     RES['power'] = dict(pw=pw, mde={str(T): kupiec_mde(T) for T in (250, 1000, len(fc))}, T=len(fc),
                         rej250=[int(x) for x in kupiec_power(250, 0.02)[1][:12]])
-    fig, ax = plt.subplots(figsize=(7.6, 3.0))
+    fig, ax = plt.subplots(figsize=(6.4, 4.0))
     grid = np.arange(0.002, 0.0405, 0.0005)
     for T, c in [(250, Orange), (1000, MainBlue), (len(fc), IDAred)]:
         ax.plot(100 * grid, [kupiec_power(T, p1)[0] for p1 in grid], color=c, lw=1.2, label=f'T = {T} days')
@@ -182,26 +182,26 @@ def part_var(full_res):
     ax.axvline(1.0, color='black', lw=0.6, ls='--', label='Null: 1%')
     ax.set_xlabel('True breach rate of the VaR 1% model (%)')
     ax.set_ylabel('Rejection probability of\nthe 5% Kupiec test')
-    legend_outside_bottom(ax, ncol=4, y=-0.2)
+    legend_outside_bottom(ax, ncol=2, y=-0.16)
     save_fig('ch19_kupiec_power')
 
     # grafic: pierderi si VaR 1% (2020-2026)
     d = fc.loc['2020-01-01':]
-    fig, ax = plt.subplots(figsize=(9.6, 3.3))
+    fig, ax = plt.subplots(figsize=(7.6, 4.2))
     ax.bar(d.index, d['L'].clip(lower=0), width=1.5, color=Teal, alpha=0.7, label='Daily loss (gains set to 0)')
     ax.plot(d.index, d['Normal'], color=Orange, lw=0.9, label='Normal VaR 1% (500 days)')
     ax.plot(d.index, d['FHS'], color=IDAred, lw=0.9, label='FHS VaR 1% (GARCH-t filter)')
     exc = d['L'] > d['FHS']
     ax.scatter(d.index[exc], d['L'][exc], s=12, color='black', zorder=3, label='Loss above FHS VaR 1%')
     ax.set_ylabel('Loss = negative log return (%)')
-    legend_outside_bottom(ax, ncol=2, y=-0.14)
+    legend_outside_bottom(ax, ncol=2, y=-0.1)
     save_fig('ch19_bet_var')
     RES['var_2020'] = dict(n=len(d), x_fhs=int(exc.sum()), x_normal=int((d['L'] > d['Normal']).sum()),
                           fhs_max=float(d['FHS'].max()), fhs_max_date=str(d['FHS'].idxmax().date()),
                           fhs_last=float(fc['FHS'].iloc[-1]), normal_last=float(fc['Normal'].iloc[-1]))
 
     # grafic: ratele depasirilor
-    fig, ax = plt.subplots(figsize=(7.6, 3.2))
+    fig, ax = plt.subplots(figsize=(6.4, 4.0))
     x = np.arange(len(MODELS))
     rates = [100 * bt[m]['rate'] for m in MODELS]
     ax.bar(x, rates, width=0.55, color=[MODEL_COL[m] for m in MODELS])
@@ -216,7 +216,7 @@ def part_var(full_res):
     save_fig('ch19_breach_rates')
 
     # grafic: depasiri pe 250 de zile si zonele Basel
-    fig, ax = plt.subplots(figsize=(9.6, 3.3))
+    fig, ax = plt.subplots(figsize=(7.6, 4.2))
     ax.axhspan(-0.5, 4.5, color=Forest, alpha=0.08, lw=0, label='Green zone (0-4)')
     ax.axhspan(4.5, 9.5, color=Amber, alpha=0.15, lw=0, label='Yellow zone (5-9)')
     top = 0
@@ -228,7 +228,7 @@ def part_var(full_res):
     ax.set_ylim(-0.5, top + 2)
     ax.set_xlim(fc.index[0], fc.index[-1])
     ax.set_ylabel('Breaches in the last 250 days')
-    legend_outside_bottom(ax, ncol=4, y=-0.14)
+    legend_outside_bottom(ax, ncol=4, y=-0.1)
     save_fig('ch19_rolling_breaches')
 
     # capcana: informatie din viitor (parametri estimati pe toata selectia)
@@ -240,7 +240,7 @@ def part_var(full_res):
     k_hsfull = kupiec((fc['L'] > hs_full).astype(int))
     RES['lookahead'] = dict(garch_full_rate=k_full['rate'], garch_full_p=k_full['p'], garch_full_x=k_full['x'],
                             hs_full_rate=k_hsfull['rate'], hs_full_x=k_hsfull['x'], hs_full_var=float(hs_full))
-    fig, ax = plt.subplots(figsize=(7.6, 3.0))
+    fig, ax = plt.subplots(figsize=(6.4, 4.0))
     lab = ['HS', 'GARCH-t']
     oos = [100 * bt['HS']['rate'], 100 * bt['GARCH-t']['rate']]
     ins = [100 * k_hsfull['rate'], 100 * k_full['rate']]
@@ -254,7 +254,7 @@ def part_var(full_res):
     ax.set_xticks(x)
     ax.set_xticklabels(lab)
     ax.set_ylabel('Breach rate of VaR 1% (%)')
-    legend_outside_bottom(ax, ncol=3, y=-0.12)
+    legend_outside_bottom(ax, ncol=1, y=-0.1)
     save_fig('ch19_lookahead')
 
 
