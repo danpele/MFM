@@ -234,14 +234,18 @@ def b8_rnd_band(days=90, B=300):
     atm = np.sqrt(svi_w(0.0, *p0) / T)
     ln = lambda x: float(stats.lognorm.cdf(x * F, s=atm * np.sqrt(T), scale=F * np.exp(-0.5 * atm ** 2 * T)))
     rng = np.random.default_rng(SEED)
-    P80, P120 = [], []
+    P80, P120, D80, D120 = [], [], [], []   # D: SVI minus log-normal, cu volatilitatea ATM a fiecarei reestimari
     while len(P80) < B:
         i = rng.integers(0, len(kq), len(kq))
         if len(np.unique(kq[i])) < 6:
             continue
         pb = svi_fit(kq[i], wq[i])
-        a_, b_ = probs(rnd_from_svi([pb[x] for x in ['a', 'b', 'rho', 'm', 's']], F, T, K))
+        pbv = [pb[x] for x in ['a', 'b', 'rho', 'm', 's']]
+        a_, b_ = probs(rnd_from_svi(pbv, F, T, K))
         P80.append(a_); P120.append(b_)
+        sb = np.sqrt(svi_w(0.0, *pbv) / T)
+        lnb = lambda x: float(stats.lognorm.cdf(x * F, s=sb * np.sqrt(T), scale=F * np.exp(-0.5 * sb ** 2 * T)))
+        D80.append(a_ - lnb(0.8)); D120.append(b_ - (1 - lnb(1.2)))
     kmin, kmax = float(np.exp(kq.min())), float(np.exp(kq.max()))
     A0 = integrate.trapezoid(q0, K)
     ext_lo = float(integrate.trapezoid(q0[K <= kmin * F], K[K <= kmin * F]) / A0)       # masa sub ultima cotatie
@@ -250,7 +254,9 @@ def b8_rnd_band(days=90, B=300):
                 ext_lo=ext_lo, ext_hi=ext_hi, ext_lo_share=ext_lo / float(p80), ext_hi_share=ext_hi / float(p120),
                 p80=float(p80), p80_lo=float(np.quantile(P80, 0.025)), p80_hi=float(np.quantile(P80, 0.975)),
                 p120=float(p120), p120_lo=float(np.quantile(P120, 0.025)), p120_hi=float(np.quantile(P120, 0.975)),
-                ln80=ln(0.8), ln120=1 - ln(1.2), kf_min=float(np.exp(kq.min())), kf_max=float(np.exp(kq.max())))
+                ln80=ln(0.8), ln120=1 - ln(1.2),
+                d80_lo=float(np.quantile(D80, 0.025)), d80_hi=float(np.quantile(D80, 0.975)),
+                d120_lo=float(np.quantile(D120, 0.025)), d120_hi=float(np.quantile(D120, 0.975)), kf_min=float(np.exp(kq.min())), kf_max=float(np.exp(kq.max())))
 
 
 # =============================================================================

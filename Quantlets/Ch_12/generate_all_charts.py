@@ -1155,6 +1155,9 @@ FF_DAILY = 'https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Rese
 # Back, Crotty & Kazempour (2022), Tabelul 1: randamentul mediu in exces al S&P 500 cu dividende (% anualizat)
 BCK_TABLE1_RET = {1: 8.76, 3: 8.73, 6: 8.67, 12: 8.86}
 BCK_H = [1, 3, 6, 12]
+# esantionul Tabelului 1: zile de formare cu predictorii Welch--Goyal disponibili (de la ultima zi de
+# tranzactionare din ianuarie 1990), ca in summary_tabs.py din pachetul de replicare
+BCK_START = '1990-01-31'
 
 
 def ff_rf_daily():
@@ -1195,7 +1198,7 @@ def fig_bck_bound(d):
     ax.set_ylim(0, 1.05 * float(d['lb_cylr_1'].max()))
     ax.set_title('Option-implied lower bounds on the equity premium, 1-month horizon', fontsize=9.5, loc='left')
     ax = axes[1]
-    x = d[['f12', 'lb_m_12']].dropna()
+    x = d.loc[BCK_START:, ['f12', 'lb_m_12']].dropna()
     ax.axhline(0, color=Gray, lw=0.6)
     ax.plot(x.index, x['f12'], color=MainBlue, lw=0.7)
     ax.plot(x.index, x['lb_m_12'], color=IDAred, lw=1.1)
@@ -1223,7 +1226,7 @@ def fig_bck_means(d):
     pe orizonturi: marja medie."""
     rows = {}
     for h in BCK_H:
-        x = d[[f'f{h}', f'lb_m_{h}']].dropna()
+        x = d.loc[BCK_START:, [f'f{h}', f'lb_m_{h}']].dropna()
         rows[h] = dict(ret=float(x[f'f{h}'].mean()), bound=float(x[f'lb_m_{h}'].mean()),
                        slack=float((x[f'f{h}'] - x[f'lb_m_{h}']).mean()),
                        below=float((x[f'f{h}'] < x[f'lb_m_{h}']).mean()), n=int(len(x)),
