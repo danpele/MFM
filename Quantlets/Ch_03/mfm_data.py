@@ -76,6 +76,22 @@ FILES = {
     ('ind10', 'M'): '10_Industry_Portfolios_CSV.zip',
     ('ind30', 'M'): '30_Industry_Portfolios_CSV.zip',
     ('p100', 'M'): '100_Portfolios_10x10_CSV.zip',
+    # portofolii univariate (primul tabel: ponderate cu valoarea de piata), studiul de caz Jensen-Kelly-Pedersen
+    ('ME', 'M'): 'Portfolios_Formed_on_ME_CSV.zip',
+    ('BE-ME', 'M'): 'Portfolios_Formed_on_BE-ME_CSV.zip',
+    ('OP', 'M'): 'Portfolios_Formed_on_OP_CSV.zip',
+    ('INV', 'M'): 'Portfolios_Formed_on_INV_CSV.zip',
+    ('E-P', 'M'): 'Portfolios_Formed_on_E-P_CSV.zip',
+    ('CF-P', 'M'): 'Portfolios_Formed_on_CF-P_CSV.zip',
+    ('D-P', 'M'): 'Portfolios_Formed_on_D-P_CSV.zip',
+    ('AC', 'M'): 'Portfolios_Formed_on_AC_CSV.zip',
+    ('NI', 'M'): 'Portfolios_Formed_on_NI_CSV.zip',
+    ('BETA', 'M'): 'Portfolios_Formed_on_BETA_CSV.zip',
+    ('VAR', 'M'): 'Portfolios_Formed_on_VAR_CSV.zip',
+    ('RESVAR', 'M'): 'Portfolios_Formed_on_RESVAR_CSV.zip',
+    ('PRIOR_12_2', 'M'): '10_Portfolios_Prior_12_2_CSV.zip',
+    ('PRIOR_1_0', 'M'): '10_Portfolios_Prior_1_0_CSV.zip',
+    ('PRIOR_60_13', 'M'): '10_Portfolios_Prior_60_13_CSV.zip',
 }
 
 

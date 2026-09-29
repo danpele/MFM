@@ -585,6 +585,147 @@ def fig_fama_macbeth():
 
 
 # =============================================================================
+# FIG 14: Studiul de caz Jensen, Kelly & Pedersen (2023): alfa CAPM OLS vs empirical Bayes
+# =============================================================================
+# 15 factori long-short din portofoliile univariate ponderate cu valoarea (Kenneth French Data Library):
+# (fisier, portofoliul long, portofoliul short); long = extrema cu randament mai mare in lucrarea originala
+JKP_SIGNALS = {
+    'Size': ('ME', 'Lo 30', 'Hi 30'),
+    'Book/market': ('BE-ME', 'Hi 30', 'Lo 30'),
+    'Profitability': ('OP', 'Hi 30', 'Lo 30'),
+    'Investment': ('INV', 'Lo 30', 'Hi 30'),
+    'Earnings/price': ('E-P', 'Hi 30', 'Lo 30'),
+    'Cash flow/price': ('CF-P', 'Hi 30', 'Lo 30'),
+    'Dividend/price': ('D-P', 'Hi 30', 'Lo 30'),
+    'Accruals': ('AC', 'Lo 20', 'Hi 20'),
+    'Net share issues': ('NI', 'Lo 20', 'Hi 20'),
+    'Market beta': ('BETA', 'Lo 20', 'Hi 20'),
+    'Variance': ('VAR', 'Lo 20', 'Hi 20'),
+    'Residual variance': ('RESVAR', 'Lo 20', 'Hi 20'),
+    'Momentum 12-2': ('PRIOR_12_2', 'Hi PRIOR', 'Lo PRIOR'),
+    'Reversal 1-0': ('PRIOR_1_0', 'Lo PRIOR', 'Hi PRIOR'),
+    'Reversal 60-13': ('PRIOR_60_13', 'Lo PRIOR', 'Hi PRIOR'),
+}
+# numele temelor: tema care contine factorul-reper
+JKP_THEME_NAMES = [('Book/market', 'Value'), ('Profitability', 'Quality and low risk'),
+                   ('Momentum 12-2', 'Accruals and momentum'), ('Size', 'Size and reversal')]
+
+
+def jkp_replication(start='1963-07-31', kmax=8):
+    """Jensen, Kelly & Pedersen (2023) pe 15 factori SUA: alfa CAPM cu factorii scalati la 10% volatilitate
+    idiosincratica anuala (Sec. II.A), rata de replicare OLS (t >= 1.96), Benjamini-Yekutieli la 5%,
+    teme prin Ward pe 1 - corelatia reziduurilor CAPM (Sec. II.B) si modelul ierarhic empirical Bayes cu media
+    a priori 0 (ec. 21-23, Prop. 4; o singura regiune, deci tau_s = 0). Numarul de teme: maximul
+    verosimilitatii marginale a lui alfa_hat ~ N(0, M M' tau_c^2 + I tau_w^2 + Sigma / T), k = 1..kmax."""
+    from scipy.cluster.hierarchy import linkage, fcluster
+    from scipy.spatial.distance import squareform
+    from scipy.optimize import minimize
+    X = pd.DataFrame({k: french(f, 'M')[lo] - french(f, 'M')[sh] for k, (f, lo, sh) in JKP_SIGNALS.items()})
+    X = X.loc[start:END].dropna()
+    m = factors('M').loc[X.index, 'Mkt-RF'].values
+    T, N = X.shape
+    Z = np.column_stack([np.ones(T), m])
+    E0 = X.values - Z @ np.linalg.lstsq(Z, X.values, rcond=None)[0]
+    Xs = X * (0.10 / np.sqrt(12)) / E0.std(0, ddof=2)               # volatilitate reziduala lunara 10%/sqrt(12)
+    B = np.linalg.lstsq(Z, Xs.values, rcond=None)[0]
+    E = Xs.values - Z @ B
+    a = B[0]
+    se = np.sqrt((E ** 2).sum(0) / (T - 2) * np.linalg.inv(Z.T @ Z)[0, 0])
+    t = a / se
+    p = 2 * stats.norm.sf(np.abs(t))
+    # Benjamini-Yekutieli la 5%
+    o = np.argsort(p)
+    ok = p[o] <= np.arange(1, N + 1) / (N * np.sum(1 / np.arange(1, N + 1))) * 0.05
+    by = np.zeros(N, bool)
+    by[o[:np.max(np.where(ok)[0]) + 1 if ok.any() else 0]] = True
+    # teme: Ward pe distanta 1 - corelatia reziduurilor
+    D = 1 - np.corrcoef(E.T)
+    np.fill_diagonal(D, 0)
+    L = linkage(squareform(D, checks=False), 'ward')
+    S = np.cov(E.T, ddof=2) / T                                      # Sigma / T
+
+    def eb(g):
+        Mm = (g[:, None] == np.unique(g)[None, :]).astype(float)
+
+        def nll(q):
+            tc, tw = np.exp(q)
+            return -stats.multivariate_normal.logpdf(a, np.zeros(N), Mm @ Mm.T * tc ** 2 + np.eye(N) * tw ** 2 + S)
+        fits = [minimize(nll, np.log(x0), method='Nelder-Mead', options=dict(xatol=1e-8, fatol=1e-10, maxiter=5000))
+                for x0 in ([0.003, 0.002], [0.0005, 0.003], [0.003, 0.0003])]
+        best = min(fits, key=lambda z: z.fun)
+        tc, tw = np.exp(best.x)
+        O = Mm @ Mm.T * tc ** 2 + np.eye(N) * tw ** 2
+        P = np.linalg.inv(np.linalg.inv(O) + np.linalg.inv(S))       # Prop. 4, cu Sigma / T
+        pm = P @ np.linalg.solve(S, a)
+        ps = np.sqrt(np.diag(P))
+        return dict(tau_c=tc, tau_w=tw, post_mean=pm, post_sd=ps, z=pm / ps, loglik=-best.fun)
+    fits = {k: eb(fcluster(L, k, 'maxclust') if k > 1 else np.ones(N, int)) for k in range(1, kmax + 1)}
+    k = max(fits, key=lambda j: fits[j]['loglik'])
+    g = fcluster(L, k, 'maxclust') if k > 1 else np.ones(N, int)
+    names = {}
+    for f, nm in JKP_THEME_NAMES:
+        c = g[list(X.columns).index(f)]
+        names.setdefault(c, nm)
+    theme = [names.get(c, f'Theme {c}') for c in g]
+    r = fits[k]
+    tab = pd.DataFrame({'theme': theme, 'alpha': a, 'se': se, 't': t, 'by': by, 'post_mean': r['post_mean'],
+                        'post_sd': r['post_sd'], 'z': r['z']}, index=X.columns)
+    summ = dict(T=T, start=str(X.index[0].date()), end=str(X.index[-1].date()), k=k,
+                tau_c=r['tau_c'], tau_w=r['tau_w'],
+                rate_ols=float(np.mean(t >= 1.96)), rate_by=float(by.mean()),
+                by_crit_t=float(np.min(np.abs(t[by]))) if by.any() else None,
+                rate_eb=float(np.mean(r['z'] >= 1.96)),
+                rate_eb_by_k={j: float(np.mean(v['z'] >= 1.96)) for j, v in fits.items()},
+                loglik_by_k={j: v['loglik'] for j, v in fits.items()})
+    return tab, summ
+
+
+def fig_jkp_replication():
+    tab, s = jkp_replication()
+    order = [nm for _, nm in JKP_THEME_NAMES if nm in set(tab['theme'])]
+    order += [x for x in dict.fromkeys(tab['theme']) if x not in order]
+    d = pd.concat([tab[tab['theme'] == th].sort_values('alpha') for th in order])
+    y = np.arange(len(d))[::-1].astype(float)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(6.3, 3.6), sharey=True, gridspec_kw=dict(width_ratios=[1.25, 1]))
+    h = 0.17
+    ax1.errorbar(d['alpha'] * 100, y + h, xerr=1.96 * d['se'] * 100, fmt='o', ms=3.5, color=MainBlue, lw=0.9,
+                 capsize=0, label='OLS alpha, 95% confidence interval')
+    ax1.errorbar(d['post_mean'] * 100, y - h, xerr=1.96 * d['post_sd'] * 100, fmt='s', ms=3.5, color=IDAred, lw=0.9,
+                 capsize=0, label='Empirical Bayes: posterior mean, 95% credible interval')
+    ax1.axvline(0, color=Gray, lw=0.6)
+    ax1.set_xlabel('Alpha, % per month (scaled)')
+    ax2.barh(y + h, d['t'], 2 * h, color=MainBlue)
+    ax2.barh(y - h, d['z'], 2 * h, color=IDAred)
+    ax2.axvline(1.96, color=Forest, ls='--', lw=0.9, label='t = 1.96 (single test, 5%)')
+    ax2.axvline(s['by_crit_t'], color=Purple, ls=':', lw=1.2,
+                label=f"t = {s['by_crit_t']:.2f} (Benjamini-Yekutieli, 5%)")
+    ax2.axvline(0, color=Gray, lw=0.6)
+    ax2.set_xlabel('OLS t-statistic / posterior z')
+    ax1.set_yticks(y, d.index)
+    ax1.tick_params(axis='y', labelsize=8)
+    # separatoare si nume de teme
+    th = d['theme'].values
+    for i in range(1, len(d)):
+        if th[i] != th[i - 1]:
+            for ax in (ax1, ax2):
+                ax.axhline(y[i] + 0.5, color=Gray, lw=0.4, ls='-')
+    xr = 1.5 * max(d['t'].max(), d['z'].max())
+    ax2.set_xlim(0, xr)
+    for nm in order:
+        yy = y[th == nm]
+        ax2.text(xr, yy.mean(), nm.replace(' and ', '\nand '), ha='right', va='center', fontsize=7,
+                 color='black', style='italic')
+    ax1.set_title(f"CAPM alphas of 15 US factors, {s['start'][:4]}-{s['end'][:4]}", fontsize=9, loc='left')
+    ax2.set_title('OLS t versus posterior z', fontsize=9, loc='left')
+    h1, l1 = ax1.get_legend_handles_labels()
+    h2, l2 = ax2.get_legend_handles_labels()
+    fig.legend(h1 + h2, l1 + l2, loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=2, frameon=False)
+    plt.tight_layout()
+    save_fig('ch3_jkp_replication')
+    return dict(table=tab.reset_index(names='factor').round(5).to_dict(orient='records'), summary=s)
+
+
+# =============================================================================
 # INFERENTA AVANSATA (fara grafice): GRS ca test Sharpe, erori robuste la specificare gresita,
 # factori inutili, R^2 transversal (Lewellen-Nagel-Shanken), numarul de factori, compararea modelelor
 # =============================================================================
@@ -903,6 +1044,7 @@ if __name__ == '__main__':
     R['etf_alphas'] = fig_etf_alphas()
     R['bvb_betas'] = fig_bvb_betas()
     R['fama_macbeth'] = fig_fama_macbeth()
+    R['jkp_replication'] = fig_jkp_replication()
     R['advanced'] = advanced()
     with open(os.path.join(HERE, 'ch3_results.json'), 'w') as f:
         json.dump(to_py(R), f, indent=1, default=str)

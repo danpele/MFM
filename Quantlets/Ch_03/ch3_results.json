@@ -1041,5 +1041,206 @@
     "sd_beta": 0.30409602509421557
    }
   }
+ },
+ "jkp_replication": {
+  "table": [
+   {
+    "factor": "Size",
+    "theme": "Size and reversal",
+    "alpha": 0.00045,
+    "se": 0.00106,
+    "t": 0.42525,
+    "by": false,
+    "post_mean": 0.00088,
+    "post_sd": 0.00064,
+    "z": 1.36803
+   },
+   {
+    "factor": "Book/market",
+    "theme": "Value",
+    "alpha": 0.00248,
+    "se": 0.00106,
+    "t": 2.34615,
+    "by": false,
+    "post_mean": 0.0028,
+    "post_sd": 0.00067,
+    "z": 4.1607
+   },
+   {
+    "factor": "Profitability",
+    "theme": "Quality and low risk",
+    "alpha": 0.0038,
+    "se": 0.00106,
+    "t": 3.59381,
+    "by": true,
+    "post_mean": 0.00267,
+    "post_sd": 0.00067,
+    "z": 3.98553
+   },
+   {
+    "factor": "Investment",
+    "theme": "Value",
+    "alpha": 0.00354,
+    "se": 0.00106,
+    "t": 3.34545,
+    "by": true,
+    "post_mean": 0.0029,
+    "post_sd": 0.00067,
+    "z": 4.31852
+   },
+   {
+    "factor": "Earnings/price",
+    "theme": "Value",
+    "alpha": 0.00288,
+    "se": 0.00106,
+    "t": 2.71889,
+    "by": true,
+    "post_mean": 0.00291,
+    "post_sd": 0.00069,
+    "z": 4.23269
+   },
+   {
+    "factor": "Cash flow/price",
+    "theme": "Value",
+    "alpha": 0.00256,
+    "se": 0.00106,
+    "t": 2.41928,
+    "by": false,
+    "post_mean": 0.00281,
+    "post_sd": 0.00069,
+    "z": 4.06833
+   },
+   {
+    "factor": "Dividend/price",
+    "theme": "Value",
+    "alpha": 0.00215,
+    "se": 0.00106,
+    "t": 2.02713,
+    "by": false,
+    "post_mean": 0.00284,
+    "post_sd": 0.00068,
+    "z": 4.20227
+   },
+   {
+    "factor": "Accruals",
+    "theme": "Accruals and momentum",
+    "alpha": 0.00388,
+    "se": 0.00106,
+    "t": 3.66273,
+    "by": true,
+    "post_mean": 0.00449,
+    "post_sd": 0.00074,
+    "z": 6.03316
+   },
+   {
+    "factor": "Net share issues",
+    "theme": "Quality and low risk",
+    "alpha": 0.0044,
+    "se": 0.00106,
+    "t": 4.16051,
+    "by": true,
+    "post_mean": 0.00271,
+    "post_sd": 0.00068,
+    "z": 4.00044
+   },
+   {
+    "factor": "Market beta",
+    "theme": "Quality and low risk",
+    "alpha": 0.00149,
+    "se": 0.00106,
+    "t": 1.40912,
+    "by": false,
+    "post_mean": 0.00247,
+    "post_sd": 0.00067,
+    "z": 3.66841
+   },
+   {
+    "factor": "Variance",
+    "theme": "Quality and low risk",
+    "alpha": 0.00369,
+    "se": 0.00106,
+    "t": 3.48237,
+    "by": true,
+    "post_mean": 0.00276,
+    "post_sd": 0.00068,
+    "z": 4.08632
+   },
+   {
+    "factor": "Residual variance",
+    "theme": "Quality and low risk",
+    "alpha": 0.00355,
+    "se": 0.00106,
+    "t": 3.35471,
+    "by": true,
+    "post_mean": 0.00263,
+    "post_sd": 0.00068,
+    "z": 3.87029
+   },
+   {
+    "factor": "Momentum 12-2",
+    "theme": "Accruals and momentum",
+    "alpha": 0.00555,
+    "se": 0.00106,
+    "t": 5.24166,
+    "by": true,
+    "post_mean": 0.00454,
+    "post_sd": 0.00074,
+    "z": 6.12315
+   },
+   {
+    "factor": "Reversal 1-0",
+    "theme": "Size and reversal",
+    "alpha": 0.00015,
+    "se": 0.00106,
+    "t": 0.14563,
+    "by": false,
+    "post_mean": 0.00088,
+    "post_sd": 0.00065,
+    "z": 1.36011
+   },
+   {
+    "factor": "Reversal 60-13",
+    "theme": "Size and reversal",
+    "alpha": 0.00133,
+    "se": 0.00106,
+    "t": 1.25364,
+    "by": false,
+    "post_mean": 0.00093,
+    "post_sd": 0.00065,
+    "z": 1.43199
+   }
+  ],
+  "summary": {
+   "T": 757,
+   "start": "1963-07-31",
+   "end": "2026-07-31",
+   "k": 4,
+   "tau_c": 0.003084574694565608,
+   "tau_w": 0.00020749720861569667,
+   "rate_ols": 0.7333333333333333,
+   "rate_by": 0.5333333333333333,
+   "by_crit_t": 2.718888119908746,
+   "rate_eb": 0.8,
+   "rate_eb_by_k": {
+    "1": 1.0,
+    "2": 0.8,
+    "3": 0.9333333333333333,
+    "4": 0.8,
+    "5": 0.8,
+    "6": 0.8,
+    "7": 0.8,
+    "8": 0.8
+   },
+   "loglik_by_k": {
+    "1": 77.01422502898086,
+    "2": 76.32175651181439,
+    "3": 76.61337073060623,
+    "4": 78.21303962797734,
+    "5": 77.33521256626582,
+    "6": 75.87235645609299,
+    "7": 75.24399566025764,
+    "8": 74.18365124385434
+   }
+  }
  }
 }
