@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -25,7 +26,8 @@ from generate_all_charts import (plt, R, V, ALL, US, EU, RO, NAMES, MainBlue, ID
                                  frm_design, frm_window, weekly_returns, SEED)
 from systemic import (covar_static, covar_boot, block_bootstrap_idx, mes, mes_threshold, lrmes, breakeven_leverage,  # noqa: E402
                       srisk_ratio, var_fit, gfevd, spillover_table, ma_coefs)
-from inference18 import spill_bootstrap  # noqa: E402
+from inference18 import (spill_bootstrap, gjr_fit, dcc_fit, simulate_market, simulate_firm,  # noqa: E402
+                         REGION_INDEX)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SEM = {}
@@ -425,7 +427,294 @@ def fig_c1(res, f):
     save_fig('ch18_sem_c1')
 
 
+
+# =============================================================================
+# GRAFICE PENTRU REZOLVARI (A1, A7, B2, B3, B4, B6, B7, B8, B10); cifrele raman cele din sem18_results.json
+# =============================================================================
+def fig_a1(s_sys=1.5, s_i=2.0, rho=0.6, alpha=0.01):
+    """Densitatile conditionate ale sistemului: banca la mediana si banca la VaR 1%."""
+    a = a1_covar_normal(s_sys, s_i, rho, alpha)
+    z = a['z']
+    sd = a['cond_sd']
+    x = np.linspace(-9, 5, 600)
+    fig, ax = plt.subplots(figsize=(6.2, 2.7))
+    for mu, c, lab, q in [(0.0, MainBlue, 'System given bank at its median, X_i = 0', -a['covar_med']),
+                          (rho * s_sys / s_i * s_i * z, IDAred, 'System given bank at its VaR 1%, X_i = q_1%', -a['covar'])]:
+        ax.plot(x, stats.norm.pdf(x, mu, sd), color=c, lw=1.3, label=lab)
+        xs = x[x <= q]
+        ax.fill_between(xs, 0, stats.norm.pdf(xs, mu, sd), color=c, alpha=0.25)
+        ax.axvline(q, color=c, lw=0.8, ls='--')
+    y0 = 0.36
+    ax.annotate('', xy=(-a['covar'], y0), xytext=(-a['covar_med'], y0),
+                arrowprops=dict(arrowstyle='<->', color='black', lw=0.9))
+    ax.text(-a['covar'] - 0.2, y0 + 0.02, f"ΔCoVaR 1% = {a['dcovar']:.2f}", ha='right',
+            fontsize=8, color='black')
+    ax.text(-a['covar'], 0.02, f"-CoVaR = {-a['covar']:.2f}", ha='right', fontsize=7.5, color=IDAred)
+    ax.text(-a['covar_med'], 0.02, f" -CoVaR = -{a['covar_med']:.2f}", ha='left', fontsize=7.5, color=MainBlue)
+    ax.set_xlabel('System return X_sys (%)')
+    ax.set_ylabel('Conditional density')
+    ax.set_ylim(0, 0.42)
+    legend_outside_bottom(ax, ncol=1, y=-0.28)
+    save_fig('ch18_sem_a1')
+
+
+def fig_a7(b=(1.2, 0.8), S=((16, 6), (6, 9)), target=20):
+    """Planul factorilor: elipsele Mahalanobis, dreapta de pierdere -b'f = l* si scenariul cel mai plauzibil."""
+    b, S = np.asarray(b, float), np.asarray(S, float)
+    r = reverse_2f(b, S, target)
+    L = np.linalg.cholesky(S)
+    t = np.linspace(0, 2 * np.pi, 400)
+    fig, ax = plt.subplots(figsize=(4.6, 3.4))
+    for c, col in [(1, Teal), (2, Forest), (r['d'], IDAred)]:
+        e = (L @ np.vstack([np.cos(t), np.sin(t)])) * c
+        ax.plot(e[0], e[1], color=col, lw=1.0, label=f'Mahalanobis distance {c:.2f}' if c > 2 else f'Mahalanobis distance {c:.0f}')
+    f1 = np.linspace(-22, 6, 50)
+    ax.plot(f1, (-target - b[0] * f1) / b[1], color=MainBlue, lw=1.2, label=f"Loss line -b'f = {target}%")
+    ax.plot(*r['f'], 'o', color=IDAred, ms=6, label=f"f* = ({r['f'][0]:.1f}, {r['f'][1]:.1f})")
+    ax.axhline(0, color=Gray, lw=0.5)
+    ax.axvline(0, color=Gray, lw=0.5)
+    ax.set_xlim(-22, 12)
+    ax.set_ylim(-16, 12)
+    ax.set_aspect('equal')
+    ax.set_xlabel('Factor 1 return f1 (%)')
+    ax.set_ylabel('Factor 2 return f2 (%)')
+    legend_outside_bottom(ax, ncol=2, y=-0.22)
+    save_fig('ch18_sem_a7')
+
+
+def fig_b2(sem):
+    """Delta-CoVaR 1% (interval bootstrap pe blocuri) si 5% pentru bancile europene; VaR 1% vs Delta-CoVaR 1%."""
+    t = sem['B2']['table']
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.9), gridspec_kw={'width_ratios': [1.2, 1]})
+    ax = axes[0]
+    xs = np.arange(len(EU))
+    d1 = np.array([t[k]['d1'] for k in EU])
+    ax.errorbar(xs - 0.1, d1, yerr=[d1 - [t[k]['lo1'] for k in EU], np.array([t[k]['hi1'] for k in EU]) - d1],
+                fmt='o', color=IDAred, capsize=3, lw=1, label='ΔCoVaR 1% with 95% block-bootstrap interval')
+    ax.plot(xs + 0.1, [t[k]['d5'] for k in EU], 's', color=MainBlue, ms=5, label='ΔCoVaR 5%')
+    ax.set_xticks(xs)
+    ax.set_xticklabels([NAMES[k] for k in EU], fontsize=8, rotation=20, ha='right')
+    ax.set_ylabel('ΔCoVaR (%)')
+    legend_outside_bottom(ax, ncol=1, y=-0.32)
+    ax = axes[1]
+    for k in US + EU:
+        col = MainBlue if k in US else IDAred
+        c1 = covar_static(system_ex(k, US if k in US else EU).values, R[k].values, 0.01)
+        ax.plot(c1['var_i'], c1['dcovar'], 'o', color=col, ms=5)
+        ax.annotate(NAMES[k], (c1['var_i'], c1['dcovar']), fontsize=6, color='black',
+                    xytext=(3, 2), textcoords='offset points')
+    ax.plot([], [], 'o', color=MainBlue, label='US banks')
+    ax.plot([], [], 'o', color=IDAred, label='European banks')
+    b4 = sem['B4']
+    ax.set_title(f"Spearman {b4['rho']:.2f}, 95% interval [{b4['lo']:.2f}, {b4['hi']:.2f}]", fontsize=8, color='black')
+    ax.set_xlabel('VaR 1% of the bank (%)')
+    ax.set_ylabel('ΔCoVaR 1% (%)')
+    legend_outside_bottom(ax, ncol=2, y=-0.32)
+    fig.tight_layout()
+    save_fig('ch18_sem_b2')
+
+
+def lrmes_paths(end, h, C, Sn, seed, want):
+    """Aceeasi simulare ca inference18.lrmes_sim (aceleasi extrageri aleatoare), dar intoarce pierderea fiecarei
+    banci cerute pe traiectoriile de criza (fractii), pentru graficele B3 si B4."""
+    rng = np.random.default_rng(seed)
+    Rs = R.loc[:end]
+    out = {}
+    for reg, mem in (('US', US), ('EU', EU), ('RO', RO)):
+        rm = Rs[REGION_INDEX[reg]].values
+        gm = gjr_fit(rm)
+        eps_m = rm / gm['sig']
+        T = len(rm)
+        keep = []
+        for _ in range(Sn // 20000):
+            idx = rng.integers(0, T, size=(20000, h))
+            cm = simulate_market(gm, eps_m, idx)
+            keep.append(idx[np.exp(cm / 100) - 1 < C])
+        kept = np.concatenate(keep)
+        for k in mem:
+            if k not in want:
+                continue
+            ri = Rs[k].values
+            gf = gjr_fit(ri)
+            e = np.column_stack([ri / gf['sig'], eps_m])
+            dcc = dcc_fit(e)
+            xi = (e[:, 0] - dcc['rho'] * e[:, 1]) / np.sqrt(1 - dcc['rho'] ** 2)
+            ci = simulate_firm(gf, gm, dcc, eps_m, xi, kept)
+            out[k] = -(np.exp(ci / 100) - 1)
+    return out
+
+
+def _loss_hist(ax, loss_today, loss_covid, lr_today, lr_covid, title):
+    bins = np.linspace(-0.3, 0.8, 56)
+    for L_, lr, c, lab in [(loss_today, lr_today, MainBlue, 'Information to 18 Sep 2026'),
+                           (loss_covid, lr_covid, IDAred, 'Information to 31 Mar 2020')]:
+        ax.hist(100 * L_, bins=100 * bins, density=True, histtype='step', color=c, lw=1.2,
+                label=f'{lab}: LRMES {100 * lr:.1f}% (dashed), 90% range shaded')
+        ax.axvline(100 * lr, color=c, lw=1.0, ls='--')
+        q05, q95 = np.quantile(L_, [0.05, 0.95])
+        ax.axvspan(100 * q05, 100 * q95, color=c, alpha=0.08)
+    ax.set_title(title, fontsize=9, color='black')
+    ax.set_xlabel('22-day loss of the bank on market-crisis paths (%)')
+    ax.set_ylabel('Density')
+
+
+def fig_b3_b4(inf=None):
+    """Distributia pierderii bancii pe traiectoriile de criza (piata sub -10% in 22 de zile), azi si la 31.03.2020;
+    cu inf (ch18_inference.json) se verifica egalitatea cu LRMES raportat."""
+    end = R.index[-1]
+    today = lrmes_paths(end, 22, -0.10, 200000, SEED, ['JPM', 'DBK', 'TLV'])
+    covid = lrmes_paths(pd.Timestamp('2020-03-31'), 22, -0.10, 200000, SEED + 3, ['JPM', 'DBK', 'TLV'])
+    for k in ['JPM', 'DBK', 'TLV']:
+        if inf is not None:
+            assert abs(today[k].mean() - inf['srisk']['be'][k]['lrmes']) < 1e-9, k
+            assert abs(covid[k].mean() - inf['srisk']['covid'][k]['lrmes']) < 1e-9, k
+    fig, ax = plt.subplots(figsize=(6.2, 2.8))
+    _loss_hist(ax, today['JPM'], covid['JPM'], today['JPM'].mean(), covid['JPM'].mean(), 'JPMorgan, crisis: S&P 500 below -10% in 22 days')
+    legend_outside_bottom(ax, ncol=1, y=-0.3)
+    save_fig('ch18_sem_b3')
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.8))
+    for ax, k, m in zip(axes, ['DBK', 'TLV'], ['Euro Stoxx 50', 'BET']):
+        _loss_hist(ax, today[k], covid[k], today[k].mean(), covid[k].mean(), f'{NAMES[k]}, crisis: {m} below -10%')
+    h, lab = axes[0].get_legend_handles_labels()
+    fig.tight_layout()
+    h2, lab2 = axes[1].get_legend_handles_labels()
+    fig.legend(h + h2, [f'Deutsche Bank, {x}' for x in lab] + [f'Banca Transilvania, {x}' for x in lab2],
+               loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=1, frameon=False, fontsize=7)
+    save_fig('ch18_sem_b4')
+
+
+def fig_b6(sem):
+    """Indicele pe ferestre mobile cu mediile 2010-2019 si 2020-2026; estimarile pe subperioade cu intervale."""
+    tot = pd.read_csv(os.path.join(HERE, 'ch18_spill_rolling.csv'), index_col=0, parse_dates=True).iloc[:, 0]
+    b6, bs = sem['B6'], sem['B6S']
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.8), gridspec_kw={'width_ratios': [1.8, 1]})
+    ax = axes[0]
+    ax.plot(tot.index, tot.values, color=Purple, lw=0.8, label='Rolling total connectedness (250 days, VAR(2), H = 10)')
+    cut = pd.Timestamp('2020-01-01')
+    ax.hlines(b6['before'], tot.index[0], cut, color=MainBlue, lw=1.8, label=f"Mean 2010-2019: {b6['before']:.2f}%")
+    ax.hlines(b6['after'], cut, tot.index[-1], color=IDAred, lw=1.8, label=f"Mean 2020-2026: {b6['after']:.2f}%")
+    ax.axvline(cut, color=Gray, lw=0.6, ls=':')
+    ax.set_xlim(tot.index[0], tot.index[-1])
+    ax.set_ylabel('Total connectedness (%)')
+    legend_outside_bottom(ax, ncol=1, y=-0.14)
+    ax = axes[1]
+    pts = [('2010-2019', bs['c1'], bs['lo1'], bs['hi1'], MainBlue), ('2020-2026', bs['c2'], bs['lo2'], bs['hi2'], IDAred)]
+    for i, (lab, c, lo, hi, col) in enumerate(pts):
+        ax.errorbar(i, c, yerr=[[c - lo], [hi - c]], fmt='o', color=col, capsize=4, lw=1.2)
+    ax.set_xticks([0, 1])
+    ax.set_xticklabels(['2010-2019', '2020-2026'])
+    ax.set_xlim(-0.6, 1.6)
+    ax.set_ylabel('C, VAR(1), H = 10 (%)')
+    ax.set_title(f"Difference {bs['diff']:.1f}, 95% interval [{bs['lo']:.1f}, {bs['hi']:.1f}]", fontsize=8, color='black')
+    fig.tight_layout()
+    save_fig('ch18_sem_b6')
+
+
+def fig_b7(sem):
+    """Coeficientii regresiei cuantile penalizate pentru JPMorgan, fereastra calma vs fereastra de criza."""
+    D = frm_design()
+    names = [NAMES[j] for j in ALL if j != 'JPM'] + ['S&P 500 (t-1)', 'Euro Stoxx 50 (t-1)', 'VIX (t-1)']
+    fig, ax = plt.subplots(figsize=(6.6, 3.0))
+    ys = np.arange(len(names))
+    for j, (end, c, lab) in enumerate([('2019-06-28', MainBlue, 'Calm window ending 28 Jun 2019'),
+                                       ('2020-03-31', IDAred, 'COVID-19 window ending 31 Mar 2020')]):
+        w = D.loc[:end].iloc[-63:]
+        r = frm_window(w, 'JPM')
+        assert abs(r['lambda'] - sem['B7'][end]['lambda']) < 1e-15 and r['df_sel'] == sem['B7'][end]['df']
+        ax.barh(ys + (0.2 if j == 0 else -0.2), r['coef'], 0.38, color=c,
+                label=f"{lab}: λ = {r['lambda']:.1e}, {r['df_sel']} of 15 active")
+    ax.axvline(0, color=Gray, lw=0.6)
+    ax.set_yticks(ys)
+    ax.set_yticklabels(names, fontsize=7)
+    ax.invert_yaxis()
+    ax.set_xlabel('Coefficient in the 5% quantile regression of JPMorgan')
+    legend_outside_bottom(ax, ncol=1, y=-0.2)
+    save_fig('ch18_sem_b7')
+
+
+def fig_b8(sem):
+    """Randamentul log cumulat al portofoliului 50/50 BT/BRD in cele doua ferestre, cu cele mai rele 10 zile."""
+    X = R[RO]
+    port = 100 * np.log(np.exp(X / 100).mean(axis=1))
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.7))
+    for ax, (name, a, b, c) in zip(axes, [('RO bank tax', '2018-12-10', '2019-01-31', Forest),
+                                          ('COVID-19', '2020-02-15', '2020-04-30', IDAred)]):
+        p = port.loc[a:b]
+        d = sem['B8'][name]
+        ax.plot(p.index, p.cumsum(), color=c, lw=1.3, label=f'Cumulative log return of the portfolio, {name}')
+        ax.axvspan(pd.Timestamp(d['start']), pd.Timestamp(d['end']), color=c, alpha=0.12,
+                   label=f"Worst 10 days: loss {d['loss']:.1f}%")
+        w = port.loc[d['start']:d['end']].sum()
+        assert abs(-100 * (np.exp(w / 100) - 1) - d['loss']) < 1e-9
+        ax.axhline(0, color=Gray, lw=0.5)
+        ax.set_ylabel('Cumulative log return (%)')
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%d %b\n%Y'))
+        ax.xaxis.set_major_locator(mdates.AutoDateLocator(maxticks=5))
+        ax.tick_params(axis='x', labelsize=7)
+        legend_outside_bottom(ax, ncol=1, y=-0.3)
+    fig.tight_layout()
+    save_fig('ch18_sem_b8')
+
+
+def fig_b10(inf):
+    """Evenimentele comune observate fata de regiunea de acceptare Kupiec; puterea testului."""
+    bt = inf['backtest_ge']
+    n, p0 = bt['JPM']['n'], 0.05 ** 2
+
+    def lr(x, p):
+        ph = x / n
+        l1 = (x * np.log(ph) if x else 0) + (n - x) * np.log(1 - ph)
+        return -2 * ((x * np.log(p) + (n - x) * np.log(1 - p)) - l1)
+
+    rej = np.array([stats.chi2.sf(lr(x, p0), 1) < 0.05 for x in range(0, 80)])
+    lo = max(x for x in range(0, int(n * p0)) if rej[x]) + 1
+    hi = min(x for x in range(int(n * p0) + 1, 80) if rej[x]) - 1
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.6), gridspec_kw={'width_ratios': [1.4, 1]})
+    fig.subplots_adjust(bottom=0.45, wspace=0.3)
+    ax = axes[0]
+    ks = US + EU
+    ax.axhspan(lo - 0.5, hi + 0.5, color=Forest, alpha=0.12, label=f'Kupiec 5% acceptance region: {lo} to {hi} hits')
+    ax.bar(np.arange(len(ks)), [bt[k]['hits'] for k in ks], color=[MainBlue if k in US else IDAred for k in ks],
+           label='Observed joint hits')
+    ax.axhline(n * p0, color='black', lw=0.9, ls='--', label=f'Expected under H0: {n * p0:.1f}')
+    ax.set_xticks(np.arange(len(ks)))
+    ax.set_xticklabels([NAMES[k] for k in ks], rotation=40, ha='right', fontsize=7)
+    ax.set_ylabel('Joint hits')
+    legend_outside_bottom(ax, ncol=1, y=-0.42)
+    ax = axes[1]
+    mult = np.linspace(1, 3, 41)
+    xs = np.arange(0, 80)
+    power = [stats.binom.pmf(xs[rej], n, m * p0).sum() for m in mult]
+    ax.plot(mult, 100 * np.array(power), color=Purple, lw=1.4, label='Power of the 5% Kupiec test')
+    p2 = 100 * stats.binom.pmf(xs[rej], n, 2 * p0).sum()
+    ax.plot(2, p2, 'o', color=IDAred, label=f'Doubled rate: power {p2:.0f}%')
+    ax.set_xlabel('True joint rate / α²')
+    ax.set_ylabel('Rejection probability (%)')
+    ax.set_ylim(0, 100)
+    legend_outside_bottom(ax, ncol=1, y=-0.25)
+    save_fig('ch18_sem_b10')
+
+
+def solution_charts():
+    """Graficele rezolvarilor, din cifrele deja salvate (sem18_results.json, ch18_inference.json, ch18_results.json)."""
+    with open(os.path.join(HERE, 'sem18_results.json')) as f:
+        sem = json.load(f)
+    with open(os.path.join(HERE, 'ch18_inference.json')) as f:
+        inf = json.load(f)
+    fig_a1()
+    fig_a7()
+    fig_b2(sem)
+    fig_b6(sem)
+    fig_b7(sem)
+    fig_b8(sem)
+    fig_b10(inf)
+    fig_b3_b4(inf)
+
+
 if __name__ == '__main__':
+    if '--charts' in sys.argv:
+        solution_charts()
+        sys.exit(0)
     SEM['A1'] = a1_covar_normal()
     SEM['A2'] = a2_covar_normal()
     SEM['A2GE'] = a2_ge_covar()
@@ -461,3 +750,4 @@ if __name__ == '__main__':
     with open(os.path.join(HERE, 'sem18_results.json'), 'w') as fjs:
         json.dump(jsonable(SEM), fjs, indent=1, default=str)
     print('saved sem18_results.json')
+    solution_charts()
