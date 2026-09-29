@@ -165,7 +165,7 @@ def evans_bubble(T=400, r=0.02, alpha=1.0, delta=0.5, pi=0.85, seed=11):
 # =============================================================================
 # LPPLS (Johansen-Ledoit-Sornette; calibrare Filimonov-Sornette 2013)
 # Spatiul de cautare, filtrele si ferestrele: Shu & Zhu (2020), Physica A 557, 124892, sectiunea 2.2,
-# ecuatiile (11)-(12) (arXiv:1905.09640v2), dupa Sornette et al. (2015)
+# ecuatiile (11)-(12), dupa Sornette et al. (2015)
 # =============================================================================
 LPPLS_SEARCH = dict(m=(0.0, 1.0), w=(1.0, 50.0), tc_frac=(0.0, 1 / 3), damping_min=1.0)            # ec. (11)
 LPPLS_FILTER = dict(m=(0.01, 0.99), w=(2.0, 25.0), tc_frac=(0.0, 1 / 5), osc_min=2.5,             # ec. (12)

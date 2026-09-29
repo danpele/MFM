@@ -712,7 +712,7 @@ def fig_signal_to_noise(df):
 # =============================================================================
 # STUDIU DE CAZ: Chen, Pelger & Zhu (2024) -- Sharpe lunar al portofoliilor SDF
 # =============================================================================
-# Tabelul I si Tabelul A.VI (arXiv:1904.00745v6), test 1992-2016, SR lunar
+# Tabelul I si Tabelul A.VI, test 1992-2016, SR lunar
 CPZ_SR = {'GAN': 0.75, 'EN': 0.50, 'FFN': 0.44, 'LS': 0.42, 'FF5': 0.22, 'FF3': 0.19}
 CPZ_TRAIN = ('1967-01', '1986-12')
 CPZ_TEST = ('1992-01', '2016-12')

@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 29 September 2026'
 
-Datafile: 'Published values from Ando, T., Greenwood-Nimmo, M., Shin, Y. (2022), Quantile connectedness: modeling tail behavior in the topology of financial networks, Management Science 68(4), 2401-2431 (accepted manuscript, University of Melbourne repository, 2020): Figure 4, Table 3, Figure 13'
+Datafile: 'Published values from Ando, T., Greenwood-Nimmo, M., Shin, Y. (2022), Quantile connectedness: modeling tail behavior in the topology of financial networks, Management Science 68(4), 2401-2431: Figure 4, Table 3, Figure 13'
 
 Output: 'ch18_case_quantile_index.pdf, ch18_case_tail_corr.pdf'

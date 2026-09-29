@@ -592,8 +592,8 @@ def fig_reverse(rv):
 
 
 # =============================================================================
-# STUDIU DE CAZ: ANDO, GREENWOOD-NIMMO & SHIN (2022), cifrele publicate
-# (manuscrisul acceptat, 2020): Figura 4, Tabelul 3, Figura 13, Sectiunea 4.3
+# STUDIU DE CAZ: ANDO, GREENWOOD-NIMMO & SHIN (2022), cifrele publicate:
+# Figura 4, Tabelul 3, Figura 13, Sectiunea 4.3
 # =============================================================================
 AGS_FIG4 = {0.01: 88.18, 0.05: 77.17, 0.10: 72.20, 0.90: 73.34, 0.95: 79.36, 0.99: 91.77}
 AGS_MEAN = 56.57
