@@ -25,6 +25,7 @@ import os
 import json
 import time
 import urllib.request
+import urllib.parse
 import numpy as np
 import pandas as pd
 
@@ -197,6 +198,16 @@ def chain_tvl():
         s = pd.Series({x['name']: (x.get('tvl') or 0) / 1e9 for x in js}).sort_values(ascending=False)
         _CACHE['chains'] = s
     return _CACHE['chains']
+
+
+def chain_tvl_at(name, date=END):
+    """TVL al unui blockchain la o data (ultima valoare pana la data), miliarde USD (DefiLlama)."""
+    key = ('chain', name)
+    if key not in _CACHE:
+        js = _get_json('https://api.llama.fi/v2/historicalChainTvl/' + urllib.parse.quote(name))
+        _CACHE[key] = pd.Series({pd.Timestamp(int(x['date']), unit='s').normalize(): x['tvl'] / 1e9 for x in js}).sort_index()
+    s = _CACHE[key].loc[:date]
+    return float(s.iloc[-1]) if len(s) else 0.0
 
 
 # universul pentru clasificarea activelor (replicare restransa a abordarii Pele et al., 2023): simbol -> (eticheta, clasa, tip)

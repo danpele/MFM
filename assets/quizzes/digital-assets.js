@@ -92,27 +92,27 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             "correct": 3,
             "en": {
                 "title": "Shanken correction",
-                "text": "Why are Fama-MacBeth standard errors of crypto factor premia too small?",
+                "text": "Which source of uncertainty does the Shanken correction add to the Fama-MacBeth standard errors of crypto factor premia?",
                 "options": [
-                    "Because the weekly estimates of the premium are autocorrelated",
-                    "Because the crypto market factor is not a traded portfolio",
-                    "Because there are too many coins in the cross-section",
-                    "Because they ignore that the first-pass betas are estimated (errors in variables)"
+                    "The autocorrelation of the weekly premium estimates",
+                    "The fact that the crypto market factor is not a traded portfolio",
+                    "The number of coins in the cross-section",
+                    "The estimation error in the first-pass betas (errors in variables)"
                 ],
-                "correctExplanation": "The second pass treats the estimated betas as known; Shanken (1992) inflates the variance by (1 + lambda' Sigma_f^-1 lambda) and adds Sigma_f / T.",
-                "incorrectExplanation": "The problem is errors in variables: the betas in the second pass are estimates, which Fama-MacBeth standard errors ignore."
+                "correctExplanation": "The second pass treats the estimated betas as known; Shanken (1992) multiplies the residual-driven part of the variance by (1 + lambda' Sigma_f^-1 lambda) and adds the factor-variation part Sigma_f / T once, without that multiplier.",
+                "incorrectExplanation": "The Shanken correction addresses errors in variables: the betas in the second pass are estimates, which Fama-MacBeth standard errors ignore. Serial correlation of the premium estimates is a separate issue, handled by HAC standard errors."
             },
             "ro": {
                 "title": "Corecția Shanken",
-                "text": "De ce sunt prea mici erorile standard Fama-MacBeth ale primelor factorilor cripto?",
+                "text": "Ce sursă de incertitudine adaugă corecția Shanken erorilor standard Fama-MacBeth ale primelor factorilor cripto?",
                 "options": [
-                    "Pentru că estimările săptămânale ale primei sunt autocorelate",
-                    "Pentru că factorul pieței cripto nu este un portofoliu tranzacționat",
-                    "Pentru că sunt prea multe monede în secțiunea transversală",
-                    "Pentru că ignoră faptul că beta din prima etapă sunt estimate (erori în variabile)"
+                    "Autocorelarea estimărilor săptămânale ale primei",
+                    "Faptul că factorul pieței cripto nu este un portofoliu tranzacționat",
+                    "Numărul de monede din secțiunea transversală",
+                    "Eroarea de estimare a coeficienților beta din prima etapă (erori în variabile)"
                 ],
-                "correctExplanation": "A doua etapă tratează beta estimate ca și cum ar fi cunoscute; Shanken (1992) înmulțește varianța cu (1 + lambda' Sigma_f^-1 lambda) și adaugă Sigma_f / T.",
-                "incorrectExplanation": "Problema este eroarea în variabile: beta din a doua etapă sunt estimări, lucru ignorat de erorile standard Fama-MacBeth."
+                "correctExplanation": "A doua etapă tratează beta estimate ca și cum ar fi cunoscute; Shanken (1992) înmulțește partea varianței care provine din reziduuri cu (1 + lambda' Sigma_f^-1 lambda) și adaugă o singură dată, fără acest factor, partea provenită din variația factorilor, Sigma_f / T.",
+                "incorrectExplanation": "Corecția Shanken tratează eroarea în variabile: beta din a doua etapă sunt estimări, lucru ignorat de erorile standard Fama-MacBeth. Autocorelarea estimărilor primei este o problemă separată, tratată cu erori standard HAC."
             }
         },
         {
@@ -473,11 +473,11 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "text": "Why is total value locked (TVL) in DeFi a weak measure of adoption?",
                 "options": [
                     "It counts only Bitcoin",
-                    "Deposits are valued at market prices, so TVL moves mostly with the Ether price",
+                    "Deposits are valued at market prices, so TVL mixes price changes with deposits and co-moves strongly with Ether",
                     "It is published only once a year",
                     "It excludes stablecoins"
                 ],
-                "correctExplanation": "Monthly TVL changes load on Ether returns with a slope near 0.8 and R^2 about 0.6.",
+                "correctExplanation": "Monthly TVL changes load on Ether returns with a slope near 0.8 and R^2 about 0.6; the regression does not separate valuation from net deposits.",
                 "incorrectExplanation": "TVL is a market value: a price fall lowers it even if nobody withdraws."
             },
             "ro": {
@@ -485,11 +485,11 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "text": "De ce este valoarea totală blocată (TVL) în DeFi o măsură slabă a adoptării?",
                 "options": [
                     "Numără doar Bitcoin",
-                    "Depozitele sunt evaluate la prețul pieței, deci TVL se mișcă în principal cu prețul Ether",
+                    "Depozitele sunt evaluate la prețul pieței, deci TVL amestecă schimbările de preț cu depunerile și se mișcă strâns cu Ether",
                     "Se publică doar o dată pe an",
                     "Exclude stablecoin-urile"
                 ],
-                "correctExplanation": "Variațiile lunare ale TVL depind de randamentele Ether cu o pantă de aproximativ 0,8 și R^2 de aproximativ 0,6.",
+                "correctExplanation": "Variațiile lunare ale TVL depind de randamentele Ether cu o pantă de aproximativ 0,8 și R^2 de aproximativ 0,6; regresia nu separă evaluarea de depunerile nete.",
                 "incorrectExplanation": "TVL este o valoare de piață: o scădere a prețului o reduce chiar dacă nimeni nu retrage."
             }
         },

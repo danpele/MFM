@@ -37,7 +37,7 @@ warnings.filterwarnings('ignore')
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from mfm_data import (ASSETS, CRIX_UNIVERSE, STABLE, CLASS_ASSETS, END, price, joint_prices, joint_returns,  # noqa: E402
-                      market_values, read_market, symbol_returns)
+                      market_values, read_market, symbol_returns, periods_per_year)
 from generate_all_charts import (plt, MainBlue, IDAred, Forest, Amber, Orange, Purple, Teal, Gray,  # noqa: E402
                                  save_fig, fig_legend_bottom, jsonable, hill, crix_index, asset_features,
                                  STYL, WINDOWS, FEATURES, ETF_START, SEED)
@@ -158,7 +158,7 @@ def crix_rule(kmax=4):
     qends = pd.date_range('2018-06-30', END, freq='QE')
     res = []
     for qe in qends:
-        days = mv.loc[qe - pd.DateOffset(months=3) + pd.Timedelta(days=1):qe].index
+        days = mv.loc[qe.to_period('Q').start_time:qe].index      # trimestrul calendaristic incheiat la qe
         rows = crix_window(mv, px, days)
         if rows is None or len(rows) < 60:
             continue
@@ -333,8 +333,11 @@ def tar_fit(d, trim=TRIM, B=999, seed=SEED):
     """EQ-TAR: d_t = phi_in d_{t-1} + e_t daca |d_{t-1}| <= c, d_t = phi_out d_{t-1} + e_t altfel.
     Pragul c: cautare pe grila (valorile lui |d_{t-1}| intre cuantilele trim si 1 - trim), minimul SSR.
     Test H0: phi_in = phi_out (AR(1) liniar), sup-Wald robust la heteroscedasticitate; p-valoare prin bootstrap cu
-    regresori ficsi y*_t = e_t eta_t, eta_t ~ N(0, 1), e_t reziduurile modelului liniar (Hansen, 1996)."""
-    y, x = d.values[1:], d.values[:-1]
+    regresori ficsi y*_t = e_t eta_t, eta_t ~ N(0, 1), e_t reziduurile modelului liniar (H0) (Hansen, 1996).
+    Doar perechile (d_(t-1), d_t) din zile calendaristice consecutive: daca se elimina o perioada din serie, nicio
+    pereche nu trece peste golul creat."""
+    ok = np.diff(d.index.values).astype('timedelta64[D]') == np.timedelta64(1, 'D')
+    y, x = d.values[1:][ok], d.values[:-1][ok]
     a = np.abs(x)
     order = np.argsort(a, kind='stable')
     xs, ys, as_ = x[order], y[order], a[order]
@@ -393,15 +396,17 @@ def peg_tar(start='2021-01-01'):
 # 5. LVR: CI bootstrap pentru rata realizata
 # =============================================================================
 def lvr_ci(start='2024-01-01', B=2000, block=20, seed=SEED):
-    """Rata anuala LVR realizata = [sum ln(1 + R_t/2) - 0.5 ln(P_T/P_0)] / ani, cu R_t randamentul simplu;
-    sigma^2/8 din varianta randamentelor log; interval bootstrap pe blocuri mobile pentru ambele si pentru diferenta."""
+    """Rata anuala LVR realizata (Milionis et al., 2022): portofoliul de reechilibrare detine zilnic cantitatea de ETH
+    a fondului x = V/(2P); pierderea zilnica normalizata (dR_t - dV_t)/V_(t-1) = R_t/2 - (sqrt(1 + R_t) - 1),
+    R_t randamentul simplu; rata = suma / ani. sigma^2/8 din varianta randamentelor log; rv8 = suma R_t^2 / 8 / ani;
+    interval bootstrap pe blocuri mobile pentru rata realizata, pentru sigma^2/8 si pentru diferenta."""
     p = price('ETH', start)
     r = np.log(p).diff().dropna().values
     yrs = (p.index[-1] - p.index[0]).days / 365.25
 
     def rates(rr):
         R = np.expm1(rr)
-        real = (np.sum(np.log1p(R / 2)) - 0.5 * np.sum(rr)) / yrs
+        real = np.sum(R / 2 - (np.sqrt(1 + R) - 1)) / yrs
         theo = rr.var(ddof=1) * 365 / 8
         rv8 = np.sum(R ** 2) / 8 / yrs
         return 100 * real, 100 * theo, 100 * rv8
@@ -442,9 +447,11 @@ def class_distances(f):
     return out
 
 
-def alt_bootstrap(B=500, block=20, seed=SEED):
-    """Bootstrap pe blocuri mobile, independent pentru fiecare activ si fereastra: caracteristicile recalculate,
-    standardizare comuna, modificarea W2 - W1 a distantelor; CI 95% percentile."""
+def alt_bootstrap(B=500, block=28, seed=SEED):
+    """Bootstrap pe blocuri mobile comune tuturor activelor: in fiecare fereastra se extrag blocuri de 28 de zile
+    calendaristice (4 saptamani = 20 de zile lucratoare) si fiecare activ ia randamentele sale (pe calendarul propriu)
+    din aceleasi zile, deci dependenta dintre active se pastreaza; caracteristicile recalculate, standardizare
+    comuna, modificarea W2 - W1 a distantelor; CI 95% percentile."""
     rng = np.random.default_rng(seed)
     base = []
     series = {}
@@ -455,15 +462,21 @@ def alt_bootstrap(B=500, block=20, seed=SEED):
             base.append(dict(symbol=s, cls=cls, window=w, **asset_features(r)))
     f0 = pd.DataFrame(base)
     d0 = class_distances(f0)
+    cal = {w: pd.date_range(min(r.index[0] for (s, ww), r in series.items() if ww == w),
+                            max(r.index[-1] for (s, ww), r in series.items() if ww == w), freq='D') for w in WINDOWS}
+    ppy = {k: periods_per_year(r) for k, r in series.items()}
     draws = []
     for _ in range(B):
         rows = []
-        for (s, w), r in series.items():
-            n = len(r)
-            nb = int(np.ceil(n / block))
-            st = rng.integers(0, n - block + 1, nb)
-            rr = pd.Series(r.values[(st[:, None] + np.arange(block)[None, :]).ravel()[:n]], index=r.index)
-            rows.append(dict(symbol=s, cls=CLASS_ASSETS[s][1], window=w, **asset_features(rr)))
+        for w, days in cal.items():
+            n = len(days)
+            st = rng.integers(0, n - block + 1, int(np.ceil(n / block)))
+            sel = days[(st[:, None] + np.arange(block)[None, :]).ravel()[:n]]      # aceleasi zile pentru toate activele
+            for (s, ww), r in series.items():
+                if ww != w:
+                    continue
+                rr = r.reindex(sel).dropna()
+                rows.append(dict(symbol=s, cls=CLASS_ASSETS[s][1], window=w, **asset_features(rr, ppy[(s, w)])))
         d = class_distances(pd.DataFrame(rows))
         draws.append({k: d['W2'][k] - d['W1'][k] for k in d['W1']})
     D = pd.DataFrame(draws)

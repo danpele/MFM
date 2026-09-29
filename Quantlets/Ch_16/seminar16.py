@@ -66,7 +66,10 @@ def a2_replace():
 
 def a3_band(x=1000.0, y=3_000_000.0, P=3300.0, fee=0.003):
     """Banda de ne-arbitraj a unui fond x*y = k cu comision f: gamma P <= p <= P / gamma; marimea optima a
-    arbitrajului cand pretul extern P depaseste banda: y' = sqrt(gamma P k), dy* = (y' - y) / gamma."""
+    arbitrajului cand pretul extern P depaseste banda: rezerva efectiva y' = y + gamma dy* = sqrt(gamma P k),
+    dy* = (y' - y) / gamma. Comisionul ramane in fond (convenția Uniswap v2): rezervele reale dupa tranzactie sunt
+    x' si y + dy*, deci pretul fondului este (y + dy*) / x'. Profitul pe unitatea de valoare a fondului: raportat la
+    valoarea fondului inainte de tranzactie, la pretul fondului (p x + y)."""
     g = 1 - fee
     k = x * y
     p = y / x
@@ -75,8 +78,11 @@ def a3_band(x=1000.0, y=3_000_000.0, P=3300.0, fee=0.003):
     dy = (y1 - y) / g
     dx = x - x1
     profit = dx * P - dy
-    return dict(k=k, p=p, lo=g * P, hi=P / g, y1=y1, x1=x1, dy=dy, dx=dx, profit=profit, p_new=y1 / x1,
-                avg=dy / dx, profit_nofee=a4_nofee(x, y, P))
+    V0 = p * x + y
+    y_act = y + dy
+    return dict(k=k, p=p, lo=g * P, hi=P / g, y1=y1, x1=x1, dy=dy, dx=dx, profit=profit, p_eff=y1 / x1,
+                y_act=y_act, p_new=y_act / x1, band_lo=g * y_act / x1, band_hi=y_act / x1 / g,
+                avg=dy / dx, profit_nofee=a4_nofee(x, y, P), V0=V0, rel=100 * profit / V0)
 
 
 def a4_nofee(x, y, P):
@@ -86,8 +92,10 @@ def a4_nofee(x, y, P):
 
 
 def a4_weighted(w=0.8, x=1000.0, p=3000.0, P=3300.0, fee=0.003):
-    """Fond ponderat x^w y^(1-w) = k (tip Balancer): pretul marginal p = (w/(1-w)) y/x; rezervele dupa arbitraj
-    x' = k (w/(gamma P (1-w)))^(1-w), y' = k (gamma P (1-w)/w)^w; dy* = (y' - y)/gamma."""
+    """Fond ponderat x^w y^(1-w) = k (tip Balancer): pretul marginal p = (w/(1-w)) y/x; rezervele efective dupa
+    arbitraj x' = k (w/(gamma P (1-w)))^(1-w), y' = k (gamma P (1-w)/w)^w; dy* = (y' - y)/gamma. Comisionul ramane in
+    fond: rezerva reala y + dy*, pretul fondului (w/(1-w)) (y + dy*)/x'. Profitul pe unitatea de valoare: raportat la
+    valoarea fondului inainte de tranzactie, p x + y = y / (1 - w)."""
     g = 1 - fee
     y = p * x * (1 - w) / w
     k = x ** w * y ** (1 - w)
@@ -95,7 +103,10 @@ def a4_weighted(w=0.8, x=1000.0, p=3000.0, P=3300.0, fee=0.003):
     y1 = k * (g * P * (1 - w) / w) ** w
     dy = (y1 - y) / g
     dx = x - x1
-    return dict(w=w, y=y, k=k, x1=x1, y1=y1, dy=dy, dx=dx, profit=dx * P - dy, p_new=(w / (1 - w)) * y1 / x1)
+    V0 = p * x + y
+    y_act = y + dy
+    return dict(w=w, y=y, k=k, x1=x1, y1=y1, dy=dy, dx=dx, profit=dx * P - dy, p_eff=(w / (1 - w)) * y1 / x1,
+                y_act=y_act, p_new=(w / (1 - w)) * y_act / x1, V0=V0, rel=100 * (dx * P - dy) / V0)
 
 
 def il_weighted(r, w):
@@ -151,10 +162,10 @@ def block_boot(x, stat, B=B_BOOT, block=BLOCK, seed=SEED):
 
 
 def weekend_ratio(r):
-    """Raportul dispersiilor: weekend (sambata, duminica) / zile lucratoare."""
+    """Raportul dispersiilor (centrate): weekend (sambata, duminica) / zile lucratoare."""
     we = r[r.index.dayofweek >= 5]
     wd = r[r.index.dayofweek < 5]
-    return (we ** 2).mean() / (wd ** 2).mean()
+    return we.var(ddof=1) / wd.var(ddof=1)
 
 
 def b1_btc_facts(key='BTC'):
@@ -262,7 +273,8 @@ def b7_equity(key='MSTR'):
     """Regresie saptamanala cu doi factori, testul b_BTC = 1 pe subperioade si testul sup-Wald (Andrews, 1993)
     pentru o ruptura la o data necunoscuta in toti cei trei coeficienti, cu erori HAC si CI Bai (1997)."""
     out = {}
-    for lab, a, b in [('full', '2021-04-16', END), ('p1', '2021-04-16', '2023-12-31'), ('p2', ETF_START, END)]:
+    # subperioadele partitioneaza esantionul complet: p1 se incheie in ajunul ETF-urilor, p2 incepe cu ele
+    for lab, a, b in [('full', '2021-04-16', END), ('p1', '2021-04-16', '2024-01-10'), ('p2', ETF_START, END)]:
         w = joint_returns([key, 'BTC', 'SPX'], None, freq='W').loc[a:b]
         m = hac_ols(w[key], w[['BTC', 'SPX']])
         out[lab] = dict(n=len(w), b_btc=m.params['BTC'], se_btc=m.bse['BTC'], b_spx=m.params['SPX'],
@@ -310,9 +322,19 @@ def c1_hedge():
             X[f'q{int(100 * q)}'] = r['SPX'] * (r['SPX'] <= thr)
         m = hac_ols(r['BTC'], X)
         b0 = m.params['SPX']
+        # indicatorii sunt imbricati: b = panta peste cuantila 10%, b + c10 intre 5% si 10%, b + c10 + c5 intre 1% si 5%,
+        # b + c10 + c5 + c1 in cel mai rau 1%; SE ale sumelor din matricea de covarianta HAC completa
+        Vc = m.cov_params()
+        def tot(names):
+            R = pd.Series(0.0, index=m.params.index)
+            R[names] = 1.0
+            return float(R @ m.params), float(np.sqrt(R @ Vc @ R))
+        (t10, s10), (t5, s5), (t1, s1) = tot(['SPX', 'q10']), tot(['SPX', 'q10', 'q5']), tot(['SPX', 'q10', 'q5', 'q1'])
+        mall = hac_ols(r['BTC'], r[['SPX']])          # regresia de acoperire pe toate zilele
         bl[lab] = dict(n=len(r), b=b0, se=m.bse['SPX'], c10=m.params['q10'], c5=m.params['q5'], c1=m.params['q1'],
-                       tot10=b0 + m.params['q10'], tot5=b0 + m.params['q10'] + m.params['q5'],
-                       tot1=b0 + m.params['q10'] + m.params['q5'] + m.params['q1'],
+                       tot10=t10, tot5=t5, tot1=t1, se_tot10=s10, se_tot5=s5, se_tot1=s1,
+                       lo_tot1=t1 - 1.96 * s1, hi_tot1=t1 + 1.96 * s1,
+                       b_all=mall.params['SPX'], se_all=mall.bse['SPX'],
                        se10=m.bse['q10'], se5=m.bse['q5'], se1=m.bse['q1'])
         # beta in zilele de scadere / crestere
         dn, up = r[r['SPX'] < 0], r[r['SPX'] > 0]
@@ -363,20 +385,44 @@ def c1_hedge():
 
 
 def fig_sem_hedge(c1):
-    """Beta Bitcoin fata de S&P 500: normal, in cele mai rele 10%, 5%, 1% zile; inainte si dupa ETF-uri."""
+    """Panta Bitcoin fata de S&P 500 in cele patru regimuri disjuncte ale regresiei cu indicatori imbricati (zilele
+    S&P 500 peste cuantila 10%, intre 5% si 10%, intre 1% si 5%, cel mai rau 1%), inainte si dupa ETF-uri; +- 1.96 SE."""
     fig, ax = plt.subplots(figsize=(6.8, 2.8))
-    labs = ['All days', 'Worst 10% of S&P 500 days', 'Worst 5%', 'Worst 1%']
+    labs = ['Above 10th percentile', '5th-10th percentile', '1st-5th percentile', 'Bottom 1%']
     x = np.arange(4)
     for i, (lab, c) in enumerate([('pre', MainBlue), ('post', Orange)]):
         b = c1['bl'][lab]
         ax.bar(x + (i - 0.5) * 0.38, [b['b'], b['tot10'], b['tot5'], b['tot1']], 0.36, color=c,
+               yerr=1.96 * np.array([b['se'], b['se_tot10'], b['se_tot5'], b['se_tot1']]), capsize=2,
+               error_kw=dict(ecolor='black', lw=0.7),
                label='Jan 2021 - 10 Jan 2024' if lab == 'pre' else '11 Jan 2024 - Sep 2026')
     ax.axhline(0, color=Gray, lw=0.6)
     ax.set_xticks(x)
     ax.set_xticklabels(labs, fontsize=8)
-    ax.set_ylabel('Bitcoin beta to the S&P 500')
+    ax.set_xlabel('S&P 500 daily return regime')
+    ax.set_ylabel('Bitcoin slope on the S&P 500')
     legend_outside_bottom(ax, ncol=2, y=-0.18)
     save_fig('ch16_sem_hedge')
+
+
+def c2_ai(start='2021', end='2025'):
+    """C2: raspunsul asistentului AI (randamente log din preturile taiate la 2021-2025, anualizare cu 252,
+    r_f = 5%) si pasii corectarii: 365; randamente calculate inainte de selectarea perioadei; randamente simple
+    in exces pentru raportul Sharpe; r_f = media randamentului bonurilor de trezorerie la 3 luni (FRED DTB3)."""
+    btc = read_market(ASSETS['BTC'][0])['close']
+    r = np.log(btc.loc[start:end]).diff().dropna()                  # codul AI: prima zi din 2021 se pierde
+    out = dict(n_ai=len(r), per_year={str(k): int(v) for k, v in r.groupby(r.index.year).size().items()})
+    for m in [252, 365]:
+        mu, sd = r.mean() * m, r.std() * np.sqrt(m)
+        out[f'mu{m}'], out[f'sd{m}'], out[f'sh{m}'] = 100 * mu, 100 * sd, (mu - 0.05) / sd
+    rs = btc.pct_change().loc[start:end].dropna()                      # randamente simple, calculate inainte de selectie
+    tb = pd.read_csv('https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTB3', index_col=0, parse_dates=True).iloc[:, 0]
+    rf = float(pd.to_numeric(tb, errors='coerce').dropna().loc[start:end].mean() / 100)
+    mu, sd = rs.mean() * 365, rs.std() * np.sqrt(365)
+    rl = np.log1p(rs)
+    out.update(n=len(rs), mu_log=100 * rl.mean() * 365, mu_s=100 * mu, sd_s=100 * sd, rf=100 * rf,
+               sh_s=(mu - rf) / sd, gap=100 * (mu - rl.mean() * 365), half_var=100 * sd ** 2 / 2)
+    return out
 
 
 if __name__ == '__main__':
@@ -399,6 +445,7 @@ if __name__ == '__main__':
     c1 = c1_hedge()
     fig_sem_hedge(c1)
     S['C1'] = c1
+    S['C2'] = c2_ai()
     with open(os.path.join(HERE, 'sem16_results.json'), 'w') as fh:
         json.dump(jsonable(S), fh, indent=1)
     print('saved sem16_results.json')

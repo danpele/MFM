@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch16_amm'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Constant-product automated market maker: slippage by trade size and fee, impermanent loss, and a simulated Ether/USD liquidity position since January 2024 compared with holding and with daily rebalancing (loss-versus-rebalancing sigma^2/8).'
+Description: 'Constant-product automated market maker: slippage by trade size and fee, impermanent loss, and a simulated Ether/USD liquidity position since January 2024 compared with holding, with the rebalancing benchmark that holds the pool's Ether each day (realised loss-versus-rebalancing against sigma^2/8) and with a constant 50/50 mix rebalanced daily.'
 
 Keywords: 'automated market maker, Uniswap, constant product, slippage, impermanent loss, loss-versus-rebalancing'
 

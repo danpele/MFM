@@ -24,7 +24,7 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import (ASSETS, LABELS, CRIX_UNIVERSE, STABLE, CLASS_ASSETS, END, price, log_returns,  # noqa: E402
                       joint_prices, joint_returns, periods_per_year, market_values, defi_tvl,
-                      stablecoin_chart, stablecoin_list, chain_tvl, symbol_returns, read_market)
+                      stablecoin_chart, stablecoin_list, chain_tvl, chain_tvl_at, symbol_returns, read_market)
 
 # Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
 plt.rcParams['figure.facecolor'] = 'none'
@@ -178,7 +178,11 @@ def stylised_table(start='2018-01-01'):
                        ann_vol=r.std() * np.sqrt(ppy), skew=stats.skew(r), kurt=stats.kurtosis(r),
                        acf1=r.autocorr(1), acf1_abs=r.abs().autocorr(1), var1=-q, es2_5=-r[r <= q25].mean(),
                        min=r.min(), min_date=str(r.idxmin().date()), mdd=mdd, mdd_date=str(mdd_date.date()),
-                       hill_left=hill(-r.values), share5sd=100 * (np.abs(r - r.mean()) > 5 * r.std()).mean())
+                       hill_left=hill(-r.values), share5sd=100 * (np.abs(r - r.mean()) > 5 * r.std()).mean(),
+                       # aceleasi masuri ca pierderi simple, in % din pozitie: 1 - exp(r/100)
+                       var1_simple=100 * (1 - np.exp(q / 100)),
+                       es2_5_simple=100 * (1 - np.exp(r[r <= q25] / 100)).mean(),
+                       min_simple=100 * (np.exp(r.min() / 100) - 1))
     t = pd.DataFrame(rows).T
     t.to_csv(os.path.join(HERE, 'ch16_stylised_facts.csv'))
     return t
@@ -238,9 +242,10 @@ def fig_weekday(start='2018-01-01'):
     save_fig('ch16_weekday')
 
     def ratio(x):
+        """Raportul dispersiilor (centrate): weekend / zile lucratoare."""
         we = x[x.index.dayofweek >= 5]
         wd = x[x.index.dayofweek < 5]
-        return (we ** 2).mean() / (wd ** 2).mean()
+        return we.var(ddof=1) / wd.var(ddof=1)
     return dict(ratio_pre=ratio(pre), ratio_post=ratio(post), pre=v_pre.tolist(), post=v_post.tolist(),
                 wd_pre=np.sqrt((pre[pre.index.dayofweek < 5] ** 2).mean()),
                 we_pre=np.sqrt((pre[pre.index.dayofweek >= 5] ** 2).mean()),
@@ -359,9 +364,11 @@ def fig_crix():
     axes[0].set_xlabel('Number of constituents k')
     axes[0].set_ylabel('% per year')
     axes[0].set_xticks(ks)
-    gain = [a['aic'][k] - a['aic'][k + 1] for k in ks[:-1]]
-    axes[1].bar([f'{k} to {k + 1}' for k in ks[:-1]], gain, color=Orange, label='AIC fall when one constituent is added')
-    axes[1].axhline(2, color=IDAred, lw=1.0, ls='--', label='Penalty per constituent (2)')
+    # imbunatatirea ajustarii n ln(s2_k / s2_(k+1)) = AIC(k) - AIC(k+1) + 2, comparata cu penalizarea 2
+    fit = [a['aic'][k] - a['aic'][k + 1] + 2 for k in ks[:-1]]
+    axes[1].bar([f'{k} to {k + 1}' for k in ks[:-1]], fit, color=Orange,
+                label='Fit improvement n ln(s2(k) / s2(k+1)) when one constituent is added')
+    axes[1].axhline(2, color=IDAred, lw=1.0, ls='--', label='AIC penalty per constituent (2)')
     axes[1].set_yscale('log')
     axes[1].set_xlabel('k')
     fig.tight_layout()
@@ -408,14 +415,25 @@ def fig_stablecoin_supply():
     ax.set_ylabel('Supply (USD bn)')
     legend_outside_bottom(ax, ncol=4, y=-0.14)
     save_fig('ch16_stablecoin_supply')
+    # clasificarea pe mecanisme la aceeasi data ca totalul (END): valoarea fiecarei monede de peste 100 mil. USD,
+    # restul monedelor = totalul minus suma lor
     lst = stablecoin_list()
-    mech = lst.assign(mechanism=lst['mechanism'].replace({'crytpo-backed': 'crypto-backed'})).groupby('mechanism')['supply'].sum()
+    lst = lst.assign(mechanism=lst['mechanism'].replace({'crytpo-backed': 'crypto-backed'}))
+    big = lst[lst['supply'] >= 0.1].copy()
+    vals = []
+    for i in big['id']:
+        v = stablecoin_chart(int(i))['value'].loc[:END].dropna()
+        vals.append(float(v.iloc[-1]) if len(v) and v.index[-1] >= pd.Timestamp(END) - pd.Timedelta(days=3) else 0.0)
+    big['value'] = vals
+    big = big[big['value'] > 0].sort_values('value', ascending=False)
+    mech = big.groupby('mechanism')['value'].sum()
     return dict(total_end=tot.iloc[-1], total_2020=tot.loc[:'2020-01-01'].iloc[-1],
+                n_big=int(len(big)), other=float(tot.iloc[-1] - big['value'].sum()),
                 usdt_end=parts['USDT'].iloc[-1], usdc_end=parts['USDC'].iloc[-1], dai_end=parts['DAI'].iloc[-1],
                 usdt_share=100 * parts['USDT'].iloc[-1] / tot.iloc[-1], usdc_share=100 * parts['USDC'].iloc[-1] / tot.iloc[-1],
                 usdc_peak=parts['USDC'].max(), usdc_peak_date=str(parts['USDC'].idxmax().date()),
                 n_coins=int(len(lst)), mech={k: float(v) for k, v in mech.items()},
-                top=[dict(symbol=r.symbol, name=r.name, mechanism=r.mechanism, supply=r.supply) for r in lst.head(12).itertuples()],
+                top=[dict(symbol=r.symbol, name=r.name, mechanism=r.mechanism, supply=r.value) for r in big.head(12).itertuples()],
                 end=str(tot.index[-1].date()),
                 tot_peak22=tot.loc[:'2022-12-31'].max(), tot_peak22_date=str(tot.loc[:'2022-12-31'].idxmax().date()),
                 tot_trough=tot.loc['2022-06-01':'2024-06-30'].min(),
@@ -546,28 +564,36 @@ def fig_amm_theory():
 
 
 def fig_lp_vs_hodl(start='2024-01-01'):
-    """Fond ETH/USD x*y = k fara comisioane: furnizorul de lichiditate vs pastrarea activelor vs reechilibrarea zilnica 50/50."""
+    """Fond ETH/USD x*y = k fara comisioane: furnizorul de lichiditate vs pastrarea activelor, vs portofoliul de
+    reechilibrare din Milionis et al. (2022) (detine in fiecare zi cantitatea de ETH a fondului, x = V/(2P), si
+    tranzactioneaza la pretul pietei) si vs un portofoliu 50/50 reechilibrat zilnic (pondere constanta)."""
     p = price('ETH', start)
     rel = p / p.iloc[0]
     hodl = 100 * (1 + rel) / 2
     lp = 100 * np.sqrt(rel)
     R = p.pct_change().fillna(0)
     reb = 100 * (1 + 0.5 * R).cumprod()
+    x_pool = lp / (2 * p)                                         # ETH detinut de fond (V'(P) = V / 2P)
+    dR = (x_pool.shift(1) * p.diff()).fillna(0)
+    mmrz = 100 + dR.cumsum()                                      # R_t = R_(t-1) + x(P_(t-1)) (P_t - P_(t-1))
     fig, ax = plt.subplots(figsize=(7.2, 3.0))
     ax.plot(hodl.index, hodl.values, color=MainBlue, lw=1.1, label='Hold 50% ETH + 50% USD')
-    ax.plot(reb.index, reb.values, color=Forest, lw=1.1, label='Rebalance to 50/50 every day')
+    ax.plot(reb.index, reb.values, color=Forest, lw=1.1, label='Constant 50/50 mix, rebalanced daily')
+    ax.plot(mmrz.index, mmrz.values, color=Orange, lw=1.1, ls='--', label="Rebalancing benchmark: the pool's ETH, daily")
     ax.plot(lp.index, lp.values, color=IDAred, lw=1.3, label='Liquidity provider, x*y = k, no fees')
     ax.set_ylabel('Value (100 at start)')
-    legend_outside_bottom(ax, ncol=3, y=-0.14)
+    legend_outside_bottom(ax, ncol=2, y=-0.14)
     save_fig('ch16_lp_vs_hodl')
     r = np.log(p).diff().dropna()
     sig2 = r.var() * 365
     yrs = (p.index[-1] - p.index[0]).days / 365.25
-    lvr_real = np.log(reb.iloc[-1] / lp.iloc[-1]) / yrs
+    # LVR realizata (Milionis et al., 2022): suma pierderilor zilnice (dR_t - dV_t) / V_(t-1), anualizata
+    lvr_real = ((dR - lp.diff()) / lp.shift(1)).dropna().sum() / yrs
     return dict(start=str(p.index[0].date()), p0=p.iloc[0], p1=p.iloc[-1], ratio=rel.iloc[-1], hodl=hodl.iloc[-1],
-                lp=lp.iloc[-1], reb=reb.iloc[-1], il=100 * (lp.iloc[-1] / hodl.iloc[-1] - 1), sigma=100 * np.sqrt(sig2),
-                lvr_theory=100 * sig2 / 8, lvr_real=100 * lvr_real, years=yrs,
-                fee_apr_hodl=100 * np.log(hodl.iloc[-1] / lp.iloc[-1]) / yrs)
+                lp=lp.iloc[-1], reb=reb.iloc[-1], mmrz=mmrz.iloc[-1], lvr_level=mmrz.iloc[-1] - lp.iloc[-1],
+                il=100 * (lp.iloc[-1] / hodl.iloc[-1] - 1), sigma=100 * np.sqrt(sig2),
+                lvr_theory=100 * sig2 / 8, lvr_real=100 * lvr_real, cm_gap=100 * np.log(reb.iloc[-1] / lp.iloc[-1]) / yrs,
+                years=yrs, fee_apr_hodl=100 * np.log(hodl.iloc[-1] / lp.iloc[-1]) / yrs)
 
 
 # =============================================================================
@@ -672,13 +698,14 @@ def fig_defi_tvl():
     save_fig('ch16_defi_tvl')
     d = np.log(m).diff().dropna()
     reg = hac_ols(d['TVL'], d['ETH'], lags=3)
-    ch = chain_tvl().head(10)
+    # TVL pe blockchain-uri la aceeasi data ca seria totala (END): cele mai mari 10 dintre primele 15 de azi
+    ch = pd.Series({c: chain_tvl_at(c, END) for c in chain_tvl().head(15).index}).sort_values(ascending=False).head(10)
     fig, ax = plt.subplots(figsize=(6.6, 2.9))
     ax.barh(ch.index[::-1], ch.values[::-1], color=Teal, label='Total value locked (USD bn)')
     ax.set_xlabel('USD bn')
     legend_outside_bottom(ax, ncol=1, y=-0.18)
     save_fig('ch16_tvl_chains')
-    tot_now = chain_tvl().sum()
+    tot_now = tvl.iloc[-1]
     return dict(peak=tvl.max(), peak_date=str(tvl.idxmax().date()), last=tvl.iloc[-1], last_date=str(tvl.index[-1].date()),
                 start=tvl.iloc[0], beta=reg.params['ETH'], se=reg.bse['ETH'], r2=reg.rsquared, n=len(d),
                 corr=d['TVL'].corr(d['ETH']), chains={k: float(v) for k, v in ch.items()},
@@ -692,9 +719,10 @@ WINDOWS = {'W1': ('2019-01-01', '2021-06-30'), 'W2': (ETF_START, END)}
 FEATURES = ['ann_vol', 'skew', 'kurt', 'acf1', 'acf1_sq', 'hill_left', 'hill_right', 'mdd']
 
 
-def asset_features(r):
-    """Caracteristicile statistice ale unei serii de randamente log zilnice."""
-    ppy = periods_per_year(r)
+def asset_features(r, ppy=None):
+    """Caracteristicile statistice ale unei serii de randamente log zilnice (ppy: observatii pe an, implicit
+    frecventa reala a seriei)."""
+    ppy = periods_per_year(r) if ppy is None else ppy
     p = np.exp(r.cumsum())
     return dict(ann_vol=np.log(r.std() * np.sqrt(ppy)), skew=stats.skew(r), kurt=np.log1p(max(stats.kurtosis(r), 0)),
                 acf1=r.autocorr(1), acf1_sq=(r ** 2).autocorr(1), hill_left=hill(-r.values - (-r).median()),
@@ -720,6 +748,7 @@ def fig_alt_assets():
     pc = Z @ Vt[:2].T
     if np.corrcoef(pc[:, 0], f['ann_vol'])[0, 1] < 0:
         pc[:, 0] *= -1
+        Vt[0] *= -1          # incarcarile PC1 cu acelasi semn ca axa din grafic
     f['pc1'], f['pc2'] = pc[:, 0], pc[:, 1]
     ev = S ** 2 / (S ** 2).sum()
     fig, ax = plt.subplots(figsize=(7.2, 4.0))
