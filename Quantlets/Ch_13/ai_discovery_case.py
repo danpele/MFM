@@ -133,10 +133,52 @@ def main():
         'best': labels[best], 'best_t': float(tdisc[best]), 'best_t_hold': float(thold[best]),
         'best_p_raw': float(p[best]),
         'raw_list': [(labels[i], round(float(tdisc[i]), 2), round(float(thold[i]), 2)) for i in np.where(raw)[0]],
+        'labels': labels, 't_disc': [float(x) for x in tdisc], 't_hold': [float(x) for x in thold],
+        'bh_t_cut': float(np.min(np.abs(tdisc[bh]))) if bh.any() else None,
+        'holm_t_first': float(stats.norm.ppf(1 - 0.05 / (2 * M))),
     }
     with open(os.path.join(HERE, 'ai_discovery_case.json'), 'w') as fh:
         json.dump(res, fh, indent=2)
-    print(json.dumps(res, indent=2))
+    print(json.dumps({k: v for k, v in res.items() if k not in ('labels', 't_disc', 't_hold')}, indent=2))
+    fig_ai_tstats(res)
+
+
+def fig_ai_tstats(res):
+    """Graficul mini-studiului de caz: |t| ordonate cu pragurile corecțiilor și verificarea pe holdout."""
+    import matplotlib.pyplot as plt
+    from generate_all_charts import MainBlue, IDAred, Forest, Amber, Purple, Orange, save_fig
+    td, th = np.array(res['t_disc']), np.array(res['t_hold'])
+    order = np.argsort(-np.abs(td))
+    fig, axes = plt.subplots(1, 2, figsize=(10.0, 3.3), gridspec_kw={'width_ratios': [1.35, 1]})
+    ax = axes[0]
+    k = np.arange(1, len(td) + 1)
+    ax.bar(k, np.abs(td[order]), color=[MainBlue if abs(t) > 1.96 else Amber for t in td[order]], width=0.85)
+    for y, c, ls, lab in ((1.96, 'black', ':', '|t| = 1.96: 21 of 102 pass'),
+                          (res['bh_t_cut'], Forest, '--', 'BH, FDR 10%: 13 pass'),
+                          (3.0, Purple, '-.', '|t| > 3: 4 pass'),
+                          (res['maxt_crit95'], IDAred, '-', 'joint null, 95%% of max|t| = %.2f: 1 passes' % res['maxt_crit95']),
+                          (res['holm_t_first'], Orange, '--', 'Holm first step, FWER 5%%: |t| > %.2f, none' % res['holm_t_first'])):
+        ax.axhline(y, color=c, ls=ls, lw=1.0, label=lab)
+    ax.set_xlabel('test rank (34 features x 3 horizons, ordered by |t|)'); ax.set_ylabel('|Newey-West t|, 2001-2015')
+    ax.set_xlim(0, len(td) + 1)
+    ax.set_title('Discovery sample: how many tests survive?', loc='left')
+    ax = axes[1]
+    raw = np.abs(td) > 1.96
+    same = raw & (np.sign(th) == np.sign(td)) & (np.abs(th) > 1.96)
+    ax.scatter(td[~raw], th[~raw], s=10, color=Amber, alpha=0.8, label='|t| < 1.96 in discovery')
+    ax.scatter(td[raw & ~same], th[raw & ~same], s=16, color=MainBlue, label='discovery |t| > 1.96, fails in holdout')
+    ax.scatter(td[same], th[same], s=26, color=IDAred, marker='D', label='replicates: same sign, |t| > 1.96')
+    lim = 4.0
+    ax.plot([-lim, lim], [-lim, lim], color='black', ls=':', lw=0.8)
+    for v in (-1.96, 1.96):
+        ax.axhline(v, color='black', lw=0.5, ls='--'); ax.axvline(v, color='black', lw=0.5, ls='--')
+    ax.set_xlim(-lim, lim); ax.set_ylim(-lim, lim)
+    ax.set_xlabel('t, discovery 2001-2015'); ax.set_ylabel('t, holdout 2016-2026')
+    ax.set_title('Holdout check', loc='left')
+    plt.tight_layout()
+    h1, l1 = axes[0].get_legend_handles_labels(); h2, l2 = axes[1].get_legend_handles_labels()
+    fig.legend(h1 + h2, l1 + l2, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=3, frameon=False, fontsize=7.5)
+    save_fig('ch13_ai_tstats')
 
 
 if __name__ == '__main__':

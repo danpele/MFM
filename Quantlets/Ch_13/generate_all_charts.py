@@ -281,7 +281,7 @@ def fig_purged_cv_scheme():
             if t_start <= t < t_end:
                 c = IDAred
             elif t_start - h <= t < t_start:
-                c = LightGray
+                c = Purple
             elif t_end <= t < t_end + emb:
                 c = Amber
             else:
@@ -295,7 +295,7 @@ def fig_purged_cv_scheme():
     ax.spines['left'].set_visible(False)
     handles = [mpatches.Patch(color=MainBlue, label='Train'),
                mpatches.Patch(color=IDAred, label='Test'),
-               mpatches.Patch(color=LightGray, label='Purged (label overlaps test)'),
+               mpatches.Patch(color=Purple, label='Purged (label overlaps test)'),
                mpatches.Patch(color=Amber, label='Embargo (after test)')]
     ax.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=4, frameon=False)
     plt.tight_layout()

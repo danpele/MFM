@@ -309,15 +309,19 @@ def dml_section():
     d = ((df['vix_level'] - df['vix_level'].mean()) / df['vix_level'].std()).values
     n, p = X.shape
     ols = lambda yv, Xv, lags=4: sm.OLS(yv, sm.add_constant(Xv)).fit(cov_type='HAC', cov_kwds={'maxlags': lags})
+    est = {}
     r = ols(y, d)
+    est['OLS, VIX only'] = (r.params[1], r.bse[1])
     print(f'  n = {n}, controls p = {p}, sd(log VIX) = {df["vix_level"].std():.3f}; '
           f'OLS on log VIX alone: {r.params[1]:.1f} bp (HAC SE {r.bse[1]:.1f})')
     r = ols(y, np.column_stack([d, X]))
+    est[f'OLS, all {p} controls'] = (r.params[1], r.bse[1])
     print(f'  OLS with all {p} controls: {r.params[1]:.1f} bp (HAC SE {r.bse[1]:.1f})')
     sel = rlasso(y, np.column_stack([d, X]))
     print(f'  single LASSO of y on (VIX, controls): {len(sel)} regressors kept, VIX kept: {0 in sel}')
     Sy, Sd = rlasso(y, X), rlasso(d, X); U = sorted(set(Sy) | set(Sd))
     r = ols(y, np.column_stack([d, X[:, U]]))
+    est['post-double selection'] = (r.params[1], r.bse[1])
     print(f'  post-double selection: |S_y| = {len(Sy)}, |S_d| = {len(Sd)}; theta = {r.params[1]:.1f} bp, '
           f'SE {r.bse[1]:.1f}, 95% CI [{r.params[1] - 1.96 * r.bse[1]:.1f}, {r.params[1] + 1.96 * r.bse[1]:.1f}]')
     folds = np.array_split(np.arange(n), 5); h = 5
@@ -336,8 +340,29 @@ def dml_section():
                 res[te] = target[te] - pred
         theta = np.sum(vt * ut) / np.sum(vt * vt)
         se = sm.OLS(ut, vt).fit(cov_type='HAC', cov_kwds={'maxlags': 4}).bse[0]
+        est['DML, LASSO learners' if learner == 'lasso' else 'DML, random forests'] = (theta, se)
         print(f'  DML ({learner}, 5 contiguous folds, 5-day purge): theta = {theta:.1f} bp, SE {se:.1f}, '
               f'95% CI [{theta - 1.96 * se:.1f}, {theta + 1.96 * se:.1f}]')
+    fig_vix_inference(est, len(Sy), len(Sd))
+    return est
+
+
+def fig_vix_inference(est, ny, nd):
+    """Estimatiile efectului log VIX asupra randamentului S&P 500 pe 5 zile, cu CI HAC de 95%."""
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(figsize=(6.4, 2.9))
+    cols = [g.MainBlue, g.Amber, g.Forest, g.Purple, g.Orange]
+    for i, ((k, (th, se)), c) in enumerate(zip(est.items(), cols)):
+        ax.errorbar(th, i, xerr=1.96 * se, fmt='o', color=c, capsize=3)
+        ax.text(th + 1.96 * se + 2, i, f'{th:.1f} [{th - 1.96 * se:.1f}; {th + 1.96 * se:.1f}]', va='center', fontsize=7)
+    ax.plot([], [], 'x', color=g.IDAred, label='single LASSO on (VIX, controls): VIX dropped, no standard error')
+    ax.axvline(0, color='black', ls='--', lw=0.8, label='no predictive effect')
+    ax.set_yticks(range(len(est)), list(est)); ax.invert_yaxis(); ax.set_xlim(-60, 75)
+    ax.set_xlabel('bp of 5-day S&P 500 log return per SD of log VIX (HAC 95% CI)')
+    ax.set_title(f'Double selection keeps $|\\hat S_y| = {ny}$ and $|\\hat S_d| = {nd}$ controls', loc='left')
+    plt.tight_layout()
+    fig.legend(loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=1, frameon=False, fontsize=7.5)
+    g.save_fig('ch13_vix_inference')
 
 
 # =============================================================================
