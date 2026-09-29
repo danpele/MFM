@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch18_quantile_connectedness'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study of Ando, Greenwood-Nimmo and Shin (2022), quantile connectedness of 17 sovereign and 17 financial-sector CDS series, 2006-2017: the published full-sample spillover index of the quantile factor VAR by quantile (Figure 4) against the conditional-mean index, and the published correlations of the rolling tail indices (Table 3) and of the tail indices and relative tail dependence with CATFIN (Figure 13).'
+
+Keywords: 'quantile connectedness, quantile factor VAR, QFVAR, spillover index, relative tail dependence, CDS, sovereign-bank loop, CATFIN'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 29 September 2026'
+
+Datafile: 'Published values from Ando, T., Greenwood-Nimmo, M., Shin, Y. (2022), Quantile connectedness: modeling tail behavior in the topology of financial networks, Management Science 68(4), 2401-2431 (accepted manuscript, University of Melbourne repository, 2020): Figure 4, Table 3, Figure 13'
+
+Output: 'ch18_case_quantile_index.pdf, ch18_case_tail_corr.pdf'

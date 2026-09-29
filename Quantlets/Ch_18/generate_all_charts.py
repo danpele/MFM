@@ -592,9 +592,85 @@ def fig_reverse(rv):
 
 
 # =============================================================================
+# STUDIU DE CAZ: ANDO, GREENWOOD-NIMMO & SHIN (2022), cifrele publicate
+# (manuscrisul acceptat, 2020): Figura 4, Tabelul 3, Figura 13, Sectiunea 4.3
+# =============================================================================
+AGS_FIG4 = {0.01: 88.18, 0.05: 77.17, 0.10: 72.20, 0.90: 73.34, 0.95: 79.36, 0.99: 91.77}
+AGS_MEAN = 56.57
+AGS_CENTRE = (0.30, 0.70, 40.0)          # "about 40%" over the central 40% of the distribution
+AGS_TAB3 = {'Mean and S(0.95)': 0.774, 'Mean and S(0.05)': 0.411, 'S(0.95) and S(0.05)': 0.367}
+AGS_FIG13 = {'S(0.95)': 0.51, 'S(0.05)': 0.15, 'RTD': 0.42}
+
+
+def fig_case_quantile_index():
+    """Indicele de transmitere pe intregul esantion, pe cuantile (Figura 4 din lucrare)."""
+    fig, ax = plt.subplots(figsize=(6.4, 3.0))
+    left = [t for t in AGS_FIG4 if t < 0.5]
+    right = [t for t in AGS_FIG4 if t > 0.5]
+    ax.plot(left, [AGS_FIG4[t] for t in left], color=Forest, marker='o', ms=5, lw=1.3,
+            label='Left tail: large beneficial shocks (CDS spreads fall)')
+    ax.plot(right, [AGS_FIG4[t] for t in right], color=IDAred, marker='o', ms=5, lw=1.3,
+            label='Right tail: large adverse shocks (CDS spreads rise)')
+    a, b, c = AGS_CENTRE
+    ax.plot([a, b], [c, c], color=Amber, lw=3.0, solid_capstyle='butt',
+            label=f'Centre, quantiles {a:.2f} to {b:.2f}: about {c:.0f}%')
+    ax.axhline(AGS_MEAN, color=MainBlue, ls='--', lw=1.2, label=f'Conditional mean (VAR): {AGS_MEAN:.2f}%')
+    for t, v in AGS_FIG4.items():
+        ax.annotate(fr'$\tau$ = {t:.2f}: {v:.2f}%', (t, v), textcoords='offset points',
+                    xytext=(8, 0) if t < 0.5 else (-8, 0), ha='left' if t < 0.5 else 'right', va='center',
+                    fontsize=7.5, color='black')
+    ax.set_xlim(0, 1)
+    ax.set_ylim(30, 100)
+    ax.set_xticks([0.0, 0.10, 0.30, 0.50, 0.70, 0.90, 1.0])
+    ax.set_xlabel(r'Quantile $\tau$ of the QFVAR')
+    ax.set_ylabel(r'Spillover index $S_\tau^{(5)}$ (%)')
+    ax.set_title('17 sovereigns and 17 financial sectors, daily CDS changes, 2006-2017', fontsize=9.5)
+    legend_outside_bottom(ax, ncol=2, y=-0.24)
+    save_fig('ch18_case_quantile_index')
+
+
+def fig_case_tail_corr():
+    """Corelatii publicate: indicii pe ferestre mobile (Tabelul 3) si cu CATFIN (Figura 13)."""
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.8))
+    cols = {'S(0.95)': IDAred, 'S(0.05)': Forest, 'tails': Amber, 'RTD': Purple}
+    k3 = list(AGS_TAB3)
+    c3 = [cols['S(0.95)'], cols['S(0.05)'], cols['tails']]
+    axes[0].bar(range(3), [AGS_TAB3[k] for k in k3], color=c3, width=0.6)
+    axes[0].set_xticks(range(3))
+    axes[0].set_xticklabels(['Mean,\nS(0.95)', 'Mean,\nS(0.05)', 'S(0.95),\nS(0.05)'])
+    axes[0].set_title('Rolling 250-day indices (Table 3)', fontsize=9.5)
+    k13 = list(AGS_FIG13)
+    axes[1].bar(range(3), [AGS_FIG13[k] for k in k13], color=[cols[k] for k in k13], width=0.6)
+    axes[1].set_xticks(range(3))
+    axes[1].set_xticklabels(['S(0.95)', 'S(0.05)', 'RTD'])
+    axes[1].set_title('Monthly correlation with CATFIN (Figure 13)', fontsize=9.5)
+    for ax, vals in [(axes[0], [AGS_TAB3[k] for k in k3]), (axes[1], [AGS_FIG13[k] for k in k13])]:
+        for i, v in enumerate(vals):
+            ax.text(i, v + 0.02, f'{v:.3f}' if ax is axes[0] else f'{v:.2f}', ha='center', va='bottom',
+                    fontsize=8, color='black')
+        ax.set_ylim(0, 0.9)
+        ax.set_ylabel('Correlation')
+    from matplotlib.patches import Patch
+    h = [Patch(color=cols['S(0.95)'], label='Involves the right tail S(0.95): large adverse shocks'),
+         Patch(color=cols['S(0.05)'], label='Involves the left tail S(0.05): large beneficial shocks'),
+         Patch(color=cols['tails'], label='Right tail against left tail'),
+         Patch(color=cols['RTD'], label='Relative tail dependence RTD = S(0.95) - S(0.05)')]
+    fig.tight_layout()
+    fig.legend(handles=h, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=2, frameon=False)
+    save_fig('ch18_case_tail_corr')
+
+
+# =============================================================================
 # RULARE
 # =============================================================================
+if __name__ == '__main__' and sys.argv[1:] == ['case']:
+    fig_case_quantile_index()
+    fig_case_tail_corr()
+    sys.exit(0)
+
 if __name__ == '__main__':
+    fig_case_quantile_index()
+    fig_case_tail_corr()
     print('1. bank indices')
     RESULTS['indices'] = fig_bank_indices()
     RESULTS['sample'] = {'start': R.index[0], 'end': R.index[-1], 'N': len(R)}
