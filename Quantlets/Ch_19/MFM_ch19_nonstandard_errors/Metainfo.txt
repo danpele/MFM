@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch19_nonstandard_errors'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Research case study on nonstandard errors (Menkveld et al., 2024, Journal of Finance): a 27-path multiverse for the hypothesis that market efficiency has not changed over time, on the Euro Stoxx 50 and BET indices (daily closes, 2002-2018). Forks from Table V of the paper that daily data allow: outlier treatment (none, winsorised, trimmed), annual measure (|VR(5) - 1|, |VR(21) - 1|, R2 of an AR(1)) and model of the average yearly change (linear trend, log difference, relative difference). Median, interquartile range (the nonstandard error) and the k-sample Anderson-Darling ranking of the forks.'
+
+Keywords: 'nonstandard errors, multiverse analysis, researcher degrees of freedom, market efficiency, variance ratio, Jensen inequality, Anderson-Darling, replication, Euro Stoxx 50, BET'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Euro Stoxx 50 index, BET index (closing values)'
+
+Output: 'ch19_nse_multiverse.pdf, ch19_nse_forks.pdf, ch19_nse.json'
