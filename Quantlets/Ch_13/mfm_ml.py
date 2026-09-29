@@ -113,7 +113,7 @@ def exact_local_whittle(x, m=None, alpha=0.65):
 # ETICHETARE: METODA CELOR TREI BARIERE
 # =============================================================================
 def get_daily_vol(close, span=50):
-    """Volatilitatea EWMA a randamentelor logaritmice zilnice."""
+    """Volatilitatea EWMA: radacina patrata a mediei EWMA a abaterilor patratice ale randamentelor log zilnice."""
     return np.log(close).diff().ewm(span=span).std()
 
 
@@ -123,6 +123,7 @@ def triple_barrier(close, events_idx, vol, pt=1.0, sl=1.0, horizon=10):
       bariera superioara = P_t0 * exp(+pt * vol_t0 * sqrt(horizon))
       bariera inferioara = P_t0 * exp(-sl * vol_t0 * sqrt(horizon))
       bariera verticala  = t0 + horizon zile de tranzactionare
+    Evenimentele fara o fereastra completa de horizon zile (sfarsitul esantionului) sunt omise.
     Eticheta: +1 (atinge sus), -1 (atinge jos), sign(randament) la bariera verticala.
     Intoarce DataFrame cu t1 (momentul atingerii), ret, label, barrier.
     """
@@ -131,9 +132,9 @@ def triple_barrier(close, events_idx, vol, pt=1.0, sl=1.0, horizon=10):
     rows = []
     for t0 in events_idx:
         i0 = pos[t0]
-        if i0 + 1 >= len(close) or np.isnan(vol.iloc[i0]):
-            continue
-        i1 = min(i0 + horizon, len(close) - 1)
+        if i0 + horizon >= len(close) or np.isnan(vol.iloc[i0]):
+            continue                                   # fereastra completa de h zile, altfel evenimentul e cenzurat
+        i1 = i0 + horizon
         width = vol.iloc[i0] * np.sqrt(horizon)
         path = logp.iloc[i0 + 1:i1 + 1] - logp.iloc[i0]
         up = path[path >= pt * width].index.min() if pt > 0 else pd.NaT

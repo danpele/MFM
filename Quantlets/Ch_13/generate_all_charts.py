@@ -610,21 +610,34 @@ def fig_expected_max_sharpe():
 # =============================================================================
 # FIG 12: Backtest overfitting: Sharpe in-sample vs out-of-sample
 # =============================================================================
-def fig_is_vs_oos():
-    """Cautare de parametri pentru o strategie de medii mobile pe BTC: IS 2015-2020, OOS 2021-2026."""
+def btc_grid_returns():
+    """Randamentele log zilnice ale celor 1 279 de reguli long/cash (MA rapida, MA lenta, banda) pe BTC.
+    Semnalul lipseste (NaN) pana cand ambele medii exista; toate regulile incep in prima zi in care
+    semnalul celei mai lente reguli este disponibil (dupa decalajul de o zi), deci nicio regula nu
+    primeste o perioada artificiala in numerar."""
     r = np.log(btc).diff()
     lp = np.log(btc)
-    is_mask = btc.index < '2021-01-01'
-    rows = []
+    cols = {}
     for fast in range(2, 60, 3):
         for slow in range(10, 250, 10):
             if slow <= fast:
                 continue
             for band in (0.0, 0.01, 0.03):
-                sig = ((lp.rolling(fast).mean() - lp.rolling(slow).mean()) > band).astype(float).shift(1)
-                sr_is = sharpe_ratio((sig * r)[is_mask].dropna(), 365)
-                sr_oos = sharpe_ratio((sig * r)[~is_mask].dropna(), 365)
-                rows.append((fast, slow, band, sr_is, sr_oos))
+                gap = lp.rolling(fast).mean() - lp.rolling(slow).mean()
+                sig = (gap > band).astype(float).where(gap.notna()).shift(1)
+                cols[(fast, slow, band)] = sig * r
+    M = pd.DataFrame(cols)
+    return M.loc[M.dropna().index[0]:].dropna()
+
+
+def fig_is_vs_oos():
+    """Cautare de parametri pentru o strategie de medii mobile pe BTC: IS 15.05.2015-2020, OOS 2021-2026.
+    Toate regulile se evalueaza din aceeasi zi: prima zi cu semnal valid pentru cea mai lenta medie (240 de zile)."""
+    M = btc_grid_returns()
+    is_mask = M.index < '2021-01-01'
+    rows = []
+    for (fast, slow, band), x in M.items():
+        rows.append((fast, slow, band, sharpe_ratio(x[is_mask], 365), sharpe_ratio(x[~is_mask], 365)))
     res = pd.DataFrame(rows, columns=['fast', 'slow', 'band', 'sr_is', 'sr_oos']).dropna()
     best = res.loc[res['sr_is'].idxmax()]
     rank_corr = stats.spearmanr(res['sr_is'], res['sr_oos'])[0]
@@ -637,7 +650,7 @@ def fig_is_vs_oos():
                label=f"Best IS: SR$_{{IS}}$={best['sr_is']:.2f}, SR$_{{OOS}}$={best['sr_oos']:.2f}")
     lims = [min(res['sr_is'].min(), res['sr_oos'].min()) - 0.1, max(res['sr_is'].max(), res['sr_oos'].max()) + 0.1]
     ax.plot(lims, lims, color=Gray, ls=':', lw=0.8)
-    ax.set_xlabel('Sharpe in-sample (2015-2020)')
+    ax.set_xlabel('Sharpe in-sample (May 2015 - 2020)')
     ax.set_ylabel('Sharpe out-of-sample (2021-2026)')
     ax.set_title(f'BTC moving-average crossover grid search (Spearman $\\rho$ = {rank_corr:.2f})',
                  fontsize=9, loc='left')

@@ -171,6 +171,36 @@ def case_study_section():
         print(f'  {k:5s}: acc {P:.3f} vs P* {Ps:.3f}, PT {s:.2f}; log loss {ll(p1).mean():.4f} vs constant {ll(p0).mean():.4f}; '
               f'DM t = {t:.2f} (p {pdm:.3f}); Clark-West t = {tcw:.2f} (one-sided p {1 - stats.norm.cdf(tcw):.2f}); '
               f'GW = {S:.2f} (p {pgw:.3f})')
+    # GW presupune o fereastra de estimare marginita: aceeasi comparatie cu o fereastra mobila de 8 ani
+    wr = pd.DataFrame(index=df.index)
+    for yr in range(2010, df.index[-1].year + 1):
+        test = df.index[df.index.year == yr]
+        train = df.index[(df['t1'] < test[0]) & (df.index >= test[0] - pd.DateOffset(years=8))]
+        for nm, mdl in (('gbm', HistGradientBoostingClassifier(max_depth=3, learning_rate=0.03, max_iter=200,
+                                                                min_samples_leaf=100, random_state=SEED)),
+                        ('logit', make_pipeline(StandardScaler(), LogisticRegression(C=0.1, max_iter=2000)))):
+            mdl.fit(df.loc[train, feat], df.loc[train, 'y'])
+            wr.loc[test, nm] = mdl.predict_proba(df.loc[test, feat])[:, 1]
+        wr.loc[test, 'const'] = df.loc[train, 'y'].mean()
+    wr = wr.dropna(); yr_ = df.loc[wr.index, 'y'].values
+    llr = lambda p: -(yr_ * np.log(np.clip(p, 1e-6, 1)) + (1 - yr_) * np.log(np.clip(1 - p, 1e-6, 1)))
+    for k in ('logit', 'gbm'):
+        S, pgw = giacomini_white(llr(wr[k].values) - llr(wr['const'].values))
+        print(f'  rolling 8-year window, {k:5s}: log loss {llr(wr[k].values).mean():.4f} vs constant '
+              f'{llr(wr["const"].values).mean():.4f}; GW = {S:.2f} (p {pgw:.4f})')
+    # sensibilitatea backtestului la alegerea lui d (ales pe tot esantionul)
+    for lab, dfx, cols_ in (('d frozen on data up to 2009', g.modelling_frame(0.15), feat),
+                            ('without ffd_price', df, [c for c in feat if c != 'ffd_price'])):
+        sig = pd.Series(np.nan, index=dfx.index)
+        for yr in range(2010, dfx.index[-1].year + 1):
+            test = dfx.index[dfx.index.year == yr]; train = dfx.index[dfx['t1'] < test[0]]
+            mdl = HistGradientBoostingClassifier(max_depth=3, learning_rate=0.03, max_iter=200,
+                                                 min_samples_leaf=100, random_state=SEED)
+            mdl.fit(dfx.loc[train, cols_], dfx.loc[train, 'y'])
+            sig.loc[test] = (mdl.predict_proba(dfx.loc[test, cols_])[:, 1] > 0.5).astype(float)
+        ps = sig.dropna(); r1 = np.log(g.spx).diff().shift(-1).reindex(ps.index)
+        st = (ps * r1 - ps.diff().abs().fillna(ps.iloc[0]) * 5 / 1e4).dropna()
+        print(f'  walk-forward, {lab}: SR {sharpe_ratio(st):.2f}, exposure {ps.mean():.0%}')
     ret1 = np.log(g.spx).diff().shift(-1).reindex(wf.index)
     pos = (wf['gbm'] > 0.5).astype(float)
     strat = (pos * ret1 - pos.diff().abs().fillna(pos.iloc[0]) * 5 / 1e4).dropna()
@@ -225,21 +255,22 @@ def snooping_tests(Dm, B=2000, q=1 / 20, seed=SEED, alpha=0.05):
 
 def btc_grid_section():
     print('== 3. BTC grid: data-snooping tests ==')
-    btc = g.btc; r = np.log(btc).diff(); lp = np.log(btc)
-    is_mask = btc.index < '2021-01-01'
-    cols = {}
-    for fast in range(2, 60, 3):
-        for slow in range(10, 250, 10):
-            if slow <= fast:
-                continue
-            for band in (0.0, 0.01, 0.03):
-                sig = ((lp.rolling(fast).mean() - lp.rolling(slow).mean()) > band).astype(float).shift(1)
-                cols[(fast, slow, band)] = sig * r
-    M = pd.DataFrame(cols)
-    Mis = M[is_mask].dropna()
-    Mis = Mis.loc[:, (Mis.std() > 0) & (M[~is_mask].dropna().std() > 0)]
+    r = np.log(g.btc).diff()
+    M = g.btc_grid_returns()                     # semnale valide pentru toate regulile, start comun
+    is_mask = M.index < '2021-01-01'
+    Mis = M[is_mask]
+    Mis = Mis.loc[:, (Mis.std() > 0) & (M[~is_mask].std() > 0)]
     bh = r.reindex(Mis.index)
-    print(f'  {Mis.shape[1]} rules, in-sample n = {len(Mis)}')
+    print(f'  {Mis.shape[1]} rules, in-sample {Mis.index[0].date()} - {Mis.index[-1].date()}, n = {len(Mis)}')
+    # DSR al celei mai bune reguli (exemplul lucrat din curs)
+    srs = Mis.mean() / Mis.std(); best = srs.idxmax(); x = Mis[best]; T = len(x)
+    sr, g3, g4 = srs[best], stats.skew(x), stats.kurtosis(x, fisher=False)
+    den = np.sqrt(1 - g3 * sr + (g4 - 1) / 4 * sr ** 2)
+    print(f'  best rule {best}: SR {sr:.4f}/day ({sr * np.sqrt(365):.2f} ann.), skew {g3:.2f}, kurt {g4:.2f}, denominator {den:.3f}')
+    for lab, sd in (('dispersion of trial SRs', srs.std()), ('independent trials 1/T', np.sqrt(1 / T))):
+        sr0 = sd * ((1 - 0.5772156649) * stats.norm.ppf(1 - 1 / len(srs)) + 0.5772156649 * stats.norm.ppf(1 - 1 / (len(srs) * np.e)))
+        z = (sr - sr0) * np.sqrt(T - 1) / den
+        print(f'  DSR, {lab}: sd {sd:.4f}, SR0 {sr0:.3f}/day, z {z:.2f}, DSR {stats.norm.cdf(z):.3f}')
     for lab, Dm in (('cash', Mis.values), ('buy-and-hold', Mis.values - bh.values[:, None])):
         print(f'  benchmark {lab}:', {k: (round(v, 3) if isinstance(v, float) else v) for k, v in snooping_tests(Dm).items()})
 

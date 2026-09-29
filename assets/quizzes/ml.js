@@ -65,26 +65,26 @@ window.MFM_DATA.quizzes['ml'] = {
             correct: 0,
             en: {
                 title: 'Testing directional accuracy',
-                text: 'A model predicts "up" on 98.3% of days and is right 57.6% of the time, while 58.1% of the days are up. Which test answers whether its signs carry information?',
+                text: 'Over 6,269 days, a model predicts "up" on 98.3% of days and is right 57.6% of the time, while 58.1% of the days are up. Which one-sided test answers whether its signs carry positive information?',
                 options: [
-                    'The Pesaran-Timmermann test, which compares the hit rate with the rate expected under independence given both marginal frequencies (here 57.8%, so it does not reject)',
+                    'The Pesaran-Timmermann test, which compares the hit rate with the rate expected under independence given both marginal frequencies (here 57.8%, above the hit rate, so it cannot reject)',
                     'A binomial test of the hit rate against 50%',
                     'A t-test of the accuracy against 0.5 with i.i.d. standard errors',
                     'A McNemar test against a coin flip'
                 ],
-                correctExplanation: 'Under independence the expected hit rate is $\\hat p_y\\hat p_x + (1-\\hat p_y)(1-\\hat p_x) = 0.578$; the observed 0.576 is below it ($PT = -1.28$). With overlapping labels the variance must also be HAC-adjusted.',
+                correctExplanation: 'Under independence the expected hit rate is $\\hat p_y\\hat p_x + (1-\\hat p_y)(1-\\hat p_x) = 0.578$; the observed 0.576 is below it, so the statistic is negative for any $n$ (here $PT = -1.28$ over 6,269 days). With overlapping labels the variance must also be HAC-adjusted.',
                 incorrectExplanation: 'A 50% benchmark ignores that the market goes up on 58% of days and that the model almost always says "up"; the right null conditions on both frequencies.'
             },
             ro: {
                 title: 'Testarea acurateței direcționale',
-                text: 'Un model prezice „sus” în 98,3% din zile și are dreptate în 57,6% din cazuri, iar 58,1% dintre zile sunt „sus”. Ce test răspunde dacă semnele lui conțin informație?',
+                text: 'Pe 6.269 de zile, un model prezice „sus” în 98,3% din zile și are dreptate în 57,6% din cazuri, iar 58,1% dintre zile sunt „sus”. Ce test unilateral răspunde dacă semnele lui conțin informație pozitivă?',
                 options: [
-                    'Testul Pesaran-Timmermann, care compară rata de succes cu rata așteptată sub independență, dat fiind ambele frecvențe marginale (aici 57,8%, deci nu respinge)',
+                    'Testul Pesaran-Timmermann, care compară rata de succes cu rata așteptată sub independență, date fiind ambele frecvențe marginale (aici 57,8%, peste rata de succes, deci nu poate respinge)',
                     'Un test binomial al ratei de succes față de 50%',
                     'Un test t al acurateței față de 0,5, cu erori standard i.i.d.',
                     'Un test McNemar față de aruncarea unei monede'
                 ],
-                correctExplanation: 'Sub independență rata așteptată este $\\hat p_y\\hat p_x + (1-\\hat p_y)(1-\\hat p_x) = 0,578$; valoarea observată 0,576 este sub ea ($PT = -1,28$). Cu etichete suprapuse, varianța trebuie ajustată și HAC.',
+                correctExplanation: 'Sub independență rata așteptată este $\\hat p_y\\hat p_x + (1-\\hat p_y)(1-\\hat p_x) = 0,578$; valoarea observată 0,576 este sub ea, deci statistica este negativă pentru orice $n$ (aici $PT = -1,28$ pe 6.269 de zile). Cu etichete suprapuse, varianța trebuie ajustată și HAC.',
                 incorrectExplanation: 'Un reper de 50% ignoră faptul că piața crește în 58% dintre zile și că modelul spune aproape mereu „sus”; ipoteza nulă corectă ține cont de ambele frecvențe.'
             }
         },
@@ -335,27 +335,27 @@ window.MFM_DATA.quizzes['ml'] = {
             correct: 0,
             en: {
                 title: 'Data-snooping tests',
-                text: 'You backtest 1,279 highly correlated moving-average rules on Bitcoin. Which procedure tests whether the best rule beats buy-and-hold without choosing an "effective number of trials"?',
+                text: 'You backtest 1,279 highly correlated moving-average rules on Bitcoin. Which procedure tests whether the best rule beats buy-and-hold by estimating, from the data, the null distribution of the best rule\'s statistic, correlation between rules included?',
                 options: [
                     'Hansen\'s SPA test (or White\'s Reality Check) with a stationary bootstrap of the whole matrix of rule returns',
                     'A Bonferroni correction with N = 1,279',
                     'The Deflated Sharpe Ratio with N = 1,279',
                     'A t-test of the best rule\'s mean return'
                 ],
-                correctExplanation: 'Resampling whole days keeps the correlation between rules, so the null distribution of the maximum is exact for this grid; here SPA gives $p = 0.56$ against buy-and-hold.',
-                incorrectExplanation: 'Bonferroni and the DSR both need a number of independent trials; a bootstrap of the full return matrix takes the dependence from the data.'
+                correctExplanation: 'Resampling whole days keeps the correlation between rules, so the bootstrap estimates the null distribution of the maximum for this grid; here SPA gives $p = 0.70$ against buy-and-hold.',
+                incorrectExplanation: 'Bonferroni with N = 1,279 remains valid under any dependence but ignores the correlation and is very conservative; the DSR needs a choice of N and of the variance of the Sharpe ratios; a bootstrap of the full return matrix takes the dependence from the data.'
             },
             ro: {
                 title: 'Teste de data snooping',
-                text: 'Testați retrospectiv 1.279 de reguli de medii mobile, puternic corelate, pe Bitcoin. Ce procedură testează dacă cea mai bună regulă bate buy-and-hold fără a alege un „număr efectiv de încercări”?',
+                text: 'Testați retrospectiv 1.279 de reguli de medii mobile, puternic corelate, pe Bitcoin. Ce procedură testează dacă cea mai bună regulă bate buy-and-hold estimând din date distribuția sub ipoteza nulă a statisticii celei mai bune reguli, inclusiv corelația dintre reguli?',
                 options: [
                     'Testul SPA al lui Hansen (sau Reality Check al lui White) cu bootstrap staționar al întregii matrice a randamentelor regulilor',
                     'O corecție Bonferroni cu N = 1.279',
                     'Raportul Sharpe deflatat cu N = 1.279',
                     'Un test t al randamentului mediu al celei mai bune reguli'
                 ],
-                correctExplanation: 'Reeșantionarea unor zile întregi păstrează corelația dintre reguli, deci distribuția maximului sub ipoteza nulă este exactă pentru această grilă; aici SPA dă $p = 0,56$ față de buy-and-hold.',
-                incorrectExplanation: 'Bonferroni și DSR au nevoie de un număr de încercări independente; un bootstrap al întregii matrice de randamente ia dependența din date.'
+                correctExplanation: 'Reeșantionarea unor zile întregi păstrează corelația dintre reguli, deci bootstrap-ul estimează distribuția maximului sub ipoteza nulă pentru această grilă; aici SPA dă $p = 0,70$ față de buy-and-hold.',
+                incorrectExplanation: 'Bonferroni cu N = 1.279 rămâne valid la orice dependență, dar ignoră corelația și este foarte conservator; DSR cere alegerea lui N și a varianței rapoartelor Sharpe; un bootstrap al întregii matrice de randamente ia dependența din date.'
             }
         },
         {
@@ -443,7 +443,7 @@ window.MFM_DATA.quizzes['ml'] = {
             correct: 3,
             en: {
                 title: 'False Strategy Theorem',
-                text: 'With 5 years of daily data, the best of $N = 1000$ strategies with zero true skill has an expected annualised Sharpe ratio of about 1.45. What does this imply?',
+                text: 'With 5 years of daily data, the best of $N = 1000$ independent strategies with zero true skill has an expected annualised Sharpe ratio of about 1.45. What does this imply?',
                 options: [
                     'A Sharpe ratio of 1.45 always proves skill',
                     'Testing more strategies reduces the risk of false discoveries',
@@ -455,7 +455,7 @@ window.MFM_DATA.quizzes['ml'] = {
             },
             ro: {
                 title: 'Teorema strategiei false',
-                text: 'Cu 5 ani de date zilnice, cea mai bună dintre $N = 1000$ de strategii fără nicio abilitate reală are un raport Sharpe anualizat așteptat de circa 1,45. Ce implică acest lucru?',
+                text: 'Cu 5 ani de date zilnice, cea mai bună dintre $N = 1000$ de strategii independente, fără nicio abilitate reală, are un raport Sharpe anualizat așteptat de circa 1,45. Ce implică acest lucru?',
                 options: [
                     'Un Sharpe de 1,45 dovedește întotdeauna abilitate',
                     'Testarea mai multor strategii reduce riscul descoperirilor false',
@@ -470,53 +470,53 @@ window.MFM_DATA.quizzes['ml'] = {
             correct: 0,
             en: {
                 title: 'Grid search on Bitcoin',
-                text: 'A grid search over 1,279 moving-average crossover configurations on BTC finds a best in-sample Sharpe of 1.65 (2015-2020). Its out-of-sample Sharpe (2021-2026) is 0.02. What is the main lesson?',
+                text: 'A grid search over 1,279 moving-average crossover configurations on BTC finds a best in-sample Sharpe of 1.89 (May 2015-2020). Its out-of-sample Sharpe (2021-2026) is 0.02. What is the main lesson?',
                 options: [
                     'Selecting the in-sample winner among many trials picks up noise; the out-of-sample Sharpe collapses (backtest overfitting)',
                     'Moving averages never work, on any asset',
                     'The out-of-sample period must have been mis-measured',
                     'More configurations would have fixed the problem'
                 ],
-                correctExplanation: 'The in-sample and out-of-sample Sharpe ratios are only weakly related (Spearman correlation 0.12), so ranking by the backtest is largely ranking by luck.',
-                incorrectExplanation: 'The collapse from 1.65 to 0.02 is the classic signature of backtest overfitting under multiple testing.'
+                correctExplanation: 'The in-sample and out-of-sample Sharpe ratios are only weakly related (Spearman correlation 0.18), so ranking by the backtest is largely ranking by luck.',
+                incorrectExplanation: 'The collapse from 1.89 to 0.02 is the classic signature of backtest overfitting under multiple testing.'
             },
             ro: {
                 title: 'Căutare exhaustivă pe Bitcoin',
-                text: 'O căutare pe 1.279 de configurații de încrucișare a mediilor mobile pe BTC găsește un Sharpe in-sample maxim de 1,65 (2015-2020). Sharpe-ul său out-of-sample (2021-2026) este 0,02. Care este lecția principală?',
+                text: 'O căutare pe 1.279 de configurații de încrucișare a mediilor mobile pe BTC găsește un Sharpe in-sample maxim de 1,89 (mai 2015-2020). Sharpe-ul său out-of-sample (2021-2026) este 0,02. Care este lecția principală?',
                 options: [
                     'Alegerea câștigătorului in-sample dintre multe încercări captează zgomot; Sharpe-ul out-of-sample se prăbușește (overfitting de backtest)',
                     'Mediile mobile nu funcționează niciodată, pe niciun activ',
                     'Perioada out-of-sample a fost probabil măsurată greșit',
                     'Mai multe configurații ar fi rezolvat problema'
                 ],
-                correctExplanation: 'Sharpe-urile in-sample și out-of-sample sunt slab legate (corelație Spearman 0,12), deci ierarhizarea după backtest este în mare parte ierarhizare după noroc.',
-                incorrectExplanation: 'Prăbușirea de la 1,65 la 0,02 este semnătura clasică a overfitting-ului de backtest în condiții de testare multiplă.'
+                correctExplanation: 'Sharpe-urile in-sample și out-of-sample sunt slab legate (corelație Spearman 0,18), deci ierarhizarea după backtest este în mare parte ierarhizare după noroc.',
+                incorrectExplanation: 'Prăbușirea de la 1,89 la 0,02 este semnătura clasică a overfitting-ului de backtest în condiții de testare multiplă.'
             }
         },
         {
             correct: 2,
             en: {
                 title: 'Probabilistic Sharpe Ratio',
-                text: 'Two strategies have the same observed Sharpe ratio and track-record length. Strategy A has negative skewness and fat tails; strategy B has returns that follow the Normal distribution. Which has the higher Probabilistic Sharpe Ratio (PSR)?',
+                text: 'Two strategies have the same positive observed Sharpe ratio, above the common benchmark $SR^* = 0$, and the same track-record length. Strategy A has negative skewness and fat tails; strategy B has returns that follow the Normal distribution. Which has the higher Probabilistic Sharpe Ratio $PSR(0)$?',
                 options: [
                     'A, because fat tails increase expected returns',
                     'They always have the same PSR',
                     'B, because negative skewness and excess kurtosis inflate the standard error of the Sharpe ratio and lower the PSR',
                     'PSR does not depend on the return distribution'
                 ],
-                correctExplanation: 'The denominator $\\sqrt{1 - \\gamma_3 SR + \\frac{\\gamma_4 - 1}{4}SR^2}$ grows when $\\gamma_3 < 0$ and $\\gamma_4 > 3$, so the same SR is less convincing.',
+                correctExplanation: 'For $SR > 0$ the denominator $\\sqrt{1 - \\gamma_3 SR + \\frac{\\gamma_4 - 1}{4}SR^2}$ grows when $\\gamma_3 < 0$ and $\\gamma_4 > 3$, so the same positive excess over $SR^*$ is less convincing.',
                 incorrectExplanation: 'PSR penalises negative skewness and fat tails through the standard error of the estimated Sharpe ratio.'
             },
             ro: {
                 title: 'Probabilistic Sharpe Ratio',
-                text: 'Două strategii au același raport Sharpe observat și aceeași lungime a istoricului. Strategia A are asimetrie negativă și cozi groase; strategia B are randamente cu distribuție Normală. Care are un Probabilistic Sharpe Ratio (PSR) mai mare?',
+                text: 'Două strategii au același raport Sharpe observat, pozitiv, peste reperul comun $SR^* = 0$, și aceeași lungime a istoricului. Strategia A are asimetrie negativă și cozi groase; strategia B are randamente cu distribuție Normală. Care are un Probabilistic Sharpe Ratio $PSR(0)$ mai mare?',
                 options: [
                     'A, pentru că cozile groase cresc randamentul așteptat',
                     'Au întotdeauna același PSR',
                     'B, pentru că asimetria negativă și excesul de aplatizare cresc eroarea standard a raportului Sharpe și scad PSR',
                     'PSR nu depinde de distribuția randamentelor'
                 ],
-                correctExplanation: 'Numitorul $\\sqrt{1 - \\gamma_3 SR + \\frac{\\gamma_4 - 1}{4}SR^2}$ crește când $\\gamma_3 < 0$ și $\\gamma_4 > 3$, deci același SR este mai puțin convingător.',
+                correctExplanation: 'Pentru $SR > 0$ numitorul $\\sqrt{1 - \\gamma_3 SR + \\frac{\\gamma_4 - 1}{4}SR^2}$ crește când $\\gamma_3 < 0$ și $\\gamma_4 > 3$, deci același avans pozitiv față de $SR^*$ este mai puțin convingător.',
                 incorrectExplanation: 'PSR penalizează asimetria negativă și cozile groase prin eroarea standard a raportului Sharpe estimat.'
             }
         },
@@ -659,7 +659,7 @@ window.MFM_DATA.quizzes['ml'] = {
             correct: 2,
             en: {
                 title: 'Spot the AI error: shuffled cross-validation',
-                text: 'An AI assistant writes: "To evaluate a daily Bitcoin direction classifier, use KFold(n_splits=5, shuffle=True): shuffling removes ordering bias, so the AUC is a clean out-of-sample estimate." What is wrong?',
+                text: 'A classifier predicts, every day, the 5-day forward direction of Bitcoin from 20-day rolling features. An AI assistant writes: "Use KFold(n_splits=5, shuffle=True): shuffling removes ordering bias, so the AUC is a clean out-of-sample estimate." What is wrong?',
                 options: [
                     'Five folds are too few; with 10 shuffled folds the estimate would be clean',
                     'AUC cannot be used for a binary classifier',
@@ -671,7 +671,7 @@ window.MFM_DATA.quizzes['ml'] = {
             },
             ro: {
                 title: 'Găsiți eroarea AI: validarea încrucișată cu amestecare',
-                text: 'Un asistent AI scrie: „Pentru a evalua un clasificator zilnic al direcției Bitcoin, folosiți KFold(n_splits=5, shuffle=True): amestecarea elimină efectul ordinii, deci AUC este o estimare curată în afara eșantionului.” Ce este greșit?',
+                text: 'Un clasificator prezice, în fiecare zi, direcția Bitcoin pe următoarele 5 zile din caracteristici mobile pe 20 de zile. Un asistent AI scrie: „Folosiți KFold(n_splits=5, shuffle=True): amestecarea elimină efectul ordinii, deci AUC este o estimare curată în afara eșantionului.” Ce este greșit?',
                 options: [
                     'Cinci blocuri sunt prea puține; cu 10 blocuri amestecate estimarea ar fi curată',
                     'AUC nu poate fi folosit pentru un clasificator binar',
