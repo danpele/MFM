@@ -555,7 +555,215 @@ def c2_ai(start='2021', end='2025'):
     return out
 
 
+# =============================================================================
+# GRAFICELE SOLUTIILOR (A1, A3, A5, A7, B2, B4, B5, B6, B7, B8, C2)
+# =============================================================================
+def fig_sem_a1(a1):
+    """A1: ponderile valorii de piata ale celor trei monede la data de baza si dupa realocare."""
+    fig, ax = plt.subplots(figsize=(5.6, 2.7))
+    x = np.arange(3)
+    ax.bar(x - 0.19, 100 * np.array(a1['w0']), 0.36, color=MainBlue, label='Base day (weights of $D_0$)')
+    ax.bar(x + 0.19, 100 * np.array(a1['w1']), 0.36, color=Orange, label='After the reallocation (weights of $D_1$)')
+    for i in range(3):
+        ax.text(x[i] - 0.19, 100 * a1['w0'][i] + 1.5, f"{100 * a1['w0'][i]:.1f}", ha='center', fontsize=7, color='black')
+        ax.text(x[i] + 0.19, 100 * a1['w1'][i] + 1.5, f"{100 * a1['w1'][i]:.1f}", ha='center', fontsize=7, color='black')
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"Coin {c}: return {100 * r:+.0f}%" for c, r in zip('ABC', a1['rets'])], fontsize=8)
+    ax.set_ylabel('Index weight (%)')
+    ax.set_ylim(0, 90)
+    legend_outside_bottom(ax, ncol=2, y=-0.18)
+    save_fig('ch16_sem_a1_index')
+
+
+def fig_sem_a3(a3, x=1000.0, y=3_000_000.0, P=3300.0, fee=0.003):
+    """A3: profitul arbitrajului pi(dy) = P [x - k/(y + gamma dy)] - dy, cu si fara comision; optimul marcat."""
+    k = x * y
+    dy = np.linspace(0, 300_000, 400)
+    fig, ax = plt.subplots(figsize=(5.8, 2.8))
+    for g, c, lab in [(1 - fee, MainBlue, 'Fee 0.3%'), (1.0, Orange, 'No fee')]:
+        prof = P * (x - k / (y + g * dy)) - dy
+        ax.plot(dy / 1000, prof / 1000, color=c, lw=1.6, label=f'{lab}: profit of buying Ether with $\\Delta y$')
+    ax.scatter([a3['dy'] / 1000], [a3['profit'] / 1000], color=IDAred, s=26, zorder=3,
+               label=f"Optimum with fee: $\\Delta y^*$ = {a3['dy'] / 1000:.1f}k, profit {a3['profit']:,.0f} USD")
+    ax.axhline(0, color=Gray, lw=0.6)
+    ax.set_xlabel('USD Coin paid into the pool, $\\Delta y$ (thousand)')
+    ax.set_ylabel('Profit (thousand USD)')
+    legend_outside_bottom(ax, ncol=1, y=-0.22)
+    save_fig('ch16_sem_a3_profit')
+
+
+def fig_sem_a5():
+    """A5: pierderea impermanenta IL_w(r) pentru w = 0.5 si 0.8, cu aproximarea de ordinul doi."""
+    r = np.exp(np.linspace(np.log(0.2), np.log(5), 400))
+    fig, ax = plt.subplots(figsize=(5.8, 2.8))
+    for w, c in [(0.5, MainBlue), (0.8, Orange)]:
+        ax.plot(r, 100 * il_weighted(r, w), color=c, lw=1.7, label=f'Exact, w = {w}')
+        ax.plot(r, 100 * (np.exp(-w * (1 - w) * np.log(r) ** 2 / 2) - 1), color=c, lw=1.1, ls='--',
+                label=f'Second-order approximation, w = {w}')
+        for rr in [2.0, 4.0]:
+            ax.scatter([rr], [100 * il_weighted(rr, w)], color=c, s=18, zorder=3)
+    ax.axhline(0, color=Gray, lw=0.6)
+    ax.set_xscale('log')
+    ax.set_xticks([0.25, 0.5, 1, 2, 4])
+    ax.set_xticklabels(['0.25', '0.5', '1', '2', '4'])
+    ax.set_xlabel('Price ratio $r = P_1/P_0$ (log scale)')
+    ax.set_ylabel('Impermanent loss (%)')
+    legend_outside_bottom(ax, ncol=2, y=-0.22)
+    save_fig('ch16_sem_a5_il')
+
+
+def fig_sem_a7(tar, d0=285.0):
+    """A7: dinamica determinista |d_t| de la 285 pb: phi_out in afara benzii, phi_in in interior; banda c."""
+    d, path = d0, [d0]
+    for _ in range(10):
+        d = d * (tar['phi_out'] if d > tar['c'] else tar['phi_in'])
+        path.append(d)
+    path = np.array(path)
+    fig, ax = plt.subplots(figsize=(5.8, 2.7))
+    t = np.arange(len(path))
+    ax.plot(t, path, color=MainBlue, lw=1.4, marker='o', ms=4, label='$|d_t|$, skeleton with $\\varepsilon_t = 0$ (bp)')
+    ax.axhline(tar['c'], color=IDAred, lw=1.2, ls='--', label=f"Band edge $\\hat c$ = {tar['c']:.2f} bp")
+    ax.set_yscale('log')
+    ax.set_xlabel('Days after the close of 11 March 2023')
+    ax.set_ylabel('Deviation from 1 USD (bp, log scale)')
+    legend_outside_bottom(ax, ncol=2, y=-0.22)
+    save_fig('ch16_sem_a7_path')
+
+
+def fig_sem_b2(S):
+    """B2: volatilitatea anualizata cu CI bootstrap si raportul weekend / zile lucratoare inainte si dupa ETF-uri."""
+    rows = [('Bitcoin', S['B1']), ('Ether', S['B2']['ETH']), ('Solana', S['B2']['SOL'])]
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.8))
+    x = np.arange(3)
+    v = np.array([b['vol'] for _, b in rows])
+    lo = np.array([b['vol_lo'] for _, b in rows])
+    hi = np.array([b['vol_hi'] for _, b in rows])
+    axes[0].bar(x, v, 0.55, color=[Orange, Purple, Teal], yerr=[v - lo, hi - v], capsize=3,
+                error_kw=dict(ecolor='black', lw=0.8))
+    for i, (_, b) in enumerate(rows):
+        axes[0].text(i, hi[i] + 3, f"{b['vol']:.0f}%\n{b['ratio']:.1f}x S&P 500", ha='center', fontsize=7, color='black')
+    axes[0].set_xticks(x)
+    axes[0].set_xticklabels([n for n, _ in rows])
+    axes[0].set_ylabel('Annualised volatility (%)')
+    axes[0].set_ylim(0, 165)
+    for j, (per, c, lab) in enumerate([('pre', MainBlue, 'Before 11 Jan 2024'), ('post', Orange, 'From 11 Jan 2024')]):
+        m = np.array([b[f'wr_{per}'] for _, b in rows])
+        l_ = np.array([b[f'wr_{per}_lo'] for _, b in rows])
+        h_ = np.array([b[f'wr_{per}_hi'] for _, b in rows])
+        axes[1].bar(x + (j - 0.5) * 0.36, m, 0.34, color=c, yerr=[m - l_, h_ - m], capsize=3,
+                    error_kw=dict(ecolor='black', lw=0.8), label=lab)
+    axes[1].axhline(1, color=Gray, lw=0.7, ls='--')
+    axes[1].set_xticks(x)
+    axes[1].set_xticklabels([n for n, _ in rows])
+    axes[1].set_ylabel('Weekend / weekday variance')
+    fig.tight_layout()
+    fig_legend_bottom(fig, ncol=2, y=0.0)
+    save_fig('ch16_sem_b2_vol')
+
+
+def fig_sem_b4(S):
+    """B4: pantele AR cu prag in interiorul si in afara benzii, cu intervale 95%, pentru Tether, USD Coin, Dai."""
+    rows = [('Tether', S['B4']['USDT']['full']), ('USD Coin', S['B3']['full']), ('Dai', S['B4']['DAI']['full'])]
+    fig, ax = plt.subplots(figsize=(5.8, 2.8))
+    x = np.arange(3)
+    for j, (k, c, lab) in enumerate([('in', MainBlue, 'Inside the band, $\\hat\\phi_{in}$'),
+                                     ('out', IDAred, 'Outside the band, $\\hat\\phi_{out}$')]):
+        m = np.array([t[f'phi_{k}'] for _, t in rows])
+        se = np.array([t[f'se_{k}'] for _, t in rows])
+        ax.bar(x + (j - 0.5) * 0.36, m, 0.34, color=c, yerr=1.96 * se, capsize=3,
+               error_kw=dict(ecolor='black', lw=0.8), label=lab)
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"{n}\n$\\hat c$ = {t['c']:.1f} bp, bootstrap p = {t['p_boot']:.3f}" for n, t in rows], fontsize=7.5)
+    ax.set_ylabel('AR slope (95% interval)')
+    ax.set_ylim(0, 1.05)
+    legend_outside_bottom(ax, ncol=2, y=-0.3)
+    save_fig('ch16_sem_b4_tar')
+
+
+def fig_sem_b56(etf, coin, name):
+    """B5 / B6: logaritmul raportului de pret ETF / moneda (in %, fata de prima zi) cu tendinta estimata si
+    tendinta implicata de comisionul de 0,25% pe an."""
+    p = pd.concat([price(etf), price(coin)], axis=1, join='inner').dropna()
+    lr = 100 * np.log(p[etf] / p[coin])
+    lr = lr - lr.iloc[0]
+    t = (lr.index - lr.index[0]).days / 365.25
+    b, a = np.polyfit(t, lr.values, 1)
+    fig, ax = plt.subplots(figsize=(6.4, 2.7))
+    ax.plot(lr.index, lr.values, color=MainBlue, lw=0.6, alpha=0.8, label=f'$\\ell_t$ = ln({etf} / {coin} price), change since day 1 (%)')
+    ax.plot(lr.index, lr.rolling(20).mean().values, color=Teal, lw=1.3, label='20-day moving average of $\\ell_t$')
+    ax.plot(lr.index, a + b * t, color=IDAred, lw=1.6, label=f'Fitted trend: {b:.3f}% a year')
+    ax.plot(lr.index, a - 0.25 * t, color=Forest, lw=1.2, ls='--', label='Slope of the 0.25% sponsor fee')
+    ax.set_ylabel('%')
+    ax.tick_params(axis='x', labelsize=8)
+    legend_outside_bottom(ax, ncol=2, y=-0.2)
+    save_fig(name)
+
+
+def fig_sem_b78(key, b, name):
+    """B7 / B8: statistica Wald W(tau) pentru o ruptura in toti coeficientii, la fiecare saptamana candidata."""
+    w = 100 * joint_returns([key, 'BTC', 'SPX'], None, freq='W').loc['2021-04-16':END]
+    X = np.column_stack([np.ones(len(w)), w['BTC'].values, w['SPX'].values])
+    sw = I.sup_wald(w[key].values, X, w.index)
+    Wser = pd.Series(sw['W'], index=w.index).dropna()
+    fig, ax = plt.subplots(figsize=(6.4, 2.7))
+    ax.plot(Wser.index, Wser.values, color=MainBlue, lw=1.2, label='$W(\\tau)$, HAC, break in $(a, \\beta_{BTC}, \\beta_{SPX})$')
+    ax.axhline(b['sw']['cv5'], color=IDAred, lw=1.1, ls='--', label=f"5% critical value of sup W: {b['sw']['cv5']:.2f}")
+    d = pd.Timestamp(b['sw']['date'])
+    ax.axvspan(pd.Timestamp(b['sw']['ci_lo']), pd.Timestamp(b['sw']['ci_hi']), color=Amber, alpha=0.2,
+               label=f"Break date {d.strftime('%d %b %Y')} and 95% interval")
+    ax.axvline(d, color=Amber, lw=1.2)
+    ax.axvline(pd.Timestamp(ETF_START), color=Forest, lw=1.1, ls=':', label='Spot ETF launch, 11 Jan 2024')
+    ax.set_ylabel('Wald statistic')
+    ax.tick_params(axis='x', labelsize=8)
+    legend_outside_bottom(ax, ncol=2, y=-0.2)
+    save_fig(name)
+    return float(np.nanmax(sw['W']))
+
+
+def fig_sem_c2(c2):
+    """C2: volatilitatea si raportul Sharpe al Bitcoin dupa fiecare corectare a raspunsului AI."""
+    labs = ['AI answer\n(252, log returns, $r_f$ = 5%)', 'Annualised with 365\n(same $r_f$)',
+            'Corrected\n(365, simple returns, T-bill $r_f$)']
+    vol = [c2['sd252'], c2['sd365'], c2['sd_s']]
+    sh = [c2['sh252'], c2['sh365'], c2['sh_s']]
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.7))
+    x = np.arange(3)
+    axes[0].bar(x, vol, 0.55, color=[IDAred, Amber, Forest])
+    axes[1].bar(x, sh, 0.55, color=[IDAred, Amber, Forest])
+    for i in range(3):
+        axes[0].text(i, vol[i] + 1, f'{vol[i]:.1f}%', ha='center', fontsize=7.5, color='black')
+        axes[1].text(i, sh[i] + 0.01, f'{sh[i]:.2f}', ha='center', fontsize=7.5, color='black')
+    for ax, yl in [(axes[0], 'Annualised volatility (%)'), (axes[1], 'Sharpe ratio')]:
+        ax.set_xticks(x)
+        ax.set_xticklabels(labs, fontsize=6.5)
+        ax.set_ylabel(yl)
+    axes[0].set_ylim(0, 70)
+    axes[1].set_ylim(0, 0.75)
+    fig.tight_layout()
+    save_fig('ch16_sem_c2_correction')
+
+
+def make_solution_charts(S):
+    """Toate graficele noi ale solutiilor, din cifrele salvate (sem16_results.json) si din datele locale."""
+    fig_sem_a1(S['A1'])
+    fig_sem_a3(S['A3'])
+    fig_sem_a5()
+    fig_sem_a7(S['B3']['full'])
+    fig_sem_b2(S)
+    fig_sem_b4(S)
+    fig_sem_b56('IBIT', 'BTC', 'ch16_sem_b5_ratio')
+    fig_sem_b56('ETHA', 'ETH', 'ch16_sem_b6_ratio')
+    for key, lab, name in [('MSTR', 'B7', 'ch16_sem_b7_break'), ('COIN', 'B8', 'ch16_sem_b8_break')]:
+        m = fig_sem_b78(key, S[lab], name)
+        assert abs(m - S[lab]['sw']['sup_w']) < 1e-6, (lab, m, S[lab]['sw']['sup_w'])
+    fig_sem_c2(S['C2'])
+
+
 if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] == '--charts':
+        with open(os.path.join(HERE, 'sem16_results.json')) as fh:
+            make_solution_charts(json.load(fh))
+        sys.exit(0)
     print('Seminar 16')
     S = {}
     S['A1'], S['A2'], S['A3'], S['A4'] = a1_index(), a2_replace(), a3_band(), a4_weighted()
@@ -580,3 +788,4 @@ if __name__ == '__main__':
     with open(os.path.join(HERE, 'sem16_results.json'), 'w') as fh:
         json.dump(jsonable(S), fh, indent=1)
     print('saved sem16_results.json')
+    make_solution_charts(json.loads(json.dumps(jsonable(S))))

@@ -7,7 +7,7 @@ Ipoteza testata: lansarea ETF-urilor spot pe Bitcoin (11 ian. 2024) a integrat B
   * scanare a datei de ruptura: statistica z Fisher intre 500 de zile comune inainte si 500 dupa fiecare data
     candidat; data ETF este comparata cu data aleasa de date (ruptura cea mai puternica)
 Datele: data/market (Bitcoin, S&P 500), join pe PRETURI in zilele comune, apoi randamente log.
-Iesire: ai_discovery_case.json
+Iesire: ai_discovery_case.json si graficul charts/ch16_ai_zscan (statistica z pe datele candidate)
 """
 
 import os
@@ -32,6 +32,23 @@ def cbb_corr(x, rng):
     idx = (rng.integers(0, n, k)[:, None] + np.arange(BLOCK)[None, :]).ravel()[:n] % n
     y = x[idx]
     return np.corrcoef(y[:, 0], y[:, 1])[0, 1]
+
+
+def fig_zscan(z, res):
+    """Statistica z Fisher a schimbarii corelatiei, pe fiecare data candidat, cu data ETF si banda +-1.96."""
+    from generate_all_charts import plt, MainBlue, IDAred, Forest, save_fig, legend_outside_bottom
+    fig, ax = plt.subplots(figsize=(6.8, 2.9))
+    ax.plot(z.index, z.values, color=MainBlue, lw=1.0, label='z of the correlation change (500 common days each side)')
+    ax.axhspan(-1.96, 1.96, color='0.85', alpha=0.5, lw=0, label='|z| < 1.96')
+    ax.axvline(pd.Timestamp(ETF_START), color=IDAred, lw=1.2, ls='--', label='Spot ETF launch, 11 Jan 2024')
+    zd = pd.Timestamp(res['z_max_date'])
+    ax.scatter([zd], [res['z_max_signed']], color=Forest, s=28, zorder=3,
+               label=f"Largest break: {zd.strftime('%d %b %Y')}, z = {res['z_max_signed']:.2f}")
+    ax.axhline(0, color='0.6', lw=0.5)
+    ax.set_ylabel('z statistic')
+    ax.set_xlabel('Candidate break date')
+    legend_outside_bottom(ax, ncol=2, y=-0.22)
+    save_fig('ch16_ai_zscan')
 
 
 def main():
@@ -63,6 +80,7 @@ def main():
                share_larger=rank, scan_start=str(z.index[0].date()), scan_end=str(z.index[-1].date()))
     with open(os.path.join(HERE, 'ai_discovery_case.json'), 'w') as f:
         json.dump(res, f, indent=2)
+    fig_zscan(z, res)
     print(json.dumps(res, indent=2))
 
 
