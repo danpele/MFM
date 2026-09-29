@@ -61,7 +61,48 @@ out['placebo_n'] = len(plac)
 out['placebo_nsig'] = int(sum(abs(p['z']) > 1.96 for p in plac))
 out['placebo_maxabsz'] = float(max(abs(p['z']) for p in plac))
 
+
+
+def fig_ai_etf(o):
+    """rho1 inainte/dupa ETF-urile spot cu intervale robuste, diferenta cu +-MDE si comparatia placebo."""
+    from generate_all_charts import plt, MainBlue, IDAred, Amber, Forest, Purple, Gray, save_fig
+    fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.0), gridspec_kw={'width_ratios': [1.1, 1.4]})
+    ax = axes[0]
+    rows = [('Before', o['pre']['rho1'], o['pre']['se'], MainBlue), ('After', o['post']['rho1'], o['post']['se'], Forest),
+            ('After - before', o['drho'], np.hypot(o['pre']['se'], o['post']['se']), IDAred)]
+    for i, (lab, v, se, c) in enumerate(rows):
+        ax.errorbar(i, v, yerr=1.96 * se, fmt='o', color=c, capsize=4)
+        ax.text(i + 0.08, v, f'{v:+.3f}', fontsize=7.5, va='center', color='black')
+    ax.errorbar(2.3, 0, yerr=o['mde_rho'], fmt='none', ecolor=Purple, capsize=6, lw=1.6)
+    ax.axhline(0, color=Gray, lw=0.6)
+    ax.set_xticks(range(3))
+    ax.set_xticklabels([r[0] for r in rows], fontsize=8)
+    ax.set_xlim(-0.5, 2.7)
+    ax.set_ylabel(r'Lag-1 autocorrelation $\hat\rho_1$')
+    ax.set_title(f"Two windows of {o['post']['n']} days around 11 Jan 2024", fontsize=8.5, loc='left')
+    ax = axes[1]
+    pz = [p['z'] for p in o['placebo']]
+    yrs = [p['date'][:4] for p in o['placebo']]
+    ax.bar(range(len(pz)), pz, color=Amber, width=0.6)
+    ax.bar(len(pz), o['z_diff'], color=IDAred, width=0.6)
+    for v in (-1.96, 1.96):
+        ax.axhline(v, color=Gray, ls='--', lw=0.7)
+    ax.axhline(0, color=Gray, lw=0.5)
+    ax.set_xticks(range(len(pz) + 1))
+    ax.set_xticklabels(yrs + ['2024\n(ETF)'], fontsize=7.5)
+    ax.set_ylabel(r'$z$ of the change in $\hat\rho_1$')
+    ax.set_title('Placebo dates (11 January) and the ETF date', fontsize=8.5, loc='left')
+    h = [plt.Line2D([], [], marker='o', ls='', color='black', label='Estimate with robust 95% interval'),
+         plt.Line2D([], [], color=Purple, lw=1.6, label=f"Minimum detectable change $\\pm${o['mde_rho']:.2f}"),
+         plt.Rectangle((0, 0), 1, 1, color=Amber, label='Placebo z'), plt.Rectangle((0, 0), 1, 1, color=IDAred, label='ETF z'),
+         plt.Line2D([], [], color=Gray, ls='--', label=r'$\pm 1.96$')]
+    fig.legend(handles=h, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=3, frameon=False)
+    plt.tight_layout()
+    save_fig('ch2_ai_etf')
+
+
 if __name__ == '__main__':
     print(json.dumps(out, indent=1))
+    fig_ai_etf(out)
     with open(os.path.join(HERE, 'ai_discovery_case.json'), 'w') as f:
         json.dump(out, f, indent=1)
