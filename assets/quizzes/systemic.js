@@ -64,7 +64,7 @@ window.MFM_DATA.quizzes['systemic'] = {
         {
             "correct": 0,
             "en": {
-                "title": "SRISK as published",
+                "title": "SRISK: LRMES by simulation",
                 "text": "How do Brownlees and Engle (2017) obtain the LRMES that enters SRISK?",
                 "options": [
                     "By simulating 22-day bank and market paths from GJR-GARCH and DCC models with resampled standardised innovations, keeping the paths where the market falls below -10%",
@@ -76,7 +76,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "incorrectExplanation": "The exponential formula is a shortcut used where the simulation is not implemented; the published measure is simulated from a GJR-GARCH/DCC model conditional on a market crisis."
             },
             "ro": {
-                "title": "SRISK ca în lucrarea publicată",
+                "title": "SRISK: LRMES prin simulare",
                 "text": "Cum obțin Brownlees și Engle (2017) LRMES care intră în SRISK?",
                 "options": [
                     "Prin simularea unor traiectorii de 22 de zile ale băncii și pieței din modele GJR-GARCH și DCC cu inovații standardizate reeșantionate, păstrând traiectoriile în care piața scade sub -10%",
