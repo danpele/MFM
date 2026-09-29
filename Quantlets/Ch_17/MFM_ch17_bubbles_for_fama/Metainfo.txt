@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch17_bubbles_for_fama'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Bubbles for Fama (Greenwood, Shleifer and You 2019) on 49 US industries, 1926-2026: probability of a 40% drawdown and mean return over the two years after a two-year run-up above a threshold, raw and net of the market, with 95% bootstrap intervals by calendar year.'
+Description: 'Bubbles for Fama (Greenwood, Shleifer and You 2019, Section 2) on the first 48 Fama-French US industries (excluding Other, at least ten firms), 1926-2026: probability of a 40% drawdown and mean return over the two years after a two-year run-up above a threshold, raw and net of the market, with a five-year raw return of at least 50%; 95% bootstrap intervals by calendar year.'
 
 Keywords: 'bubbles for Fama, industry run-ups, crash probability, return predictability, Kenneth French data, bootstrap'
 

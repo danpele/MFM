@@ -150,7 +150,7 @@ def blanchard_watson(T=400, r=0.01, pi=0.97, b0=1.0, sd=0.5, seed=7):
 def evans_bubble(T=400, r=0.02, alpha=1.0, delta=0.5, pi=0.85, seed=11):
     """Bula care se prabuseste periodic (Evans 1991): creste cu (1+r) sub alpha, apoi explodeaza sau revine la delta."""
     rng = np.random.default_rng(seed)
-    u = np.exp(rng.normal(-0.005, 0.07, T))       # u_t > 0, E[u_t] ~ 1
+    u = np.exp(rng.normal(-0.5 * 0.07 ** 2, 0.07, T))   # u_t > 0, E[u_t] = 1 exact (lognormal)
     B = np.empty(T)
     B[0] = delta
     for t in range(1, T):
@@ -269,7 +269,9 @@ def ar1_pass(fit, alpha):
 
 
 def lppls_conditions(fit, flt=LPPLS_FILTER, search=LPPLS_SEARCH):
-    """Conditiile ec. (12) (plus amortizarea din ec. 11), fiecare separat; bula pozitiva: B < 0."""
+    """Conditiile ec. (12) (plus amortizarea din ec. 11); bula pozitiva: B < 0. Conditiile de parametri si eroarea relativa
+    se evalueaza fiecare separat; testul Lomb doar daca toate trec, iar testul de radacina unitara al reziduului doar daca
+    trece si Lomb (ponderi cumulative pentru ultimele doua)."""
     if fit is None:
         return None
     D = fit['t2'] - fit['t1']

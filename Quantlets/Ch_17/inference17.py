@@ -172,8 +172,11 @@ def fwer_bitcoin(R=2000):
 # 3. INDICATORUL DE INCREDERE LPPLS: SEMNAL VS FARA SEMNAL
 # =============================================================================
 def lppls_hits(ci, p, horizon=90, fall=0.20):
+    """Doar datele cu fereastra completa de `horizon` zile calendaristice in date (fara rezultate cenzurate la final)."""
     rows = []
     for d, v in ci.items():
+        if d + pd.Timedelta(days=horizon) > p.index[-1]:
+            continue
         fut = p.loc[d:d + pd.Timedelta(days=horizon)]
         rows.append(dict(date=d, sig=float(v > 0), hit=float(fut.min() / fut.iloc[0] - 1 <= -fall)))
     return pd.DataFrame(rows).set_index('date')
@@ -346,7 +349,21 @@ def gsy_ess(thr=1.0, B=2000):
         st.append(np.concatenate([g[keys[j]] for j in pick]).mean())
     p = float(d['crash'].mean())
     se = float(np.std(st))
-    return dict(n=int(len(d)), n_years=int(len(keys)), n_ind=int(d['ind'].nunique()), p=p, se_boot=se,
+    # sensibilitate: bootstrap pe blocuri mobile de k ani calendaristici consecutivi (pastreaza dependenta dintre
+    # ferestrele de 2 ani ale evenimentelor din ani vecini), k = 2, 3, 5
+    years = np.arange(d['date'].dt.year.min(), d['date'].dt.year.max() + 1)
+    se_blocks = {}
+    for k in (2, 3, 5):
+        nb = int(np.ceil(len(years) / k))
+        vals = []
+        for _ in range(B):
+            starts = rng.integers(0, len(years) - k + 1, nb)
+            pick = np.concatenate([years[a:a + k] for a in starts])[:len(years)]
+            v = np.concatenate([g[y] for y in pick if y in g] or [np.array([])])
+            if len(v):
+                vals.append(v.mean())
+        se_blocks[str(k)] = float(np.std(vals))
+    return dict(n=int(len(d)), n_years=int(len(keys)), n_ind=int(d['ind'].nunique()), p=p, se_boot=se, se_block=se_blocks,
                 se_binom=float(np.sqrt(p * (1 - p) / len(d))), ess=float(p * (1 - p) / se ** 2),
                 deff=float(se ** 2 / (p * (1 - p) / len(d))))
 

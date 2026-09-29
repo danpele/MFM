@@ -22,7 +22,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from mfm_data import MARKETS, LABELS, price, shiller, industries   # noqa: E402
+from mfm_data import MARKETS, LABELS, price, shiller, industries, industry_firms   # noqa: E402
 from bubbles import (psy, psy_cv, wild_cv, episodes, adf_stat, min_window, blanchard_watson, evans_bubble,  # noqa: E402
                      lppls_fit, lppls_path, lppls_qualified, lppls_conditions, lomb_pvalue, lppls_confidence, drawdown,
                      LPPLS_WINDOWS, LPPLS_STEP, LPPLS_FILTER, LPPLS_SEARCH)
@@ -124,18 +124,20 @@ def d2s(d):
 # 1. BULE RATIONALE SIMULATE (Blanchard-Watson; Evans)
 # =============================================================================
 def fig_rational_bubble():
-    """Pret = valoare fundamentala (dividende mers aleator, r = 1% pe perioada) + bula rationala care se prabuseste:
-    supravietuieste cu probabilitatea pi = 0.97 si atunci creste cu (1+r)/pi; altfel reporneste de la o valoare mica."""
+    """Pret = valoare fundamentala (dividende mers aleator, r = 1% pe perioada) + bula rationala care se prabuseste
+    si reporneste pozitiv, in forma Evans (1991): cu probabilitatea pi = 0.97 supravietuieste,
+    B_t = [b0 + (1+r)/pi * (B_{t-1} - b0/(1+r))] u_t; altfel B_t = b0 u_t, cu E[u_t] = 1 exact.
+    Termenul -b0/(1+r) plateste repornirea, deci E_{t-1}[B_t] = (1+r) B_{t-1} exact."""
     rng = np.random.default_rng(48)
-    T, r, pi, b0 = 400, 0.01, 0.97, 2.0
+    T, r, pi, b0, su = 400, 0.01, 0.97, 5.0, 0.03
     D = 1 + np.cumsum(0.01 * rng.standard_normal(T))
     F = D / r                                           # E_t sum D_{t+i}/(1+r)^i cu dividende mers aleator
     Bb = np.empty(T)
     Bb[0] = b0
     alive = rng.random(T) < pi
-    u = np.exp(rng.normal(-0.0005, 0.03, T))            # E[u] = 1
+    u = np.exp(rng.normal(-su ** 2 / 2, su, T))         # lognormal cu E[u] = 1 exact
     for t in range(1, T):
-        Bb[t] = (1 + r) / pi * Bb[t - 1] * u[t] if alive[t] else b0
+        Bb[t] = (b0 + (1 + r) / pi * (Bb[t - 1] - b0 / (1 + r))) * u[t] if alive[t] else b0 * u[t]
     Pp = F + Bb
     collapses = int(sum(1 for t in range(1, T) if not alive[t] and Bb[t - 1] > 25))   # prabusiri vizibile (bula > 25)
     fig, ax = plt.subplots(figsize=(7.2, 3.0))
@@ -143,11 +145,11 @@ def fig_rational_bubble():
     ax.plot(F, color=Forest, lw=1.2, label='Fundamental value $D_t / r$')
     ax.set_xlabel('Period')
     ax.set_ylabel('Price')
-    ax.set_title('Simulated rational bubble: survives with probability 0.97 and then grows at (1+r)/0.97',
+    ax.set_title('Simulated rational bubble (Evans form): survives with probability 0.97, restarts at a small positive value',
                  fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=2, y=-0.25)
     save_fig('ch17_rational_bubble')
-    return dict(T=T, r=r, pi=pi, growth=(1 + r) / pi - 1, life=1 / (1 - pi), collapses=collapses,
+    return dict(T=T, r=r, pi=pi, b0=b0, growth=(1 + r) / pi - 1, life=1 / (1 - pi), collapses=collapses,
                 max_share=float(np.max(Bb / Pp)), max_mult=float(np.max(Pp / F)))
 
 
@@ -241,10 +243,21 @@ def fig_episodes(tab):
 # =============================================================================
 # 3. BUBBLES FOR FAMA (Greenwood-Shleifer-You 2019) PE 49 DE INDUSTRII
 # =============================================================================
-def gsy_events(thr, H=24, crash=0.40):
-    """Cresteri de peste thr in 2 ani (brut si peste piata); prabusire = scadere de 40% in urmatorii 2 ani."""
+def gsy_sample():
+    """Esantionul Greenwood, Shleifer & You (2019), sectiunea 2: primele 48 de industrii Fama-French (fara 'Other'),
+    luni-industrie cu cel putin zece firme."""
     ind, mkt = industries()
-    ind = ind.loc[:, ind.notna().mean() > 0]
+    firms = industry_firms().reindex(ind.index)
+    ind = ind.loc[:, [c for c in ind.columns if c.strip().lower() != 'other' and ind[c].notna().mean() > 0]]
+    ok = firms.reindex(columns=ind.columns) >= 10
+    return ind, mkt, ok
+
+
+def gsy_events(thr, H=24, crash=0.40, H5=60, r5=0.50, r5_from='1931-01-01'):
+    """Cresteri GSY (2019, sectiunea 2): randament pe 2 ani peste thr, brut si peste piata, si randament brut pe 5 ani
+    de cel putin 50% (impus din 1931); prima luna a cresterii, fara un nou episod in aceeasi industrie timp de 2 ani;
+    prabusire = scadere de 40% fata de un maxim anterior in urmatorii 2 ani."""
+    ind, mkt, ok = gsy_sample()
     Pm = (1 + mkt.reindex(ind.index)).cumprod()
     runm = Pm / Pm.shift(H) - 1
     rows = []
@@ -253,7 +266,9 @@ def gsy_events(thr, H=24, crash=0.40):
         valid = r.notna()
         p = (1 + r.fillna(0)).cumprod()
         run = p / p.shift(H) - 1
-        cond = (run > thr) & ((run - runm) > thr) & valid & valid.shift(H, fill_value=False)
+        run5 = p / p.shift(H5) - 1
+        five = (run5 >= r5) | (ind.index < pd.Timestamp(r5_from))
+        cond = ((run > thr) & ((run - runm) > thr) & five & ok[c] & valid & valid.shift(H, fill_value=False))
         last = None
         for i in np.where(cond.values)[0]:
             if (last is not None and i - last < H) or i + H >= len(p):
@@ -268,14 +283,13 @@ def gsy_events(thr, H=24, crash=0.40):
 
 
 def gsy_unconditional(H=24, crash=0.40):
-    """Probabilitatea neconditionata a unei scaderi de 40% in 2 ani (toate lunile-industrie)."""
-    ind, _ = industries()
-    ind = ind.loc[:, ind.notna().mean() > 0]
+    """Probabilitatea neconditionata a unei scaderi de 40% in 2 ani (toate lunile-industrie din esantionul GSY)."""
+    ind, _, ok = gsy_sample()
     hits, n, rets = 0, 0, []
     for c in ind.columns:
         r = ind[c]
         p = (1 + r.fillna(0)).cumprod().values
-        v = r.notna().values
+        v = (r.notna() & ok[c]).values
         for i in range(len(p) - H):
             if not v[i]:
                 continue
@@ -326,7 +340,7 @@ def fig_gsy():
     axes[1].axhline(0, color=Gray, lw=0.5)
     axes[1].set_xlabel('Run-up threshold (%)')
     axes[1].set_ylabel('Mean return over next 2 years, %')
-    fig.suptitle('Bubbles for Fama, 49 US industries 1926-2026: two-year run-ups above the threshold, raw and net of the market',
+    fig.suptitle('Bubbles for Fama, 48 US industries 1926-2026: two-year run-ups above the threshold, raw and net of the market',
                  fontsize=8.5, x=0.02, ha='left')
     fig.tight_layout()
     fig_legend(fig, axes, ncol=2, y=0.0)
@@ -463,16 +477,20 @@ def real_time(o, p, win_years=2):
 
 
 def signal_vs_peak(o, p, window, gap_days, dd_years=2):
-    """Primul semnal al grupului de episoade care precede varful din fereastra data (timp real) vs varful."""
+    """Primul semnal al grupului de episoade care precede varful din fereastra data vs varful.
+    Inceputul episodului este datat retrospectiv (prima depasire); in timp real episodul este confirmat abia dupa
+    L = ceil(ln T) depasiri consecutive, adica la observatia start + L - 1 a seriei testate ('confirm')."""
     pk = p.loc[window[0]:window[1]].idxmax()
     ep = sorted([(s, e if e is not None else p.index[-1]) for s, e, _ in o['ep'] if s <= pk])
     i = len(ep) - 1
     while i > 0 and (ep[i][0] - ep[i - 1][1]).days <= gap_days:
         i -= 1
     first = ep[i][0]
+    conf = o['idx'][o['idx'].get_loc(first) + o['L'] - 1]
     p0 = p.loc[:first].iloc[-1]
     return dict(first=d2s(first), peak=d2s(pk), lead_days=int((pk - first).days), lead_months=float((pk - first).days / 30.44),
-                gain=float(p.loc[pk] / p0 - 1), dd_after=float(p.loc[pk:pk + pd.DateOffset(years=dd_years)].min() / p.loc[pk] - 1),
+                confirm=d2s(conf), lead_confirm_days=int((pk - conf).days), lead_confirm_months=float((pk - conf).days / 30.44),
+                gain=float(p.loc[pk] / p0 - 1), gain_confirm=float(p.loc[pk] / p.loc[:conf].iloc[-1] - 1), dd_after=float(p.loc[pk:pk + pd.DateOffset(years=dd_years)].min() / p.loc[pk] - 1),
                 signal_end=d2s(ep[-1][1]) if ep[-1][1] != p.index[-1] else None)
 
 
@@ -481,7 +499,7 @@ def signal_vs_peak(o, p, window, gap_days, dd_years=2):
 # =============================================================================
 COND_LABELS = {'B': 'B < 0', 'm': 'm in [0.01, 0.99]', 'w': 'omega in [2, 25]', 'tc': 'tc in [t2, t2 + (t2-t1)/5]',
                'osc': 'oscillations >= 2.5', 'damping': 'damping >= 1', 'rel_err': 'max relative error <= 0.15',
-               'lomb': 'Lomb test, 10%', 'ar1': 'residuals AR(1), 10%'}
+               'lomb': 'Lomb test, 10% (cumulative)', 'ar1': 'residual unit root rejected, 10% (cumulative)'}
 
 
 def fig_lppls_btc2017():
@@ -587,9 +605,12 @@ def confidence_series(key, start, t2_from, step=LPPLS_STEP, procs=None):
 
 
 def ci_evaluation(ci, p, horizon=90, fall=0.20):
-    """Semnal (indicator > 0) vs o scadere de cel putin 20% sub pretul curent in urmatoarele 90 de zile."""
+    """Semnal (indicator > 0) vs o scadere de cel putin 20% sub pretul curent in urmatoarele 90 de zile;
+    doar datele cu fereastra completa de 90 de zile calendaristice in date."""
     rows = []
     for d, v in ci.items():
+        if d + pd.Timedelta(days=horizon) > p.index[-1]:
+            continue
         fut = p.loc[d:d + pd.Timedelta(days=horizon)]
         rows.append(dict(date=d, ci=v, hit=bool(fut.min() / fut.iloc[0] - 1 <= -fall)))
     r = pd.DataFrame(rows)
@@ -647,6 +668,7 @@ def ms_fit(key, start, freq='W', k=2):
     import statsmodels.api as sm
     p = price(key, freq, start)
     r = 100 * np.log(p).diff().dropna()
+    np.random.seed(SEED)                              # cautarea aleatoare a punctelor de start: reproductibila
     res = sm.tsa.MarkovRegression(r, k_regimes=k, trend='c', switching_variance=True).fit(search_reps=20, disp=False)
     hi = int(np.argmax([res.params[f'sigma2[{j}]'] for j in range(k)]))
     return p, r, res, hi
@@ -673,7 +695,7 @@ def fig_ms(key, start, name, title):
     fig, axes = plt.subplots(2, 1, figsize=(7.4, 4.0), sharex=True, gridspec_kw=dict(height_ratios=[1.2, 1]))
     axes[0].plot(p.index, p.values, color=MainBlue, lw=0.8, label=f'{LABELS[key]} (log scale)')
     axes[0].set_yscale('log')
-    axes[1].plot(fp.index, fp.values, color=IDAred, lw=0.7, label='Filtered probability (real time)')
+    axes[1].plot(fp.index, fp.values, color=IDAred, lw=0.7, label='Filtered probability (full-sample parameters)')
     axes[1].plot(sp.index, sp.values, color=Forest, lw=1.0, label='Smoothed probability (full sample)')
     axes[1].set_ylabel('P(turbulent regime)')
     axes[1].set_ylim(-0.02, 1.02)
@@ -766,7 +788,7 @@ def main():
     fig_episodes(tab)
     RES['gsy'] = fig_gsy()
     fig_windows()
-    # Shiller P/D, 1871-2024
+    # Shiller P/D, din 1871 pana la ultima luna disponibila
     sh = shiller()
     y_pd = np.log(sh['PD'])
     o_pd = run_psy(y_pd, R=1000)
@@ -775,7 +797,9 @@ def main():
     RES['sp_pd']['pd_mean'] = float(sh['PD'].mean())
     RES['sp_pd']['pd_max'] = float(sh['PD'].max())
     RES['sp_pd']['pd_max_date'] = d2s(sh['PD'].idxmax())
-    fig_psy(y_pd, o_pd, 'ch17_sp_pd', 'S&P Composite real price-dividend ratio, monthly 1871-2024',
+    RES['sp_pd']['pd_max_dotcom'] = float(sh['PD'].loc['1995':'2002'].max())
+    RES['sp_pd']['pd_max_dotcom_date'] = d2s(sh['PD'].loc['1995':'2002'].idxmax())
+    fig_psy(y_pd, o_pd, 'ch17_sp_pd', f'S&P Composite real price-dividend ratio, monthly {sh.index[0].year}-{sh.index[-1].year}',
             'Price / dividend (log scale)', level=sh['PD'], level_label='Real price-dividend ratio')
     # Nasdaq 100 lunar (cu datarea PWY) si distributiile nule pentru T = 440
     y_ndx = np.log(price('ndx', 'M'))

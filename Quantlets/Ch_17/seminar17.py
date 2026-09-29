@@ -289,7 +289,7 @@ def b7_ms_sp():
     fig, axes = plt.subplots(2, 1, figsize=(7.4, 3.8), sharex=True, gridspec_kw=dict(height_ratios=[1.2, 1]))
     axes[0].plot(p.index, p.values, color=MainBlue, lw=0.8, label='S&P 500 (log scale)')
     axes[0].set_yscale('log')
-    axes[1].plot(fp.index, fp.values, color=IDAred, lw=0.7, label='Filtered probability (real time)')
+    axes[1].plot(fp.index, fp.values, color=IDAred, lw=0.7, label='Filtered probability (full-sample parameters)')
     axes[1].plot(sp.index, sp.values, color=Forest, lw=1.0, label='Smoothed probability (full sample)')
     axes[1].set_ylabel('P(turbulent regime)')
     axes[0].set_title('S&P 500, weekly log returns 1990-2026: two-regime Markov-switching model', fontsize=9, loc='left')
@@ -316,6 +316,7 @@ def b8_ms_btc():
     r = 100 * np.log(p).diff().dropna()
     out = {}
     for k in (2, 3):
+        np.random.seed(SEED + k)                      # cautarea aleatoare a punctelor de start: reproductibila
         res = sm.tsa.MarkovRegression(r, k_regimes=k, trend='c', switching_variance=True).fit(search_reps=30, maxiter=1000, disp=False)
         order = np.argsort([res.params[f'sigma2[{j}]'] for j in range(k)])
         out[f'k{k}'] = dict(llf=float(res.llf), aic=float(res.aic), bic=float(res.bic),
@@ -362,12 +363,14 @@ def c1_ai():
     fig_legend(fig, axes, ncol=3, y=0.0)
     save_fig('ch17_sem_ai')
     # cresteri pe 2 ani (Greenwood-Shleifer-You), brut si peste Nasdaq 100
-    pn, pc, pq = price('nvda', 'M'), price('csco', 'M'), price('ndx', 'M')
+    pn = price('nvda', 'M')
+    pnd, pcd, pqd = price('nvda', 'D'), price('csco', 'D'), price('ndx', 'D')
+    # din preturi zilnice: ultima inchidere pana la data d vs ultima inchidere pana la aceeasi data cu doi ani inainte
     run = lambda p, d: float(p.loc[:d].iloc[-1] / p.loc[:pd.Timestamp(d) - pd.DateOffset(years=2)].iloc[-1] - 1)
-    out['run_nvda_now'] = run(pn, '2026-09-18')
-    out['run_ndx_now'] = run(pq, '2026-09-18')
-    out['run_csco_peak'] = run(pc, '2000-03-31')
-    out['run_ndx_2000'] = run(pq, '2000-03-31')
+    out['run_nvda_now'] = run(pnd, pnd.index[-1])
+    out['run_ndx_now'] = run(pqd, pqd.index[-1])
+    out['run_csco_peak'] = run(pcd, '2000-03-31')
+    out['run_ndx_2000'] = run(pqd, '2000-03-31')
     out['run_nvda_max'] = float((pn / pn.shift(24) - 1).max())
     out['run_nvda_max_date'] = d2s((pn / pn.shift(24) - 1).idxmax())
     pdd = price('csco', 'D')

@@ -69,10 +69,13 @@ def price(name, freq='D', start=None, end=END):
         s = s[s.index.dayofweek < 5]          # fara cotatii de weekend
     if kind == 'index':
         s = s[s.diff() != 0]                  # fara sarbatori completate cu pretul anterior
+    last = s.index[-1]
     if freq == 'W':
         s = s.resample('W-FRI').last().dropna()
     elif freq == 'M':
         s = s.resample('ME').last().dropna()
+    if freq in ('W', 'M') and s.index[-1] > last:
+        s.index = s.index[:-1].append(pd.DatetimeIndex([last]))   # ultima perioada incompleta: datata la ultima observatie
     return s.rename(name)
 
 
@@ -115,13 +118,15 @@ def shiller():
     return d
 
 
-def _french_table(fname):
-    """Primul tabel lunar (YYYYMM) dintr-un fisier Kenneth French, in zecimal."""
+def _french_table(fname, section=None, scale=100.0):
+    """Un tabel lunar (YYYYMM) dintr-un fisier Kenneth French: primul (implicit) sau cel cu titlul `section`;
+    randamentele sunt impartite la `scale` (100: in zecimal), numarul de firme se citeste cu scale=1."""
     raw = urllib.request.urlopen(urllib.request.Request(FRENCH + fname, headers={'User-Agent': 'Mozilla/5.0'}),
                                  timeout=120).read()
     text = zipfile.ZipFile(io.BytesIO(raw)).read(zipfile.ZipFile(io.BytesIO(raw)).namelist()[0]).decode('latin-1')
     lines = text.splitlines()
-    i = next(k for k, l in enumerate(lines) if l.startswith(',') and len(l.split(',')) > 1)
+    k0 = 0 if section is None else next(k for k, l in enumerate(lines) if l.strip() == section)
+    i = next(k for k, l in enumerate(lines) if k >= k0 and l.startswith(',') and len(l.split(',')) > 1)
     cols = [c.strip() for c in lines[i].split(',')[1:]]
     rows = []
     for l in lines[i + 1:]:
@@ -131,7 +136,7 @@ def _french_table(fname):
         rows.append([parts[0]] + [float(x) for x in parts[1:]])
     df = pd.DataFrame(rows, columns=['date'] + cols)
     df['date'] = pd.to_datetime(df['date'], format='%Y%m') + pd.offsets.MonthEnd(0)
-    return df.set_index('date').replace([-99.99, -999.0], np.nan) / 100.0
+    return df.set_index('date').replace([-99.99, -999.0], np.nan) / scale
 
 
 def industries():
@@ -143,3 +148,10 @@ def industries():
     mkt = (ff['Mkt-RF'] + ff['RF']).rename('MKT')
     _CACHE['ind'] = (ind, mkt)
     return ind, mkt
+
+
+def industry_firms():
+    """Numarul lunar de firme din fiecare dintre cele 49 de portofolii sectoriale (Kenneth French)."""
+    if 'firms' not in _CACHE:
+        _CACHE['firms'] = _french_table('49_Industry_Portfolios_CSV.zip', 'Number of Firms in Portfolios', 1.0)
+    return _CACHE['firms']

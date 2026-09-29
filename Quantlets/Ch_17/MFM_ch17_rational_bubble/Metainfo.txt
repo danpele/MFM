@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch17_rational_bubble'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Simulated rational bubble on top of a fundamental value: the bubble survives each period with probability 0.97 and then grows at (1+r)/0.97, otherwise it restarts from a small value.'
+Description: 'Simulated rational bubble on top of a fundamental value: the bubble survives each period with probability 0.97 and otherwise restarts at a small positive value; the survival growth is reduced by the cost of the restart (Evans 1991 form), so the rational-bubble condition E_t[B_{t+1}] = (1+r) B_t holds exactly.'
 
 Keywords: 'rational bubble, Blanchard-Watson, present value model, fundamental value, simulation'
 
