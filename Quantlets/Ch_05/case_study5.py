@@ -61,7 +61,7 @@ def qsd_filter(theta, r, x):
     """Medie AR(1) si recursia (31); intoarce reziduurile y_t, f_t si eps_t."""
     mu, phi, om, vp, al, be, xi, ze = theta
     y = r[1:] - mu - phi * r[:-1]
-    xx = x[:-1]
+    xx = x[1:]                                                  # X_t aliniat cu y_t: f_{t+1} foloseste X_t
     n = len(y)
     f = np.empty(n)
     f[0] = np.var(y)
