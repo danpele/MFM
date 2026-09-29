@@ -4,11 +4,11 @@ case_study_race.py -- Capitolul 10, studiul de caz: cat valoreaza cursa vitezei 
 Extrapolarea din sectiunea VI a articolului (tabelul XV), aplicata la SPY:
   * col. 2:  Pi_t = 0.4213 bp x V_t
   * col. 6:  Pi_t = 0.3354 bp x V_t + 0.0066 bp x sigma_t x Vbar   (sigma_t = volatilitatea realizata anualizata, %)
-  * limitele tabelului XIV: taxa intre 0.20 si 0.74 bp din valoarea tranzactionata
+  * scenariile extreme ale tabelului XIV: taxa intre 0.20 si 0.74 bp din valoarea tranzactionata
 Date: bare de 5 minute SPY, sesiunea regulata (09:30-16:00, ora New York), zilele cu toate cele 78 de bare, 2021-2025.
   V_t     = suma (inchidere x volum) pe cele 78 de bare
   sigma_t = 100 sqrt(252 sum r^2), din randamentele log pe 5 minute (prima bara: de la deschidere)
-Grafice: ch10_race_tax (taxa zilnica implicata, col. 6), ch10_race_prize (premiul anual implicat, col. 2 si col. 6)
+Grafice: ch10_race_tax (taxa zilnica implicata, col. 6, la valoarea tranzactionata medie V_t = Vbar), ch10_race_prize (premiul anual implicat, col. 2 si col. 6)
 Iesire: case_study_race.json
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """
@@ -32,7 +32,7 @@ YEARS = (2021, 2025)
 
 
 def race_daily(s):
-    """V_t (USD) si sigma_t (%, anualizata) pentru fiecare zi completa; taxa zilnica implicata dupa col. 6 (pb)."""
+    """V_t (USD) si sigma_t (%, anualizata) pentru fiecare zi completa; taxa zilnica implicata dupa col. 6 la V_t = Vbar (pb)."""
     s = s.loc[s['date'].dt.year.between(*YEARS)]
     d = pd.DataFrame({'V': s.groupby('date')['dv'].sum(),
                       'sigma': 100 * np.sqrt(252 * s.groupby('date')['r'].apply(lambda v: (v ** 2).sum()))})
@@ -42,7 +42,7 @@ def race_daily(s):
 
 
 def race_prize(d):
-    """Premiul anual implicat (USD milioane) dupa col. 2, col. 6 si limitele tabelului XIV."""
+    """Premiul anual implicat (USD milioane) dupa col. 2, col. 6 si scenariile extreme ale tabelului XIV."""
     out = {}
     for y, g in d.groupby('year'):
         V, Vbar = g['V'].sum(), g['V'].mean()
@@ -55,9 +55,9 @@ def race_prize(d):
 
 def fig_race_tax(d):
     fig, ax = plt.subplots(figsize=(9, 3.4))
-    ax.plot(d.index, d['tax6'], color=MainBlue, lw=0.8, label='Implied daily tax, Table XV col. 6: 0.3354 + 0.0066 x daily realised volatility (bp)')
+    ax.plot(d.index, d['tax6'], color=MainBlue, lw=0.8, label='Implied daily tax at mean traded value, Table XV col. 6: 0.3354 + 0.0066 x daily realised volatility (bp)')
     ax.axhline(ABO['col2'], color=IDAred, lw=1.0, ls='--', label='Table XV col. 2: 0.4213 bp')
-    ax.axhline(ABO['lo'], color=Forest, lw=1.0, ls=':', label='Table XIV bounds: 0.20 and 0.74 bp')
+    ax.axhline(ABO['lo'], color=Forest, lw=1.0, ls=':', label='Table XIV lowest and highest scenarios: 0.20 and 0.74 bp')
     ax.axhline(ABO['hi'], color=Forest, lw=1.0, ls=':')
     top = d['tax6'].idxmax()
     ax.annotate(f"{top.day} {top.strftime('%B %Y')}: {d.loc[top, 'tax6']:.2f} bp\n(volatility {d.loc[top, 'sigma']:.1f}%)",
@@ -83,7 +83,7 @@ def fig_race_prize(P):
     b6 = ax.bar(x + w / 2, [P[y]['col6'] for y in ys], w, color=IDAred, label='Table XV col. 6 (traded value and volatility)')
     xr = x + w + 0.08                                             # intervalul limitelor, la dreapta perechii de bare
     ax.vlines(xr, [P[y]['lo'] for y in ys], [P[y]['hi'] for y in ys], color=Forest, lw=1.6,
-              label='Range at the Table XIV bounds (0.20 to 0.74 bp)')
+              label='Range between the Table XIV lowest and highest scenarios (0.20 to 0.74 bp)')
     ax.scatter(np.r_[xr, xr], [P[y]['lo'] for y in ys] + [P[y]['hi'] for y in ys], color=Forest, marker='_', s=120, zorder=3)
     for bars in (b2, b6):
         for b in bars:
