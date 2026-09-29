@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_covol'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Engle and Campos-Martins (2023, JFE): the asset-class version of global COVOL (Section 9) on US-listed ETFs, 2000-2026. AR(1) means with the first principal component of returns as factor, GARCH(1,1) variances, then the heterogeneous-loading COVOL model estimated by alternating cross-sectional and time-series maximum likelihood (Section 5.3) on the unbalanced panel; daily squared COVOL compared with the 20 largest values in Table 15 of the paper, and the R-squared values of Table 8 of the paper.'
+
+Keywords: 'global COVOL, common volatility, volatility factor, GARCH, standardised residuals, extreme events, Engle and Campos-Martins, USCOVOL, ETFs'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): the US-listed ETFs XLB, XLC, XLE, XLF, XLI, XLK, XLP, XLRE, XLU, XLV, XLY, IWF, IWD, IWM, EFA, EEM, GLD, TLT, LQD, USO; Engle and Campos-Martins (2023), Tables 8 and 15'
+
+Output: 'ch6_covol_replication.pdf, ch6_covol_table8.pdf'

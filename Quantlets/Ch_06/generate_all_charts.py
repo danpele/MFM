@@ -16,11 +16,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import networkx as nx
 from scipy import stats
+from arch import arch_model
 import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from mfm_data import LABELS, SHORT, BANKS, joint_returns, weekly_returns, joint_prices   # noqa: E402
+from mfm_data import (LABELS, SHORT, BANKS, COVOL_ETFS, joint_returns, weekly_returns, joint_prices,  # noqa: E402
+                      load_price)
 from dep_tools import (ewma_cov, ewma_corr, rolling_corr, fisher_ci, garch_all, dcc_fit, fr_adjust,  # noqa: E402
                        fr_inflation, crisis_table, exceedance_corr, FAMILIES, FAM_LABEL, pseudo_obs,
                        kendall_tau, spearman_rho, theta_from_tau, tail_dep, simulate, fit_copula, gof_test,
@@ -582,6 +584,170 @@ def fig_banks():
 
 
 # =============================================================================
+# 7. Studiu de caz: COVOL pe clase de active (Engle si Campos-Martins, 2023, Sectiunea 9)
+# =============================================================================
+# Tabelul 15 din articol: cele mai mari 20 de valori USCOVOL x_t, iunie 2000 -- 1 martie 2021
+ECM_TABLE15 = [('2001-09-11', 73.16), ('2016-11-09', 43.04), ('2000-01-10', 41.46), ('2020-03-09', 40.47),
+               ('2020-11-09', 34.12), ('2014-11-28', 24.92), ('2001-01-02', 24.89), ('2001-09-04', 24.62),
+               ('2001-01-03', 24.51), ('2020-11-04', 22.23), ('2001-09-14', 19.61), ('2008-10-13', 19.12),
+               ('2008-10-10', 18.42), ('2014-08-08', 17.51), ('2016-06-24', 17.25), ('2003-09-02', 16.21),
+               ('2003-01-02', 15.45), ('2008-09-19', 14.56), ('2016-11-10', 14.19), ('2021-01-06', 13.58)]
+# Tabelul 8 din articol: R^2 al regresiilor lunare ale socului de volatilitate ACWI (248 de luni)
+ECM_TABLE8_R2 = [('Global COVOL$^2_m$', 0.404), ('Change in global EPU', 0.110), ('Change in GPR', 0.005),
+                 ('All three together', 0.406)]
+ECM_END = '2021-03-01'
+
+
+def covol_panel():
+    """Panel neechilibrat de randamente log zilnice (fiecare ETF pe calendarul propriu, de la prima zi)
+    si factorul PC1 (Sectiunea 9): scorul celor mai mici patrate pe prima componenta principala a
+    matricei de corelatie a randamentelor, calculat in fiecare zi din ETF-urile disponibile."""
+    R = pd.concat([np.log(load_price('etf_' + e.lower())).diff().rename(e) for e in COVOL_ETFS], axis=1)
+    R = R.loc['2000-01-01':].dropna(how='all')
+    Zs = (R - R.mean()) / R.std()
+    w_val, w_vec = np.linalg.eigh(Zs.corr().values)
+    w = w_vec[:, -1] * np.sign(w_vec[:, -1].sum())
+    avail = Zs.notna().values
+    f = np.nansum(Zs.values * w, axis=1) / (avail * w ** 2).sum(axis=1)
+    return R, pd.Series(f, index=R.index, name='PC1')
+
+
+def covol_residuals(R, f):
+    """AR(1) cu factorul PC1 in medie si GARCH(1,1) pentru fiecare ETF; AR(1)-GARCH(1,1) pentru PC1.
+    Intoarce reziduurile standardizate (panel neechilibrat)."""
+    E = {}
+    for c in R.columns:
+        r = 100 * R[c].dropna()
+        x = f.reindex(r.index).to_frame()
+        res = arch_model(r, x=x, mean='ARX', lags=1, vol='GARCH', p=1, q=1).fit(disp='off')
+        E[c] = res.resid / res.conditional_volatility
+    res = arch_model(f, mean='AR', lags=1, vol='GARCH', p=1, q=1).fit(disp='off')
+    E['PC1'] = res.resid / res.conditional_volatility
+    return pd.DataFrame(E).dropna(how='all')
+
+
+def golden_min(obj, lo, hi, n=80):
+    """Minimizare vectoriala prin sectiunea de aur: obj(u) intoarce un vector, cate o valoare pentru fiecare u."""
+    phi = (np.sqrt(5) - 1) / 2
+    a, b = np.array(lo, float), np.array(hi, float)
+    c, d = b - phi * (b - a), a + phi * (b - a)
+    fc, fd = obj(c), obj(d)
+    for _ in range(n):
+        left = fc < fd
+        b = np.where(left, d, b)
+        a = np.where(left, a, c)
+        c2 = np.where(left, b - phi * (b - a), d)
+        d2 = np.where(left, c, a + phi * (b - a))
+        fn = obj(np.where(left, c2, d2))
+        fc, fd = np.where(left, fn, fd), np.where(left, fc, fn)
+        c, d = c2, d2
+    return (a + b) / 2
+
+
+def covol_fit(E, tol=1e-6, maxit=500):
+    """COVOL cu incarcari diferite (Sectiunea 5.3): maximizarea alternativa a lui
+    -1/2 sum [ln g + e^2/g], g = s x + 1 - s, pe x_t (sectiuni transversale) si pe s_i (serii de timp),
+    cu 0 <= s_i <= 1, s's = 1 si media x_t = 1 dupa fiecare pas (Observatia 2). Valori initiale: prima
+    componenta principala a matricei corelatiilor de rang ale patratelor."""
+    Q = E.values ** 2
+    M = ~np.isnan(Q)
+    Q0 = np.where(M, Q, 0.0)
+    C = (E ** 2).rank().corr().values
+    val, vec = np.linalg.eigh(C)
+    s = np.clip(np.abs(vec[:, -1]), 0, 1)
+    s /= np.sqrt(s @ s)
+
+    def x_step(s):
+        def obj(lx):
+            g = s[None, :] * np.exp(lx)[:, None] + 1 - s[None, :]
+            return (M * (np.log(g) + Q0 / g)).sum(axis=1)
+        T = len(Q)
+        return np.exp(golden_min(obj, np.full(T, np.log(1e-4)), np.full(T, np.log(1e4))))
+
+    def s_step(x):
+        def obj(sv):
+            g = x[:, None] * sv[None, :] + 1 - sv[None, :]
+            return (M * (np.log(g) + Q0 / g)).sum(axis=0)
+        N = Q.shape[1]
+        return golden_min(obj, np.zeros(N), np.ones(N))
+
+    for it in range(1, maxit + 1):
+        x = x_step(s)
+        x /= x.mean()
+        s_new = np.clip(s_step(x), 0, 1)
+        s_new /= np.sqrt(s_new @ s_new)
+        done = np.max(np.abs(s_new - s)) < tol
+        s = s_new
+        if done:
+            break
+    x = x_step(s)
+    x /= x.mean()
+    return pd.Series(x, index=E.index, name='x'), pd.Series(s, index=E.columns, name='s'), it
+
+
+def fig_covol():
+    """Replicarea USCOVOL pe ETF-urile cursului: x_t zilnic 2000-2026 si cele 20 de zile din tabelul 15."""
+    R, f = covol_panel()
+    E = covol_residuals(R, f)
+    x, s, it = covol_fit(E)
+    rbar = 100 * R.reindex(x.index).mean(axis=1)
+    top = x.sort_values(ascending=False)
+    pre = x.loc[:ECM_END].sort_values(ascending=False)
+    post = x.loc[pd.Timestamp(ECM_END) + pd.Timedelta(days=1):].sort_values(ascending=False)
+    paper = pd.Series({pd.Timestamp(d): v for d, v in ECM_TABLE15})
+    fig, ax = plt.subplots(figsize=(7.0, 3.0))
+    ax.plot(x.index, x.values, color=MainBlue, lw=0.5, label='Squared USCOVOL $\\hat x_t$, course ETF panel (ours)')
+    ax.scatter(paper.index, paper.values, marker='D', s=16, facecolors='none', edgecolors=Orange, lw=0.9, zorder=4,
+               label='Top 20 in Table 15 of Engle and Campos-Martins (2023)')
+    ax.axvline(pd.Timestamp(ECM_END), color=Gray, ls='--', lw=0.8, label='End of the paper sample (1 March 2021)')
+    for d, v in top.iloc[:6].items():
+        left = d.year == 2020 and d.month == 3              # eticheta la stanga, ca sa nu acopere noiembrie 2020
+        ax.annotate(f'{d.day} {d:%b %Y}', (d, v), xytext=(-4 if left else 4, 2), textcoords='offset points',
+                    fontsize=7, color='black', ha='right' if left else 'left')
+    ax.set_ylabel('Squared common volatility $\\hat x_t$')
+    ax.set_xlim(pd.Timestamp('1999-10-01'), x.index[-1] + pd.Timedelta(days=90))
+    ax.set_ylim(0, 1.08 * max(top.iloc[0], paper.max()))
+    legend_outside_bottom(ax, ncol=2, y=-0.14)
+    save_fig('ch6_covol_replication')
+    common = set(pre.index[:20]) & set(paper.index)
+    NUM.update(cv_n=E.shape[1], cv_T=len(x), cv_start=str(x.index[0].date()), cv_end=str(x.index[-1].date()),
+               cv_iter=it, cv_common20=len(common),
+               cv_common20_list='; '.join(d.strftime('%Y-%m-%d') for d in sorted(common)),
+               cv_rank_20161109=int((pre > x.loc['2016-11-09']).sum() + 1),
+               cv_rank_20200309=int((pre > x.loc['2020-03-09']).sum() + 1),
+               cv_rank_20010917=int((pre > x.loc['2001-09-17']).sum() + 1),
+               cv_x_20010917=x.loc['2001-09-17'], cv_x_20161109=x.loc['2016-11-09'], cv_x_20200309=x.loc['2020-03-09'],
+               cv_s_max=s.idxmax(), cv_s_min=s.idxmin(), cv_s_pc1=s['PC1'])
+    for k in range(6):
+        d = top.index[k]
+        NUM.update({f'cv_top{k + 1}_date': str(d.date()), f'cv_top{k + 1}_x': top.iloc[k],
+                    f'cv_top{k + 1}_r': rbar.loc[d]})
+    for k in range(3):
+        d = pre.index[k]
+        NUM.update({f'cv_pre{k + 1}_date': str(d.date()), f'cv_pre{k + 1}_x': pre.iloc[k]})
+    for k in range(3):
+        d = post.index[k]
+        NUM.update({f'cv_post{k + 1}_date': str(d.date()), f'cv_post{k + 1}_x': post.iloc[k],
+                    f'cv_post{k + 1}_r': rbar.loc[d]})
+    return x, s, E
+
+
+def fig_covol_paper():
+    """Tabelul 8 din Engle si Campos-Martins (2023): R^2 al socului lunar de volatilitate ACWI pe COVOL^2,
+    pe variatia indicelui GEPU (incertitudinea politicii economice) si pe variatia indicelui GPR (risc geopolitic)."""
+    lab = [a for a, _ in ECM_TABLE8_R2][::-1]
+    val = [b for _, b in ECM_TABLE8_R2][::-1]
+    col = [Purple, Amber, Forest, MainBlue]
+    fig, ax = plt.subplots(figsize=(6.4, 2.4))
+    bars = ax.barh(lab, val, color=col, height=0.6)
+    for b_, v in zip(bars, val):
+        ax.text(v + 0.006, b_.get_y() + b_.get_height() / 2, f'{v:.3f}', va='center', fontsize=8, color='black')
+    ax.set_xlim(0, 0.5)
+    ax.set_xlabel('$R^2$: monthly ACWI volatility shock on each regressor (248 months)')
+    save_fig('ch6_covol_table8')
+
+
+# =============================================================================
 # Exemplu: raportul de acoperire de varianta minima (expunere BET acoperita cu Euro Stoxx 50)
 # =============================================================================
 def hedge_example():
@@ -651,6 +817,8 @@ if __name__ == '__main__':
     fig_tail_dep(Ub, tb)
     fig_integration()
     fig_banks()
+    fig_covol()
+    fig_covol_paper()
     hedge_example()
     extra_numbers()
     save_numbers()
