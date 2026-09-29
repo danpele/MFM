@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_seminar'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Seminar 4 solution charts: two-asset GMV, ERC versus 60/40, Black-Litterman updates, Sharpe-difference tests, the in-sample Sharpe bias, the sector backtest step by step (first month, wealth, bootstrap), shrinkage and variance ratios, HRP on four assets and on nine sectors, the break-even cost, Britten-Jones tests with their size under the null, Bitcoin in risk parity, HRP versus GMV, the AI-answer critique and the BVB test family.'
+
+Keywords: 'portfolio optimisation, GMV, risk parity, HRP, Black-Litterman, shrinkage, bootstrap, Sharpe ratio test, seminar'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): sector and multi-asset ETFs, Bitcoin, BVB blue chips, BET-TR; risk-free rate from the Kenneth French Data Library; USD/RON reference rate (BNR); sem4_results.json (base results of the seminar, including the calibrated bootstrap blocks)'
+
+Output: 'ch4_sem_a1_two_asset.pdf, ch4_sem_a3_erc.pdf, ch4_sem_a4_6040.pdf, ch4_sem_a5_bl.pdf, ch4_sem_a6_bl_sectors.pdf, ch4_sem_a7_normal.pdf, ch4_sem_a8_intervals.pdf, ch4_sem_a9_bias.pdf, ch4_sem_b1_timeline.pdf, ch4_sem_b1_wealth.pdf, ch4_sem_b1_boot.pdf, ch4_sem_b2_varratio.pdf, ch4_sem_b2x_eigen.pdf, ch4_sem_b3_worked.pdf, ch4_sem_b3_sectors.pdf, ch4_sem_b4_shrink.pdf, ch4_sem_b5_btc.pdf, ch4_sem_b6_hrp_gmv.pdf, ch4_sem_b7_bl_multi.pdf, ch4_sem_b8_breakeven.pdf, ch4_sem_b9_bj.pdf, ch4_sem_c2_correction.pdf, ch4_sem_c1_tests.pdf'
