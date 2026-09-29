@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch5_quasi_score_driven'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Lecture case study (Blasques, Francq and Laurent, 2023, Journal of Econometrics): GARCH(1,1)-t, Beta-t-GARCH and quasi score-driven QSD GARCH(1,1)-t with an AR(1) mean and the squared VIX (daily horizon) in the variance equation, estimated by maximum likelihood on 11 S&P 500 stocks, 3 January 1995 (or later) to 28 February 2019; likelihood ratio tests of zeta = 0 and xi = zeta, the gap between the tail parameter xi and the downweighting parameter zeta per stock, and news impact curves at the 5, 50 and 95% quantiles of the estimates.'
+
+Keywords: 'score-driven models, quasi score-driven, GAS, Beta-t-GARCH, Student-t, robust volatility, likelihood ratio test, news impact curve, VIX'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): AAPL, AMZN, BAC, C, CSCO, GS, JPM, MSFT, MS, NVDA, WFC (adjusted close) and the VIX'
+
+Output: 'ch5_qsd_gap.pdf, ch5_qsd_nic.pdf, ch5_case_qsd.csv'
