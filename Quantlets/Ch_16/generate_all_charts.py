@@ -804,7 +804,11 @@ LTW_NAME = {'BTC': 'Bitcoin', 'XRP': 'XRP', 'ETH': 'Ether'}
 def ltw_weekly(key, end=END):
     """Randamente saptamanale simple cu calendarul lucrarii: 52 de saptamani pe an, primele 51 de 7 zile,
     ultima pana la 31 decembrie; doar saptamanile complete (ultima inchidere = ultima zi a saptamanii)."""
-    p = price(key, None, end)
+    return ltw_weekly_series(price(key, None, end)).rename(key)
+
+
+def ltw_weekly_series(p):
+    """Acelasi calendar pentru orice serie zilnica de preturi 7/7 (de ex. un indice cripto)."""
     doy = p.index.dayofyear
     wk = np.minimum((doy - 1) // 7 + 1, 52)
     grp = pd.DataFrame({'p': p.values, 'd': p.index, 'y': p.index.year, 'w': wk}).groupby(['y', 'w'])
@@ -814,7 +818,7 @@ def ltw_weekly(key, end=END):
     last = last[last['d'].values == np.array(wend, dtype='datetime64[ns]')]
     r = last['p'].pct_change()
     r.index = pd.DatetimeIndex(last['d'])
-    return r.dropna().rename(key)
+    return r.dropna()
 
 
 def ltw_moments(r):

@@ -26,7 +26,8 @@ import statsmodels.api as sm                                                    
 import inference16 as I                                                             # noqa: E402
 from generate_all_charts import (plt, MainBlue, IDAred, Forest, Amber, Orange, Purple, Teal, Gray, COL,  # noqa: E402,F811
                                  save_fig, legend_outside_bottom, fig_legend_bottom, jsonable, hac_ols,
-                                 amm_swap, impermanent_loss, etf_tracking, ETF_START, SEED, B_BOOT)
+                                 amm_swap, impermanent_loss, etf_tracking, ETF_START, SEED, B_BOOT,
+                                 crix_index, ltw_weekly_series)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BLOCK = 20          # lungimea blocului pentru bootstrap (zile)
@@ -288,6 +289,135 @@ def b7_equity(key='MSTR'):
     sw.update(p=float((crit >= sw['sup_w']).mean()), cv5=float(np.percentile(crit, 95)),
               W_etf=float(Wser.loc[ETF_START:].iloc[0]), W_date=float(Wser.loc[sw['date']]))
     out['sw'] = sw
+    # testul schimbarii: regresie comuna cu interactiuni D_t = 1 dupa lansarea ETF-urilor, erori HAC (aceleasi decalaje)
+    w = joint_returns([key, 'BTC', 'SPX'], None, freq='W').loc['2021-04-16':END]
+    D = (w.index >= pd.Timestamp(ETF_START)).astype(float)
+    Xi = pd.DataFrame({'BTC': w['BTC'], 'SPX': w['SPX'], 'D': D, 'D_BTC': D * w['BTC'], 'D_SPX': D * w['SPX']}, index=w.index)
+    m = hac_ols(w[key], Xi)
+    out['chg'] = dict(d_btc=m.params['D_BTC'], se=m.bse['D_BTC'], t=m.tvalues['D_BTC'], p=m.pvalues['D_BTC'])
+    return out
+
+
+# =============================================================================
+# C3: factori cripto dupa iulie 2020 (referinta pentru profesor; Liu, Tsyvinski & Wu, 2022)
+# =============================================================================
+C3_COINS = ['BTC', 'ETH', 'XRP', 'BNB', 'ADA', 'SOL', 'DOGE', 'LTC', 'LINK']
+FX_FRED = {'DEXCAUS': -1, 'DEXSIUS': -1, 'DEXUSAL': 1, 'DEXUSEU': 1, 'DEXUSUK': 1}   # -1: unitati pe USD; 1: USD pe unitate
+
+
+def paper_week(idx):
+    """Saptamana din calendarul lucrarii: 52 pe an, primele 51 de 7 zile, ultima pana la 31 decembrie."""
+    idx = pd.DatetimeIndex(idx)
+    return pd.MultiIndex.from_arrays([idx.year, np.minimum((idx.dayofyear - 1) // 7 + 1, 52)])
+
+
+def compound_weekly(r):
+    """Compune randamente simple zilnice (zile lucratoare) in saptamanile lucrarii; index = sfarsitul saptamanii."""
+    g = (1 + r).groupby(paper_week(r.index)).prod() - 1
+    ends = [pd.Timestamp(y, 12, 31) if w == 52 else pd.Timestamp(y, 1, 1) + pd.Timedelta(days=7 * w - 1) for y, w in g.index]
+    g.index = pd.DatetimeIndex(ends)
+    return g
+
+
+def c3_factors():
+    """Cei cinci factori globali (piete dezvoltate) si rata bonurilor la o luna, zilnic, din Kenneth French Data
+    Library; randamentele USD ale detinerii a cinci valute (FRED)."""
+    import io, zipfile, urllib.request
+    url = 'https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/Developed_5_Factors_Daily_CSV.zip'
+    raw = zipfile.ZipFile(io.BytesIO(urllib.request.urlopen(url).read()))
+    txt = raw.read(raw.namelist()[0]).decode('latin-1').splitlines()
+    rows = [l.split(',') for l in txt if l[:8].strip().isdigit() and len(l.split(',')) == 7]
+    ff = pd.DataFrame([[float(x) for x in r[1:]] for r in rows], columns=['MKT', 'SMB', 'HML', 'RMW', 'CMA', 'RF'],
+                      index=pd.to_datetime([r[0].strip() for r in rows], format='%Y%m%d')) / 100
+    fx = {}
+    for sid, sign in FX_FRED.items():
+        s = pd.read_csv(f'https://fred.stlouisfed.org/graph/fredgraph.csv?id={sid}', index_col=0, parse_dates=True).iloc[:, 0]
+        s = pd.to_numeric(s, errors='coerce').dropna()
+        fx[sid] = (s if sign > 0 else 1 / s).pct_change().dropna()
+    return ff, pd.DataFrame(fx)
+
+
+def c3_ltw(split='2020-07-31'):
+    """C3 (referinta): (b) segmentare: randamentul in exces al indicelui celor cinci monede pe cei cinci factori
+    globali si cinci valute; (c) impuls pe trei saptamani: cele trei monede cu cel mai mare randament pe ultimele
+    trei saptamani minus cele trei cu cel mai mic, ponderi egale, detinere o saptamana; CAPM cripto; (d) regresie
+    comuna cu D_t (dupa iulie 2020) si D_t * CMKT, testul sup-Wald pentru (alfa, beta) la data necunoscuta; Holm."""
+    ff, fx = c3_factors()
+    tot, _ = crix_index(None, 'cap')
+    mkt = ltw_weekly_series(tot)
+    rf = compound_weekly(ff['RF'])
+    fw = pd.DataFrame({'MKT': compound_weekly(ff['MKT'] + ff['RF']) - rf,
+                       **{c: compound_weekly(ff[c]) for c in ['SMB', 'HML', 'RMW', 'CMA']},
+                       **{c: compound_weekly(fx[c]) for c in fx}})
+    last_wk = rf.index[rf.index <= ff.index[-1]][-1]        # ultima saptamana acoperita complet de factori
+    mkt, rf, fw = mkt.loc[:last_wk], rf.loc[:last_wk], fw.loc[:last_wk]
+    out = dict(start=str(mkt.index[0].date()), ff_end=str(ff.index[-1].date()), last=str(last_wk.date()))
+    # (b)
+    d = pd.concat([(mkt - rf).rename('y'), fw], axis=1, join='inner').dropna()
+    X = d.drop(columns='y')
+    rng = np.random.default_rng(SEED)
+    for lab, a, b in [('ins', None, split), ('oos', '2020-08-01', None)]:
+        dd = d.loc[a:b]
+        m = hac_ols(dd['y'], X.loc[dd.index], lags=I.nw_lags(len(dd)))
+        T, bl = len(dd), 8
+        r2 = []
+        for _ in range(999):
+            st = rng.integers(0, T - bl + 1, int(np.ceil(T / bl)))
+            ix = np.concatenate([np.arange(s0, s0 + bl) for s0 in st])[:T]
+            yb, Xb = dd['y'].values[ix], sm.add_constant(X.loc[dd.index].values[ix])
+            r2.append(sm.OLS(yb, Xb).fit().rsquared)
+        out['b_' + lab] = dict(n=T, first=str(dd.index[0].date()), last=str(dd.index[-1].date()), r2=m.rsquared,
+                               r2_lo=float(np.percentile(r2, 2.5)), r2_hi=float(np.percentile(r2, 97.5)),
+                               n_sig=int((m.pvalues.drop('const') < 0.05).sum()),
+                               t_mkt=m.tvalues['MKT'], b_mkt=m.params['MKT'])
+    # (c)
+    W = pd.concat([ltw_weekly_series(price(k)).rename(k) for k in C3_COINS], axis=1)
+    past = (1 + W).rolling(3, min_periods=3).apply(np.prod, raw=True) - 1
+    mom = {}
+    for t in range(3, len(W) - 1):
+        ok = past.iloc[t].notna() & W.iloc[t + 1].notna()
+        if ok.sum() < 6:
+            continue
+        srt = past.iloc[t][ok].sort_values()
+        nxt = W.iloc[t + 1]
+        mom[W.index[t + 1]] = nxt[srt.index[-3:]].mean() - nxt[srt.index[:3]].mean()
+    mom = pd.Series(mom).loc[out['start']:]
+    n_coins = W.notna().sum(axis=1)
+    c = pd.concat([mom.rename('mom'), (mkt - rf).rename('m')], axis=1, join='inner').dropna()
+    for lab, a, b in [('ins', None, split), ('oos', '2020-08-01', None), ('full', None, None)]:
+        cc = c.loc[a:b]
+        L = I.nw_lags(len(cc))
+        m0 = sm.OLS(cc['mom'].values, np.ones(len(cc))).fit(cov_type='HAC', cov_kwds={'maxlags': L})
+        m1 = hac_ols(cc['mom'], cc[['m']], lags=L)
+        out['c_' + lab] = dict(n=len(cc), first=str(cc.index[0].date()), last=str(cc.index[-1].date()),
+                               mean=100 * m0.params[0], t_mean=m0.tvalues[0], alpha=100 * m1.params['const'],
+                               t_alpha=m1.tvalues['const'], p_alpha=m1.pvalues['const'], beta=m1.params['m'],
+                               t_beta=m1.tvalues['m'], r2=m1.rsquared)
+    out['c_ncoins_start'] = int(n_coins.loc[c.index[0]])
+    # (d) regresie comuna: alfa si beta se pot schimba dupa iulie 2020
+    D = (c.index > pd.Timestamp(split)).astype(float)
+    Xi = pd.DataFrame({'m': c['m'], 'D': D, 'Dm': D * c['m']}, index=c.index)
+    L = I.nw_lags(len(c))
+    m2 = hac_ols(c['mom'], Xi, lags=L)
+    out['d_chg'] = dict(d=100 * m2.params['D'], t=m2.tvalues['D'], p=m2.pvalues['D'], e=m2.params['Dm'], t_e=m2.tvalues['Dm'])
+    Xs = np.column_stack([np.ones(len(c)), 100 * c['m'].values])
+    sw = I.sup_wald(100 * c['mom'].values, Xs, c.index)
+    Wser = pd.Series(sw.pop('W'), index=c.index)
+    crit = I.sup_wald_crit(2)
+    lo_d, hi_d = Wser.dropna().index[0], Wser.dropna().index[-1]
+    sw.update(p=float((crit >= sw['sup_w']).mean()), cv5=float(np.percentile(crit, 95)),
+              trim_lo=str(lo_d.date()), trim_hi=str(hi_d.date()),
+              W_split=float(Wser.loc[:split].dropna().iloc[-1]) if Wser.loc[:split].notna().any() else float('nan'))
+    out['d_sw'] = sw
+    # Holm pentru familia testelor lui alfa: (c) in, (c) out, (d) schimbare, (d) sup-Wald
+    fam = {'c_ins': out['c_ins']['p_alpha'], 'c_oos': out['c_oos']['p_alpha'], 'd_chg': out['d_chg']['p'], 'd_sw': sw['p']}
+    ks = sorted(fam, key=fam.get)
+    adj, run = {}, 0.0
+    for i, k in enumerate(ks):
+        run = max(run, min(1.0, (len(ks) - i) * fam[k]))
+        adj[k] = run
+    out['holm'] = adj
+    out['holm_raw'] = fam
     return out
 
 
@@ -446,6 +576,7 @@ if __name__ == '__main__':
     fig_sem_hedge(c1)
     S['C1'] = c1
     S['C2'] = c2_ai()
+    S['C3'] = c3_ltw()
     with open(os.path.join(HERE, 'sem16_results.json'), 'w') as fh:
         json.dump(jsonable(S), fh, indent=1)
     print('saved sem16_results.json')
