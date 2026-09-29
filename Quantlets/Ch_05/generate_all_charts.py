@@ -33,16 +33,19 @@ plt.rcParams['savefig.transparent'] = True
 plt.rcParams['axes.grid'] = False
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = ['Helvetica', 'Arial', 'DejaVu Sans']
-plt.rcParams['font.size'] = 9
-plt.rcParams['axes.labelsize'] = 10
-plt.rcParams['axes.titlesize'] = 11
+# fonturi dimensionate pentru slide-uri (graficele au 9--11 inch latime si se afiseaza pe 8--14 cm)
+plt.rcParams['font.size'] = 12
+plt.rcParams['axes.labelsize'] = 13
+plt.rcParams['axes.titlesize'] = 13
+plt.rcParams['xtick.labelsize'] = 11.5
+plt.rcParams['ytick.labelsize'] = 11.5
 plt.rcParams['axes.spines.top'] = False
 plt.rcParams['axes.spines.right'] = False
 plt.rcParams['axes.linewidth'] = 0.6
-plt.rcParams['lines.linewidth'] = 1.1
+plt.rcParams['lines.linewidth'] = 1.4
 plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
-plt.rcParams['legend.fontsize'] = 8
+plt.rcParams['legend.fontsize'] = 11
 
 # Culori brand
 MainBlue = '#1A3A6E'
@@ -542,7 +545,7 @@ def forecast_eval(k='sp500', first_year=2016, H=22):
                         va='bottom' if vals[m] >= 0 else 'top', fontsize=8, xytext=(0, 2 if vals[m] >= 0 else -2),
                         textcoords='offset points')
     ax.axhline(0, color=Gray, lw=0.6)
-    ax.set_ylabel('Mean QLIKE minus GARCH-t (lower = better)')
+    ax.set_ylabel('QLIKE minus GARCH-t\n(lower = better)')
     save_fig('ch5_qlike')
     # grafic 3: Mincer-Zarnowitz pe 22 de zile, in logaritmi
     fig, ax = plt.subplots(figsize=(7, 4))
