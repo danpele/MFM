@@ -67,6 +67,18 @@ def legend_outside_bottom(ax, ncol=2, y=-0.22):
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
+def bottom_legend(fig, ncol=3, handles=None, labels=None, fontsize=8):
+    """Legenda sub figura (in afara axelor), dupa tight_layout; save_fig o include (bbox_inches='tight')."""
+    plt.tight_layout()
+    if handles is None:
+        handles, labels, seen = [], [], set()
+        for ax in fig.axes:
+            for h, l in zip(*ax.get_legend_handles_labels()):
+                if l not in seen and not l.startswith('_'):
+                    handles.append(h); labels.append(l); seen.add(l)
+    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=ncol, frameon=False, fontsize=fontsize)
+
+
 def log_axis(ax, ticks):
     """Axa logaritmica cu etichete lizibile (fara notatie stiintifica)."""
     ax.set_yscale('log')
@@ -156,7 +168,7 @@ def ann_stats(p, periods=252):
 # FIG 1: Cresterea a 1 USD investit in 2015 (clase de active)
 # =============================================================================
 def fig_cross_asset_growth(start='2015-01-02'):
-    fig, ax = plt.subplots(figsize=(7.0, 3.2))
+    fig, ax = plt.subplots(figsize=(6.6, 2.1))
     out = {}
     panel = cross_panel()
     for name, c in zip(CROSS, CROSS_COL):
@@ -171,8 +183,7 @@ def fig_cross_asset_growth(start='2015-01-02'):
     ax.set_title(f'{pd.Timestamp(start).year}-2026, all in USD: S&P 500 and TLT = total return, '
                  'Euro Stoxx 50 and Nikkei 225 = price, gold = spot',
                  fontsize=8.5, loc='left')
-    legend_outside_bottom(ax, ncol=3, y=-0.12)
-    plt.tight_layout()
+    bottom_legend(fig, ncol=3)
     save_fig('ch0_cross_asset_growth')
     return pd.Series(out)
 
@@ -196,7 +207,7 @@ def fig_risk_return(start='2015-01-02'):
         cagr, v = ann_stats(s, 'obs')          # q = numarul observat de zile de tranzactionare pe an
         rows.append((n, cagr, v, s.index[0]))
     res = pd.DataFrame(rows, columns=['asset', 'cagr', 'vol', 'from']).set_index('asset')
-    fig, ax = plt.subplots(figsize=(6.6, 3.2))
+    fig, ax = plt.subplots(figsize=(4.7, 3.1))
     for (n, r), c in zip(res.iterrows(), cols):
         ax.scatter(r['vol'], r['cagr'], s=40, color=c, zorder=3)
         late = r['from'] > pd.Timestamp(start) + pd.Timedelta(days=30)
@@ -213,8 +224,7 @@ def fig_risk_return(start='2015-01-02'):
     ax.set_ylim(-0.08, None)
     ax.set_xlabel('Annualised volatility (log scale)')
     ax.set_ylabel('Annualised return (CAGR)')
-    ax.set_title('Risk and return, 2015-2026: assets in USD, EUR/RON in RON per EUR',
-                 fontsize=9, loc='left')
+    ax.set_title('Risk and return, 2015-2026', fontsize=9, loc='left')
     plt.tight_layout()
     save_fig('ch0_risk_return')
     return res
@@ -232,8 +242,12 @@ EPISODES = [('Dot-com', '2000-01-01', '2003-12-31'),
 def fig_sp500_drawdowns():
     s = px['S&P 500'].dropna()
     dd = drawdown(s)
-    fig, axes = plt.subplots(2, 1, figsize=(7.0, 3.6), sharex=True, gridspec_kw={'height_ratios': [1.3, 1]})
+    fig, axes = plt.subplots(2, 1, figsize=(4.7, 3.3), sharex=True, gridspec_kw={'height_ratios': [1.1, 1]})
     axes[0].plot(s.index, s.values, color=MainBlue, lw=0.8)
+    pk, rc = pd.Timestamp('2007-10-09'), s.loc['2009-03-10':][s.loc['2009-03-10':] >= s.loc['2007-10-09']].index[0]
+    axes[0].plot([pk, rc], [s[pk], s[pk]], color=Amber, lw=2.2, solid_capstyle='butt')
+    axes[0].annotate(f'{(rc - pk).days / 365.25:.1f} years to regain\nthe Oct 2007 peak', (rc, s[pk]), xytext=(4, -3),
+                     textcoords='offset points', fontsize=7, va='top', color='black')
     log_axis(axes[0], [1000, 2000, 4000, 8000])
     axes[0].set_ylabel('S&P 500 (log)')
     axes[1].fill_between(dd.index, dd.values, 0, color=IDAred, alpha=0.35, lw=0)
@@ -245,11 +259,11 @@ def fig_sp500_drawdowns():
         seg = dd.loc[a:b]
         t, v = seg.idxmin(), seg.min()
         res[name] = (t.date(), v)
-        axes[1].annotate(f'{name}\n{v:.0%}', (t, v), xytext=(0, -2), textcoords='offset points',
-                         ha='center', va='top', fontsize=7)
+        dx, ha = {'COVID-19': (-4, 'right'), '2022 inflation shock': (6, 'left')}.get(name, (0, 'center'))
+        axes[1].annotate(f'{name}\n{v:.0%}', (t, v), xytext=(dx, -2), textcoords='offset points',
+                         ha=ha, va='top', fontsize=7)
     axes[1].set_ylim(dd.min() * 1.45, 0.02)
-    axes[0].set_title('S&P 500, 2000-2026: level (log scale) and drawdown from the running peak',
-                      fontsize=9, loc='left')
+    axes[0].set_title('S&P 500, 2000-2026: level (log) and drawdown', fontsize=9, loc='left')
     plt.tight_layout()
     save_fig('ch0_sp500_drawdowns')
     return res
@@ -260,7 +274,7 @@ def fig_sp500_drawdowns():
 # =============================================================================
 def fig_vix_regimes():
     v = px['VIX'].dropna()
-    fig, ax = plt.subplots(figsize=(7.0, 3.0))
+    fig, ax = plt.subplots(figsize=(6.6, 2.1))
     ax.plot(v.index, v.values, color=MainBlue, lw=0.5)
     ax.axhline(20, color=Amber, ls='--', lw=0.8)
     ax.axhline(30, color=IDAred, ls='--', lw=0.8)
@@ -287,27 +301,53 @@ def fig_vix_regimes():
 
 
 # =============================================================================
+# FIG 4b: VIX vs volatilitatea realizata ulterior (prima de risc de varianta)
+# =============================================================================
+def fig_vix_vrp(h=21):
+    """VIX (implicita, % pe an) vs volatilitatea realizata a S&P 500 in urmatoarele h = 21 de zile de tranzactionare:
+    sqrt(252/h * suma r^2), fara ferestrele incomplete de la final; jos: varianta implicita minus cea realizata."""
+    v = px['VIX'].dropna(); s = px['S&P 500'].dropna()
+    r = np.log(s).diff()
+    rv = np.sqrt((r ** 2)[::-1].rolling(h).sum()[::-1].shift(-1) * 252 / h) * 100
+    j = pd.concat([v, rv], axis=1, keys=['vix', 'rv']).dropna()
+    gap = (j['vix'] / 100) ** 2 - (j['rv'] / 100) ** 2
+    fig, axes = plt.subplots(2, 1, figsize=(4.7, 3.3), sharex=True, gridspec_kw={'height_ratios': [1.2, 1]})
+    axes[0].plot(j.index, j['rv'], color=Orange, lw=0.5, label='Realised volatility, next 21 trading days')
+    axes[0].plot(j.index, j['vix'], color=MainBlue, lw=0.5, label='VIX (implied, next 30 calendar days)')
+    axes[0].set_ylabel('% per year'); axes[0].set_ylim(0, 110)
+    axes[1].fill_between(gap.index, gap.values, 0, where=gap >= 0, color=Forest, alpha=0.6, lw=0,
+                         label='Implied > realised variance')
+    axes[1].fill_between(gap.index, gap.values, 0, where=gap < 0, color=IDAred, alpha=0.6, lw=0,
+                         label='Implied < realised variance')
+    axes[1].axhline(0, color=Gray, lw=0.5)
+    axes[1].set_ylabel('Variance gap'); axes[1].set_ylim(-0.5, 0.2)
+    axes[0].set_title('VIX vs subsequent realised volatility, S&P 500', fontsize=9, loc='left')
+    bottom_legend(fig, ncol=2, fontsize=7.2)
+    save_fig('ch0_vix_vrp')
+    return dict(n=len(j), first=j.index[0].date(), last=j.index[-1].date(), mean_vix=j['vix'].mean(),
+                mean_rv=j['rv'].mean(), share_vix_above=(j['vix'] > j['rv']).mean(), mean_gap=gap.mean(),
+                share_gap_pos=(gap > 0).mean())
+
+
+# =============================================================================
 # FIG 5: Dobanzi SUA si inversarea curbei (10y - 2y)
 # =============================================================================
 def fig_rates():
     d = fred[['DGS10', 'DGS2']].dropna()
     ff = fred['FEDFUNDS'].dropna()
     spread = d['DGS10'] - d['DGS2']
-    fig, axes = plt.subplots(2, 1, figsize=(7.0, 3.6), sharex=True, gridspec_kw={'height_ratios': [1.3, 1]})
+    fig, axes = plt.subplots(2, 1, figsize=(4.7, 3.3), sharex=True, gridspec_kw={'height_ratios': [1.3, 1]})
     axes[0].plot(ff.index, ff.values, color=Teal, lw=0.9, label='Fed funds (monthly)')
     axes[0].plot(d.index, d['DGS2'], color=Amber, lw=0.7, label='2-year Treasury')
     axes[0].plot(d.index, d['DGS10'], color=MainBlue, lw=0.7, label='10-year Treasury')
     axes[0].set_ylabel('Yield (%)')
-    h, l = axes[0].get_legend_handles_labels()
-    axes[1].legend(h, l, loc='upper center', bbox_to_anchor=(0.5, -0.32), ncol=3, frameon=False, fontsize=7.5)
     axes[1].plot(spread.index, spread.values, color=MainBlue, lw=0.6)
     axes[1].fill_between(spread.index, spread.values, 0, where=spread < 0, color=IDAred, alpha=0.45, lw=0)
     axes[1].axhline(0, color=Gray, lw=0.5)
     axes[1].set_ylabel('10y - 2y (pp)')
     inv = spread.loc['2022':'2024']
-    axes[0].set_title('US rates 2000-2026 and the yield-curve spread (red = inverted curve)',
-                      fontsize=9, loc='left')
-    plt.tight_layout()
+    axes[0].set_title('US rates and the 10y - 2y spread (red = inverted)', fontsize=9, loc='left')
+    bottom_legend(fig, ncol=3, fontsize=7.5)
     save_fig('ch0_rates')
     runs = (spread < 0).astype(int)
     first_neg = inv[inv < 0].index.min()
@@ -324,18 +364,17 @@ def fig_rates():
 def fig_concentration():
     p = px[['SPY', 'RSP']].dropna()
     ratio = (p['SPY'] / p['SPY'].iloc[0]) / (p['RSP'] / p['RSP'].iloc[0])
-    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.9), gridspec_kw={'width_ratios': [1.25, 1]})
+    fig, axes = plt.subplots(1, 2, figsize=(6.6, 2.2), gridspec_kw={'width_ratios': [1.25, 1]})
     for col, c, lab in [('SPY', MainBlue, 'SPY (cap-weighted)'), ('RSP', Amber, 'RSP (equal-weighted)')]:
         g = p[col] / p[col].iloc[0]
         axes[0].plot(g.index, g.values, color=c, lw=0.8, label=f'{lab}: x{g.iloc[-1]:.1f}')
     log_axis(axes[0], [0.5, 1, 2, 4, 8])
     axes[0].set_ylabel('Growth of 1 USD (log)')
-    legend_outside_bottom(axes[0], ncol=1, y=-0.12)
-    axes[1].plot(ratio.index, ratio.values, color=IDAred, lw=0.8)
+    axes[1].plot(ratio.index, ratio.values, color=IDAred, lw=0.8, label='SPY / RSP (both rebased to 1 in Apr 2003)')
     axes[1].axhline(1, color=Gray, lw=0.5, ls=':')
     axes[1].set_title('SPY / RSP relative performance', fontsize=8.5, loc='left')
     axes[0].set_title(f'S&P 500 ETFs, {p.index[0]:%b %Y}-2026 (total return)', fontsize=8.5, loc='left')
-    plt.tight_layout()
+    bottom_legend(fig, ncol=3)
     save_fig('ch0_concentration')
     since23 = ratio.loc['2023-01-03':]
     return dict(start=p.index[0].date(), spy=(p['SPY'].iloc[-1] / p['SPY'].iloc[0]),
@@ -358,7 +397,7 @@ def fig_rolling_correlations(window=252):
     pp = pd.concat([px['S&P 500'], px['Bitcoin']], axis=1).dropna()
     trio = np.log(pp).diff().dropna()
     c_be = trio.iloc[:, 0].rolling(window).corr(trio.iloc[:, 1])
-    fig, ax = plt.subplots(figsize=(7.0, 3.0))
+    fig, ax = plt.subplots(figsize=(6.6, 2.1))
     ax.plot(c_sb.index, c_sb.values, color=MainBlue, lw=0.9, label='S&P 500 vs long Treasuries (TLT)')
     ax.plot(c_be.index, c_be.values, color=Orange, lw=0.9, label='S&P 500 vs Bitcoin')
     ax.axhline(0, color=Gray, lw=0.5)
@@ -366,8 +405,7 @@ def fig_rolling_correlations(window=252):
     ax.set_ylabel('1-year rolling correlation')
     ax.set_title('Diversification is not constant: rolling correlations of daily log returns',
                  fontsize=9, loc='left')
-    legend_outside_bottom(ax, ncol=2, y=-0.13)
-    plt.tight_layout()
+    bottom_legend(fig, ncol=2)
     save_fig('ch0_rolling_correlations')
     return dict(sb_2010_2020=c_sb.loc['2010':'2020'].mean(), sb_2022_2026=c_sb.loc['2022':].mean(),
                 sb_last=c_sb.dropna().iloc[-1], be_2016_2019=c_be.loc['2016':'2019'].mean(),
@@ -382,17 +420,16 @@ def fig_rolling_vol(window=63):
     btc = np.log(px['Bitcoin'].dropna()).diff()
     v_eq = eq.rolling(window).std() * np.sqrt(252)
     v_btc = btc.rolling(window).std() * np.sqrt(365)
-    fig, ax = plt.subplots(figsize=(7.0, 2.9))
+    fig, ax = plt.subplots(figsize=(6.6, 2.1))
     ax.plot(v_btc.index, v_btc.values, color=Orange, lw=0.8, label='Bitcoin (365 days/year)')
     ax.plot(v_eq.loc['2014-09':].index, v_eq.loc['2014-09':].values, color=MainBlue, lw=0.8,
             label='S&P 500 (252 days/year)')
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f'{v:.0%}'))
-    ax.set_ylabel('Annualised volatility (63 observations)')
+    ax.set_ylabel('Volatility (63 obs.)')
     ratio = (v_btc.loc['2024':].mean() / v_eq.loc['2024':].mean())
     ax.set_title(f'Rolling volatility: Bitcoin is still about {ratio:.1f} times as volatile as the S&P 500 '
                  f'(2024-2026)', fontsize=9, loc='left')
-    legend_outside_bottom(ax, ncol=2, y=-0.13)
-    plt.tight_layout()
+    bottom_legend(fig, ncol=2)
     save_fig('ch0_rolling_vol')
     return dict(btc_2015_17=v_btc.loc['2015':'2017'].mean(), btc_2024_26=v_btc.loc['2024':].mean(),
                 eq_2024_26=v_eq.loc['2024':].mean(), ratio=ratio)
@@ -403,10 +440,10 @@ def fig_rolling_vol(window=63):
 # =============================================================================
 def fig_stablecoins():
     s = stable[stable > 0].loc['2018':]
-    fig, ax = plt.subplots(figsize=(7.0, 2.9))
+    fig, ax = plt.subplots(figsize=(6.6, 2.1))
     ax.fill_between(s.index, s.values, 0, color=Forest, alpha=0.25, lw=0)
     ax.plot(s.index, s.values, color=Forest, lw=0.9)
-    ax.set_ylabel('USD-pegged stablecoins (bn USD)')
+    ax.set_ylabel('bn USD')
     pts = {}
     peak = s.loc['2022'].idxmax()                         # maximul din 2022
     trough = s.loc[peak:'2023-12-31'].idxmin()            # minimul exact de dupa maxim
@@ -423,12 +460,43 @@ def fig_stablecoins():
 
 
 # =============================================================================
+# FIG 9b: Tether (USDT): abaterea fata de paritatea de 1 USD
+# =============================================================================
+def fig_usdt_peg():
+    """Pretul USDT (close) 2019-2026, abaterea fata de 1 USD in %, benzi de +-0,5% si +-1%, detaliu martie 2020."""
+    u = load('Tether (USDT)', start='2019-01-01').dropna()
+    dev = 100 * (u - 1)
+    fig, ax = plt.subplots(figsize=(6.6, 2.1))
+    ax.plot(dev.index, dev.values, color=Forest, lw=0.6, label='USDT price minus 1 USD (%)')
+    for b, c, lab in [(0.5, Amber, 'Band of 0.5%'), (1.0, IDAred, 'Band of 1%')]:
+        ax.axhline(b, color=c, ls='--', lw=0.8, label=lab)
+        ax.axhline(-b, color=c, ls='--', lw=0.8)
+    ax.set_ylabel('Deviation (%)'); ax.set_ylim(-3.2, 6.0)
+    for t in [dev.idxmin(), dev.idxmax()]:
+        ax.annotate(f'{u[t]:.3f} USD\n{t:%d %b %Y}', (t, dev[t]), xytext=(14, 0), textcoords='offset points',
+                    fontsize=7, va='center', color='black')
+    ins = ax.inset_axes([0.62, 0.52, 0.34, 0.42])
+    m = dev.loc['2020-02-24':'2020-04-10']
+    ins.plot(m.index, m.values, color=Forest, lw=0.9)
+    for b, c in [(0.5, Amber), (1.0, IDAred)]:
+        ins.axhline(b, color=c, ls='--', lw=0.6); ins.axhline(-b, color=c, ls='--', lw=0.6)
+    ins.set_title('March 2020', fontsize=7, loc='left', pad=2)
+    ins.tick_params(labelsize=6); ins.xaxis.set_major_formatter(mdates.DateFormatter('%d %b'))
+    ins.xaxis.set_major_locator(mdates.DayLocator(bymonthday=[1, 15]))
+    ax.set_title('Tether (USDT), 2019-2026: distance from the 1 USD peg', fontsize=9, loc='left')
+    bottom_legend(fig, ncol=3)
+    save_fig('ch0_usdt_peg')
+    return dict(n=len(u), first=u.index[0].date(), last=u.index[-1].date(), within05=(dev.abs() <= 0.5).mean(),
+                within1=(dev.abs() <= 1.0).mean(), min=(u.idxmin().date(), u.min()), max=(u.idxmax().date(), u.max()))
+
+
+# =============================================================================
 # FIG 10: ETF-ul spot Bitcoin IBIT: valoarea tranzactionata
 # =============================================================================
 def fig_ibit():
     d = pd.concat([px['IBIT'], ibit_volume, px['Bitcoin']], axis=1, keys=['p', 'v', 'btc']).dropna()
     dv = (d['p'] * d['v'] / 1e9)
-    fig, ax = plt.subplots(figsize=(7.0, 2.9))
+    fig, ax = plt.subplots(figsize=(6.6, 2.1))
     ax.bar(dv.index, dv.values, width=1.0, color=MainBlue, alpha=0.35, label='IBIT daily traded value')
     ax.plot(dv.rolling(20).mean().index, dv.rolling(20).mean().values, color=MainBlue, lw=1.0,
             label='20-day average')
@@ -439,10 +507,9 @@ def fig_ibit():
     ax2.spines['right'].set_visible(True)
     h1, l1 = ax.get_legend_handles_labels()
     h2, l2 = ax2.get_legend_handles_labels()
-    ax.legend(h1 + h2, l1 + l2, loc='upper center', bbox_to_anchor=(0.5, -0.13), ncol=3, frameon=False)
     ax.set_title('iShares Bitcoin Trust (IBIT) since launch on 11 Jan 2024: price x volume',
                  fontsize=9, loc='left')
-    plt.tight_layout()
+    bottom_legend(fig, ncol=3, handles=h1 + h2, labels=l1 + l2)
     save_fig('ch0_ibit')
     return dict(first=d.index[0].date(), mean_bn=dv.mean(), median_bn=dv.median(), max_bn=dv.max(),
                 max_date=dv.idxmax().date(), total_bn=dv.sum())
@@ -453,7 +520,7 @@ def fig_ibit():
 # =============================================================================
 def fig_romania():
     """BET-TR si blue chips BVB (ajustate pentru dividende), EUR/RON (BNR), randamente 10 ani RO vs DE."""
-    fig, axes = plt.subplots(1, 3, figsize=(7.4, 2.9), gridspec_kw={'width_ratios': [1.35, 0.9, 0.9]})
+    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.5), gridspec_kw={'width_ratios': [1.35, 0.9, 0.9]})
     start = '2015-01-05'
     out = {}
     b = px['BET-TR'].loc[start:].dropna()
@@ -493,6 +560,25 @@ def fig_romania():
                 bonds_first=y.index[0].date(), h2o_first=bvb['Hidroelectrica'].first_valid_index().date())
 
 
+def fig_bad_ticks():
+    """EUR/RON: fisierul de piata (cotatii eronate) vs cursul BNR, 2015-2026, cu volatilitatile anualizate."""
+    mk = eurron_mkt.loc['2015':]; bn = eurron.loc['2015':]
+    res = data_pitfall()
+    fig, ax = plt.subplots(figsize=(6.6, 2.1))
+    ax.plot(mk.index, mk.values, color=IDAred, lw=0.6,
+            label=f"Market file (EURRON.FOREX): volatility {res['vol_market']:.1%}")
+    ax.plot(bn.index, bn.values, color=MainBlue, lw=0.9, label=f"BNR reference rate: volatility {res['vol_bnr']:.1%}")
+    for d, dy in [('2025-08-13', 0), ('2022-01-05', 0)]:
+        t = pd.Timestamp(d)
+        ax.annotate(f'{t:%d %b %Y}: {mk[t]:.2f}', (t, mk[t]), xytext=(-8, 0), textcoords='offset points', ha='right',
+                    va='center', fontsize=7, color='black')
+    ax.set_ylabel('RON per EUR'); ax.set_ylim(4.2, 6.05)
+    ax.set_title('EUR/RON 2015-2026: isolated bad ticks, each reversed the next day', fontsize=9, loc='left')
+    bottom_legend(fig, ncol=2)
+    save_fig('ch0_bad_ticks')
+    return res
+
+
 def data_pitfall():
     """EUR/RON: fisierul de piata (cu erori de cotatie) vs BNR, 2015-2026."""
     r_e = np.log(eurron_mkt).diff().dropna().loc['2015':]
@@ -511,7 +597,7 @@ def fig_bvb_history():
     """Indicele BET 1997-2026 pe scara log, valori oficiale de inchidere, cu evenimente marcate."""
     bet = load('BET', start='1997-01-01').dropna()
     full = bet
-    fig, ax = plt.subplots(figsize=(7.2, 3.3))
+    fig, ax = plt.subplots(figsize=(6.8, 2.45))
     ax.plot(bet.index, bet.values, color=MainBlue, lw=0.8, label='BET, official closing values (base 1,000 on 19 Sep 1997)')
     ax.set_yscale('log')
     ax.set_ylabel('Index level (log scale)')
@@ -526,8 +612,7 @@ def fig_bvb_history():
                     arrowprops=dict(arrowstyle='-', color=LightGray, lw=0.5))
     ax.set_ylim(150, 5e4)
     ax.set_title('The BET index, 1997-2026', fontsize=9, loc='left')
-    legend_outside_bottom(ax, ncol=1, y=-0.13)
-    plt.tight_layout()
+    bottom_legend(fig, ncol=1)
     save_fig('ch0_bvb_history')
     lvl = lambda s, d: s.loc[s.index[s.index.searchsorted(pd.Timestamp(d))]]
     return dict(bet_first=(bet.index[0].date(), bet.iloc[0]),                 bet_1999_min=(bet.loc['1999'].idxmin().date(), bet.loc['1999'].min()),
@@ -556,7 +641,7 @@ def fig_hhl_passive():
     active = HHL['active0'] - (s - s.iloc[0])
     d_active = active / HHL['active0'] - 1
     d_elast = HHL['pass_through'] * d_active
-    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.9))
+    fig, axes = plt.subplots(1, 2, figsize=(6.6, 2.35))
     axes[0].plot(s.index, 100 * s.values, color=Teal, lw=1.1, label='ETF share of US corporate equities')
     for d in [s.index[0], pd.Timestamp('2020-10-01'), s.index[-1]]:
         axes[0].plot(d, 100 * s.loc[d], 'o', ms=3.5, color=Teal)
@@ -583,10 +668,7 @@ def fig_hhl_passive():
         ax.xaxis.set_major_locator(mdates.YearLocator(5))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
         ax.tick_params(axis='x', labelsize=7.5)
-    h0, l0 = axes[0].get_legend_handles_labels()
-    h1, l1 = axes[1].get_legend_handles_labels()
-    fig.legend(h0 + h1, l0 + l1, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=3, frameon=False, fontsize=7.5)
-    plt.tight_layout()
+    bottom_legend(fig, ncol=3, fontsize=7.5)
     save_fig('ch0_hhl_passive')
     pick = lambda d: dict(etf=round(s.loc[d], 4), active=round(d_active.loc[d], 4), elast=round(d_elast.loc[d], 4))
     return {str(d.date()): pick(d) for d in [s.index[0], pd.Timestamp('2020-10-01'), s.index[-1]]}
@@ -597,7 +679,7 @@ def fig_hhl_elasticity():
     relativ la piata fara investitori pasivi: alpha (1 + chi) / (1 + chi alpha)."""
     alpha = np.linspace(0, 1, 401)
     rel = lambda chi: alpha * (1 + chi) / (1 + chi * alpha)
-    fig, ax = plt.subplots(figsize=(6.4, 3.0))
+    fig, ax = plt.subplots(figsize=(4.7, 3.0))
     passive = 100 * (1 - alpha)
     for chi, c, lab in [(0, IDAred, '$\\chi = 0$: no strategic response (Koijen and Yogo)'),
                         (HHL['chi'], MainBlue, '$\\chi = 2.97$: estimate (Table 2, row 1)'),
@@ -614,8 +696,7 @@ def fig_hhl_elasticity():
     ax.set_xlabel('Share of investors turned passive, $1 - \\alpha$ (%)')
     ax.set_ylabel('$\\mathcal{E}_{agg}$ relative to all active')
     ax.set_title('Aggregate elasticity when investors turn passive, eq. (5)', fontsize=9, loc='left')
-    legend_outside_bottom(ax, ncol=2, y=-0.27)
-    plt.tight_layout()
+    bottom_legend(fig, ncol=1)
     save_fig('ch0_hhl_elasticity')
     return {chi: round(0.70 * (1 + chi) / (1 + chi * 0.70), 3) for chi in (0, HHL['chi'], 10)}
 
@@ -628,14 +709,16 @@ if __name__ == '__main__':
     print(fig_risk_return().round(3))
     print(fig_sp500_drawdowns())
     print(fig_vix_regimes())
+    print(fig_vix_vrp())
     print(fig_rates())
     print(fig_concentration())
     print(fig_rolling_correlations())
     print(fig_rolling_vol())
     print(fig_stablecoins())
+    print(fig_usdt_peg())
     print(fig_ibit())
     print(fig_romania())
     print(fig_bvb_history())
-    print(data_pitfall())
+    print(fig_bad_ticks())
     print(fig_hhl_passive())
     print(fig_hhl_elasticity())

@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch0_drawdowns_vix'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'S&P 500 level and drawdown from the running peak, 2000-2026, with the troughs of the dot-com crash, the Global Financial Crisis, COVID-19 and the 2022 inflation shock; VIX history with its largest peaks and the share of days below 20 and above 30.'
+Description: 'S&P 500 level and drawdown from the running peak, 2000-2026, with the troughs of the dot-com crash, the Global Financial Crisis, COVID-19 and the 2022 inflation shock; VIX history with its largest peaks and the share of days below 20 and above 30; the VIX against the realised S&P 500 volatility of the next 21 trading days and the gap between implied and realised variance.'
 
 Keywords: 'drawdown, crisis, S&P 500, VIX, implied volatility, volatility regimes'
 
@@ -12,4 +12,4 @@ Submitted: 'Monday, 21 September 2026'
 
 Datafile: 'Daily market data (data/market in the MFM repository)'
 
-Output: 'ch0_sp500_drawdowns.pdf, ch0_vix_regimes.pdf'
+Output: 'ch0_sp500_drawdowns.pdf, ch0_vix_regimes.pdf, ch0_vix_vrp.pdf'

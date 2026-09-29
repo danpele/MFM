@@ -48,7 +48,40 @@ for lab, x in [('full', d), ('a', d.loc[:'2014-12-31']), ('b', d.loc['2015-01-01
 for lab in ['full', 'b']:
     out[lab]['mde_ann_pct'] = 2.8 * abs(out[lab]['mean_ann_pct'] / out[lab]['t_nw'])
 
+def fig_ai_spread(out):
+    """Media anualizata a diferentei SPY - RSP cu intervale HAC de 95% si MDE (grafic pentru slide-ul mini-cazului)."""
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({'figure.facecolor': 'none', 'axes.facecolor': 'none', 'savefig.facecolor': 'none',
+                         'font.family': 'sans-serif', 'font.sans-serif': ['Helvetica', 'Arial', 'DejaVu Sans'],
+                         'font.size': 9, 'axes.spines.top': False, 'axes.spines.right': False, 'legend.frameon': False})
+    MainBlue, IDAred, Amber, Forest = '#1A3A6E', '#CD0000', '#B5853F', '#2E7D32'
+    labs = [('full', 'May 2003 - Sep 2026'), ('a', '2003 - 2014'), ('b', '2015 - 2026')]
+    fig, ax = plt.subplots(figsize=(4.6, 2.6))
+    for k, (key, lab) in enumerate(labs):
+        m, t = out[key]['mean_ann_pct'], out[key]['t_nw']; se = abs(m / t)
+        ax.errorbar(m, k, xerr=1.96 * se, fmt='o', color=[MainBlue, Forest, Forest][k], capsize=3, ms=5, lw=1.3,
+                    label='Estimate with HAC 95% interval' if k == 0 else None)
+        ax.annotate(f'{m:+.2f}% (t = {t:.2f})', (m, k), xytext=(0, 7), textcoords='offset points', ha='center',
+                    fontsize=7.5, color='black')
+        if 'mde_ann_pct' in out[key]:
+            ax.plot([out[key]['mde_ann_pct'], -out[key]['mde_ann_pct']], [k, k], '|', color=IDAred, ms=12, mew=2,
+                    label='Minimum detectable effect, $\\pm 2.8$ SE' if key == 'full' else None)
+    ax.axvline(0, color='black', lw=0.7, ls=':')
+    ax.set_yticks(range(3)); ax.set_yticklabels([l for _, l in labs])
+    ax.invert_yaxis(); ax.set_ylim(2.6, -0.6)
+    ax.set_xlabel('Mean of $r_{SPY} - r_{RSP}$ (% per year)')
+    ax.set_title('Is there a concentration premium?', loc='left', fontsize=9)
+    plt.tight_layout()
+    h, l = ax.get_legend_handles_labels()
+    fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=1, fontsize=7.5)
+    charts = os.path.join(HERE, '..', '..', 'charts')
+    for ext, kw in [('pdf', {}), ('png', {'dpi': 180})]:
+        plt.savefig(os.path.join(charts, f'ch0_ai_spread.{ext}'), bbox_inches='tight', transparent=True, **kw)
+    plt.close()
+
+
 if __name__ == '__main__':
     print(json.dumps(out, indent=1))
+    fig_ai_spread(out)
     with open(os.path.join(HERE, 'ai_discovery_case.json'), 'w') as f:
         json.dump(out, f, indent=1)

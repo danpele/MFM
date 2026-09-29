@@ -48,6 +48,7 @@ SERIES = {
     'EUR/RON (market file)':    ('market', 'EURRON.FOREX', 'close'),
     'Bitcoin':            ('market', 'BTC-USD.CC', 'close'),
     'Ethereum':           ('market', 'ETH-USD.CC', 'close'),
+    'Tether (USDT)':      ('market', 'USDT-USD.CC', 'close'),
     # randamente titluri de stat (close, %)
     'Romania 10y':        ('market', 'RO10Y.GBOND', 'close'),
     'Germany 10y':        ('market', 'DE10Y.GBOND', 'close'),
