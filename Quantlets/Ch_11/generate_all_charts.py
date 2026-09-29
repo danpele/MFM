@@ -903,7 +903,7 @@ def fig_rough_vol(rv):
 
 
 def fig_rough_vs_paper(rv):
-    """Tabelul 3, Panoul A (E-mini S&P 500, 2011-2014) pe scale Delta, fata de estimarile noastre pentru SPY, Delta = 1 zi."""
+    """Tabelul 3, Panoul A (E-mini S&P 500, 2011-2014) pe scale Delta, fata de estimarile pe datele cursului pentru SPY, Delta = 1 zi."""
     # Tabelul 3, Panoul A (log-volatilitatea E-mini S&P 500, 2011-2014): Delta in minute (390 = o zi de tranzactionare)
     T = {'delta_min': [10, 15, 30, 65, 130, 390],
          'alpha_ols': [-0.38, -0.35, -0.31, -0.30, -0.32, -0.30],
@@ -920,8 +920,8 @@ def fig_rough_vs_paper(rv):
              r'Memory parameter $\hat\beta$ (Cauchy class)', ('beta_cau', 'beta_cau_star'))]:
         ax.plot(xd - 0.08, T[k1], 'o-', color=MainBlue, ms=5, lw=1, label=l1)
         ax.plot(xd + 0.08, T[k2], 's--', color=IDAred, ms=5, lw=1, label=l2)
-        ax.plot([xd[-1] + 0.35], [rv[ours[0]]], 'D', color=Forest, ms=7, label='SPY 2020-2026, ours: OLS / plain')
-        ax.plot([xd[-1] + 0.55], [rv[ours[1]]], '^', color=Orange, ms=8, label='SPY 2020-2026, ours: noise-robust')
+        ax.plot([xd[-1] + 0.35], [rv[ours[0]]], 'D', color=Forest, ms=7, label='SPY 2020-2026, course data: OLS / plain')
+        ax.plot([xd[-1] + 0.55], [rv[ours[1]]], '^', color=Orange, ms=8, label='SPY 2020-2026, course data: noise-robust')
         ax.annotate('SPY,\n1 day', xy=(xd[-1] + 0.45, max(rv[ours[0]], rv[ours[1]])), xytext=(0, 12),
                     textcoords='offset points', ha='center', fontsize=7.5, color=Forest)
         ax.set_xticks(xd)
@@ -937,7 +937,7 @@ def fig_rough_vs_paper(rv):
     axes[1].set_ylim(-0.05, 1.2)
     fig_legend_bottom(fig, handles=axes[0].get_legend_handles_labels()[0],
                       labels=['Paper, Table 3A: OLS / plain', 'Paper, Table 3A: noise-robust (*)',
-                              'SPY 2020-2026 (ours): OLS / plain', 'SPY 2020-2026 (ours): noise-robust (*)'],
+                              'SPY 2020-2026 (course data): OLS / plain', 'SPY 2020-2026 (course data): noise-robust (*)'],
                       ncol=2, y=0.1)
     plt.tight_layout(rect=(0, 0.1, 1, 1))
     save_fig('ch11_case_rough_paper')
