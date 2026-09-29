@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch16_ltw'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Liu, Tsyvinski and Wu (2022, Journal of Finance), Common risk factors in cryptocurrency: Table 1, Panel B rebuilt for Bitcoin, XRP and Ether with the paper calendar (52 weeks a year, the first 51 of seven days), January 2014 (Ether: August 2015) - July 2020, against the published mean and standard deviation; the same statistics out of sample, August 2020 - September 2026; rolling 52-week standard deviation.'
+
+Keywords: 'cryptocurrency, factor model, replication, weekly returns, Bitcoin, XRP, Ether, out-of-sample, volatility'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama; 4-week Treasury bill rate from FRED'
+
+Output: 'ch16_ltw_table1.pdf, ch16_ltw_rolling_sd.pdf'

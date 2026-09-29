@@ -792,6 +792,81 @@ def fig_alt_assets():
     return out
 
 
+# =============================================================================
+# 8. STUDIU DE CAZ: LIU, TSYVINSKI & WU (2022), TABELUL 1, PANELUL B
+# =============================================================================
+LTW_T1 = {'BTC': (1.3, 11.1), 'XRP': (2.6, 23.7), 'ETH': (3.6, 21.0)}   # medie, abatere standard (%), Tabelul 1, Panelul B
+LTW_START = {'BTC': '2014-01-01', 'XRP': '2014-01-01', 'ETH': '2015-08-06'}   # Ether: din saptamana 32 din 2015
+LTW_END = '2020-07-31'
+LTW_NAME = {'BTC': 'Bitcoin', 'XRP': 'XRP', 'ETH': 'Ether'}
+
+
+def ltw_weekly(key, end=END):
+    """Randamente saptamanale simple cu calendarul lucrarii: 52 de saptamani pe an, primele 51 de 7 zile,
+    ultima pana la 31 decembrie; doar saptamanile complete (ultima inchidere = ultima zi a saptamanii)."""
+    p = price(key, None, end)
+    doy = p.index.dayofyear
+    wk = np.minimum((doy - 1) // 7 + 1, 52)
+    grp = pd.DataFrame({'p': p.values, 'd': p.index, 'y': p.index.year, 'w': wk}).groupby(['y', 'w'])
+    last = grp.last()
+    wend = [pd.Timestamp(y, 12, 31) if w == 52 else pd.Timestamp(y, 1, 1) + pd.Timedelta(days=7 * w - 1)
+            for y, w in last.index]
+    last = last[last['d'].values == np.array(wend, dtype='datetime64[ns]')]
+    r = last['p'].pct_change()
+    r.index = pd.DatetimeIndex(last['d'])
+    return r.dropna().rename(key)
+
+
+def ltw_moments(r):
+    return dict(n=len(r), mean=100 * r.mean(), median=100 * r.median(), sd=100 * r.std(),
+                skew=stats.skew(r), kurt=stats.kurtosis(r, fisher=False),
+                first=str(r.index[0].date()), last=str(r.index[-1].date()))
+
+
+def fig_ltw_table1():
+    """Tabelul 1, Panelul B din Liu, Tsyvinski & Wu (2022) refacut pe datele cursului (2014 - iulie 2020)
+    si aceleasi statistici in afara esantionului (august 2020 - 2026); volatilitatea pe 52 de saptamani."""
+    out, W = {}, {}
+    for k in LTW_T1:
+        r = ltw_weekly(k)
+        W[k] = r.loc[LTW_START[k]:]
+        out[k] = dict(ins=ltw_moments(r.loc[LTW_START[k]:LTW_END]), oos=ltw_moments(r.loc['2020-08-01':]),
+                      paper_mean=LTW_T1[k][0], paper_sd=LTW_T1[k][1])
+    keys = list(LTW_T1)
+    x = np.arange(len(keys))
+    bw = 0.26
+    ins_lab = f"Course data, same weeks ({out['BTC']['ins']['first'][:4]} - Jul 2020)"
+    oos_lab = f"Course data, out of sample (Aug 2020 - {pd.Timestamp(out['BTC']['oos']['last']).strftime('%b %Y')})"
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.9))
+    for ax, (stat, ttl) in zip(axes, [('mean', 'Mean weekly return (%)'), ('sd', 'Standard deviation of weekly returns (%)')]):
+        bars = [([LTW_T1[k][0 if stat == 'mean' else 1] for k in keys], MainBlue, 'Liu, Tsyvinski & Wu (2022), Table 1, Panel B'),
+                ([out[k]['ins'][stat] for k in keys], Orange, ins_lab),
+                ([out[k]['oos'][stat] for k in keys], Forest, oos_lab)]
+        for j, (v, c, lab) in enumerate(bars):
+            b = ax.bar(x + (j - 1) * bw, v, bw, color=c, label=lab)
+            ax.bar_label(b, fmt='%.1f', fontsize=6.5, color='black', padding=1)
+        ax.set_xticks(x)
+        ax.set_xticklabels([LTW_NAME[k] for k in keys])
+        ax.set_title(ttl, fontsize=9)
+        ax.set_ylim(0, 1.15 * max(max(v) for v, _, _ in bars))
+    fig.tight_layout()
+    fig_legend_bottom(fig, ncol=2, y=0.02)
+    save_fig('ch16_ltw_table1')
+
+    fig, ax = plt.subplots(figsize=(7.2, 2.9))
+    for k in keys:
+        rs = 100 * W[k].rolling(52).std().dropna()
+        ax.plot(rs.index, rs.values, color=COL[k], lw=1.0, label=f'{LTW_NAME[k]}: 52-week standard deviation')
+        out[k]['roll_max'], out[k]['roll_last'] = rs.max(), rs.iloc[-1]
+        out[k]['roll_max_date'] = str(rs.idxmax().date())
+    ax.axvline(pd.Timestamp(LTW_END), color=Gray, lw=0.6, ls='--')
+    ax.text(pd.Timestamp(LTW_END), ax.get_ylim()[1] * 0.92, ' end of the paper\'s sample', fontsize=7.5, color='black')
+    ax.set_ylabel('Standard deviation, % per week')
+    legend_outside_bottom(ax, ncol=3, y=-0.14)
+    save_fig('ch16_ltw_rolling_sd')
+    return out
+
+
 if __name__ == '__main__':
     print('Chapter 16: digital assets and DeFi')
     res = {}
@@ -813,6 +888,7 @@ if __name__ == '__main__':
     res['equities'] = fig_crypto_equities()
     res['defi'] = fig_defi_tvl()
     res['alt'] = fig_alt_assets()
+    res['ltw'] = fig_ltw_table1()
     with open(os.path.join(HERE, 'ch16_results.json'), 'w') as fh:
         json.dump(jsonable(res), fh, indent=1)
     print('saved ch16_results.json')
