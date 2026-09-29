@@ -1,11 +1,11 @@
 """
-Generator pentru graficele din Capitolul 8: Backtesting si evaluarea prognozelor de risc
-======================================================================================
-Toate graficele: fundal transparent, etichete ENG, legenda in afara, jos.
-Date: S&P 500, BET si Bitcoin (data/market), EUR/RON (cursul de referinta BNR).
-Prognoze VaR/ES la o zi pe fereastra mobila (1000 de observatii): HS, Normal, Student-t,
-GARCH-t, FHS, GARCH-EVT; evaluare din 2007 (EUR/RON din 2009, Bitcoin din 2017).
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Chart generator for Chapter 8: Backtesting and Evaluating Risk Forecasts
+========================================================================
+All charts: transparent background, English labels, legend outside at the bottom.
+Data: S&P 500, BET and Bitcoin (data/market), EUR/RON (BNR reference rate).
+One-day-ahead VaR/ES forecasts on a rolling window (1000 observations): HS, Normal, Student-t,
+GARCH-t, FHS, GARCH-EVT; evaluation from 2007 (EUR/RON from 2009, Bitcoin from 2017).
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -23,7 +23,7 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mfm_data as M   # noqa: E402
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# MFM standard style (as in SFM): transparent + English labels + legend at the bottom
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -42,7 +42,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Brand colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -61,7 +61,7 @@ CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -70,12 +70,12 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
 def pv_heatmap(ax, P, fmt='{:.2f}', title=None):
-    """Harta valorilor p: rosu = respingere, verde = nerespingere (scala log)."""
+    """Heat map of p-values: red = rejection, green = no rejection (log scale)."""
     Z = np.log10(np.clip(P.values.astype(float), 1e-4, 1))
     ax.imshow(Z, cmap=PV_CMAP, vmin=-4, vmax=0, aspect='auto')
     for i in range(P.shape[0]):
@@ -92,7 +92,7 @@ def pv_heatmap(ax, P, fmt='{:.2f}', title=None):
 
 
 # =============================================================================
-# DATE: prognozele tuturor modelelor pentru cele patru active
+# DATA: forecasts of all models for the four assets
 # =============================================================================
 _FC = {}
 
@@ -109,7 +109,7 @@ def hits(name, model, col='VaR1'):
 
 
 # =============================================================================
-# FIG 1: patru active, pierderi si VaR 1% GARCH-EVT
+# FIG 1: four assets, losses and GARCH-EVT VaR 1%
 # =============================================================================
 def fig_four_assets():
     fig, axs = plt.subplots(2, 2, figsize=(7.0, 3.9), sharex=False)
@@ -133,7 +133,7 @@ def fig_four_assets():
 
 
 # =============================================================================
-# FIG 2: S&P 500 -- pierderi, VaR 1% HS si GARCH-t, depasiri
+# FIG 2: S&P 500 -- losses, VaR 1% of HS and GARCH-t, breaches
 # =============================================================================
 def fig_sp500_var():
     F = fc('sp500')[0]
@@ -154,7 +154,7 @@ def fig_sp500_var():
 
 
 # =============================================================================
-# FIG 3: zoom COVID-19 (feb.-iun. 2020), toate modelele
+# FIG 3: COVID-19 zoom (Feb.-June 2020), all models
 # =============================================================================
 def fig_covid_zoom():
     F = fc('sp500')[0]
@@ -177,7 +177,7 @@ def fig_covid_zoom():
 
 
 # =============================================================================
-# FIG 4: rata depasirilor VaR 1% pe modele si active
+# FIG 4: VaR 1% breach rates by model and asset
 # =============================================================================
 def breach_table(col='VaR1', p=0.01):
     rows = {}
@@ -207,7 +207,7 @@ def fig_breach_rates(tab):
 
 
 # =============================================================================
-# FIG 5: statistica Kupiec in functie de numarul de depasiri
+# FIG 5: Kupiec statistic as a function of the number of breaches
 # =============================================================================
 def fig_kupiec_curve():
     fig, axs = plt.subplots(1, 2, figsize=(6.8, 2.8))
@@ -230,7 +230,7 @@ def fig_kupiec_curve():
 
 
 # =============================================================================
-# FIG 6: valori p ale testelor VaR (Kupiec, Christoffersen, durate)
+# FIG 6: p-values of the VaR tests (Kupiec, Christoffersen, durations)
 # =============================================================================
 def fig_var_pvalues(tab):
     fig, axs = plt.subplots(1, 3, figsize=(7.2, 2.7), sharey=True)
@@ -244,7 +244,7 @@ def fig_var_pvalues(tab):
 
 
 # =============================================================================
-# FIG 7: cronologia depasirilor (S&P 500)
+# FIG 7: breach timeline (S&P 500)
 # =============================================================================
 def fig_breach_timeline():
     fig, ax = plt.subplots(figsize=(6.8, 2.6))
@@ -263,7 +263,7 @@ def fig_breach_timeline():
 
 
 # =============================================================================
-# FIG 8: functia de supravietuire a duratelor dintre depasiri
+# FIG 8: survival function of the durations between breaches
 # =============================================================================
 def fig_durations(tab):
     fig, ax = plt.subplots(figsize=(6.4, 3.0))
@@ -285,7 +285,7 @@ def fig_durations(tab):
 
 
 # =============================================================================
-# FIG 9: semaforul Basel -- exceptii pe 250 de zile (S&P 500)
+# FIG 9: Basel traffic light -- exceptions over 250 days (S&P 500)
 # =============================================================================
 def rolling_exceptions(name, model, col='VaR1', n=250):
     return hits(name, model, col).rolling(n).sum().dropna()
@@ -313,7 +313,7 @@ def fig_traffic_light():
 
 
 # =============================================================================
-# TESTE ES: McNeil-Frey, Acerbi-Szekely, Du-Escanciano
+# ES TESTS: McNeil-Frey, Acerbi-Szekely, Du-Escanciano
 # =============================================================================
 def es_table():
     rows = {}
@@ -389,7 +389,7 @@ def fig_mf_residuals():
 
 
 # =============================================================================
-# FIG: elicitabilitate -- pierderea cuantila si FZ0 in medie
+# FIG: elicitability -- expected quantile (pinball) and FZ0 losses
 # =============================================================================
 def fig_elicitability(nu=4, a=0.025, n=2_000_000, seed=3):
     rng = np.random.default_rng(seed)
@@ -426,7 +426,7 @@ def fig_elicitability(nu=4, a=0.025, n=2_000_000, seed=3):
 
 
 # =============================================================================
-# PIERDEREA FZ0, DIEBOLD-MARIANO, MCS
+# FZ0 LOSS, DIEBOLD-MARIANO, MCS
 # =============================================================================
 def fz_losses(name):
     F = fc(name)[0]
@@ -495,7 +495,7 @@ def fig_mcs(tab):
 
 
 # =============================================================================
-# PREDICTIE CONFORMALA
+# CONFORMAL PREDICTION
 # =============================================================================
 def conformal_table(a=0.01):
     out = {}
@@ -560,7 +560,7 @@ def fig_conformal_regimes(tab):
 
 
 # =============================================================================
-# EXEMPLE LUCRATE PENTRU CURS
+# WORKED EXAMPLES FOR THE LECTURE
 # =============================================================================
 def worked_examples():
     out = {}
@@ -570,14 +570,14 @@ def worked_examples():
     out['chr_hs'] = dict(**M.transitions(h.values), **M.christoffersen(h.values, 0.01))
     h = hits('sp500', 'GARCH-t').loc['2007':'2010']
     out['chr_garch'] = dict(**M.transitions(h.values), **M.christoffersen(h.values, 0.01))
-    # FRTB: exceptii la nivel de desk in ultimele 250 de zile
+    # FRTB: desk-level exceptions in the last 250 days
     out['desk'] = {n: {m: dict(x99=int(hits(n, m, 'VaR1').iloc[-250:].sum()),
                                 x975=int(hits(n, m, 'VaR2.5').iloc[-250:].sum())) for m in M.MODELS}
                    for n in M.ASSETS}
     out['last_window'] = {n: [str(hits(n, 'HS').index[-250].date()), str(hits(n, 'HS').index[-1].date())]
                           for n in M.ASSETS}
     out['binom250'] = [float(stats.binom.cdf(k, 250, 0.01)) for k in range(0, 11)]
-    # parametrii medii ai modelelor
+    # average model parameters
     out['params'] = {n: dict(nu_garch=float(fc(n)[0]['GARCH-t']['nu'].median()),
                              nu_t=float(fc(n)[0]['Student-t']['nu'].median()),
                              xi=float(fc(n)[0]['GARCH-EVT']['xi'].median())) for n in M.ASSETS}
@@ -585,11 +585,11 @@ def worked_examples():
 
 
 # =============================================================================
-# INFERENTA: testul DQ, marime si putere (Monte Carlo), riscul de estimare,
-# Giacomini-White, zonele Nolde-Ziegel, diagrama Murphy, testul multinomial
+# INFERENCE: DQ test, size and power (Monte Carlo), estimation risk,
+# Giacomini-White, Nolde-Ziegel zones, Murphy diagram, multinomial test
 # =============================================================================
 def dq_test(hit, var, a, lags=4):
-    """Testul Dynamic Quantile (Engle & Manganelli, 2004): Hit_t = I_t - a regresat pe
+    """Dynamic Quantile test (Engle & Manganelli, 2004): Hit_t = I_t - a regressed on
     X_t = (1, Hit_{t-1..t-lags}, VaR_t); DQ = b'X'Xb / (a(1-a)) ~ chi2(k)."""
     h = np.asarray(hit, float) - a
     v = np.asarray(var, float)
@@ -610,7 +610,7 @@ def dq_table(col='VaR1', a=0.01):
 
 
 def fig_var_pvalues4(tab, dq):
-    """Harta valorilor p: Kupiec, CC, durate si DQ (VaR 1%)."""
+    """Heat map of p-values: Kupiec, CC, durations and DQ (VaR 1%)."""
     fig, axs = plt.subplots(1, 4, figsize=(8.6, 2.7), sharey=True)
     for ax, (key, title) in zip(axs, (('p_uc', 'Kupiec POF'), ('p_cc', 'Christoffersen CC'),
                                       ('p_dur', 'Duration (Weibull)'), ('dq', 'Dynamic Quantile'))):
@@ -626,8 +626,8 @@ def fig_var_pvalues4(tab, dq):
 
 
 def pof_power(T, pis, a=0.01, level=0.05):
-    """Puterea exacta a testului Kupiec (LR, nivel 5%) sub Binomial(T, pi) si aproximarea locala
-    chi2 necentrala cu parametrul T (pi - a)^2 / (a(1-a))."""
+    """Exact power of the Kupiec test (LR, 5% level) under Binomial(T, pi) and the local
+    noncentral chi2 approximation with parameter T (pi - a)^2 / (a(1-a))."""
     x = np.arange(T + 1)
     lr = np.array([M.kupiec(np.r_[np.ones(k), np.zeros(T - k)], a)['LR'] for k in x])
     rej = lr > stats.chi2.ppf(1 - level, 1)
@@ -662,7 +662,7 @@ def fig_pof_power():
 
 
 def sim_garch_t(par, n, reps, rng, burn=500):
-    """Traiectorii GARCH(1,1)-t (inovatii t standardizate); intoarce randamentele si sigma_t."""
+    """GARCH(1,1)-t paths (standardised t innovations); returns the returns and sigma_t."""
     mu, om, a, b, nu = par
     z = rng.standard_t(nu, size=(reps, n + burn)) * np.sqrt((nu - 2) / nu)
     r = np.empty((reps, n + burn))
@@ -676,9 +676,9 @@ def sim_garch_t(par, n, reps, rng, burn=500):
 
 
 def mc_size_power(reps=1000, seed=8, Ts=(250, 1000, 5000), a=0.01, w=1000):
-    """Monte Carlo: DGP GARCH(1,1)-t cu parametrii estimati pe S&P 500 1990-2026.
-    Prognoze VaR 1%: modelul corect (parametri adevarati), Normal-GARCH (sigma adevarat, coada Normala), HS (1000 zile).
-    Rata de respingere la 5% pentru POF, CC, durate (Weibull) si DQ; p nedefinit (prea putine depasiri) = nerespingere."""
+    """Monte Carlo: GARCH(1,1)-t DGP with the parameters estimated on the S&P 500, 1990-2026.
+    VaR 1% forecasts: correct model (true parameters), Normal-GARCH (true sigma, Normal tail), HS (1000 days).
+    Rejection rate at 5% for POF, CC, durations (Weibull) and DQ; undefined p (too few breaches) = no rejection."""
     r = M.load_returns('sp500').values
     par = M.garch_fit(r)
     mu, om, al, be, nu = par
@@ -714,8 +714,8 @@ def mc_size_power(reps=1000, seed=8, Ts=(250, 1000, 5000), a=0.01, w=1000):
 
 
 def mc_estimation_risk(reps=400, seed=9, Rw=1000, Ps=(250, 1000, 5000), a=0.01):
-    """Riscul de estimare: GARCH-t estimat o singura data pe R = 1000 de zile (schema fixa), VaR 1% pe P zile.
-    Rata de respingere POF la 5% cu parametri estimati versus parametri adevarati, pe aceleasi traiectorii."""
+    """Estimation risk: GARCH-t estimated once on R = 1000 days (fixed scheme), VaR 1% over P days.
+    POF rejection rate at 5% with estimated versus true parameters, on the same paths."""
     r0 = M.load_returns('sp500').values
     par = M.garch_fit(r0)
     rng = np.random.default_rng(seed)
@@ -745,8 +745,8 @@ def mc_estimation_risk(reps=400, seed=9, Rw=1000, Ps=(250, 1000, 5000), a=0.01):
 
 
 def gw_test(la, lb):
-    """Testul de abilitate predictiva conditionala Giacomini-White (2006), orizont 1:
-    Z_t = h_{t-1} d_t cu h_{t-1} = (1, d_{t-1}); W = T Zbar' Omega^{-1} Zbar ~ chi2(2)."""
+    """Giacomini-White (2006) test of conditional predictive ability, horizon 1:
+    Z_t = h_{t-1} d_t with h_{t-1} = (1, d_{t-1}); W = T Zbar' Omega^{-1} Zbar ~ chi2(2)."""
     d = np.asarray(la) - np.asarray(lb)
     Z = np.column_stack([d[1:], d[:-1] * d[1:]])
     T = len(Z)
@@ -763,8 +763,8 @@ def gw_table():
 
 
 def nz_zones(standard='HS', internals=('GARCH-t', 'FHS', 'GARCH-EVT'), level=0.05):
-    """Backtesting comparativ in trei zone (Nolde & Ziegel, 2017): doua teste unilaterale DM pe FZ0
-    ale modelului intern fata de modelul standard. Verde: intern semnificativ mai bun; rosu: semnificativ mai slab."""
+    """Three-zone comparative backtesting (Nolde & Ziegel, 2017): two one-sided DM tests on FZ0
+    of the internal model against the standard model. Green: internal significantly better; red: significantly worse."""
     z = stats.norm.ppf(1 - level)
     out = {}
     for n in M.ASSETS:
@@ -776,8 +776,8 @@ def nz_zones(standard='HS', internals=('GARCH-t', 'FHS', 'GARCH-EVT'), level=0.0
 
 
 def elementary_scores(L, v, thetas, tau):
-    """Scorurile elementare pentru cuantila de ordin tau (Ehm et al., 2016):
-    S_theta(v, y) = (1{y < v} - tau)(1{theta < v} - 1{theta < y}); matrice T x len(thetas)."""
+    """Elementary scores for the quantile of order tau (Ehm et al., 2016):
+    S_theta(v, y) = (1{y < v} - tau)(1{theta < v} - 1{theta < y}); matrix T x len(thetas)."""
     L = np.asarray(L)[:, None]
     v = np.asarray(v)[:, None]
     th = np.asarray(thetas)[None, :]
@@ -787,7 +787,7 @@ def elementary_scores(L, v, thetas, tau):
 def murphy(name, mA, mB, col='VaR1', a=0.01, n=240):
     F = fc(name)[0]
     L = F[mA]['L'].values
-    lo, hi = np.nanquantile(np.r_[F[mA][col], F[mB][col]], [0.01, 0.99])   # zona in care se afla prognozele
+    lo, hi = np.nanquantile(np.r_[F[mA][col], F[mB][col]], [0.01, 0.99])   # range covered by the forecasts
     th = np.linspace(0.8 * lo, hi, n)
     SA = elementary_scores(L, F[mA][col].values, th, 1 - a)
     SB = elementary_scores(L, F[mB][col].values, th, 1 - a)
@@ -835,8 +835,8 @@ def murphy_summary(name, mA, mB, col, a):
 
 
 def multinomial_table(N=4, a=0.025):
-    """Testul multinomial VaR (Kratz, Lok & McNeil, 2018), statistica Pearson, N = 4 niveluri de coada
-    a_j = a (1 - (j-1)/N): 2.5%, 1.875%, 1.25%, 0.625%; celulele se definesc prin PIT."""
+    """Multinomial VaR test (Kratz, Lok & McNeil, 2018), Pearson statistic, N = 4 tail levels
+    a_j = a (1 - (j-1)/N): 2.5%, 1.875%, 1.25%, 0.625%; cells are defined through the PIT."""
     lev = np.array([1 - a * (1 - j / N) for j in range(N)])      # 0.975, 0.98125, 0.9875, 0.99375
     probs = np.diff(np.r_[0.0, lev, 1.0])
     out = {}
@@ -853,7 +853,7 @@ def multinomial_table(N=4, a=0.025):
 
 
 def extras(R):
-    """Blocurile de inferenta adaugate cursului (DQ, putere, risc de estimare, GW, Nolde-Ziegel, Murphy, multinomial)."""
+    """Inference blocks of the lecture (DQ, power, estimation risk, GW, Nolde-Ziegel, Murphy, multinomial)."""
     R['dq'] = dq_table()
     fig_var_pvalues4(R['var99'], R['dq'])
     R['pof_power'] = fig_pof_power()
@@ -881,7 +881,7 @@ def to_py(o):
 
 
 if __name__ == '__main__' and '--extras' in sys.argv:
-    # doar blocurile de inferenta, adaugate la rezultatele existente
+    # only the inference blocks, added to the existing results
     R = json.load(open(os.path.join(HERE, 'ch8_results.json')))
     extras(R)
     with open(os.path.join(HERE, 'ch8_results.json'), 'w') as f:

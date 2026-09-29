@@ -126,7 +126,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "Estimation risk matters only for ES backtests, not for VaR",
                     "A larger P always removes estimation risk"
                 ],
-                "correctExplanation": "Out-of-sample hits depend on the estimated parameters; the extra term is of order sqrt(P/R). In the lecture's Monte Carlo a correct GARCH-t is rejected in about 27% of samples at P = 5000 with estimated parameters.",
+                "correctExplanation": "Out-of-sample hits depend on the estimated parameters; the extra term is of order sqrt(P/R). In the lecture's fixed-scheme Monte Carlo a correct GARCH-t is rejected in about 27% of samples at P = 5000 with estimated parameters; the rolling scheme has a different correction term of the same order.",
                 "incorrectExplanation": "Estimation error enters the hits through VaR_t(theta-hat); its effect grows with P/R, so a larger evaluation sample makes it worse, not better."
             },
             "ro": {
@@ -138,7 +138,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "Riscul de estimare contează doar pentru testele ES, nu pentru VaR",
                     "Un P mai mare elimină întotdeauna riscul de estimare"
                 ],
-                "correctExplanation": "Depășirile din afara eșantionului depind de parametrii estimați; termenul suplimentar este de ordinul sqrt(P/R). În simularea Monte Carlo din curs, un GARCH-t corect este respins în circa 27% din eșantioane la P = 5000 cu parametri estimați.",
+                "correctExplanation": "Depășirile din afara eșantionului depind de parametrii estimați; termenul suplimentar este de ordinul sqrt(P/R). În simularea Monte Carlo din curs, cu schemă fixă, un GARCH-t corect este respins în circa 27% din eșantioane la P = 5000 cu parametri estimați; schema mobilă are un alt termen de corecție, de același ordin.",
                 "incorrectExplanation": "Eroarea de estimare intră în depășiri prin VaR_t(theta estimat); efectul ei crește cu P/R, deci un eșantion de evaluare mai mare o agravează, nu o elimină."
             }
         },
@@ -200,7 +200,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
             "correct": 3,
             "en": {
                 "title": "DQ versus Christoffersen",
-                "text": "A model's breaches occur about five days after each large loss and never on consecutive days. Which test is designed to detect this?",
+                "text": "A model's breaches tend to occur five days after a previous breach, while the breach probability the day after a breach is normal. Which test is designed to detect this?",
                 "options": [
                     "Christoffersen's first-order Markov independence test",
                     "The Kupiec POF test",
@@ -212,7 +212,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
             },
             "ro": {
                 "title": "DQ versus Christoffersen",
-                "text": "Depășirile unui model apar la circa cinci zile după fiecare pierdere mare și niciodată în zile consecutive. Ce test este construit să detecteze aceasta?",
+                "text": "Depășirile unui model tind să apară la cinci zile după o depășire anterioară, iar probabilitatea de depășire în ziua de după o depășire este normală. Ce test este construit să detecteze aceasta?",
                 "options": [
                     "Testul de independență Christoffersen, cu lanț Markov de ordinul întâi",
                     "Testul POF Kupiec",
@@ -289,7 +289,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "ES_t = VaR_t"
                 ],
                 "correctExplanation": "E[L_t I_t | F_{t-1}] = P(breach) E[L_t | breach] = alpha ES_t; since ES_t is known at t-1, each ratio has mean alpha and the known denominator T alpha makes the mean exactly zero.",
-                "incorrectExplanation": "The coverage identity alone says nothing about the size of tail losses; the proof needs the tail expectation on breach days to equal alpha times ES."
+                "incorrectExplanation": "The coverage identity alone says nothing about the size of tail losses; the proof needs E[L_t I_t | F_{t-1}] = alpha ES_t, i.e. the mean loss on breach days equal to ES_t, multiplied by the breach probability alpha."
             },
             "ro": {
                 "title": "De ce E[Z2] = 0",
@@ -301,14 +301,14 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "ES_t = VaR_t"
                 ],
                 "correctExplanation": "E[L_t I_t | F_{t-1}] = P(depășire) E[L_t | depășire] = alpha ES_t; cum ES_t este cunoscut la t-1, fiecare raport are media alpha, iar numitorul cunoscut T alpha face media exact zero.",
-                "incorrectExplanation": "Identitatea de acoperire singură nu spune nimic despre mărimea pierderilor din coadă; demonstrația cere ca media pierderilor din zilele cu depășire să fie alpha ori ES."
+                "incorrectExplanation": "Identitatea de acoperire singură nu spune nimic despre mărimea pierderilor din coadă; demonstrația cere E[L_t I_t | F_{t-1}] = alpha ES_t, adică media pierderilor din zilele cu depășire egală cu ES_t, înmulțită cu probabilitatea de depășire alpha."
             }
         },
         {
             "correct": 0,
             "en": {
                 "title": "Ranking ES by squared error",
-                "text": "Ranking ES forecasts by the mean of (L_t - ES_t)^2 over breach days",
+                "text": "Ranking ES forecasts by the mean of (L_t - ES_t)^2 over each model's own breach days (L_t > its VaR_t)",
                 "options": [
                     "can favour a wrong forecast, because this score is not consistent for ES",
                     "is consistent, because ES is a conditional mean",
@@ -320,7 +320,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
             },
             "ro": {
                 "title": "Clasificarea ES după eroarea pătratică",
-                "text": "Clasificarea prognozelor ES după media lui (L_t - ES_t)^2 în zilele cu depășire",
+                "text": "Clasificarea prognozelor ES după media lui (L_t - ES_t)^2 în zilele cu depășire ale fiecărui model (L_t > VaR_t al lui)",
                 "options": [
                     "poate favoriza o prognoză greșită, pentru că acest scor nu este consistent pentru ES",
                     "este consistentă, pentru că ES este o medie condiționată",
@@ -335,24 +335,24 @@ window.MFM_DATA.quizzes['backtesting'] = {
             "correct": 1,
             "en": {
                 "title": "Why the pinball loss is consistent",
-                "text": "Differentiating E[(1{L > v} - alpha)(L - v)] with respect to v gives F(v) - (1 - alpha). What follows?",
+                "text": "Let L have a density f > 0 around its unique (1 - alpha)-quantile. Differentiating E[(1{L > v} - alpha)(L - v)] with respect to v gives F(v) - (1 - alpha). What follows?",
                 "options": [
                     "The minimiser is the mean of L",
                     "The minimiser satisfies F(v) = 1 - alpha, i.e. v = VaR_alpha, and the second derivative f(v) > 0 makes it a minimum",
                     "The minimiser is ES_alpha",
-                    "The pinball loss has no unique minimiser for continuous F"
+                    "The pinball loss has no unique minimiser under this assumption"
                 ],
                 "correctExplanation": "The first-order condition identifies the (1 - alpha)-quantile of the loss, which is VaR_alpha; the identification function 1{L <= v} - (1 - alpha) has mean zero only there.",
                 "incorrectExplanation": "Set the derivative to zero: P(L > v) = alpha, which is the definition of the VaR, not of the mean or of ES."
             },
             "ro": {
                 "title": "De ce este consistentă pierderea pinball",
-                "text": "Derivând E[(1{L > v} - alpha)(L - v)] în raport cu v obținem F(v) - (1 - alpha). Ce rezultă?",
+                "text": "Fie L cu densitatea f > 0 în jurul cuantilei sale unice de ordin 1 - alpha. Derivând E[(1{L > v} - alpha)(L - v)] în raport cu v obținem F(v) - (1 - alpha). Ce rezultă?",
                 "options": [
                     "Punctul de minim este media lui L",
                     "Punctul de minim satisface F(v) = 1 - alpha, adică v = VaR_alpha, iar derivata a doua f(v) > 0 îl face minim",
                     "Punctul de minim este ES_alpha",
-                    "Pierderea pinball nu are un minim unic pentru F continuă"
+                    "Pierderea pinball nu are un minim unic sub această ipoteză"
                 ],
                 "correctExplanation": "Condiția de ordinul întâi identifică cuantila de ordin 1 - alpha a pierderii, adică VaR_alpha; funcția de identificare 1{L <= v} - (1 - alpha) are media zero doar acolo.",
                 "incorrectExplanation": "Egalați derivata cu zero: P(L > v) = alpha, care este chiar definiția VaR, nu a mediei sau a ES."
@@ -391,7 +391,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "title": "FZ0 loss",
                 "text": "In the FZ0 loss (1{L>v}(L-v))/(alpha e) + v/e + ln e - 1, what does the first term do?",
                 "options": [
-                    "It rewards large ES forecasts",
+                    "It increases when the reported ES increases, holding the loss and VaR fixed",
                     "It penalises forecasts on quiet days",
                     "It penalises breaches, in proportion to the excess loss and inversely to the reported ES",
                     "It measures the variance of losses"
@@ -403,7 +403,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "title": "Pierderea FZ0",
                 "text": "În pierderea FZ0 (1{L>v}(L-v))/(alpha e) + v/e + ln e - 1, ce face primul termen?",
                 "options": [
-                    "Recompensează prognozele ES mari",
+                    "Crește când ES raportat crește, la pierdere și VaR fixe",
                     "Penalizează prognozele în zilele liniștite",
                     "Penalizează depășirile, proporțional cu pierderea în exces și invers proporțional cu ES raportat",
                     "Măsoară dispersia pierderilor"
@@ -448,10 +448,10 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "Only the single best model",
                     "All models that pass the Kupiec test",
                     "The models with positive DM statistics",
-                    "The set of models that contains the best one with a given probability, after sequential elimination"
+                    "A set built by sequential elimination to contain the best models with a given asymptotic probability"
                 ],
                 "correctExplanation": "Models are eliminated one by one while equal predictive ability is rejected; the survivors form the MCS. On Bitcoin all six models survive: the data cannot separate them.",
-                "incorrectExplanation": "The MCS is a set of statistically equivalent best models, not a single winner."
+                "incorrectExplanation": "The MCS is a set of models that the data cannot separate from the best, not a single winner; non-rejection is not proof of equal performance."
             },
             "ro": {
                 "title": "Mulțimea de modele de încredere",
@@ -460,10 +460,10 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "Doar cel mai bun model",
                     "Toate modelele care trec testul Kupiec",
                     "Modelele cu statistici DM pozitive",
-                    "Mulțimea de modele care conține modelul cel mai bun cu o probabilitate dată, după eliminări succesive"
+                    "O mulțime construită prin eliminări succesive astfel încât să conțină modelele cele mai bune cu o probabilitate asimptotică dată"
                 ],
                 "correctExplanation": "Modelele sunt eliminate unul câte unul cât timp egalitatea abilității predictive este respinsă; cele rămase formează MCS. Pe Bitcoin rămân toate cele șase modele: datele nu le pot separa.",
-                "incorrectExplanation": "MCS este o mulțime de modele cele mai bune, echivalente statistic, nu un singur câștigător."
+                "incorrectExplanation": "MCS este o mulțime de modele pe care datele nu le pot separa de cel mai bun, nu un singur câștigător; nerespingerea nu dovedește performanțe egale."
             }
         },
         {
@@ -475,9 +475,9 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "1/(n + 1)",
                     "the ACI step size gamma",
                     "zero, by the finite-sample guarantee",
-                    "weighted total-variation distances between the calibration scores and the test score (Barber et al., 2023)"
+                    "weighted total-variation distances between the joint score vector and the vectors obtained by swapping the test score with each calibration score (Barber et al., 2023)"
                 ],
-                "correctExplanation": "Barber, Candès, Ramdas and Tibshirani (2023) bound the coverage loss by weighted total-variation distances; volatility clustering makes these distances large right after turbulent periods.",
+                "correctExplanation": "Barber, Candès, Ramdas and Tibshirani (2023) bound the loss of marginal coverage by weighted total-variation distances between the joint score vector and its swapped versions; the bound concerns marginal coverage, not coverage on crisis days.",
                 "incorrectExplanation": "The finite-sample guarantee requires exchangeability; 1/(n + 1) is only the upper slack of coverage under exchangeability, and gamma belongs to ACI."
             },
             "ro": {
@@ -487,9 +487,9 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "1/(n + 1)",
                     "pasul ACI gamma",
                     "zero, datorită garanției în eșantion finit",
-                    "distanțe ponderate în variație totală între scorurile de calibrare și scorul de test (Barber et al., 2023)"
+                    "distanțe ponderate în variație totală între vectorul comun al scorurilor și vectorii obținuți schimbând scorul de test cu fiecare scor de calibrare (Barber et al., 2023)"
                 ],
-                "correctExplanation": "Barber, Candès, Ramdas și Tibshirani (2023) mărginesc pierderea de acoperire prin distanțe ponderate în variație totală; gruparea volatilității face aceste distanțe mari imediat după perioade agitate.",
+                "correctExplanation": "Barber, Candès, Ramdas și Tibshirani (2023) mărginesc pierderea de acoperire marginală prin distanțe ponderate în variație totală între vectorul comun al scorurilor și versiunile lui cu scoruri schimbate; marginea privește acoperirea marginală, nu acoperirea în zilele de criză.",
                 "incorrectExplanation": "Garanția în eșantion finit cere schimbabilitate; 1/(n + 1) este doar marja superioară a acoperirii sub schimbabilitate, iar gamma ține de ACI."
             }
         },
@@ -497,27 +497,27 @@ window.MFM_DATA.quizzes['backtesting'] = {
             "correct": 2,
             "en": {
                 "title": "Exchangeability",
-                "text": "Why does the split conformal guarantee fail conditionally on financial returns?",
+                "text": "Why can the split conformal guarantee not simply be invoked for VaR on financial returns, and why does it say nothing about crisis days?",
                 "options": [
                     "Because returns have a mean of zero",
                     "Because the method needs Normal data",
-                    "Because volatility clustering makes the scores non-exchangeable, so breaches concentrate after turbulent periods",
+                    "Because volatility clustering makes the scores non-exchangeable, and even under exchangeability the guarantee is only marginal",
                     "Because the calibration set is too large"
                 ],
-                "correctExplanation": "The guarantee holds only on average over exchangeable data; after turbulent periods the S&P 500 split conformal VaR 5% is breached on about 7% of days, and breaches cluster.",
-                "incorrectExplanation": "The assumption that breaks is exchangeability: volatility clusters, so coverage is only marginal."
+                "correctExplanation": "The finite-sample guarantee needs exchangeable scores, which volatility clustering breaks; even with exchangeable scores it is marginal, not conditional on crisis days. After turbulent periods the S&P 500 split conformal VaR 5% is breached on about 7% of days, and breaches cluster.",
+                "incorrectExplanation": "The assumption that breaks is exchangeability, and conditional coverage was never guaranteed: split conformal controls only average coverage."
             },
             "ro": {
                 "title": "Schimbabilitate",
-                "text": "De ce garanția conformală split eșuează condiționat pe randamentele financiare?",
+                "text": "De ce garanția conformală split nu poate fi invocată pur și simplu pentru VaR pe randamente financiare și de ce nu spune nimic despre zilele de criză?",
                 "options": [
                     "Pentru că randamentele au media zero",
                     "Pentru că metoda cere date Normale",
-                    "Pentru că gruparea volatilității face scorurile neschimbabile, deci depășirile se concentrează după perioade agitate",
+                    "Pentru că gruparea volatilității face scorurile neschimbabile, iar chiar sub schimbabilitate garanția este doar marginală",
                     "Pentru că mulțimea de calibrare este prea mare"
                 ],
-                "correctExplanation": "Garanția este valabilă doar în medie, pentru date schimbabile; după perioade agitate, VaR conformal split 5% pe S&P 500 este depășit în circa 7% dintre zile, iar depășirile se grupează.",
-                "incorrectExplanation": "Ipoteza care cade este schimbabilitatea: volatilitatea se grupează, deci acoperirea este doar marginală."
+                "correctExplanation": "Garanția în eșantion finit cere scoruri schimbabile, iar gruparea volatilității distruge această proprietate; chiar cu scoruri schimbabile, garanția este marginală, nu condiționată de zilele de criză. După perioade agitate, VaR conformal split 5% pe S&P 500 este depășit în circa 7% dintre zile, iar depășirile se grupează.",
+                "incorrectExplanation": "Ipoteza care cade este schimbabilitatea, iar acoperirea condiționată nu a fost niciodată garantată: conformal split controlează doar acoperirea medie."
             }
         },
         {
@@ -612,7 +612,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "HS assumes the Normal distribution",
                     "FHS ignores the largest losses"
                 ],
-                "correctExplanation": "HS updates only when extreme days enter the 1000-day window; FHS multiplies empirical standardised quantiles by today's volatility forecast, so it adapts to the crash almost immediately.",
+                "correctExplanation": "HS updates as days enter and leave its 1000-day window but has no current-volatility scaling, so it adapts slowly; FHS multiplies empirical standardised quantiles by today's volatility forecast, so it adapts to the crash almost immediately.",
                 "incorrectExplanation": "Conditioning on current volatility, not the tail shape, made the difference."
             },
             "ro": {
@@ -624,7 +624,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "HS presupune distribuția Normală",
                     "FHS ignoră cele mai mari pierderi"
                 ],
-                "correctExplanation": "HS se actualizează doar când zile extreme intră în fereastra de 1000 de zile; FHS înmulțește cuantilele empirice standardizate cu volatilitatea prognozată azi, deci se adaptează aproape imediat la prăbușire.",
+                "correctExplanation": "HS se actualizează pe măsură ce zilele intră și ies din fereastra de 1000 de zile, dar nu are scalare cu volatilitatea curentă, deci se adaptează lent; FHS înmulțește cuantilele empirice standardizate cu volatilitatea prognozată azi, deci se adaptează aproape imediat la prăbușire.",
                 "incorrectExplanation": "Condiționarea pe volatilitatea curentă, nu forma cozii, a făcut diferența."
             }
         },

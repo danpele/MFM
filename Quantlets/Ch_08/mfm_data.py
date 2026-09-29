@@ -1,16 +1,16 @@
 """
-mfm_data.py -- Date si instrumente pentru Capitolul 8 (MFM): backtesting-ul prognozelor de risc
+mfm_data.py -- Data and tools for Chapter 8 (MFM): backtesting risk forecasts
 ==============================================================================================
-  * load_returns(name)   -- randamente log zilnice: S&P 500, BET, Bitcoin (data/market), EUR/RON (curs BNR)
-  * rolling_forecasts    -- prognoze VaR/ES la o zi, pe fereastra mobila: HS, Normal, Student-t,
+  * load_returns(name)   -- daily log returns: S&P 500, BET, Bitcoin (data/market), EUR/RON (BNR rate)
+  * rolling_forecasts    -- one-day-ahead VaR/ES forecasts on a rolling window: HS, Normal, Student-t,
                             GARCH-t, FHS, GARCH-EVT (McNeil-Frey)
-  * teste VaR            -- Kupiec (POF), Christoffersen (independenta, acoperire conditionata),
-                            durate (Christoffersen-Pelletier), zonele Basel (semafor)
-  * teste ES             -- McNeil-Frey, Acerbi-Szekely Z1/Z2 (simulare), Du-Escanciano
-  * comparatii           -- pierderea FZ0, testul Diebold-Mariano (HAC), multimea de modele de incredere (MCS)
-  * conformal            -- VaR conformal split si inferenta conformala adaptiva (ACI)
+  * VaR tests            -- Kupiec (POF), Christoffersen (independence, conditional coverage),
+                            durations (Christoffersen-Pelletier), Basel zones (traffic light)
+  * ES tests             -- McNeil-Frey, Acerbi-Szekely Z1/Z2 (simulation), Du-Escanciano
+  * comparisons          -- FZ0 loss, Diebold-Mariano test (HAC), model confidence set (MCS)
+  * conformal            -- split conformal VaR and adaptive conformal inference (ACI)
 
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -24,12 +24,12 @@ from numpy.lib.stride_tricks import sliding_window_view
 REPO_RAW = 'https://raw.githubusercontent.com/danpele/MFM/main/data/market/'
 MARKET_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'data', 'market')
 
-# nume -> (simbol, data de start); indici/cripto: pretul de inchidere
+# name -> (symbol, start date); indices/crypto: closing price
 SOURCES = {
     'sp500':  ('GSPC.INDX', '1990-01-01'),
     'bet':    ('BET', '1997-09-19'),
     'btc':    ('BTC-USD.CC', '2014-09-17'),
-    'eurron': ('REF:EUR', '2005-07-01'),        # cursul de referinta BNR, de la introducerea leului nou
+    'eurron': ('REF:EUR', '2005-07-01'),        # BNR reference rate, since the introduction of the new leu
 }
 LABELS = {'sp500': 'S&P 500', 'bet': 'BET', 'btc': 'Bitcoin', 'eurron': 'EUR/RON'}
 ASSETS = list(SOURCES)
@@ -38,7 +38,7 @@ _CACHE = {}
 
 
 def read_market(symbol):
-    """Citeste data/market/<SIMBOL>.csv local sau din repo-ul GitHub."""
+    """Read data/market/<SYMBOL>.csv locally or from the GitHub repository."""
     fname = f'{symbol}.csv'
     path = os.path.join(MARKET_DIR, fname)
     src = path if os.path.exists(path) else REPO_RAW + fname
@@ -46,7 +46,7 @@ def read_market(symbol):
 
 
 def read_reference_rate(currency='EUR', start='2005-07-01', end='2026-09-18'):
-    """Cursul oficial de referinta RON publicat de BNR (arhive XML anuale)."""
+    """Official RON reference rate published by the BNR (yearly XML archives)."""
     key = (currency, start, end)
     if key in _CACHE:
         return _CACHE[key]
@@ -68,7 +68,7 @@ def read_reference_rate(currency='EUR', start='2005-07-01', end='2026-09-18'):
 
 
 def load_price(name):
-    """Seria de preturi (inchidere) a activului."""
+    """Price series (close) of the asset."""
     symbol, start = SOURCES[name]
     if symbol.startswith('REF:'):
         return read_reference_rate(symbol.split(':')[1], start=start)
@@ -77,38 +77,38 @@ def load_price(name):
 
 
 def load_returns(name):
-    """Randamente log zilnice pe calendarul propriu al seriei."""
+    """Daily log returns on the series' own calendar."""
     return np.log(load_price(name)).diff().dropna()
 
 
 # =============================================================================
-# PROGNOZE VaR / ES PE FEREASTRA MOBILA (o zi inainte)
+# VaR / ES FORECASTS ON A ROLLING WINDOW (one day ahead)
 # =============================================================================
-W = 1000                       # fereastra de estimare (observatii)
-REFIT = 20                     # parametrii GARCH / t / EVT se reestimeaza la fiecare 20 de zile
-LEVELS = (0.01, 0.025, 0.05)   # probabilitati de coada: VaR 1%, VaR 2.5%, VaR 5%
+W = 1000                       # estimation window (observations)
+REFIT = 20                     # GARCH / t / EVT parameters are re-estimated every 20 days
+LEVELS = (0.01, 0.025, 0.05)   # tail probabilities: VaR 1%, VaR 2.5%, VaR 5%
 A_ES = 0.025                   # ES 2.5% (FRTB)
-K_TAIL = int(np.ceil(A_ES * W))   # numarul de statistici de ordine din coada (simularea Z2)
+K_TAIL = int(np.ceil(A_ES * W))   # number of tail order statistics (Z2 simulation)
 MODELS = ['HS', 'Normal', 'Student-t', 'GARCH-t', 'FHS', 'GARCH-EVT']
-EVAL_FROM = '2007-01-01'       # prima zi posibila de evaluare
-EVT_Q = 0.90                   # pragul POT: cuantila 90% a pierderilor standardizate
+EVAL_FROM = '2007-01-01'       # first possible evaluation day
+EVT_Q = 0.90                   # POT threshold: 90% quantile of the standardised losses
 
 
 def t_std_q(nu, a):
-    """Cuantila 1-a a distributiei Student-t standardizate (dispersie 1)."""
+    """Quantile of order 1-a of the standardised Student-t distribution (unit variance)."""
     return stats.t.ppf(1 - a, nu) * np.sqrt((nu - 2) / nu)
 
 
 def t_std_es(nu, a):
-    """ES la nivelul 1-a al distributiei Student-t standardizate (dispersie 1)."""
+    """ES at level 1-a of the standardised Student-t distribution (unit variance)."""
     q = stats.t.ppf(1 - a, nu)
     return stats.t.pdf(q, nu) / a * (nu + q ** 2) / (nu - 1) * np.sqrt((nu - 2) / nu)
 
 
 def garch_fit(x, prev=None):
-    """GARCH(1,1) cu inovatii Student-t, prin verosimilitate maxima; parametri in unitati zecimale.
-    Seria este rescalata la dispersie unitara pentru stabilitate numerica; daca optimizarea esueaza,
-    se pastreaza parametrii estimati anterior."""
+    """GARCH(1,1) with Student-t innovations by maximum likelihood; parameters in decimal units.
+    The series is rescaled to unit variance for numerical stability; if the optimisation fails,
+    the previous estimates are kept."""
     from arch import arch_model
     c = 1 / x.std()
     res = arch_model(c * x, mean='Constant', vol='GARCH', p=1, q=1, dist='t',
@@ -121,7 +121,7 @@ def garch_fit(x, prev=None):
 
 
 def garch_filter(x, mu, om, a, b, s2_0):
-    """Dispersia conditionata: s2[t] foloseste doar x[:t]; ultimul element este prognoza."""
+    """Conditional variance: s2[t] uses only x[:t]; the last element is the forecast."""
     e2 = (x - mu) ** 2
     s2 = np.empty(len(x) + 1)
     s2[0] = s2_0
@@ -131,7 +131,7 @@ def garch_filter(x, mu, om, a, b, s2_0):
 
 
 def gpd_tail(y, a_list, q=EVT_Q):
-    """EVT (POT): GPD pe excedentele pierderilor standardizate peste cuantila q; VaR/ES la nivelurile 1-a."""
+    """EVT (POT): GPD on the excesses of standardised losses over the q quantile; VaR/ES at levels 1-a."""
     u = np.quantile(y, q)
     exc = y[y > u] - u
     xi, _, beta = stats.genpareto.fit(exc, floc=0)
@@ -142,7 +142,7 @@ def gpd_tail(y, a_list, q=EVT_Q):
 
 
 def gpd_cdf(y, g, emp):
-    """Functia de repartitie EVT: empirica sub prag, GPD deasupra pragului."""
+    """EVT distribution function: empirical below the threshold, GPD above it."""
     if y <= g['u']:
         return np.mean(emp <= y)
     base = 1 + g['xi'] * (y - g['u']) / g['beta']
@@ -150,10 +150,10 @@ def gpd_cdf(y, g, emp):
 
 
 def rolling_forecasts(r, eval_from=EVAL_FROM, w=W, refit=REFIT):
-    """Prognoze VaR (LEVELS) si ES (A_ES) la o zi pentru pierderea L = -r, cu toate modelele.
+    """One-day-ahead VaR (LEVELS) and ES (A_ES) forecasts for the loss L = -r, for all models.
 
-    Rezultat: dict model -> DataFrame (index = ziua prognozata) cu coloanele
-    VaR1, VaR2.5, VaR5, ES2.5, ES1, pit (F(L_t)), scale, mu, plus informatii pentru simularea cozii."""
+    Result: dict model -> DataFrame (index = forecast day) with columns
+    VaR1, VaR2.5, VaR5, ES2.5, ES1, pit (F(L_t)), scale, mu, plus information for tail simulation."""
     r = r.dropna()
     L = -r.values
     idx = r.index
@@ -166,8 +166,8 @@ def rolling_forecasts(r, eval_from=EVAL_FROM, w=W, refit=REFIT):
     lev = {0.01: 'VaR1', 0.025: 'VaR2.5', 0.05: 'VaR5'}
     Lcur = L[start:]
 
-    # --- HS si Normal: vectorizat pe ferestre
-    win = sliding_window_view(L[:-1], w)[start - w:]          # fereastra pentru ziua t: L[t-w:t]
+    # --- HS and Normal: vectorised over windows
+    win = sliding_window_view(L[:-1], w)[start - w:]          # window for day t: L[t-w:t]
     srt = np.sort(win, axis=1)
     o = out['HS']
     for a, k in lev.items():
@@ -179,7 +179,7 @@ def rolling_forecasts(r, eval_from=EVAL_FROM, w=W, refit=REFIT):
     o['scale'] = win.std(axis=1, ddof=1)
     o['mu'] = np.zeros(T)
     tails['HS'] = srt[:, -K_TAIL:]
-    mu_w, sd_w = -win.mean(axis=1), win.std(axis=1, ddof=1)     # medie a randamentelor, abatere standard
+    mu_w, sd_w = -win.mean(axis=1), win.std(axis=1, ddof=1)     # mean of returns, standard deviation
     o = out['Normal']
     for a, k in lev.items():
         o[k] = -mu_w + sd_w * stats.norm.ppf(1 - a)
@@ -188,16 +188,16 @@ def rolling_forecasts(r, eval_from=EVAL_FROM, w=W, refit=REFIT):
     o['pit'] = stats.norm.cdf((Lcur + mu_w) / sd_w)
     o['scale'], o['mu'] = sd_w, mu_w
 
-    # --- modele reestimate la fiecare `refit` zile
+    # --- models re-estimated every `refit` days
     prev = None
     for b0 in range(0, T, refit):
         t0 = start + b0
         b1 = min(T, b0 + refit)
         x = r.values[t0 - w:t0]
-        # Student-t neconditionat: grade de libertate, locatie si scala prin MLE
+        # unconditional Student-t: degrees of freedom, location and scale by MLE
         nu_t, loc_t, sc_t = stats.t.fit(x)
         nu_t = max(nu_t, 2.2)
-        sd_t = sc_t * np.sqrt(nu_t / (nu_t - 2))                # abaterea standard implicata
+        sd_t = sc_t * np.sqrt(nu_t / (nu_t - 2))                # implied standard deviation
         # GARCH(1,1)-t
         prev = garch_fit(x, prev if b0 > 0 else None)
         mu, om, al, be, nu = prev
@@ -205,13 +205,13 @@ def rolling_forecasts(r, eval_from=EVAL_FROM, w=W, refit=REFIT):
         xx = r.values[t0 - w:t0 + (b1 - b0)]
         s2 = garch_filter(xx, mu, om, al, be, np.var(x[:50]))
         z = (x - mu) / np.sqrt(s2[:w])
-        y = np.sort(-z)                                         # pierderi standardizate
+        y = np.sort(-z)                                         # standardised losses
         g = gpd_tail(y, (0.01, 0.025, 0.05))
         for t in range(b0, b1):
             j = w + (t - b0)
             sig = np.sqrt(s2[j])
             Lt = Lcur[t]
-            # Student-t neconditionat
+            # unconditional Student-t
             o = out['Student-t']
             for a, k in lev.items():
                 o[k][t] = -loc_t + sd_t * t_std_q(nu_t, a)
@@ -227,7 +227,7 @@ def rolling_forecasts(r, eval_from=EVAL_FROM, w=W, refit=REFIT):
             o['ES1'][t] = -mu + sig * t_std_es(nu, 0.01)
             o['pit'][t] = stats.t.cdf((Lt + mu) / sig / np.sqrt((nu - 2) / nu), nu)
             o['scale'][t], o['mu'][t], o['nu'][t] = sig, mu, nu
-            # FHS: cuantilele empirice ale pierderilor standardizate
+            # FHS: empirical quantiles of the standardised losses
             o = out['FHS']
             for a, k in lev.items():
                 o[k][t] = -mu + sig * np.quantile(y, 1 - a)
@@ -255,7 +255,7 @@ def rolling_forecasts(r, eval_from=EVAL_FROM, w=W, refit=REFIT):
 
 
 def get_forecasts(name):
-    """Prognozele pentru un activ, cu memorare temporara (calculul dureaza cateva minute)."""
+    """Forecasts for one asset, with a temporary cache (the computation takes a few minutes)."""
     path = os.path.join(tempfile.gettempdir(), f'mfm_ch8_fc_{name}_{W}_{REFIT}.pkl')
     if os.path.exists(path):
         with open(path, 'rb') as f:
@@ -267,10 +267,10 @@ def get_forecasts(name):
 
 
 # =============================================================================
-# TESTE PENTRU VaR
+# VaR TESTS
 # =============================================================================
 def kupiec(hits, p):
-    """Testul POF al lui Kupiec: LR_uc ~ chi2(1)."""
+    """Kupiec POF test: LR_uc ~ chi2(1)."""
     hits = np.asarray(hits, int)
     T, x = len(hits), hits.sum()
     ph = x / T
@@ -281,7 +281,7 @@ def kupiec(hits, p):
 
 
 def transitions(hits):
-    """Numararea tranzitiilor n00, n01, n10, n11 ale sirului de depasiri."""
+    """Counts of the transitions n00, n01, n10, n11 of the hit sequence."""
     h = np.asarray(hits, int)
     a, b = h[:-1], h[1:]
     return dict(n00=int(np.sum((a == 0) & (b == 0))), n01=int(np.sum((a == 0) & (b == 1))),
@@ -289,7 +289,7 @@ def transitions(hits):
 
 
 def christoffersen_from_counts(n00, n01, n10, n11, p):
-    """LR_ind (independenta, lant Markov de ordinul 1) si LR_cc = LR_uc + LR_ind."""
+    """LR_ind (independence, first-order Markov chain) and LR_cc = LR_uc + LR_ind."""
     def xlogy(n, q):
         return n * np.log(q) if n > 0 else 0.0
     pi01 = n01 / (n00 + n01)
@@ -310,7 +310,7 @@ def christoffersen(hits, p):
 
 
 def durations(hits):
-    """Duratele (zile) dintre depasiri, cu indicatorii de cenzurare pentru prima si ultima durata."""
+    """Durations (days) between breaches, with censoring flags for the first and last duration."""
     h = np.asarray(hits, int)
     pos = np.flatnonzero(h)
     if len(pos) == 0:
@@ -323,7 +323,7 @@ def durations(hits):
 
 
 def duration_test(hits):
-    """Testul de durata Christoffersen-Pelletier (2004): Weibull, H0: b = 1 (fara memorie)."""
+    """Christoffersen-Pelletier (2004) duration test: continuous Weibull approximation, H0: b = 1 (memoryless)."""
     D, c1, cn = durations(hits)
     if len(D) < 3:
         return dict(b=np.nan, LR=np.nan, p=np.nan, n=len(D))
@@ -347,17 +347,17 @@ def duration_test(hits):
 
 
 def traffic_light(x, T=250, p=0.01):
-    """Zona Basel (verde/galben/rosu) pentru x exceptii in T zile; probabilitatea cumulata binomiala."""
+    """Basel zone (green/yellow/red) for x exceptions in T days; cumulative Binomial probability."""
     cum = stats.binom.cdf(x, T, p)
     zone = 'green' if cum < 0.95 else ('yellow' if cum < 0.9999 else 'red')
     return zone, cum
 
 
 # =============================================================================
-# TESTE PENTRU ES
+# ES TESTS
 # =============================================================================
 def mcneil_frey(L, var, es, scale, B=5000, seed=0):
-    """Reziduurile de depasire (L - ES)/sigma in zilele cu L > VaR; H0: medie 0, H1: medie > 0 (bootstrap)."""
+    """Exceedance residuals (L - ES)/sigma on days with L > VaR; H0: mean 0, H1: mean > 0 (i.i.d. bootstrap)."""
     hit = L > var
     e = ((L - es) / scale)[hit]
     n = len(e)
@@ -372,7 +372,7 @@ def mcneil_frey(L, var, es, scale, B=5000, seed=0):
 
 
 def acerbi_szekely(L, var, es, a=A_ES):
-    """Statisticile Z1 si Z2 ale lui Acerbi-Szekely (2014), in conventia pierderilor pozitive."""
+    """Acerbi-Szekely (2014) Z1 and Z2 statistics, with losses positive."""
     hit = L > var
     T, n = len(L), hit.sum()
     z1 = 1 - np.mean(L[hit] / es[hit]) if n > 0 else np.nan
@@ -381,7 +381,7 @@ def acerbi_szekely(L, var, es, a=A_ES):
 
 
 def tail_sampler(df, model, tails, U):
-    """Inversa functiei de repartitie a pierderii, pentru nivelurile U > 1 - A_ES (matrice T x M)."""
+    """Inverse loss distribution function for levels U > 1 - A_ES (matrix T x M)."""
     mu, sc = df['mu'].values[:, None], df['scale'].values[:, None]
     if model in ('HS', 'FHS'):
         k = np.clip(np.ceil((U - (1 - A_ES)) / A_ES * K_TAIL).astype(int) - 1, 0, K_TAIL - 1)
@@ -398,7 +398,7 @@ def tail_sampler(df, model, tails, U):
 
 
 def z_pvalues(df, model, tails, M=2000, seed=1, a=A_ES):
-    """Valori p prin simulare sub H0 (distributia prognozata a modelului) pentru Z1 si Z2."""
+    """Simulated p-values under H0 (the model's forecast distribution) for Z1 and Z2."""
     L, var, es = df['L'].values, df['VaR2.5'].values, df['ES2.5'].values
     z1, z2 = acerbi_szekely(L, var, es, a)
     rng = np.random.default_rng(seed)
@@ -406,21 +406,22 @@ def z_pvalues(df, model, tails, M=2000, seed=1, a=A_ES):
     z1s, z2s = np.empty(M), np.empty(M)
     step = 250
     for m0 in range(0, M, step):
-        U = rng.uniform(size=(T, step))
+        k = min(step, M - m0)
+        U = rng.uniform(size=(T, k))
         hit = U > 1 - a
         Us = np.where(hit, U, 1 - a / 2)
         Ls = tail_sampler(df, model, tails, Us)
         ratio = np.where(hit, Ls / es[:, None], 0.0)
-        z2s[m0:m0 + step] = 1 - ratio.sum(0) / (T * a)
+        z2s[m0:m0 + k] = 1 - ratio.sum(0) / (T * a)
         nh = hit.sum(0)
-        z1s[m0:m0 + step] = 1 - ratio.sum(0) / np.maximum(nh, 1)
+        z1s[m0:m0 + k] = 1 - ratio.sum(0) / np.maximum(nh, 1)
     return dict(Z1=z1, Z2=z2, p1=float(np.mean(z1s <= z1)), p2=float(np.mean(z2s <= z2)),
                 crit2=float(np.quantile(z2s, 0.05)))
 
 
 def du_escanciano(pit, a=A_ES, lags=5):
-    """Du-Escanciano (2017): violarea cumulata H_t = (1/a)(u_t - (1-a)) 1{u_t > 1-a};
-    testul neconditionat U_ES ~ N(0,1) si testul conditionat C_ES (Box-Pierce, chi2(lags))."""
+    """Du-Escanciano (2017): cumulative violation H_t = (1/a)(u_t - (1-a)) 1{u_t > 1-a};
+    unconditional test U_ES ~ N(0,1) and conditional test C_ES (Box-Pierce, chi2(lags))."""
     u = np.clip(np.asarray(pit), 0, 1)
     H = (u - (1 - a)) / a * (u > 1 - a)
     T = len(H)
@@ -433,41 +434,41 @@ def du_escanciano(pit, a=A_ES, lags=5):
 
 
 # =============================================================================
-# PIERDEREA FZ0, DIEBOLD-MARIANO, MCS
+# FZ0 LOSS, DIEBOLD-MARIANO, MCS
 # =============================================================================
 def fz0(L, var, es, a=A_ES):
-    """Pierderea FZ0 (Patton, Ziegel & Chen, 2019), scrisa pentru pierderi pozitive:
+    """FZ0 loss (Patton, Ziegel & Chen, 2019), written for positive losses:
     FZ0 = (1/(a ES)) 1{L > VaR} (L - VaR) + VaR/ES + log(ES) - 1  (ES > 0)."""
     return (L > var) * (L - var) / (a * es) + var / es + np.log(es) - 1
 
 
 def pinball(L, var, a):
-    """Pierderea cuantila (tick): (1{L > VaR} - a)(L - VaR) >= 0, minimizata in medie de cuantila 1-a."""
+    """Quantile (tick) loss: (1{L > VaR} - a)(L - VaR) >= 0, minimised in expectation by the 1-a quantile."""
     return ((L > var).astype(float) - a) * (L - var)
 
 
 def nw_var(d, lags=None):
-    """Varianta pe termen lung (Newey-West, nucleu Bartlett)."""
+    """Long-run variance (Newey-West, Bartlett kernel)."""
     d = np.asarray(d) - np.mean(d)
     T = len(d)
     if lags is None:
         lags = int(np.floor(4 * (T / 100) ** (2 / 9)))
     v = np.mean(d ** 2)
     for j in range(1, lags + 1):
-        v += 2 * (1 - j / (lags + 1)) * np.mean(d[j:] * d[:-j])
+        v += 2 * (1 - j / (lags + 1)) * np.dot(d[j:], d[:-j]) / T     # autocovariance with divisor T (PSD)
     return v
 
 
 def diebold_mariano(la, lb, lags=None):
-    """DM = mean(d) / sqrt(LRV/T), d = la - lb; negativ => A are pierdere medie mai mica."""
+    """DM = mean(d) / sqrt(LRV/T), d = la - lb; negative => A has the lower average loss."""
     d = np.asarray(la) - np.asarray(lb)
     dm = d.mean() / np.sqrt(nw_var(d, lags) / len(d))
     return dict(dbar=d.mean(), DM=dm, p=2 * stats.norm.sf(abs(dm)))
 
 
 def mcs(losses, alpha=0.10, B=1000, block=10, seed=2):
-    """Multimea de modele de incredere (Hansen, Lunde & Nason, 2011), statistica T_max,
-    bootstrap circular pe blocuri. losses: DataFrame T x m. Rezultat: p-valorile MCS."""
+    """Model confidence set (Hansen, Lunde & Nason, 2011), T_max statistic,
+    circular block bootstrap. losses: DataFrame T x m. Result: MCS p-values."""
     rng = np.random.default_rng(seed)
     X = losses.values
     T, m = X.shape
@@ -495,17 +496,18 @@ def mcs(losses, alpha=0.10, B=1000, block=10, seed=2):
 
 
 # =============================================================================
-# PREDICTIE CONFORMALA PENTRU VaR
+# CONFORMAL PREDICTION FOR VaR
 # =============================================================================
 def conformal_var(r, a=0.01, n_cal=250, n_sd=250, gamma=0.005, eval_from=EVAL_FROM):
-    """VaR conformal split pe fereastra mobila si ACI (Gibbs & Candes, 2021).
+    """Rolling split conformal VaR and ACI (Gibbs & Candes, 2021).
 
-    Scorul de neconformitate: s_t = L_t / sd_t, sd_t = abaterea standard a ultimelor n_sd randamente.
-    VaR_t = sd_t * cuantila de ordin ceil((n+1)(1-a))/n a ultimelor n_cal scoruri.
-    ACI: a_{t+1} = a_t + gamma (a - err_t); daca nivelul cerut depaseste 1, VaR = +inf."""
+    Nonconformity score: s_t = L_t / sd_t, sd_t = standard deviation of the previous n_sd returns.
+    VaR_t = sd_t * the order statistic k = ceil((n+1)(1-a)) of the last n_cal scores (+inf if k > n).
+    ACI: a_{t+1} = a_t + gamma (a - err_t); if the required rank exceeds n, VaR = +inf.
+    Rolling-standardised scores are only approximately exchangeable, even for i.i.d. returns."""
     r = r.dropna()
     L = -r.values
-    sd = pd.Series(r.values).rolling(n_sd).std().shift(1).values   # doar informatie pana la t-1
+    sd = pd.Series(r.values).rolling(n_sd).std().shift(1).values   # only information up to t-1
     s = L / sd
     start = max(n_sd + n_cal + 1, int(np.searchsorted(r.index, pd.Timestamp(eval_from))))
     T = len(r) - start
@@ -515,7 +517,7 @@ def conformal_var(r, a=0.01, n_cal=250, n_sd=250, gamma=0.005, eval_from=EVAL_FR
         t = start + i
         cal = np.sort(s[t - n_cal:t])
         k = int(np.ceil((n_cal + 1) * (1 - a)))
-        var_s[i] = sd[t] * cal[min(k, n_cal) - 1]
+        var_s[i] = np.inf if k > n_cal else sd[t] * cal[k - 1]
         ka = int(np.ceil((n_cal + 1) * (1 - at)))
         var_a[i] = np.inf if ka > n_cal else sd[t] * cal[max(ka, 1) - 1]
         a_path[i] = at
@@ -525,8 +527,10 @@ def conformal_var(r, a=0.01, n_cal=250, n_sd=250, gamma=0.005, eval_from=EVAL_FR
                          'sd': sd[start:]}, index=r.index[start:])
 
 
-def regimes(r, idx, n=20, q=0.90):
-    """Zile de criza: volatilitatea pe cele n zile dinaintea zilei t (fara ziua t, deci cunoscuta ex ante)
-    peste cuantila q din perioada evaluata."""
-    rv = r.rolling(n).std().shift(1).reindex(idx)
-    return rv > rv.quantile(q)
+def regimes(r, idx, n=20, q=0.90, w=W, min_obs=250):
+    """Crisis days: volatility over the n days before day t (excluding day t) above the q quantile of the
+    same volatilities over the last w days (the models' estimation window, at least min_obs values);
+    the indicator and its threshold use returns up to t-1 only, so they are known ex ante."""
+    rv = r.rolling(n).std().shift(1)
+    cut = rv.rolling(w, min_periods=min_obs).quantile(q)
+    return (rv > cut).reindex(idx).fillna(False).astype(bool)

@@ -1,11 +1,11 @@
 """
-Seminarul 8: Backtesting si evaluarea prognozelor de risc -- calcule pentru toate problemele
+Seminar 8: Backtesting and Evaluating Risk Forecasts -- computations for all problems
 =========================================================================================
-Partea A: Kupiec, Christoffersen, semaforul Basel, FZ0, Z2 si cuantila conformala, pas cu pas.
-Partea B: backtesting pe S&P 500, BET, Bitcoin si EUR/RON (curs BNR): teste VaR, teste ES cu
-simulare si bootstrap, Diebold-Mariano (HAC), MCS, VaR conformal in perioade calme si de criza.
-Partea C: portofoliu RON 50% BET + 50% EUR (analiza de referinta pentru profesor).
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Part A: Kupiec, Christoffersen, Basel traffic light, FZ0, Z2 and the conformal quantile, step by step.
+Part B: backtesting on the S&P 500, BET, Bitcoin and EUR/RON (BNR rate): VaR tests, ES tests with
+simulation and bootstrap, Diebold-Mariano (HAC), MCS, conformal VaR in calm and crisis periods.
+Part C: RON portfolio 50% BET + 50% EUR, rebalanced daily (reference analysis for the instructor).
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -26,10 +26,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 # =============================================================================
-# PARTEA A
+# PART A
 # =============================================================================
 def a1_kupiec(T=250, x=7, p=0.01):
-    """Kupiec pas cu pas."""
+    """Kupiec step by step."""
     ph = x / T
     l0 = (T - x) * np.log(1 - p) + x * np.log(p)
     l1 = (T - x) * np.log(1 - ph) + x * np.log(ph)
@@ -50,7 +50,7 @@ def a5_traffic(T=250, p=0.01):
                 red_min=int(np.min(np.flatnonzero(np.array(cum) >= 0.9999))), p97=float(stats.binom.cdf(5, T, 0.03)))
 
 
-A6_L = np.array([0.8, -1.1, 3.4, 2.3, -0.5])          # pierderi (%) in cinci zile
+A6_L = np.array([0.8, -1.1, 3.4, 2.3, -0.5])          # losses (%) on five days
 A6_FC = {'A': (2.0, 2.6), 'B': (2.6, 3.4), 'C': (2.0, 4.0)}   # (VaR 2.5%, ES 2.5%), in %
 
 
@@ -63,8 +63,8 @@ def a6_fz0(a=0.025):
     return out
 
 
-A7_L = np.array([3.9, 2.8, 4.6, 3.1, 5.2, 2.9, 3.6, 7.4])      # pierderi (%) in zilele cu depasire
-A7_ES = np.array([3.4, 3.3, 3.6, 3.2, 3.5, 3.3, 3.4, 3.8])      # ES prognozat (%) in acele zile
+A7_L = np.array([3.9, 2.8, 4.6, 3.1, 5.2, 2.9, 3.6, 7.4])      # losses (%) on the breach days
+A7_ES = np.array([3.4, 3.3, 3.6, 3.2, 3.5, 3.3, 3.4, 3.8])      # ES forecast (%) on those days
 
 
 def a7_z2(T=250, a=0.025):
@@ -75,8 +75,8 @@ def a7_z2(T=250, a=0.025):
 
 
 A8_S = np.array([1.12, 0.35, 2.41, 0.88, 1.95, 0.52, 3.10, 1.47, 0.73, 2.02,
-                 0.19, 1.66, 2.75, 0.94, 1.28, 0.61, 1.83, 2.28, 1.05])   # 19 scoruri de calibrare
-A8_SD = 1.4          # abaterea standard (%) prognozata pentru ziua urmatoare
+                 0.19, 1.66, 2.75, 0.94, 1.28, 0.61, 1.83, 2.28, 1.05])   # 19 calibration scores
+A8_SD = 1.4          # standard deviation (%) forecast for the next day
 
 
 def a8_conformal(a=0.10, gamma=0.02):
@@ -92,9 +92,9 @@ def a8_conformal(a=0.10, gamma=0.02):
                 k_nohit=int(np.ceil((n + 1) * (1 - a_next_nohit))))
 
 
-# --- derivari (partea A, varianta de master) ---
+# --- derivations (Part A, master level) ---
 def a1_pof_power(T=250, pi=0.02, a=0.01):
-    """Puterea locala (chi2 necentrala) si exacta (Binomiala) a testului Kupiec la 5%; marimea exacta."""
+    """Local (noncentral chi2) and exact (Binomial) power of the 5% Kupiec test; exact size."""
     lam = T * (pi - a) ** 2 / (a * (1 - a))
     crit = stats.chi2.ppf(0.95, 1)
     ex, asy, rej = g.pof_power(T, np.array([pi, a]), a)
@@ -103,7 +103,7 @@ def a1_pof_power(T=250, pi=0.02, a=0.01):
 
 
 def a2_days_for_power(pi=0.05, a=0.025, power=0.80):
-    """Numarul de zile pentru o putere data: din lambda* (asimptotic) si prin cautare exacta."""
+    """Number of days for a given power: from lambda* (asymptotic) and by exact search."""
     from scipy.optimize import brentq
     crit = stats.chi2.ppf(0.95, 1)
     lam = brentq(lambda l: stats.ncx2.sf(crit, 1, l) - power, 0.1, 50)
@@ -113,7 +113,7 @@ def a2_days_for_power(pi=0.05, a=0.025, power=0.80):
 
 
 def a4_dq_constant(T=250, x=7, a=0.01):
-    """DQ cu X_t = 1: forma scor (Wald cu dispersia de sub H0) a testului Kupiec, fata de LR."""
+    """DQ with X_t = 1: score form (Wald with the null variance) of the Kupiec test, versus LR."""
     ph = x / T
     dq = T * (ph - a) ** 2 / (a * (1 - a))
     k = a1_kupiec(T, x, a)
@@ -121,7 +121,7 @@ def a4_dq_constant(T=250, x=7, a=0.01):
 
 
 def a6_consistency(nu=4, a=0.025, n=1_000_000, seed=5):
-    """Verificare numerica: minimul pierderii pinball medii si al FZ0 medii pe pierderi t(nu) cu dispersie 1."""
+    """Numerical check: minimisers of the average pinball and FZ0 losses on unit-variance t(nu) losses."""
     from scipy.optimize import minimize, minimize_scalar
     rng = np.random.default_rng(seed)
     L = rng.standard_t(nu, n) * np.sqrt((nu - 2) / nu)
@@ -133,7 +133,7 @@ def a6_consistency(nu=4, a=0.025, n=1_000_000, seed=5):
 
 
 def es_discrete(vals, probs, a):
-    """ES la probabilitatea de coada a pentru o distributie discreta a pierderilor."""
+    """ES at tail probability a for a discrete loss distribution."""
     o = np.argsort(vals)[::-1]
     v, p = np.asarray(vals, float)[o], np.asarray(probs, float)[o]
     take = np.minimum(p, np.maximum(a - np.r_[0, np.cumsum(p)[:-1]], 0))
@@ -141,7 +141,7 @@ def es_discrete(vals, probs, a):
 
 
 def a9_es_not_elicitable(a=0.025):
-    """Doua distributii cu acelasi ES a caror mixtura are alt ES: multimile de nivel nu sunt convexe."""
+    """Two distributions with the same ES whose mixture has a different ES: level sets are not convex."""
     F0 = ([1.0], [1.0])
     F1 = ([2.0, 0.0], [a / 2, 1 - a / 2])
     mix = ([2.0, 1.0, 0.0], [a / 4, 0.5, 0.5 - a / 4])
@@ -149,7 +149,7 @@ def a9_es_not_elicitable(a=0.025):
 
 
 def a10_de_moments(a=0.025, n=4_000_000, seed=6, T=250):
-    """Momentele violarii cumulate H = (u - (1 - a))/a 1{u > 1 - a} sub H0 (u uniform)."""
+    """Moments of the cumulative violation H = (u - (1 - a))/a 1{u > 1 - a} under H0 (u uniform)."""
     u = np.random.default_rng(seed).uniform(size=n)
     H = (u - (1 - a)) / a * (u > 1 - a)
     return dict(mean=float(H.mean()), var=float(H.var()), mean_th=a / 2, var_th=a * (1 / 3 - a / 4),
@@ -167,10 +167,10 @@ def part_a():
 
 
 # =============================================================================
-# PARTEA B
+# PART B
 # =============================================================================
 def b1_sp500_var():
-    """Teste VaR 1% pe S&P 500; valoarea p asimptotica vs exacta (binomiala)."""
+    """VaR 1% tests on the S&P 500; asymptotic versus exact (Binomial) p-value."""
     out = {}
     for m in M.MODELS:
         h = g.hits('sp500', m).values
@@ -178,7 +178,7 @@ def b1_sp500_var():
         exact = 2 * min(stats.binom.cdf(k['x'], k['T'], 0.01), stats.binom.sf(k['x'] - 1, k['T'], 0.01))
         out[m] = dict(x=k['x'], T=k['T'], rate=k['rate'], p_uc=k['p'], p_exact=float(min(exact, 1)),
                       p_ind=c['p_ind'], p_cc=c['p_cc'], b=d['b'], p_dur=d['p'])
-    # esantion mic: un an (2008) pentru GARCH-t
+    # small sample: one year (2008) for GARCH-t
     h = g.hits('sp500', 'GARCH-t').loc['2008'].values
     k = M.kupiec(h, 0.01)
     out['small'] = dict(T=k['T'], x=k['x'], p_asy=k['p'],
@@ -188,7 +188,7 @@ def b1_sp500_var():
 
 
 def b2_traffic_bet():
-    """Semaforul Basel pentru VaR 1% GARCH-t pe BET: ultimele 250 de zile si ponderea timpului pe zone."""
+    """Basel traffic light for the GARCH-t VaR 1% on the BET: last 250 days and share of time in each zone."""
     x = g.rolling_exceptions('bet', 'GARCH-t')
     last = int(x.iloc[-1])
     zone, cum = M.traffic_light(last)
@@ -212,7 +212,7 @@ def b2_traffic_bet():
 
 
 def z2_null(name, model, M_sim=5000, seed=11, last=None):
-    """Distributia simulata a lui Z2 sub H0 (distributia prognozata de model)."""
+    """Simulated distribution of Z2 under H0 (the model's forecast distribution)."""
     F, tails = g.fc(name)
     df = F[model]
     tl = {k: v for k, v in tails.items()}
@@ -225,7 +225,7 @@ def z2_null(name, model, M_sim=5000, seed=11, last=None):
     T = len(L)
     sims = []
     for m0 in range(0, M_sim, 500):
-        U = rng.uniform(size=(T, 500))
+        U = rng.uniform(size=(T, min(500, M_sim - m0)))
         hit = U > 1 - M.A_ES
         Ls = M.tail_sampler(df, model, tl, np.where(hit, U, 1 - M.A_ES / 2))
         sims.append(1 - np.where(hit, Ls / es[:, None], 0).sum(0) / (T * M.A_ES))
@@ -303,7 +303,7 @@ def b7_conformal_sp500():
         c = M.conformal_var(r, a=a).loc[g.fc('sp500')[0]['HS'].index[0]:]
         reg = M.regimes(r, c.index)
         hs = c['L'] > c['VaR_split']
-        # simulare: aceeasi procedura pe date i.i.d. Student-t (schimbabile)
+        # simulation: same procedure on i.i.d. Student-t returns (exchangeable returns; rolling scores only approximately)
         rng = np.random.default_rng(5)
         x = pd.Series(rng.standard_t(4, len(r)) * 0.01, index=r.index)
         ci = M.conformal_var(x, a=a).loc[c.index[0]:]
@@ -344,11 +344,11 @@ def b8_conformal_bet_btc():
 
 
 # =============================================================================
-# PARTEA C: portofoliu RON 50% BET + 50% EUR
+# PART C: RON portfolio 50% BET + 50% EUR
 # =============================================================================
 def portfolio_returns():
-    """Pozitie in lei: jumatate in indicele BET, jumatate in euro (valoare in lei la cursul BNR).
-    Join pe PRETURI in zilele comune, apoi randamente simple, apoi randamentul log al portofoliului."""
+    """RON position: half in the BET index, half in euro (valued in lei at the BNR rate), rebalanced daily.
+    Join PRICES on common days, then simple returns, then the portfolio log return."""
     P = pd.concat([M.load_price('bet').rename('BET'), M.load_price('eurron').rename('EUR')], axis=1, join='inner').dropna()
     R = P.pct_change().dropna()
     rp = np.log1p(0.5 * R['BET'] + 0.5 * R['EUR'])
@@ -377,7 +377,7 @@ def part_c():
     for m in M.MODELS:
         rows[m]['mcs'] = float(mc[m])
     out['rows'] = rows
-    # grafic: VaR 1% FHS si HS pe portofoliu
+    # chart: VaR 1% of FHS and HS on the portfolio
     fig, ax = plt.subplots(figsize=(6.8, 3.0))
     L = F['HS']['L']
     ax.plot(L.index, 100 * L, color=g.Orange, lw=0.5, alpha=0.6, label='Daily loss, 50% BET + 50% EUR (RON)')
@@ -391,26 +391,26 @@ def part_c():
     return out
 
 
-# --- partea B: inferenta suplimentara ---
+# --- Part B: additional inference ---
 def b1_dq_sp500():
-    """Testul DQ (Engle & Manganelli, 2004) pentru cele sase modele VaR 1% pe S&P 500."""
+    """DQ test (Engle & Manganelli, 2004) for the six VaR 1% models on the S&P 500."""
     F = g.fc('sp500')[0]
     return {m: g.dq_test((F[m]['L'] > F[m]['VaR1']).astype(int).values, F[m]['VaR1'].values, 0.01) for m in M.MODELS}
 
 
 def b5_gw_sp500():
-    """Testul Giacomini-White conditional pe diferentele FZ0 fata de FHS."""
+    """Conditional Giacomini-White test on the FZ0 differentials against FHS."""
     Lf = g.fz_losses('sp500')
     return {f'{a}|FHS': g.gw_test(Lf[a], Lf['FHS']) for a in ('GARCH-t', 'HS', 'GARCH-EVT')}
 
 
 def b6_murphy_btc():
-    """Diagrama Murphy pe Bitcoin, VaR 2.5%: HS fata de GARCH-EVT (scoruri elementare)."""
+    """Murphy diagram on Bitcoin, VaR 2.5%: HS versus GARCH-EVT (elementary scores)."""
     return g.murphy_summary('btc', 'HS', 'GARCH-EVT', 'VaR2.5', 0.025)
 
 
 def b9_estimation_risk(reps=400):
-    """Bootstrap parametric sub riscul de estimare: GARCH-t reestimat pe fiecare traiectorie simulata."""
+    """Parametric bootstrap under estimation risk: GARCH-t re-estimated on every simulated path."""
     return g.mc_estimation_risk(reps=reps)
 
 
