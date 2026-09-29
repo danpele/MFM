@@ -396,6 +396,296 @@ def c1_ai():
     return out
 
 
+
+# =============================================================================
+# GRAFICE PENTRU ENUNTURI SI SOLUTII (seminarul restructurat)
+# =============================================================================
+def fig_sem_data():
+    """Datele seminarului: raportul P/D Shiller, Nasdaq 100 lunar, S&P 500 saptamanal, Bitcoin saptamanal."""
+    sh = shiller()
+    series = [(sh['PD'], 'S&P Composite real price-dividend ratio, monthly', MainBlue),
+              (price('ndx', 'M'), 'Nasdaq 100, month-end close', IDAred),
+              (price('sp500', 'W', '1990-01-01'), 'S&P 500, week-end close', Forest),
+              (price('btc', 'W'), 'Bitcoin (USD), week-end close', Purple)]
+    fig, axes = plt.subplots(2, 2, figsize=(7.6, 4.2))
+    out = {}
+    for ax, (x, lab, col) in zip(axes.ravel(), series):
+        x = x.dropna()
+        ax.plot(x.index, x.values, color=col, lw=0.8, label=lab)
+        ax.set_yscale('log')
+        ax.set_title(f'{x.index[0]:%b %Y} - {x.index[-1]:%b %Y}, {len(x)} observations', fontsize=8, loc='left')
+        out[lab] = dict(n=int(len(x)), start=d2s(x.index[0]), end=d2s(x.index[-1]))
+    fig.tight_layout()
+    fig_legend(fig, axes.ravel(), ncol=2, y=0.0)
+    save_fig('ch17_sem_data')
+    return out
+
+
+def fig_sem_a1(D1=2.0, r=0.06, g=0.02, P=65.0):
+    """A1: valoarea fundamentala F_h, bula asteptata E[B_h] si ponderea bulei in pretul asteptat."""
+    a = a1_present_value(D1, r, g, P)
+    h = np.arange(0, 101)
+    F, B = a['F'] * (1 + g) ** h, a['B'] * (1 + r) ** h
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.9))
+    axes[0].plot(h, F, color=MainBlue, label='Fundamental value $F_h$')
+    axes[0].plot(h, B, color=IDAred, label='Expected bubble $E[B_h]$')
+    axes[0].set_yscale('log')
+    axes[0].set_xlabel('Years ahead $h$')
+    axes[0].set_ylabel('Value (log scale)')
+    axes[1].plot(h, 100 * B / (F + B), color=Purple, label='Bubble share of the expected price (%)')
+    for k in (5, 30, 100):
+        axes[1].plot(k, 100 * a[f'share{k}'], 'o', color=Purple, ms=4)
+        axes[1].annotate(f'{100 * a[f"share{k}"]:.1f}%', (k, 100 * a[f'share{k}']), textcoords='offset points',
+                         xytext=(-10, 6), fontsize=7.5, color='black', ha='right' if k == 100 else 'left')
+    axes[1].set_ylim(0, 100)
+    axes[1].set_xlabel('Years ahead $h$')
+    axes[1].set_ylabel('%')
+    fig.tight_layout()
+    fig_legend(fig, axes, ncol=3, y=0.0)
+    save_fig('ch17_sem_a1')
+    return {k: a[k] for k in ('F', 'B', 'share5', 'share30', 'share100')}
+
+
+def fig_sem_a2(B0=15.0, r=0.06, pi=0.9, delta=1.0, T=300, seed=SEED):
+    """A2(d): bula Evans (reluare pozitiva delta), fara zgomot; in logaritmi prabusirile arata ca revenire la medie."""
+    rng = np.random.default_rng(seed)
+    B = np.empty(T + 1)
+    B[0] = B0
+    for t in range(T):
+        B[t + 1] = delta + (1 + r) / pi * (B[t] - delta / (1 + r)) if rng.random() < pi else delta
+    y = np.log(B)
+    dy, yl = np.diff(y), y[:-1]
+    X = np.column_stack([np.ones_like(yl), yl])
+    coef = np.linalg.lstsq(X, dy, rcond=None)[0]
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.9))
+    axes[0].plot(np.arange(T + 1), B, color=IDAred, lw=0.8, label='Simulated bubble $B_t$ (log scale)')
+    axes[0].set_yscale('log')
+    axes[0].set_xlabel('Year $t$')
+    axes[1].scatter(yl, dy, s=6, color=MainBlue, label=r'$(y_t, \Delta y_{t+1})$, $y = \ln B$')
+    xs = np.linspace(yl.min(), yl.max(), 50)
+    axes[1].plot(xs, coef[0] + coef[1] * xs, color=Orange, lw=1.2, label=f'OLS fit on all years, slope {coef[1]:.3f}')
+    c = np.log(delta)
+    axes[1].plot(xs, pi * np.log((1 + r) / pi) + (1 - pi) * (c - xs), color=Forest, lw=1.2, ls='--',
+                 label=f'Approximation for $B \\gg \\delta$, slope $-(1-\\pi)$ = {-(1 - pi):.2f}')
+    axes[1].axhline(0, color=Gray, lw=0.5)
+    axes[1].set_xlabel('$y_t = \\ln B_t$')
+    axes[1].set_ylabel('$\\Delta y_{t+1}$')
+    fig.tight_layout()
+    fig_legend(fig, axes, ncol=3, y=0.0)
+    save_fig('ch17_sem_a2')
+    return dict(delta=delta, T=T, slope=float(coef[1]), theory=-(1 - pi), collapses=int((np.diff(B) < 0).sum()))
+
+
+def fig_sem_a3(T=1000, R=20_000):
+    """A3: distributia simulata a statisticii t (Dickey-Fuller cu termen liber) si cuantilele ei."""
+    rng = np.random.default_rng(SEED)
+    tt = np.concatenate([_df_t(np.cumsum(rng.standard_normal((2000, T + 1)), axis=1)) for _ in range(R // 2000)])
+    q05, q95 = np.quantile(tt, [0.05, 0.95])
+    fig, ax = plt.subplots(figsize=(7.0, 2.8))
+    ax.hist(tt, bins=80, density=True, color=MainBlue, alpha=0.8, label=f'Simulated $t_b$, {R:,} random walks, T = {T}')
+    ax.axvline(q05, color=Forest, ls='--', lw=1.0, label=f'5% quantile {q05:.2f}')
+    ax.axvline(q95, color=IDAred, ls='--', lw=1.2, label=f'95% quantile {q95:.2f} (right-tail critical value)')
+    ax.axvline(1.645, color=Orange, ls='-.', lw=1.2, label='1.645, the Normal 95% quantile')
+    ax.set_xlabel('$t_b$')
+    ax.set_ylabel('Density')
+    legend_outside_bottom(ax, ncol=2, y=-0.25)
+    save_fig('ch17_sem_a3')
+    return dict(q05=float(q05), q95=float(q95), share_neg=float((tt < 0).mean()))
+
+
+def fig_sem_a4(Ts=(100, 400, 1600), alpha=0.8, c=1.0, R=4000):
+    """A4: distributia statisticii t sub o radacina usor exploziva: se muta spre dreapta cand T creste."""
+    rng = np.random.default_rng(SEED)
+    fig, ax = plt.subplots(figsize=(7.0, 2.8))
+    out = []
+    for T, col in zip(Ts, [MainBlue, Orange, IDAred]):
+        rho = 1 + c / T ** alpha
+        e = rng.standard_normal((R, T))
+        Y = np.zeros((R, T + 1))
+        for t in range(T):
+            Y[:, t + 1] = rho * Y[:, t] + e[:, t]
+        tt = _df_t(Y)
+        ax.hist(np.clip(tt, -4, 40), bins=np.linspace(-4, 40, 89), density=True, histtype='step', lw=1.3, color=col,
+                label=f'T = {T}: median {np.median(tt):.1f}')
+        out.append(dict(T=T, med=float(np.median(tt))))
+    ax.axvline(-0.09, color=Forest, ls='--', lw=1.0, label='Unit-root 95% critical value (A3)')
+    ax.set_xlabel('Right-tailed ADF t-statistic (values above 40 shown at 40)')
+    ax.set_ylabel('Density')
+    legend_outside_bottom(ax, ncol=2, y=-0.25)
+    save_fig('ch17_sem_a4')
+    return out
+
+
+def _fig_filter(name, P, mu, sd, prev_turb, r):
+    a = a5_markov(P, mu, sd, prev_turb, r)
+    x = np.linspace(min(mu) - 4 * max(sd), max(mu) + 4 * max(sd), 400)
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.8), gridspec_kw=dict(width_ratios=[1.6, 1]))
+    axes[0].plot(x, stats.norm.pdf(x, mu[0], sd[0]), color=Forest, label=f'Calm density, N({mu[0]}, {sd[0]}$^2$)')
+    axes[0].plot(x, stats.norm.pdf(x, mu[1], sd[1]), color=IDAred, label=f'Turbulent density, N({mu[1]}, {sd[1]}$^2$)')
+    axes[0].axvline(r, color=MainBlue, ls='--', lw=1.1, label=f'Observed return {r:+.0f}%')
+    axes[0].set_xlabel('Weekly return (%)')
+    vals = [prev_turb, a['pred_turb'], a['post_turb']]
+    bars = axes[1].bar(['Last week', 'Predicted', 'Filtered'], vals, color=[Amber, Orange, Purple],
+                       label='P(turbulent regime)')
+    for b_, v in zip(bars, vals):
+        axes[1].text(b_.get_x() + b_.get_width() / 2, v + 0.02, f'{v:.3f}', ha='center', fontsize=8, color='black')
+    axes[1].set_ylim(0, 1.05)
+    fig.tight_layout()
+    fig_legend(fig, axes, ncol=2, y=0.0)
+    save_fig(name)
+    return dict(pred=a['pred_turb'], post=a['post_turb'])
+
+
+def fig_sem_a5():
+    return _fig_filter('ch17_sem_a5', ((0.98, 0.02), (0.10, 0.90)), (0.3, -0.5), (2.0, 5.0), 0.2, -6.0)
+
+
+def fig_sem_a6():
+    return _fig_filter('ch17_sem_a6', ((0.95, 0.05), (0.20, 0.80)), (0.4, -1.0), (2.0, 6.0), 0.1, 1.0)
+
+
+def _lppls_trend(t, tc, m, w, B, C1, C2, osc=True):
+    tau = tc - t
+    f = tau ** m
+    return B * f + (C1 * f * np.cos(w * np.log(tau)) + C2 * f * np.sin(w * np.log(tau)) if osc else 0)
+
+
+def fig_sem_a7(t1=2025.0, t2=2026.0, tc=2026.08, m=0.5, w=8.0, B=-1.2, C1=0.06, C2=-0.02):
+    """A7: tendinta LPPLS implicata de parametri (A = 0): legea putere si oscilatiile log-periodice."""
+    t = np.linspace(t1, tc - 1e-4, 2000)
+    fig, ax = plt.subplots(figsize=(7.0, 2.8))
+    ax.plot(t, _lppls_trend(t, tc, m, w, B, C1, C2, False), color=MainBlue, lw=1.1, label='Power law $B(t_c - t)^m$')
+    ax.plot(t, _lppls_trend(t, tc, m, w, B, C1, C2, True), color=IDAred, lw=1.0, label='With log-periodic oscillations')
+    ax.axvspan(t1, t2, color=Amber, alpha=0.15, lw=0, label='Estimation window $[t_1, t_2]$')
+    ax.axvline(tc, color=Forest, ls='--', lw=1.0, label=f'Critical time $t_c$ = {tc}')
+    ax.set_xlabel('Time (years)')
+    ax.set_ylabel('$\\ln p - A$')
+    legend_outside_bottom(ax, ncol=2, y=-0.25)
+    save_fig('ch17_sem_a7')
+    d = _lppls_diag(t1, t2, tc, m, w, B, C1, C2)
+    return dict(O=d['O'], damping=d['damping'])
+
+
+def fig_sem_a8():
+    """A8: la ce faze este deriva (rata de hazard) negativa? Parametrii A7 vs A8, deriva normalizata cu tau^(1-m)."""
+    fig, ax = plt.subplots(figsize=(7.0, 2.8))
+    out = {}
+    for tag, (t1, t2, tc, m, w, B, C1, C2), col in [('A7', (2025.0, 2026.0, 2026.08, 0.5, 8.0, -1.2, 0.06, -0.02), MainBlue),
+                                                   ('A8', (2025.0, 2026.0, 2026.45, 0.95, 3.5, -0.8, 0.25, 0.0), IDAred)]:
+        t = np.linspace(t1, t2, 2000)
+        tau = tc - t
+        C, phi = np.hypot(C1, C2), np.arctan2(C2, C1)
+        th = w * np.log(tau) - phi
+        drift = -B * m - C * (m * np.cos(th) - w * np.sin(th))       # mu(t) / tau^(m-1)
+        ax.plot(t, drift, color=col, lw=1.1, label=f'{tag} parameters: $\\mu(t)\\,\\tau^{{1-m}}$')
+        out[tag] = dict(min=float(drift.min()), share_neg=float((drift < 0).mean()))
+    ax.axhline(0, color=Gray, lw=0.7)
+    ax.set_xlabel('Time (years), estimation window')
+    ax.set_ylabel('Normalised drift')
+    legend_outside_bottom(ax, ncol=2, y=-0.25)
+    save_fig('ch17_sem_a8')
+    return out
+
+
+def fig_sem_b1(r0s=(0.03, None, 0.08)):
+    """B1: BSADF pe raportul P/D pentru trei ferestre minime, cu valorile critice si episoadele datate."""
+    sh = shiller()
+    y = np.log(sh['PD'])
+    fig, axes = plt.subplots(3, 1, figsize=(7.4, 5.0), sharex=True)
+    out = []
+    for ax, r0 in zip(axes, r0s):
+        res = psy(y.values, r0)
+        cv = psy_cv(res['n'], res['w0'], 1000, SEED)
+        L = int(np.ceil(np.log(res['n'])))
+        idx = y.index[1:]
+        ep = episodes(res['bsadf'], cv['bsadf95'], idx, L)
+        ax.plot(idx, res['bsadf'], color=IDAred, lw=0.7, label='BSADF statistic')
+        ax.plot(idx, cv['bsadf95'], color=Forest, lw=1.0, ls='--', label='95% critical value (Monte Carlo)')
+        for s0, s1, n in ep:
+            up = _chg(y, s0, s1) is None or _chg(y, s0, s1) >= 0
+            ax.axvspan(s0, s1 if s1 is not None else idx[-1], color=Amber if up else Teal, alpha=0.35, lw=0,
+                       label='Episode, ratio rising' if up else 'Episode, ratio falling')
+        ax.set_title(f'$r_0$ = {res["r0"]:.3f}, minimum window {res["w0"]} months: GSADF {res["gsadf"]:.2f}, '
+                     f'95% critical value {cv["gsadf"]["95"]:.2f}', fontsize=8.5, loc='left')
+        ax.set_ylim(-3, 5)
+        out.append(dict(r0=res['r0'], w0=res['w0'], gsadf=res['gsadf'], cv95=cv['gsadf']['95'], n_ep=len(ep)))
+    fig.tight_layout()
+    fig_legend(fig, axes, ncol=2, y=0.0)
+    save_fig('ch17_sem_b1')
+    return out
+
+
+def fig_sem_b2():
+    """B2: S&P 500 lunar, ADF recursiv (PWY, inceput fix) vs BSADF (PSY), cu valorile critice."""
+    y = np.log(price('sp500', 'M'))
+    o = run_psy(y)
+    idx = o['idx']
+    fig, axes = plt.subplots(2, 1, figsize=(7.4, 4.0), sharex=True, gridspec_kw=dict(height_ratios=[1, 1.3]))
+    axes[0].plot(y.index, np.exp(y.values), color=MainBlue, lw=0.8, label='S&P 500 (log scale)')
+    axes[0].set_yscale('log')
+    for s0, s1, n in o['ep']:
+        axes[0].axvspan(s0, s1 if s1 is not None else idx[-1], color=Amber, alpha=0.3, lw=0, label='BSADF episode (PSY)')
+    axes[1].plot(idx, o['res']['bsadf'], color=IDAred, lw=0.8, label='BSADF (PSY)')
+    axes[1].plot(idx, o['cv']['bsadf95'], color=Forest, lw=1.0, ls='--', label='95% critical value of BSADF')
+    axes[1].plot(idx, o['res']['fwd'], color=Purple, lw=0.8, label='Recursive ADF, start fixed (PWY)')
+    axes[1].plot(idx, o['cv']['fwd95'], color=Orange, lw=1.0, ls='-.', label='95% critical value of the recursive ADF')
+    axes[1].set_ylabel('Statistic')
+    axes[0].set_title('S&P 500, monthly 1990-2026: PSY and PWY date-stamping', fontsize=9, loc='left')
+    fig.tight_layout()
+    fig_legend(fig, axes, ncol=2, y=0.0)
+    save_fig('ch17_sem_b2')
+    s = summarise(o, y)
+    return dict(gsadf=s['gsadf'], sadf=s['sadf'], n_ep=len(s['episodes']), n_pwy=len(s['episodes_pwy']))
+
+
+def fig_sem_size(keys, labs, name):
+    """B9 / B10: marimea GSADF si rata episoadelor false (studiul de nivel din inference17.json)."""
+    with open(os.path.join(HERE, 'inference17.json')) as f:
+        sz = json.load(f)['size']
+    x = np.arange(len(keys))
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.9))
+    for ax, (a, b, ttl) in zip(axes, [('size_mc', 'size_wild', 'Rejection rate of GSADF at 5%'),
+                                      ('fp_mc', 'fp_wild', 'Paths with a false date-stamped episode')]):
+        v1 = [100 * sz['rows'][k][a] for k in keys]
+        v2 = [100 * sz['rows'][k][b] for k in keys]
+        ax.bar(x - 0.2, v1, 0.4, color=MainBlue, label='Monte Carlo critical values')
+        ax.bar(x + 0.2, v2, 0.4, color=IDAred, label='Wild bootstrap critical values')
+        for xi, a1, a2 in zip(x, v1, v2):
+            ax.text(xi - 0.2, a1 + 1, f'{a1:.1f}', ha='center', fontsize=7.5, color='black')
+            ax.text(xi + 0.2, a2 + 1, f'{a2:.1f}', ha='center', fontsize=7.5, color='black')
+        if a == 'size_mc':
+            ax.axhline(5, color=Gray, ls='--', lw=0.8)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labs, fontsize=8)
+        ax.set_ylabel('%')
+        ax.set_ylim(0, 100 if a == 'fp_mc' else max(v1 + v2) * 1.25)
+        ax.set_title(ttl, fontsize=9, loc='left')
+    fig.tight_layout()
+    fig_legend(fig, axes, ncol=2, y=0.0)
+    save_fig(name)
+    return {k: sz['rows'][k] for k in keys}
+
+
+def charts():
+    """Graficele noi ale seminarului (fara a rescrie sem17_results.json); cifrele verificate fata de JSON."""
+    with open(os.path.join(HERE, 'sem17_results.json')) as f:
+        S = json.load(f)
+    out = dict(data=fig_sem_data(), A1=fig_sem_a1(), A2=fig_sem_a2(), A3=fig_sem_a3(), A4=fig_sem_a4(),
+               A5=fig_sem_a5(), A6=fig_sem_a6(), A7=fig_sem_a7(), A8=fig_sem_a8(),
+               B9=fig_sem_size(['iid', 'up'], ['Constant volatility', 'Volatility x3 at T/2'], 'ch17_sem_b9'),
+               B10=fig_sem_size(['garch', 'down'], ['GARCH(1,1)', 'Volatility x1/3 at T/2'], 'ch17_sem_b10'))
+    assert abs(out['A3']['q95'] - S['A3']['q95']) < 1e-12 and abs(out['A3']['q05'] - S['A3']['q05']) < 1e-12
+    assert all(abs(a['med'] - b['med']) < 1e-12 for a, b in zip(out['A4'], S['A4']))
+    assert abs(out['A5']['post'] - S['A5']['post_turb']) < 1e-12 and abs(out['A6']['post'] - S['A6']['post_turb']) < 1e-12
+    out['B2'] = fig_sem_b2()
+    assert abs(out['B2']['gsadf'] - S['B2']['sp500']['gsadf']) < 1e-9
+    out['B1'] = fig_sem_b1()
+    for a, b in zip(out['B1'], S['B1']):
+        assert abs(a['gsadf'] - b['gsadf']) < 1e-9 and abs(a['cv95'] - b['cv95']) < 1e-9, (a, b)
+    with open(os.path.join(HERE, 'sem17_charts.json'), 'w') as f:
+        json.dump(jsonable(out), f, indent=1)
+    return out
+
 def main():
     S = {}
     S['A1'] = a1_present_value()
@@ -422,4 +712,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] == 'charts':
+        print(jsonable(charts()))
+    else:
+        main()
