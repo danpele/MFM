@@ -713,6 +713,122 @@ def stale_open_check(start='2008-01-01'):
     return t, eq
 
 
+# =============================================================================
+# STUDIU DE CAZ: volatilitatea depinde de traiectorie (Guyon & Lekeufack, 2023)
+# =============================================================================
+PDV_LAGS = 1000                 # ultimele 1000 de randamente, Sectiunea 3.3
+PDV_DT = 1 / 252
+PDV_TABLE3_VIX = (0.057, -0.095, 0.82, 1.06, 0.020, 1.60, 0.052)   # b0, b1, b2, a1, d1, a2, d2 (Table 3)
+PDV_TRAIN = ('2000-01-01', '2018-12-31')
+PDV_TEST = ('2019-01-01', '2022-05-15')
+
+
+def pdv_kernel(alpha, delta, n=PDV_LAGS):
+    """Nucleul TSPL normalizat, eq. (3.9): K(tau) = (tau + delta)^(-alpha) / Z, tau = i * dt."""
+    tau = np.arange(n) * PDV_DT
+    return (tau + delta) ** (-alpha) * (alpha - 1) / delta ** (1 - alpha)
+
+
+def pdv_predict(X, p):
+    """Modelul (3.7): sigma_t = b0 + b1 R1_t + b2 Sigma_t; X[t, i] = r_{t-i}."""
+    b0, b1, b2, a1, d1, a2, d2 = p
+    R1 = X @ pdv_kernel(a1, d1)
+    Sig = np.sqrt((X ** 2) @ pdv_kernel(a2, d2))
+    return b0 + b1 * R1 + b2 * Sig
+
+
+def pdv_data():
+    """Matricea randamentelor simple trecute ale S&P 500 si VIX/100 pe zilele S&P 500."""
+    spx = read_market('GSPC.INDX')['close']
+    r = spx / spx.shift(1) - 1
+    X = pd.DataFrame(np.column_stack([r.shift(i).values for i in range(PDV_LAGS)]), index=r.index)
+    vix = read_market('VIX.INDX')['close'] / 100
+    return X.join(vix.rename('vix'), how='inner').dropna()
+
+
+def pdv_fit():
+    """Celor mai mici patrate neliniare pe 2000-2018, pornind de la randul VIX din Table 3."""
+    from scipy.optimize import least_squares
+    df = pdv_data()
+    tr = df.loc[PDV_TRAIN[0]:PDV_TRAIN[1]]
+    lb = [-np.inf] * 3 + [1.0001, 1e-4, 1.0001, 1e-4]
+    ub = [np.inf] * 3 + [20, 5, 20, 5]
+    res = least_squares(lambda p: pdv_predict(tr.iloc[:, :PDV_LAGS].values, p) - tr['vix'].values,
+                        x0=PDV_TABLE3_VIX, bounds=(lb, ub), method='trf')
+    fit = pd.Series(pdv_predict(df.iloc[:, :PDV_LAGS].values, res.x), index=df.index)
+    rows = []
+    for name, (a, b) in [('train', PDV_TRAIN), ('test', PDV_TEST),
+                         ('after test', ('2022-05-16', str(df.index[-1].date())))]:
+        y, yh = df['vix'].loc[a:b], fit.loc[a:b]
+        rows.append({'set': name, 'start': y.index[0].date(), 'end': y.index[-1].date(), 'N': len(y),
+                     'RMSE': np.sqrt(np.mean((y - yh) ** 2)),
+                     'r2': 1 - np.sum((y - yh) ** 2) / np.sum((y - y.mean()) ** 2)})
+    scores = pd.DataFrame(rows).set_index('set')
+    params = pd.Series(res.x, index=['beta0', 'beta1', 'beta2', 'alpha1', 'delta1', 'alpha2', 'delta2'])
+    params.to_csv(os.path.join(TABLE_DIR, 'ch1_pdv_parameters.csv'), float_format='%.4g')
+    scores.to_csv(os.path.join(TABLE_DIR, 'ch1_pdv_scores.csv'), float_format='%.4g')
+    return df['vix'], fit, params, scores
+
+
+def fig_cs_pdv_vix(vix, fit, scores):
+    """Figure 3.2 (top) replicat si extins: VIX observat vs. VIX prezis doar din traiectoria S&P 500."""
+    fig, (ax, ax2) = plt.subplots(2, 1, figsize=(7.6, 3.7), sharex=True, gridspec_kw={'height_ratios': [2.3, 1]})
+    v, f = 100 * vix.loc[PDV_TRAIN[0]:], 100 * fit.loc[PDV_TRAIN[0]:]
+    ax.plot(v.index, v, color=MainBlue, lw=0.7, label='VIX (observed)')
+    ax.plot(f.index, f, color=IDAred, lw=0.7, label='Predicted from past S&P 500 returns, eq. (3.7)')
+    ratio = vix.loc[PDV_TRAIN[0]:] / fit.loc[PDV_TRAIN[0]:]
+    ax2.plot(ratio.index, ratio, color=Forest, lw=0.6, label='Ratio observed / predicted VIX')
+    ax2.axhline(1, color=Gray, lw=0.6, ls='--')
+    for a in (ax, ax2):
+        a.axvspan(pd.Timestamp(PDV_TEST[0]), pd.Timestamp(PDV_TEST[1]), color=Amber, alpha=0.15, lw=0)
+        a.axvline(pd.Timestamp(PDV_TEST[1]), color=Gray, lw=0.6, ls=':')
+    top = 0.97
+    for (a, b), key, lab in [(PDV_TRAIN, 'train', 'Training 2000-2018'), (PDV_TEST, 'test', 'Test'),
+                             (('2022-05-16', str(vix.index[-1].date())), 'after test', 'After test')]:
+        mid = pd.Timestamp(a) + (pd.Timestamp(b) - pd.Timestamp(a)) / 2
+        ax.text(mid, 99, f"{lab}\n$r^2$ = {scores.loc[key, 'r2']:.3f}", ha='center', va='top', fontsize=8, color='black')
+    ax.set_ylim(0, 100)
+    ax.set_ylabel('Volatility (%)')
+    ax2.set_ylabel('Ratio')
+    ax2.set_ylim(0.4, 1.8)
+    ax.set_title('VIX explained by the S&P 500 path alone (test set shaded)')
+    h1, l1 = ax.get_legend_handles_labels()
+    h2, l2 = ax2.get_legend_handles_labels()
+    fig.legend(h1 + h2, l1 + l2, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=2, frameon=False)
+    plt.tight_layout()
+    save_fig('ch1_cs_pdv_vix')
+
+
+def fig_cs_pdv_kernels(params):
+    """Figure 3.1 / B.1 replicat: ponderile zilnice K(i dt) dt ale celor doi nuclei, scala log-log."""
+    lag = np.arange(1, PDV_LAGS)
+    p3 = PDV_TABLE3_VIX
+    fig, ax = plt.subplots(figsize=(6.4, 3.2))
+    ax.loglog(lag, pdv_kernel(params['alpha1'], params['delta1'])[1:] * PDV_DT, color=IDAred, lw=1.4,
+              label=f"$K_1$ (trend $R_1$), ours: $\\alpha_1$ = {params['alpha1']:.2f}, $\\delta_1$ = {params['delta1']:.3f}")
+    ax.loglog(lag, pdv_kernel(p3[3], p3[4])[1:] * PDV_DT, color=Orange, lw=1.2, ls='--',
+              label=f"$K_1$, Table 3: $\\alpha_1$ = {p3[3]:.2f}, $\\delta_1$ = {p3[4]:.3f}")
+    ax.loglog(lag, pdv_kernel(params['alpha2'], params['delta2'])[1:] * PDV_DT, color=MainBlue, lw=1.4,
+              label=f"$K_2$ (volatility $\\Sigma$), ours: $\\alpha_2$ = {params['alpha2']:.2f}, $\\delta_2$ = {params['delta2']:.3f}")
+    ax.loglog(lag, pdv_kernel(p3[5], p3[6])[1:] * PDV_DT, color=Teal, lw=1.4, ls=(0, (2, 2)),
+              label=f"$K_2$, Table 3: $\\alpha_2$ = {p3[5]:.2f}, $\\delta_2$ = {p3[6]:.3f}")
+    ax.set_xlabel('Lag i (trading days, log scale)')
+    ax.set_ylabel('Weight $K(i\\Delta t)\\Delta t$ (log scale)')
+    ax.set_title('Fitted kernels of the VIX model')
+    legend_outside_bottom(ax, ncol=2, y=-0.2)
+    plt.tight_layout()
+    save_fig('ch1_cs_pdv_kernels')
+
+
+def pdv_weight_shares(params):
+    """Ponderea totala (din 1000 de zile) pe ultimele 5 zile si dincolo de 250 de zile."""
+    out = {}
+    for k, (a, d) in {'K1': (params['alpha1'], params['delta1']), 'K2': (params['alpha2'], params['delta2'])}.items():
+        w = pdv_kernel(a, d) * PDV_DT
+        out[k] = {'today': w[0], 'first5': w[:5].sum(), 'beyond250': w[250:].sum(), 'total1000': w.sum()}
+    return pd.DataFrame(out)
+
+
 if __name__ == '__main__':
     pd.set_option('display.width', 200)
     print('Chapter 1 charts')
@@ -739,3 +855,7 @@ if __name__ == '__main__':
     print(acf_robust_lag1().round(3).T)
     print(long_memory_table().round(3).T)
     so, so_y = stale_open_check(); print(so.round(3)); print(so_y.loc[[1995, 2000, 2005, 2006, 2007, 2008, 2010, 2020, 2026]].round(3))
+    pvix, pfit, pparams, pscores = pdv_fit(); print(pparams.round(3)); print(pscores.round(3))
+    fig_cs_pdv_vix(pvix, pfit, pscores)
+    fig_cs_pdv_kernels(pparams)
+    print(pdv_weight_shares(pparams).round(3))
