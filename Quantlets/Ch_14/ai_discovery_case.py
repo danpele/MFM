@@ -9,7 +9,7 @@ d_t = QLIKE(Chronos-2) - QLIKE(log-HAR) ar trebui să crească (avantajul să di
     MDE = (z_0.975 + z_0.80) * se_HAC(beta_1); și numărul de zile de după publicare necesar pentru a detecta
     o schimbare egală cu diferența medie dinainte de publicare
 Folosește prognozele salvate în ch14_rv.csv (nu rulează din nou modelele).
-Ieșire: ai_discovery_case.json
+Ieșire: ai_discovery_case.json și graficul ch14_ai_prepost (charts/)
 """
 
 import json
@@ -83,6 +83,29 @@ def main():
     with open(os.path.join(HERE, 'ai_discovery_case.json'), 'w') as fh:
         json.dump(out, fh, indent=2)
     print(json.dumps(out, indent=2))
+    fig_prepost(dpre, dpost, b[1], np.sqrt(V[1, 1]), mde, lags)
+
+
+def fig_prepost(dpre, dpost, diff, se_diff, mde, lags):
+    """Pre- and post-release means of d_t and their difference, with HAC 95% intervals and +/- MDE."""
+    import sys
+    sys.path.insert(0, HERE)
+    from generate_all_charts import plt, MainBlue, IDAred, Orange, Forest, Gray, save_fig, legend_outside_bottom
+    rows = [('Before 3 Nov 2025\n(%d days)' % len(dpre), dpre.mean(), np.sqrt(lrv(dpre.values, lags) / len(dpre)), Forest),
+            ('After 3 Nov 2025\n(%d days)' % len(dpost), dpost.mean(), np.sqrt(lrv(dpost.values, lags) / len(dpost)), Orange),
+            ('Change $\\hat\\beta_1$\n(after minus before)', diff, se_diff, MainBlue)]
+    fig, ax = plt.subplots(figsize=(4.6, 3.2))
+    for i, (lab, m, se, c) in enumerate(rows):
+        ax.plot([m - 1.96 * se, m + 1.96 * se], [i, i], color=c, lw=2.4, solid_capstyle='butt')
+        ax.scatter(m, i, color=c, s=34, zorder=3)
+    ax.scatter([-mde, mde], [2, 2], marker='|', s=260, color=IDAred, zorder=4, label='$\\pm$MDE of $\\beta_1$ (80% power)')
+    ax.plot([], [], color='black', lw=2.4, label='HAC 95% interval')
+    ax.axvline(0, color=Gray, lw=0.7, ls='--')
+    ax.set_yticks(range(3), [r[0] for r in rows], fontsize=8)
+    ax.invert_yaxis()
+    ax.set_xlabel('Mean QLIKE differential $d_t$ (Chronos-2 minus log-HAR)')
+    legend_outside_bottom(ax, ncol=2, y=-0.2)
+    save_fig('ch14_ai_prepost')
 
 
 if __name__ == '__main__':
