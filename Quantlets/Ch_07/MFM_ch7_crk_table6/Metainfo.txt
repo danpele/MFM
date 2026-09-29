@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_crk_table6'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study: deep neural network quantile regression for VaR (Chronopoulos, Raftapostolos and Kapetanios, 2024, Journal of Financial Econometrics 22(3)). Relative RMSFE of VaR 1% forecasts for the S&P 500 (2,000 out-of-sample days to August 2020) by method and predictor set, as published in Table 6 of the paper; linear quantile regression = 1.'
+
+Keywords: 'deep learning, neural network, quantile regression, value-at-risk, CAViaR, MIDAS, forecast evaluation, S&P 500'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Published values from Table 6 of Chronopoulos, Raftapostolos and Kapetanios (2024), https://doi.org/10.1093/jjfinec/nbad014'
+
+Output: 'ch7_crk_table6.pdf'

@@ -545,6 +545,56 @@ def liquidity(sym='TLV', position=1_000_000):
                 var_amt=v / 100 * position, col_amt=col / 100 * position, lvar_amt=(v + col) / 100 * position)
 
 
+# =============================================================================
+# 13. STUDIU DE CAZ: Chronopoulos, Raftapostolos & Kapetanios (2024), JFEc 22(3), Tabelul 6 (alpha = 1%)
+# RMSFE relativ la regresia cuantila liniara; cifrele sunt cele publicate in Tabelul 6 al articolului
+# =============================================================================
+CRK_METHODS = ['Polynomial', 'B-splines', 'Linear MIDAS', 'Deep', 'Deep LASSO', 'Deep ridge', 'Deep elastic net',
+               'Deep MIDAS']
+CRK_TABLE6_1PCT = {
+    'GARCH(1,1)':        [0.909, 0.791, 1.083, 0.346, 0.236, 0.177, 0.146, 0.346],
+    'RiskMetrics':       [0.780, 0.570, 1.066, 0.289, 0.141, 0.207, 0.239, 0.246],
+    'CAViaR SAV':        [1.000, 1.511, 0.838, 0.198, 0.024, 0.225, 0.498, 0.850],
+    'Asymmetric slope':  [1.000, 1.040, 4.918, 0.235, 0.096, 0.014, 0.037, 0.601],
+}
+
+
+def fig_crk_table6():
+    """Tabelul 6 din Chronopoulos et al. (2024), alpha = 1%: RMSFE relativ, pe metode si seturi de predictori."""
+    cols = [MainBlue, IDAred, Forest, Orange]
+    fig, ax = plt.subplots(figsize=(8, 3.4))
+    xx = np.arange(len(CRK_METHODS))
+    w = 0.2
+    for i, (lab, v) in enumerate(CRK_TABLE6_1PCT.items()):
+        ax.bar(xx + (i - 1.5) * w, v, w * 0.95, color=cols[i], label=f'Predictors: {lab}')
+    ax.set_yscale('log')
+    ax.set_ylim(0.007, 16)
+    ax.axhline(1.0, color='black', lw=0.9, ls='--')
+    ax.text(len(CRK_METHODS) - 0.5, 1.12, 'Linear quantile regression = 1', ha='right', va='bottom', fontsize=8,
+            color='black')
+    ax.axvline(2.5, color=Gray, lw=0.6, ls=':')
+    ax.text(0.9, 11.0, 'Flexible, not deep', ha='center', fontsize=8.5, color=Orange, fontweight='bold')
+    ax.text(5.0, 11.0, 'Deep neural network quantile regression', ha='center', fontsize=8.5, color=MainBlue,
+            fontweight='bold')
+    for i, v in enumerate(CRK_TABLE6_1PCT.values()):       # valorile extreme din Tabelul 6
+        for j, y in enumerate(v):
+            if y > 2 or y < 0.03:
+                ax.text(xx[j] + (i - 1.5) * w, y * 1.12, f'{y:.3f}', ha='center',
+                        va='bottom', fontsize=7.5, color='black')
+    ax.set_xticks(xx)
+    ax.set_xticklabels([m.replace(' ', '\n', 1) if m.startswith('Deep ') or m.startswith('Linear') else m
+                        for m in CRK_METHODS], fontsize=8)
+    ax.set_yticks([0.01, 0.1, 1])
+    ax.set_yticklabels(['0.01', '0.1', '1'])
+    ax.set_ylabel('RMSFE relative to linear QR (log scale)')
+    ax.set_title('S&P 500, VaR 1%: relative RMSFE by method and predictor set (Chronopoulos et al., 2024, Table 6)')
+    legend_outside_bottom(ax, 4, -0.2)
+    save_fig('ch7_crk_table6')
+    v = np.array(list(CRK_TABLE6_1PCT.values()))
+    return dict(deep_min=float(v[:, 3:7].min()), deep_max=float(v[:, 3:7].max()),
+                share_deep_below1=float((v[:, 3:] < 1).mean()), share_flex_above1=float((v[:, :3] >= 1).mean()))
+
+
 def jsonable(o):
     if isinstance(o, dict):
         return {str(k): jsonable(v) for k, v in o.items()}
@@ -589,6 +639,7 @@ if __name__ == '__main__':
     RES['gev'] = fig_gev()
     RES['basel'] = fig_basel(t)
     RES['liq'] = liquidity()
+    RES['crk'] = fig_crk_table6()
     with open(os.path.join(HERE, 'ch7_results.json'), 'w') as f:
         json.dump(jsonable(RES), f, indent=1)
     print('saved ch7_results.json')
