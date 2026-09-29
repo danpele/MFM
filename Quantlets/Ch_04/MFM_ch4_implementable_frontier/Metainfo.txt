@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_implementable_frontier'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Jensen, Kelly, Malamud and Pedersen (2026, Review of Financial Studies), Machine learning and the implementable efficient frontier: net Sharpe ratios and utilities of their Table 2, and a small-scale replication on 14 US stocks and 9 sector ETFs (monthly, out of sample 2014-2026) with their price-impact cost (eq. 35), gamma = 10, wealth of 10 billion dollars in 2020 and the tuning grid of their Table 1: Portfolio-ML, Static-ML, Markowitz-ML, minimum variance and 1/N, gross and net of trading costs.'
+
+Keywords: 'implementable efficient frontier, trading costs, price impact, Portfolio-ML, random Fourier features, ridge regression, machine learning, utility, 1/N'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Market data (data/market): 14 US stocks, nine sector ETFs, SPY; risk-free rate from the Kenneth French Data Library'
+
+Output: 'ch4_jkmp_paper.pdf, ch4_jkmp_replication.pdf'

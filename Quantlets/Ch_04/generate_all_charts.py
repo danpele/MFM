@@ -22,7 +22,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from mfm_data import (prices, price, log_returns, french_rf, monthly_returns, bnr_rate,
+from mfm_data import (read_market, prices, price, log_returns, french_rf, monthly_returns, bnr_rate,
                       SECTORS, SECTOR_NAMES, MULTI, MULTI_NAMES, BVB, BVB_NAMES)
 
 # Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
@@ -1241,6 +1241,318 @@ def fig_bvb(bb, n_jobs=1, blocks=None):
 
 
 # =============================================================================
+# STUDIU DE CAZ: FRONTIERA EFICIENTA IMPLEMENTABILA (Jensen, Kelly, Malamud & Pedersen 2026)
+# =============================================================================
+JKMP_STOCKS = ['JPM', 'BAC', 'C', 'GS', 'MS', 'WFC', 'NVDA', 'AAPL', 'MSFT', 'AMZN', 'GOOGL', 'CSCO', 'GME', 'MSTR']
+JKMP_ASSETS = [s + '.US' for s in JKMP_STOCKS + SECTORS]
+JKMP_MKT = 'SPY.US'
+JKMP_GAMMA = 10.0                 # aversiunea la risc (Sectiunea 5.1)
+JKMP_W2020 = 1e10                 # averea la sfarsitul lui 2020, creste odata cu piata
+JKMP_NLAG = 12
+JKMP_LAMBDAS = np.r_[0.0, np.exp(np.arange(-10, 10.0001, 0.2))]      # Tabelul 1
+JKMP_PS = [2 ** 6, 2 ** 7, 2 ** 8, 2 ** 9]
+JKMP_ETAS = [np.exp(-3), np.exp(-2)]
+JKMP_VAL_START, JKMP_TEST_START, JKMP_END = 2011, 2014, '2026-08-31'
+JKMP_SEED = 20260929
+# Tabelul 2 din Jensen, Kelly, Malamud & Pedersen (2026): raportul Sharpe net si utilitatea (gamma = 10)
+JKMP_TABLE2 = {'Portfolio-ML': (1.33, 0.086), 'Multiperiod-ML*': (0.83, 0.020), 'Static-ML*': (0.81, 0.030),
+               '1/N': (0.54, -0.051), 'Market': (0.51, -0.033)}
+JKMP_COL = {'Portfolio-ML': MainBlue, 'Multiperiod-ML*': Forest, 'Static-ML*': Orange, 'Static-ML': Orange,
+            '1/N': EWcol, 'Market': Purple, 'Minimum variance': Amber, 'Markowitz-ML': IDAred}
+
+
+def jkmp_split_adjusted(d):
+    """Pretul ajustat doar pentru split-uri (pentru volumul in dolari)."""
+    raw = d['close'].astype(float)
+    adj = d['adjusted_close'].astype(float)
+    ratio = (adj / adj.shift(1)) / (raw / raw.shift(1))
+    fac = ratio.where((ratio > 1.4) | (ratio < 0.7), 1.0).fillna(1.0).round(3)
+    cum_future = fac[::-1].cumprod()[::-1].shift(-1).fillna(1.0)
+    return raw / cum_future
+
+
+def jkmp_ew_cov(R, hl_corr=378, hl_var=126):
+    """Covarianta cu ponderi exponentiale: timp de injumatatire 378 zile (corelatii), 126 zile (variante)."""
+    j = np.arange(len(R))[::-1]
+    def wts(hl):
+        w = 0.5 ** (j / hl)
+        return w / w.sum()
+    X = R.values - R.values.mean(0)
+    wc, wv = wts(hl_corr), wts(hl_var)
+    C = (X * wc[:, None]).T @ X
+    sd_c = np.sqrt(np.diag(C))
+    corr = C / np.outer(sd_c, sd_c)
+    sd = np.sqrt((X ** 2 * wv[:, None]).sum(0))
+    return corr * np.outer(sd, sd)
+
+
+def jkmp_replication():
+    """Portfolio-ML, Static-ML, Markowitz-ML, varianta minima si 1/N cu costul eq. (35), pe datele cursului."""
+    A, N, GAMMA = JKMP_ASSETS, len(JKMP_ASSETS), JKMP_GAMMA
+    frames, dv = {}, {}
+    for s in A + [JKMP_MKT]:
+        d = read_market(s)
+        frames[s] = d['adjusted_close'].astype(float).rename(s)
+        dv[s] = (jkmp_split_adjusted(d) * d['volume'].astype(float)).rename(s)
+    P = pd.concat(frames.values(), axis=1).dropna()                  # join pe preturi, zile comune
+    DV = pd.concat(dv.values(), axis=1).reindex(P.index)
+    rd = P.pct_change().dropna()
+    me = P.resample('ME').last()
+    rm = me.pct_change().dropna()
+    rf = french_rf().reindex(rm.index, method='ffill').ffill()
+    last_full = pd.Timestamp(JKMP_END)
+    months = rm.index[rm.index <= last_full]
+    rx = rm[A].sub(rf, axis=0)
+    mret = rm[JKMP_MKT]
+    # semnale: ranguri transversale in [0, 1] (Sectiunea 5.1.2)
+    lp = np.log(me[A])
+    sig = {'ret_1_0': lp - lp.shift(1), 'ret_6_1': lp.shift(1) - lp.shift(6),
+           'ret_12_1': lp.shift(1) - lp.shift(12),
+           'rvol_252d': rd[A].rolling(252).std().resample('ME').last(),
+           'dolvol_126d': np.log(DV[A].rolling(126).mean().resample('ME').last())}
+    names = list(sig)
+    K = len(names)
+    S = {}
+    for t in months:
+        vals = np.column_stack([sig[k].reindex([t]).values.ravel() for k in names])
+        if not np.isnan(vals).any():
+            S[t] = (pd.DataFrame(vals).rank(axis=0).values - 1) / (N - 1)
+    smonths = [t for t in months if t in S]
+    # Sigma lunar, Lambda (eq. 35), averea, g (eq. 6), m (Lema 1, eq. 14)
+    dvm = DV[A].rolling(126).mean().resample('ME').last()
+    cum = (1 + mret).cumprod()
+    w = JKMP_W2020 * cum / cum.loc['2020-12-31']
+    g = pd.DataFrame((1 + rf.values[:, None] + rx.values) / (1 + mret.values[:, None]), index=rm.index, columns=A)
+    Sig, Lam, Mmat = {}, {}, {}
+    for t in smonths:
+        Sig[t] = jkmp_ew_cov(rd[A].loc[:t].iloc[-2520:]) * 21
+        Lam[t] = 0.2 / dvm.loc[t].values
+        wl = w.loc[t] * Lam[t]
+        Lh = 1 / np.sqrt(wl)
+        X = GAMMA * (Lh[:, None] * Sig[t] * Lh[None, :])
+        gh = g.loc[:t].values
+        G = gh.T @ gh / len(gh)
+        mt = np.eye(N) * 0.5
+        for _ in range(500):
+            new = np.linalg.inv(X + np.eye(N) + (np.eye(N) - mt) * G)
+            new = (new + new.T) / 2
+            done = np.abs(new - mt).max() < 1e-12
+            mt = new
+            if done:
+                break
+        sl = np.sqrt(wl)
+        Mmat[t] = (1 / sl)[:, None] * mt * sl[None, :]
+    idx = list(rm.index)
+    nxt = {t: idx[idx.index(t) + 1] for t in smonths
+           if idx.index(t) + 1 < len(idx) and idx[idx.index(t) + 1] <= last_full}
+    dec = [t for t in smonths if t in nxt]
+
+    def evaluate(pis, months_eval):
+        rows = []
+        for t in months_eval:
+            p = pis[t]
+            pprev = pis.get(idx[idx.index(t) - 1], np.zeros(N))
+            trade = p - g.loc[t].values * pprev
+            tc = 0.5 * w.loc[t] * float(trade @ (Lam[t] * trade))
+            rows.append((float(rx.loc[nxt[t]].values @ p), tc, np.abs(trade).sum(), np.abs(p).sum()))
+        a = np.array(rows)
+        net = a[:, 0] - a[:, 1]
+        return dict(R=12 * a[:, 0].mean(), Vol=np.sqrt(12) * a[:, 0].std(ddof=1),
+                    SRg=np.sqrt(12) * a[:, 0].mean() / a[:, 0].std(ddof=1), TC=12 * a[:, 1].mean(),
+                    RTC=12 * net.mean(), VolN=np.sqrt(12) * net.std(ddof=1),
+                    SRn=np.sqrt(12) * net.mean() / net.std(ddof=1),
+                    U=12 * net.mean() - GAMMA / 2 * 12 * net.var(ddof=1),
+                    Turn=a[:, 2].mean(), Lev=a[:, 3].mean(), n=len(a)), net
+
+    def util_flow(pis, months_eval):
+        _, net = evaluate(pis, months_eval)
+        return 12 * net - GAMMA / 2 * 12 * (net - net.mean()) ** 2
+
+    test = [t for t in dec if t.year >= JKMP_TEST_START]
+    val_all = [t for t in dec if t.year >= JKMP_VAL_START]
+    rng = np.random.default_rng(JKMP_SEED)
+    Wdraw = {(p, e): rng.normal(0, 1, (K, p // 2)) * e for p in JKMP_PS for e in JKMP_ETAS}
+
+    def rf_feat(s, p, e):
+        z = s @ Wdraw[(p, e)]
+        return np.hstack([np.sin(z), np.cos(z)]) / np.sqrt(p)
+
+    # Portfolio-ML (Propozitia 4, eq. 24-26, 40)
+    pml_val = {}
+    for p in JKMP_PS:
+        for e in JKMP_ETAS:
+            F = {}
+            for t in smonths:
+                Z = rf_feat(S[t], p, e)
+                Z = Z - Z.mean(0)
+                Z = np.hstack([Z / np.sqrt((Z ** 2).sum(0)), np.ones((N, 1)) / np.sqrt(N)])
+                F[t] = Z / np.sqrt(np.diag(Sig[t]))[:, None]
+            St = {}
+            for k, t in enumerate(smonths):
+                if k < JKMP_NLAG - 1:
+                    continue
+                m = Mmat[t]
+                Im = np.eye(N) - m
+                acc = Im @ F[t]
+                Mprod = np.eye(N)
+                for th in range(1, JKMP_NLAG):
+                    Mprod = Mprod @ (m * g.loc[smonths[k - th + 1]].values[None, :])
+                    acc = acc + Mprod @ Im @ F[smonths[k - th]]
+                St[t] = acc
+            tl = [t for t in dec if t in St]
+            rt, Sg = {}, {}
+            for t in tl:
+                s_ = St[t]
+                D = s_ - g.loc[t].values[:, None] * St.get(idx[idx.index(t) - 1], np.zeros_like(s_))
+                rt[t] = s_.T @ rx.loc[nxt[t]].values
+                Sg[t] = GAMMA * s_.T @ Sig[t] @ s_ + w.loc[t] * D.T @ (Lam[t][:, None] * D)
+            for y in range(JKMP_VAL_START, 2027):
+                tr = [t for t in tl if nxt[t].year < y]
+                if len(tr) < 24:
+                    continue
+                Abar = sum(Sg[t] for t in tr) / len(tr)
+                bbar = sum(rt[t] for t in tr) / len(tr)
+                ev, V = np.linalg.eigh((Abar + Abar.T) / 2)
+                Vb = V.T @ bbar
+                ym = [t for t in tl if t.year == y]
+                for lam in JKMP_LAMBDAS:
+                    beta = V @ (Vb / np.maximum(ev + lam, 1e-18))
+                    d = pml_val.setdefault((p, e, lam), {})
+                    for t in ym:
+                        d[t] = St[t] @ beta
+    pml, choice = {}, {}
+    for y in range(JKMP_TEST_START, 2027):
+        best, bh = -np.inf, None
+        vm = [t for t in val_all if t.year < y]
+        for h, d in pml_val.items():
+            if all(t in d for t in vm):
+                u = util_flow(d, vm).mean()
+                if u > best:
+                    best, bh = u, h
+        choice[y] = bh
+        for t in [t for t in dec if t.year == y]:
+            pml[t] = pml_val[bh][t]
+    prev0 = idx[idx.index(test[0]) - 1]
+    pml[prev0] = pml_val[choice[JKMP_TEST_START]].get(prev0, np.zeros(N))
+    # prognoza randamentelor (Markowitz-ML, Static-ML): ridge pe caracteristici Fourier aleatoare
+    mu = {}
+    for y in range(JKMP_VAL_START - 1, 2027):
+        best, bh = np.inf, None
+        trm = [t for t in dec if nxt[t].year < y - 3]
+        vam = [t for t in dec if y - 3 <= nxt[t].year < y]
+        if len(trm) < 24:
+            continue
+        for p in JKMP_PS:
+            for e in JKMP_ETAS:
+                Xtr = np.vstack([rf_feat(S[t], p, e) for t in trm])
+                ytr = np.concatenate([rx.loc[nxt[t]].values for t in trm])
+                Xva = np.vstack([rf_feat(S[t], p, e) for t in vam])
+                yva = np.concatenate([rx.loc[nxt[t]].values for t in vam])
+                U_, s_, Vt = np.linalg.svd(Xtr, full_matrices=False)
+                Uy = U_.T @ ytr
+                for lam in JKMP_LAMBDAS:
+                    b = Vt.T @ (s_ / (s_ ** 2 + lam + 1e-18) * Uy)
+                    mse = np.mean((yva - Xva @ b) ** 2)
+                    if mse < best:
+                        best, bh = mse, (p, e, lam)
+        p, e, lam = bh
+        trf = [t for t in dec if nxt[t].year < y]
+        Xtr = np.vstack([rf_feat(S[t], p, e) for t in trf])
+        ytr = np.concatenate([rx.loc[nxt[t]].values for t in trf])
+        U_, s_, Vt = np.linalg.svd(Xtr, full_matrices=False)
+        b = Vt.T @ (s_ / (s_ ** 2 + lam + 1e-18) * (U_.T @ ytr))
+        for t in [t for t in smonths if t.year == y]:
+            mu[t] = rf_feat(S[t], p, e) @ b
+    mk, st, mv, ew = {}, {}, {}, {}
+    one = np.ones(N)
+    prev = None
+    for t in [prev0] + test:
+        Si = np.linalg.inv(Sig[t])
+        mk[t] = Si @ mu[t] / GAMMA                                   # eq. (32)
+        mv[t] = Si @ one / (one @ Si @ one)
+        ew[t] = one / N
+        wl = w.loc[t] * np.diag(Lam[t])                              # eq. (34), phi = 1
+        pp = np.zeros(N) if prev is None else g.loc[t].values * st[prev]
+        st[t] = np.linalg.solve(GAMMA * Sig[t] + wl, mu[t] + wl @ pp)
+        prev = t
+    res, flows = {}, {}
+    for name, d in [('Portfolio-ML', pml), ('Static-ML', st), ('Markowitz-ML', mk),
+                    ('Minimum variance', mv), ('1/N', ew)]:
+        res[name], _ = evaluate(d, test)
+        flows[name] = util_flow(d, test)
+    prob = {}
+    for a_ in flows:
+        for b_ in flows:
+            if a_ != b_:
+                dd = flows[a_] - flows[b_]
+                prob[f'{a_} > {b_}'] = float(stats.norm.cdf(dd.mean() / (dd.std(ddof=1) / np.sqrt(len(dd)))))
+    return dict(start=f'{nxt[test[0]]:%Y-%m}', end=f'{nxt[test[-1]]:%Y-%m}', n_months=len(test), res=res,
+                prob=prob, choice={y: [float(v) for v in h] for y, h in choice.items()})
+
+
+def fig_jkmp_paper():
+    """Tabelul 2 din Jensen, Kelly, Malamud & Pedersen (2026): raportul Sharpe net si utilitatea."""
+    names = list(JKMP_TABLE2)
+    cols = [JKMP_COL[n] for n in names]
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.3))
+    for ax, j, lab in [(axes[0], 0, 'Net Sharpe ratio'), (axes[1], 1, r'Utility, $\gamma = 10$')]:
+        v = [JKMP_TABLE2[n][j] for n in names]
+        bars = ax.barh(range(len(names)), v, color=cols, height=0.62)
+        ax.axvline(0, color=Gray, lw=0.6)
+        ax.set_yticks(range(len(names)))
+        ax.set_yticklabels(names if j == 0 else [])
+        ax.invert_yaxis()
+        ax.set_xlabel(lab)
+        span = max(v) - min(0, min(v))
+        for b, x in zip(bars, v):
+            ax.text(x + (0.02 * span if x >= 0 else -0.02 * span), b.get_y() + b.get_height() / 2,
+                    f'{x:.2f}' if j == 0 else f'{x:.3f}', va='center', ha='left' if x >= 0 else 'right',
+                    fontsize=8, color='black')
+        ax.set_xlim(min(0, min(v)) - 0.25 * span if min(v) < 0 else 0, max(v) + 0.22 * span)
+    handles = [plt.Rectangle((0, 0), 1, 1, color=c) for c in cols]
+    fig.legend(handles, names, loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=5, frameon=False)
+    fig.suptitle('Out of sample 1981-2020, US stocks, wealth \\$10 billion (Markowitz-ML off scale)',
+                 fontsize=9, x=0.02, ha='left')
+    plt.tight_layout()
+    save_fig('ch4_jkmp_paper')
+    return JKMP_TABLE2
+
+
+def fig_jkmp_replication(out):
+    """Planul risc-randament: brut (gol) si net de costuri (plin), cu curbe de utilitate constanta."""
+    res = out['res']
+    names = ['Portfolio-ML', 'Static-ML', 'Minimum variance', '1/N']
+    fig, ax = plt.subplots(figsize=(7.2, 4.0))
+    s = np.linspace(0, 0.34, 200)
+    for u, ls in [(res['Portfolio-ML']['U'], '--'), (0.0, ':')]:
+        ax.plot(s, u + JKMP_GAMMA / 2 * s ** 2, color=MainBlue, ls=ls, lw=0.9,
+                label=f'Utility = {u:.3f} ($\\gamma = 10$)')
+    ax.axhline(0, color=Gray, lw=0.5)
+    for n in names:
+        r = res[n]
+        c = JKMP_COL[n]
+        ax.annotate('', xy=(r['VolN'], r['RTC']), xytext=(r['Vol'], r['R']),
+                    arrowprops=dict(arrowstyle='->', color=c, lw=1.0))
+        ax.scatter(r['Vol'], r['R'], s=40, facecolors='none', edgecolors=c, lw=1.2, zorder=3)
+        ax.scatter(r['VolN'], r['RTC'], s=40, color=c, zorder=3,
+                   label=f"{n}: net SR {r['SRn']:.2f}, utility {r['U']:.3f}")
+    ax.scatter([], [], s=40, facecolors='none', edgecolors='black', label='Gross of costs (hollow)')
+    ax.set_xlim(0, 0.34)
+    ax.set_ylim(-0.42, 0.30)
+    ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.0%}'))
+    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.0%}'))
+    ax.set_xlabel('Annualised volatility')
+    ax.set_ylabel('Annualised excess return')
+    ax.set_title(f"14 US stocks + 9 sector ETFs, out of sample {pd.Timestamp(out['start']):%b %Y} - "
+                 f"{pd.Timestamp(out['end']):%b %Y}, wealth \\$10 billion in 2020 (Markowitz-ML off scale)",
+                 fontsize=8.5, loc='left')
+    legend_outside_bottom(ax, ncol=2, y=-0.14)
+    plt.tight_layout()
+    save_fig('ch4_jkmp_replication')
+    return {n: {k: res[n][k] for k in ('R', 'Vol', 'RTC', 'VolN', 'SRg', 'SRn', 'U', 'TC')} for n in res}
+
+
+# =============================================================================
 # MAIN
 # =============================================================================
 def to_py(o):
@@ -1296,6 +1608,9 @@ if __name__ == '__main__':
     R['gmv_nl'] = gmv_nl_backtests()
     R['lo_sharpe'] = {u: lo_sharpe(bts[u][0]['1/N']) for u in bts}
     R['deflated_sharpe'] = deflated_sharpe({f'{u}: {s}': bts[u][0][s].values for u in bts for s in STRATS})
+    R['jkmp_paper'] = fig_jkmp_paper()
+    R['jkmp'] = jkmp_replication()
+    R['jkmp']['chart'] = fig_jkmp_replication(R['jkmp'])
     with open(os.path.join(HERE, 'ch4_results.json'), 'w') as f:
         json.dump(to_py(R), f, indent=1, default=str)
     print(json.dumps(to_py(R), indent=1, default=str)[:30000])
