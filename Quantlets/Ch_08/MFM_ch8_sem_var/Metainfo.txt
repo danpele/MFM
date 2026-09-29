@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
 
-Output: 'ch8_sem_traffic_bet.pdf'
+Output: 'ch8_sem_traffic_bet.pdf, ch8_sem_b1_timing.pdf, ch8_sem_b1_results.pdf, ch8_sem_b9_estrisk.pdf, ch8_sem_c2_lookahead.pdf'
