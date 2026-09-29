@@ -796,7 +796,7 @@ def fig_models_vs_data(g, me, hp):
 # =============================================================================
 # 8. STUDIU DE CAZ: Bennedsen, Lunde & Pakkanen (2022), volatilitate rugoasa si persistenta
 #    Replicare pe SPY (bare de 5 minute, 2020-2026), Delta = 1 zi; reperele din Tabelul 3, Panoul A
-#    (versiunea acceptata arXiv:1610.00332v3)
+#    (articolul publicat, Journal of Financial Econometrics 20(5), 961-1006)
 # =============================================================================
 def variogram(x, ks):
     """Variograma empirica de ordinul 2: media (x_{i+k} - x_i)^2."""
@@ -805,7 +805,7 @@ def variogram(x, ks):
 
 
 def alpha_ols(x, m=6):
-    """ec. (3.1): OLS pentru log gamma_2(k) pe log k, k = 1..m; alpha = (a1 - 1)/2."""
+    """ec. (2.1): OLS pentru log gamma_2(k) pe log k, k = 1..m; alpha = (a1 - 1)/2."""
     ks = np.arange(1, m + 1)
     a1 = np.polyfit(np.log(ks), np.log(variogram(x, ks)), 1)[0]
     return (a1 - 1) / 2
