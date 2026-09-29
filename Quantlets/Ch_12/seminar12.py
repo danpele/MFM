@@ -131,19 +131,21 @@ BFLY_EXPIRY = '2026-10-30 08:00:00'
 
 
 def a1_butterfly(h=1000.0, K0=85000.0):
-    """Convexitatea in K pe lantul Bitcoin: fluture C(K-h) - 2C(K) + C(K+h) din preturile de marcare (USD) si costul
-    executabil (aripile la ask, corpul la bid); densitatea aproximativa q(K) ~ fluture / h^2 (r = 0)."""
+    """Convexitatea in K pe lantul Bitcoin: fluture C(K-h) - 2C(K) + C(K+h) din preturile de marcare in USD (prima in BTC
+    x indicele S, conventia Deribit) si costul executabil (aripile la ask, corpul la bid); densitatea
+    q(K) ~ e^{r tau} fluture / h^2, cu e^{r tau} = F/S (rata implicita in forward-ul Deribit)."""
     c = deribit_chain()
     g = c[(c['expiry'] == pd.Timestamp(BFLY_EXPIRY)) & (c['type'] == 'call')].set_index('strike').sort_index()
-    F = float(g['forward'].iloc[0])
-    usd = lambda col: g[col] * F
+    F, S = float(g['forward'].iloc[0]), float(g['index'].iloc[0])
+    usd = lambda col: g[col] * S
     m, b, a = usd('mark_price'), usd('bid'), usd('ask')
-    out = dict(F=F, h=h, K=K0, Cm=float(m[K0 - h]), C0=float(m[K0]), Cp=float(m[K0 + h]),
+    out = dict(F=F, S=S, growth=F / S, h=h, K=K0, Cm=float(m[K0 - h]), C0=float(m[K0]), Cp=float(m[K0 + h]),
                bid0=float(b[K0]), askm=float(a[K0 - h]), askp=float(a[K0 + h]))
     out['bf_mark'] = out['Cm'] - 2 * out['C0'] + out['Cp']
     out['bf_exec'] = out['askm'] - 2 * out['bid0'] + out['askp']
-    out['q'] = out['bf_mark'] / h ** 2
-    out['mass'] = out['bf_mark'] / h                         # ~ P(K - h < S_T < K + h), ponderare triunghiulara
+    out['q'] = F / S * out['bf_mark'] / h ** 2
+    out['mass'] = F / S * out['bf_mark'] / h                 # E^Q[(h - |S_T - K|)^+]/h: masa ponderata triunghiular ~ h q(K)
+    out['p_int'] = 2 * h * out['q']                           # ~ P(K - h < S_T < K + h), fara ponderare
     # toate tripletele echidistante din lantul acestei scadente
     Ks = list(g.index)
     n_tr = n_neg_mark = n_neg_exec = 0
@@ -165,11 +167,13 @@ def a1_butterfly(h=1000.0, K0=85000.0):
 
 
 def a2_implied_forward():
-    """Paritatea ca regresie: C - P = D F - D K pe toate preturile de exercitare cu call si put cotate (mid, USD)."""
+    """Paritatea ca regresie: C - P = D F - D K pe toate preturile de exercitare cu call si put cotate
+    (mid in USD = prima in BTC x indicele S, conventia Deribit)."""
     c = deribit_chain()
     g = c[(c['expiry'] == pd.Timestamp(BFLY_EXPIRY)) & (c['bid'] > 0) & (c['ask'] > 0)].copy()
-    F0 = float(g['forward'].iloc[0])
-    g['mid'] = 0.5 * (g['bid'] + g['ask']) * F0
+    F0, S0 = float(g['forward'].iloc[0]), float(g['index'].iloc[0])
+    tau = float((g['expiry'].iloc[0] - g['snapshot_utc'].iloc[0]).total_seconds() / (365 * 86400))
+    g['mid'] = 0.5 * (g['bid'] + g['ask']) * S0
     p = g.pivot_table(index='strike', columns='type', values='mid').dropna()
     y = p['call'] - p['put']
     X = sm.add_constant(pd.Series(p.index.values, index=p.index, name='K'))
@@ -180,7 +184,8 @@ def a2_implied_forward():
     a_, b_ = m.params['const'], m.params['K']
     grad = np.array([-1 / b_, a_ / b_ ** 2])
     seF = float(np.sqrt(grad @ m.cov_params().values @ grad))
-    return dict(n=int(len(p)), D=float(D), D_se=float(m.bse['K']), F=float(Fh), F_se=seF, F_exch=F0,
+    return dict(n=int(len(p)), D=float(D), D_se=float(m.bse['K']), F=float(Fh), F_se=seF, F_exch=F0, S=S0, tau=tau,
+                D_exch=S0 / F0, r_impl=float(-np.log(D) / tau), r_exch=float(np.log(F0 / S0) / tau),
                 kmin=float(p.index.min()), kmax=float(p.index.max()), r2=float(m.rsquared))
 
 
@@ -237,7 +242,12 @@ def b8_rnd_band(days=90, B=300):
         pb = svi_fit(kq[i], wq[i])
         a_, b_ = probs(rnd_from_svi([pb[x] for x in ['a', 'b', 'rho', 'm', 's']], F, T, K))
         P80.append(a_); P120.append(b_)
+    kmin, kmax = float(np.exp(kq.min())), float(np.exp(kq.max()))
+    A0 = integrate.trapezoid(q0, K)
+    ext_lo = float(integrate.trapezoid(q0[K <= kmin * F], K[K <= kmin * F]) / A0)       # masa sub ultima cotatie
+    ext_hi = float(1 - integrate.trapezoid(q0[K <= kmax * F], K[K <= kmax * F]) / A0)   # masa peste ultima cotatie
     return dict(expiry=str(pd.Timestamp(e).date()), days=float(f['days']), n=int(len(kq)), atm=float(100 * atm),
+                ext_lo=ext_lo, ext_hi=ext_hi, ext_lo_share=ext_lo / float(p80), ext_hi_share=ext_hi / float(p120),
                 p80=float(p80), p80_lo=float(np.quantile(P80, 0.025)), p80_hi=float(np.quantile(P80, 0.975)),
                 p120=float(p120), p120_lo=float(np.quantile(P120, 0.025)), p120_hi=float(np.quantile(P120, 0.975)),
                 ln80=ln(0.8), ln120=1 - ln(1.2), kf_min=float(np.exp(kq.min())), kf_max=float(np.exp(kq.max())))
@@ -283,7 +293,7 @@ def b2_delta_hedged():
     n, L = len(x), 6
     means = []
     for _ in range(2000):
-        st = rng.integers(0, n - L, size=int(np.ceil(n / L)))
+        st = rng.integers(0, n - L + 1, size=int(np.ceil(n / L)))   # toate blocurile, inclusiv ultimul
         means.append(np.concatenate([x[s:s + L] for s in st])[:n].mean())
     worst5 = np.sort(x)[:5]
     return dict(n=n, mean=m, se=se, t=m / se, lo=float(np.quantile(means, 0.025)), hi=float(np.quantile(means, 0.975)),
@@ -342,6 +352,12 @@ def b5_vrp():
         mv, sev = nw_mean(x['vrp_vol'], 21)
         out[tag] = dict(n=int(len(x)), mean=m, se=se, t=m / se, lo=m - 1.96 * se, hi=m + 1.96 * se, mean_vol=mv, se_vol=sev,
                         share=float((x['vrp'] > 0).mean()), iv=float(x['vix'].mean()), rv=float(np.sqrt(x['rv']).mean()))
+    # stabilitatea intre subperioade: VRP pe constanta si un indicator 2008-2026, erori Newey-West (21 de lag-uri)
+    X = sm.add_constant(pd.Series((d.index >= '2008-01-01').astype(float), index=d.index, name='post'))
+    for col, tag in [('vrp', 'diff'), ('vrp_vol', 'diff_vol')]:
+        m = sm.OLS(d[col], X).fit(cov_type='HAC', cov_kwds={'maxlags': 21})
+        out[tag] = dict(d=float(m.params['post']), se=float(m.bse['post']), t=float(m.tvalues['post']),
+                        p=float(m.pvalues['post']))
     naive = d['vrp'].std() / np.sqrt(len(d))
     out['naive_se'] = float(naive)
     out['ratio_se'] = out['all']['se'] / float(naive)
@@ -393,7 +409,7 @@ def perf(p, per_year=12):
     srs = []
     xv = x.values
     for _ in range(2000):
-        st = rng.integers(0, n - L, size=int(np.ceil(n / L)))
+        st = rng.integers(0, n - L + 1, size=int(np.ceil(n / L)))   # toate blocurile, inclusiv ultimul
         y = np.concatenate([xv[s:s + L] for s in st])[:n]
         srs.append(y.mean() / y.std() * np.sqrt(per_year))
     return dict(n=int(n), mean=float(x.mean()), sd=float(x.std()), sharpe=float(sr), sr_lo=float(np.quantile(srs, 0.025)),
@@ -409,14 +425,23 @@ def c1_vrp_signal():
     p_sp = monthly_swap(sp['vix'].loc[r_sp.index], r_sp, 21, 252)
     ratio = (px['vix'] / px['vix3m']).dropna()
     p_sp3 = p_sp.loc[ratio.index[0]:]
-    cond = p_sp3[ratio.reindex(p_sp3.index) <= 1]
+    active = ratio.reindex(p_sp3.index) <= 1
+    cond = p_sp3.assign(pnl=p_sp3['pnl'].where(active, 0.0))   # lunile sarite: P&L 0 (numerar), acelasi calendar lunar
     dv = dvol_history()
     b = load_close('btc')
     r_b = np.log(b).diff().dropna()
     p_b = monthly_swap(dv, r_b, 30, 365)
-    res = dict(sp=perf(p_sp), sp_since=perf(p_sp3), sp_cond=perf(cond), btc=perf(p_b),
-               skipped=int(len(p_sp3) - len(cond)),
-               skipped_mean=float(p_sp3.loc[~p_sp3.index.isin(cond.index), 'pnl'].mean()))
+    # sensibilitatea la calendarul lunar: aceeasi strategie, cu grila de 21 de zile pornita in fiecare dintre primele 21 de zile
+    grid = []
+    for o in range(21):
+        x = monthly_swap(sp['vix'].loc[r_sp.index].iloc[o:], r_sp.iloc[o:], 21, 252)['pnl']
+        grid.append((x.mean() / x.std() * np.sqrt(12), x.min()))
+    grid = np.array(grid)
+    res = dict(grid_sr_min=float(grid[:, 0].min()), grid_sr_max=float(grid[:, 0].max()),
+               grid_worst_min=float(grid[:, 1].min()), grid_worst_max=float(grid[:, 1].max()))
+    res.update(sp=perf(p_sp), sp_since=perf(p_sp3), sp_cond=perf(cond), sp_active=perf(p_sp3[active]), btc=perf(p_b),
+               skipped=int((~active).sum()), skipped_mean=float(p_sp3.loc[~active, 'pnl'].mean()))
+
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.2))
     axes[0].plot(p_sp.index, p_sp['pnl'].cumsum(), color=MainBlue, lw=1.1, label='S&P 500, every month (VIX)')
     axes[0].plot(cond.index, cond['pnl'].cumsum() + p_sp['pnl'].cumsum().reindex(cond.index).iloc[0] - cond['pnl'].iloc[0],

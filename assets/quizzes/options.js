@@ -11,26 +11,26 @@ window.MFM_DATA.quizzes['options'] = {
             "correct": 1,
             "en": {
                 "title": "Jump bias of the VIX",
-                "text": "If S&P 500 prices can jump, the squared VIX (a strip of OTM options weighted by 1/K^2) is the risk-neutral expectation of which quantity?",
+                "text": "If S&P 500 prices can jump, what does the annualised strip variance (VIX/100)^2 measure in the ideal limit of a continuum of strikes (a strip of OTM options weighted by 1/K^2, horizon T)?",
                 "options": [
-                    "Expected quadratic variation E^Q[QV], exactly, in any model",
-                    "E^Q[-2 ln(S_T/F)], which differs from expected quadratic variation by a jump term",
+                    "Annualised expected quadratic variation E^Q[QV]/T, exactly, in any model",
+                    "E^Q[-2 ln(S_T/F)]/T, which differs from annualised expected quadratic variation by a jump term",
                     "The squared at-the-money implied volatility",
-                    "E^P[RV], the expected realised variance under the real-world probability"
+                    "E^P[RV]/T, the annualised expected realised variance under the real-world probability"
                 ],
-                "correctExplanation": "Itô's lemma makes the log contract equal to integrated variance only for continuous paths; with jumps J the gap is 2E^Q[sum(e^J - 1 - J - J^2/2)], about E^Q[sum J^3]/3, negative for crashes (-2.0% of variance in the lecture's Merton example).",
+                "correctExplanation": "(VIX/100)^2 = E^Q[-2 ln(S_T/F)]/T with a continuum of strikes (the VIX index is 100 times its square root). Itô's lemma makes the log contract equal to integrated variance only for continuous paths; with jumps J the gap is 2E^Q[sum(e^J - 1 - J - J^2/2)], about E^Q[sum J^3]/3, negative for crashes (-2.0% of variance in the lecture's Merton example).",
                 "incorrectExplanation": "The strip prices the log contract. It equals expected quadratic variation only without jumps, and it is an expectation under the pricing measure Q, not under the real-world measure."
             },
             "ro": {
                 "title": "Deplasarea VIX din salturi",
-                "text": "Dacă prețurile S&P 500 pot avea salturi, pătratul VIX (o bandă de opțiuni OTM ponderate cu 1/K^2) este speranța neutră la risc a cărei mărimi?",
+                "text": "Dacă prețurile S&P 500 pot avea salturi, ce măsoară varianța anualizată a benzii, (VIX/100)^2, în limita ideală a unui continuum de prețuri de exercitare (o bandă de opțiuni OTM ponderate cu 1/K^2, orizontul T)?",
                 "options": [
-                    "Variația pătratică așteptată E^Q[QV], exact, în orice model",
-                    "E^Q[-2 ln(S_T/F)], care diferă de variația pătratică așteptată printr-un termen de salt",
+                    "Variația pătratică așteptată anualizată E^Q[QV]/T, exact, în orice model",
+                    "E^Q[-2 ln(S_T/F)]/T, care diferă de variația pătratică așteptată anualizată printr-un termen de salt",
                     "Pătratul volatilității implicite la bani",
-                    "E^P[RV], varianța realizată așteptată sub probabilitatea reală"
+                    "E^P[RV]/T, varianța realizată așteptată anualizată sub probabilitatea reală"
                 ],
-                "correctExplanation": "Lema lui Itô face contractul logaritmic egal cu varianța integrată doar pentru traiectorii continue; cu salturi J diferența este 2E^Q[sum(e^J - 1 - J - J^2/2)], aproximativ E^Q[sum J^3]/3, negativă pentru prăbușiri (-2,0% din varianță în exemplul Merton din curs).",
+                "correctExplanation": "(VIX/100)^2 = E^Q[-2 ln(S_T/F)]/T pentru un continuum de prețuri de exercitare (indicele VIX este de 100 de ori rădăcina ei pătrată). Lema lui Itô face contractul logaritmic egal cu varianța integrată doar pentru traiectorii continue; cu salturi J diferența este 2E^Q[sum(e^J - 1 - J - J^2/2)], aproximativ E^Q[sum J^3]/3, negativă pentru prăbușiri (-2,0% din varianță în exemplul Merton din curs).",
                 "incorrectExplanation": "Banda evaluează contractul logaritmic. Acesta este egal cu variația pătratică așteptată doar fără salturi și este o speranță sub măsura de evaluare Q, nu sub măsura reală."
             }
         },
@@ -42,7 +42,7 @@ window.MFM_DATA.quizzes['options'] = {
                 "options": [
                     "Nothing: SVI wings must be linear in k",
                     "The wing slope must be exactly 2",
-                    "It violates Lee's bound: w(k)/|k| cannot exceed 2 at extreme strikes, so the fitted smile admits arbitrage there",
+                    "It violates Lee's bound: w(k)/|k| cannot exceed 2 asymptotically, as |k| grows, so the fitted smile admits arbitrage in the wing",
                     "Nothing: only the left wing is constrained by no arbitrage"
                 ],
                 "correctExplanation": "Lee (2004): limsup w(k)/|k| lies in [0, 2] in both wings, and the slope fixes the number of finite moments of S_T; the fits in the lecture have slopes of at most 0.39.",
@@ -54,7 +54,7 @@ window.MFM_DATA.quizzes['options'] = {
                 "options": [
                     "Nimic: aripile SVI trebuie să fie liniare în k",
                     "Panta aripii trebuie să fie exact 2",
-                    "Încalcă limita lui Lee: w(k)/|k| nu poate depăși 2 la prețuri de exercitare extreme, deci zâmbetul estimat admite arbitraj acolo",
+                    "Încalcă limita lui Lee: w(k)/|k| nu poate depăși 2 asimptotic, când |k| crește, deci zâmbetul estimat admite arbitraj în aripă",
                     "Nimic: doar aripa stângă este constrânsă de absența arbitrajului"
                 ],
                 "correctExplanation": "Lee (2004): limsup w(k)/|k| este în [0, 2] în ambele aripi, iar panta fixează numărul de momente finite ale lui S_T; estimările din curs au pante de cel mult 0,39.",
@@ -65,7 +65,7 @@ window.MFM_DATA.quizzes['options'] = {
             "correct": 3,
             "en": {
                 "title": "Early exercise",
-                "text": "Which American option may be optimally exercised before expiry, even without dividends?",
+                "text": "Assuming a strictly positive risk-free rate, which American option may be optimally exercised before expiry, even without dividends?",
                 "options": [
                     "A call on a stock without dividends",
                     "Any option that is out of the money",
@@ -73,11 +73,11 @@ window.MFM_DATA.quizzes['options'] = {
                     "A put that is deep in the money"
                 ],
                 "correctExplanation": "Deep in the money, receiving K now and earning interest on it can be worth more than keeping the put alive.",
-                "incorrectExplanation": "A call on a stock without dividends is worth more alive than exercised (at least S - K e^{-r tau}); for puts the interest on K makes early exercise valuable."
+                "incorrectExplanation": "With r > 0, a call on a stock without dividends is worth more alive than exercised (at least S - K e^{-r tau} > S - K); for puts the interest on K makes early exercise valuable."
             },
             "ro": {
                 "title": "Exercitarea anticipată",
-                "text": "Ce opțiune americană poate fi exercitată optim înainte de scadență, chiar fără dividende?",
+                "text": "Presupunând o rată fără risc strict pozitivă, ce opțiune americană poate fi exercitată optim înainte de scadență, chiar fără dividende?",
                 "options": [
                     "Un call pe o acțiune fără dividende",
                     "Orice opțiune în afara banilor",
@@ -85,14 +85,14 @@ window.MFM_DATA.quizzes['options'] = {
                     "Un put adânc în bani"
                 ],
                 "correctExplanation": "Adânc în bani, a încasa K acum și a câștiga dobânda poate valora mai mult decât a păstra put-ul.",
-                "incorrectExplanation": "Un call pe o acțiune fără dividende valorează mai mult nevândut decât exercitat (cel puțin S - K e^{-r tau}); la put-uri dobânda la K face valoroasă exercitarea anticipată."
+                "incorrectExplanation": "Cu r > 0, un call pe o acțiune fără dividende valorează mai mult neexercitat decât exercitat (cel puțin S - K e^{-r tau} > S - K); la put-uri dobânda la K face valoroasă exercitarea anticipată."
             }
         },
         {
             "correct": 1,
             "en": {
                 "title": "Joint versus individual tests",
-                "text": "Mincer-Zarnowitz regression of 21-day realised variance on VIX^2: intercept -51.7 (s.e. 34.4), slope 0.86 (s.e. 0.10), joint Wald statistic 41.5 with 2 degrees of freedom. What do you conclude?",
+                "text": "Mincer-Zarnowitz regression of 21-day realised variance on VIX^2: intercept -51.9 (s.e. 34.4), slope 0.86 (s.e. 0.10), joint Wald statistic 41.7 with 2 degrees of freedom. What do you conclude?",
                 "options": [
                     "Unbiasedness is not rejected, because both t-statistics are below 2",
                     "Unbiasedness is rejected jointly, although neither coefficient alone differs significantly from (0, 1): the two estimates are strongly negatively correlated",
@@ -104,7 +104,7 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "Teste comune și teste individuale",
-                "text": "Regresia Mincer-Zarnowitz a varianței realizate pe 21 de zile pe VIX^2: termenul liber -51,7 (e.s. 34,4), panta 0,86 (e.s. 0,10), statistica Wald comună 41,5 cu 2 grade de libertate. Ce concluzionați?",
+                "text": "Regresia Mincer-Zarnowitz a varianței realizate pe 21 de zile pe VIX^2: termenul liber -51,9 (e.s. 34,4), panta 0,86 (e.s. 0,10), statistica Wald comună 41,7 cu 2 grade de libertate. Ce concluzionați?",
                 "options": [
                     "Prognoza nedeplasată nu este respinsă, pentru că ambele statistici t sunt sub 2",
                     "Prognoza nedeplasată este respinsă împreună, deși niciun coeficient luat separat nu diferă semnificativ de (0, 1): cele două estimări sunt puternic corelate negativ",
@@ -153,8 +153,8 @@ window.MFM_DATA.quizzes['options'] = {
                     "Both are always positive for a long option",
                     "Theta + 0.5 sigma^2 S^2 Gamma + r S Delta - r C = 0: long gamma is paid for by time decay"
                 ],
-                "correctExplanation": "This is the Black-Scholes partial differential equation; a long-gamma position loses time value, a short-gamma one earns it.",
-                "incorrectExplanation": "The Black-Scholes equation ties theta to gamma: the holder of convexity pays for it through time decay."
+                "correctExplanation": "This is the Black-Scholes partial differential equation: after financing the delta hedge, Theta + r S Delta - r C = -0.5 sigma^2 S^2 Gamma < 0, so a delta-hedged long-gamma position loses value over time and a short-gamma one earns it. Raw theta alone can be positive, e.g. for a deep in-the-money put.",
+                "incorrectExplanation": "The Black-Scholes equation ties theta to gamma: net of financing, the holder of convexity pays for it through time decay."
             },
             "ro": {
                 "title": "Theta și gamma",
@@ -165,8 +165,8 @@ window.MFM_DATA.quizzes['options'] = {
                     "Ambele sunt mereu pozitive pentru o opțiune cumpărată",
                     "Theta + 0,5 sigma^2 S^2 Gamma + r S Delta - r C = 0: gamma pozitivă se plătește prin erodarea în timp"
                 ],
-                "correctExplanation": "Aceasta este ecuația cu derivate parțiale Black-Scholes; o poziție cu gamma pozitivă pierde valoare în timp, una cu gamma negativă o câștigă.",
-                "incorrectExplanation": "Ecuația Black-Scholes leagă theta de gamma: deținătorul convexității o plătește prin erodarea în timp."
+                "correctExplanation": "Aceasta este ecuația cu derivate parțiale Black-Scholes: după finanțarea acoperirii delta, Theta + r S Delta - r C = -0,5 sigma^2 S^2 Gamma < 0, deci o poziție acoperită delta cu gamma pozitivă pierde valoare în timp, iar una cu gamma negativă o câștigă. Theta singură poate fi pozitivă, de exemplu pentru un put adânc în bani.",
+                "incorrectExplanation": "Ecuația Black-Scholes leagă theta de gamma: după costul finanțării, deținătorul convexității o plătește prin erodarea în timp."
             }
         },
         {
@@ -447,10 +447,10 @@ window.MFM_DATA.quizzes['options'] = {
                 "options": [
                     "From the at-the-money implied volatility of S&P 100 options",
                     "From a GARCH model fitted to S&P 500 returns",
-                    "From a strip of out-of-the-money S&P 500 options weighted by 1/K^2, around 30 days (a variance-swap rate)",
+                    "From a strip of out-of-the-money S&P 500 options weighted by 1/K^2, interpolated to 30 days (an estimate of the variance-swap strike)",
                     "From VIX futures prices"
                 ],
-                "correctExplanation": "The Cboe formula sigma^2 = 2/T sum dK/K^2 e^{RT} Q(K) - (F/K0 - 1)^2/T replicates a 30-day variance swap.",
+                "correctExplanation": "For each of two expiries around 30 days, sigma^2 = 2/T sum dK/K^2 e^{RT} Q(K) - (F/K0 - 1)^2/T; the total variances are interpolated to 30 days and VIX = 100 times the square root of the annualised result. The strip prices the log contract, so it equals the fair variance-swap strike only for continuous paths and a continuum of strikes.",
                 "incorrectExplanation": "The original 1993 VIX used at-the-money S&P 100 options; the current VIX is a model-free variance measure from a strip of S&P 500 options."
             },
             "ro": {
@@ -459,10 +459,10 @@ window.MFM_DATA.quizzes['options'] = {
                 "options": [
                     "Din volatilitatea implicită la bani a opțiunilor pe S&P 100",
                     "Dintr-un model GARCH estimat pe randamentele S&P 500",
-                    "Dintr-o bandă de opțiuni S&P 500 în afara banilor, ponderate cu 1/K^2, în jurul a 30 de zile (rata unui swap de varianță)",
+                    "Dintr-o bandă de opțiuni S&P 500 în afara banilor, ponderate cu 1/K^2, interpolată la 30 de zile (o estimare a prețului de exercitare al unui swap de varianță)",
                     "Din prețurile contractelor futures pe VIX"
                 ],
-                "correctExplanation": "Formula Cboe sigma^2 = 2/T sum dK/K^2 e^{RT} Q(K) - (F/K0 - 1)^2/T replică un swap de varianță pe 30 de zile.",
+                "correctExplanation": "Pentru fiecare dintre două scadențe din jurul a 30 de zile, sigma^2 = 2/T sum dK/K^2 e^{RT} Q(K) - (F/K0 - 1)^2/T; varianțele totale se interpolează la 30 de zile, iar VIX = de 100 de ori rădăcina pătrată a rezultatului anualizat. Banda evaluează contractul logaritmic, deci este egală cu prețul corect al swap-ului de varianță doar pentru traiectorii continue și un continuum de prețuri de exercitare.",
                 "incorrectExplanation": "VIX-ul original din 1993 folosea opțiuni la bani pe S&P 100; VIX-ul actual este o măsură a varianței fără model, dintr-o bandă de opțiuni pe S&P 500."
             }
         },
@@ -558,7 +558,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "The VIX is too high on average, most of all when it is high: it contains a risk premium",
                     "The VIX has no information about future volatility"
                 ],
-                "correctExplanation": "An unbiased forecast needs intercept 0 and slope 1; neither t-statistic alone rejects, but the joint Wald test does (41.5, p below 10^-9): the VIX overstates realised variance, yet explains more (R^2 0.37) than past variance (0.29).",
+                "correctExplanation": "An unbiased forecast needs intercept 0 and slope 1; neither t-statistic alone rejects, but the joint Wald test does (41.7, p below 10^-9): the VIX overstates realised variance, yet explains more (R^2 0.37) than past variance (0.29).",
                 "incorrectExplanation": "The regression shows an upward bias from the risk premium, but the VIX remains informative about future volatility."
             },
             "ro": {
@@ -570,7 +570,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "VIX este prea mare în medie, cel mai mult când este mare: conține o primă de risc",
                     "VIX nu conține informație despre volatilitatea viitoare"
                 ],
-                "correctExplanation": "O prognoză nedeplasată cere termen liber 0 și pantă 1; nicio statistică t separată nu respinge, dar testul Wald comun respinge (41,5, p sub 10^-9): VIX supraestimează varianța realizată, dar explică mai mult (R^2 0,37) decât varianța trecută (0,29).",
+                "correctExplanation": "O prognoză nedeplasată cere termen liber 0 și pantă 1; nicio statistică t separată nu respinge, dar testul Wald comun respinge (41,7, p sub 10^-9): VIX supraestimează varianța realizată, dar explică mai mult (R^2 0,37) decât varianța trecută (0,29).",
                 "incorrectExplanation": "Regresia arată o deplasare în sus dată de prima de risc, dar VIX rămâne informativ pentru volatilitatea viitoare."
             }
         },
@@ -582,10 +582,10 @@ window.MFM_DATA.quizzes['options'] = {
                 "options": [
                     "They are the same quantity measured in different units",
                     "The ex-post premium uses past realised variance, the ex-ante premium future realised variance",
-                    "The ex-ante premium (VIX^2 minus past realised variance) is known at t and can predict returns; the ex-post premium uses future realised variance and is the realised P&L of a variance swap",
+                    "The ex-ante premium E^Q_t[RV] - E^P_t[RV], proxied by VIX^2 minus past realised variance, is known at t and can serve as a predictor; the ex-post premium uses future realised variance and is the realised P&L of a variance swap",
                     "Only the ex-post premium can be tested with Newey-West errors"
                 ],
-                "correctExplanation": "A predictor must be known at the forecast date; VIX_t^2 - RV_{t,t+21} is known only at t+21 and measures what a variance-swap seller earned, not what an investor could see.",
+                "correctExplanation": "A predictor must be known at the forecast date; VIX_t^2 - RV_{t,t+21} is known only at t+21 and measures what a variance-swap seller earned, not what an investor could see. Past realised variance is only a forecast of E^P_t[RV], so VIX_t^2 - RV_{t-21,t} is a proxy for the ex-ante premium.",
                 "incorrectExplanation": "The two differ in timing: the ex-post version subtracts variance realised after t, so it cannot be used as a predictor at t."
             },
             "ro": {
@@ -594,10 +594,10 @@ window.MFM_DATA.quizzes['options'] = {
                 "options": [
                     "Sunt aceeași mărime, măsurată în unități diferite",
                     "Prima ex post folosește varianța realizată trecută, cea ex ante varianța realizată viitoare",
-                    "Prima ex ante (VIX^2 minus varianța realizată trecută) este cunoscută la t și poate prognoza randamente; prima ex post folosește varianța realizată viitoare și este rezultatul realizat al unui swap de varianță",
+                    "Prima ex ante E^Q_t[RV] - E^P_t[RV], aproximată prin VIX^2 minus varianța realizată trecută, este cunoscută la t și poate fi folosită ca predictor; prima ex post folosește varianța realizată viitoare și este rezultatul realizat al unui swap de varianță",
                     "Doar prima ex post poate fi testată cu erori Newey-West"
                 ],
-                "correctExplanation": "Un predictor trebuie să fie cunoscut la data prognozei; VIX_t^2 - RV_{t,t+21} este cunoscută abia la t+21 și măsoară ce a câștigat vânzătorul unui swap de varianță, nu ce putea vedea un investitor.",
+                "correctExplanation": "Un predictor trebuie să fie cunoscut la data prognozei; VIX_t^2 - RV_{t,t+21} este cunoscută abia la t+21 și măsoară ce a câștigat vânzătorul unui swap de varianță, nu ce putea vedea un investitor. Varianța realizată trecută este doar o prognoză pentru E^P_t[RV], deci VIX_t^2 - RV_{t-21,t} este o aproximare a primei ex ante.",
                 "incorrectExplanation": "Cele două diferă prin moment: versiunea ex post scade varianța realizată după t, deci nu poate fi folosită ca predictor la t."
             }
         },

@@ -22,7 +22,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from mfm_data import load_close, log_returns, spy_open_close, deribit_chain, dvol_history, read_market  # noqa: E402
+from mfm_data import load_close, log_returns, spy_open_close, deribit_chain, dvol_history, read_market, _get  # noqa: E402
 from option_tools import (bs_price, bs_greeks, implied_vol, newton_iv, crr_price, merton_price,  # noqa: E402
                           heston_price, svi_w, svi_fit, variance_from_strip, delta_hedge)
 
@@ -513,14 +513,38 @@ def fig_btc_term(tab, dvol_now):
     save_fig('ch12_btc_term')
 
 
+def cboe_strip(g, F, S):
+    """Banda de optiuni a formulei Cboe pentru o scadenta (Cboe, sectiunea 3(a)(iii)): K0 = primul pret de exercitare
+    egal cu sau imediat sub F; put-uri sub K0 si call-uri peste K0, fara cele cu bid zero, oprire dupa doua preturi
+    de exercitare consecutive cu bid zero; la K0 media put-ului si a call-ului. Q = pretul mid in USD
+    (prima in BTC inmultita cu indicele S, conventia Deribit)."""
+    g = g.assign(mid=0.5 * (g['bid'] + g['ask']) * S, bid0=g['bid'].fillna(0.0))
+    Ks = np.sort(g['strike'].unique())
+    K0 = Ks[Ks <= F].max()
+    side = {t: g[g['type'] == t].set_index('strike').sort_index() for t in ('put', 'call')}
+    rows = []
+    for t, seq in (('put', Ks[Ks < K0][::-1]), ('call', Ks[Ks > K0])):
+        zeros = 0
+        for K in seq:
+            if K not in side[t].index or side[t].loc[K, 'bid0'] <= 0:
+                zeros += 1
+                if zeros == 2:
+                    break
+                continue
+            zeros = 0
+            rows.append((K, float(side[t].loc[K, 'mid'])))
+    rows.append((K0, 0.5 * float(side['put'].loc[K0, 'mid'] + side['call'].loc[K0, 'mid'])))
+    rows.sort()
+    return np.array([r[0] for r in rows]), np.array([r[1] for r in rows]), float(K0)
+
+
 def btc_vix(c_all=None):
-    """Indice de tip VIX pe 30 de zile din lantul BTC (formula Cboe, r = 0, preturi mid in USD)."""
+    """Indice de tip VIX pe 30 de zile din lantul BTC (formula Cboe): preturi mid in USD (prima in BTC x indicele S),
+    rata R = ln(F/S)/T implicita in forward-ul Deribit, deci e^{RT} Q = prima in BTC x F."""
     c = deribit_chain() if c_all is None else c_all
     t0 = c['snapshot_utc'].iloc[0]
     c = c.copy()
     c['T'] = (c['expiry'] - t0).dt.total_seconds() / (365 * 86400)
-    c = c[(c['bid'] > 0) & (c['ask'] > 0)]
-    c['mid_usd'] = 0.5 * (c['bid'] + c['ask']) * c['forward']
     exps = sorted(c['expiry'].unique())
     Td = {e: c.loc[c['expiry'] == e, 'T'].iloc[0] * 365 for e in exps}
     near = max(e for e in exps if Td[e] < 30)
@@ -528,11 +552,13 @@ def btc_vix(c_all=None):
     res = {}
     for tag, e in [('near', near), ('next', nxt)]:
         g = c[c['expiry'] == e]
-        F = g['forward'].iloc[0]; T = g['T'].iloc[0]
-        otm = pd.concat([g[(g['type'] == 'put') & (g['strike'] < F)], g[(g['type'] == 'call') & (g['strike'] >= F)]])
-        v = variance_from_strip(otm['strike'].values, otm['mid_usd'].values, F, T)
-        res[tag] = dict(expiry=str(pd.Timestamp(e).date()), days=float(T * 365), F=float(F), n=int(len(otm)), var=float(v),
-                        vol=float(100 * np.sqrt(v)))
+        F = float(g['forward'].iloc[0]); S = float(g['index'].iloc[0]); T = float(g['T'].iloc[0])
+        K, Q, K0 = cboe_strip(g, F, S)
+        R = np.log(F / S) / T
+        v = variance_from_strip(K, Q, F, T, R)
+        res[tag] = dict(expiry=str(pd.Timestamp(e).date()), days=float(T * 365), F=F, S=S, R=float(R), K0=K0,
+                        n=int(len(K)), var=float(v), vol=float(100 * np.sqrt(v)),
+                        kf_min=float(K.min() / F), kf_max=float(K.max() / F))
     T1, T2 = res['near']['days'], res['next']['days']
     w1 = (T2 - 30) / (T2 - T1)
     v30 = (T1 * res['near']['var'] * w1 + T2 * res['next']['var'] * (1 - w1)) / 30
@@ -541,10 +567,14 @@ def btc_vix(c_all=None):
 
 
 def dvol_now():
-    """Ultima valoare DVOL disponibila la momentul instantaneului."""
-    t0 = deribit_chain()['snapshot_utc'].iloc[0]
-    d = dvol_history(start=str((t0 - pd.Timedelta(days=5)).date()), end=str(t0.date()))
-    return float(d.iloc[-1]), str(d.index[-1].date())
+    """Valoarea DVOL la momentul instantaneului: inchiderea ultimului minut complet inainte de ora instantaneului."""
+    t0 = pd.Timestamp(deribit_chain()['snapshot_utc'].iloc[0]).tz_localize('UTC')
+    t1 = int(t0.timestamp() * 1000)
+    r = _get('get_volatility_index_data', currency='BTC', start_timestamp=t1 - 3_600_000, end_timestamp=t1, resolution='60')
+    d = pd.DataFrame(r['data'], columns=['t', 'open', 'high', 'low', 'close'])
+    d = d[d['t'] + 60_000 <= t1]
+    last = d.iloc[-1]
+    return float(last['close']), str(pd.to_datetime(last['t'] + 60_000, unit='ms'))
 
 
 # =============================================================================
@@ -853,6 +883,7 @@ def btc_rnd(tab, c=None, days=30, B=300):
         Q = np.array(Q)
         band = (np.quantile(Q, 0.025, axis=0), np.quantile(Q, 0.975, axis=0))
         kmin, kmax = float(np.exp(kq.min())), float(np.exp(kq.max()))
+        out.update(ext70=below(kmin), ext70_share=below(kmin) / out['p70'])   # masa sub ultima cotatie (extrapolare SVI)
         out.update(B=int(B), p70_lo=float(np.quantile(P70, 0.025)), p70_hi=float(np.quantile(P70, 0.975)),
                    p80_lo=float(np.quantile(P80, 0.025)), p80_hi=float(np.quantile(P80, 0.975)),
                    kf_min=kmin, kf_max=kmax, n_quotes=int(len(kq)),
@@ -877,7 +908,7 @@ def btc_rnd(tab, c=None, days=30, B=300):
 
 
 def strip_variance(K, Q, F, T):
-    """Integrala 2/T * int Q(K)/K^2 dK (trapez) pe o grila densa de preturi OTM (F = K0, r = 0)."""
+    """Integrala 2/T * int Q(K)/K^2 dK (trapez) pe o grila densa de preturi forward OTM (put sub F, call peste F)."""
     return 2 / T * integrate.trapezoid(Q / K ** 2, K)
 
 
@@ -888,21 +919,21 @@ def btc_vix_bias(tab, c_all=None):
     t0 = c['snapshot_utc'].iloc[0]
     c = c.copy()
     c['T'] = (c['expiry'] - t0).dt.total_seconds() / (365 * 86400)
-    c = c[(c['bid'] > 0) & (c['ask'] > 0)]
     base = btc_vix(c_all)
     res = {}
     for tag in ['near', 'next']:
         e = pd.Timestamp(base[tag]['expiry'] + ' 08:00:00')
         g = c[c['expiry'] == e]
-        F = g['forward'].iloc[0]; T = g['T'].iloc[0]
-        otm = pd.concat([g[(g['type'] == 'put') & (g['strike'] < F)], g[(g['type'] == 'call') & (g['strike'] >= F)]])
+        F = float(g['forward'].iloc[0]); S = float(g['index'].iloc[0]); T = float(g['T'].iloc[0])
+        Kq, _, K0 = cboe_strip(g, F, S)                                      # aceleasi preturi de exercitare ca indicele
         f = tab.loc[e]
         p = [float(f[x]) for x in ['a', 'b', 'rho', 'm', 's']]
-        def svi_q(K):
+        def svi_q(K, split=F):
+            """Pretul forward (e^{RT} x pretul in USD) al optiunii OTM, din SVI: put sub split, call peste."""
             sig = np.sqrt(np.clip(svi_w(np.log(K / F), *p), 1e-10, None) / T)
-            return np.where(K < F, bs_price(F, K, T, 0.0, sig, 'put'), bs_price(F, K, T, 0.0, sig, 'call'))
-        Kq = np.sort(otm['strike'].values)
-        v_q = variance_from_strip(Kq, svi_q(Kq), F, T)                        # SVI la preturile cotate
+            return np.where(K < split, bs_price(F, K, T, 0.0, sig, 'put'), bs_price(F, K, T, 0.0, sig, 'call'))
+        Qq = np.where(Kq == K0, 0.5 * (svi_q(Kq, np.inf) + svi_q(Kq, -np.inf)), svi_q(Kq, K0))
+        v_q = variance_from_strip(Kq, Qq, F, T)                              # SVI la preturile cotate, regula Cboe
         Kd = np.linspace(Kq.min(), Kq.max(), 20001)
         v_d = strip_variance(Kd, svi_q(Kd), F, T)                            # grila densa, acelasi interval
         Kw = F * np.exp(np.linspace(-4, 4, 40001))

@@ -43,14 +43,13 @@ def read_market(symbol):
 
 
 def load_close(name, start=None, end=END):
-    """Pretul (sau nivelul indicelui) zilnic; indicii: doar zilele lucratoare, fara zilele cu valoare neschimbata."""
+    """Pretul (sau nivelul indicelui) zilnic; in afara criptoactivelor: doar zilele lucratoare
+    (sedintele cu inchidere neschimbata sunt pastrate: sunt zile reale de tranzactionare)."""
     symbol, col, kind = SERIES[name]
     s = read_market(symbol)[col].loc[start:end]
     s = s[s > 0].dropna()
     if kind != 'crypto':
         s = s[s.index.dayofweek < 5]
-    if kind == 'index':
-        s = s[s.diff() != 0]
     return s.rename(name)
 
 
