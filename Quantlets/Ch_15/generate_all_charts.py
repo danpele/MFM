@@ -590,7 +590,7 @@ def fig_subperiods():
 
 # =============================================================================
 # STUDIUL DE CAZ: LOPEZ-LIRA & TANG (JFE 2026), cifrele publicate
-# arXiv:2304.07619v6, Table 5 (portofolii long-short pe stirile de peste noapte) si Figure 8 / Section 8.2
+# JFE 184 (2026) 104335, Table 5 (portofolii long-short pe stirile de peste noapte) si Figure 8 / Section 8.2
 # =============================================================================
 # model: (HR-I, HR-D, SharpeLS, mu_LS in % pe zi)
 LLT_TABLE5 = {'GPT-4': (0.93, 0.58, 2.97, 0.34), 'GPT-3.5': (0.93, 0.56, 1.66, 0.29),

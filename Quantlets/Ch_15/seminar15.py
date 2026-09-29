@@ -354,6 +354,12 @@ if __name__ == '__main__':
     S['B8'] = b_prompts()
     S['C'] = part_c(P, rets)
     part_a_inference(R)
+    old = os.path.join(HERE, 'sem15_results.json')
+    if os.path.exists(old):                     # C3 (c3_reference.py) se pastreaza
+        with open(old) as f:
+            c3 = json.load(f).get('c3')
+        if c3 is not None:
+            S['c3'] = c3
     with open(os.path.join(HERE, 'sem15_results.json'), 'w') as f:
         json.dump(jsonable(S), f, indent=1, default=float)
     print('saved sem15_results.json')
