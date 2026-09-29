@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch12_bck_bounds'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Back, Crotty and Kazempour (2022): daily Martin and Chabi-Yo-Loudis lower bounds on the equity premium (1, 3, 6 and 12 months, January 1990 - December 2020) against the realised S&P 500 excess return over the same horizon (price index minus the risk-free rate, returns up to March 2021); mean excess return, mean bound and mean slackness by horizon, next to Table 1 of the paper.'
+
+Keywords: 'Martin bound, SVIX, equity premium, option-implied bound, slackness, S&P 500, risk-neutral variance'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'S&P 500 daily closes (data/market); daily risk-free rate (Kenneth French Data Library); daily Martin and Chabi-Yo-Loudis bounds of Back, Crotty and Kazempour (2022), replication package doi:10.5281/zenodo.6115448'
+
+Output: 'ch12_bck_bound.pdf, ch12_bck_means.pdf'

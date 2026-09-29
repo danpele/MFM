@@ -1145,6 +1145,114 @@ def vrp_predict(B=2000):
     return out
 
 
+# =============================================================================
+# 9b. STUDIU DE CAZ: BACK, CROTTY & KAZEMPOUR (2022), LIMITA MARTIN A PRIMEI DE RISC
+# =============================================================================
+# seria zilnica a limitelor publicata de autori (pachetul de replicare, doi:10.5281/zenodo.6115448)
+BCK_URL = ('https://raw.githubusercontent.com/kpcrotty/Back_Crotty_Kazempour_OptionBounds/aa0a31e/'
+           'market/intermediate/market_bounds.csv')
+FF_DAILY = 'https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_Factors_daily_CSV.zip'
+# Back, Crotty & Kazempour (2022), Tabelul 1: randamentul mediu in exces al S&P 500 cu dividende (% anualizat)
+BCK_TABLE1_RET = {1: 8.76, 3: 8.73, 6: 8.67, 12: 8.86}
+BCK_H = [1, 3, 6, 12]
+
+
+def ff_rf_daily():
+    """Rata zilnica fara risc (Kenneth French Data Library), in zecimal."""
+    import io
+    import zipfile
+    import urllib.request
+    raw = urllib.request.urlopen(urllib.request.Request(FF_DAILY, headers={'User-Agent': 'Mozilla/5.0'}),
+                                 timeout=120).read()
+    z = zipfile.ZipFile(io.BytesIO(raw))
+    rows = [l.split(',') for l in z.read(z.namelist()[0]).decode('latin-1').splitlines()
+            if l[:8].strip().isdigit() and len(l.split(',')) == 5]
+    return pd.Series([float(r[4]) / 100 for r in rows],
+                     index=pd.to_datetime([r[0].strip() for r in rows], format='%Y%m%d'), name='rf')
+
+
+def bck_data():
+    """Limitele zilnice Martin si Chabi-Yo--Loudis (% anualizat, h = 1, 3, 6, 12 luni) si randamentul in exces
+    al S&P 500 pe urmatoarele 21h zile de tranzactionare (indice de pret minus rata fara risc, compus, x 12/h, in %),
+    ca in Tabelul 1 al lucrarii: zile de formare ianuarie 1990 -- decembrie 2020, randamente pana in martie 2021."""
+    b = pd.read_csv(BCK_URL, index_col='date', parse_dates=True)
+    px = load_close('sp500', '1989-12-01', '2021-03-31')
+    r = px.pct_change()
+    ex = (r - ff_rf_daily().reindex(r.index).ffill()).fillna(0.0)   # prima zi: baza indicelui cumulat
+    g = (1 + ex).cumprod()
+    d = pd.DataFrame({f'f{h}': (g.shift(-21 * h) / g - 1) * (12 / h) * 100 for h in BCK_H})
+    return d.join(b, how='outer').loc['1990':'2020']
+
+
+def fig_bck_bound(d):
+    """Sus: limitele Martin si Chabi-Yo--Loudis pe 1 luna (seria autorilor); jos: randamentul in exces realizat
+    pe 12 luni vs limita Martin pe 12 luni, la data formarii."""
+    fig, axes = plt.subplots(2, 1, figsize=(7.6, 4.3), sharex=True, gridspec_kw={'height_ratios': [1, 1.25]})
+    ax = axes[0]
+    ax.plot(d.index, d['lb_cylr_1'], color=Orange, lw=0.7)
+    ax.plot(d.index, d['lb_m_1'], color=IDAred, lw=0.7)
+    ax.set_ylabel('Bound, 1 month\n(annualised %)')
+    ax.set_ylim(0, 1.05 * float(d['lb_cylr_1'].max()))
+    ax.set_title('Option-implied lower bounds on the equity premium, 1-month horizon', fontsize=9.5, loc='left')
+    ax = axes[1]
+    x = d[['f12', 'lb_m_12']].dropna()
+    ax.axhline(0, color=Gray, lw=0.6)
+    ax.plot(x.index, x['f12'], color=MainBlue, lw=0.7)
+    ax.plot(x.index, x['lb_m_12'], color=IDAred, lw=1.1)
+    ax.fill_between(x.index, x['f12'], x['lb_m_12'], where=x['f12'] < x['lb_m_12'], color=IDAred, alpha=0.15, lw=0)
+    ax.set_ylabel('12 months\n(annualised %)')
+    ax.set_title('Realised 12-month S&P 500 excess return vs the 12-month Martin bound, by formation date',
+                 fontsize=9.5, loc='left')
+    fig_legend_bottom(fig, [Line2D([], [], color=IDAred, lw=1.1, label='Martin bound (SVIX)'),
+                            Line2D([], [], color=Orange, lw=1.1, label='Chabi-Yo\u2013Loudis bound'),
+                            Line2D([], [], color=MainBlue, lw=1.1, label='Realised excess return (price index)'),
+                            Patch(color=IDAred, alpha=0.15, label='Realised below the bound')], ncol=2, y=0.0)
+    plt.tight_layout()
+    save_fig('ch12_bck_bound')
+    m1 = d['lb_m_1'].dropna()
+    c = d[['lb_m_1', 'lb_cylr_1']].dropna()
+    return dict(m1_max=float(m1.max()), m1_max_date=str(m1.idxmax().date()), m1_med=float(m1.median()),
+                m12_max=float(d['lb_m_12'].max()), m12_max_date=str(d['lb_m_12'].idxmax().date()),
+                cyl_above=float((c['lb_cylr_1'] >= c['lb_m_1']).mean()),
+                below12=float((x['f12'] < x['lb_m_12']).mean()), corr12=float(x.corr().iloc[0, 1]),
+                start=str(x.index[0].date()), end12=str(x.index[-1].date()), n12=int(len(x)))
+
+
+def fig_bck_means(d):
+    """Media randamentului in exces (lucrare, cu dividende; datele cursului, indice de pret) si media limitei Martin,
+    pe orizonturi: marja medie."""
+    rows = {}
+    for h in BCK_H:
+        x = d[[f'f{h}', f'lb_m_{h}']].dropna()
+        rows[h] = dict(ret=float(x[f'f{h}'].mean()), bound=float(x[f'lb_m_{h}'].mean()),
+                       slack=float((x[f'f{h}'] - x[f'lb_m_{h}']).mean()),
+                       below=float((x[f'f{h}'] < x[f'lb_m_{h}']).mean()), n=int(len(x)),
+                       paper=BCK_TABLE1_RET[h], end=str(x.index[-1].date()))
+    fig, ax = plt.subplots(figsize=(9, 3.2))
+    pos = np.arange(len(BCK_H)); w = 0.26
+    bars = [('paper', MainBlue, 'Mean excess return with dividends (paper, Table 1)'),
+            ('ret', Teal, 'Mean excess return, price index (course data)'),
+            ('bound', IDAred, 'Mean Martin bound (authors\' series)')]
+    for i, (k, col, lab) in enumerate(bars):
+        v = [rows[h][k] for h in BCK_H]
+        ax.bar(pos + (i - 1) * w, v, w * 0.92, color=col, label=lab)
+        for p, y in zip(pos + (i - 1) * w, v):
+            ax.text(p, y + 0.15, f'{y:.2f}', ha='center', va='bottom', fontsize=7.5, color='black')
+    ax.set_xticks(pos)
+    ax.set_xticklabels([f'{h} month' + ('s' if h > 1 else '') for h in BCK_H])
+    ax.set_xlabel('Horizon')
+    ax.set_ylabel('Annualised %')
+    ax.set_ylim(0, 10.5)
+    legend_outside_bottom(ax, ncol=3, y=-0.2)
+    save_fig('ch12_bck_means')
+    return {str(h): v for h, v in rows.items()}
+
+
+def case_study():
+    d = bck_data()
+    return dict(bound=fig_bck_bound(d), means=fig_bck_means(d))
+
+
 def jsonable(o):
     if isinstance(o, dict):
         return {str(k): jsonable(v) for k, v in o.items()}
@@ -1158,6 +1266,15 @@ def jsonable(o):
 
 
 if __name__ == '__main__':
+    if 'case' in sys.argv[1:]:
+        # doar graficele studiului de caz; celelalte cifre raman neschimbate
+        with open(os.path.join(HERE, 'ch12_results.json')) as f:
+            RES = json.load(f)
+        RES['bck'] = case_study()
+        with open(os.path.join(HERE, 'ch12_results.json'), 'w') as f:
+            json.dump(jsonable(RES), f, indent=1)
+        print('saved ch12_results.json (case study)')
+        sys.exit(0)
     RES = {}
     RES['payoffs'] = fig_payoffs()
     RES['strategies'] = fig_strategies()
@@ -1199,6 +1316,7 @@ if __name__ == '__main__':
     RES['gamma0'] = fig_0dte_gamma()
     od, phi = odte_straddle()
     RES['odte'] = fig_0dte_straddle(od, phi)
+    RES['bck'] = case_study()
     with open(os.path.join(HERE, 'ch12_results.json'), 'w') as f:
         json.dump(jsonable(RES), f, indent=1)
     print('saved ch12_results.json')
