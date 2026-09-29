@@ -190,6 +190,9 @@ def stylised_table(start='2018-01-01'):
 
 def fig_rolling_vol(start='2018-01-01'):
     """Volatilitatea anualizata pe ferestre mobile de un an calendaristic."""
+    # culori distincte: aurul (Forest, linie intrerupta) nu se confunda cu Bitcoin (Orange)
+    VOL_COL = {'BTC': Orange, 'ETH': Purple, 'SPX': MainBlue, 'GOLD': Forest}
+    VOL_LS = {'BTC': '-', 'ETH': '-', 'SPX': '-', 'GOLD': '--'}
     fig, ax = plt.subplots(figsize=(7.2, 3.0))
     out = {}
     for k in ['BTC', 'ETH', 'SPX', 'GOLD']:
@@ -197,7 +200,7 @@ def fig_rolling_vol(start='2018-01-01'):
         ppy = periods_per_year(r)
         v = 100 * r.rolling('365D', min_periods=int(0.9 * ppy)).std() * np.sqrt(ppy)
         v = v.loc['2019-01-01':]
-        ax.plot(v.index, v.values, color=COL[k], lw=1.0, label=LABELS[k])
+        ax.plot(v.index, v.values, color=VOL_COL[k], lw=1.0, ls=VOL_LS[k], label=LABELS[k])
         out[k] = dict(last=v.iloc[-1], min=v.min(), max=v.max(), min_date=str(v.idxmin().date()))
     ax.set_ylabel('Annualised volatility (%), 1-year window')
     legend_outside_bottom(ax, ncol=4, y=-0.14)
@@ -254,13 +257,19 @@ def fig_weekday(start='2018-01-01'):
 
 
 def fig_rolling_corr():
-    """Corelatia pe 250 de zile comune: Bitcoin cu S&P 500, Nasdaq 100 si aurul (join pe preturi)."""
-    fig, ax = plt.subplots(figsize=(7.2, 3.0))
+    """Corelatia pe 250 de zile comune: Bitcoin cu S&P 500, Nasdaq 100 si aurul (join pe preturi).
+    Panoul din stanga: indicii de actiuni (aproape suprapusi: linie continua vs intrerupta cu markeri); dreapta: aurul."""
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 3.0), sharex=True, sharey=True,
+                             gridspec_kw=dict(wspace=0.08))
     out = {}
-    for k, c in [('SPX', MainBlue), ('QQQ', Teal), ('GOLD', Amber)]:
+    style = {'SPX': (axes[0], MainBlue, '-', None, 1.3), 'QQQ': (axes[0], IDAred, '--', 'o', 0.9),
+             'GOLD': (axes[1], Forest, '-', None, 1.0)}
+    for k in ['SPX', 'QQQ', 'GOLD']:
+        ax, c, ls, mk, lw = style[k]
         r = joint_returns(['BTC', k], '2016-01-01')
         rc = r['BTC'].rolling(250).corr(r[k]).loc['2018-01-01':]
-        ax.plot(rc.index, rc.values, color=c, lw=1.0, label=f'Bitcoin vs {LABELS[k]}')
+        ax.plot(rc.index, rc.values, color=c, lw=lw, ls=ls, marker=mk, markevery=60, markersize=3,
+                label=f'Bitcoin vs {LABELS[k]}')
         per = {}
         for lab, a, b in [('p1', '2017-01-01', '2019-12-31'), ('p2', '2020-01-01', '2023-12-31'),
                           ('p3', ETF_START, END)]:
@@ -268,12 +277,17 @@ def fig_rolling_corr():
             per[lab] = x['BTC'].corr(x[k])
             per[lab + '_n'] = len(x)
         out[k] = dict(per, last=rc.iloc[-1], max=rc.max(), max_date=str(rc.idxmax().date()))
-    ax.axhline(0, color=Gray, lw=0.5)
-    ax.axvline(pd.Timestamp(ETF_START), color=Gray, lw=0.6, ls='--')
-    ax.text(pd.Timestamp(ETF_START), 0.72, ' spot ETFs', fontsize=7.5, color='black')
-    ax.set_ylabel('Correlation of daily returns')
-    ax.set_ylim(-0.4, 0.8)
-    legend_outside_bottom(ax, ncol=3, y=-0.14)
+    for ax, ttl in zip(axes, ['Bitcoin vs equity indices', 'Bitcoin vs gold']):
+        ax.axhline(0, color=Gray, lw=0.5)
+        ax.axvline(pd.Timestamp(ETF_START), color=Gray, lw=0.6, ls='--')
+        ax.set_title(ttl, fontsize=8.5, loc='left', color='black')
+    for ax in axes:
+        ax.text(pd.Timestamp(ETF_START), 0.72, ' spot ETFs', fontsize=7.5, color='black')
+        ax.xaxis.set_major_locator(mdates.YearLocator(2))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+    axes[0].set_ylim(-0.4, 0.8)
+    axes[0].set_ylabel('Correlation of daily returns')
+    fig_legend_bottom(fig, ncol=3, y=0.0)
     save_fig('ch16_rolling_corr')
     return out
 
