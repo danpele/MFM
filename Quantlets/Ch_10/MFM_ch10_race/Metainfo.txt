@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch10_race'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Aquilina, Budish and O’Neill (2022, QJE): the latency arbitrage tax extrapolated to SPY with the published Table XV specifications (col. 2: 0.4213 bp of traded value; col. 6: 0.3354 bp of traded value plus 0.0066 bp times realised volatility times mean traded value) and the Table XIV bounds (0.20 and 0.74 bp); daily traded value and realised volatility from SPY 5-minute bars, full days of 2021-2025; implied daily tax and implied annual prize.'
+
+Keywords: 'latency arbitrage, high-frequency trading, sniping, arms race, realised volatility, traded value, SPY'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'SPY and Bitcoin 5-minute bars (data/market/intraday); daily open, high, low, close and volume for US stocks, Bucharest Stock Exchange stocks and crypto-assets (data/market); CBOE VIX; BET-TR; USD/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch10_race_tax.pdf, ch10_race_prize.pdf'
