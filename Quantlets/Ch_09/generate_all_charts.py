@@ -621,7 +621,7 @@ def fig_rough():
 # =============================================================================
 # 12. STUDIU DE CAZ: Christensen, Siggaard & Veliyev (2023), JFEc 21(5)
 # Cifre publicate: randul "HAR" din Tabelele 2-7 (MSE in afara esantionului relativ la HAR, medie pe 29 de actiuni DJIA,
-# setul de test = ultimele 20% din 2001-2017), versiunea acceptata a autorilor (arXiv:2601.13014).
+# setul de test = ultimele 20% din 2001-2017), articolul publicat: JFEc 21(5), 1680-1727, doi:10.1093/jjfinec/nbac020.
 # =============================================================================
 CSV_MODELS = ['HAR-X', 'LogHAR', 'LevHAR', 'SHAR', 'HARQ', 'RR', 'LA', 'EN', 'A-LA', 'P-LA', 'BG', 'RF', 'GB',
               'NN1_1', 'NN10_1', 'NN1_2', 'NN10_2', 'NN1_3', 'NN10_3', 'NN1_4', 'NN10_4']
