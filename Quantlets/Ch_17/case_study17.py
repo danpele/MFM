@@ -125,7 +125,7 @@ def fig_dnz_leadlag():
     ka, kb = int(a['corr'].idxmax()), int(b['corr'].idxmax())
     fig, ax = plt.subplots(figsize=(7.2, 3.4))
     ax.fill_between(a.index, a['lo'], a['hi'], color=Teal, alpha=0.22, lw=0,
-                    label='95% circular block bootstrap interval (24-month blocks), 2000-2011')
+                    label='Pointwise 95% circular block bootstrap interval (24-month blocks), 2000-2011')
     ax.axhline(0, color=Gray, lw=0.6)
     ax.axvline(0, color=Gray, lw=0.6, ls=':')
     ax.axvline(24, color=Forest, lw=1.2, ls='--', label='Peak lag in DeFusco et al. (2022), Fig. 2: k = 24')
@@ -138,7 +138,7 @@ def fig_dnz_leadlag():
     ax.axhline(1, color=Gray, lw=0.6, ls=':')
     ax.set_ylim(-1, 1.4)
     ax.set_xticks(np.arange(-12, 49, 6))
-    ax.set_xlabel('Lag k of volume behind prices (months)')
+    ax.set_xlabel('Lag k of volume (months; k > 0: volume precedes prices)')
     ax.set_ylabel('Implied correlation')
     ax.set_title('Correlation of log house prices with lagged new-home sales, Eq. (1)', color='black')
     legend_outside_bottom(ax, ncol=2, y=-0.2)
