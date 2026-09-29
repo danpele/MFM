@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
 
-Output: 'ch7_sem_bet_hs.pdf, ch7_sem_bet_gpd.pdf, ch7_sem_btc_fhs.pdf, ch7_sem_capital.pdf, ch7_var_es_table.csv, ch7_rolling_btc.csv'
+Output: 'ch7_sem_bet_data.pdf, ch7_sem_a1a2_tails.pdf, ch7_sem_a3_mass.pdf, ch7_sem_a4_var_alpha.pdf, ch7_sem_a5_shares.pdf, ch7_sem_bet_hs.pdf, ch7_sem_b1_ci.pdf, ch7_sem_b6_ci.pdf, ch7_sem_bet_gpd.pdf, ch7_sem_btc_fhs.pdf, ch7_sem_b5_shares.pdf, ch7_sem_c2_horizon.pdf, ch7_sem_a6_cf.pdf, ch7_sem_a7_ru.pdf, ch7_sem_a8_sim.pdf, ch7_sem_b3_boot.pdf, ch7_sem_b4_methods.pdf, ch7_sem_b5_rp.pdf, ch7_sem_b2_clusters.pdf, ch7_sem_b7_caviar.pdf, ch7_sem_c1_stress.pdf, ch7_sem_capital.pdf, ch7_sem_c3_design.pdf, ch7_var_es_table.csv, ch7_rolling_btc.csv'

@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import log_returns, joint_returns   # noqa: E402
 from risk_measures import hs_var_es, gpd_fit, gpd_se, gpd_var_es, garch_filter, garch_next, rolling_conditional  # noqa: E402
 from seminar7 import boot_ci   # noqa: E402
-from generate_all_charts import save_fig, legend_outside_bottom, jsonable, MainBlue, IDAred, Teal, Amber, SEED  # noqa: E402
+from generate_all_charts import save_fig, legend_outside_bottom, jsonable, MainBlue, IDAred, Teal, Amber, Purple, SEED  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -169,7 +169,7 @@ def aggregation(alpha=0.01):
 # =============================================================================
 # 4. Riscul de estimare in VaR-ul FHS (bootstrap pe reziduuri)
 # =============================================================================
-def fhs_bootstrap(r, alpha=0.01, B=999, seed=SEED, level=0.90):
+def fhs_bootstrap(r, alpha=0.01, B=999, seed=SEED, level=0.90, return_draws=False):
     """Christoffersen & Goncalves (2005): traiectorii AR(1)-GARCH(1,1) cu reziduuri reesantionate;
     re-estimam parametrii pe fiecare traiectorie; sigma_{T+1} din datele ORIGINALE cu parametrii bootstrap;
     cuantila din reziduurile standardizate ale traiectoriei bootstrap."""
@@ -204,10 +204,11 @@ def fhs_bootstrap(r, alpha=0.01, B=999, seed=SEED, level=0.90):
     q0 = np.quantile(-z, 1 - alpha)
     only_q = np.quantile(-m1 + s1 * parts[:, 1], [(1 - level) / 2, (1 + level) / 2])
     only_s = np.quantile(-m1 + parts[:, 0] * q0, [(1 - level) / 2, (1 + level) / 2])
-    return dict(var=var0, lo=lo, hi=hi, sd=out.std(ddof=1), B=B, level=level, sigma=s1,
+    res = dict(var=var0, lo=lo, hi=hi, sd=out.std(ddof=1), B=B, level=level, sigma=s1,
                 sig_lo=np.quantile(parts[:, 0], (1 - level) / 2), sig_hi=np.quantile(parts[:, 0], (1 + level) / 2),
                 q=q0, q_lo=np.quantile(parts[:, 1], (1 - level) / 2), q_hi=np.quantile(parts[:, 1], (1 + level) / 2),
                 onlyq_lo=only_q[0], onlyq_hi=only_q[1], onlys_lo=only_s[0], onlys_hi=only_s[1])
+    return (res, out) if return_draws else res
 
 
 # =============================================================================
@@ -367,7 +368,57 @@ def seminar_extras():
 
 
 # =============================================================================
-if __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == 'extras':
+# 8. Graficul preciziei pentru S&P 500 (curs): intervale de 95% pentru VaR 1% si ES 2,5%
+# =============================================================================
+def fig_precision(INF, B6):
+    """Intervale de 95% pentru S&P 500: asimptotic i.i.d., asimptotic HAC (VaR si ES) si bootstrap i.i.d. / pe blocuri (ES).
+    Un rand pentru fiecare masura si selectie; metodele sunt barele decalate din interiorul randului."""
+    plt.rcParams['font.size'] = 9
+    col = {'Asymptotic i.i.d.': Teal, 'Asymptotic HAC': Purple, 'i.i.d. bootstrap': MainBlue,
+           'Block bootstrap, 20 days': IDAred}
+    rows = []
+    for what, lab in [('var', 'VaR 1%'), ('es', 'ES 2.5%')]:
+        for tag, per in [('sp500_full', '2000-2026'), ('sp500_w500', 'last 500 days')]:
+            s = INF['se'][tag]
+            if what == 'var':
+                est = s['var1']
+                iv = {'Asymptotic i.i.d.': (est - 1.96 * s['se_var'], est + 1.96 * s['se_var']),
+                      'Asymptotic HAC': (est - 1.96 * s['se_var_hac'], est + 1.96 * s['se_var_hac'])}
+            else:
+                est, b = s['es'], B6[tag]
+                iv = {'Asymptotic i.i.d.': (est - 1.96 * s['se_es'], est + 1.96 * s['se_es']),
+                      'Asymptotic HAC': (est - 1.96 * s['se_es_hac'], est + 1.96 * s['se_es_hac']),
+                      'i.i.d. bootstrap': (b['iid_lo'], b['iid_hi']),
+                      'Block bootstrap, 20 days': (b['blk_lo'], b['blk_hi'])}
+            rows.append((f'{lab}\n{per}', est, iv))
+    fig, ax = plt.subplots(figsize=(5.6, 2.9))
+    offs = dict(zip(col, [0.27, 0.09, -0.09, -0.27]))
+    for i, (lab, est, iv) in enumerate(rows):
+        y = len(rows) - 1 - i
+        for m, (lo, hi) in iv.items():
+            ax.plot([lo, hi], [y + offs[m], y + offs[m]], color=col[m], lw=2.6, solid_capstyle='butt')
+            ax.text(hi + 0.04, y + offs[m], f'{hi - lo:.2f}', va='center', fontsize=6.5, color='black')
+        ax.plot([est, est], [y - 0.38, y + 0.38], color='black', lw=1.0)
+    ax.set_yticks(range(len(rows)))
+    ax.set_yticklabels([r[0] for r in rows][::-1], fontsize=8)
+    ax.set_xlabel('Daily loss (%); black tick = estimate, number = interval width')
+    ax.set_xlim(1.4, 4.9)
+    for m, c in col.items():
+        ax.plot([], [], color=c, lw=2.6, label=m)
+    plt.tight_layout()
+    fig.legend(*ax.get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=4,
+               frameon=False, fontsize=7.5)
+    save_fig('ch7_precision')
+
+
+# =============================================================================
+if __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == 'precision':
+    with open(os.path.join(HERE, 'ch7_inference.json')) as f:
+        INF = json.load(f)
+    with open(os.path.join(HERE, 'sem7_results.json')) as f:
+        B6 = json.load(f)['B6']
+    fig_precision(INF, B6)
+elif __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == 'extras':
     with open(os.path.join(HERE, 'ch7_inference.json')) as f:
         OUT = json.load(f)
     L_sp = (-100 * log_returns('sp500')).values

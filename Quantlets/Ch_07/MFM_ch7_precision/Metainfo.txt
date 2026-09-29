@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_precision'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Precision of historical VaR 1% and ES 2.5% for the S&P 500 (2000-2026 and the last 500 days): 95% intervals from i.i.d. and HAC asymptotics (Chen, 2008) and from i.i.d. and moving-block bootstraps.'
+
+Keywords: 'value-at-risk, expected shortfall, standard error, HAC, block bootstrap, estimation risk, S&P 500'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+
+Output: 'ch7_precision.pdf'

@@ -17,6 +17,7 @@ import sys
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+import matplotlib.pyplot as plt
 from scipy import stats
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -68,3 +69,29 @@ res = {
 with open(os.path.join(HERE, 'ai_discovery_case.json'), 'w') as f:
     json.dump(res, f, indent=1)
 print(json.dumps(res, indent=1))
+
+
+# Graficul mini-studiului de caz: diferentele medii FZ0 si intervalele HAC de 95%, pe perechi si subperioade
+sys.path.insert(0, HERE)
+from generate_all_charts import save_fig, MainBlue, IDAred, Forest  # noqa: E402
+plt.rcParams['font.size'] = 9
+fig, ax = plt.subplots(figsize=(5.4, 2.4))
+rows = [('FHS - GARCH-N, 2006-2026', 'fhs_vs_ng', MainBlue), ('FHS - GARCH-N, 2006-2015', 'fhs_vs_ng_early', MainBlue),
+        ('FHS - GARCH-N, 2016-2026', 'fhs_vs_ng_late', MainBlue), ('cEVT - FHS, 2006-2026', 'cevt_vs_fhs', IDAred),
+        ('cEVT - FHS, 2006-2015', 'cevt_vs_fhs_early', IDAred), ('cEVT - FHS, 2016-2026', 'cevt_vs_fhs_late', IDAred)]
+for i, (lab, k, c) in enumerate(rows):
+    y = len(rows) - 1 - i
+    m, se = res[k]['mean_diff'], abs(res[k]['mean_diff'] / res[k]['t'])
+    ax.plot([m - 1.96 * se, m + 1.96 * se], [y, y], color=c, lw=2.4, solid_capstyle='butt')
+    ax.plot([m], [y], 'o', color=c, ms=4.5)
+    ax.text(m + 1.96 * se + 0.012, y, f"t = {res[k]['t']:.2f}", va='center', fontsize=7.5, color='black')
+ax.axvline(0, color='#7F7F7F', lw=0.7, ls='--')
+ax.set_yticks(range(len(rows)))
+ax.set_yticklabels([r[0] for r in rows][::-1], fontsize=8)
+ax.set_xlabel('Mean FZ0 score difference (negative favours the first model)')
+ax.set_xlim(-0.38, 0.08)
+ax.plot([], [], color=MainBlue, lw=2.4, label='Shape of the shocks: FHS vs GARCH with Normal shocks')
+ax.plot([], [], color=IDAred, lw=2.4, label='Tail model: conditional EVT vs FHS')
+plt.tight_layout()
+fig.legend(*ax.get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=1, frameon=False, fontsize=8)
+save_fig('ch7_ai_fz0')
