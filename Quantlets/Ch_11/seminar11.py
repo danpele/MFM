@@ -22,8 +22,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from generate_all_charts import (plt, MainBlue, IDAred, Forest, Amber, Orange, Purple, Teal, Gray, LightGray,  # noqa: E402
                                  MODEL_COL, save_fig, legend_outside_bottom, fig_legend_bottom, jsonable, rets, DTS,
                                  simulate_stats, SEED)
-from mfm_data import LABELS, load_vix, read_fred  # noqa: E402
-from ct_models import (convergence_study, slope_ci, gbm_mle, ou_mle, ou_bias_mc, merton_mle, merton_moments,  # noqa: E402
+from mfm_data import LABELS, load_vix, read_fred, load_close  # noqa: E402
+from ct_models import (convergence_study, slope_ci, slope_boot, gbm_mle, ou_mle, ou_bias_mc, merton_mle, merton_moments,  # noqa: E402
                        lr_bootstrap, lee_mykland, heston_from_vix, heston_from_proxy, stylised, merton_logpdf,
                        nw_drift_diffusion, short_rate_fits)
 from scipy import optimize  # noqa: E402
@@ -44,7 +44,12 @@ def a1_gbm(mu=0.08, sigma=0.20, T=10.0):
 
 
 def a2_siegel(mu=0.02, sigma=0.044):
-    """A2: cursul invers Y = 1/X pentru X o GBM (paradoxul lui Siegel)."""
+    """A2: cursul invers Y = 1/X pentru X o GBM (paradoxul lui Siegel); X = lei pentru un euro.
+    (a)-(c): driftul procentual al lui Y este -mu + sigma^2; drifturile logaritmice sunt exact opuse.
+    (d), simbolic, cu rate constante: sub Q^RON, X_t e^{(r_EUR - r_RON) t} (contul in euro, in lei, actualizat) este
+    martingala, deci dX = (r_RON - r_EUR) X dt + sigma X dW~ si E^{Q^RON}[X_T] = X_0 e^{(r_RON - r_EUR) T} = F;
+    schimbarea activului de referinta: dQ^EUR/dQ^RON = X_T e^{-(r_RON - r_EUR) T} / X_0 = exp(sigma W~_T - sigma^2 T / 2),
+    iar sub Q^EUR driftul lui 1/X este r_EUR - r_RON, deci E^{Q^EUR}[1/X_T] = 1/F. Driftul real mu nu intra in forward."""
     return dict(drift_y=-mu + sigma ** 2, logdrift_x=mu - 0.5 * sigma ** 2, logdrift_y=-(mu - 0.5 * sigma ** 2))
 
 
@@ -55,8 +60,10 @@ def a3_qv(T=1.0, n=252):
 
 
 def a4_ito_integral(T=1.0):
-    """A4: integrala Ito a lui W dupa W: media, dispersia; integrala Stratonovich."""
-    return dict(mean=0.0, var=T ** 2 / 2, sd=np.sqrt(T ** 2 / 2), strat_mean=T / 2)
+    """A4: int_0^T W dW = (W_T^2 - T) / 2: media 0, dispersia T^2 / 2; Stratonovich W_T^2 / 2 are media T / 2.
+    Din lema lui Ito pentru W^3: int_0^T W^2 dW = W_T^3 / 3 - int_0^T W_t dt, cu media 0 si, prin izometria Ito,
+    dispersia int_0^T E[W_t^4] dt = int_0^T 3 t^2 dt = T^3."""
+    return dict(mean=0.0, var=T ** 2 / 2, sd=np.sqrt(T ** 2 / 2), strat_mean=T / 2, var_w2dw=T ** 3)
 
 
 def a5_ou(kappa=0.5, theta=0.03, sigma=0.01, r0=0.06, h=1.0):
@@ -86,10 +93,12 @@ def a7_merton(sigma=0.15, lam=5.0, mu_j=-0.03, s_j=0.04, dt=1 / 252):
                 p_jump_day=1 - np.exp(-lam * dt), p_jump_year=1 - np.exp(-lam))
 
 
-def a8_rare(sigma=0.15, lam=0.5, mu_j=-0.10, s_j=0.05, dt=1 / 252):
-    """A8: salturi rare si mari: aplatizarea zilnica si probabilitatea de a nu observa niciun salt."""
+def a8_rare(sigma=0.15, lam=0.5, mu_j=-0.10, s_j=0.05, dt=1 / 252, T=36.7, rel_target=0.20):
+    """A8: salturi rare si mari: aplatizarea zilnica, probabilitatea de a nu observa niciun salt si, cu toate salturile
+    observate, e.s. a lui lam_hat = N_T / T; e.s. relativa 1 / sqrt(lam T) = rel_target cere T = 1 / (rel_target^2 lam) ani."""
     mo = merton_moments(dt, sigma, lam, mu_j, s_j)
-    return dict(mo, p_none_1y=np.exp(-lam), p_none_10y=np.exp(-10 * lam), exp_10y=10 * lam)
+    return dict(mo, p_none_1y=np.exp(-lam), p_none_10y=np.exp(-10 * lam), exp_10y=10 * lam,
+                se_lam=np.sqrt(lam / T), rel_se=1 / np.sqrt(lam * T), years_needed=1 / (rel_target ** 2 * lam))
 
 
 # --- Partea A, probleme de derivare (schimbarea masurii, Feynman-Kac, CIR, VIX in Heston, informatia Fisher) ---
@@ -123,14 +132,19 @@ def a5_cir(kappa=0.11, theta=0.055, sigma=0.056, r0=0.03, t=1.0):
     nc = 2 * c * r0 * e
     q = stats.ncx2.ppf([0.05, 0.95], df, nc) / (2 * c)
     vas_sd = sigma * np.sqrt(r0) * np.sqrt((1 - e ** 2) / (2 * kappa))
+    # P(r_t < 1 punct de baza); cu nu >= 2 (Feller) zero nu este atins, deci P(r_t = 0) = 0
     return dict(cmean=m, csd=np.sqrt(v), c=c, df=df, nc=nc, feller=2 * kappa * theta / sigma ** 2, q05=q[0], q95=q[1],
-                p_zero=float(stats.ncx2.cdf(2 * c * 1e-4, df, nc)))
+                p_below_1bp=float(stats.ncx2.cdf(2 * c * 1e-4, df, nc)))
 
 
 def a6_vix_heston(kappa_q=5.0, tau=30 / 365, xi_hat=0.56, theta_q=0.044):
-    """A6: VIX^2 sub Heston: VIX^2 / 100^2 = a + b v_t, cu b = (1 - e^{-kappa^Q tau}) / (kappa^Q tau), a = theta^Q (1 - b)."""
+    """A6: VIX^2 sub Heston: VIX^2 / 100^2 = a + b v_t, cu b = (1 - e^{-kappa^Q tau}) / (kappa^Q tau), a = theta^Q (1 - b).
+    Difuzia lui y este xi sqrt(b (y - a)); raportata la sqrt(y), coeficientul xi_y(v) = b xi sqrt(v / (a + b v)) depinde
+    de stare si este egal cu b xi doar la v = theta^Q: xi_hat / b este o corectie locala (aproximativa), nu un estimator."""
     b = (1 - np.exp(-kappa_q * tau)) / (kappa_q * tau)
-    return dict(b=b, a=theta_q * (1 - b), xi_corr=xi_hat / b, ktau=kappa_q * tau)
+    a = theta_q * (1 - b)
+    ratio = {f'{v:.3f}': float(b * np.sqrt(v / (a + b * v))) for v in (0.01, theta_q, 0.10)}
+    return dict(b=b, a=a, xi_corr=xi_hat / b, ktau=kappa_q * tau, xi_ratio=ratio)
 
 
 def a7_fisher(lam=5.0, T=36.7, lam_mle=None, se_mle=None):
@@ -161,11 +175,19 @@ def a9_ar_ou_delta(a=0.0012, b=0.97, se=0.0025, dt=1 / 12, n=600):
 def b1_convergence():
     """B1: ordinele de convergenta estimate prin regresie log-log, cu intervale de incredere de 95%."""
     rng = np.random.default_rng(SEED + 4)
-    d = convergence_study(rng)
-    se = slope_ci(d['dt'], d['strong_em'])
-    sm = slope_ci(d['dt'], d['strong_mil'])
-    we = slope_ci(d['dt'], d['weak_em_exact'])
-    wm = slope_ci(d['dt'], d['weak_em_mc'])
+    d, P = convergence_study(rng, return_paths=True)
+    rb = np.random.default_rng(SEED + 40)
+    # intervale bootstrap pe traiectorii intregi: se reesantioneaza cele 20.000 de traiectorii, toti pasii impreuna
+    se = slope_boot(d['dt'], P['abs_em'], rb)
+    sm = slope_boot(d['dt'], P['abs_mil'], rb)
+    wm = slope_boot(d['dt'], P['x_em'], rb, target=P['ex'])
+    # media exacta (1 + 2 dt)^{1/dt}: eroare determinista, panta pe grila fara interval de incredere
+    x = np.log(d['dt'].values)
+    we = dict(slope=float(np.polyfit(x, np.log(d['weak_em_exact']), 1)[0]),
+              slope_fine=float((np.log(d['weak_em_exact'].iloc[1]) - np.log(d['weak_em_exact'].iloc[0])) / (x[1] - x[0])))
+    # pantele locale ale erorilor tari intre cei mai fini doi pasi (curbura pre-asimptotica)
+    se['slope_fine'] = float((np.log(d['strong_em'].iloc[1]) - np.log(d['strong_em'].iloc[0])) / (x[1] - x[0]))
+    sm['slope_fine'] = float((np.log(d['strong_mil'].iloc[1]) - np.log(d['strong_mil'].iloc[0])) / (x[1] - x[0]))
     x_sd = np.exp(2.0) * np.sqrt(np.exp(1.0) - 1)            # abaterea standard a lui X_T (lam = 2, mu = 1, T = 1)
     w_small = float(d['weak_em_exact'].iloc[0])
     return dict(em=se, mil=sm, weak=we, weak_mc=wm, x_sd=x_sd, se_mc=x_sd / np.sqrt(20000),
@@ -184,10 +206,34 @@ def b2_gbm(key='sp500'):
     lb = n * (n + 2) * np.sum(ac ** 2 / (n - np.arange(1, 21)))
     q20 = [r.values[i:i + 20].sum() for i in range(0, n - 19, 20)]
     vr = np.var(q20) / (20 * r.var())
+    # erori standard fara ipoteza GBM: (i) s.e.(sigma) robusta la aplatizare pentru randamente independente,
+    # sigma sqrt((k + 2) / (4n)), k = excesul de aplatizare; (ii) bootstrap pe blocuri mobile (Kunsch, 1989), blocuri de
+    # 63 de zile (un trimestru), care pastreaza gruparea volatilitatii si autocorelatia
+    k = float(stats.kurtosis(r.values))
+    se_s_kurt = g['sigma'] * np.sqrt((k + 2) / (4 * n))
+    bm, bs = block_bootstrap_gbm(r.values, dt, block=63, n_boot=999, rng=np.random.default_rng(SEED + 30))
     return dict(g, m_lo=g['m'] - 1.96 * g['se_m'], m_hi=g['m'] + 1.96 * g['se_m'], jb=float(jb.statistic),
+                se_sigma_kurt=float(se_s_kurt), se_sigma_block=float(bs.std()), se_m_block=float(bm.std()),
+                m_lo_block=float(np.quantile(bm, 0.025)), m_hi_block=float(np.quantile(bm, 0.975)),
+                s_lo_block=float(np.quantile(bs, 0.025)), s_hi_block=float(np.quantile(bs, 0.975)),
                 jb_p=float(jb.pvalue), lb=float(lb), lb_crit=float(stats.chi2.ppf(0.95, 20)), acf1=float(ac[0]),
                 years_1pp=float((1.96 * g['sigma'] / 0.01) ** 2), start=str(r.index[0].date()), vr20=float(vr),
                 exkurt=float(stats.kurtosis(r.values)))
+
+
+def block_bootstrap_gbm(r, dt, block=63, n_boot=999, rng=None):
+    """Bootstrap pe blocuri mobile pentru sigma si driftul logaritmic m (estimatorii GBM), fara ipoteza i.i.d."""
+    r = np.asarray(r)
+    n = len(r)
+    nb = int(np.ceil(n / block))
+    starts_max = n - block + 1
+    m, s = np.empty(n_boot), np.empty(n_boot)
+    for i in range(n_boot):
+        idx = (rng.integers(0, starts_max, nb)[:, None] + np.arange(block)[None, :]).ravel()[:n]
+        x = r[idx]
+        m[i] = x.mean() / dt
+        s[i] = np.sqrt(x.var() / dt)
+    return m, s
 
 
 def b4_vasicek(n_sim=500):
@@ -206,7 +252,20 @@ def b4_vasicek(n_sim=500):
     legend_outside_bottom(ax, ncol=1, y=-0.2)
     save_fig('ch11_sem_kappa_bias')
     years = len(tb) * DT
+    # inferenta dupa corectie: (i) test al lui kappa = 0 (mers aleator, radacina unitara) cu distributia nula simulata
+    # a lui kappa_hat (500 de mersuri aleatoare de aceeasi lungime, pornite din x_0, cu abaterea standard a reziduurilor);
+    # (ii) interval aproximativ pentru kappa corectat: kappa_c +/- 1.96 * abaterea standard simulata a lui kappa_hat
+    rw = np.random.default_rng(SEED + 24)
+    sd = f['sigma'] * np.sqrt((1 - f['b'] ** 2) / (2 * f['kappa']))
+    k0 = np.empty(n_sim)
+    for i in range(n_sim):
+        x = tb.values[0] + np.concatenate([[0.0], np.cumsum(sd * rw.standard_normal(len(tb) - 1))])
+        k0[i] = -np.log(ou_mle(x, DT)['b']) / DT
+    p_rw = (1 + np.sum(k0 >= f['kappa'])) / (1 + n_sim)
     return dict(f, n_obs=len(tb), years=years, start=str(tb.index[0].date()), k_mean=float(k.mean()),
+                k0_mean=float(k0.mean()), k0_q95=float(np.quantile(k0, 0.95)), p_rw=float(p_rw),
+                kc_lo=float(kc - 1.96 * k.std()), kc_hi=float(kc + 1.96 * k.std()),
+                resid_after_72=float(np.exp(-kc * years)),
                 k_sd=float(k.std()), bias=float(bias), k_corr=float(kc), hl_corr=float(np.log(2) / kc) if kc > 0 else None,
                 share_above=float(np.mean(k > f['kappa'])), approx_bias=4 / years,
                 k_lo=f['kappa'] - 1.96 * f['se_kappa'], k_hi=f['kappa'] + 1.96 * f['se_kappa'])
@@ -227,11 +286,14 @@ def b5_vix(n_sim=300):
                 acf=ac, acf_ou={str(L): float(f['b'] ** L) for L in lags})
 
 
-def b6_merton_lr(n_boot=200):
-    """B6: Merton pe S&P 500: parametri cu erori standard; testul LR GBM vs Merton cu bootstrap parametric."""
+def b6_merton_lr(n_boot=200, sigma_min=0.05, n_jobs=None):
+    """B6: Merton pe S&P 500: parametri cu erori standard; testul LR GBM vs Merton cu bootstrap parametric.
+    Statistica este definita pe spatiul restrans sigma >= 5% (verosimilitatea nerestransa este nemarginita, B6 (d)),
+    cu aceleasi sase puncte de start pentru esantionul observat si pentru fiecare esantion bootstrap."""
     r = rets['sp500'].values
     rng = np.random.default_rng(SEED + 22)
-    res = lr_bootstrap(r, DT, n_boot, rng)
+    n_jobs = os.cpu_count() if n_jobs is None else n_jobs
+    res = lr_bootstrap(r, DT, n_boot, rng, sigma_min=sigma_min, n_jobs=n_jobs)
     mf = res['merton']
     fig, ax = plt.subplots(figsize=(8, 3.3))
     ax.hist(res['boot'], bins=30, color=Teal, alpha=0.85, label=f'LR statistic in {n_boot} samples simulated from the fitted GBM')
@@ -241,7 +303,8 @@ def b6_merton_lr(n_boot=200):
     legend_outside_bottom(ax, ncol=1, y=-0.2)
     save_fig('ch11_sem_lr_boot')
     mo = merton_moments(DT, mf['sigma'], mf['lam'], mf['mu_j'], mf['s_j'], mf['m'])
-    return dict(lr=res['lr'], p_boot=res['p_boot'], crit95=res['crit95'], chi2=float(stats.chi2.ppf(0.95, 3)),
+    return dict(lr=res['lr'], p_boot=res['p_boot'], n_exceed=res['n_exceed'], p_upper95=res['p_upper95'],
+                sigma_min=sigma_min, crit95=res['crit95'], chi2=float(stats.chi2.ppf(0.95, 3)),
                 boot_mean=float(res['boot'].mean()), boot_zero=float(np.mean(res['boot'] < 1e-6)),
                 merton={k: v for k, v in mf.items()}, moments=mo, n_boot=n_boot)
 
@@ -263,9 +326,9 @@ def b7_btc():
 def b8_heston():
     """B8: parametrii Heston din VIX, cu erori standard OLS pentru kappa si interval Fisher z pentru rho."""
     vix = load_vix()
-    r = rets['sp500']
-    hp = heston_from_vix(vix, r, DT)
-    d = pd.concat([vix.rename('vix'), r.rename('r')], axis=1, join='inner').dropna()
+    p = load_close('sp500')
+    hp = heston_from_vix(vix, p, DT)
+    d = pd.concat([vix.rename('vix'), p.rename('p')], axis=1, join='inner').dropna().iloc[1:]
     v = (d['vix'] / 100) ** 2
     y = ((v.shift(-1) - v) / np.sqrt(v)).values[:-1]
     X = np.column_stack([DT / np.sqrt(v), -DT * np.sqrt(v)])[:-1]
@@ -277,7 +340,7 @@ def b8_heston():
     zlo, zhi = z - 1.96 / np.sqrt(hp['n'] - 3), z + 1.96 / np.sqrt(hp['n'] - 3)
     halves = {}
     for a, b in [('1990', '2007'), ('2008', '2026')]:
-        h = heston_from_vix(vix.loc[a:b], r.loc[a:b], DT)
+        h = heston_from_vix(vix.loc[a:b], p.loc[a:b], DT)
         halves[f'{a}-{b}'] = {k: float(h[k]) for k in ['kappa', 'theta', 'xi', 'rho', 'feller']}
     return dict(hp, se_kappa=se_k, k_lo=hp['kappa'] - 1.96 * se_k, k_hi=hp['kappa'] + 1.96 * se_k,
                 rho_lo=float(np.tanh(zlo)), rho_hi=float(np.tanh(zhi)), vrp=hp['theta'] - hp['real_var'],
@@ -321,14 +384,18 @@ def b8_affine_rv(kappa_q=5.0):
     """B8 (d)-(e): xi corectat pentru relatia afina VIX^2 = a + b v; rho din varianta realizata la 5 minute (SPY, Capitolul 9)
     fata de rho din VIX, pe aceleasi zile."""
     vix = load_vix()
-    r = rets['sp500']
-    hp = heston_from_vix(vix, r, DT)
+    p = load_close('sp500')
+    hp = heston_from_vix(vix, p, DT)
     b = (1 - np.exp(-kappa_q * 30 / 365)) / (kappa_q * 30 / 365)
     path = os.path.join(HERE, '..', 'Ch_09', 'ch9_rv_spy.csv')
     if not os.path.exists(path):
         path = 'https://raw.githubusercontent.com/danpele/MFM/main/Quantlets/Ch_09/ch9_rv_spy.csv'
     rv = pd.read_csv(path, index_col=0, parse_dates=True)['rv_total'] * 1e-4 / DT      # varianta anualizata
-    d = pd.concat([r.rename('r'), vix.rename('vix'), rv.rename('rv')], axis=1, join='inner').dropna()
+    # preturile, VIX si RV aliniate intai pe zilele comune; randamentele pe aceasta grila
+    d = pd.concat([p.rename('p'), vix.rename('vix'), rv.rename('rv')], axis=1, join='inner').dropna()
+    d['r'] = np.log(d['p']).diff()
+    d = d.dropna()
+    # xi / b: corectie locala, exacta doar la v = theta^Q (vezi A6)
     out = dict(b=b, xi=hp['xi'], xi_corr=hp['xi'] / b, n_rv=len(d), start_rv=str(d.index[0].date()))
     for name, v in [('vix', (d['vix'] / 100) ** 2), ('rv', d['rv'])]:
         dv = v.diff().shift(-1) / np.sqrt(v)
@@ -368,13 +435,17 @@ def b9_np(mult=(0.5, 1.0, 2.0)):
 # PARTEA C
 # =============================================================================
 def c1_models(n_sim=100):
-    """C1: GBM, Merton si Heston (varianta aproximata prin varianta realizata pe 21 de zile) pentru BET si Bitcoin:
-    distributiile simulate ale faptelor stilizate si pozitia datelor in aceste distributii."""
+    """C1: GBM, Merton si Heston (varianta aproximata prin varianta realizata pe 21 de zile,
+    RV_t = (1/21) sum_{j=0}^{20} r_{t-j}^2 / dt) pentru BET si Bitcoin: distributiile simulate ale faptelor stilizate
+    si percentila q a datelor in aceste distributii (verificare descriptiva: parametrii sunt estimati pe aceleasi date
+    si nu sunt reestimati pe esantioanele simulate, deci q nu este o valoare p calibrata).
+    Fereastra mobila suprapusa induce singura persistenta: pentru randamente independente, autocorelatia de ordinul 1
+    a lui RV_t este 20/21, deci kappa estimat reflecta si constructia ferestrei, nu doar dinamica variantei latente."""
     rng = np.random.default_rng(SEED + 23)
     out = {}
     fig, axes = plt.subplots(2, 3, figsize=(11, 5.2))
     keys = ['exkurt', 'hill', 'acf_abs_sum20']
-    titles = ['Excess kurtosis', 'Hill tail index (5% of losses)', 'Sum of ACF of |r|, lags 1-20']
+    titles = ['Excess kurtosis', 'Hill statistic (k = 5% of n)', 'Sum of ACF of |r|, lags 1-20']
     for row, k in enumerate(['bet', 'btc']):
         r = rets[k].values
         dt = DTS[k]
@@ -418,12 +489,12 @@ def extra(S):
     """Problemele noi (derivari in Partea A, extinderi in Partea B), adaugate la rezultatele existente."""
     S['A1g'] = a1_girsanov()
     S['A3b'] = a3_vasicek_bond()
-    S['A4'] = dict(a4_ito_integral(), var_w2dw=1.0)
+    S['A4'] = a4_ito_integral()
     S['A5c'] = a5_cir()
     S['A6h'] = a6_vix_heston()
     me = json.load(open(os.path.join(HERE, 'ch11_results.json')))['merton']['sp500']
     S['A7f'] = a7_fisher(5.0, 36.7, me['lam'], me['se']['lam'])
-    S['A8f'] = dict(a7_fisher(0.5, 36.7), years_20pct=25 / 0.5)
+    S['A8f'] = dict(a7_fisher(0.5, 36.7), years_20pct=a8_rare()['years_needed'])
     S['A9'] = a9_ar_ou_delta()
     print('B4 likelihoods'); S['B4L'] = b4_likelihoods()
     print('B6 profile'); S['B6P'] = b6_profile()

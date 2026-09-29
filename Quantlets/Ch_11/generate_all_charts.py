@@ -21,10 +21,10 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import LABELS, log_returns, load_close, load_vix, read_fred, periods_per_year  # noqa: E402
 from ct_models import (scaled_random_walk, bm_paths, quadratic_variation, total_variation, ito_stratonovich,  # noqa: E402
-                       max_prob, convergence_study, slope_ci, gbm_paths, gbm_mle, gbm_simulate_returns,
+                       max_prob, convergence_study, slope_ci, slope_boot, gbm_paths, gbm_mle, gbm_simulate_returns,
                        ou_exact_path, ou_mle, merton_logpdf, merton_mle, merton_moments, merton_simulate_returns,
                        lee_mykland, heston_paths, heston_from_vix, heston_simulate_returns, heston_smile, acf,
-                       stylised, short_rate_fits, nw_drift_diffusion)
+                       stylised, short_rate_fits, nw_drift_diffusion, hill)
 
 # Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
 plt.rcParams['figure.facecolor'] = 'none'
@@ -247,7 +247,7 @@ def fig_ito():
 def fig_convergence():
     """Erorile tare si slabe ale schemelor Euler-Maruyama si Milstein pentru ecuatia de test a lui Higham."""
     rng = np.random.default_rng(SEED + 4)
-    d = convergence_study(rng)
+    d, P = convergence_study(rng, return_paths=True)
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
     axes[0].errorbar(d['dt'], d['strong_em'], yerr=1.96 * d['strong_em_se'], fmt='o-', color=MainBlue, ms=4,
                      capsize=2, label='Euler-Maruyama')
@@ -269,9 +269,12 @@ def fig_convergence():
     legend_outside_bottom(axes[1], ncol=2, y=-0.2)
     plt.tight_layout()
     save_fig('ch11_convergence')
-    se = slope_ci(d['dt'], d['strong_em'])
-    sm = slope_ci(d['dt'], d['strong_mil'])
-    we = slope_ci(d['dt'], d['weak_em_exact'])
+    # pante log-log; intervale de 95% prin bootstrap pe traiectorii intregi (toate rezolutiile impreuna)
+    rb = np.random.default_rng(SEED + 40)
+    se = slope_boot(d['dt'], P['abs_em'], rb)
+    sm = slope_boot(d['dt'], P['abs_mil'], rb)
+    # eroarea slaba exacta este determinista: panta pe grila, fara interval de incredere
+    we = dict(slope=float(np.polyfit(np.log(d['dt']), np.log(d['weak_em_exact']), 1)[0]))
     d.to_csv(os.path.join(HERE, 'ch11_convergence.csv'), index=False)
     return dict(table=d.to_dict('list'), slope_em=se, slope_mil=sm, slope_weak=we)
 
@@ -508,12 +511,16 @@ def fig_vix_ou():
 # =============================================================================
 def diffusion_fits():
     """Vasicek, CIR (exact si Euler) si CKLS pe randamentul titlurilor de stat pe 3 luni (FRED, DTB3), 1954-2007:
-    date zilnice si sfarsit de luna. Perioada 2008-2026 este exclusa: CIR are suport r > 0, iar ratele au atins 0."""
+    date zilnice si sfarsit de luna. Perioada 2008-2026 este exclusa: contine cotatii exact zero si negative (in afara
+    domeniului verosimilitatii CIR si al pseudo-verosimilitatii Euler cu r^gamma) si un regim de dobanzi la limita zero."""
     tb = read_fred('DTB3') / 100
     s = tb.loc['1954':'2007']
     out = {'daily': short_rate_fits(s.values, DT), 'monthly': short_rate_fits(s.resample('ME').last().values, 1 / 12)}
     out['min_rate'] = float(s.min())
-    out['share_zero_post2008'] = float(np.mean(tb.loc['2008':] < 0.0005))
+    post = tb.loc['2008':]
+    out['share_zero_post2008'] = float(np.mean(post < 0.0005))
+    out['n_zero_post2008'] = int((post == 0).sum())
+    out['n_neg_post2008'] = int((post < 0).sum())
     return out
 
 
@@ -568,7 +575,11 @@ def fig_np_diffusion(fits):
 
 def measure_change(g, vs, hp):
     """Schimbarea masurii: pretul de piata al riscului pentru S&P 500; preturile obligatiunilor Vasicek (Feynman-Kac);
-    ce identifica VIX in modelul Heston (VIX^2 afin in v_t, cu parametri sub masura neutra la risc)."""
+    ce identifica VIX in modelul Heston (VIX^2 afin in v_t, cu parametri sub masura neutra la risc).
+    Randamentele Vasicek folosesc parametrii estimati sub P cu ipoteza explicita lambda = 0 (fara prima de risc,
+    deci theta^Q = theta^P); diferenta fata de DGS10 include prima de termen omisa.
+    Corectia xi / b este o aproximare locala, valabila la v_t = theta^Q: difuzia lui y = a + b v este
+    b xi sqrt(v) = xi sqrt(b (y - a)), deci raportul fata de xi_y sqrt(y) depinde de stare."""
     tb = read_fred('DTB3') / 100
     sp = g['sp500']
     rbar = float(tb.loc[sp['start']:].mean())
@@ -659,7 +670,8 @@ def fig_jumps():
 # 5. HESTON
 # =============================================================================
 def heston_estimates():
-    hp = heston_from_vix(load_vix(), rets['sp500'], DT)
+    """Parametrii Heston din VIX: pretul S&P 500 si VIX aliniate intai pe zilele comune (randamente pe grila comuna)."""
+    hp = heston_from_vix(load_vix(), load_close('sp500'), DT)
     return hp
 
 
@@ -682,11 +694,16 @@ def fig_heston_paths(hp, g):
     save_fig('ch11_heston_paths')
     lr = np.diff(np.log(S), axis=0)
     dv = np.diff(V, axis=0)
-    return dict(corr_sim=float(np.corrcoef(lr.ravel(), dv.ravel())[0, 1]))
+    # raportul Feller al parametrilor simulati (theta = varianta realizata), nu al celor din VIX
+    return dict(corr_sim=float(np.corrcoef(lr.ravel(), dv.ravel())[0, 1]),
+                feller_sim=float(2 * hp['kappa'] * hp['theta_p'] / hp['xi'] ** 2),
+                share_trunc=float(np.mean(V[1:] <= 0)))
 
 
 def fig_heston_smile(hp):
-    """Volatilitatea implicita Black-Scholes a preturilor Heston: efectul lui rho si al scadentei."""
+    """Volatilitatea implicita Black-Scholes a preturilor Heston: efectul lui rho si al scadentei.
+    Ilustrativ: parametrii estimati din VIX (dinamica sub P a aproximarii) sunt folositi ca parametri sub Q;
+    regresia istorica nu identifica kappa^Q, theta^Q (ar fi nevoie de calibrare pe preturi de optiuni)."""
     rng = np.random.default_rng(SEED + 10)
     K = np.linspace(0.80, 1.20, 17)
     base = dict(kappa=hp['kappa'], theta=hp['theta'], xi=hp['xi'], rho=hp['rho'], v0=hp['theta'])
@@ -749,7 +766,7 @@ def fig_models_vs_data(g, me, hp):
     axes[0].set_xlabel('Lag (trading days)')
     axes[0].set_title('ACF of |r| (median of 100 simulations)', loc='left')
     summ = {}
-    for ax, key, title in [(axes[1], 'exkurt', 'Excess kurtosis'), (axes[2], 'hill', 'Hill tail index (5% of losses)')]:
+    for ax, key, title in [(axes[1], 'exkurt', 'Excess kurtosis'), (axes[2], 'hill', 'Hill statistic, largest losses (k = 5% of n)')]:
         names = ['Data'] + list(S)
         vals, lo, hi = [d[key]], [0], [0]
         for m in S:
@@ -771,6 +788,8 @@ def fig_models_vs_data(g, me, hp):
                            p_ge=float(np.mean([x[k] >= d[k] for x in S[m]])))
                    for k in ['exkurt', 'skew', 'hill', 'acf_abs1', 'acf_abs_sum20']}
     summ['Data'] = {k: float(d[k]) for k in ['exkurt', 'skew', 'hill', 'acf_abs1', 'acf_abs_sum20']}
+    # sensibilitatea statisticii Hill la prag (k = 2.5%, 5%, 10% din n) pentru date
+    summ['Data_hill'] = {f'{q:.3f}': float(hill(-r, q)) for q in (0.025, 0.05, 0.10)}
     return summ
 
 

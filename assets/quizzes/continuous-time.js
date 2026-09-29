@@ -18,7 +18,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Both the drift and the volatility",
                     "Nothing, because equivalent measures give the same expectations"
                 ],
-                "correctExplanation": "Under Q, W becomes W~ + drift shift, so dX = (a - b theta) dt + b dW~: the drift moves, b and the quadratic variation do not. This is why realised variance measures the same sigma that prices options.",
+                "correctExplanation": "Under Q, W becomes W~ + drift shift, so dX = (a - b theta) dt + b dW~: the drift moves, b and the quadratic variation do not. Under constant-volatility GBM, realised variance therefore measures the sigma that prices options; with stochastic volatility, P and Q can still weigh future variance paths differently.",
                 "incorrectExplanation": "Quadratic variation is a path property, identical under equivalent measures, so the volatility cannot change; equivalent measures share null events, not expectations, so the drift does change."
             },
             "ro": {
@@ -30,7 +30,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Atât driftul, cât și volatilitatea",
                     "Nimic, deoarece măsurile echivalente dau aceleași valori așteptate"
                 ],
-                "correctExplanation": "Sub Q, W devine W~ plus o deplasare de drift, deci dX = (a - b theta) dt + b dW~: driftul se mută, b și variația pătratică nu. De aceea varianța realizată măsoară același sigma care evaluează opțiunile.",
+                "correctExplanation": "Sub Q, W devine W~ plus o deplasare de drift, deci dX = (a - b theta) dt + b dW~: driftul se mută, b și variația pătratică nu. Sub GBM cu volatilitate constantă, varianța realizată măsoară deci sigma care evaluează opțiunile; cu volatilitate stochastică, P și Q pot pondera totuși diferit traiectoriile viitoare ale varianței.",
                 "incorrectExplanation": "Variația pătratică este o proprietate a traiectoriei, identică sub măsuri echivalente, deci volatilitatea nu se poate schimba; măsurile echivalente au aceleași evenimente de probabilitate zero, nu aceleași valori așteptate, deci driftul se schimbă."
             }
         },
@@ -65,7 +65,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
             "correct": 2,
             "en": {
                 "title": "Infill versus long span",
-                "text": "An OU process is observed every second over a fixed 5-year window, so n grows without bound while T = 5 stays fixed. Which parameter is estimated consistently?",
+                "text": "An OU process is observed at ever higher frequency over a fixed 5-year window: the sampling interval shrinks to zero, so n grows without bound while T = 5 stays fixed. Which parameter is estimated consistently?",
                 "options": [
                     "The speed of mean reversion kappa",
                     "The long-run mean theta",
@@ -73,11 +73,11 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "All three, because n tends to infinity"
                 ],
                 "correctExplanation": "Infill asymptotics: the sum of squared increments converges to the integrated variance, so sigma is identified without error; kappa and theta are drift parameters whose information grows only with T.",
-                "incorrectExplanation": "Drift parameters (kappa, theta) are identified by the calendar span T, not by the number of observations: Var(kappa-hat) is about 2 kappa / T at any sampling step."
+                "incorrectExplanation": "Drift parameters (kappa, theta) are identified by the calendar span T, not by the number of observations: Var(kappa-hat) is about (exp(2 kappa Delta) - 1) / (T Delta), which tends to 2 kappa / T, not to zero, as the step Delta shrinks with T fixed."
             },
             "ro": {
                 "title": "Infill versus orizont lung",
-                "text": "Un proces OU este observat în fiecare secundă pe o fereastră fixă de 5 ani, deci n crește nelimitat, iar T = 5 rămâne fix. Ce parametru se estimează consistent?",
+                "text": "Un proces OU este observat din ce în ce mai des pe o fereastră fixă de 5 ani: intervalul de eșantionare tinde la zero, deci n crește nelimitat, iar T = 5 rămâne fix. Ce parametru se estimează consistent?",
                 "options": [
                     "Viteza de revenire la medie kappa",
                     "Media pe termen lung theta",
@@ -85,7 +85,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Toți trei, deoarece n tinde la infinit"
                 ],
                 "correctExplanation": "Asimptotica infill: suma pătratelor creșterilor converge la varianța integrată, deci sigma este identificat fără eroare; kappa și theta sunt parametri de drift, a căror informație crește doar cu T.",
-                "incorrectExplanation": "Parametrii de drift (kappa, theta) sunt identificați de durata calendaristică T, nu de numărul de observații: Var(kappa estimat) este circa 2 kappa / T la orice pas de eșantionare."
+                "incorrectExplanation": "Parametrii de drift (kappa, theta) sunt identificați de durata calendaristică T, nu de numărul de observații: Var(kappa estimat) este circa (exp(2 kappa Delta) - 1) / (T Delta), care tinde la 2 kappa / T, nu la zero, când pasul Delta scade, iar T rămâne fix."
             }
         },
         {
@@ -99,7 +99,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Equal to the long-run variance theta",
                     "Independent of v_t"
                 ],
-                "correctExplanation": "Integrating E^Q[v_s | v_t] = theta^Q + (v_t - theta^Q) exp(-kappa^Q (s - t)) over 30 days gives a + b v_t with b = (1 - exp(-kappa^Q tau)) / (kappa^Q tau) < 1: a regression on VIX^2 attenuates the volatility of volatility by b.",
+                "correctExplanation": "Integrating E^Q[v_s | v_t] = theta^Q + (v_t - theta^Q) exp(-kappa^Q (s - t)) over 30 days gives a + b v_t with b = (1 - exp(-kappa^Q tau)) / (kappa^Q tau) < 1: a CIR regression on VIX^2 attenuates the volatility of volatility, by the factor b at v_t = theta^Q (elsewhere the attenuation depends on the state).",
                 "incorrectExplanation": "The VIX averages expected variance over the next 30 days under Q; mean reversion pulls this average towards theta^Q, so it depends on v_t, but with a slope below one."
             },
             "ro": {
@@ -111,7 +111,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Egal cu varianța pe termen lung theta",
                     "Independent de v_t"
                 ],
-                "correctExplanation": "Integrând E^Q[v_s | v_t] = theta^Q + (v_t - theta^Q) exp(-kappa^Q (s - t)) pe 30 de zile obținem a + b v_t, cu b = (1 - exp(-kappa^Q tau)) / (kappa^Q tau) < 1: o regresie pe VIX^2 atenuează volatilitatea volatilității cu factorul b.",
+                "correctExplanation": "Integrând E^Q[v_s | v_t] = theta^Q + (v_t - theta^Q) exp(-kappa^Q (s - t)) pe 30 de zile obținem a + b v_t, cu b = (1 - exp(-kappa^Q tau)) / (kappa^Q tau) < 1: o regresie CIR pe VIX^2 atenuează volatilitatea volatilității, cu factorul b la v_t = theta^Q (în rest, atenuarea depinde de stare).",
                 "incorrectExplanation": "VIX mediază varianța așteptată în următoarele 30 de zile sub Q; revenirea la medie trage această medie spre theta^Q, deci depinde de v_t, dar cu o pantă sub unu."
             }
         },
@@ -254,26 +254,26 @@ window.MFM_DATA.quizzes['continuous-time'] = {
             "correct": 2,
             "en": {
                 "title": "Drift precision",
-                "text": "How can the precision of the estimated drift of GBM be improved?",
+                "text": "How can the precision of the estimated log drift m = mu - sigma^2/2 of GBM be improved?",
                 "options": [
                     "By sampling daily instead of monthly",
                     "By using intraday data",
                     "Only by a longer calendar span of data",
                     "By using log instead of simple returns"
                 ],
-                "correctExplanation": "The standard error of the drift is sigma/sqrt(T): it depends on the calendar length only, since the sum of log returns uses only the first and last prices.",
+                "correctExplanation": "The standard error of the estimated log drift is sigma/sqrt(T): it depends on the calendar length only, since the sum of log returns uses only the first and last prices.",
                 "incorrectExplanation": "Sampling more often improves the volatility estimate, not the drift estimate."
             },
             "ro": {
                 "title": "Precizia driftului",
-                "text": "Cum poate fi îmbunătățită precizia driftului estimat al GBM?",
+                "text": "Cum poate fi îmbunătățită precizia driftului logaritmic estimat m = mu - sigma^2/2 al GBM?",
                 "options": [
                     "Prin eșantionare zilnică în loc de lunară",
                     "Prin folosirea datelor intraday",
                     "Doar printr-o durată calendaristică mai lungă a datelor",
                     "Prin randamente log în loc de randamente simple"
                 ],
-                "correctExplanation": "Eroarea standard a driftului este sigma/sqrt(T): depinde doar de durata calendaristică, deoarece suma randamentelor log folosește doar primul și ultimul preț.",
+                "correctExplanation": "Eroarea standard a driftului logaritmic estimat este sigma/sqrt(T): depinde doar de durata calendaristică, deoarece suma randamentelor log folosește doar primul și ultimul preț.",
                 "incorrectExplanation": "Eșantionarea mai deasă îmbunătățește estimarea volatilității, nu a driftului."
             }
         },
@@ -350,7 +350,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "text": "Pentru procesul CIR dr = kappa (theta - r) dt + sigma sqrt(r) dW, care este legea exactă a lui r_{t + Delta} condiționat de r_t?",
                 "options": [
                     "Un chi-pătrat necentral scalat, cu 4 kappa theta / sigma^2 grade de libertate",
-                    "Normală, ca la Vasicek",
+                    "Distribuția Normală, ca în modelul Vasicek",
                     "Lognormală",
                     "O mixtură Poisson de distribuții Normale"
                 ],
@@ -462,7 +462,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "CIR are salturi",
                     "Vasicek are formă închisă pentru prețurile obligațiunilor, iar CIR nu"
                 ],
-                "correctExplanation": "În Vasicek rata este Normală și poate deveni negativă; difuzia sqrt(r) din CIR scade lângă zero.",
+                "correctExplanation": "În modelul Vasicek, rata urmează distribuția Normală și poate deveni negativă; difuzia sqrt(r) din CIR scade lângă zero.",
                 "incorrectExplanation": "Ambele modele revin la medie, nu au salturi și dau prețurile obligațiunilor în formă închisă."
             }
         },
@@ -477,8 +477,8 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "The estimate is a numerical error",
                     "Jumps explain the volatility clustering"
                 ],
-                "correctExplanation": "An i.i.d. model cannot separate a jump from a volatile period, so it uses frequent small jumps to fatten the tails; the Lee-Mykland test finds under one jump per year.",
-                "incorrectExplanation": "Merton returns are still independent over time, so they cannot produce clustering; true jumps are rare."
+                "correctExplanation": "An i.i.d. model cannot separate a jump from a volatile period, so it uses frequent small jumps to fatten the tails; the Lee-Mykland test flags under one candidate jump per year.",
+                "incorrectExplanation": "Merton returns are still independent over time, so they cannot produce clustering; the jumps detected in daily data are rare."
             },
             "ro": {
                 "title": "Merton estimat prin MLE",
@@ -489,8 +489,8 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Estimarea este o eroare numerică",
                     "Salturile explică gruparea volatilității"
                 ],
-                "correctExplanation": "Un model i.i.d. nu poate separa un salt de o perioadă volatilă, așa că folosește salturi mici și frecvente pentru a îngroșa cozile; testul Lee-Mykland găsește sub un salt pe an.",
-                "incorrectExplanation": "Randamentele Merton rămân independente în timp, deci nu pot produce grupare; salturile reale sunt rare."
+                "correctExplanation": "Un model i.i.d. nu poate separa un salt de o perioadă volatilă, așa că folosește salturi mici și frecvente pentru a îngroșa cozile; testul Lee-Mykland marchează sub un salt candidat pe an.",
+                "incorrectExplanation": "Randamentele Merton rămân independente în timp, deci nu pot produce grupare; salturile detectate în datele zilnice sunt rare."
             }
         },
         {
@@ -635,24 +635,24 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "text": "Simulated against the S&P 500, which statement matches the lecture results?",
                 "options": [
                     "GBM reproduces all stylised facts",
-                    "Merton reproduces the tail index, Heston the volatility clustering, and neither the excess kurtosis",
+                    "Merton reproduces the Hill statistic, Heston the volatility clustering, and neither the excess kurtosis",
                     "Merton reproduces volatility clustering",
                     "Heston reproduces the excess kurtosis of 10.9"
                 ],
-                "correctExplanation": "Merton's Hill index (2.68) is near the data (2.56) but its ACF of |r| is zero; Heston's ACF matches, but both give an excess kurtosis near 3.5 against 10.9.",
-                "incorrectExplanation": "GBM fails on every statistic, i.i.d. jumps cannot create clustering, and no single model reaches the kurtosis: jumps and stochastic volatility are needed together."
+                "correctExplanation": "Merton's Hill statistic (2.70) is near the data (2.56) but its ACF of |r| is zero; Heston's ACF matches, but both give an excess kurtosis near 3.5 against 10.9.",
+                "incorrectExplanation": "GBM fails on every statistic, i.i.d. jumps cannot create clustering, and no fitted model reaches the kurtosis: the evidence favours combining jumps and stochastic volatility."
             },
             "ro": {
                 "title": "Ce model?",
                 "text": "Simulate și comparate cu S&P 500, ce afirmație corespunde rezultatelor din curs?",
                 "options": [
                     "GBM reproduce toate faptele stilizate",
-                    "Merton reproduce indicele de coadă, Heston gruparea volatilității și niciunul excesul de aplatizare",
+                    "Merton reproduce statistica Hill, Heston gruparea volatilității și niciunul excesul de aplatizare",
                     "Merton reproduce gruparea volatilității",
                     "Heston reproduce excesul de aplatizare de 10,9"
                 ],
-                "correctExplanation": "Indicele Hill Merton (2,68) este aproape de date (2,56), dar ACF a lui |r| este zero; ACF Heston se potrivește, dar ambele dau un exces de aplatizare de circa 3,5 față de 10,9.",
-                "incorrectExplanation": "GBM eșuează la toate statisticile, salturile i.i.d. nu pot crea grupare și niciun model singur nu atinge aplatizarea: este nevoie simultan de salturi și volatilitate stochastică."
+                "correctExplanation": "Statistica Hill Merton (2,70) este aproape de date (2,56), dar ACF a lui |r| este zero; ACF Heston se potrivește, dar ambele dau un exces de aplatizare de circa 3,5 față de 10,9.",
+                "incorrectExplanation": "GBM eșuează la toate statisticile, salturile i.i.d. nu pot crea grupare și niciun model estimat nu atinge aplatizarea: rezultatele susțin combinarea salturilor cu volatilitatea stochastică."
             }
         },
         {

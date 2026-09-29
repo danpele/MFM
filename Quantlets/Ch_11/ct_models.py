@@ -76,24 +76,47 @@ def em_milstein_gbm(x0, lam, mu, dW, dt):
 
 
 def convergence_study(rng, x0=1.0, lam=2.0, mu=1.0, T=1.0, n_fine=2 ** 11, n_paths=20000,
-                      ratios=(1, 2, 4, 8, 16, 32, 64)):
-    """Eroarea tare E|X_T - X^h_T| si eroarea slaba |E X^h_T - E X_T| pentru pasi dt = ratio * T / n_fine."""
+                      ratios=(1, 2, 4, 8, 16, 32, 64), return_paths=False):
+    """Eroarea tare E|X_T - X^h_T| si eroarea slaba |E X^h_T - E X_T| pentru pasi dt = ratio * T / n_fine.
+    Cu return_paths=True intoarce si matricele traiectorie x pas (erorile absolute EM si Milstein, X^h_T EM),
+    folosite pentru bootstrapul pe traiectorii intregi (aceleasi traiectorii la toti pasii)."""
     dt_f = T / n_fine
     dW = rng.standard_normal((n_paths, n_fine)) * np.sqrt(dt_f)
     WT = dW.sum(axis=1)
     x_true = x0 * np.exp((lam - 0.5 * mu ** 2) * T + mu * WT)
     ex = x0 * np.exp(lam * T)                       # E X_T exact
-    rows = []
+    rows, ae, am, xs = [], [], [], []
     for r in ratios:
         dWr = dW.reshape(n_paths, n_fine // r, r).sum(axis=2)
         h = r * dt_f
         xe, xm = em_milstein_gbm(x0, lam, mu, dWr, h)
+        ae.append(np.abs(x_true - xe))
+        am.append(np.abs(x_true - xm))
+        xs.append(xe)
         rows.append(dict(dt=h, strong_em=np.mean(np.abs(x_true - xe)), strong_mil=np.mean(np.abs(x_true - xm)),
                          strong_em_se=np.std(np.abs(x_true - xe)) / np.sqrt(n_paths),
                          strong_mil_se=np.std(np.abs(x_true - xm)) / np.sqrt(n_paths),
                          weak_em_exact=abs(x0 * (1 + lam * h) ** round(T / h) - ex),
                          weak_em_mc=abs(xe.mean() - ex), weak_mil_mc=abs(xm.mean() - ex)))
-    return pd.DataFrame(rows)
+    d = pd.DataFrame(rows)
+    if return_paths:
+        return d, dict(abs_em=np.column_stack(ae), abs_mil=np.column_stack(am), x_em=np.column_stack(xs), ex=ex)
+    return d
+
+
+def slope_boot(dt, M, rng, n_boot=1000, level=0.95, target=None):
+    """Panta log-log cu interval bootstrap pe traiectorii intregi: se reesantioneaza randurile matricei M
+    (traiectorie x pas), pastrand toate rezolutiile impreuna; eroarea la fiecare pas este media coloanei
+    (target=None, eroare tare) sau |media coloanei - target| (eroare slaba Monte Carlo)."""
+    x = np.log(np.asarray(dt))
+    f = (lambda A: A.mean(axis=0)) if target is None else (lambda A: np.abs(A.mean(axis=0) - target))
+    slope = np.polyfit(x, np.log(f(M)), 1)[0]
+    n = M.shape[0]
+    b = np.empty(n_boot)
+    for i in range(n_boot):
+        b[i] = np.polyfit(x, np.log(np.maximum(f(M[rng.integers(0, n, n)]), 1e-300)), 1)[0]
+    q = np.quantile(b, [(1 - level) / 2, (1 + level) / 2])
+    return dict(slope=float(slope), se=float(b.std()), lo=float(q[0]), hi=float(q[1]))
 
 
 def slope_ci(dt, err, level=0.95):
@@ -274,15 +297,40 @@ def short_rate_fits(x, dt):
     sc = np.column_stack([(euler_loglik(x, dt, *(th + e), per_obs=True) - euler_loglik(x, dt, *(th - e), per_obs=True)) / (2 * hi)
                           for e, hi in zip(np.diag(h), h)])
     V = Hi @ (sc.T @ sc) @ Hi
+    Vh = Hi @ hac_cov(sc) @ Hi
     out['ckls'] = dict(kappa=th[0], theta=th[1], sigma=th[2], gamma=th[3], se_gamma=float(np.sqrt(Hi[3, 3])),
-                       se_gamma_rob=float(np.sqrt(V[3, 3])), se_kappa=float(np.sqrt(Hi[0, 0])), loglik=-best.fun)
+                       se_gamma_rob=float(np.sqrt(V[3, 3])), se_gamma_hac=float(np.sqrt(Vh[3, 3])),
+                       hac_lags=nw_lags(len(sc)), se_kappa=float(np.sqrt(Hi[0, 0])), loglik=-best.fun)
     c = out['ckls']
     c['lr_g0'] = 2 * (c['loglik'] - out['vasicek_euler']['loglik'])
     c['lr_g05'] = 2 * (c['loglik'] - out['cir_euler']['loglik'])
     c['wald_g0'] = (c['gamma'] / c['se_gamma_rob']) ** 2
     c['wald_g05'] = ((c['gamma'] - 0.5) / c['se_gamma_rob']) ** 2
+    c['wald_g0_hac'] = (c['gamma'] / c['se_gamma_hac']) ** 2
+    c['wald_g05_hac'] = ((c['gamma'] - 0.5) / c['se_gamma_hac']) ** 2
+    L0 = nw_lags(len(sc))                   # sensibilitate: de cinci ori mai multe laguri
+    se5 = float(np.sqrt((Hi @ hac_cov(sc, 5 * L0) @ Hi)[3, 3]))
+    c.update(hac_lags5=5 * L0, se_gamma_hac5=se5, wald_g0_hac5=(c['gamma'] / se5) ** 2,
+             wald_g05_hac5=((c['gamma'] - 0.5) / se5) ** 2)
     out['n'] = len(x) - 1
     return out
+
+
+def nw_lags(n):
+    """Numarul de laguri Newey-West: floor(4 (n / 100)^(2/9))."""
+    return int(np.floor(4 * (n / 100) ** (2 / 9)))
+
+
+def hac_cov(sc, L=None):
+    """Covarianta pe termen lung a scorurilor (Newey si West, 1987): nucleu Bartlett cu L laguri; tine cont de
+    autocorelatia scorurilor (de exemplu, din volatilitatea persistenta omisa din model)."""
+    sc = np.asarray(sc) - np.asarray(sc).mean(axis=0)
+    L = nw_lags(len(sc)) if L is None else L
+    S = sc.T @ sc
+    for j in range(1, L + 1):
+        G = sc[j:].T @ sc[:-j]
+        S += (1 - j / (L + 1)) * (G + G.T)
+    return S
 
 
 def nw_drift_diffusion(x, dt, grid, h=None):
@@ -321,28 +369,32 @@ def merton_logpdf(r, dt, m, sigma, lam, mu_j, s_j, kmax=12):
     return np.log(np.maximum(dens, 1e-300))
 
 
-def _merton_unpack(p):
-    return p[0], np.exp(p[1]), np.exp(p[2]), p[3], np.exp(p[4])
+def _merton_unpack(p, sigma_min=0.0):
+    return p[0], sigma_min + np.exp(p[1]), np.exp(p[2]), p[3], np.exp(p[4])
 
 
-def merton_mle(r, dt, starts=None):
+def merton_mle(r, dt, starts=None, sigma_min=0.0):
     """Verosimilitate maxima pentru Merton (m, sigma, lam, mu_j, s_j); mai multe puncte de start.
+    sigma_min > 0 restrange spatiul parametrilor la sigma >= sigma_min (sigma = sigma_min + e^q): verosimilitatea
+    nerestransa este nemarginita (sigma -> 0 cu m dt egal cu un randament observat), cea restransa este marginita.
     Erorile standard: inversa hessianei numerice in parametrii originali (metoda delta)."""
     r = np.asarray(r)
     sd = r.std()
-    nll = lambda p: -merton_logpdf(r, dt, *_merton_unpack(p)).sum()
+    unpack = lambda p: _merton_unpack(p, sigma_min)
+    nll = lambda p: -merton_logpdf(r, dt, *unpack(p)).sum()
     if starts is None:
         starts = []
+        s0 = np.log(max(0.7 * sd / np.sqrt(dt) - sigma_min, 1e-3))
         for lam0 in (2.0, 10.0, 40.0):
             for sj0 in (1.5, 3.0):
-                starts.append([r.mean() / dt, np.log(0.7 * sd / np.sqrt(dt)), np.log(lam0), -0.5 * sd, np.log(sj0 * sd)])
+                starts.append([r.mean() / dt, s0, np.log(lam0), -0.5 * sd, np.log(sj0 * sd)])
     best = None
     for s0 in starts:
         res = optimize.minimize(nll, s0, method='Nelder-Mead', options=dict(maxiter=20000, maxfev=20000, xatol=1e-7, fatol=1e-7))
         res = optimize.minimize(nll, res.x, method='BFGS')
         if best is None or res.fun < best.fun:
             best = res
-    m, sigma, lam, mu_j, s_j = _merton_unpack(best.x)
+    m, sigma, lam, mu_j, s_j = unpack(best.x)
     theta = np.array([m, sigma, lam, mu_j, s_j])
     nll_orig = lambda th: -merton_logpdf(r, dt, *th).sum()
     H = numerical_hessian(nll_orig, theta)
@@ -385,22 +437,39 @@ def merton_simulate_returns(m, sigma, lam, mu_j, s_j, n, dt, rng):
     return m * dt + sigma * np.sqrt(dt) * rng.standard_normal(n) + jumps
 
 
-def lr_bootstrap(r, dt, n_boot, rng):
+def _lr_stat(r, dt, sigma_min):
+    """Statistica LR GBM vs Merton pe spatiul restrans sigma >= sigma_min, cu aceeasi regula de optimizare
+    (cele sase puncte de start implicite din merton_mle) pentru orice esantion."""
+    l0 = stats.norm.logpdf(r, r.mean(), r.std()).sum()
+    mf = merton_mle(r, dt, sigma_min=sigma_min)
+    return max(2 * (mf['loglik'] - l0), 0.0), mf
+
+
+def _lr_boot_one(args):
+    rb, dt, sigma_min = args
+    return _lr_stat(rb, dt, sigma_min)[0]
+
+
+def lr_bootstrap(r, dt, n_boot, rng, sigma_min=0.05, n_jobs=1):
     """Testul raportului de verosimilitate GBM (fara salturi) vs Merton, cu valoarea p din bootstrap parametric.
-    Sub ipoteza nula lam = 0 se afla pe frontiera, iar mu_j, s_j nu sunt identificati: distributia chi-patrat nu se aplica."""
+    Sub ipoteza nula lam = 0 se afla pe frontiera, iar mu_j, s_j nu sunt identificati: distributia chi-patrat nu se aplica.
+    Verosimilitatea Merton nerestransa este nemarginita, deci statistica este definita pe spatiul restrans
+    sigma >= sigma_min; aceeasi restrictie si aceleasi puncte de start pentru esantionul observat si pentru fiecare
+    esantion bootstrap. Valoarea p: (1 + numarul depasirilor) / (1 + n_boot), cu limita superioara binomiala de 95%."""
     r = np.asarray(r)
     g = gbm_mle(r, dt)
-    ll0 = stats.norm.logpdf(r, r.mean(), r.std()).sum()
-    mf = merton_mle(r, dt)
-    lr = 2 * (mf['loglik'] - ll0)
-    boot = np.empty(n_boot)
-    for i in range(n_boot):
-        rb = gbm_simulate_returns(g['m'], g['sigma'], len(r), dt, rng)
-        l0 = stats.norm.logpdf(rb, rb.mean(), rb.std()).sum()
-        mb = merton_mle(rb, dt, starts=[[rb.mean() / dt, np.log(rb.std() / np.sqrt(dt)), np.log(5.0), 0.0, np.log(2 * rb.std())],
-                                        [rb.mean() / dt, np.log(0.8 * rb.std() / np.sqrt(dt)), np.log(30.0), 0.0, np.log(1.5 * rb.std())]])
-        boot[i] = max(2 * (mb['loglik'] - l0), 0.0)
-    return dict(lr=lr, p_boot=float(np.mean(boot >= lr)), boot=boot, crit95=float(np.quantile(boot, 0.95)), merton=mf)
+    lr, mf = _lr_stat(r, dt, sigma_min)
+    samples = [gbm_simulate_returns(g['m'], g['sigma'], len(r), dt, rng) for _ in range(n_boot)]
+    jobs = [(rb, dt, sigma_min) for rb in samples]
+    if n_jobs > 1:
+        import multiprocessing as mp
+        with mp.get_context('fork').Pool(n_jobs) as pool:
+            boot = np.array(pool.map(_lr_boot_one, jobs))
+    else:
+        boot = np.array([_lr_boot_one(j) for j in jobs])
+    k = int(np.sum(boot >= lr))
+    return dict(lr=lr, n_exceed=k, p_boot=(k + 1) / (n_boot + 1), p_upper95=float(stats.beta.ppf(0.95, k + 1, n_boot - k)),
+                boot=boot, crit95=float(np.quantile(boot, 0.95)), merton=mf, sigma_min=sigma_min)
 
 
 # =============================================================================
@@ -449,11 +518,15 @@ def heston_paths(S0, v0, mu, kappa, theta, xi, rho, T, n_steps, n_paths, rng, an
     return np.linspace(0, T, n_steps + 1), np.exp(X), V
 
 
-def heston_from_vix(vix, logret, dt):
+def heston_from_vix(vix, price, dt):
     """Parametrii Heston din VIX: v_t = (VIX_t / 100)^2 ca aproximare a variantei; regresia CIR discretizata
     (v_{t+1} - v_t) / sqrt(v_t) = kappa theta dt / sqrt(v_t) - kappa dt sqrt(v_t) + xi sqrt(dt) eps;
-    rho = corelatia dintre socurile de randament si socurile de varianta."""
-    d = pd.concat([vix.rename('vix'), logret.rename('r')], axis=1, join='inner').dropna()
+    rho = corelatia dintre socurile de randament si socurile de varianta.
+    Pretul si VIX sunt aliniate intai pe zilele comune; randamentele se calculeaza apoi pe aceasta grila comuna,
+    astfel incat randamentul si variatia lui v acopera acelasi interval."""
+    d = pd.concat([vix.rename('vix'), price.rename('p')], axis=1, join='inner').dropna()
+    d['r'] = np.log(d['p']).diff()
+    d = d.dropna()
     v = (d['vix'] / 100) ** 2
     y = (v.shift(-1) - v) / np.sqrt(v)
     X = np.column_stack([dt / np.sqrt(v), -dt * np.sqrt(v)])
@@ -474,9 +547,10 @@ def heston_from_vix(vix, logret, dt):
 def heston_from_proxy(logret, dt, window=21):
     """Aceeasi regresie CIR, cu varianta aproximata prin varianta realizata anualizata pe o fereastra mobila
     (pentru piete fara un indice de volatilitate, de exemplu BET si Bitcoin)."""
-    rv = (logret ** 2).rolling(window).mean() / dt
+    rv = (logret ** 2).rolling(window).mean() / dt          # RV_t = (1/21) sum_{j=0}^{20} r_{t-j}^2 / dt
     proxy = 100 * np.sqrt(rv)
-    return heston_from_vix(proxy.dropna(), logret, dt)
+    price = np.exp(logret.cumsum())                           # pret reconstruit pe calendarul randamentelor
+    return heston_from_vix(proxy.dropna(), price, dt)
 
 
 def heston_simulate_returns(p, n, dt, rng, mu=0.0, burn=500):
@@ -518,7 +592,9 @@ def acf(x, lags):
 
 
 def hill(x, share=0.05):
-    """Estimatorul Hill al indicelui de coada pentru cele mai mari share din valori (pierderi)."""
+    """Statistica Hill pentru cele mai mari k = share * n valori ale lui x (n = numarul total de observatii);
+    cu x = -r: cele mai mari pierderi, k = 5% din toate randamentele. Estimeaza indicele de coada doar sub
+    variatie regulata (coada de tip Pareto); pentru o coada Normala este o statistica descriptiva a formei cozii."""
     x = np.sort(np.asarray(x))[::-1]
     k = int(share * len(x))
     return 1 / np.mean(np.log(x[:k] / x[k]))

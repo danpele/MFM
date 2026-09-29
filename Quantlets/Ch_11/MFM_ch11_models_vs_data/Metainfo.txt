@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch11_models_vs_data'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'S&P 500 against 100 simulated samples from fitted GBM, Merton and Heston models: ACF of absolute returns, excess kurtosis and Hill tail index.'
+Description: 'S&P 500 against 100 simulated samples from fitted GBM, Merton and Heston models: ACF of absolute returns, excess kurtosis and the Hill statistic of the largest losses (k = 5% of all returns).'
 
 Keywords: 'model comparison, stylised facts, geometric Brownian motion, Merton, Heston, Hill estimator'
 

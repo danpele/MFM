@@ -7,8 +7,9 @@ mfm_data.py -- Incarcarea datelor pentru Capitolul 11 (MFM): modele in timp cont
   * read_fred(series)  -- serii publice FRED (de ex. DTB3, randamentul titlurilor de stat pe 3 luni)
 
 Conventii (ca in capitolele 0-8):
-  * indicii bursieri: doar zilele lucratoare; zilele cu inchidere identica cu ziua precedenta
-    (sarbatori completate cu ultimul pret) sunt eliminate;
+  * indicii bursieri: doar zilele lucratoare; cotatiile inerte (inchidere identica cu ziua precedenta si
+    fara amplitudine intraday, high = low, sau fara high/low) sunt eliminate; o inchidere neschimbata intr-o zi
+    cu tranzactii reale (high > low) este pastrata ca randament zero;
   * cripto: 7 zile din 7; ETF-uri si actiuni: pretul ajustat; indici, FX, cripto: pretul de inchidere;
   * EUR/RON: cursul oficial de referinta BNR.
 
@@ -91,12 +92,15 @@ def load_close(name, start=None, end=END):
     start = start or start0
     if symbol.startswith('REF:'):
         return read_reference_rate(symbol.split(':')[1], start=start, end=end).rename(name)
-    s = read_market(symbol)['close'].loc[start:end]
-    s = s[s > 0].dropna()
+    d = read_market(symbol).loc[start:end]
+    d = d[d['close'] > 0].dropna(subset=['close'])
     if kind != 'crypto':
-        s = s[s.index.dayofweek < 5]          # fara cotatii de weekend
+        d = d[d.index.dayofweek < 5]          # fara cotatii de weekend
+    s = d['close']
     if kind == 'index':
-        s = s[s.diff() != 0]                  # fara sarbatori completate cu pretul anterior
+        # cotatie inerta: inchidere neschimbata si nicio amplitudine intraday (sau high/low indisponibile)
+        no_range = (d['high'] <= d['low']) if {'high', 'low'} <= set(d.columns) else pd.Series(True, index=d.index)
+        s = s[~((s.diff() == 0) & no_range)]
     return s.rename(name)
 
 
