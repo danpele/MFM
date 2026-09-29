@@ -304,14 +304,28 @@ def block_bootstrap(x, stat, block=20, B=2000, seed=42):
     return out
 
 
+def block_bootstrap_blocks(x, stat, block=60, B=300, seed=42):
+    """Bootstrap pe blocuri mobile care pastreaza blocurile separate: `stat` primeste o matrice (blocuri x lungime),
+    astfel incat incrementele se calculeaza doar in interiorul fiecarui bloc (fara salturi artificiale la imbinari)."""
+    rng = np.random.default_rng(seed)
+    x = np.asarray(x, dtype=float)
+    n = len(x)
+    nb = int(np.ceil(n / block))
+    out = np.empty(B)
+    for b in range(B):
+        starts = rng.integers(0, n - block + 1, nb)
+        out[b] = stat(x[starts[:, None] + np.arange(block)[None, :]])
+    return out
+
+
 # =============================================================================
 # VOLATILITATE ASPRA
 # =============================================================================
 def roughness(logsig, qs=(0.5, 1.0, 1.5, 2.0, 3.0), lags=range(1, 31)):
     """m(q, D) = media |log sigma_{t+D} - log sigma_t|^q ~ D^{q H}: panta zeta_q = q H pe scara log-log."""
-    x = np.asarray(logsig)
+    x = np.asarray(logsig, dtype=float)             # 1D: o serie (NaN = zi lipsa); 2D: blocuri, incremente doar in bloc
     lags = np.array(list(lags))
-    M = {q: np.array([np.mean(np.abs(x[l:] - x[:-l]) ** q) for l in lags]) for q in qs}
+    M = {q: np.array([np.nanmean(np.abs(x[..., l:] - x[..., :-l]) ** q) for l in lags]) for q in qs}
     zeta = {q: np.polyfit(np.log(lags), np.log(M[q]), 1)[0] for q in qs}
     H = np.polyfit(list(qs), [zeta[q] for q in qs], 1)[0] if len(qs) > 1 else zeta[qs[0]] / qs[0]
     return {'lags': lags, 'm': M, 'zeta': zeta, 'H': float(H)}

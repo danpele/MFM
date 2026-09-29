@@ -9,7 +9,7 @@ ai_discovery_case.py -- Capitolul 9, secțiunea „AI pentru descoperire știin�
         m(2, Delta) = c * Delta^(2H) + 2 Var(e)   (termen constant, independent de Delta)
     => H estimat crește când renunțăm la întârzierile mici; un ajustaj neliniar cu termen constant îl corectează
   * Estimări: H pe Delta = 1..30, 5..30, 10..50; ajustaj neliniar m(2, Delta) = c Delta^(2H) + k pe Delta = 1..50;
-    bootstrap pe blocuri (blocuri de 60 de zile, 300 de replicări) pentru H corectat
+    bootstrap pe blocuri (blocuri de 60 de zile, 300 de replicări, incremente doar în interiorul blocurilor) pentru H corectat
 Iesire: ai_discovery_case.json
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """
@@ -38,7 +38,7 @@ def H_scaling(x, lags):
 
 
 def m2(x, lags):
-    return np.array([np.mean((x[d:] - x[:-d]) ** 2) for d in lags])
+    return np.array([np.nanmean((x[..., d:] - x[..., :-d]) ** 2) for d in lags])
 
 
 def H_corrected(x, lags=range(1, 51)):
@@ -70,7 +70,7 @@ def main():
                  H_5_30=H_scaling(x, range(5, 31)),
                  H_10_50=H_scaling(x, range(10, 51)))
         d.update({f'nls_{k}': v for k, v in H_corrected(x).items()})
-        boot = T.block_bootstrap(x, lambda z: H_corrected(z)['H'], 60, 300, SEED)
+        boot = T.block_bootstrap_blocks(x, lambda z: H_corrected(z)['H'], 60, 300, SEED)
         d['nls_H_lo'] = float(np.percentile(boot, 2.5))
         d['nls_H_hi'] = float(np.percentile(boot, 97.5))
         out[col] = d

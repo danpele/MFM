@@ -327,7 +327,7 @@ def b8_rough():
     for k, s in series.items():
         x = 0.5 * np.log(s.values)
         H = rough_H(x)['H']
-        boot = T.block_bootstrap(x, lambda z: rough_H(z)['H'], 60, 300, SEED)
+        boot = T.block_bootstrap_blocks(x, lambda z: rough_H(z)['H'], 60, 300, SEED)
         out[k] = {'H': H, 'lo': float(np.percentile(boot, 2.5)), 'hi': float(np.percentile(boot, 97.5))}
     # H pentru un proces cu H = 0.5 masurat cu zgomot (simulare): cat de mult coboara estimarea?
     rng = np.random.default_rng(SEED)

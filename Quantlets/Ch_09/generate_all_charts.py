@@ -597,7 +597,7 @@ def rough_H(logsig, qs=(0.5, 1.0, 1.5, 2.0, 3.0), lags=range(1, 31)):
 def fig_rough():
     """log m(q, Delta) vs log Delta pentru log-volatilitatea SPY; pantele zeta_q = q H."""
     ro = rough_H(0.5 * np.log(RVT_SPY.values))
-    rb = rough_H(0.5 * np.log(RV_BTC.asfreq('D').interpolate().values))
+    rb = rough_H(0.5 * np.log(RV_BTC.asfreq('D').values))   # zile lipsa = NaN: doar perechi observate la fiecare decalaj
     fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.2), gridspec_kw={'width_ratios': [1.4, 1]})
     cols = [MainBlue, Forest, Amber, Purple, IDAred]
     for q, c in zip(ro['m'], cols):
