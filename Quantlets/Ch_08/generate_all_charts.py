@@ -871,19 +871,20 @@ def extras(R):
 # =============================================================================
 # CASE STUDY: Bayer & Dimitriadis (2022), regression-based ES backtesting
 # =============================================================================
-# Table 3 of the paper (accepted version, arXiv:1801.04112v2): share of the 200 largest S&P 500 stocks for which
-# the one-sided Intercept ESR test rejects the ES 2.5% forecasts at 5%; out-of-sample Jan 2010 - Aug 2019.
+# Table 3 of the published paper (Journal of Financial Econometrics 20(3), 2022): share of the 200 largest S&P 500
+# stocks for which the one-sided Intercept ESR test rejects the ES 2.5% forecasts at 5%; out-of-sample Jan 2010 - Aug 2019.
+# Rows: rolling window (days); columns: refit frequency (days).
 BD_WINDOWS = (250, 500, 1000, 1500, 2000)
 BD_REFITS = (5, 21, 62, 125, 250)
 BD_TABLE3 = {
-    'GARCH-N': [[1.00, 1.00, 1.00, 1.00, 1.00], [0.99, 0.99, 0.99, 0.99, 0.99], [0.98, 0.97, 0.98, 0.96, 0.96],
-                [0.97, 0.97, 0.97, 0.97, 0.96], [0.96, 0.96, 0.94, 0.95, 0.94]],
-    'GJR-GARCH-N': [[1.00, 1.00, 1.00, 1.00, 1.00], [1.00, 1.00, 1.00, 0.99, 1.00], [0.99, 0.99, 0.99, 0.99, 0.99],
-                    [0.98, 0.99, 0.99, 0.99, 0.99], [0.98, 0.98, 0.98, 0.98, 0.97]],
-    'GARCH-t': [[0.26, 0.32, 0.32, 0.36, 0.59], [0.10, 0.09, 0.12, 0.12, 0.20], [0.07, 0.07, 0.07, 0.08, 0.09],
-                [0.09, 0.09, 0.09, 0.10, 0.09], [0.10, 0.08, 0.08, 0.08, 0.09]],
-    'GJR-GARCH-t': [[0.28, 0.32, 0.29, 0.37, 0.42], [0.13, 0.17, 0.17, 0.22, 0.25], [0.14, 0.11, 0.11, 0.12, 0.14],
-                    [0.08, 0.10, 0.09, 0.09, 0.09], [0.09, 0.09, 0.10, 0.09, 0.10]],
+    'GARCH-N': [[0.96, 0.96, 0.95, 0.95, 0.92], [0.94, 0.94, 0.93, 0.91, 0.87], [0.86, 0.88, 0.87, 0.83, 0.83],
+                [0.85, 0.88, 0.86, 0.87, 0.87], [0.81, 0.82, 0.83, 0.82, 0.80]],
+    'GJR-GARCH-N': [[0.96, 0.96, 0.95, 0.92, 0.90], [0.93, 0.93, 0.94, 0.94, 0.91], [0.93, 0.93, 0.91, 0.89, 0.91],
+                    [0.93, 0.93, 0.93, 0.93, 0.91], [0.92, 0.92, 0.91, 0.92, 0.91]],
+    'GARCH-t': [[0.00, 0.01, 0.04, 0.06, 0.12], [0.00, 0.00, 0.01, 0.01, 0.02], [0.00, 0.00, 0.00, 0.00, 0.00],
+                [0.00, 0.01, 0.00, 0.01, 0.01], [0.00, 0.00, 0.00, 0.01, 0.01]],
+    'GJR-GARCH-t': [[0.00, 0.00, 0.01, 0.02, 0.04], [0.00, 0.00, 0.01, 0.01, 0.01], [0.00, 0.00, 0.00, 0.00, 0.01],
+                    [0.00, 0.01, 0.00, 0.00, 0.01], [0.00, 0.01, 0.00, 0.01, 0.01]],
 }
 # large S&P 500 stocks in data/market with daily prices from 2002 (2000-day window before January 2010)
 BD_STOCKS = ['AAPL.US', 'MSFT.US', 'AMZN.US', 'NVDA.US', 'CSCO.US', 'JPM.US', 'BAC.US', 'C.US', 'WFC.US', 'GS.US',
@@ -908,7 +909,7 @@ write.csv(do.call(rbind, p), args[2], row.names = FALSE)
 
 
 def esr_intercept(series, tau=BD_TAU):
-    """One-sided Intercept ESR test of Bayer-Dimitriadis (Eq. 2.14-2.15) with the authors' R package esback:
+    """One-sided Intercept ESR test of Bayer-Dimitriadis (Eq. 1.14-1.15) with the authors' R package esback:
     joint regression of r_t - e_t on (1, e_t) for the quantile and on a constant for the ES, FZ0-type loss
     (esreg, G1 = 2, G2 = 1), misspecification-robust covariance (sparsity 'nid', 'scl_sp'); H0: gamma_1 >= 0.
     series: dict id -> DataFrame with columns r (return) and e (ES forecast, return units). Needs R (Rscript)."""
@@ -984,7 +985,7 @@ def fig_bd_table3():
         ax.set_xticks(x, [str(v) for v in BD_WINDOWS])
         ax.set_xlabel('Rolling estimation window (days)')
         ax.set_title(f'{fam}(1,1)', fontsize=10)
-        ax.set_ylim(0, 1.05)
+        ax.set_ylim(-0.03, 1.05)
     axs[0].set_ylabel('Share of stocks rejected')
     h, l = axs[0].get_legend_handles_labels()
     fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=3, frameon=False)
