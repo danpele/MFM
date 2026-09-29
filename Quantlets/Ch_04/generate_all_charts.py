@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 from scipy import stats
 from scipy.optimize import minimize
 from scipy.cluster.hierarchy import linkage, leaves_list, dendrogram
-from scipy.spatial.distance import squareform
+from scipy.spatial.distance import pdist
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -180,12 +180,13 @@ def w_erc(S):
 
 
 def hrp_tree(S):
-    """Arborele HRP: distanta d_ij = sqrt((1 - rho_ij)/2), legatura simpla (single linkage)."""
+    """Arborele HRP (Lopez de Prado 2016, Stage 1): d_ij = sqrt((1 - rho_ij)/2); apoi distanta euclidiana
+    intre coloanele matricei D, d~_ij = sqrt(sum_n (d_ni - d_nj)^2); legatura simpla (single linkage) pe d~."""
     sd = np.sqrt(np.diag(S))
     C = S / np.outer(sd, sd)
     D = np.sqrt(np.clip((1 - C) / 2, 0, None))
     np.fill_diagonal(D, 0)
-    return linkage(squareform(D, checks=False), 'single')
+    return linkage(pdist(D, 'euclidean'), 'single')
 
 
 def w_hrp(S):
@@ -279,6 +280,7 @@ def backtest(R, Rex, window=WINDOW, strategies=STRATS):
             prev[s] = w * gross / (w @ gross)
             W[s].append(w)
     ret = pd.DataFrame(out, index=idx)
+    ret.attrs['rf'] = pd.Series(R[window:, 0] - X[window:, 0], index=idx)   # rata fara risc (0 daca R = Rex)
     to = pd.DataFrame(turn, index=idx)
     Wd = {s: pd.DataFrame(np.array(W[s]), index=idx, columns=Rex.columns) for s in strategies}
     return ret, to, Wd
@@ -290,12 +292,14 @@ def sharpe(r, periods=12):
 
 
 def summary(ret, to, costs=(0, 10, 50)):
-    """Medie, volatilitate, Sharpe (anualizate), turnover mediu lunar, Sharpe net de costuri (bp)."""
+    """Medie, volatilitate, Sharpe (anualizate, randamente in exces), turnover mediu lunar, scaderea maxima
+    a averii din randamente totale (exces + rata fara risc), Sharpe net de costuri (bp)."""
     rows = {}
+    rf = ret.attrs.get('rf', 0.0)
     for s in ret.columns:
         r = ret[s]
         d = dict(mean=r.mean() * 12, vol=r.std() * np.sqrt(12), sharpe=sharpe(r),
-                 turnover=to[s].mean(), mdd=max_drawdown(r))
+                 turnover=to[s].mean(), mdd=max_drawdown(r + rf))
         for c in costs[1:]:
             d[f'sharpe_{c}bp'] = sharpe(r - c / 1e4 * to[s].fillna(0))
         rows[s] = d
@@ -303,7 +307,11 @@ def summary(ret, to, costs=(0, 10, 50)):
 
 
 def max_drawdown(r):
-    w = np.cumprod(np.maximum(1 + np.asarray(r), 1e-12))     # o pierdere > 100% anuleaza averea
+    """Scaderea maxima a averii; o pierdere lunara >= 100% anuleaza averea (drawdown -100%)."""
+    r = np.asarray(r, float)
+    if (r <= -1).any():
+        return -1.0
+    w = np.r_[1.0, np.cumprod(1 + r)]                          # averea initiala 1 intra in maximul curent
     return float((w / np.maximum.accumulate(w) - 1).min())
 
 
@@ -588,7 +596,7 @@ def fig_estimation_error(T=60, nsim=25, seed=SEED):
     fig, ax = plt.subplots(figsize=(7, 4.4))
     s_true = frontier_curve(mu, S, t)
     ax.plot(s_true * np.sqrt(12), t * 12, color=MainBlue, lw=2, label='True frontier (known parameters)')
-    est_sr, true_sr = [], []
+    est_sr, true_sr, neg_b = [], [], []
     for k in range(nsim):
         X = rng.multivariate_normal(mu, S, T)
         m_hat, S_hat = X.mean(0), np.cov(X.T)
@@ -612,7 +620,8 @@ def fig_estimation_error(T=60, nsim=25, seed=SEED):
         X = rng.multivariate_normal(mu, S, T)
         m_hat, S_hat = X.mean(0), np.cov(X.T)
         w = w_tan(m_hat, S_hat)
-        est_sr.append((w @ m_hat) / np.sqrt(w @ S_hat @ w) * np.sqrt(12))
+        est_sr.append((w @ m_hat) / np.sqrt(w @ S_hat @ w) * np.sqrt(12))   # = sign(B) theta_hat
+        neg_b.append(np.linalg.solve(S_hat, m_hat).sum() < 0)
         true_sr.append((w @ mu) / np.sqrt(w @ S @ w) * np.sqrt(12))
     wt = w_tan(mu, S)
     sr_opt = (wt @ mu) / np.sqrt(wt @ S @ wt) * np.sqrt(12)
@@ -627,8 +636,9 @@ def fig_estimation_error(T=60, nsim=25, seed=SEED):
     legend_outside_bottom(ax, ncol=2, y=-0.15)
     plt.tight_layout()
     save_fig('ch4_estimation_error')
+    # theta_hat = |Sharpe in esantion| = radacina lui mu' S^-1 mu (Sharpe-ul maxim estimat, Kan & Zhou 2007)
     est_sr, true_sr = np.abs(np.array(est_sr)), np.array(true_sr)
-    return dict(T=T, nsim=2000, sr_opt=sr_opt, sr_ew=sr_ew,
+    return dict(T=T, nsim=2000, sr_opt=sr_opt, sr_ew=sr_ew, share_B_negative=float(np.mean(neg_b)),
                 est_sr_median=float(np.median(est_sr)), true_sr_median=float(np.median(true_sr)),
                 share_true_below_ew=float(np.mean(true_sr < sr_ew)), share_true_neg=float(np.mean(true_sr < 0)))
 
@@ -689,7 +699,11 @@ def fig_rolling_weights(bt):
     plt.tight_layout()
     save_fig('ch4_rolling_weights')
     mv, lw = W['MV'], W['GMV-LW']
-    return dict(mv_max_abs=float(mv.abs().max().max()), mv_median_gross=float(mv.abs().sum(1).median()),
+    X = us_monthly(list(W['MV'].columns))[1].values
+    B = np.array([np.linalg.solve(np.cov(X[t - WINDOW:t].T), X[t - WINDOW:t].mean(0)).sum()
+                  for t in range(WINDOW, len(X))])                      # 1' S^-1 mu pe fiecare fereastra
+    return dict(n_windows=len(B), n_B_negative=int((B < 0).sum()),
+                mv_max_abs=float(mv.abs().max().max()), mv_median_gross=float(mv.abs().sum(1).median()),
                 lw_max_abs=float(lw.abs().max().max()), lw_median_gross=float(lw.abs().sum(1).median()),
                 mv_share_months_gross_gt3=float((mv.abs().sum(1) > 3).mean()))
 
@@ -775,7 +789,7 @@ def fig_black_litterman():
     plt.tight_layout()
     save_fig('ch4_black_litterman')
     return dict(start=str(Rex.index[0].date()), end=str(Rex.index[-1].date()), T=len(Rex), delta=2.5, tau=0.05,
-                view='XLK - XLU = 3% p.a.', prior_view=float(P @ pi), post_view=float(P @ mu_bl),
+                view='XLK - XLU = 3% p.a.', prior_view=(P @ pi).item(), post_view=(P @ mu_bl).item(),
                 pi=dict(zip(SECTORS, pi)), mu_bl=dict(zip(SECTORS, mu_bl)), mu_sample=dict(zip(SECTORS, mu_s)),
                 w_bl=dict(zip(SECTORS, w_bl)), w_sample_mv=dict(zip(SECTORS, w_s)),
                 w_bl_sum=float(w_bl.sum()))
@@ -825,9 +839,9 @@ def fig_hrp():
     Z = hrp_tree(S)
     w = w_hrp(S)
     fig, axes = plt.subplots(1, 2, figsize=(7.8, 3.9), gridspec_kw={'width_ratios': [1.4, 1]})
-    dn = dendrogram(Z, labels=COMBINED, ax=axes[0], color_threshold=0.35, above_threshold_color=Gray,
+    dn = dendrogram(Z, labels=COMBINED, ax=axes[0], color_threshold=0.6 * Z[:, 2].max(), above_threshold_color=Gray,
                     leaf_font_size=7)
-    axes[0].set_ylabel('Distance sqrt((1 - rho)/2)')
+    axes[0].set_ylabel('Euclidean distance between columns of D')
     axes[0].set_title('Single-linkage tree', fontsize=9, loc='left')
     order = dn['ivl']
     wi = pd.Series(w, index=COMBINED)[order]
@@ -842,7 +856,11 @@ def fig_hrp():
     legend_outside_bottom(axes[1], ncol=2, y=-0.14)
     plt.tight_layout()
     save_fig('ch4_hrp')
-    return dict(order=order, w_hrp=dict(zip(COMBINED, w)), w_gmv_lo=dict(zip(COMBINED, w_long_only(S))),
+    merges = [dict(a=[COMBINED[int(i)] for i in (Z[k, 0], Z[k, 1]) if i < len(COMBINED)], height=float(Z[k, 2]))
+              for k in range(len(Z))]
+    last = [COMBINED[int(i)] for i in Z[-1, :2] if i < len(COMBINED)]
+    return dict(order=order, merges=merges, last_single=last, first_pair=merges[0],
+                w_hrp=dict(zip(COMBINED, w)), w_gmv_lo=dict(zip(COMBINED, w_long_only(S))),
                 n_nonzero_gmv_lo=int((w_long_only(S) > 1e-4).sum()), T=len(Rex),
                 start=str(Rex.index[0].date()))
 
@@ -866,11 +884,16 @@ def fig_oos_cum(bts, universe='Multi-asset'):
     ret, to, W = bts[universe]
     fig, ax = plt.subplots(figsize=(7.2, 4.2))
     for s in STRATS:
-        wealth = np.cumprod(1 + ret[s].clip(lower=-0.99))
+        rf = ret.attrs['rf']
+        total = ret[s] + rf                                       # randamentul total al portofoliului
+        wealth = np.cumprod(1 + total) / np.cumprod(1 + rf)       # averea relativa la contul de titluri de stat
+        ruin = np.flatnonzero(total.values <= -1)                 # o pierdere >= 100% anuleaza averea
+        if len(ruin):
+            wealth.iloc[ruin[0]:] = np.nan                        # traiectoria se opreste la ruina
         ax.plot(ret.index, wealth, color=SCOL[s], lw=1.6 if s in ('1/N', 'GMV-LW', 'ERC', 'HRP') else 0.8,
                 label=f'{s} (Sharpe {sharpe(ret[s]):.2f})')
     ax.set_yscale('log')
-    ax.set_ylabel('Growth of 1 (excess return, log scale)')
+    ax.set_ylabel('Wealth relative to T-bills (log scale)')
     ax.set_title(f'{universe}: out-of-sample, 60-month rolling window, monthly rebalancing, no costs',
                  fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=4, y=-0.1)
@@ -1167,7 +1190,12 @@ def deflated_sharpe(rets):
     s = srs[k]
     z = (s - sr0) * np.sqrt(T - 1) / np.sqrt(1 - g3 * s + (g4 - 1) / 4 * s ** 2)
     psr0 = stats.norm.cdf(s * np.sqrt(T - 1) / np.sqrt(1 - g3 * s + (g4 - 1) / 4 * s ** 2))
-    return dict(N=N, best=names[k], sr_best_ann=float(s * np.sqrt(12)), sr0_ann=float(sr0 * np.sqrt(12)),
+    sens = {}
+    for n_eff in (3, 8, N):                  # numarul efectiv de incercari independente (N brut = limita superioara)
+        s0 = np.sqrt(srs.var(ddof=1)) * ((1 - gam) * stats.norm.ppf(1 - 1 / n_eff) + gam * stats.norm.ppf(1 - 1 / (n_eff * np.e)))
+        zz = (s - s0) * np.sqrt(T - 1) / np.sqrt(1 - g3 * s + (g4 - 1) / 4 * s ** 2)
+        sens[n_eff] = dict(sr0_ann=float(s0 * np.sqrt(12)), dsr=float(stats.norm.cdf(zz)))
+    return dict(N=N, best=names[k], sr_best_ann=float(s * np.sqrt(12)), sr0_ann=float(sr0 * np.sqrt(12)), n_eff=sens,
                 T=T, skew=float(g3), kurt=float(g4), dsr=float(stats.norm.cdf(z)), psr0=float(psr0),
                 sd_sr_ann=float(np.sqrt(srs.var(ddof=1)) * np.sqrt(12)))
 

@@ -97,9 +97,9 @@ def part_a():
     P = np.zeros((1, n))
     P[0, SECTORS.index('XLK')], P[0, SECTORS.index('XLU')] = 1, -1
     pi_v, mu_bl, w_bl = g.black_litterman(Sig, g.w_ew(n), P, np.array([0.03]))
-    pv = float(P @ (2.5 * Sig @ g.w_ew(n)))
-    R['A6'] = dict(prior_view=pv, q=0.03, post_view=float(P @ mu_bl), simple_average=(pv + 0.03) / 2,
-                   view_var=float(P @ Sig @ P.T), w_xlk=w_bl[SECTORS.index('XLK')], w_xlu=w_bl[SECTORS.index('XLU')])
+    pv = (P @ (2.5 * Sig @ g.w_ew(n))).item()
+    R['A6'] = dict(prior_view=pv, q=0.03, post_view=(P @ mu_bl).item(), simple_average=(pv + 0.03) / 2,
+                   view_var=(P @ Sig @ P.T).item(), w_xlk=w_bl[SECTORS.index('XLK')], w_xlu=w_bl[SECTORS.index('XLU')])
     return R
 
 
@@ -203,7 +203,8 @@ def b5_btc():
         d, se, pv = g.sr_diff_hac(ret_b[s], ret_n[s])
         out[s] = dict(sr_with=g.sharpe(ret_b[s]), sr_without=g.sharpe(ret_n[s]), diff=d, p_hac=pv,
                       vol_with=ret_b[s].std() * np.sqrt(12), vol_without=ret_n[s].std() * np.sqrt(12),
-                      mdd_with=g.max_drawdown(ret_b[s]), mdd_without=g.max_drawdown(ret_n[s]))
+                      mdd_with=g.max_drawdown(ret_b[s] + ret_b.attrs['rf']),
+                      mdd_without=g.max_drawdown(ret_n[s] + ret_n.attrs['rf']))
     return out
 
 
@@ -216,8 +217,9 @@ def b7_bl_multi():
     P[0, MULTI.index('GLD')], P[0, MULTI.index('TLT')] = 1, -1
     pi, mu_bl, w_bl = g.black_litterman(Sig, g.w_ew(n), P, np.array([0.04]))
     return dict(pi=dict(zip(MULTI, pi)), mu_bl=dict(zip(MULTI, mu_bl)), w_bl=dict(zip(MULTI, w_bl)),
-                prior_view=float(P @ pi), post_view=float(P @ mu_bl),
-                sample_view=float(rex['GLD'].mean() * 12 - rex['TLT'].mean() * 12), T=len(rex))
+                prior_view=(P @ pi).item(), post_view=(P @ mu_bl).item(),
+                sample_view=float(rex['GLD'].mean() * 12 - rex['TLT'].mean() * 12), T=len(rex),
+                view_var=(P @ Sig @ P.T).item(), corr_gld_tlt=float(rex[['GLD', 'TLT']].corr().iloc[0, 1]))
 
 
 def master_level(bts):
@@ -290,6 +292,10 @@ def part_c():
                       mdd_local=g.max_drawdown(ret_l[s]), mdd_global=g.max_drawdown(ret_g[s]),
                       diff_vs_bettr=d1, p_vs_bettr=p1, diff_vs_local=d2, p_vs_local=p2,
                       w_foreign_mean=float(W_g[s][FOREIGN].sum(1).mean()))
+    # o singura familie de 8 teste (4 reguli x 2 repere), ajustarea Holm
+    adj = g.holm({f'{s}|{k}': out[s][f'p_vs_{k}'] for s in strats for k in ('bettr', 'local')})
+    for s in strats:
+        out[s]['holm_vs_bettr'], out[s]['holm_vs_local'] = adj[f'{s}|bettr'], adj[f'{s}|local']
     fig_part_c(ret_l, ret_g, bench)
     return out
 

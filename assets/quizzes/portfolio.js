@@ -173,26 +173,26 @@ window.MFM_DATA.quizzes['portfolio'] = {
             "correct": 1,
             "en": {
                 "title": "Ledoit–Wolf intensity",
-                "text": "N is fixed and the sample length T grows. What happens to the optimal Ledoit–Wolf shrinkage intensity δ* = κ/T?",
+                "text": "N is fixed, the sample length T grows, and the target converges to a matrix different from the true covariance matrix. What happens to the optimal Ledoit–Wolf shrinkage intensity δ* = κ/T?",
                 "options": [
                     "It tends to 1: the target dominates",
                     "It tends to 0 at rate 1/T",
                     "It stays constant, because κ does not depend on T",
                     "It tends to 0 at rate 1/√T, the rate of the sample covariance"
                 ],
-                "correctExplanation": "κ converges to a constant, so δ* = κ/T falls like 1/T: with long samples the consistent sample matrix wins.",
+                "correctExplanation": "With a misspecified target, κ converges to a constant, so δ* = κ/T falls like 1/T: with long samples the consistent sample matrix wins (if the target were correct, its bias would vanish too and δ* need not go to zero).",
                 "incorrectExplanation": "The estimation error of S shrinks as T grows while the bias of the target does not, so the weight on the target must vanish; the rate is that of δ* = κ/T, not the √T rate of the estimator itself."
             },
             "ro": {
                 "title": "Intensitatea Ledoit–Wolf",
-                "text": "N este fix, iar lungimea eșantionului T crește. Ce se întâmplă cu intensitatea optimă de shrinkage Ledoit–Wolf δ* = κ/T?",
+                "text": "N este fix, lungimea eșantionului T crește, iar ținta converge la o matrice diferită de matricea de covarianță adevărată. Ce se întâmplă cu intensitatea optimă de shrinkage Ledoit–Wolf δ* = κ/T?",
                 "options": [
                     "Tinde la 1: ținta domină",
                     "Tinde la 0 cu viteza 1/T",
                     "Rămâne constantă, pentru că κ nu depinde de T",
                     "Tinde la 0 cu viteza 1/√T, viteza covarianței de selecție"
                 ],
-                "correctExplanation": "κ converge la o constantă, deci δ* = κ/T scade ca 1/T: în eșantioane lungi câștigă matricea de selecție, consistentă.",
+                "correctExplanation": "Cu o țintă greșit specificată, κ converge la o constantă, deci δ* = κ/T scade ca 1/T: în eșantioane lungi câștigă matricea de selecție, consistentă (dacă ținta ar fi corectă, deplasarea ei ar dispărea și δ* nu ar tinde neapărat la zero).",
                 "incorrectExplanation": "Eroarea de estimare a lui S scade cu T, dar deplasarea țintei nu, deci ponderea țintei trebuie să dispară; viteza este cea a lui δ* = κ/T, nu viteza √T a estimatorului."
             }
         },
@@ -208,7 +208,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "It is undefined, because Ω⁻¹ does not exist"
                 ],
                 "correctExplanation": "μ_BL = π + τΣP'(PτΣP' + Ω)⁻¹(q − Pπ); with Ω = 0 the views hold exactly and π is moved as little as possible in the τΣ metric (restricted least squares).",
-                "incorrectExplanation": "Only the combinations P of the means are pinned to q; the other directions stay at the prior, and the limit exists in the form π + τΣP'(PτΣP')⁻¹(q − Pπ)."
+                "incorrectExplanation": "The views pin Pμ_BL to q; means of assets outside the views can also move through their covariance with the viewed combinations, and the limit exists in the form π + τΣP'(PτΣP')⁻¹(q − Pπ)."
             },
             "ro": {
                 "title": "Black–Litterman cu opinii certe",
@@ -220,7 +220,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Nu este definită, pentru că Ω⁻¹ nu există"
                 ],
                 "correctExplanation": "μ_BL = π + τΣP'(PτΣP' + Ω)⁻¹(q − Pπ); cu Ω = 0 opiniile sunt satisfăcute exact, iar π se mută cât mai puțin în metrica τΣ (cele mai mici pătrate cu restricții).",
-                "incorrectExplanation": "Doar combinațiile P ale mediilor sunt fixate la q; celelalte direcții rămân la valoarea a priori, iar limita există sub forma π + τΣP'(PτΣP')⁻¹(q − Pπ)."
+                "incorrectExplanation": "Opiniile fixează Pμ_BL la q; mediile activelor din afara opiniilor se pot și ele modifica prin covarianța cu combinațiile din opinii, iar limita există sub forma π + τΣP'(PτΣP')⁻¹(q − Pπ)."
             }
         },
         {
@@ -578,7 +578,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             "correct": 2,
             "en": {
                 "title": "Annualising a Sharpe ratio",
-                "text": "Monthly returns have first-order autocorrelation ρ₁ = 0.2 and no higher autocorrelations. Compared with multiplying the monthly Sharpe ratio by √12, the correct annual Sharpe ratio (Lo, 2002) is…",
+                "text": "The monthly Sharpe ratio is positive. Monthly returns have first-order autocorrelation ρ₁ = 0.2 and no higher autocorrelations. Compared with multiplying the monthly Sharpe ratio by √12, the correct annual Sharpe ratio (Lo, 2002) is…",
                 "options": [
                     "identical, because √12 is exact for any return process",
                     "larger, because autocorrelation adds return",
@@ -590,7 +590,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Anualizarea raportului Sharpe",
-                "text": "Randamentele lunare au autocorelația de ordinul întâi ρ₁ = 0,2 și nicio altă autocorelație. Față de înmulțirea raportului Sharpe lunar cu √12, raportul Sharpe anual corect (Lo, 2002) este…",
+                "text": "Raportul Sharpe lunar este pozitiv. Randamentele lunare au autocorelația de ordinul întâi ρ₁ = 0,2 și nicio altă autocorelație. Față de înmulțirea raportului Sharpe lunar cu √12, raportul Sharpe anual corect (Lo, 2002) este…",
                 "options": [
                     "identic, pentru că √12 este exact pentru orice proces",
                     "mai mare, pentru că autocorelația adaugă randament",
@@ -632,7 +632,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             "correct": 2,
             "en": {
                 "title": "Low risk, low Sharpe",
-                "text": "On the multi-asset set (2012–2026), GMV rules had the lowest volatility but also the lowest Sharpe ratios. Why?",
+                "text": "On the multi-asset set (2012–2026), GMV rules had the lowest volatility but also low Sharpe ratios. Why?",
                 "options": [
                     "They held mostly equities",
                     "Their turnover was zero",
@@ -644,7 +644,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Risc mic, Sharpe mic",
-                "text": "Pe setul multi-active (2012–2026), regulile GMV au avut cea mai mică volatilitate, dar și cele mai mici rapoarte Sharpe. De ce?",
+                "text": "Pe setul multi-active (2012–2026), regulile GMV au avut cea mai mică volatilitate, dar și rapoarte Sharpe mici. De ce?",
                 "options": [
                     "Au deținut mai ales acțiuni",
                     "Rulajul lor a fost zero",
@@ -666,8 +666,8 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "GMV weights are proportional to the inverse covariance matrix times expected returns, not times a vector of ones",
                     "GMV weights cannot be rebalanced monthly because they do not sum to one"
                 ],
-                "correctExplanation": "Out of sample means that the weights of month t use only data up to month t-1, e.g. a rolling 60-month window. A covariance matrix from the full sample leaks future information; sqrt(12) is the right factor for monthly data.",
-                "incorrectExplanation": "The annualisation with sqrt(12) and the GMV formula are correct; the problem is that the covariance matrix already contains the evaluation months (look-ahead bias)."
+                "correctExplanation": "Out of sample means that the weights of month t use only data up to month t-1, e.g. a rolling 60-month window. A covariance matrix from the full sample leaks future information; sqrt(12) is the right factor for serially uncorrelated monthly returns.",
+                "incorrectExplanation": "The annualisation with sqrt(12) (serially uncorrelated monthly returns) and the GMV formula are correct; the problem is that the covariance matrix already contains the evaluation months (look-ahead bias)."
             },
             "ro": {
                 "title": "Găsiți eroarea: un backtest scris de AI",
@@ -678,8 +678,8 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Ponderile GMV sunt proporționale cu inversa matricei de covarianță înmulțită cu randamentele așteptate, nu cu un vector de unu",
                     "Ponderile GMV nu pot fi reechilibrate lunar, deoarece nu însumează unu"
                 ],
-                "correctExplanation": "În afara eșantionului înseamnă că ponderile lunii t folosesc doar date până în luna t-1, de exemplu o fereastră rulantă de 60 de luni. O matrice de covarianță din tot eșantionul folosește informație din viitor; sqrt(12) este factorul corect pentru date lunare.",
-                "incorrectExplanation": "Anualizarea cu sqrt(12) și formula GMV sunt corecte; problema este că matricea de covarianță conține deja lunile evaluate (informație din viitor)."
+                "correctExplanation": "În afara eșantionului înseamnă că ponderile lunii t folosesc doar date până în luna t-1, de exemplu o fereastră rulantă de 60 de luni. O matrice de covarianță din tot eșantionul folosește informație din viitor; sqrt(12) este factorul corect pentru randamente lunare necorelate serial.",
+                "incorrectExplanation": "Anualizarea cu sqrt(12) (randamente lunare necorelate serial) și formula GMV sunt corecte; problema este că matricea de covarianță conține deja lunile evaluate (informație din viitor)."
             }
         },
         {
