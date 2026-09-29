@@ -150,7 +150,7 @@ def variance_from_strip(K, Q, F, T, r=0.0):
 def delta_hedge(paths, K, T, r, sigma_imp, n_rebal, kind='call'):
     """Vinde o optiune la pretul BS(sigma_imp) si acopera delta de n_rebal ori pana la scadenta.
     paths: matrice (n_traiectorii, n_pasi+1) de preturi pe o grila uniforma; n_pasi divizibil cu n_rebal.
-    Intoarce eroarea de acoperire la scadenta (valoarea portofoliului de acoperire minus plata optiunii)."""
+    Intoarce eroarea de hedging la scadenta (valoarea portofoliului de hedging minus plata optiunii)."""
     npath, nstep = paths.shape[0], paths.shape[1] - 1
     every = nstep // n_rebal
     dt = T / nstep

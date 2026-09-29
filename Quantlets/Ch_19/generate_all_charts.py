@@ -231,7 +231,7 @@ def part_var(full_res):
     legend_outside_bottom(ax, ncol=4, y=-0.1)
     save_fig('ch19_rolling_breaches')
 
-    # capcana: informatie din viitor (parametri estimati pe toata selectia)
+    # capcana: look-ahead bias (parametri estimati pe toata selectia)
     p = full_res.params
     sig_full = full_res.conditional_volatility.loc[fc.index]
     var_full = -(p['mu'] + sig_full * t_std_q(p['nu'], ALPHA))

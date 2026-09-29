@@ -607,8 +607,8 @@
                 'Descrierea structurii piețelor financiare moderne, de la burse și ETF-uri la active tokenizate și cripto',
                 'Documentarea faptelor stilizate ale randamentelor și testarea eficienței pieței cu instrumente moderne',
                 'Construirea și estimarea modelelor factoriale, de portofoliu, în timp continuu și de evaluare a opțiunilor pe date reale',
-                'Modelarea volatilității, a riscului de coadă și a riscului sistemic, backtesting-ul corect al VaR / ES și evaluarea prognozelor de risc cu funcții de scor consistente și conformal prediction',
-                'Aplicarea machine learning, a modelelor fundaționale pentru serii de timp și a LLM-urilor pe date financiare fără scurgeri de informație sau overfitting de backtest',
+                'Modelarea volatilității, a tail risk-ului și a riscului sistemic, backtesting-ul corect al VaR / ES și evaluarea prognozelor de risc cu funcții de scor consistente și conformal prediction',
+                'Aplicarea machine learning, a modelelor fundaționale pentru serii de timp și a LLM-urilor pe date financiare fără leakage sau overfitting de backtest',
                 'Realizarea de cercetare reproductibilă în Python și GitHub, documentată ca Quantlets'
             ]
         },
@@ -654,7 +654,7 @@
                 title: { en: 'Factor Models and Asset Pricing', ro: 'Modele factoriale și evaluarea activelor' },
                 topics: {
                     en: ['CAPM and its tests', 'Fama-French 5 factors, momentum', 'The factor zoo', 'Fama-MacBeth regressions', 'Latent factors: PCA, IPCA'],
-                    ro: ['CAPM și testarea sa', 'Modelul Fama-French cu 5 factori, momentum', '„Grădina zoologică” a factorilor', 'Regresii Fama-MacBeth', 'Factori latenți: PCA, IPCA']
+                    ro: ['CAPM și testarea sa', 'Modelul Fama-French cu 5 factori, momentum', 'Factor zoo', 'Regresii Fama-MacBeth', 'Factori latenți: PCA, IPCA']
                 },
                 links: factorsLinks,
                 quantinar: q('gmm', 'mva')
@@ -704,7 +704,7 @@
                 title: { en: 'Backtesting and Evaluating Risk Forecasts', ro: 'Backtesting și evaluarea prognozelor de risc' },
                 topics: {
                     en: ['Kupiec and Christoffersen tests', 'ES backtests', 'Fissler-Ziegel scoring functions', 'Diebold-Mariano test', 'Conformal prediction for tail risk', 'Basel FRTB'],
-                    ro: ['Testele Kupiec și Christoffersen', 'Backtesting pentru ES', 'Funcții de scor Fissler-Ziegel', 'Testul Diebold-Mariano', 'Conformal prediction pentru riscul de coadă', 'Basel FRTB']
+                    ro: ['Testele Kupiec și Christoffersen', 'Backtesting pentru ES', 'Funcții de scor Fissler-Ziegel', 'Testul Diebold-Mariano', 'Conformal prediction pentru tail risk', 'Basel FRTB']
                 },
                 links: backtestingLinks,
                 quantinar: q('mlRisk')
@@ -804,7 +804,7 @@
                 title: { en: 'Systemic Risk and Networks', ro: 'Risc sistemic și rețele' },
                 topics: {
                     en: ['CoVaR and SRISK', 'Diebold-Yilmaz spillover networks', 'Financial Risk Meter (FRM)', 'Climate risk', 'Stress testing'],
-                    ro: ['CoVaR și SRISK', 'Rețele de contagiune Diebold-Yilmaz', 'Financial Risk Meter (FRM)', 'Riscul climatic', 'Teste de stres']
+                    ro: ['CoVaR și SRISK', 'Rețele de spillover Diebold-Yilmaz', 'Financial Risk Meter (FRM)', 'Riscul climatic', 'Teste de stres']
                 },
                 links: systemicLinks,
                 quantinar: q('frm', 'cryptoNetworks', 'centrality')
@@ -863,7 +863,7 @@
                 '<strong>AI-ul este permis</strong> pentru cod, depanare, căutarea literaturii și redactare, în proiect și la seminar.',
                 '<strong>Utilizarea AI se declară</strong> în <code>AI_USE.md</code>: ce instrument, pentru ce și ce ați verificat voi. Utilizarea nedeclarată a AI este tratată ca plagiat.',
                 '<strong>Răspundeți pentru fiecare rând.</strong> „L-a scris AI-ul” nu este o explicație la susținerea orală.',
-                '<strong>Notați erorile găsite</strong> în <code>AI_ERRORS.md</code>: cel puțin trei locuri în care asistentul a greșit (o formulă greșită, privire în viitor, semnul VaR, date inventate sau o referință care nu există) și cum v-ați dat seama.',
+                '<strong>Notați erorile găsite</strong> în <code>AI_ERRORS.md</code>: cel puțin trei locuri în care asistentul a greșit (o formulă greșită, look-ahead bias, semnul VaR, date inventate sau o referință care nu există) și cum v-ați dat seama.',
                 '<strong>Verificați fiecare referință.</strong> Fiecare citare are nevoie de un DOI sau link funcțional. O referință care nu există este tratată ca date fabricate.',
                 '<strong>Ce notăm:</strong> întrebarea, verificările, interpretarea și răspunsurile de la susținere, nu cantitatea de cod.',
                 '<strong>Fără AI la susținerea orală.</strong> Răspundeți singuri, pe baza propriei înțelegeri a proiectului.'

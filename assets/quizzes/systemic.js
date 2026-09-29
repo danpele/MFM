@@ -184,8 +184,8 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "incorrectExplanation": "A backtest of CoVaR must check the joint event of bank distress and system loss beyond CoVaR; its null probability is alpha times alpha, not alpha."
             },
             "ro": {
-                "title": "Verificarea ex post a CoVaR",
-                "text": "Ce variabilă de depășire folosește un test de acoperire pentru CoVaR Girardi-Ergun la nivelul alpha?",
+                "title": "Backtesting-ul CoVaR",
+                "text": "Ce variabilă de depășire folosește un backtest de acoperire pentru CoVaR Girardi-Ergun la nivelul alpha?",
                 "options": [
                     "1{X_i <= -VaR_i}, cu probabilitatea alpha",
                     "1{X_sys <= -VaR_sys}, cu probabilitatea alpha",
@@ -193,7 +193,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Numărul de bănci aflate în dificultate în aceeași zi"
                 ],
                 "correctExplanation": "CoVaR condiționează pe X_i <= -VaR_i, cu probabilitatea alpha, iar sistemul depășește apoi CoVaR cu probabilitatea alpha: evenimentul comun are probabilitatea alpha la pătrat sub ipoteza nulă.",
-                "incorrectExplanation": "Verificarea CoVaR trebuie să urmărească evenimentul comun: banca în dificultate și sistemul dincolo de CoVaR; probabilitatea lui sub ipoteza nulă este alpha înmulțit cu alpha, nu alpha."
+                "incorrectExplanation": "Backtest-ul CoVaR trebuie să urmărească evenimentul comun: banca în dificultate și sistemul dincolo de CoVaR; probabilitatea lui sub ipoteza nulă este alpha înmulțit cu alpha, nu alpha."
             }
         },
         {
@@ -403,7 +403,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "title": "Eroarea de estimare a rețelei",
                 "text": "Un VAR(1) pe volatilitățile a 13 bănci este estimat pe ferestre mobile de 250 de zile. Care este principala problemă pentru tabelul de conectivitate?",
                 "options": [
-                    "169 de coeficienți de pantă din 250 de zile dau o eroare de estimare mare: raportăm intervale bootstrap și luăm în calcul VAR-uri cu micșorare (elastic net)",
+                    "169 de coeficienți de pantă din 250 de zile dau o eroare de estimare mare: raportăm intervale bootstrap și luăm în calcul VAR-uri cu shrinkage (elastic net)",
                     "Tabelul depinde de ordinea băncilor",
                     "Logaritmii volatilităților nu sunt staționari",
                     "Orizontul H = 10 este prea scurt"
@@ -489,7 +489,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Ca transmițători către băncile americane",
                     "Ca receptori neți, cu o pondere proprie mare a dispersiei"
                 ],
-                "correctExplanation": "Ponderile lor proprii au fost peste 70%, iar transmiterile nete negative: sunt conduse mai ales de șocuri interne și primesc mai mult decât trimit.",
+                "correctExplanation": "Ponderile lor proprii au fost peste 70%, iar spillover-urile nete negative: sunt conduse mai ales de șocuri interne și primesc mai mult decât trimit.",
                 "incorrectExplanation": "Băncile românești primesc puțin de la băncile americane și europene și nu trimit aproape nimic înapoi."
             }
         },

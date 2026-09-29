@@ -481,7 +481,7 @@ window.MFM_DATA.quizzes['factors'] = {
                 incorrectExplanation: "Each useless factor passes the 5% test with probability 0.05, so 300 tests give about 15 false discoveries."
             },
             ro: {
-                title: "Grădina zoologică a factorilor",
+                title: "Factor zoo",
                 text: "Cu 300 de factori independenți fără primă reală, câți v-ați aștepta să treacă pragul |t| > 1,96?",
                 options: [
                     "Aproximativ 15",
@@ -544,7 +544,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Pentru că erorile Fama–MacBeth sunt prea mari"
                 ],
                 correctExplanation: "Testarea multiplă ridică ștacheta: cu 300 de factori inutili, cel mai bun are un |t| median de aproximativ 3,06.",
-                incorrectExplanation: "Pragul mai mare este o corecție pentru testarea multiplă în grădina zoologică a factorilor."
+                incorrectExplanation: "Pragul mai mare este o corecție pentru testarea multiplă din factor zoo."
             }
         },
         {
@@ -674,7 +674,7 @@ window.MFM_DATA.quizzes['factors'] = {
                 text: "Un asistent AI scrie acest backtest de momentum: „mom = P.pct_change(12); la fiecare sfârșit de lună t, ordonați acțiunile după mom la t și înregistrați randamentul primelor minus ultimelor acțiuni în luna t.” Rezultatul este circa 50% pe an. Ce este greșit?",
                 options: [
                     "Momentum-ul se calculează pe 36 de luni, nu pe 12",
-                    "Informații din viitor (look-ahead bias): semnalul la t conține randamentul lunii t, luna în care portofoliul este deținut; semnalul trebuie să fie cunoscut înainte de începutul lunii",
+                    "Look-ahead bias: semnalul la t conține randamentul lunii t, luna în care portofoliul este deținut; semnalul trebuie să fie cunoscut înainte de începutul lunii",
                     "Randamentele lunare nu pot fi anualizate prin înmulțire cu 12",
                     "Un portofoliu long–short are mereu randamentul mediu zero"
                 ],

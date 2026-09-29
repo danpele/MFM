@@ -319,7 +319,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "incorrectExplanation": "The concern is information from the test period entering through the pretraining data."
                 },
                 "ro": {
-                    "title": "Scurgerea de informație prin pre-antrenare",
+                    "title": "Leakage prin pre-antrenare",
                     "text": "De ce poate un model fundațional să pară mai bun decât este când este evaluat pe serii financiare publice?",
                     "options": [
                         "Pentru că modelele fundaționale au mereu mai mulți parametri decât GARCH",
@@ -516,8 +516,8 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Ferestrele suprapuse din zile vecine sunt aproape identice; o împărțire aleatoare pune aproape-copii ale ferestrelor de validare în setul de antrenare și face pierderea de validare prea optimistă",
                         "Pentru că împărțirea în ordinea timpului dă mereu o pierdere de validare mai mică"
                     ],
-                    "correctExplanation": "Cu ferestre suprapuse, o împărțire amestecată scurge informație între antrenare și validare; împărțirea în ordinea timpului imită prognoza reală.",
-                    "incorrectExplanation": "Problema este scurgerea de informație între ferestrele suprapuse, care face pierderea de validare amestecată prea optimistă."
+                    "correctExplanation": "Cu ferestre suprapuse, o împărțire amestecată produce leakage între antrenare și validare; împărțirea în ordinea timpului imită prognoza reală.",
+                    "incorrectExplanation": "Problema este leakage-ul între ferestrele suprapuse, care face pierderea de validare amestecată prea optimistă."
                 }
             },
             {
@@ -543,7 +543,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Creșteți numărul de epoci până când toate semințele dau același R²",
                         "Raportați întreaga distribuție pe semințe (sau media ansamblului), nu cea mai bună rulare"
                     ],
-                    "correctExplanation": "Când semnalul este slab, variația de la o sămânță la alta are aceeași mărime ca efectul; alegerea celei mai bune semințe este o formă de supraajustare a backtestului.",
+                    "correctExplanation": "Când semnalul este slab, variația de la o sămânță la alta are aceeași mărime ca efectul; alegerea celei mai bune semințe este o formă de overfitting al backtestului.",
                     "incorrectExplanation": "Alegerea celei mai bune semințe după ce ați văzut rezultatele de test supraestimează performanța; raportați toate semințele sau un ansamblu."
                 }
             },
@@ -652,7 +652,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Toate ponderile modelelor folosite au fost publicate înainte de această dată, deci aceste observații nu pot fi în niciun corpus de pre-antrenare"
                     ],
                     "correctExplanation": "O fereastră care începe după fixarea ponderilor este cu adevărat în afara eșantionului pentru modelele fundaționale, deși este scurtă și are putere mai mică.",
-                    "incorrectExplanation": "Scopul este eliminarea scurgerii prin pre-antrenare; prețul este un număr mai mic de observații și o putere mai mică."
+                    "incorrectExplanation": "Scopul este eliminarea leakage-ului prin pre-antrenare; prețul este un număr mai mic de observații și o putere mai mică."
                 }
             },
             {
@@ -678,7 +678,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Contextul trebuie mai întâi standardizat la varianță unitară",
                         "Fragmentul se termină cu r_t, valoarea prognozată: contextul trebuie să se oprească la r_{t-1}, adică r[t-512 : t]"
                     ],
-                    "correctExplanation": "Un fragment Python a:b include a și exclude b, deci r[t-511 : t+1] se termină la r_t; prognoza folosește atunci răspunsul (informație din viitor), iar backtestul arată mult prea bine.",
+                    "correctExplanation": "Un fragment Python a:b include a și exclude b, deci r[t-511 : t+1] se termină la r_t; prognoza folosește atunci răspunsul (look-ahead bias), iar backtestul arată mult prea bine.",
                     "incorrectExplanation": "Scrieți primul și ultimul indice al fragmentului și comparați-l pe ultimul cu ziua prognozată."
                 }
             },
@@ -705,7 +705,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Numărul așteptat de depășiri este 1,5, nu 15",
                         "5 depășiri sunt prea multe, deci VaR este prea mic"
                     ],
-                    "correctExplanation": "Testul de acoperire necondiționată respinge atât prea multe, cât și prea puține depășiri; prea puține înseamnă un VaR prea mare și, într-un backtest, sunt adesea simptomul informației din viitor.",
+                    "correctExplanation": "Testul de acoperire necondiționată respinge atât prea multe, cât și prea puține depășiri; prea puține înseamnă un VaR prea mare și, într-un backtest, sunt adesea simptomul unui look-ahead bias.",
                     "incorrectExplanation": "Calculați statistica raportului de verosimilitate a testului de acoperire necondiționată în loc să comparați 5 cu 15 din ochi."
                 }
             }

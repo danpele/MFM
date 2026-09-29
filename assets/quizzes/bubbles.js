@@ -57,8 +57,8 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Pentru că sub ipoteza nulă a rădăcinii unitare statistica tinde la o funcțională a mișcării browniene standard care depinde doar de r0 și de termenii determiniști",
                     "Pentru că întârzierile ADF elimină orice dependență din date"
                 ],
-                "correctExplanation": "Sub un mers aleator cu derivă asimptotic neglijabilă, fiecare ADF pe fereastră tinde la un raport de funcționale browniene în care sigma se simplifică; SADF și GSADF sunt supremuri ale acestei funcționale, deci cuantilele lor depind doar de r0 (și de specificarea termenului liber/derivei).",
-                "incorrectExplanation": "Limita este pivotală, dar nestandard: sigma și deriva dispar, iar supremul pe ferestre nu urmează distribuția Normală. Argumentul este asimptotic și presupune dispersie constantă; la schimbări de volatilitate nivelul în eșantioane finite este distorsionat și este nevoie de wild bootstrap."
+                "correctExplanation": "Sub un mers aleator cu drift asimptotic neglijabilă, fiecare ADF pe fereastră tinde la un raport de funcționale browniene în care sigma se simplifică; SADF și GSADF sunt supremuri ale acestei funcționale, deci cuantilele lor depind doar de r0 (și de specificarea termenului liber/drift-ului).",
+                "incorrectExplanation": "Limita este pivotală, dar nestandard: sigma și drift-ul dispar, iar supremul pe ferestre nu urmează distribuția Normală. Argumentul este asimptotic și presupune dispersie constantă; la schimbări de volatilitate nivelul în eșantioane finite este distorsionat și este nevoie de wild bootstrap."
             }
         },
         {

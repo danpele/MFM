@@ -76,16 +76,16 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "incorrectExplanation": "The gap is the volatility drag between arithmetic and geometric means."
             },
             "ro": {
-                "title": "Frâna volatilității",
+                "title": "Volatility drag",
                 "text": "Pentru Bitcoin 2014-2026, media randamentelor simple zilnice înmulțită cu 365 este 65,2% pe an, iar CAGR realizat este 53,9%. Ce explică diferența?",
                 "options": [
                     "O eroare de date",
                     "Costurile de tranzacționare",
-                    "Frâna volatilității: rata medie de creștere logaritmică este aproximativ media aritmetică minus jumătate din varianță",
+                    "Volatility drag: rata medie de creștere logaritmică este aproximativ media aritmetică minus jumătate din varianță",
                     "Bitcoin nu plătește dividende"
                 ],
-                "correctExplanation": "Randamentul log mediu anualizat este aproximativ P medie(R) - P Var(R)/2 = 65,2% - 0,66^2/2, circa 43,3%, iar CAGR = exp(43,3%) - 1, circa 54%. La o volatilitate de circa 66% pe an, frâna este mare.",
-                "incorrectExplanation": "Diferența este frâna volatilității dintre media aritmetică și cea geometrică."
+                "correctExplanation": "Randamentul log mediu anualizat este aproximativ P medie(R) - P Var(R)/2 = 65,2% - 0,66^2/2, circa 43,3%, iar CAGR = exp(43,3%) - 1, circa 54%. La o volatilitate de circa 66% pe an, volatility drag este mare.",
+                "incorrectExplanation": "Diferența este volatility drag dintre media aritmetică și cea geometrică."
             }
         },
         {
@@ -243,7 +243,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "options": [
                     "0,55, pentru că randamentul simplu mediu este aproximativ 8,3% + sigma^2/2 = 9,9%",
                     "0,46, randamentul log mediu împărțit la volatilitate",
-                    "0,37, după ce se scade încă o dată frâna volatilității",
+                    "0,37, după ce se scade încă o dată volatility drag",
                     "0,18, chiar volatilitatea"
                 ],
                 "correctExplanation": "Raportul Sharpe folosește media aritmetică a randamentelor simple: aproximativ 8,3% + 0,18^2/2 = 9,9%, iar 9,9/18,0 = 0,55. Media randamentelor log (0,46) îl subestimează, mult pentru active volatile precum Bitcoin (0,65 în loc de 0,98).",
@@ -589,16 +589,16 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "incorrectExplanation": "Pure range estimators ignore the overnight component of volatility."
             },
             "ro": {
-                "title": "Estimatori bazați pe amplitudine",
+                "title": "Estimatori de range volatility",
                 "text": "Pe S&P 500 (2008-2026), volatilitatea închidere-închidere are media 16,4%, iar Parkinson dă 13,0%. De ce este Parkinson mai mic?",
                 "options": [
                     "Parkinson este deplasat în sus",
-                    "Folosește doar amplitudinea maxim-minim din timpul zilei și ratează salturile de peste noapte (închidere-deschidere)",
+                    "Folosește doar range-ul maxim-minim din timpul zilei și ratează salturile de peste noapte (închidere-deschidere)",
                     "S&P 500 nu are volatilitate intraday",
                     "Estimatorul închidere-închidere folosește o fereastră mai lungă"
                 ],
-                "correctExplanation": "Amplitudinea zilnică surprinde doar variația din timpul zilei; salturile de peste noapte fac parte din randamentele închidere-închidere, dar nu din amplitudine. Yang-Zhang le readaugă, dar pe indice ajunge doar la 13,9%, pentru că deschiderea indicelui este parțial veche (16,8% pe ETF-ul SPY).",
-                "incorrectExplanation": "Estimatorii bazați doar pe amplitudine ignoră componenta de peste noapte a volatilității."
+                "correctExplanation": "Range-ul zilnic surprinde doar variația din timpul zilei; salturile de peste noapte fac parte din randamentele închidere-închidere, dar nu din range. Yang-Zhang le readaugă, dar pe indice ajunge doar la 13,9%, pentru că deschiderea indicelui este parțial veche (16,8% pe ETF-ul SPY).",
+                "incorrectExplanation": "Estimatorii bazați doar pe range ignoră componenta de peste noapte a volatilității."
             }
         },
         {

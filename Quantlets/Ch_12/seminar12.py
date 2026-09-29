@@ -87,7 +87,7 @@ def a5_bs():
 
 
 def a6_delta_gamma():
-    """Acoperire delta-gamma: vandut 1000 de call-uri A5; instrumente: call K = 110 (aceeasi scadenta) si actiunea."""
+    """Hedging delta-gamma: vandut 1000 de call-uri A5; instrumente: call K = 110 (aceeasi scadenta) si actiunea."""
     S, T, r, s = 100.0, 0.5, 0.03, 0.25
     g1 = bs_greeks(S, 100, T, r, s); g2 = bs_greeks(S, 110, T, r, s)
     pos_delta, pos_gamma = -1000 * float(g1['delta']), -1000 * float(g1['gamma'])
@@ -311,7 +311,7 @@ def b1_hedge_boot():
 
 
 def b2_delta_hedged():
-    """Vanzatorul unei optiuni call pe o luna pe S&P 500, acoperita zilnic la VIX: media P&L, Newey-West, bootstrap pe blocuri."""
+    """Vanzatorul unei optiuni call pe o luna pe S&P 500, cu hedging zilnic la VIX: media P&L, Newey-West, bootstrap pe blocuri."""
     d = delta_hedged_history()
     x = d['pnl'].values
     m, se = nw_mean(x, 3)

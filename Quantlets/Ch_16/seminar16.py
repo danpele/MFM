@@ -5,7 +5,7 @@ Partea A: indice ponderat cu valoarea de piata si divizorul (A1, A2), banda de n
 intr-un fond cu comision (A3) si intr-un fond ponderat (A4), pierderea impermanenta a unui fond ponderat (A5),
 LVR prin Ito (A6), algebra AR cu prag si banda (A7, A8).
 Partea B: Bitcoin vs S&P 500 si efectul de weekend cu bootstrap pe blocuri (B1, B2), paritatea ca AR cu prag
-(EQ-TAR) cu testul sup-Wald si bootstrap cu regresori ficsi (B3, B4), deriva din comision cu HAC, ADF/KPSS si beta
+(EQ-TAR) cu testul sup-Wald si bootstrap cu regresori ficsi (B3, B4), drift-ul din comision cu HAC, ADF/KPSS si beta
 Dimson pentru IBIT / ETHA (B5, B6), ruptura la data necunoscuta pentru beta Strategy / Coinbase (B7, B8).
 Partea C: este Bitcoin un activ alternativ, un activ de risc sau o acoperire? (C1), cu corelatia Forbes-Rigobon
 si regresia cuantila.
@@ -244,7 +244,7 @@ def fig_sem_usdc(tar):
 
 
 def b5_etf(etf='IBIT', coin='BTC'):
-    """Urmarirea: beta zilnic vs saptamanal (HAC); deriva din comision ca medie a lui Delta ln(P_ETF/P_coin) cu eroare
+    """Urmarirea: beta zilnic vs saptamanal (HAC); drift-ul din comision ca medie a lui Delta ln(P_ETF/P_coin) cu eroare
     HAC; teste ADF (H0: radacina unitara) si KPSS (H0: stationaritate in jurul unei tendinte) pe nivelul raportului;
     comparatie cu panta regresiei nivelului pe timp; beta Dimson (1979) cu un decalaj si un avans."""
     from statsmodels.tsa.stattools import adfuller, kpss
@@ -425,7 +425,7 @@ def c3_ltw(split='2020-07-31'):
 # PARTEA C: este Bitcoin un activ alternativ, un activ de risc sau o acoperire?
 # =============================================================================
 def c1_hedge():
-    """Corelatii inainte / dupa ETF-uri (bootstrap pe blocuri) si regresia Baur-Lucey pentru acoperire si refugiu."""
+    """Corelatii inainte / dupa ETF-uri (bootstrap pe blocuri) si regresia Baur-Lucey pentru hedge si refugiu."""
     out = {}
     per = {'pre': ('2021-01-01', '2024-01-10'), 'post': (ETF_START, END)}
     for k in ['SPX', 'QQQ', 'GLD', 'TLT']:
@@ -460,7 +460,7 @@ def c1_hedge():
             R[names] = 1.0
             return float(R @ m.params), float(np.sqrt(R @ Vc @ R))
         (t10, s10), (t5, s5), (t1, s1) = tot(['SPX', 'q10']), tot(['SPX', 'q10', 'q5']), tot(['SPX', 'q10', 'q5', 'q1'])
-        mall = hac_ols(r['BTC'], r[['SPX']])          # regresia de acoperire pe toate zilele
+        mall = hac_ols(r['BTC'], r[['SPX']])          # regresia de hedging pe toate zilele
         bl[lab] = dict(n=len(r), b=b0, se=m.bse['SPX'], c10=m.params['q10'], c5=m.params['q5'], c1=m.params['q1'],
                        tot10=t10, tot5=t5, tot1=t1, se_tot10=s10, se_tot5=s5, se_tot1=s1,
                        lo_tot1=t1 - 1.96 * s1, hi_tot1=t1 + 1.96 * s1,

@@ -535,7 +535,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "incorrectExplanation": "The drift matches the fee, not a premium or a supply effect."
             },
             "ro": {
-                "title": "Deriva din comision",
+                "title": "Drift-ul din comision",
                 "text": "Logaritmul raportului IBIT / Bitcoin scade cu aproximativ 0,24% pe an. Ce explică această scădere?",
                 "options": [
                     "O primă care crește în timp",
@@ -544,7 +544,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "Creșterea ofertei de Bitcoin"
                 ],
                 "correctExplanation": "Fondul vinde Bitcoin pentru a-și plăti comisionul, deci Bitcoin-ul pe unitate scade cu aproximativ rata comisionului.",
-                "incorrectExplanation": "Deriva corespunde comisionului, nu unei prime sau unui efect de ofertă."
+                "incorrectExplanation": "Drift-ul corespunde comisionului, nu unei prime sau unui efect de ofertă."
             }
         },
         {

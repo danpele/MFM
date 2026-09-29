@@ -705,7 +705,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "O excepție apare când r_t depășește VaR, nu -r_t",
                     "Simularea istorică cere cel puțin 1.000 de zile, deci 250 nu este permis"
                 ],
-                "correctExplanation": "Aceasta este privirea în viitor: o pierdere mare în ziua t intră în propria cuantilă și ascunde excepția, astfel că backtest-ul pare mai bun decât este. Convenția de semn (VaR = minus cuantila, excepție când pierderea -r_t depășește VaR) este corectă.",
+                "correctExplanation": "Acesta este look-ahead bias: o pierdere mare în ziua t intră în propria cuantilă și ascunde excepția, astfel că backtest-ul pare mai bun decât este. Convenția de semn (VaR = minus cuantila, excepție când pierderea -r_t depășește VaR) este corectă.",
                 "incorrectExplanation": "Convenția de semn și regula de excepție sunt corecte; greșeala este că prognoza pentru ziua t folosește randamentul din ziua t."
             }
         }

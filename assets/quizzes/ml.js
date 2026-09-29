@@ -106,7 +106,7 @@ window.MFM_DATA.quizzes['ml'] = {
                 title: 'Inferența după selecție',
                 text: 'LASSO selectează 3 din 14 caracteristici; apoi rulați OLS pe aceste 3 și raportați statisticile lor t drept dovadă că prezic randamentele. Ce este greșit?',
                 options: [
-                    'Nimic, pentru că OLS elimină biasul de micșorare al LASSO',
+                    'Nimic, pentru că OLS elimină biasul de shrinkage al LASSO',
                     'Doar erorile standard sunt greșite; erorile robuste la heteroscedasticitate rezolvă problema',
                     'Coeficienții LASSO sunt nedeplasați, deci pasul OLS este inutil',
                     'Statisticile t ignoră pasul de selecție bazat pe date și sunt prea optimiste; folosiți selecția dublă, machine learning dublu (DML) sau împărțirea eșantionului'
@@ -163,7 +163,7 @@ window.MFM_DATA.quizzes['ml'] = {
                     'Este neglijabil, pentru că orice $R^2$ sub 1% nu are valoare economică',
                     'Este relevant economic: pătratul raportului Sharpe crește la $(SR_0^2 + R^2)/(1 - R^2)$; pentru S&P 500 ($SR_0$ anualizat 0,44) raportul Sharpe crește la aproximativ 0,51',
                     'Măsura se aplică doar modelelor de clasificare',
-                    'Un $R^2$ atât de mic trebuie să provină dintr-o scurgere de informație'
+                    'Un $R^2$ atât de mic trebuie să provină din leakage'
                 ],
                 correctExplanation: 'Pentru că rapoartele Sharpe lunare sunt mici, un $R^2$ mic înseamnă un câștig relativ mare: $SR^{*2} = (SR_0^2 + R^2)/(1 - R^2)$. Welch și Goyal (2008) arată că majoritatea predictorilor pică acest test față de media istorică.',
                 incorrectExplanation: 'Comparați $R^2$ cu pătratul raportului Sharpe lunar al pieței, nu cu 1.'
@@ -274,7 +274,7 @@ window.MFM_DATA.quizzes['ml'] = {
                     'Pentru a elimina weekendurile din date'
                 ],
                 correctExplanation: 'Embargoul elimină o mică fracțiune (de exemplu 1%) din observațiile imediat de după setul de test, deoarece variabilele lor se suprapun cu informația din perioada de test.',
-                incorrectExplanation: 'Embargoul protejează împotriva scurgerii de informație prin autocorelare și prin ferestrele mobile imediat după setul de test.'
+                incorrectExplanation: 'Embargoul protejează împotriva leakage-ului prin autocorelare și prin ferestrele mobile imediat după setul de test.'
             }
         },
         {
@@ -292,16 +292,16 @@ window.MFM_DATA.quizzes['ml'] = {
                 incorrectExplanation: 'There is no signal in a random walk; the inflated accuracy comes from information leakage through overlapping labels and shuffling.'
             },
             ro: {
-                title: 'Experimentul de scurgere a informației',
+                title: 'Experimentul de leakage',
                 text: 'Pe un mers aleator pur (nimic nu este predictibil), cu etichete suprapuse pe 20 de zile și variabile de zgomot persistente, un random forest obține 69,4% acuratețe cu K-Fold amestecat, dar 49,7% cu Purged K-Fold și embargo. Ce explică valoarea de 69,4%?',
                 options: [
                     'Mersul aleator conține de fapt un trend predictibil',
                     'Random forest este mai bun decât aruncarea monedei pe orice date',
-                    'Scurgerea de informație: amestecarea pune în antrenare vecini aproape identici ai fiecărei observații de test, pe care modelul îi „recunoaște”',
+                    'Leakage: amestecarea pune în antrenare vecini aproape identici ai fiecărei observații de test, pe care modelul îi „recunoaște”',
                     'Purged K-Fold irosește prea multe date'
                 ],
-                correctExplanation: 'Valoarea de 69,4% este scurgere de informație pură. Cu purjare și embargo, acuratețea revine la nivelul aruncării monedei, cum trebuie să fie când nu există semnal.',
-                incorrectExplanation: 'Într-un mers aleator nu există semnal; acuratețea umflată vine din scurgerea de informație prin etichete suprapuse și amestecare.'
+                correctExplanation: 'Valoarea de 69,4% este leakage pur. Cu purjare și embargo, acuratețea revine la nivelul aruncării monedei, cum trebuie să fie când nu există semnal.',
+                incorrectExplanation: 'Într-un mers aleator nu există semnal; acuratețea umflată vine din leakage prin etichete suprapuse și amestecare.'
             }
         },
         {
@@ -347,7 +347,7 @@ window.MFM_DATA.quizzes['ml'] = {
             },
             ro: {
                 title: 'Teste de data snooping',
-                text: 'Testați retrospectiv 1.279 de reguli de medii mobile, puternic corelate, pe Bitcoin. Ce procedură testează dacă cea mai bună regulă bate buy-and-hold estimând din date distribuția sub ipoteza nulă a statisticii celei mai bune reguli, inclusiv corelația dintre reguli?',
+                text: 'Faceți backtesting pentru 1.279 de reguli de medii mobile, puternic corelate, pe Bitcoin. Ce procedură testează dacă cea mai bună regulă bate buy-and-hold estimând din date distribuția sub ipoteza nulă a statisticii celei mai bune reguli, inclusiv corelația dintre reguli?',
                 options: [
                     'Testul SPA al lui Hansen (sau Reality Check al lui White) cu bootstrap staționar al întregii matrice a randamentelor regulilor',
                     'O corecție Bonferroni cu N = 1.279',
@@ -647,12 +647,12 @@ window.MFM_DATA.quizzes['ml'] = {
                 text: 'Modelele fundamentale pentru serii de timp (de exemplu Chronos, TimesFM) fac prognoze „zero-shot” după pre-antrenarea pe colecții uriașe de serii. Care este un risc specific la evaluarea lor pe date financiare?',
                 options: [
                     'Nu pot produce prognoze probabilistice',
-                    'Corpusul de pre-antrenare poate conține deja perioada de evaluare, ceea ce introduce informație din viitor în testul „out-of-sample”',
+                    'Corpusul de pre-antrenare poate conține deja perioada de evaluare, ceea ce introduce look-ahead bias în testul „out-of-sample”',
                     'Funcționează doar pe date lunare',
                     'Depășesc întotdeauna modelele GARCH'
                 ],
                 correctExplanation: 'Un model pre-antrenat pe date care includ anii de test a „văzut” deja răspunsurile. Perioada de test trebuie să fie ulterioară datei limită a pre-antrenării.',
-                incorrectExplanation: 'Principalul risc de evaluare este scurgerea de informație din viitor prin datele de pre-antrenare.'
+                incorrectExplanation: 'Principalul risc de evaluare este leakage-ul (look-ahead bias) prin datele de pre-antrenare.'
             }
         },
         {
@@ -675,7 +675,7 @@ window.MFM_DATA.quizzes['ml'] = {
                 options: [
                     'Cinci blocuri sunt prea puține; cu 10 blocuri amestecate estimarea ar fi curată',
                     'AUC nu poate fi folosit pentru un clasificator binar',
-                    'Amestecarea pune în antrenare zilele vecine fiecărei zile de test; caracteristicile și etichetele suprapuse transmit atunci informație, deci folosiți purged K-fold cu embargo sau validare walk-forward',
+                    'Amestecarea pune în antrenare zilele vecine fiecărei zile de test; caracteristicile și etichetele suprapuse produc atunci leakage, deci folosiți purged K-fold cu embargo sau validare walk-forward',
                     'Amestecarea este o problemă doar pentru regresie, nu pentru clasificare'
                 ],
                 correctExplanation: 'Într-o serie de timp, observațiile vecine au informație comună (caracteristici mobile, etichete suprapuse); o împărțire amestecată i-o arată modelului, ceea ce umflă scorul.',
@@ -698,12 +698,12 @@ window.MFM_DATA.quizzes['ml'] = {
             },
             ro: {
                 title: 'Găsiți eroarea AI: scalarea',
-                text: 'Un asistent AI scrie: „Mai întâi standardizați toate caracteristicile cu StandardScaler().fit_transform(X) pe tot eșantionul 2014-2026, apoi rulați validarea walk-forward pentru regresia logistică L1: walk-forward garantează că nu există informație din viitor.” Ce este greșit?',
+                text: 'Un asistent AI scrie: „Mai întâi standardizați toate caracteristicile cu StandardScaler().fit_transform(X) pe tot eșantionul 2014-2026, apoi rulați validarea walk-forward pentru regresia logistică L1: walk-forward garantează că nu există look-ahead bias.” Ce este greșit?',
                 options: [
                     'Scalarea este estimată pe tot eșantionul, deci mediile și abaterile standard din perioadele de test intră în datele de antrenare; estimați-o în fiecare fereastră de antrenare (un pipeline)',
                     'O regresie logistică penalizată L1 nu are nevoie de caracteristici standardizate',
-                    'Validarea walk-forward este ea însăși o formă de informație din viitor',
-                    'StandardScaler trebuie înlocuit cu scalarea min-max pentru a evita informația din viitor'
+                    'Validarea walk-forward este ea însăși o formă de look-ahead bias',
+                    'StandardScaler trebuie înlocuit cu scalarea min-max pentru a evita look-ahead bias'
                 ],
                 correctExplanation: 'Orice pas de pregătire a datelor care se estimează din date face parte din model și trebuie estimat doar pe fereastra de antrenare; un pipeline face asta automat.',
                 incorrectExplanation: 'Verificați ce date folosește fiecare mărime estimată: media și abaterea standard ale scalării sunt și ele estimări.'

@@ -202,7 +202,7 @@ EPISODES = [  # (cheie, eticheta, fereastra in care se cauta maximul)
 
 
 def episode_table():
-    """Varf, crestere pe 2 ani inainte de varf, scadere maxima dupa varf, minim si revenire."""
+    """Varf, crestere pe 2 ani inainte de varf, drawdown maxim, minim si revenire."""
     rows = []
     for k, lab, (a, b) in EPISODES:
         p = price(k, 'D')

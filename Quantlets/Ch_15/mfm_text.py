@@ -407,7 +407,7 @@ def block_boot_mean(x, B=2000, block=10, seed=0):
 
 
 def signal_portfolio(P, col, days, cost_bp=0.0, band=0.0, ret='r2'):
-    """Strategia zilnica: pentru fiecare actiune cu stiri (|scor| > band) luam pozitia sign(scor), acoperita cu SPY,
+    """Strategia zilnica: pentru fiecare actiune cu stiri (|scor| > band) luam pozitia sign(scor), cu hedge pe SPY,
     ponderi egale; castigul este randamentul in exces din coloana ret (implicit r2: pozitia se deschide la
     inchiderea zilei de dupa stire, cand stirea este sigur publica). Zilele fara pozitii au randament 0.
     Costul: cost_bp puncte de baza pe fiecare tranzactie (actiune si SPY, la intrare si la iesire: 4 x cost)."""

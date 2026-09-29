@@ -166,7 +166,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Doar shrinkage-ul bate 1/N"
                 ],
                 "correctExplanation": "Eroarea de estimare anulează câștigul optimizării; cu 25 de active, MV de selecție are nevoie de circa 3000 de luni de date.",
-                "incorrectExplanation": "Rezultatul lor este că niciun model nu a bătut consecvent ponderile egale în raport Sharpe, echivalent cert sau rulaj."
+                "incorrectExplanation": "Rezultatul lor este că niciun model nu a bătut consecvent ponderile egale în raport Sharpe, echivalent cert sau turnover."
             }
         },
         {
@@ -239,7 +239,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Estimatorul de tip shrinkage",
-                "text": "Ce este estimatorul Ledoit–Wolf al matricei de covarianță?",
+                "text": "Ce este estimatorul de shrinkage Ledoit–Wolf al matricei de covarianță?",
                 "options": [
                     "Matricea de selecție cu valorile proprii negative puse la zero",
                     "O matrice estimată din date zilnice în loc de lunare",
@@ -274,7 +274,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Acționează ca un shrinkage al matricei de covarianță și pot reduce riscul în afara eșantionului"
                 ],
                 "correctExplanation": "GMV doar long este GMV fără restricții al unei matrice de covarianță modificate: restricția „greșită” ajută.",
-                "incorrectExplanation": "Ideea lor este că restricția contractă implicit covarianțele activelor pe care este activă."
+                "incorrectExplanation": "Ideea lor este că restricția aplică implicit shrinkage covarianțelor activelor pe care este activă."
             }
         },
         {
@@ -512,7 +512,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                 "text": "GMV fără vânzări în lipsă este GMV nerestricționat al matricei modificate S̃ = S − (λ1' + 1λ'), cu λ ≥ 0 multiplicatorii restricțiilor w ≥ 0. Ce face o restricție activă pe activul i?",
                 "options": [
                     "Crește varianța activului i",
-                    "Scade toate covarianțele activului i cu λ_i, micșorând estimările mari",
+                    "Scade toate covarianțele activului i cu λ_i, aplicând shrinkage estimărilor mari",
                     "Anulează corelațiile activului i",
                     "Lasă matricea de covarianță neschimbată"
                 ],
@@ -617,7 +617,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Costurile de tranzacționare",
-                "text": "În universul cu 16 ETF-uri, sub ce cost aproximativ pe unitatea de rulaj și-a păstrat MV doar long avantajul față de 1/N?",
+                "text": "În universul cu 16 ETF-uri, sub ce cost aproximativ pe unitatea de turnover și-a păstrat MV doar long avantajul față de 1/N?",
                 "options": [
                     "2 bp",
                     "Circa 22 bp",
@@ -625,7 +625,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "La orice cost"
                 ],
                 "correctExplanation": "MV-LO tranzacționează circa 0,20 din avere pe lună față de 0,025 pentru 1/N, deci micul avantaj brut (0,81 față de 0,76) dispare la circa 22 bp.",
-                "incorrectExplanation": "Rulajul mare erodează rapid un avantaj brut mic."
+                "incorrectExplanation": "Turnover-ul mare erodează rapid un avantaj brut mic."
             }
         },
         {
@@ -647,7 +647,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                 "text": "Pe setul multi-active (2012–2026), regulile GMV au avut cea mai mică volatilitate, dar și rapoarte Sharpe mici. De ce?",
                 "options": [
                     "Au deținut mai ales acțiuni",
-                    "Rulajul lor a fost zero",
+                    "Turnover-ul lor a fost zero",
                     "S-au încărcat pe titluri de stat, ale căror randamente în exces au fost ușor negative după 2012",
                     "Au folosit medii de selecție"
                 ],
@@ -674,12 +674,12 @@ window.MFM_DATA.quizzes['portfolio'] = {
                 "text": "Un asistent AI scrie: „Estimez matricea de covarianță o singură dată pe tot eșantionul 2000-2026, calculez ponderile GMV, reechilibrez lunar la ele și raportez un raport Sharpe în afara eșantionului de 0,9, anualizat cu sqrt(12).” Care este eroarea?",
                 "options": [
                     "Rapoartele Sharpe lunare se anualizează cu sqrt(252), nu cu sqrt(12)",
-                    "Ponderile folosesc date din lunile evaluate (informație din viitor), deci raportul Sharpe este în eșantion, nu în afara eșantionului",
+                    "Ponderile folosesc date din lunile evaluate (look-ahead bias), deci raportul Sharpe este în eșantion, nu în afara eșantionului",
                     "Ponderile GMV sunt proporționale cu inversa matricei de covarianță înmulțită cu randamentele așteptate, nu cu un vector de unu",
                     "Ponderile GMV nu pot fi reechilibrate lunar, deoarece nu însumează unu"
                 ],
-                "correctExplanation": "În afara eșantionului înseamnă că ponderile lunii t folosesc doar date până în luna t-1, de exemplu o fereastră rulantă de 60 de luni. O matrice de covarianță din tot eșantionul folosește informație din viitor; sqrt(12) este factorul corect pentru randamente lunare necorelate serial.",
-                "incorrectExplanation": "Anualizarea cu sqrt(12) (randamente lunare necorelate serial) și formula GMV sunt corecte; problema este că matricea de covarianță conține deja lunile evaluate (informație din viitor)."
+                "correctExplanation": "În afara eșantionului înseamnă că ponderile lunii t folosesc doar date până în luna t-1, de exemplu o fereastră rulantă de 60 de luni. O matrice de covarianță din tot eșantionul introduce look-ahead bias; sqrt(12) este factorul corect pentru randamente lunare necorelate serial.",
+                "incorrectExplanation": "Anualizarea cu sqrt(12) (randamente lunare necorelate serial) și formula GMV sunt corecte; problema este că matricea de covarianță conține deja lunile evaluate (look-ahead bias)."
             }
         },
         {

@@ -309,7 +309,7 @@ def fig_hedge_error(errs, prem):
 
 
 def fig_vol_mismatch():
-    """Vanzatorul acoperit delta la sigma implicita 20%, cand volatilitatea realizata este 15%, 20% sau 25%."""
+    """Vanzatorul cu delta hedging la sigma implicita 20%, cand volatilitatea realizata este 15%, 20% sau 25%."""
     h = HEDGE
     prem = float(bs_price(h['S0'], h['K'], h['T'], h['r'], 0.20))
     vega = float(bs_greeks(h['S0'], h['K'], h['T'], h['r'], 0.20)['vega'])

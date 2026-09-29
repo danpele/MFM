@@ -566,7 +566,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "text": "De ce ES a fost stabilit la 2,5% și nu la 1%, vechiul nivel al VaR?",
                 "options": [
                     "Sub distribuția Normală, ES 2,5% este aproape egal cu VaR 1%, deci capitalul rămâne similar pentru cozi subțiri, dar crește pentru cozi grele",
-                    "Pentru că ES 2,5% este mai ușor de testat retrospectiv decât orice VaR",
+                    "Pentru că ES 2,5% este mai ușor de supus backtesting-ului decât orice VaR",
                     "Pentru că ES 1% nu există",
                     "Pentru că reduce capitalul pentru toate portofoliile"
                 ],
@@ -594,11 +594,11 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "options": [
                     "ES singur este elicitabil, VaR nu",
                     "VaR este elicitabil; ES singur nu este, dar perechea (VaR, ES) este elicitabilă împreună",
-                    "Nici VaR, nici ES nu pot fi testate retrospectiv",
+                    "Nici VaR, nici ES nu pot fi supuse backtesting-ului",
                     "Ambele sunt elicitabile cu eroarea pătratică"
                 ],
                 "correctExplanation": "Cuantila minimizează funcția de pierdere pinball; Gneiting (2011) a arătat că ES singur nu este elicitabil, iar Fissler și Ziegel (2016) au arătat elicitabilitatea comună.",
-                "incorrectExplanation": "VaR este elicitabil, ES doar împreună cu VaR; de aceea testarea retrospectivă a ES este mai dificilă (Capitolul 8)."
+                "incorrectExplanation": "VaR este elicitabil, ES doar împreună cu VaR; de aceea backtesting-ul ES este mai dificilă (Capitolul 8)."
             }
         },
         {

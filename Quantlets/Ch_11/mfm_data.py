@@ -98,7 +98,7 @@ def load_close(name, start=None, end=END):
         d = d[d.index.dayofweek < 5]          # fara cotatii de weekend
     s = d['close']
     if kind == 'index':
-        # cotatie inerta: inchidere neschimbata si nicio amplitudine intraday (sau high/low indisponibile)
+        # cotatie inerta: inchidere neschimbata si niciun range intraday (sau high/low indisponibile)
         no_range = (d['high'] <= d['low']) if {'high', 'low'} <= set(d.columns) else pd.Series(True, index=d.index)
         s = s[~((s.diff() == 0) & no_range)]
     return s.rename(name)

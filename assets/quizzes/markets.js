@@ -241,13 +241,13 @@ window.MFM_DATA.quizzes['markets'] = {
                 "title": "Corelația acțiuni-obligațiuni",
                 "text": "Corelația mobilă pe 1 an dintre randamentele S&P 500 și ale obligațiunilor Trezoreriei pe termen lung (TLT) a fost în medie -0,43 în 2010–2020 și +0,08 în 2022–2026. Ce implică acest lucru?",
                 "options": [
-                    "Obligațiunile pe termen lung au protejat mai slab pierderile la acțiuni după șocul inflaționist din 2022",
+                    "Obligațiunile pe termen lung au oferit un hedge mai slab pentru pierderile la acțiuni după șocul inflaționist din 2022",
                     "Obligațiunile au devenit mai riscante decât Bitcoin",
                     "Corelațiile sunt constante în timp",
                     "Acțiunile și obligațiunile se mișcă acum mereu în sens opus"
                 ],
-                "correctExplanation": "O corelație negativă acțiuni-obligațiuni face din obligațiuni o acoperire; când a devenit pozitivă, obligațiunile și acțiunile au scăzut împreună, ca în 2022.",
-                "incorrectExplanation": "Trecerea de la -0,43 la +0,08 înseamnă că obligațiunile și-au pierdut mult din valoarea de acoperire după 2022."
+                "correctExplanation": "O corelație negativă acțiuni-obligațiuni face din obligațiuni un hedge; când a devenit pozitivă, obligațiunile și acțiunile au scăzut împreună, ca în 2022.",
+                "incorrectExplanation": "Trecerea de la -0,43 la +0,08 înseamnă că obligațiunile și-au pierdut mult din valoarea de hedge după 2022."
             }
         },
         {
@@ -268,13 +268,13 @@ window.MFM_DATA.quizzes['markets'] = {
                 "title": "Bitcoin și acțiunile",
                 "text": "În datele noastre, corelația mobilă medie dintre Bitcoin și S&P 500 a crescut de la 0,01 (2016–2019) la 0,38 (2022–2026). Ce implică acest lucru pentru un portofoliu?",
                 "options": [
-                    "Bitcoin a devenit o acoperire perfectă pentru acțiuni",
+                    "Bitcoin a devenit un hedge perfect pentru acțiuni",
                     "Volatilitatea Bitcoin a scăzut la nivelul acțiunilor",
                     "Bitcoin oferă mai puțină diversificare față de riscul acțiunilor decât înainte",
                     "Corelația dovedește că Bitcoin este o acțiune"
                 ],
                 "correctExplanation": "O corelație mai mare înseamnă că Bitcoin tinde să scadă când scad acțiunile, deci beneficiul de diversificare s-a redus.",
-                "incorrectExplanation": "Creșterea corelației reduce beneficiul de diversificare; nu face din Bitcoin o acoperire sau o acțiune."
+                "incorrectExplanation": "Creșterea corelației reduce beneficiul de diversificare; nu face din Bitcoin un hedge sau o acțiune."
             }
         },
         {
@@ -670,16 +670,16 @@ window.MFM_DATA.quizzes['markets'] = {
                 "incorrectExplanation": "The index is built from survivors known today, which biases past returns upward; the other effects do not explain a selection built with hindsight."
             },
             "ro": {
-                "title": "Supraviețuire și selecție",
-                "text": "Un indice al celor mai mari 100 de monede de azi, calculat retroactiv din 2015, arată un CAGR de 70%. Care este problema principală a acestei cifre?",
+                "title": "Survivorship bias și selecție",
+                "text": "Un indice al celor mai mari 100 de monede de azi, reconstruit ex post din 2015, arată un CAGR de 70%. Care este problema principală a acestei cifre?",
                 "options": [
-                    "Supraviețuirea și selecția cu informație din viitor: lipsesc monedele eșuate",
-                    "Frâna volatilității scade CAGR",
+                    "Survivorship bias și selecția cu look-ahead bias: lipsesc monedele eșuate",
+                    "Volatility drag scade CAGR",
                     "Efectul Epps",
                     "Tranzacționarea nesincronă între burse"
                 ],
-                "correctExplanation": "Alegerea componentelor cu informația de azi păstrează doar câștigătorii; monedele eșuate sunt excluse, deci randamentul calculat retroactiv este deplasat în sus (Brown et al., 1992).",
-                "incorrectExplanation": "Indicele este construit din supraviețuitorii cunoscuți azi, ceea ce deplasează în sus randamentele trecute; celelalte efecte nu explică o selecție făcută retroactiv."
+                "correctExplanation": "Alegerea componentelor cu informația de azi păstrează doar câștigătorii; monedele eșuate sunt excluse, deci randamentul reconstruit ex post este deplasat în sus (Brown et al., 1992).",
+                "incorrectExplanation": "Indicele este construit din supraviețuitorii cunoscuți azi, ceea ce deplasează în sus randamentele trecute; celelalte efecte nu explică o selecție făcută ex post."
             }
         },
         {

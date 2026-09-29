@@ -139,7 +139,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Devine negativă"
                 ],
                 "correctExplanation": "Gamma ATM este proporțională cu 1/(sigma sqrt(tau)): cu o zi în loc de 21 de zile de tranzacționare este de aproximativ 4,6 ori mai mare.",
-                "incorrectExplanation": "Gamma unei opțiuni la bani crește ca 1/sqrt(tau), motiv pentru care acoperirea opțiunilor aproape de scadență este atât de solicitantă."
+                "incorrectExplanation": "Gamma unei opțiuni la bani crește ca 1/sqrt(tau), motiv pentru care hedging-ul opțiunilor aproape de scadență este atât de solicitant."
             }
         },
         {
@@ -158,14 +158,14 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "Theta și gamma",
-                "text": "Pentru o poziție în opțiuni acoperită delta, în modelul Black-Scholes, care este legătura dintre theta și gamma?",
+                "text": "Pentru o poziție în opțiuni cu delta hedging, în modelul Black-Scholes, care este legătura dintre theta și gamma?",
                 "options": [
                     "Nu sunt legate",
                     "Theta este egală cu gamma",
                     "Ambele sunt mereu pozitive pentru o opțiune cumpărată",
                     "Theta + 0,5 sigma^2 S^2 Gamma + r S Delta - r C = 0: gamma pozitivă se plătește prin erodarea în timp"
                 ],
-                "correctExplanation": "Aceasta este ecuația cu derivate parțiale Black-Scholes: după finanțarea acoperirii delta, Theta + r S Delta - r C = -0,5 sigma^2 S^2 Gamma < 0, deci o poziție acoperită delta cu gamma pozitivă pierde valoare în timp, iar una cu gamma negativă o câștigă. Theta singură poate fi pozitivă, de exemplu pentru un put adânc în bani.",
+                "correctExplanation": "Aceasta este ecuația cu derivate parțiale Black-Scholes: după finanțarea delta hedging-ului, Theta + r S Delta - r C = -0,5 sigma^2 S^2 Gamma < 0, deci o poziție cu delta hedging și gamma pozitivă pierde valoare în timp, iar una cu gamma negativă o câștigă. Theta singură poate fi pozitivă, de exemplu pentru un put adânc în bani.",
                 "incorrectExplanation": "Ecuația Black-Scholes leagă theta de gamma: după costul finanțării, deținătorul convexității o plătește prin erodarea în timp."
             }
         },
@@ -184,15 +184,15 @@ window.MFM_DATA.quizzes['options'] = {
                 "incorrectExplanation": "The slope of about -1/2 on a log-log scale means the error is proportional to 1/sqrt(N), not to 1/N."
             },
             "ro": {
-                "title": "Frecvența acoperirii",
-                "text": "În simularea din curs, abaterea standard a erorii de acoperire scade cu numărul de reechilibrări N cu o pantă log-log de -0,48. Ce implică acest lucru?",
+                "title": "Frecvența hedging-ului",
+                "text": "În simularea din curs, abaterea standard a erorii de hedging scade cu numărul de reechilibrări N cu o pantă log-log de -0,48. Ce implică acest lucru?",
                 "options": [
                     "Eroarea scade ca 1/sqrt(N): de patru ori mai multe reechilibrări o înjumătățesc aproximativ",
                     "Eroarea scade ca 1/N",
                     "Reechilibrarea mai deasă nu ajută",
                     "Eroarea crește cu N din cauza rotunjirilor"
                 ],
-                "correctExplanation": "O pantă apropiată de -1/2 înseamnă o eroare proporțională cu 1/sqrt(N): acoperirea zilnică a lăsat aproximativ 9,5% din primă, de patru ori pe zi aproximativ 4,8%.",
+                "correctExplanation": "O pantă apropiată de -1/2 înseamnă o eroare proporțională cu 1/sqrt(N): hedging-ul zilnic a lăsat aproximativ 9,5% din primă, de patru ori pe zi aproximativ 4,8%.",
                 "incorrectExplanation": "Panta de aproximativ -1/2 pe scară log-log înseamnă o eroare proporțională cu 1/sqrt(N), nu cu 1/N."
             }
         },
@@ -212,15 +212,15 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "Vânzarea volatilității",
-                "text": "Un dealer vinde un call la volatilitatea implicită de 20% și îl acoperă zilnic. Volatilitatea realizată se dovedește a fi 25%. Care este rezultatul așteptat?",
+                "text": "Un dealer vinde un call la volatilitatea implicită de 20% și îi face zilnic delta hedging. Volatilitatea realizată se dovedește a fi 25%. Care este rezultatul așteptat?",
                 "options": [
                     "Un profit, pentru că prima a fost încasată",
                     "O pierdere de aproximativ vega înmulțită cu 5 puncte de volatilitate",
-                    "Zero, pentru că poziția este acoperită delta",
+                    "Zero, pentru că poziția are delta hedging",
                     "Un profit egal cu theta înmulțită cu numărul de zile"
                 ],
-                "correctExplanation": "O opțiune acoperită delta câștigă varianța implicită minus cea realizată, ponderată cu gamma: cu realizata peste implicită, vânzătorul pierde aproximativ vega x 5 puncte.",
-                "incorrectExplanation": "Acoperirea delta elimină expunerea la direcție, nu expunerea la volatilitate: vânzătorul pierde când volatilitatea realizată o depășește pe cea implicită."
+                "correctExplanation": "O opțiune cu delta hedging câștigă varianța implicită minus cea realizată, ponderată cu gamma: cu realizata peste implicită, vânzătorul pierde aproximativ vega x 5 puncte.",
+                "incorrectExplanation": "Delta hedging-ul elimină expunerea la direcție, nu expunerea la volatilitate: vânzătorul pierde când volatilitatea realizată o depășește pe cea implicită."
             }
         },
         {
@@ -238,8 +238,8 @@ window.MFM_DATA.quizzes['options'] = {
                 "incorrectExplanation": "A delta-hedged option does not bet on direction; its average gain is the gap between implied and realised volatility, the volatility risk premium."
             },
             "ro": {
-                "title": "Opțiuni S&P 500 acoperite delta",
-                "text": "Vânzarea de call-uri S&P 500 la bani pe o lună la VIX, acoperite zilnic, 1990-2026, a dat un rezultat lunar mediu de 0,48% din indice. De ce?",
+                "title": "Opțiuni S&P 500 cu delta hedging",
+                "text": "Vânzarea de call-uri S&P 500 la bani pe o lună la VIX, cu delta hedging zilnic, 1990-2026, a dat un rezultat lunar mediu de 0,48% din indice. De ce?",
                 "options": [
                     "Pentru că S&P 500 a crescut în medie",
                     "Din cauza dobânzii la contul de numerar",
@@ -247,7 +247,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Din cauza unei convenții de calcul care ignoră pierderile"
                 ],
                 "correctExplanation": "VIX a depășit volatilitatea realizată a lunii în 85% din luni: vânzătorii de opțiuni încasează o primă pentru asigurarea împotriva turbulențelor.",
-                "incorrectExplanation": "O opțiune acoperită delta nu pariază pe direcție; câștigul ei mediu este diferența dintre volatilitatea implicită și cea realizată, prima de risc a volatilității."
+                "incorrectExplanation": "O opțiune cu delta hedging nu pariază pe direcție; câștigul ei mediu este diferența dintre volatilitatea implicită și cea realizată, prima de risc a volatilității."
             }
         },
         {
@@ -319,16 +319,16 @@ window.MFM_DATA.quizzes['options'] = {
                 "incorrectExplanation": "The drift drops out of the hedged P&L; what remains is the variance gap weighted by gamma along the path."
             },
             "ro": {
-                "title": "De unde vine rezultatul acoperirii",
-                "text": "O opțiune cumpărată și acoperită delta câștigă (1/2) Gamma S^2 (sigma_real^2 - sigma_imp^2) dt. Unde se concentrează rezultatul?",
+                "title": "De unde vine rezultatul hedging-ului",
+                "text": "O opțiune cumpărată, cu delta hedging, câștigă (1/2) Gamma S^2 (sigma_real^2 - sigma_imp^2) dt. Unde se concentrează rezultatul?",
                 "options": [
                     "Aproape de prețul de exercitare și de scadență, unde gamma este mare, deci contează traiectoria prețului, nu doar varianța realizată totală",
                     "Depinde doar de varianța realizată totală pe durata opțiunii, ca un swap de varianță",
-                    "Depinde doar de tendința mu a activului suport",
+                    "Depinde doar de drift-ul mu al activului suport",
                     "Doar de data scadenței"
                 ],
-                "correctExplanation": "Diferența de varianță este ponderată cu Gamma S^2, maximă la bani și aproape de scadență; un swap de varianță are ponderi constante, o opțiune acoperită delta are ponderi aleatoare.",
-                "incorrectExplanation": "Tendința dispare din rezultatul acoperit; rămâne diferența de varianță ponderată cu gamma de-a lungul traiectoriei."
+                "correctExplanation": "Diferența de varianță este ponderată cu Gamma S^2, maximă la bani și aproape de scadență; un swap de varianță are ponderi constante, o opțiune cu delta hedging are ponderi aleatoare.",
+                "incorrectExplanation": "Drift-ul dispare din rezultatul cu hedging; rămâne diferența de varianță ponderată cu gamma de-a lungul traiectoriei."
             }
         },
         {
@@ -354,7 +354,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Pentru că distribuția log-normală este densitatea adevărată",
                     "Pentru că derivarea de două ori a cotațiilor le amplifică zgomotul, iar fără convexitate în K densitatea estimată poate fi negativă"
                 ],
-                "correctExplanation": "q = e^{r tau} d^2C/dK^2 este o problemă inversă prost condiționată; în lanțul Deribit din curs 7 din 732 de fluturi de marcare sunt negativi, toți în interiorul marjei dintre cotații.",
+                "correctExplanation": "q = e^{r tau} d^2C/dK^2 este o problemă inversă prost condiționată; în lanțul Deribit din curs 7 din 732 de fluturi de marcare sunt negativi, toți în interiorul spread-ului bid-ask.",
                 "incorrectExplanation": "Problema este statistică: o derivată a doua a unor prețuri discrete și zgomotoase, care trebuie să fie convexe în prețul de exercitare pentru a da o densitate nenegativă."
             }
         },

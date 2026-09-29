@@ -151,7 +151,7 @@ def fhs_mc(r, params, z, h, n_paths=100_000, seed=42):
 def rolling_conditional(r, first_year, window_hs=500, alpha=0.01, tail_evt=0.10):
     """VaR/ES conditionat zi de zi: parametrii AR(1)-GARCH re-estimati la fiecare inceput de an
     pe toate datele anterioare; FHS si EVT conditionat folosesc reziduurile standardizate anterioare.
-    Pentru comparatie: HS pe fereastra mobila de window_hs zile. Fara informatie din viitor."""
+    Pentru comparatie: HS pe fereastra mobila de window_hs zile. Fara look-ahead bias."""
     out = []
     L = -r
     for y in range(first_year, r.index[-1].year + 1):

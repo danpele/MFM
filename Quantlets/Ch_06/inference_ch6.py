@@ -231,8 +231,8 @@ def nw_tstat(d):
 
 
 def fig_hedge_oos(h_all, h_static, h_expost, e_un, e_st, e_dc, split):
-    """Raportul de acoperire DCC (parametri estimati pana in 2019, apoi fixati) fata de acoperirea statica si
-    suma cumulata a patratelor randamentelor acoperite in perioada de evaluare."""
+    """Raportul de hedge DCC (parametri estimati pana in 2019, apoi fixati) fata de hedge-ul static si
+    suma cumulata a patratelor randamentelor cu hedge in perioada de evaluare."""
     fig, axes = plt.subplots(2, 1, figsize=(5.6, 4.0))
     ax = axes[0]
     h = h_all.loc['2017-01-01':]

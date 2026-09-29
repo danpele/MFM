@@ -428,8 +428,8 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                 "incorrectExplanation": "Every forecast for day t must use only data up to t-1; full-sample estimates have already seen the crashes."
             },
             "ro": {
-                "title": "Informația din viitor",
-                "text": "Un model VaR cu parametri estimați pe 2000-2026 este testat pe 2005-2026. Ce este greșit?",
+                "title": "Look-ahead bias",
+                "text": "Un model VaR cu parametri estimați pe 2000-2026 este supus backtesting-ului pe 2005-2026. Ce este greșit?",
                 "options": [
                     "Nimic: mai multe date îmbunătățesc mereu backtest-ul",
                     "Folosește informație care nu era disponibilă la data prognozei, deci backtest-ul arată mai bine decât realitatea",
@@ -518,7 +518,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Un set de modele de încredere pe o funcție de pierdere consistentă pentru (VaR, ES), de exemplu FZ0"
                 ],
                 "correctExplanation": "Setul de modele de încredere (Hansen, Lunde și Nason, 2011) păstrează toate modelele care nu sunt semnificativ mai slabe decât cel mai bun, controlând eroarea la nivel de familie; FZ0 este consistent pentru perechea (VaR, ES).",
-                "incorrectExplanation": "Cea mai mică pierdere medie ignoră eroarea de eșantionare, Kupiec verifică doar acoperirea unui model, iar R-pătrat nu este un scor consistent pentru riscul de coadă."
+                "incorrectExplanation": "Cea mai mică pierdere medie ignoră eroarea de eșantionare, Kupiec verifică doar acoperirea unui model, iar R-pătrat nu este un scor consistent pentru tail risk."
             }
         },
         {
@@ -537,7 +537,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
             },
             "ro": {
                 "title": "Identificarea unui eveniment",
-                "text": "Riscul de coadă al BET pare să scadă după reclasificarea FTSE din 2020. Ce ar face credibil un efect al reclasificării?",
+                "text": "Tail risk-ul indicelui BET pare să scadă după reclasificarea FTSE din 2020. Ce ar face credibil un efect al reclasificării?",
                 "options": [
                     "O comparație stabilită dinainte cu o piață de control (diferența în diferențe sau control sintetic), date placebo și un test de ruptură care plasează schimbarea lângă eveniment",
                     "Un test t semnificativ înainte/după",
@@ -593,12 +593,12 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                 "title": "Validarea încrucișată în finanțe",
                 "text": "De ce poate induce în eroare validarea încrucișată K-fold amestecată pe serii financiare?",
                 "options": [
-                    "Etichetele suprapuse și dependența serială aduc informație din setul de test în antrenare",
+                    "Etichetele suprapuse și dependența serială produc leakage din setul de test în antrenare",
                     "Folosește prea puține date",
                     "Subestimează mereu acuratețea",
                     "Nu poate fi folosită cu rețele neuronale"
                 ],
-                "correctExplanation": "Pe zgomot pur, K-fold amestecat a raportat o acuratețe de 69,4%; purjarea și embargoul elimină scurgerea.",
+                "correctExplanation": "Pe zgomot pur, K-fold amestecat a raportat o acuratețe de 69,4%; purjarea și embargoul elimină leakage-ul.",
                 "incorrectExplanation": "Observațiile vecine au informație comună; amestecarea lor între fold-uri îi arată modelului perioada de test."
             }
         },
@@ -674,7 +674,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                 "title": "Găsiți eroarea: un backtest scris de AI",
                 "text": "Un asistent AI scrie un backtest pentru VaR 1%: var = -r.rolling(500).quantile(0.01); hit = (-r > var). Raportează o rată a depășirilor sub 1% și spune că modelul este prudent. Ce este greșit?",
                 "options": [
-                    "VaR-ul pentru ziua t este calculat pe o fereastră care conține deja randamentul zilei t (informație din viitor); trebuie decalat cu o zi, var.shift(1), iar rata depășirilor calculată doar în zilele care au o prognoză",
+                    "VaR-ul pentru ziua t este calculat pe o fereastră care conține deja randamentul zilei t (look-ahead bias); trebuie decalat cu o zi, var.shift(1), iar rata depășirilor calculată doar în zilele care au o prognoză",
                     "VaR 1% trebuie să fie cuantila 99% a randamentelor",
                     "O fereastră de 500 de zile este prea lungă pentru simularea istorică",
                     "Depășirile trebuie numărate pe randamente, nu pe pierderi"

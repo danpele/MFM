@@ -87,7 +87,7 @@ def stats(x, active):
 
 
 def c1_same_days(c1daily, keep, rets, days):
-    """C1: sign(scorul net Qwen, prompt P1) in fiecare actiune cu stiri, acoperita cu SPY, ponderi egale, castigul din
+    """C1: sign(scorul net Qwen, prompt P1) in fiecare actiune cu stiri, cu hedge pe SPY, ponderi egale, castigul din
     d + 2 -- pe zilele-actiune ale lui C3. Expunerea: 1 pe actiuni plus |media semnelor| pe SPY (valoarea neta)."""
     P = c1daily.loc[c1daily.index.intersection(keep)]
     P = P[P['qwen'].abs() > 0]

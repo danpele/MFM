@@ -58,7 +58,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     'Nimic: corelația nu intră în volatilitatea portofoliului',
                     'A devenit fără risc'
                 ],
-                correctExplanation: 'Cu aceleași volatilități ale activelor, trecerea de la o corelație negativă la una ușor pozitivă crește volatilitatea portofoliului 60/40: obligațiunile nu mai acoperă riscul acțiunilor.',
+                correctExplanation: 'Cu aceleași volatilități ale activelor, trecerea de la o corelație negativă la una ușor pozitivă crește volatilitatea portofoliului 60/40: obligațiunile nu mai oferă hedge pentru riscul acțiunilor.',
                 incorrectExplanation: 'O corelație mai mare crește termenul încrucișat și deci volatilitatea portofoliului.'
             }
         },
@@ -324,7 +324,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                 text: 'Corelația DCC medie dintre Bitcoin și SPY a fost 0,04 înainte de 2020 și 0,31 după. Ce implică acest lucru?',
                 options: [
                     'Bitcoin și-a pierdut mare parte din valoarea de diversificare pentru investitorii în acțiuni după 2020',
-                    'Bitcoin a devenit o acoperire împotriva prăbușirilor bursiere',
+                    'Bitcoin a devenit un hedge împotriva prăbușirilor bursiere',
                     'Corelația este constantă, deci nu s-a schimbat nimic',
                     'Bitcoin și acțiunile au devenit perfect corelate'
                 ],

@@ -350,12 +350,12 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "title": "LASSO în doi pași",
                 "text": "De ce reestimează Gu et al. modelul prin OLS pe suportul selectat de LASSO?",
                 "options": [
-                    "LASSO micșorează spre zero coeficienții păstrați; OLS pe suport elimină această deplasare",
+                    "LASSO aplică shrinkage spre zero coeficienților păstrați; OLS pe suport elimină această deplasare",
                     "OLS selectează mai multe variabile decât LASSO",
                     "LASSO nu poate folosi ponderi",
                     "OLS face modelul robust la cozi groase"
                 ],
-                "correctExplanation": "Cele mai mici pătrate după selecție (Belloni și Chernozhukov, 2013) păstrează raritatea LASSO, dar nu și deplasarea lui spre zero.",
+                "correctExplanation": "Cele mai mici pătrate după selecție (Belloni și Chernozhukov, 2013) păstrează raritatea LASSO, dar nu și biasul lui de shrinkage.",
                 "incorrectExplanation": "Reestimarea este restrânsă la suportul selectat, deci nu adaugă variabile; ponderile pot fi folosite în ambii pași."
             }
         },
@@ -374,8 +374,8 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "incorrectExplanation": "Tuning on the full sample or on the evaluation losses uses future information and flatters the model."
             },
             "ro": {
-                "title": "Alegerea lui lambda fără informație din viitor",
-                "text": "Într-un studiu de prognoză pe fereastră mobilă, ce alegere a penalizării LASSO evită informația din viitor?",
+                "title": "Alegerea lui lambda fără look-ahead bias",
+                "text": "Într-un studiu de prognoză pe fereastră mobilă, ce alegere a penalizării LASSO evită look-ahead bias?",
                 "options": [
                     "Validare încrucișată pe tot eșantionul, o dată, înaintea buclei mobile",
                     "Lambda care minimizează QLIKE în afara eșantionului",
@@ -383,7 +383,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Cel mai mare lambda care păstrează toți termenii HAR pe o traiectorie LASSO estimată folosind întregul eșantion, inclusiv perioada de evaluare"
                 ],
                 "correctExplanation": "Orice calibrare trebuie să folosească doar datele disponibile la originea prognozei; cursul alege lambda prin BIC în fiecare fereastră de 1000 de zile.",
-                "incorrectExplanation": "Calibrarea pe tot eșantionul sau pe pierderile de evaluare folosește informație din viitor și avantajează nejustificat modelul."
+                "incorrectExplanation": "Calibrarea pe tot eșantionul sau pe pierderile de evaluare introduce look-ahead bias și avantajează nejustificat modelul."
             }
         },
         {
@@ -703,11 +703,11 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "options": [
                     "Folosirea log RV și folosirea a 70% pentru antrenare",
                     "Folosirea LASSO și a QLIKE în loc de MSE",
-                    "Lambda este calibrat pe date care includ perioada de test (informație din viitor), iar QLIKE este calculată cu argumentele inversate, ceea ce recompensează prognozele prea mici",
+                    "Lambda este calibrat pe date care includ perioada de test (look-ahead bias), iar QLIKE este calculată cu argumentele inversate, ceea ce recompensează prognozele prea mici",
                     "Folosirea unei singure împărțiri și raportarea QLIKE cu trei zecimale"
                 ],
                 "correctExplanation": "Calibrarea trebuie să folosească doar datele de antrenare; qlike(F, RV) = F/RV - ln(F/RV) - 1 este minimizată de media armonică, nu de E[RV]. Afirmației îi lipsesc și calculul reperului și un test DM.",
-                "incorrectExplanation": "Ținta logaritmică, LASSO și QLIKE sunt alegeri legitime; erorile sunt informația din viitor la calibrare și pierderea inversată."
+                "incorrectExplanation": "Ținta logaritmică, LASSO și QLIKE sunt alegeri legitime; erorile sunt look-ahead bias la calibrare și pierderea inversată."
             }
         }
     ]

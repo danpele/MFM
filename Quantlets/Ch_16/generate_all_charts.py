@@ -615,7 +615,7 @@ def fig_lp_vs_hodl(start='2024-01-01'):
 # =============================================================================
 def etf_tracking(etf='IBIT', coin='BTC'):
     """Randamente ETF vs activ suport in zilele de tranzactionare ale ETF-ului: zilnic (aceeasi data si data urmatoare)
-    si saptamanal (vineri); abaterea de urmarire; deriva raportului ETF / activ (comisionul anual)."""
+    si saptamanal (vineri); abaterea de urmarire; drift-ul raportului ETF / activ (comisionul anual)."""
     p = joint_prices([etf, coin])
     r = np.log(p).diff().dropna()
     c_next = np.log(price(coin)).diff().shift(-1).reindex(r.index)

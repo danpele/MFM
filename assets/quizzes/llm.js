@@ -216,7 +216,7 @@ window.MFM_DATA.quizzes['llm'] = {
                 "options": [
                     "Titlurile de pe Twitter sunt scrise într-o limbă pe care FinBERT nu o cunoaște",
                     "Qwen2.5-7B a fost ajustat fin pe Twitter Financial News",
-                    "FinBERT are mai mulți parametri decât Qwen2.5-7B și supraajustează textele scurte",
+                    "FinBERT are mai mulți parametri decât Qwen2.5-7B și face overfitting pe textele scurte",
                     "FinBERT a fost ajustat fin pe cea mai mare parte din Financial PhraseBank, deci o parte din avantajul său acolo provine probabil din suprapunerea cu datele de antrenare"
                 ],
                 "correctExplanation": "Și Qwen2.5-7B scade, cu 7,2 puncte, pentru că titlurile Twitter sunt mai grele. Dacă ambele modele ar pierde la fel fără suprapunerea cu datele de antrenare (o ipoteză de identificare, netestabilă aici), diferența diferențelor, 9,2 puncte (CI bootstrap [6,7; 11,9]), se datorează suprapunerii; CI acoperă doar zgomotul de eșantionare. Evaluați un model de limbaj doar pe texte pe care nu le-a văzut niciodată.",
@@ -433,7 +433,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "Modelul prognozează bine lunile viitoare, deci este un bun instrument de prognoză",
                     "Ambele rezultate sunt compatibile cu lipsa oricărei cunoașteri",
                     "Modelul își amintește zilele individuale mai bine decât lunile",
-                    "Își amintește parțial direcția lunară (regimuri, luni celebre), dar nu mișcările zilnice: privirea în viitor este un pericol la orizontul evenimentelor cunoscute"
+                    "Își amintește parțial direcția lunară (regimuri, luni celebre), dar nu mișcările zilnice: look-ahead bias este un pericol la orizontul evenimentelor cunoscute"
                 ],
                 "correctExplanation": "Un AUC de 0,5 înseamnă nicio cunoaștere. Un AUC lunar mult peste 0,5 înainte de publicare este memoria istoriei pieței (de exemplu octombrie 2008, martie 2020); zgomotul zilnic nu este memorat.",
                 "incorrectExplanation": "Sunt luni trecute despre care modelul a citit la antrenare, nu prognoze; 0,69 pentru luni față de circa 0,5 pentru zile înseamnă doar o memorie grosieră a regimurilor și a episoadelor celebre."
@@ -454,13 +454,13 @@ window.MFM_DATA.quizzes['llm'] = {
                 "incorrectExplanation": "Larger models remember more, prompts do not remove memory, and older data are even more likely to be in the training text. Post-cutoff data or point-in-time models separate the test period from the training text; anonymisation only mitigates the bias."
             },
             "ro": {
-                "title": "Remedii pentru privirea în viitor",
-                "text": "Care dintre următoarele este un remediu pentru privirea în viitor (look-ahead bias) la testarea istorică a unui semnal de sentiment dintr-un model mare de limbaj (LLM)?",
+                "title": "Remedii pentru look-ahead bias",
+                "text": "Care dintre următoarele este un remediu pentru look-ahead bias la backtesting-ul unui semnal de sentiment dintr-un model mare de limbaj (LLM)?",
                 "options": [
                     "Testarea doar pe titluri publicate după data-limită a datelor de antrenare sau folosirea unor modele point-in-time; eliminarea numelor de companii și a datelor calendaristice ajută ca diagnostic",
                     "Folosirea unui model mai mare, care generalizează mai bine",
                     "Media scorurilor obținute cu mai multe prompt-uri",
-                    "Extinderea testului istoric mai departe în trecut, pentru mai multe observații"
+                    "Extinderea backtest-ului mai departe în trecut, pentru mai multe observații"
                 ],
                 "correctExplanation": "Lopez-Lira & Tang (2026) testează GPT-4 pe titluri de după data-limită; Sarkar & Vafa (2024) propun modele point-in-time; Glasserman & Lin (2023) anonimizează textul pentru a măsura și a reduce distorsiunea, dar produsele, evenimentele sau citatele pot identifica în continuare episodul. Raportați mereu versiunea modelului și data publicării ponderilor.",
                 "incorrectExplanation": "Modelele mai mari memorează mai mult, prompt-urile nu șterg memoria, iar datele mai vechi sunt și mai probabil incluse în textele de antrenare. Datele de după data-limită sau modelele point-in-time separă perioada de test de textul de antrenare; anonimizarea doar atenuează distorsiunea."
@@ -514,7 +514,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "Pentru că scorurile de sentiment nu urmează distribuția Normală",
                     "Pentru că fiecare acțiune are un număr diferit de titluri",
                     "Pentru că erorile acțiunilor diferite din aceeași zi pot fi corelate prin șocuri comune, pe care erorile standard obișnuite le ignoră",
-                    "Pentru că gruparea elimină privirea în viitor a modelului de limbaj"
+                    "Pentru că gruparea elimină look-ahead bias al modelului de limbaj"
                 ],
                 "correctExplanation": "Șocurile comune de piață pot lovi mai multe acțiuni în aceeași zi. Covarianța grupată însumează X_gᵀ ε̂_g ε̂_gᵀ X_g pe zilele g și permite orice corelație în cadrul unei zile. Corecția poate merge în ambele sensuri: aici SE grupată pe zile a pantei LM este mai mică decât cea obișnuită (1,81 față de 2,32 bp).",
                 "incorrectExplanation": "Problema este dependența din cadrul unei zile: tratarea observațiilor din aceeași zi ca independente folosește o varianță greșită, indiferent de sensul erorii."
@@ -565,8 +565,8 @@ window.MFM_DATA.quizzes['llm'] = {
                 "title": "Studiu de eveniment în jurul zilelor cu știri",
                 "text": "Pentru treimea cea mai pozitivă a zilelor cu știri (FinBERT), randamentul în exces cumulat este +0,63% în cele 5 zile dinainte, +0,50% în ziua d și +0,11% în d + 1. Cum trebuie interpretat?",
                 "options": [
-                    "Până când un trader poate acționa, prețul s-a ajustat în mare parte; mișcările dinaintea evenimentului sugerează scurgeri de informație sau titluri scrise după mișcare",
-                    "Știrea produce o derivă lentă, ușor de tranzacționat în ziua d + 2",
+                    "Până când un trader poate acționa, prețul s-a ajustat în mare parte; mișcările dinaintea evenimentului sugerează information leakage sau titluri scrise după mișcare",
+                    "Știrea produce un drift lent, ușor de tranzacționat în ziua d + 2",
                     "Mișcarea dinaintea evenimentului dovedește că datele sunt greșite",
                     "Zilele cu știri pozitive sunt întotdeauna urmate de reveniri"
                 ],
@@ -698,14 +698,14 @@ window.MFM_DATA.quizzes['llm'] = {
             },
             "ro": {
                 "title": "Găsiți eroarea: LLM în afara eșantionului",
-                "text": "Un asistent AI scrie: „Am evaluat titlurile din 2010–2023 cu Qwen2.5-7B, ale cărui ponderi au fost publicate în septembrie 2024. Modelul nu a fost niciodată estimat pe randamentele noastre, deci testul istoric este complet în afara eșantionului, iar +5,64 bp pe zi (t = 2,26) este o prognoză autentică.” Care este eroarea?",
+                "text": "Un asistent AI scrie: „Am evaluat titlurile din 2010–2023 cu Qwen2.5-7B, ale cărui ponderi au fost publicate în septembrie 2024. Modelul nu a fost niciodată estimat pe randamentele noastre, deci backtest-ul este complet în afara eșantionului, iar +5,64 bp pe zi (t = 2,26) este o prognoză autentică.” Care este eroarea?",
                 "options": [
                     "Statistica t zilnică trebuia înlocuită cu una lunară",
                     "Un model antrenat pe texte până în 2024 își poate aminti ce a urmat știrilor din 2010–2023, deci testul nu este în afara eșantionului; o parte din avantaj poate fi memorarea prețurilor",
                     "Rezultatul este invalid doar pentru că modelul are mai puțini parametri decât GPT-4",
                     "Nu este nicio eroare: faptul că modelul nu a fost estimat pe randamente este suficient pentru a fi în afara eșantionului"
                 ],
-                "correctExplanation": "Privirea în viitor: un LLM publicat în 2024 poate conține informații despre ce a urmat titlurilor anterioare, deci nu este dovedit că testul folosește doar informația disponibilă la momentul respectiv. Testele curate folosesc titluri de după data-limită sau modele point-in-time (textul anonimizat atenuează problema, fără a o elimina dovedit); în plus, cei 5,64 bp dispar după costuri.",
+                "correctExplanation": "Look-ahead bias: un LLM publicat în 2024 poate conține informații despre ce a urmat titlurilor anterioare, deci nu este dovedit că testul folosește doar informația disponibilă la momentul respectiv. Testele curate folosesc titluri de după data-limită sau modele point-in-time (textul anonimizat atenuează problema, fără a o elimina dovedit); în plus, cei 5,64 bp dispar după costuri.",
                 "incorrectExplanation": "În afara eșantionului înseamnă că modelul nu a avut acces la informația din perioada de test; un model antrenat pe texte până în 2024 poate să o fi avut, chiar dacă nu a văzut direct seria de randamente."
             }
         }
