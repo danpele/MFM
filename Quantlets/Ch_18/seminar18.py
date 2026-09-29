@@ -316,25 +316,34 @@ def b7_frm_window():
 
 
 def b8_ro_stress(value=1_000_000):
-    """Portofoliu 50% Banca Transilvania / 50% BRD: scenarii istorice si un scenariu ipotetic pe factori."""
+    """Portofoliu 50% Banca Transilvania / 50% BRD, rebalansat zilnic: scenarii istorice si un scenariu ipotetic pe factori.
+
+    Randamentul log exact al portofoliului: 100 ln(1/2 e^{r_TLV/100} + 1/2 e^{r_BRD/100}) (nu media randamentelor log).
+    Scenariul ipotetic: socurile factorilor sunt randamente log saptamanale; randamentul log prezis al fiecarei banci
+    beta_k' f se transforma in randament simplu, apoi se aplica ponderile 50/50."""
     X = R[RO]
-    port = X.mean(axis=1)
+    port = 100 * np.log(np.exp(X / 100).mean(axis=1))
     out = {}
     for name, a, b in [('RO bank tax', '2018-12-10', '2019-01-31'), ('COVID-19', '2020-02-15', '2020-04-30')]:
         p = port.loc[a:b].rolling(10).sum()
         end = p.idxmin()
         i = port.index.get_loc(end)
-        out[name] = {'loss': -100 * (np.exp(p.min() / 100) - 1), 'start': port.index[i - 9], 'end': end}
+        out[name] = {'loss': -100 * (np.exp(p.min() / 100) - 1), 'start': port.index[i - 9], 'end': end,
+                     'loss_meanlog': -100 * (np.exp(X.mean(axis=1).loc[a:b].rolling(10).sum().min() / 100) - 1)}
         out[name]['amt'] = out[name]['loss'] / 100 * value
     W = weekly_returns(RO + ['SX5E', 'BET'])
     F = W[['SX5E', 'BET']]
     Xf = np.column_stack([np.ones(len(F)), F.values])
-    bet = np.mean([np.linalg.lstsq(Xf, W[k].values, rcond=None)[0][1:] for k in RO], axis=0)
-    shock = np.array([-25.0, -20.0])
-    loss = -bet @ shock
+    coefs = {k: np.linalg.lstsq(Xf, W[k].values, rcond=None)[0] for k in RO}
+    bet = np.mean([coefs[k][1:] for k in RO], axis=0)
+    shock = np.array([-25.0, -20.0])                             # randamente log saptamanale (%)
+    rhat = {k: coefs[k][1:] @ shock for k in RO}                 # randamentul log prezis al fiecarei banci (%)
+    simple = {k: 100 * (np.exp(rhat[k] / 100) - 1) for k in RO}  # randamentul simplu corespunzator (%)
+    loss = -np.mean([simple[k] for k in RO])                     # pierderea portofoliului 50/50 (%)
     out['hyp'] = {'b_sx5e': bet[0], 'b_bet': bet[1], 'loss': loss, 'amt': loss / 100 * value,
-                  'r2': np.mean([1 - np.var(W[k].values - Xf @ np.linalg.lstsq(Xf, W[k].values, rcond=None)[0]) /
-                                 np.var(W[k].values) for k in RO])}
+                  'loglin': -bet @ shock,
+                  'b_bank': {k: list(coefs[k][1:]) for k in RO}, 'rhat': rhat, 'simple': simple,
+                  'r2': np.mean([1 - np.var(W[k].values - Xf @ coefs[k]) / np.var(W[k].values) for k in RO])}
     return out
 
 

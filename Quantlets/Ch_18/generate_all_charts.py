@@ -428,7 +428,8 @@ def frm_window(D, k, tau=0.05):
 
 
 def frm_series(window=63, step=10, lam_fixed=2e-4):
-    """FRM = media lambda (GACV) pe banci, pe ferestre mobile de 63 de zile; si densitatea legaturilor la lambda fix."""
+    """FRM = media lambda (GACV) pe banci, pe ferestre mobile de 63 de zile; si ponderea predictorilor activi
+    (12 banci + 3 variabile macro intarziate) la lambda fix."""
     D = frm_design()
     rows = {}
     cache = os.path.join(HERE, 'ch18_frm.csv')
@@ -480,8 +481,8 @@ def fig_frm_rolling(f, lam_fix):
     axes[0].plot(f.index, 1e4 * f['frm'], color=MainBlue, lw=0.9, label='FRM: average GACV penalty λ × 10,000 (13 banks)')
     axes[0].set_ylabel('λ × 10,000')
     axes[1].plot(f.index, 100 * f['density'], color=Purple, lw=0.9,
-                 label=f'Share of active tail links at a fixed penalty λ = {lam_fix:.1e}')
-    axes[1].set_ylabel('Active links (%)')
+                 label=f'Share of active predictors (12 banks + 3 lagged macro variables) at a fixed penalty λ = {lam_fix:.1e}')
+    axes[1].set_ylabel('Active predictors (%)')
     ax3 = axes[1].twinx()
     ax3.plot(vix.index, vix.values, color=Orange, lw=0.7, label='VIX (right axis)')
     ax3.spines['right'].set_visible(True)
@@ -515,7 +516,8 @@ def stress_historical():
     for name, a, b in EPISODES:
         keys = INTL + (RO if pd.Timestamp(a) >= pd.Timestamp('2010-01-01') else [])
         X = (Rl.loc[a:b] if keys == INTL else R.loc[a:b, keys])
-        p = X.mean(axis=1).rolling(10).sum()
+        # randamentul log exact al portofoliului rebalansat zilnic: 100 ln(media randamentelor simple brute)
+        p = (100 * np.log(np.exp(X / 100).mean(axis=1))).rolling(10).sum()
         end = p.idxmin()
         i = X.index.get_loc(end)
         win = X.iloc[i - 9:i + 1]
@@ -552,8 +554,9 @@ def weekly_returns(keys):
 def reverse_stress(target=25.0, weeks=4):
     """Testul de stres invers: cel mai plauzibil scenariu al factorilor care produce o pierdere data.
 
-    Model: randamentele saptamanale ale bancilor = beta' f + eroare, f = (S&P 500, Euro Stoxx 50, BET);
-    pe orizontul de h saptamani f ~ N(0, h Sigma). Pierderea portofoliului L = -b'f, b = media beta.
+    Model: randamentele log saptamanale ale bancilor (%) = beta' f + eroare, f = (S&P 500, Euro Stoxx 50, BET);
+    pe orizontul de h saptamani f ~ N(0, h Sigma) (fara autocovariante). Pierderea portofoliului (randament log,
+    aproximare pe factori: erorile idiosincratice puse la zero) L = -b'f, b = media beta.
     Scenariul cel mai probabil cu L = target: f* = -target Sigma b / (b' Sigma b); distanta Mahalanobis target / sqrt(b' Sigma b)."""
     W = weekly_returns(ALL + ['SPX', 'SX5E', 'BET'])
     F = W[['SPX', 'SX5E', 'BET']]
@@ -578,7 +581,7 @@ def fig_reverse(rv):
     fig, ax = plt.subplots(figsize=(6.2, 3.0))
     xs = np.arange(3)
     ax.bar(xs - 0.2, rv['fstar'], 0.38, color=IDAred,
-           label=f'Most plausible scenario for a {rv["target"]:.0f}% loss of the bank portfolio in 4 weeks')
+           label=f'Most plausible scenario for a {rv["target"]:.0f}% log-return loss of the bank portfolio in 4 weeks')
     ax.bar(xs + 0.2, rv['real'], 0.38, color=MainBlue, label=f'Realised: 4 weeks to {rv["real_end"].date()} (COVID-19)')
     ax.axhline(0, color=Gray, lw=0.5)
     ax.set_xticks(xs)

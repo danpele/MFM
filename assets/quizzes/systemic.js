@@ -18,7 +18,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "The ranking of the two banks is significant at 5%",
                     "Apply a Bonferroni correction to each interval separately"
                 ],
-                "correctExplanation": "Both estimates use the same days, so they are positively correlated; the interval of the difference can exclude zero even when the marginal intervals overlap. Only a test on the difference answers the question.",
+                "correctExplanation": "Both estimates use the same days, so they are dependent (the sign of the dependence must be estimated, not assumed); the interval of the difference, computed on paired draws that keep this dependence, can exclude zero even when the marginal intervals overlap. Only a test on the difference answers the question.",
                 "incorrectExplanation": "Overlap of two marginal intervals is neither a test of equality nor of ranking; the difference must be tested directly, using draws that resample the same days for both banks."
             },
             "ro": {
@@ -30,7 +30,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Clasamentul celor două bănci este semnificativ la 5%",
                     "Aplicăm o corecție Bonferroni fiecărui interval separat"
                 ],
-                "correctExplanation": "Ambele estimări folosesc aceleași zile, deci sunt corelate pozitiv; intervalul diferenței poate exclude zero chiar dacă intervalele marginale se suprapun. Doar un test pe diferență răspunde la întrebare.",
+                "correctExplanation": "Ambele estimări folosesc aceleași zile, deci sunt dependente (semnul dependenței trebuie estimat, nu presupus); intervalul diferenței, calculat pe extrageri comune care păstrează această dependență, poate exclude zero chiar dacă intervalele marginale se suprapun. Doar un test pe diferență răspunde la întrebare.",
                 "incorrectExplanation": "Suprapunerea a două intervale marginale nu este nici test al egalității, nici al clasamentului; diferența se testează direct, cu extrageri care reeșantionează aceleași zile pentru ambele bănci."
             }
         },
@@ -38,27 +38,27 @@ window.MFM_DATA.quizzes['systemic'] = {
             "correct": 3,
             "en": {
                 "title": "Extremal quantiles",
-                "text": "Delta-CoVaR at 1% is estimated from about 40 tail days out of 3,960. Why are the usual quantile-regression standard errors unreliable?",
+                "text": "Delta-CoVaR at 1% is estimated by quantile regression on all 3,960 days, but only about 40 of them lie in the 1% tail. Why can the usual quantile-regression standard errors be inaccurate?",
                 "options": [
                     "Quantile regression has no standard errors",
                     "Only because the residuals are heteroskedastic",
                     "Because the bank is included in the system portfolio",
-                    "Because the effective tail sample (alpha times n) is small, so the Normal approximation for central quantiles fails; extremal-quantile inference or subsampling is needed"
+                    "Because the effective tail sample (alpha times n) is small, so the Normal approximation for central quantiles can be poor; extremal-quantile inference or subsampling is the alternative designed for this case"
                 ],
-                "correctExplanation": "The asymptotics of quantile regression need many observations near the quantile; with alpha n of a few dozen the sparsity estimate is noisy and extreme-value (extremal-quantile) theory is the valid route.",
-                "incorrectExplanation": "Standard errors exist, and the system excludes the bank; the problem is the small number of observations in the tail, which invalidates the central-quantile Normal approximation."
+                "correctExplanation": "The asymptotics of quantile regression need many observations near the quantile; with alpha n of a few dozen the sparsity estimate is noisy, and extreme-value (extremal-quantile) theory is built for this case; how poor the Normal approximation is also depends on the regressors and the tail.",
+                "incorrectExplanation": "Standard errors exist, and the system excludes the bank; the problem is the small number of observations in the tail, which can make the central-quantile Normal approximation inaccurate."
             },
             "ro": {
                 "title": "Cuantile extreme",
-                "text": "Delta-CoVaR la 1% este estimat din aproximativ 40 de zile din coadă din 3.960. De ce nu sunt fiabile erorile standard obișnuite ale regresiei cuantile?",
+                "text": "Delta-CoVaR la 1% este estimat prin regresie cuantilă pe toate cele 3.960 de zile, dar doar aproximativ 40 dintre ele se află în coada de 1%. De ce pot fi inexacte erorile standard obișnuite ale regresiei cuantile?",
                 "options": [
                     "Regresia cuantilă nu are erori standard",
                     "Doar pentru că reziduurile sunt heteroscedastice",
                     "Pentru că banca este inclusă în portofoliul sistemului",
-                    "Pentru că eșantionul efectiv din coadă (alpha înmulțit cu n) este mic, deci aproximarea Normală pentru cuantile centrale nu mai funcționează; este nevoie de inferență pentru cuantile extreme sau de subeșantionare"
+                    "Pentru că eșantionul efectiv din coadă (alpha înmulțit cu n) este mic, deci aproximarea Normală pentru cuantile centrale poate fi slabă; inferența pentru cuantile extreme sau subeșantionarea este alternativa construită pentru acest caz"
                 ],
-                "correctExplanation": "Asimptotica regresiei cuantile cere multe observații în jurul cuantilei; cu alpha n de câteva zeci, estimarea rarefierii este zgomotoasă, iar teoria cuantilelor extreme este calea validă.",
-                "incorrectExplanation": "Erorile standard există, iar sistemul exclude banca; problema este numărul mic de observații din coadă, care invalidează aproximarea Normală pentru cuantile centrale."
+                "correctExplanation": "Asimptotica regresiei cuantile cere multe observații în jurul cuantilei; cu alpha n de câteva zeci, estimarea rarefierii este zgomotoasă, iar teoria cuantilelor extreme este construită pentru acest caz; cât de slabă este aproximarea Normală depinde și de regresori și de coadă.",
+                "incorrectExplanation": "Erorile standard există, iar sistemul exclude banca; problema este numărul mic de observații din coadă, care poate face inexactă aproximarea Normală pentru cuantile centrale."
             }
         },
         {
@@ -313,9 +313,9 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "To reduce computing time",
                     "Because the bank has no data",
                     "Because regulators require it",
-                    "Because its own return would appear on both sides of the regression and inflate the slope mechanically"
+                    "Because its own return would appear on both sides of the regression, introducing a mechanical self-contribution"
                 ],
-                "correctExplanation": "With bank i inside the system, X_i enters both the dependent and the explanatory variable, which creates a spurious link.",
+                "correctExplanation": "With bank i inside the system, X_i enters both the dependent and the explanatory variable, which adds a mechanical self-contribution to the estimated link (it need not raise the slope).",
                 "incorrectExplanation": "The reason is statistical: including the bank creates a mechanical correlation between the system and the bank."
             },
             "ro": {
@@ -325,9 +325,9 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Pentru a reduce timpul de calcul",
                     "Pentru că banca nu are date",
                     "Pentru că o cer autoritățile",
-                    "Pentru că propriul randament ar apărea de ambele părți ale regresiei și ar umfla panta în mod mecanic"
+                    "Pentru că propriul randament ar apărea de ambele părți ale regresiei, introducând o contribuție mecanică proprie"
                 ],
-                "correctExplanation": "Cu banca i în sistem, X_i intră atât în variabila dependentă, cât și în cea explicativă, ceea ce creează o legătură falsă.",
+                "correctExplanation": "Cu banca i în sistem, X_i intră atât în variabila dependentă, cât și în cea explicativă, ceea ce adaugă o contribuție mecanică proprie la legătura estimată (nu neapărat o pantă mai mare).",
                 "incorrectExplanation": "Motivul este statistic: includerea băncii creează o corelație mecanică între sistem și bancă."
             }
         },
@@ -551,7 +551,7 @@ window.MFM_DATA.quizzes['systemic'] = {
             "correct": 2,
             "en": {
                 "title": "Reverse stress test",
-                "text": "In a linear factor model with Normal factors, what is the most plausible scenario f* producing a loss l*?",
+                "text": "For zero-mean factors f with the Normal distribution and covariance Sigma, and portfolio return b'f, what is the most plausible scenario f* producing the loss -b'f = l*?",
                 "options": [
                     "All factors fall by l*",
                     "The factor with the largest variance falls by l*, the others stay unchanged",
@@ -563,7 +563,7 @@ window.MFM_DATA.quizzes['systemic'] = {
             },
             "ro": {
                 "title": "Test invers de stres",
-                "text": "Într-un model factorial liniar cu factori Normali, care este cel mai plauzibil scenariu f* care produce pierderea l*?",
+                "text": "Pentru factori f cu medie zero, cu distribuția Normală și covarianța Sigma, și randamentul portofoliului b'f, care este cel mai plauzibil scenariu f* care produce pierderea -b'f = l*?",
                 "options": [
                     "Toți factorii scad cu l*",
                     "Factorul cu cea mai mare dispersie scade cu l*, ceilalți rămân neschimbați",
@@ -578,7 +578,7 @@ window.MFM_DATA.quizzes['systemic'] = {
             "correct": 3,
             "en": {
                 "title": "Probabilities of reverse stress scenarios",
-                "text": "The reverse stress test gave a Mahalanobis distance of about 4.3 for a 25% loss in four weeks, yet in 2020 the bank portfolio lost about 52% (log return) in four weeks. What is the lesson?",
+                "text": "The reverse stress test gave a Mahalanobis distance of about 4.3 for a 25% log-return loss in four weeks, yet in 2020 the bank portfolio lost about 52% (log return) in four weeks. What is the lesson?",
                 "options": [
                     "The data are wrong",
                     "The factor model is exact",
@@ -590,7 +590,7 @@ window.MFM_DATA.quizzes['systemic'] = {
             },
             "ro": {
                 "title": "Probabilitățile scenariilor inverse de stres",
-                "text": "Testul invers de stres a dat o distanță Mahalanobis de aproximativ 4,3 pentru o pierdere de 25% în patru săptămâni, dar în 2020 portofoliul bancar a pierdut aproximativ 52% (randament log) în patru săptămâni. Care este lecția?",
+                "text": "Testul invers de stres a dat o distanță Mahalanobis de aproximativ 4,3 pentru o pierdere log de 25% în patru săptămâni, dar în 2020 portofoliul bancar a pierdut aproximativ 52% (randament log) în patru săptămâni. Care este lecția?",
                 "options": [
                     "Datele sunt greșite",
                     "Modelul factorial este exact",

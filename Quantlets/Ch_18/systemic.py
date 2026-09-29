@@ -117,14 +117,15 @@ def var_fit(Y, p):
 
 
 def var_bic(Y, pmax=5):
-    """Ordinul VAR ales prin criteriul BIC."""
+    """Ordinul VAR ales prin criteriul BIC (Schwarz), cu matricea de covarianta a reziduurilor de verosimilitate maxima."""
     Y = np.asarray(Y, float)
     T, k = Y.shape
     best = None
+    n = T - pmax
     for p in range(1, pmax + 1):
         A, S = var_fit(Y[pmax - p:], p)
-        n = T - pmax
-        bic = np.log(np.linalg.det(S)) + np.log(n) * p * k * k / n
+        S_ml = S * (n - 1 - p * k) / n                        # covarianta de verosimilitate maxima E'E / n
+        bic = np.log(np.linalg.det(S_ml)) + np.log(n) * p * k * k / n
         if best is None or bic < best[1]:
             best = (p, bic)
     return best[0]

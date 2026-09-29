@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch18_frm'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Financial Risk Meter for 13 banks: L1-penalized quantile regression at 5% on 63-day windows, penalty chosen by generalized approximate cross-validation (GACV); GACV curves in a calm and a crisis window, the average penalty over time and the share of active tail links at a fixed penalty.'
+Description: 'Financial Risk Meter for 13 banks: L1-penalized quantile regression at 5% on 63-day windows, penalty chosen by generalized approximate cross-validation (GACV); GACV curves in a calm and a crisis window, the average penalty over time and the share of active predictors (bank and macro) at a fixed penalty.'
 
 Keywords: 'Financial Risk Meter, FRM, lasso quantile regression, GACV, tail network, systemic risk'
 

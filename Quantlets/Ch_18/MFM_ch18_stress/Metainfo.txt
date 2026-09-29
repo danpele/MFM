@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch18_stress'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Stress tests for a bank portfolio: worst 10-day losses in seven historical episodes (2008-2025) and a reverse stress test (most plausible factor scenario for a 25% loss in four weeks) with a three-factor model.'
+Description: 'Stress tests for a bank portfolio: worst 10-day losses in seven historical episodes (2008-2025) and a reverse stress test (most plausible factor scenario for a 25% log-return loss in four weeks) with a three-factor model.'
 
 Keywords: 'stress testing, historical scenario, reverse stress test, Mahalanobis distance, factor model, banks'
 

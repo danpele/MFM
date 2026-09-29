@@ -101,7 +101,8 @@ def bank_range_vol(keys, start=START, end=END):
         d = bank_frame(k, start, end)
         rng = np.log(d['high'] / d['low']).where(d['high'] > d['low'])
         s2 = rng ** 2 / (4 * np.log(2))
-        s2 = s2.fillna(s2[s2 > 0].min())                          # zile cu maxim = minim: cea mai mica valoare observata
+        floor = s2.where(s2 > 0).cummin().ffill()                  # cea mai mica valoare pozitiva observata PANA la ziua t
+        s2 = s2.fillna(floor)                                     # zile cu maxim = minim: fara informatie din viitor
         out.append((100 * np.sqrt(252 * s2)).rename(k))
     return pd.concat(out, axis=1, join='inner').dropna()
 
