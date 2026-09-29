@@ -8,7 +8,10 @@ complexitatea c = P/T) si a Figurii 10 (pozitiile strategiei si recesiunile NBER
     scalati cu abaterea standard pe fereastra extinsa, dupa 36 de luni de initializare (Sectiunea V.A)
   * trasaturi Fourier aleatoare S = (sin(gamma w'G), cos(gamma w'G)), w ~ N(0, I), gamma = 2 (ec. 20)
   * ridge fara termen liber pe ferestre mobile de T = 12 luni, P = 2 ... 12 000, log10 z = -3 ... 3,
-    trasaturile scalate cu abaterea standard din fereastra de antrenare; statistici mediate pe 1 000 de extrageri
+    trasaturile scalate cu abaterea standard din fereastra de antrenare; statistici calculate pentru fiecare
+    extragere si apoi mediate pe 1 000 de extrageri (Sectiunea V.C, pasul iv; Tabelul I)
+  * R^2 empiric = 1 - Var(eroare de prognoza)/Var(randament realizat), in afara esantionului; raportul Sharpe
+    cu abaterea standard centrata (nota 40 din versiunea publicata)
   * reperul: regresia liniara kitchen sink pe cei 7 predictori, z = 0+ si z = 10^3 (Sectiunea V.D)
 Iesire: kmz_case.json, charts/ch14_kmz_complexity.pdf, charts/ch14_kmz_positions.pdf
 Modelarea Pietelor Financiare - Daniel Traian PELE
@@ -96,7 +99,9 @@ def _ridge_paths(K, k, y, zs):
 
 
 def kmz_stats(fc, R):
-    """Out-of-sample R^2 = 1 - Var(error)/Var(R), annualised Sharpe ratio of pi_t R_{t+1} and its t-statistic."""
+    """Out-of-sample R^2 = 1 - Var(error)/Var(R) (footnote 40 of the paper: forecast-error variance over realised
+    return variance, both out of sample), annualised Sharpe ratio of pi_t R_{t+1} (centred standard deviation)
+    and the t-statistic of its mean."""
     e = R[:, None] - fc
     r2 = 1 - e.var(0) / R.var()
     tr = fc * R[:, None]
@@ -116,6 +121,8 @@ def kmz_run(draws=KMZ_DRAWS, seed=0):
     nP, nz = len(KMZ_P), len(zs)
     acc = {k: np.zeros((nP, nz)) for k in ('r2', 'sr', 'bn')}
     pos = np.zeros(len(tidx))
+    lin = kmz_linear(G, R, tidx, T)
+    rff = {}
     iP, iZ = KMZ_P.index(12000), KMZ_LOGZ.index(3)
     rng = np.random.default_rng(seed)
     win = np.stack([np.arange(t - T, t) for t in tidx])      # (W, T)
@@ -146,12 +153,20 @@ def kmz_run(draws=KMZ_DRAWS, seed=0):
             acc['sr'][j] += sr
             acc['bn'][j] += bns[j].mean(0)
         pos += fcs[iP][:, iZ]
+        row = kmz_row(fcs[iP][:, iZ], Rt, lin['lin3'] * Rt)      # Table I statistics of this draw
+        for key, v in row.items():
+            rff[key] = rff.get(key, 0.0) + v / draws
         if (d + 1) % 50 == 0:
             print(f'   draw {d + 1}/{draws}')
     for key in acc:
         acc[key] /= draws
     pos /= draws
-    # linear kitchen sink on the 7 predictors, no intercept (z = 0+ is least squares, P = 7 < T)
+    dates = df.index[tidx] + 1                                # month of R_{t+1}
+    return dict(dates=dates, R=Rt, acc=acc, pos=pos, lin=lin, rff=rff, rec=rec.values[tidx], zs=zs)
+
+
+def kmz_linear(G, R, tidx, T):
+    """Linear kitchen sink on the 7 predictors, no intercept (z = 0+ is least squares, P = 7 < T) and z = 10^3."""
     lin = {}
     for name, z in (('lin0', 0.0), ('lin3', 1e3)):
         f_ = np.empty(len(tidx))
@@ -161,22 +176,39 @@ def kmz_run(draws=KMZ_DRAWS, seed=0):
                 else np.linalg.lstsq(Sx, y, rcond=None)[0]
             f_[i] = G[t] @ b
         lin[name] = f_
-    dates = df.index[tidx] + 1                                # month of R_{t+1}
-    return dict(dates=dates, R=Rt, acc=acc, pos=pos, lin=lin, rec=rec.values[tidx], zs=zs)
+    return lin
+
+
+def _alpha_ir(tr, bench):
+    """Annualised information ratio (alpha over residual volatility) of tr against bench, and the alpha t-statistic."""
+    X = np.column_stack([np.ones_like(bench), bench])
+    b = np.linalg.lstsq(X, tr, rcond=None)[0]
+    u = tr - X @ b
+    se = np.sqrt(u.var(ddof=2) * np.linalg.inv(X.T @ X)[0, 0])
+    return np.sqrt(12) * b[0] / u.std(ddof=2), b[0] / se
+
+
+def kmz_row(f_, Rt, lin_tr=None):
+    """Table I statistics of one forecast series: R^2 (%), Sharpe ratio and t, information ratio and t against the
+    market (the volatility-standardised return R) and against the linear model with z = 10^3, maximum monthly loss
+    in standard deviations of the strategy return, skewness."""
+    r2, sr, t = kmz_stats(f_[:, None], Rt)
+    tr = f_ * Rt
+    ir, ir_t = _alpha_ir(tr, Rt)
+    sd = tr.std(ddof=1)
+    row = dict(r2=100 * r2[0], sr=sr[0], t=t[0], ir=ir, ir_t=ir_t, maxloss=-tr.min() / sd,
+               skew=float(np.mean((tr - tr.mean()) ** 3) / tr.std() ** 3))
+    if lin_tr is not None:
+        row['ir_lin'], row['ir_lin_t'] = _alpha_ir(tr, lin_tr)
+    return row
 
 
 def kmz_table(out):
-    """Table I-style statistics for the two linear models and RFF (c = 1000, z = 10^3, position averaged over draws)."""
+    """Table I on course data: the two linear models and RFF (c = 1000, z = 10^3); the RFF row averages the
+    statistics of each draw over the 1,000 draws, as in Table I of the paper."""
     Rt = out['R']
-    rows = {}
-    for name, f_ in (('lin0', out['lin']['lin0']), ('lin3', out['lin']['lin3']), ('rff', out['pos'])):
-        r2, sr, t = kmz_stats(f_[:, None], Rt)
-        tr = f_ * Rt
-        X = np.column_stack([np.ones_like(Rt), Rt])           # information ratio against the market
-        b = np.linalg.lstsq(X, tr, rcond=None)[0]
-        u = tr - X @ b
-        se = np.sqrt(u.var(ddof=2) * np.linalg.inv(X.T @ X)[0, 0])
-        rows[name] = dict(r2=100 * r2[0], sr=sr[0], t=t[0], ir=np.sqrt(12) * b[0] / u.std(ddof=2), ir_t=b[0] / se)
+    rows = {name: kmz_row(out['lin'][name], Rt) for name in ('lin0', 'lin3')}
+    rows['rff'] = dict(out['rff'])
     return rows
 
 
@@ -218,8 +250,8 @@ def fig_kmz_positions(out):
     pad = 0.1 * (hi - lo)
     ax.fill_between(d, lo - pad, hi + pad, where=rec, color=g.LightGray, step='mid', label='NBER recession')
     ax.plot(d, out['pos'], color=g.MainBlue, lw=1.0, label='RFF position $\\hat\\beta\' S_t$ ($c = 1000$, $z = 10^3$)')
-    ax.plot(d, pd.Series(out['pos']).rolling(12, min_periods=1).mean(), color=g.IDAred, lw=1.3,
-            label='12-month moving average')
+    ax.plot(d, pd.Series(out['pos']).rolling(6, min_periods=1).mean(), color=g.IDAred, lw=1.3,
+            label='6-month moving average')
     ax.axhline(0, color=g.Gray, lw=0.6)
     ax.set_ylim(lo - pad, hi + pad)
     ax.set_ylabel('Position (average of 1,000 draws)')

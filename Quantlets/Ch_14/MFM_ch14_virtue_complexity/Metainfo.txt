@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch14_virtue_complexity'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Case study, Kelly, Malamud and Zhou (2024), The virtue of complexity in return prediction, on course data: monthly SPY excess returns and seven Welch-Goyal predictors (tbl, lty, tms, dfy, infl, svar, lagged return), random Fourier features with gamma = 2, ridge without intercept on rolling 12-month windows, P = 2 to 12,000, log10 z = -3 to 3, averaged over 1,000 draws; out-of-sample R-squared and Sharpe ratio of the timing strategy against complexity c = P/T, linear kitchen-sink benchmarks and the timing position with NBER recessions.'
+Description: 'Case study, Kelly, Malamud and Zhou (2024), The virtue of complexity in return prediction, on course data: monthly SPY excess returns and seven Welch-Goyal predictors (tbl, lty, tms, dfy, infl, svar, lagged return), random Fourier features with gamma = 2, ridge without intercept on rolling 12-month windows, P = 2 to 12,000, log10 z = -3 to 3, statistics of each draw averaged over 1,000 draws; out-of-sample R-squared (1 - forecast-error variance over return variance) and Sharpe ratio of the timing strategy against complexity c = P/T, linear kitchen-sink benchmarks and the timing position with NBER recessions.'
 
 Keywords: 'virtue of complexity, random Fourier features, ridge regression, market timing, return predictability'
 
