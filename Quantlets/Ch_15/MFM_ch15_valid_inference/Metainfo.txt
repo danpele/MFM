@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch15_valid_inference'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Sentiment scores are estimates: attenuation of slopes from misclassification (Aigner, 1973), a one-factor model and instrumental variables with two scores, prediction-powered inference with a few human labels, calibration of LLM probabilities and temperature scaling, wild cluster bootstrap with 16 stocks and Holm adjustment, event-study differences, a specification curve with a sign-flip joint test, and the DeLong test of AUC before and after the release of the weights.'
+Description: 'Sentiment scores are estimates: attenuation of slopes from misclassification (Aigner, 1973), a one-factor model and instrumental variables with two scores, prediction-powered inference with a few human labels, calibration of LLM probabilities and temperature scaling, wild cluster bootstrap with 16 stocks and Holm adjustment, event-study differences, a specification curve with a block sign-flip joint test (dependent wild bootstrap), and the DeLong test of AUC before and after the release of the weights.'
 
 Keywords: 'measurement error, generated regressors, prediction-powered inference, calibration, wild cluster bootstrap, specification curve, multiple testing, DeLong test'
 

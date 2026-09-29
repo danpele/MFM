@@ -225,9 +225,9 @@ def fig_agreement():
         ax.bar(x + (k - 1.5) * 0.2, [100 * R[l][m] for l in M.AGREE], 0.2, color=c, label=m)
     n = RES['texts']['agree_n']
     ax.set_xticks(x)
-    ax.set_xticklabels([f'{l.replace("Agree", "")}{"%" if l != "AllAgree" else ""}\n(n = {n[l]:,})'.replace(
-        'All', '100%') for l in M.AGREE], fontsize=8)
-    ax.set_xlabel('Share of the 16 annotators who agree on the label (highest threshold reached)')
+    rng = {'50Agree': '50% to <66%', '66Agree': '66% to <75%', '75Agree': '75% to <100%', 'AllAgree': '100%'}
+    ax.set_xticklabels([f'{rng[l]}\n(n = {n[l]:,})' for l in M.AGREE], fontsize=8)
+    ax.set_xlabel("Share of each sentence's annotators (5-8 per sentence) who agree on the label")
     ax.set_ylabel('Accuracy (%)')
     ax.set_ylim(0, 100)
     legend_outside_bottom(ax, ncol=4, y=-0.32)
@@ -429,6 +429,16 @@ def news_panel():
     return P, rets
 
 
+def event_groups(x):
+    """Grupurile studiului de eveniment: tercila cea mai negativa si cea mai pozitiva a scorului zilnic. Daca cele
+    doua praguri coincid (tonul LM este exact 0 in aproape jumatate din zilele-actiune), grupurile disjuncte sunt
+    scor < prag si scor > prag, iar zilele egale cu pragul sunt excluse."""
+    q1, q2 = x.quantile([1 / 3, 2 / 3])
+    if q1 >= q2:
+        return x < q1, x > q2
+    return x <= q1, x >= q2
+
+
 def eval_news(P, rets):
     cnt = load_csv('ch15_news_counts.csv', index_col=0)
     hl = load_csv('ch15_news_headlines.csv.gz', usecols=['finbert', 'lm', 'lm_hit', 'qwen', 'finbert_lab'])
@@ -451,9 +461,9 @@ def eval_news(P, rets):
     cols = EVENT_COLS
     R['event'] = {}
     for c in ('finbert', 'qwen', 'lm'):
-        q1, q2 = P[c].quantile([1 / 3, 2 / 3])
+        neg, pos = event_groups(P[c])
         ev = {}
-        for grp, sel in (('neg', P[c] <= q1), ('pos', P[c] >= q2)):
+        for grp, sel in (('neg', neg), ('pos', pos)):
             X = P.loc[sel, cols].groupby(level='day').mean()
             car = X.fillna(0).cumsum(axis=1)
             ev[grp] = {'car': car.mean().tolist(), 'se': (car.std() / np.sqrt(len(car))).tolist(), 'n_days': len(X),
@@ -557,7 +567,7 @@ def fig_strategy():
         ax.plot(St.index, St['gross'].cumsum(), color=SCORE_COL[c], lw=1.1, label=f'{SCORE_LBL[c]}, before costs')
         ax.plot(St.index, St['net'].cumsum(), color=SCORE_COL[c], lw=0.9, ls='--', label=f'{SCORE_LBL[c]}, 5 bp per trade')
     ax.axhline(0, color=Gray, lw=0.6)
-    ax.set_ylabel('Cumulative next-day return (%, sum)')
+    ax.set_ylabel('Cumulative d+2 return (%, sum)')
     legend_outside_bottom(ax, ncol=2, y=-0.14)
     save_fig('ch15_strategy')
 

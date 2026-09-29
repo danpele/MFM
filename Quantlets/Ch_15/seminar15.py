@@ -219,9 +219,9 @@ def b_cluster(P):
 
 def b_event(P, col):
     cols = g.EVENT_COLS
-    q1, q2 = P[col].quantile([1 / 3, 2 / 3])
-    out = {}
-    for grp, sel in (('neg', P[col] <= q1), ('pos', P[col] >= q2)):
+    neg, pos = g.event_groups(P[col])
+    out = {'zero_share': float((P[col] == 0).mean())}
+    for grp, sel in (('neg', neg), ('pos', pos)):
         X = P.loc[sel, cols].groupby(level='day').mean().fillna(0)
         car = X.cumsum(axis=1)
         pre = X[['rm5', 'rm4', 'rm3', 'rm2', 'rm1']].sum(1)
@@ -230,7 +230,7 @@ def b_event(P, col):
                     'day0': float(X['r0'].mean()), 'day0_t': M.nw_t(X['r0'])[1],
                     'day1': float(X['r1'].mean()), 'day1_t': M.nw_t(X['r1'])[1],
                     'pre': float(pre.mean()), 'pre_t': M.nw_t(pre)[1],
-                    'post': float(post.mean()), 'post_t': M.nw_t(post)[1], 'n_days': len(X)}
+                    'post': float(post.mean()), 'post_t': M.nw_t(post)[1], 'n_days': len(X), 'n_obs': int(sel.sum())}
     return out
 
 
@@ -275,7 +275,7 @@ def b_prompts():
 # PARTEA C
 # =============================================================================
 def part_c(P, rets):
-    """Prezice sentimentul FinBERT al titlurilor randamentul din ziua urmatoare, dupa costuri?"""
+    """Prezice sentimentul FinBERT al titlurilor randamentul din d+2 (pozitie de la inchiderea din d+1 la inchiderea din d+2), dupa costuri?"""
     days = rets.index[rets.index >= P.index.get_level_values('day').min()]
     out = {}
     for c in ('finbert', 'qwen', 'lm'):
@@ -302,7 +302,7 @@ def part_c(P, rets):
         net = St['gross'] - np.where(act, 4 * cbp / 100, 0)
         ax.plot(St.index, net.cumsum(), color=col, lw=1.0, label=f'FinBERT signal, {cbp} bp per trade')
     ax.axhline(0, color=g.Gray, lw=0.6)
-    ax.set_ylabel('Cumulative next-day return (%, sum)')
+    ax.set_ylabel('Cumulative d+2 return (%, sum)')
     g.legend_outside_bottom(ax, ncol=3, y=-0.14)
     g.save_fig('ch15_sem_partc')
     return out

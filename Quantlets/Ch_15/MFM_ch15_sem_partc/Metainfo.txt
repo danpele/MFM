@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch15_sem_partc'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 15, Part C (reference analysis): does FinBERT sentiment on headlines predict next-day returns after costs? Newey-West t-statistics, block-bootstrap intervals, break-even costs, strong-news filter.'
+Description: 'Seminar 15, Part C (reference analysis): does FinBERT sentiment on headlines predict the excess return from the close of d+1 to the close of d+2 after costs? Newey-West t-statistics, block-bootstrap intervals, break-even costs, strong-news filter.'
 
 Keywords: 'news sentiment, FinBERT, trading strategy, transaction costs, break-even cost, Newey-West'
 

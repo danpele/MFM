@@ -11,7 +11,7 @@ ch15_memory_monthly.csv, ai_discovery_case.json); nu ruleaza din nou niciun mode
     Miller, 2008), corectia Holm pe cele 9 regresii si pe cele 3 strategii
   * studiul de eveniment: diferenta pozitiv - negativ cu CI grupat pe zile; testul Boehmer, Musumeci & Poulsen (1991)
   * curba specificatiilor (Simonsohn, Simmons & Nelson, 2020) pe grila de 36 de strategii, cu nul prin schimbarea
-    semnului pe zile
+    semnului pe blocuri de 10 zile de semnal (bootstrap salbatic dependent, Shao, 2010)
   * testul formal AUC inainte vs dupa publicare (DeLong et al., 1988) si diferenta minima detectabila
   * diferenta diferentelor pentru scurgerea datelor de antrenare, cu CI bootstrap
 Iesire: ch15_inference.json si graficele ch15_ppi, ch15_calibration, ch15_spec_curve.
@@ -135,6 +135,10 @@ def factor_iv(P):
 # 2. PREDICTION-POWERED INFERENCE PE TWITTER
 # =============================================================================
 def ppi_sim(ns=(100, 200, 400, 800), R=2000, seed=15):
+    """PPI (Angelopoulos et al., 2023): esantion etichetat (n) si esantion neetichetat (N - n) INDEPENDENTE, predictorul
+    f fix (antrenat pe alte date). Simularea trateaza cele N titluri de validare ca populatie: in fiecare replicare,
+    ambele esantioane se extrag independent, cu intoarcere, deci varianta Var(f)/(N - n) + Var(f - Y)/n este exacta,
+    iar theta (media celor N etichete) este media populatiei."""
     tw = g.load_csv('ch15_twitter_scores.csv')
     y = tw['label'].map(SIGN).values.astype(float)
     theta = y.mean()
@@ -146,8 +150,7 @@ def ppi_sim(ns=(100, 200, 400, 800), R=2000, seed=15):
     for n in ns:
         res = {'classical': [], 'ppi_finbert': [], 'ppi_qwen': []}
         for _ in range(R):
-            idx = rng.permutation(N)
-            L, U = idx[:n], idx[n:]
+            L, U = rng.integers(0, N, n), rng.integers(0, N, N - n)
             m, se = y[L].mean(), y[L].std(ddof=1) / np.sqrt(n)
             res['classical'].append((m, se))
             for c in F:
@@ -162,7 +165,7 @@ def ppi_sim(ns=(100, 200, 400, 800), R=2000, seed=15):
             r[k] = {'cover': float(np.mean(np.abs(v[:, 0] - theta) <= z * v[:, 1])), 'width': float(np.mean(2 * z * v[:, 1])),
                     'bias': float(v[:, 0].mean() - theta)}
         out['by_n'][str(n)] = r
-    # un exemplu concret cu n = 200: estimarile si intervalele
+    # un exemplu concret cu n = 200 (o impartire aleatoare a titlurilor: n etichetate, restul neetichetate)
     idx = np.random.default_rng(1).permutation(N)
     L, U = idx[:200], idx[200:]
     ex = {'classical': (y[L].mean(), y[L].std(ddof=1) / np.sqrt(200))}
@@ -363,9 +366,9 @@ def panel_inference(P, strat=None):
 # 5. STUDIUL DE EVENIMENT: DIFERENTA POZITIV - NEGATIV SI TESTUL BMP
 # =============================================================================
 def event_inference(P, rets, col='finbert'):
-    q1, q2 = P[col].quantile([1 / 3, 2 / 3])
-    sub = P[(P[col] <= q1) | (P[col] >= q2)].copy()
-    sub['pos'] = (sub[col] >= q2).astype(float)
+    neg, pos = g.event_groups(P[col])
+    sub = P[neg | pos].copy()
+    sub['pos'] = pos[neg | pos].astype(float)
     sub['post'] = sub[['r2', 'rp3', 'rp4', 'rp5']].sum(1, min_count=4)
     sub['pre'] = sub[['rm5', 'rm4', 'rm3', 'rm2', 'rm1']].sum(1, min_count=5)
     out = {}
@@ -402,7 +405,11 @@ def nw_t_mat(X, L):
     return mu / np.sqrt(v / n)
 
 
-def spec_curve(P, rets, B=2000, seed=15):
+def spec_curve(P, rets, B=2000, seed=15, block=10):
+    """Nulul comun: ponderi Rademacher constante pe blocuri de `block` zile de semnal consecutive (bootstrap salbatic
+    dependent, Shao, 2010), aceleasi pentru toate specificatiile. Ipoteze: sub nul, randamentele cu semn ale fiecarui
+    bloc sunt simetrice in jurul lui 0, iar blocurile sunt aproximativ independente; se pastreaza dependenta dintre
+    specificatii si dependenta seriala pe distante mai mici decat blocul."""
     days = rets.index[rets.index >= P.index.get_level_values('day').min()]
     series = []
     meta = []
@@ -421,7 +428,7 @@ def spec_curve(P, rets, B=2000, seed=15):
     rng = np.random.default_rng(seed)
     cnt, med = [], []
     for _ in range(B):
-        w = rng.choice([-1.0, 1.0], size=n)
+        w = np.repeat(rng.choice([-1.0, 1.0], size=int(np.ceil(n / block))), block)[:n]
         tb = nw_t_mat(X * w[None, :], L)
         cnt.append(np.sum(tb > 1.96))
         med.append(np.median(tb))
@@ -429,7 +436,8 @@ def spec_curve(P, rets, B=2000, seed=15):
     k_obs = int(np.sum(t_obs > 1.96))
     out = {'t': t_obs.tolist(), 'meta': meta, 'n_pos_sig': k_obs, 'median_t': float(np.median(t_obs)),
            'p_count': float(np.mean(cnt >= k_obs)), 'p_median': float(np.mean(med >= np.median(t_obs))),
-           'null_q95_count': float(np.quantile(cnt, 0.95)), 'n_neg_sig': int(np.sum(t_obs < -1.96)), 'B': B}
+           'null_q95_count': float(np.quantile(cnt, 0.95)), 'n_neg_sig': int(np.sum(t_obs < -1.96)), 'B': B,
+           'block': block}
     VI['spec'] = out
     return out
 
