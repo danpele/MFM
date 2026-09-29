@@ -308,8 +308,9 @@ def part_c():
     """Momentum 12-1 si beta scazut pe blue chips BVB, doar cu informatie disponibila la formarea portofoliului.
 
     * lunile incomplete (ultima luna, daca datele se opresc inainte de sfarsitul ei) se elimina;
-    * |r| > 50% intr-o luna = eroare de date (eveniment de capital neajustat): in semnal conteaza ca 0,
-      iar in luna de detinere randamentul invalid se inlocuieste cu 0 (regula fixata dinainte);
+    * |r| > 50% intr-o luna = eveniment de capital neajustat (FP, septembrie 2023): randamentul este indisponibil;
+      actiunea nu intra in clasamentele al caror semnal contine luna respectiva, iar in luna de detinere
+      iese din media portofoliului (regula fixata dinainte);
     * eligibilitatea in luna t foloseste doar informatie de la sfarsitul lunii t-1 (semnal si pret disponibile).
     """
     names = [s for s in BVB if s not in ('H2O',)]
@@ -322,9 +323,9 @@ def part_c():
     raw = m.pct_change()
     flag = raw.abs() > 0.5
     rets = raw.mask(flag)                                         # randamente valide (NaN = eroare sau lipsa)
-    gross = (1 + rets[stocks]).where(~flag[stocks], 1.0)          # eroare de date -> randament 0 in semnal
+    gross = 1 + rets[stocks]                                      # randament indisponibil -> semnal indisponibil
     mom = gross.rolling(11, min_periods=11).apply(np.prod, raw=True).shift(2) - 1   # lunile t-12 ... t-2
-    hold = rets[stocks].fillna(0.0).where(m[stocks].shift(1).notna())                # randamentul lunii t
+    hold = rets[stocks].fillna(0.0).where(m[stocks].shift(1).notna()).mask(flag[stocks])   # randamentul lunii t
     rows = []
     for t in range(13, len(m)):
         date = m.index[t]
@@ -357,7 +358,7 @@ def part_c():
     out['n_median'] = float(d['n'].median())
     out['n_flagged'] = int(flag[stocks].sum().sum())
     # C2: raspunsul AI pe acelasi esantion (semnal cu luna t inclusa, randamente log) si fiecare eroare separat
-    look = (1 + rets[stocks].fillna(0.0)).rolling(12, min_periods=12).apply(np.prod, raw=True) - 1
+    look = (1 + rets[stocks]).rolling(12, min_periods=12).apply(np.prod, raw=True) - 1
     logh = np.log1p(hold)
     var = {}
     for lab, sig, h in [('lookahead', look, hold), ('log', mom, logh), ('ai_answer', look, logh)]:

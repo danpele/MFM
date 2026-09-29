@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch3_jkp_replication'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Lecture 3 case study (Jensen, Kelly and Pedersen, 2023, Is There a Replication Crisis in Finance?): CAPM alphas of 15 US long-short factors built from value-weighted univariate sorts (July 1963 - July 2026), scaled to 10% annual idiosyncratic volatility; OLS and Benjamini-Yekutieli replication rates, themes by Ward clustering of CAPM residual correlations, and hierarchical empirical-Bayes posterior alphas.'
+Description: 'Lecture 3 case study (Jensen, Kelly and Pedersen, 2023, Is There a Replication Crisis in Finance?): CAPM alphas of 15 US long-short factors built from value-weighted univariate sorts (July 1963 - July 2026), scaled to 10% annual idiosyncratic volatility; OLS and Benjamini-Yekutieli replication rates, themes of the paper (authors' cluster labels), and hierarchical empirical-Bayes posterior alphas.'
 
 Keywords: 'replication crisis, factor zoo, CAPM alpha, empirical Bayes, shrinkage, Benjamini-Yekutieli, false discovery rate, hierarchical clustering'
 

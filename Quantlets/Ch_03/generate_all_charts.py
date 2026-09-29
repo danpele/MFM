@@ -606,19 +606,34 @@ JKP_SIGNALS = {
     'Reversal 1-0': ('PRIOR_1_0', 'Lo PRIOR', 'Hi PRIOR'),
     'Reversal 60-13': ('PRIOR_60_13', 'Lo PRIOR', 'Hi PRIOR'),
 }
-# numele temelor: tema care contine factorul-reper
-JKP_THEME_NAMES = [('Book/market', 'Value'), ('Profitability', 'Quality and low risk'),
-                   ('Momentum 12-2', 'Accruals and momentum'), ('Size', 'Size and reversal')]
+# temele lucrarii (Sec. II.B; fisierul "Cluster Labels.csv" din codul autorilor, github.com/bkelly-lab/ReplicationCrisis):
+# tema caracteristicii JKP corespunzatoare fiecarui semnal
+JKP_THEMES = {
+    'Size': 'Size',                          # market_equity
+    'Book/market': 'Value',                  # be_me
+    'Profitability': 'Profitability',        # ope_be
+    'Investment': 'Investment',              # at_gr1
+    'Earnings/price': 'Value',               # ni_me
+    'Cash flow/price': 'Value',              # ocf_me
+    'Dividend/price': 'Value',               # div12m_me
+    'Accruals': 'Accruals',                  # oaccruals_at
+    'Net share issues': 'Value',             # chcsho_12m
+    'Market beta': 'Low risk',               # beta_60m
+    'Variance': 'Low risk',                  # rvol_21d
+    'Residual variance': 'Low risk',         # ivol_ff3_21d
+    'Momentum 12-2': 'Momentum',             # ret_12_1
+    'Reversal 1-0': 'Short-term reversal',   # ret_1_0
+    'Reversal 60-13': 'Investment',          # ret_60_12
+}
+JKP_THEME_ORDER = ['Value', 'Investment', 'Low risk', 'Profitability', 'Accruals', 'Momentum', 'Size',
+                   'Short-term reversal']
 
 
-def jkp_replication(start='1963-07-31', kmax=8):
+def jkp_replication(start='1963-07-31'):
     """Jensen, Kelly & Pedersen (2023) pe 15 factori SUA: alfa CAPM cu factorii scalati la 10% volatilitate
     idiosincratica anuala (Sec. II.A), rata de replicare OLS (t >= 1.96), Benjamini-Yekutieli la 5%,
-    teme prin Ward pe 1 - corelatia reziduurilor CAPM (Sec. II.B) si modelul ierarhic empirical Bayes cu media
-    a priori 0 (ec. 21-23, Prop. 4; o singura regiune, deci tau_s = 0). Numarul de teme: maximul
-    verosimilitatii marginale a lui alfa_hat ~ N(0, M M' tau_c^2 + I tau_w^2 + Sigma / T), k = 1..kmax."""
-    from scipy.cluster.hierarchy import linkage, fcluster
-    from scipy.spatial.distance import squareform
+    temele lucrarii (JKP_THEMES, Sec. II.B) si modelul ierarhic empirical Bayes cu media a priori 0
+    (ec. 21-23, Prop. 4; o singura regiune, deci tau_s = 0); in plus, varianta cu o singura tema."""
     from scipy.optimize import minimize
     X = pd.DataFrame({k: french(f, 'M')[lo] - french(f, 'M')[sh] for k, (f, lo, sh) in JKP_SIGNALS.items()})
     X = X.loc[start:END].dropna()
@@ -638,10 +653,6 @@ def jkp_replication(start='1963-07-31', kmax=8):
     ok = p[o] <= np.arange(1, N + 1) / (N * np.sum(1 / np.arange(1, N + 1))) * 0.05
     by = np.zeros(N, bool)
     by[o[:np.max(np.where(ok)[0]) + 1 if ok.any() else 0]] = True
-    # teme: Ward pe distanta 1 - corelatia reziduurilor
-    D = 1 - np.corrcoef(E.T)
-    np.fill_diagonal(D, 0)
-    L = linkage(squareform(D, checks=False), 'ward')
     S = np.cov(E.T, ddof=2) / T                                      # Sigma / T
 
     def eb(g):
@@ -659,15 +670,11 @@ def jkp_replication(start='1963-07-31', kmax=8):
         pm = P @ np.linalg.solve(S, a)
         ps = np.sqrt(np.diag(P))
         return dict(tau_c=tc, tau_w=tw, post_mean=pm, post_sd=ps, z=pm / ps, loglik=-best.fun)
-    fits = {k: eb(fcluster(L, k, 'maxclust') if k > 1 else np.ones(N, int)) for k in range(1, kmax + 1)}
-    k = max(fits, key=lambda j: fits[j]['loglik'])
-    g = fcluster(L, k, 'maxclust') if k > 1 else np.ones(N, int)
-    names = {}
-    for f, nm in JKP_THEME_NAMES:
-        c = g[list(X.columns).index(f)]
-        names.setdefault(c, nm)
-    theme = [names.get(c, f'Theme {c}') for c in g]
-    r = fits[k]
+    theme = [JKP_THEMES[c] for c in X.columns]
+    g = np.array([JKP_THEME_ORDER.index(x) for x in theme])
+    r = eb(g)
+    r1 = eb(np.zeros(N, int))                                        # varianta: o singura tema
+    k = len(np.unique(g))
     tab = pd.DataFrame({'theme': theme, 'alpha': a, 'se': se, 't': t, 'by': by, 'post_mean': r['post_mean'],
                         'post_sd': r['post_sd'], 'z': r['z']}, index=X.columns)
     summ = dict(T=T, start=str(X.index[0].date()), end=str(X.index[-1].date()), k=k,
@@ -675,15 +682,14 @@ def jkp_replication(start='1963-07-31', kmax=8):
                 rate_ols=float(np.mean(t >= 1.96)), rate_by=float(by.mean()),
                 by_crit_t=float(np.min(np.abs(t[by]))) if by.any() else None,
                 rate_eb=float(np.mean(r['z'] >= 1.96)),
-                rate_eb_by_k={j: float(np.mean(v['z'] >= 1.96)) for j, v in fits.items()},
-                loglik_by_k={j: v['loglik'] for j, v in fits.items()})
+                rate_eb_one_theme=float(np.mean(r1['z'] >= 1.96)), tau_c_one_theme=r1['tau_c'],
+                tau_w_one_theme=r1['tau_w'])
     return tab, summ
 
 
 def fig_jkp_replication():
     tab, s = jkp_replication()
-    order = [nm for _, nm in JKP_THEME_NAMES if nm in set(tab['theme'])]
-    order += [x for x in dict.fromkeys(tab['theme']) if x not in order]
+    order = [nm for nm in JKP_THEME_ORDER if nm in set(tab['theme'])]
     d = pd.concat([tab[tab['theme'] == th].sort_values('alpha') for th in order])
     y = np.arange(len(d))[::-1].astype(float)
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(6.3, 3.6), sharey=True, gridspec_kw=dict(width_ratios=[1.25, 1]))
