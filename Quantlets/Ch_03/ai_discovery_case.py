@@ -54,7 +54,50 @@ for c in ['MOM', 'Mkt-RF']:
                   incr=d, se_incr=se_d, t_incr=d / se_d,
                   ci_pp=[b[2] - 1.96 * se[2], b[2] + 1.96 * se[2]], ci_incr=[d - 1.96 * se_d, d + 1.96 * se_d])
 
+def fig_momentum_decay():
+    """Media MOM in cele trei perioade (IC 95% Newey-West) si scaderea totala vs incrementala, cu placebo Mkt-RF."""
+    import matplotlib.pyplot as plt
+    import generate_all_charts as g
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.8), gridspec_kw={'width_ratios': [1.1, 1]})
+    y = F['MOM'].values * 100
+    lags = int(np.floor(4 * (len(y) / 100) ** (2 / 9)))
+    b = np.linalg.lstsq(np.column_stack([np.ones(len(y)), X]), y, rcond=None)[0]
+    V = hac_cov(y, X, lags)
+    per = [('In sample\n1965-1989', np.array([1, 0, 0])), ('Post-sample\n1990-Mar 1993', np.array([1, 1, 0])),
+           ('Post-publication\nApr 1993-2026', np.array([1, 0, 1]))]
+    ax = axes[0]
+    for k, (lab, c) in enumerate(per):
+        m, se = c @ b, np.sqrt(c @ V @ c)
+        ax.errorbar(k, m, yerr=1.96 * se, fmt='o', color=[g.MainBlue, g.Amber, g.IDAred][k], capsize=4, lw=1.1, ms=6)
+        ax.annotate(f'{m:.2f}%', (k, m), xytext=(8, -3), textcoords='offset points', fontsize=7, color='black')
+    ax.axhline(0, color=g.Gray, lw=0.6, ls=':')
+    ax.set_xticks(range(3), [p[0] for p in per], fontsize=7)
+    ax.set_xlim(-0.5, 2.6)
+    ax.set_ylabel('MOM mean, % a month')
+    ax.set_title('Momentum by period, 95% intervals (Newey-West)', fontsize=9, loc='left')
+    ax = axes[1]
+    rows = [(r'Total decline $b_2$', 'ci_pp', 'b_pp'), (r'Incremental $b_2 - b_1$', 'ci_incr', 'incr')]
+    for j, (fac, col, off) in enumerate([('MOM', g.MainBlue, 0.12), ('Mkt-RF', g.Forest, -0.12)]):
+        for k, (lab, ci, est) in enumerate(rows):
+            e, (lo, hi) = out[fac][est], out[fac][ci]
+            ax.errorbar(e, 1 - k + off, xerr=[[e - lo], [hi - e]], fmt='o' if fac == 'MOM' else 's', color=col,
+                        capsize=3, lw=1.0, label=(f'{fac}' + (' (placebo)' if fac == 'Mkt-RF' else '')) if k == 0 else '_n')
+    ax.axvline(0, color=g.Gray, lw=0.7, ls=':')
+    ax.set_yticks([1, 0], [r[0] for r in rows], fontsize=7)
+    ax.set_ylim(-0.6, 1.6)
+    ax.set_xlabel('% a month')
+    ax.set_title('Decline estimates, 95% intervals', fontsize=9, loc='left')
+    plt.tight_layout()
+    fig.canvas.draw()
+    r = fig.canvas.get_renderer()
+    ymin = min(a.get_tightbbox(r).transformed(fig.transFigure.inverted()).y0 for a in fig.axes)
+    fig.legend(*axes[1].get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, ymin - 0.01), ncol=2,
+               frameon=False)
+    g.save_fig('ch3_ai_momentum')
+
+
 if __name__ == '__main__':
+    fig_momentum_decay()
     print(json.dumps(out, indent=1))
     with open(os.path.join(HERE, 'ai_discovery_case.json'), 'w') as f:
         json.dump(out, f, indent=1)
