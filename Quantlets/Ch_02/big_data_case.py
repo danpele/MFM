@@ -1,16 +1,16 @@
 """
 big_data_case.py -- Capitolul 2, studiul de caz Martin & Nagel (2022, JFE): replicare pe 49 de portofolii sectoriale
 ====================================================================================================================
-Specificatia din sectiunea VII a lucrarii (Fig. VII si VIII), aplicata portofoliilor sectoriale din Kenneth French
+Specificatia din sectiunea 7 a lucrarii (Fig. 7 si 8), aplicata portofoliilor sectoriale din Kenneth French
 Data Library (randamente lunare ponderate cu capitalizarea, din iulie 1926):
   * predictori: randamentele simple si la patrat din lunile t-2 ... t-120 (238 de predictori);
   * variabila dependenta si predictorii centrati transversal in fiecare luna, predictorii scalati la abaterea
     standard transversala 1; fiecare luna primeste aceeasi pondere in regresia panel (ponderea 1/N_t);
   * r_OOS,t+1 = (1/N) h_t' X_{t+1}' r_{t+1}, cu h_t din OLS pe fereastra mobila de 20 de ani care se incheie in t;
     r_IS = randamentul in selectie al aceleiasi ferestre; media mobila pe 10 ani a lui r_OOS cu benzi de doua erori
-    standard din media patratelor randamentelor lunare ale portofoliului (Fig. VIII);
+    standard din media patratelor randamentelor lunare ale portofoliului (Fig. 8);
   * regresie ridge pe tot esantionul (din ianuarie 1971), penalizarea aleasa prin validare incrucisata cu cate un an
-    exclus (media R^2 din anii exclusi, maximizata pe o grila), coeficientii pe decalaje (Fig. VII).
+    exclus (media R^2 din anii exclusi, maximizata pe o grila), coeficientii pe decalaje (Fig. 7).
 Limita datelor: 49 de portofolii in loc de actiunile individuale din CRSP; filtrele de capitalizare si de pret nu
 se aplica portofoliilor. Un portofoliu intra in luna t doar cu istoric complet t-120 ... t.
 Iesire: ch2_big_data_numbers.json, ch2_mn_rolling.csv, ch2_mn_ridge.csv, graficele ch2_mn_rolling, ch2_mn_ridge.
@@ -83,7 +83,7 @@ def mn_moments(XS, YS):
 
 
 def mn_rolling(months, XS, YS, G, b, v, window=MN_WINDOW, ma=MN_MA):
-    """OLS pe ferestre mobile de 20 de ani: r_IS (in selectie) si r_OOS,t+1 (Martin & Nagel, ec. 19; Fig. VIII)."""
+    """OLS pe ferestre mobile de 20 de ani: r_IS (in selectie) si r_OOS,t+1 (Martin & Nagel, ec. 19; Fig. 8)."""
     rows = []
     for e in range(window - 1, len(months) - 1):
         Gs, bs = G[e - window + 1:e + 1].sum(axis=0), b[e - window + 1:e + 1].sum(axis=0)
@@ -127,7 +127,7 @@ def mn_ridge(months, G, b, v, start=MN_RIDGE_START, grid=np.logspace(0, 7, 57)):
 
 
 def fig_mn_rolling(o):
-    """Fig. VIII pe 49 de portofolii: r_OOS in medie mobila pe 10 ani, cu benzi de 2 erori standard, si r_IS."""
+    """Fig. 8 pe 49 de portofolii: r_OOS in medie mobila pe 10 ani, cu benzi de 2 erori standard, si r_IS."""
     x = o.dropna()
     s = 1e5
     fig, ax = plt.subplots(figsize=(7.2, 3.3))
@@ -146,7 +146,7 @@ def fig_mn_rolling(o):
 
 
 def fig_mn_ridge(coef):
-    """Fig. VII pe 49 de portofolii: coeficientii ridge pe randamentele trecute si pe patratele lor."""
+    """Fig. 7 pe 49 de portofolii: coeficientii ridge pe randamentele trecute si pe patratele lor."""
     lag = coef['lag'].values
     m12 = lag % 12 == 0
     short = (lag <= 12) & ~m12
