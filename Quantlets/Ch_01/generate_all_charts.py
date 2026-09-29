@@ -724,9 +724,11 @@ PDV_TEST = ('2019-01-01', '2022-05-15')
 
 
 def pdv_kernel(alpha, delta, n=PDV_LAGS):
-    """Nucleul TSPL normalizat, eq. (3.9): K(tau) = (tau + delta)^(-alpha) / Z, tau = i * dt."""
+    """Nucleul TSPL normalizat, eq. (3.9): K(tau) = (tau + delta)^(-alpha) / Z, tau = i * dt,
+    cu Z ales astfel incat sum_i K(i dt) dt = 1 pe fereastra de n zile (normalizarea din Table 3)."""
     tau = np.arange(n) * PDV_DT
-    return (tau + delta) ** (-alpha) * (alpha - 1) / delta ** (1 - alpha)
+    w = (tau + delta) ** (-alpha)
+    return w / (w.sum() * PDV_DT)
 
 
 def pdv_predict(X, p):
