@@ -325,6 +325,234 @@ def fig_cluster(B5):
     g.save_fig('ch15_sem_cluster')
 
 
+# =============================================================================
+# GRAFICELE SEMINARULUI (cate unul pentru fiecare rezolvare din Partea B si pentru A1, A3, A7)
+# =============================================================================
+def fig_a1_attenuation(key='A3', name='ch15_sem_a1_attenuation', label='FinBERT', col=None, reps=2000, seed=15):
+    """A1/A2: distributia pantei OLS pe variabila adevarata s* si pe variabila prezisa s_hat, simulata cu ratele de
+    clasificare gresita din matricea de confuzie Twitter; beta = 1, zgomot N(0, 1), n = numarul de titluri."""
+    x = S['AI']['att_' + key]
+    n, pi, a0, a1, lam = int(x['n']), x['pi'], x['a0'], x['a1'], x['lam']
+    rng = np.random.default_rng(seed)
+    bt, bh = np.empty(reps), np.empty(reps)
+    for k in range(reps):
+        s = rng.random(n) < pi
+        u = rng.random(n)
+        sh = np.where(s, u >= a1, u < a0)
+        r = s + rng.standard_normal(n)
+        bt[k] = np.cov(r, s)[0, 1] / np.var(s, ddof=1)
+        bh[k] = np.cov(r, sh)[0, 1] / np.var(sh, ddof=1)
+    fig, ax = plt.subplots(figsize=(6.4, 2.8))
+    bins = np.linspace(min(bh.min(), bt.min()), max(bh.max(), bt.max()), 60)
+    ax.hist(bt, bins=bins, color=g.MainBlue, alpha=0.75, label='Slope on the true dummy $s^*$')
+    ax.hist(bh, bins=bins, color=col or g.Forest, alpha=0.75, label=f'Slope on the {label} dummy $\\hat s$')
+    ax.axvline(1.0, color=g.MainBlue, lw=1.2, ls='--', label=r'True $\beta = 1$')
+    ax.axvline(lam, color=g.IDAred, lw=1.2, ls='--', label=rf'$\beta\lambda = {lam:.3f}$')
+    ax.set_xlabel(f'OLS slope, {reps:,} simulated samples of {n:,} headlines')
+    ax.set_ylabel('Number of samples')
+    g.legend_outside_bottom(ax, ncol=2, y=-0.24)
+    g.save_fig(name)
+    return {'mean_true': float(bt.mean()), 'mean_hat': float(bh.mean()), 'sd_hat': float(bh.std(ddof=1))}
+
+
+def fig_power(keys=('mc_B1',), labels=('LM vs FinBERT',), name='ch15_sem_a3_power'):
+    """A3/A4: puterea testului pe perechi in functie de numarul de titluri, cu d si q estimate pe Twitter."""
+    from scipy import stats as st
+    zc = st.norm.ppf(0.975)
+    nn = np.logspace(2, 4.6, 200)
+    fig, ax = plt.subplots(figsize=(6.4, 2.8))
+    for key, lab, col in zip(keys, labels, (g.MainBlue, g.IDAred)):
+        x = S['AI'][key]
+        d, q, n0 = abs(x['d']), x['q'], x['n']
+        pw = st.norm.cdf(d * np.sqrt(nn) / np.sqrt(q - d ** 2) - zc)
+        ax.plot(nn, pw, color=col, lw=1.6, label=f'{lab}: $d$ = {100 * x["d"]:+.1f} pp')
+        ax.plot([n0], [x['power']], 'o', color=col, ms=5)
+        ax.axvline(x['n80'], color=col, lw=0.9, ls=':', label=f'{lab}: $n_{{80}}$ = {x["n80"]:,.0f}')
+    ax.axhline(0.8, color=g.Gray, lw=0.7, ls='--')
+    ax.axvline(S['AI'][keys[0]]['n'], color=g.Gray, lw=0.7)
+    ax.set_xscale('log')
+    ax.set_ylim(0, 1.02)
+    ax.set_xlabel('Number of headlines $n$ (log scale); solid grey line: the validation set, dots: its power')
+    ax.set_ylabel('Power at 5%')
+    g.legend_outside_bottom(ax, ncol=2, y=-0.26)
+    g.save_fig(name)
+
+
+def fig_cost(key='cost_finbert', label='FinBERT', name='ch15_sem_a7_cost'):
+    """A7/A8: randamentul net zilnic mediu in functie de costul pe tranzactie, cu banda +-1.96 SE (a fix)."""
+    x = S['AI'][key]
+    c = np.linspace(0, 6, 121)
+    net = x['mu'] - 4 * x['a'] * c
+    fig, ax = plt.subplots(figsize=(6.4, 2.8))
+    ax.fill_between(c, net - 1.96 * x['se_mu'], net + 1.96 * x['se_mu'], color=g.LightGray, alpha=0.7,
+                    label=r'$\pm 1.96$ SE of the mean')
+    ax.plot(c, net, color=g.MainBlue, lw=1.6, label=f'{label} strategy: mean net return per day')
+    ax.axhline(0, color=g.Gray, lw=0.7)
+    ax.axvline(x['c'], color=g.IDAred, lw=1.2, ls='--', label=f'Break-even cost $c^*$ = {x["c"]:.2f} bp')
+    ax.axvspan(max(x['lo'], 0), x['hi'], color=g.IDAred, alpha=0.12, label='95% CI of $c^*$')
+    ax.axvline(5, color=g.Amber, lw=1.2, label='Realistic cost, 5 bp per trade')
+    ax.set_xlabel('Cost per trade $c$ (bp); four trades on each day with positions')
+    ax.set_ylabel('Mean net return (bp per day)')
+    g.legend_outside_bottom(ax, ncol=3, y=-0.26)
+    g.save_fig(name)
+
+
+def fig_pairs(key='B1', names=('LM', 'FinBERT'), name='ch15_sem_b1_pairs'):
+    """B1/B2: acuratetea celor doi clasificatori cu CI bootstrap, diferenta pe perechi cu CI si cazurile discordante."""
+    b = S[key]
+    fig, (ax, cx, bx) = plt.subplots(1, 3, figsize=(7.0, 2.4), gridspec_kw={'width_ratios': [1.3, 1.1, 1.0]})
+    for yy, v, ci, col in ((1, b['acc_a'], b['ci_a'], g.Orange), (0, b['acc_b'], b['ci_b'], g.MainBlue)):
+        ax.errorbar(100 * v, yy, xerr=[[100 * (v - ci[0])], [100 * (ci[1] - v)]], fmt='o', color=col, capsize=3, ms=5)
+    ax.set_yticks([1, 0])
+    ax.set_yticklabels(list(names))
+    ax.set_ylim(-0.6, 1.6)
+    ax.set_xlabel('Accuracy (%), 95% bootstrap CI')
+    d = 100 * b['diff']
+    cx.errorbar(d, 0, xerr=[[d - 100 * b['lo']], [100 * b['hi'] - d]], fmt='s', color=g.IDAred, capsize=3, ms=5)
+    cx.axvline(0, color=g.Gray, lw=0.8, ls='--')
+    cx.set_yticks([0])
+    cx.set_yticklabels([f'{names[1]} $-$\n{names[0]}'], fontsize=7)
+    cx.set_ylim(-1, 1)
+    cx.set_xlabel('Paired difference (pp), 95% CI')
+    n01, n10 = b['n01'], b['n10']
+    bx.bar([0, 1], [n01, n10], color=[g.MainBlue, g.Orange], width=0.6)
+    bx.axhline((n01 + n10) / 2, color=g.Gray, lw=0.8, ls='--')
+    bx.set_xticks([0, 1])
+    bx.set_xticklabels([f'$n_{{01}}$ = {n01}', f'$n_{{10}}$ = {n10}'])
+    bx.set_ylim(0, 1.18 * max(n01, n10))
+    bx.set_ylabel('Discordant headlines')
+    bx.set_xlabel('Dashed line: $H_0$')
+    fig.tight_layout()
+    g.save_fig(name)
+
+
+def fig_leakage():
+    """B3: acuratetea pe tot Financial PhraseBank si pe Twitter, pentru patru clasificatori."""
+    B3 = S['B3']
+    ms = ['FinBERT', 'Qwen 7B', 'LM', 'MiniLM + LR']
+    labs = ['FinBERT', 'Qwen2.5-7B', 'LM', 'MiniLM + LR']
+    fig, ax = plt.subplots(figsize=(6.4, 2.6))
+    for k, m in enumerate(ms):
+        a, b = 100 * B3[m]['pb']['acc'], 100 * B3[m]['tw']['acc']
+        ax.plot([a, b], [k, k], color=g.Amber, lw=1.4)
+        ax.plot(a, k, 'o', color=g.MainBlue, ms=6, label='Financial PhraseBank (all)' if k == 0 else None)
+        ax.plot(b, k, 's', color=g.IDAred, ms=6, label='Twitter validation set' if k == 0 else None)
+        ax.text(max(a, b) + 0.8, k, f'{a - b:+.1f} pp', va='center', fontsize=8, color='black')
+    ax.set_yticks(range(len(ms)))
+    ax.set_yticklabels(labs)
+    ax.invert_yaxis()
+    ax.set_xlabel('Accuracy (%); label: PhraseBank minus Twitter')
+    g.legend_outside_bottom(ax, ncol=2, y=-0.26)
+    g.save_fig('ch15_sem_b3_leakage')
+
+
+def fig_event_paths(P):
+    """B6: randamentul in exces cumulat mediu, zilele -5..+5, grupurile LM (semn) si FinBERT (tercile)."""
+    cols = g.EVENT_COLS
+    days = np.arange(-5, 6)
+    fig, ax = plt.subplots(figsize=(6.4, 2.8))
+    style = {('lm', 'neg'): (g.Orange, '--', 'LM tone < 0'), ('lm', 'pos'): (g.Teal, '--', 'LM tone > 0'),
+             ('finbert', 'neg'): (g.IDAred, '-', 'FinBERT bottom tercile'),
+             ('finbert', 'pos'): (g.Forest, '-', 'FinBERT top tercile')}
+    for c in ('lm', 'finbert'):
+        neg, pos = g.event_groups(P[c])
+        for grp, sel in (('neg', neg), ('pos', pos)):
+            X = P.loc[sel, cols].groupby(level='day').mean().fillna(0)
+            col, ls, lab = style[(c, grp)]
+            ax.plot(days, X.cumsum(axis=1).mean().values, color=col, ls=ls, marker='o', ms=3, lw=1.3, label=lab)
+    ax.axvline(0, color=g.Gray, lw=0.7, ls=':')
+    ax.axhline(0, color=g.Gray, lw=0.7)
+    ax.axvspan(1.5, 5.5, color=g.LightGray, alpha=0.4)
+    ax.set_xticks(days)
+    ax.set_xlabel('Trading days relative to the news day $d$ (shaded: tradable days $d+2$ to $d+5$)')
+    ax.set_ylabel('Cumulative excess return (%)')
+    g.legend_outside_bottom(ax, ncol=4, y=-0.26)
+    g.save_fig('ch15_sem_b6_event')
+
+
+def fig_perm():
+    """B7: distributia AUC sub ipoteza nula (etichete amestecate), Qwen2.5-14B, lunile dinainte de publicare."""
+    mm = g.load_csv('ch15_memory_monthly.csv', index_col=0, parse_dates=True)
+    rng = np.random.default_rng(1)
+    pre = mm.loc[:'2024-08-31']
+    p, u = pre['qwen14B'].values, (pre['ret'] > 0).values
+    null = np.array([g.auc(p, rng.permutation(u)) for _ in range(2000)])
+    obs = g.auc(p, u)
+    fig, ax = plt.subplots(figsize=(6.4, 2.6))
+    ax.hist(null, bins=40, color=g.MainBlue, alpha=0.8, label='AUC with shuffled up/down labels (2,000 permutations)')
+    ax.axvline(obs, color=g.IDAred, lw=1.6, label=f'Observed AUC = {obs:.2f}')
+    ax.axvline(0.5, color=g.Gray, lw=0.7, ls='--')
+    ax.set_xlabel('AUC of Qwen2.5-14B, monthly S&P 500 direction, months before the release')
+    ax.set_ylabel('Permutations')
+    g.legend_outside_bottom(ax, ncol=2, y=-0.26)
+    g.save_fig('ch15_sem_b7_perm')
+    return float(np.mean(null >= obs))
+
+
+def fig_prompts_ci():
+    """B8: acuratetea cu CI bootstrap si ponderea raspunsurilor 'neutral' pentru trei prompturi."""
+    B8 = S['B8']
+    fig, (ax, bx) = plt.subplots(1, 2, figsize=(6.8, 2.6))
+    for k, (s, col) in enumerate((('7B', g.MainBlue), ('14B', g.Purple))):
+        x = np.arange(3) + (k - 0.5) * 0.25
+        acc = [100 * B8[s][q]['acc'] for q in ('P1', 'P2', 'P3')]
+        lo = [a - 100 * B8[s][q]['ci'][0] for a, q in zip(acc, ('P1', 'P2', 'P3'))]
+        hi = [100 * B8[s][q]['ci'][1] - a for a, q in zip(acc, ('P1', 'P2', 'P3'))]
+        ax.errorbar(x, acc, yerr=[lo, hi], fmt='o', color=col, capsize=3, ms=5, label=f'Qwen2.5-{s}')
+        bx.bar(x, [100 * B8[s][q]['neutral'] for q in ('P1', 'P2', 'P3')], width=0.25, color=col)
+    for a in (ax, bx):
+        a.set_xticks(range(3))
+        a.set_xticklabels(['P1', 'P2', 'P3'])
+    ax.set_ylabel('Accuracy (%), 95% bootstrap CI')
+    bx.set_ylabel('"neutral" answers (%)')
+    tw = g.load_csv('ch15_twitter_scores.csv')
+    bx.axhline(100 * (tw['label'] == 'neutral').mean(), color=g.Gray, lw=0.8, ls='--')
+    bx.set_title('Dashed: share of neutral headlines', fontsize=8, color='black')
+    g.legend_outside_bottom(ax, ncol=2, y=-0.18)
+    fig.tight_layout()
+    g.save_fig('ch15_sem_b8_prompts')
+
+
+def fig_pvalues(PN):
+    """B10: valorile p ale celor noua pante, trei metode (t15, wild cluster bootstrap, Holm), scala logaritmica;
+    PN = ch15_inference.json['panel']['reg'] (valid_inference.py)."""
+    rows = [(c, h) for c in ('finbert', 'qwen', 'lm') for h in ('r0', 'r1', 'r2')]
+    names = {'finbert': 'FinBERT', 'qwen': 'Qwen2.5-7B', 'lm': 'LM'}
+    fig, ax = plt.subplots(figsize=(6.6, 2.8))
+    y = np.arange(len(rows))
+    floor = 1e-4
+    for key, col, mk, lab in (('p_t15', g.MainBlue, 'o', '$t_{15}$ critical values'),
+                              ('p_wcr', g.Orange, 's', 'Wild cluster bootstrap (9,999 draws)'),
+                              ('p_wcr_holm', g.IDAred, 'D', 'Wild bootstrap, Holm over 9 slopes')):
+        ax.plot([max(PN[f'{c}|{h}'][key], floor) for c, h in rows], y, mk, color=col, ms=5, label=lab)
+    ax.axvline(0.05, color=g.Gray, lw=0.8, ls='--')
+    ax.set_xscale('log')
+    ax.set_xlim(5e-5, 1.5)
+    ax.set_yticks(y)
+    ax.set_yticklabels([f'{names[c]}, $h$ = {h[1]}' for c, h in rows], fontsize=7)
+    ax.invert_yaxis()
+    ax.set_xlabel('$p$-value (log scale; values below $10^{-4}$ drawn at $10^{-4}$; dashed: 5%)')
+    g.legend_outside_bottom(ax, ncol=3, y=-0.24)
+    g.save_fig('ch15_sem_b10_pvalues')
+
+
+def seminar_charts(P):
+    out = {'a1_sim': fig_a1_attenuation(), 'a2_sim': fig_a1_attenuation('A4', 'ch15_sem_a2_attenuation', 'LM', g.Orange)}
+    fig_power()
+    fig_power(('mc_B1', 'mc_B2'), ('LM vs FinBERT', 'FinBERT vs Qwen2.5-7B'), 'ch15_sem_a4_power')
+    fig_cost()
+    fig_cost('cost_qwen', 'Qwen2.5-7B', 'ch15_sem_a8_cost')
+    fig_pairs()
+    fig_pairs('B2', ('FinBERT', 'Qwen2.5-7B'), 'ch15_sem_b2_pairs')
+    fig_leakage()
+    fig_event_paths(P)
+    out['perm_check'] = fig_perm()
+    fig_prompts_ci()
+    with open(os.path.join(HERE, 'ch15_inference.json')) as f:
+        fig_pvalues(json.load(f)['panel']['reg'])
+    S['charts'] = out
+
+
 def jsonable(o):
     if isinstance(o, dict):
         return {str(k): jsonable(v) for k, v in o.items() if not isinstance(v, pd.DataFrame)}
@@ -354,6 +582,7 @@ if __name__ == '__main__':
     S['B8'] = b_prompts()
     S['C'] = part_c(P, rets)
     part_a_inference(R)
+    seminar_charts(P)
     old = os.path.join(HERE, 'sem15_results.json')
     if os.path.exists(old):                     # C3 (c3_reference.py) se pastreaza
         with open(old) as f:
