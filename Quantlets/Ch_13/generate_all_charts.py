@@ -28,7 +28,8 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_ml import (load_data, ffd_weights, frac_diff_ffd, get_daily_vol, triple_barrier,
                     PurgedKFold, build_features, sharpe_ratio, expected_max_sharpe,
-                    deflated_sharpe_ratio, local_whittle, exact_local_whittle)
+                    deflated_sharpe_ratio, local_whittle, exact_local_whittle,
+                    french_factors, tangency_portfolio)
 
 # Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
 plt.rcParams['figure.facecolor'] = 'none'
@@ -709,6 +710,94 @@ def fig_signal_to_noise(df):
 
 
 # =============================================================================
+# STUDIU DE CAZ: Chen, Pelger & Zhu (2024) -- Sharpe lunar al portofoliilor SDF
+# =============================================================================
+# Tabelul I si Tabelul A.VI (arXiv:1904.00745v6), test 1992-2016, SR lunar
+CPZ_SR = {'GAN': 0.75, 'EN': 0.50, 'FFN': 0.44, 'LS': 0.42, 'FF5': 0.22, 'FF3': 0.19}
+CPZ_TRAIN = ('1967-01', '1986-12')
+CPZ_TEST = ('1992-01', '2016-12')
+FF_COLS = {'ff3': ['Mkt-RF', 'SMB', 'HML'], 'ff5': ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA']}
+
+
+def monthly_sr(r):
+    """Sharpe lunar si eroarea standard Lo (2002) sub randamente i.i.d.: sqrt((1 + SR^2/2) / T)."""
+    r = r.dropna()
+    sr = r.mean() / r.std(ddof=1)
+    return sr, np.sqrt((1 + sr ** 2 / 2) / len(r)), len(r)
+
+
+def cpz_tangency_returns():
+    """Randamentele lunare ale portofoliilor tangente FF3 / FF5 cu ponderi fixate pe 1967-1986, si Mkt-RF."""
+    out = {}
+    for k in ('ff3', 'ff5'):
+        _, out[k.upper()] = tangency_portfolio(french_factors(k)[FF_COLS[k]], CPZ_TRAIN)
+    out['Market'] = french_factors('ff3')['Mkt-RF']
+    return pd.DataFrame(out).dropna()
+
+
+def fig_cpz_sharpe(rets):
+    """Bare orizontale: SR lunar out-of-sample din lucrare vs. replicarea FF3 / FF5 pe biblioteca French."""
+    test = rets.loc[CPZ_TEST[0]:CPZ_TEST[1]]
+    ours = {k: monthly_sr(test[k]) for k in ('FF5', 'FF3')}
+    labels = list(CPZ_SR)
+    y = np.arange(len(labels))[::-1]
+    fig, ax = plt.subplots(figsize=(6.8, 3.0))
+    ax.barh(y + 0.18, [CPZ_SR[k] for k in labels], height=0.34, color=MainBlue,
+            label='Chen, Pelger & Zhu (2024), Table I and Table A.VI')
+    for k in ('FF5', 'FF3'):
+        i = labels.index(k)
+        sr, se, T = ours[k]
+        ax.barh(y[i] - 0.18, sr, height=0.34, color=IDAred, xerr=1.96 * se,
+                error_kw=dict(ecolor='black', lw=0.8, capsize=2.5),
+                label=f'Replication: Kenneth French factors, weights 1967-1986, test 1992-2016 (95% CI)'
+                if k == 'FF5' else None)
+        ax.text(sr + 1.96 * se + 0.015, y[i] - 0.18, f'{sr:.2f}', va='center', fontsize=8, color=IDAred)
+    for i, k in enumerate(labels):
+        ax.text(CPZ_SR[k] + 0.015 if k not in ('FF5', 'FF3') else CPZ_SR[k] + 0.015, y[i] + 0.18,
+                f'{CPZ_SR[k]:.2f}', va='center', fontsize=8, color=MainBlue)
+    ax.set_yticks(y)
+    ax.set_yticklabels(['GAN (deep SDF)', 'EN (linear SDF, elastic net)', 'FFN (return forecast)',
+                        'LS (linear SDF)', 'FF5 tangency', 'FF3 tangency'])
+    ax.set_xlim(0, 0.85)
+    ax.set_xlabel('Monthly out-of-sample Sharpe ratio, 1992-2016')
+    ax.set_title('Deep SDF vs. benchmarks: monthly Sharpe ratio of the SDF portfolio, test 1992-2016',
+                 fontsize=9, loc='left')
+    legend_outside_bottom(ax, ncol=1, y=-0.2)
+    plt.tight_layout()
+    save_fig('ch13_cpz_sharpe')
+    return {k: tuple(round(v, 3) for v in ours[k][:2]) + (ours[k][2],) for k in ours}
+
+
+def fig_cpz_tangency_oos(rets):
+    """Randament excedentar cumulat (suma) al portofoliilor tangente fixe, scalate la volatilitatea pietei,
+    in perioada de test a lucrarii (1992-2016) si dupa ea (2017 - ultima luna)."""
+    oos = rets.loc[CPZ_TEST[0]:]
+    vol = oos.loc[:CPZ_TEST[1]].std()
+    scaled = oos * (vol['Market'] / vol)
+    colors = {'FF5': MainBlue, 'FF3': Forest, 'Market': Amber}
+    names = {'FF5': 'FF5 tangency', 'FF3': 'FF3 tangency', 'Market': 'Market (Mkt-RF)'}
+    table = {}
+    fig, ax = plt.subplots(figsize=(7.0, 3.0))
+    for k in ('FF5', 'FF3', 'Market'):
+        a = monthly_sr(oos.loc[:CPZ_TEST[1], k])[0]
+        b = monthly_sr(oos.loc['2017-01':, k])[0]
+        table[k] = (round(a, 3), round(b, 3))
+        ax.plot(scaled.index, scaled[k].cumsum(), color=colors[k], lw=1.0,
+                label=f'{names[k]} (monthly SR {a:.2f} in 1992-2016, {b:.2f} in 2017-{oos.index[-1].year})')
+    ax.axvline(pd.Timestamp('2016-12-31'), color=Gray, lw=0.7, ls='--')
+    ax.axhline(0, color=Gray, lw=0.5)
+    ax.text(pd.Timestamp('2016-06-30'), ax.get_ylim()[1] * 0.95, 'end of the paper\'s test period ',
+            ha='right', va='top', fontsize=8, color='black')
+    ax.set_ylabel('Cumulative excess return\n(scaled to market volatility)')
+    ax.set_title(f'Tangency portfolios with weights fixed on 1967-1986: {oos.index[0]:%b %Y} - '
+                 f'{oos.index[-1]:%b %Y}', fontsize=9, loc='left')
+    legend_outside_bottom(ax, ncol=1, y=-0.13)
+    plt.tight_layout()
+    save_fig('ch13_cpz_tangency_oos')
+    return table, len(oos.loc['2017-01':]), oos.index[-1]
+
+
+# =============================================================================
 # MAIN
 # =============================================================================
 if __name__ == '__main__':
@@ -736,3 +825,6 @@ if __name__ == '__main__':
     print('   IS/OOS best:', best.to_dict(), 'rho', round(rho, 3), 'top10 median OOS', round(top_oos, 3),
           'N', len(res))
     fig_deflated_sharpe()
+    rets = cpz_tangency_returns()
+    print('   CPZ replication (SR, SE, T):', fig_cpz_sharpe(rets))
+    print('   CPZ tangency OOS:', fig_cpz_tangency_oos(rets))

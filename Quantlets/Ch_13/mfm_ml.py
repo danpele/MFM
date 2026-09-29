@@ -255,3 +255,41 @@ def deflated_sharpe_ratio(sr, T, n_trials, sr_std, skew=0.0, kurt=3.0):
     """DSR = PSR(SR_0), cu SR_0 = E[max SR] sub ipoteza nula de lipsa a abilitatii."""
     sr0 = expected_max_sharpe(n_trials, sr_std)
     return probabilistic_sharpe_ratio(sr, sr0, T, skew, kurt)
+
+
+# =============================================================================
+# FACTORI FAMA-FRENCH (KENNETH FRENCH DATA LIBRARY) -- studiul de caz
+# =============================================================================
+FRENCH_URL = 'https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/'
+FF_FILES = {'ff3': 'F-F_Research_Data_Factors_CSV.zip',
+            'ff5': 'F-F_Research_Data_5_Factors_2x3_CSV.zip'}
+
+
+def french_factors(name='ff5'):
+    """Factorii lunari FF3 / FF5 (in zecimal, index = sfarsitul lunii) din Kenneth French Data Library."""
+    import io
+    import zipfile
+    import urllib.request
+    req = urllib.request.Request(FRENCH_URL + FF_FILES[name], headers={'User-Agent': 'Mozilla/5.0'})
+    zf = zipfile.ZipFile(io.BytesIO(urllib.request.urlopen(req, timeout=120).read()))
+    lines = zf.read(zf.namelist()[0]).decode('latin-1').splitlines()
+    i = next(k for k, l in enumerate(lines) if l.startswith(',') and len(l.split(',')) > 1)
+    cols = [c.strip() for c in lines[i].split(',')[1:]]
+    rows = []
+    for l in lines[i + 1:]:
+        parts = [x.strip() for x in l.split(',')]
+        if len(parts[0]) != 6 or not parts[0].isdigit():      # sfarsitul tabelului lunar
+            break
+        rows.append([parts[0]] + [float(x) for x in parts[1:]])
+    df = pd.DataFrame(rows, columns=['date'] + cols)
+    df['date'] = pd.to_datetime(df['date'], format='%Y%m') + pd.offsets.MonthEnd(0)
+    return df.set_index('date') / 100
+
+
+def tangency_portfolio(factors, train=('1967-01', '1986-12')):
+    """Portofoliul tangent cu ponderi fixe w = Sigma^{-1} mu estimate pe perioada de antrenare
+    (normalizate la sum|w| = 1); intoarce ponderile si randamentul lunar pe tot esantionul."""
+    X = factors.loc[train[0]:train[1]]
+    w = np.linalg.solve(X.cov().values, X.mean().values)
+    w = pd.Series(w / np.abs(w).sum(), index=factors.columns)
+    return w, factors @ w
