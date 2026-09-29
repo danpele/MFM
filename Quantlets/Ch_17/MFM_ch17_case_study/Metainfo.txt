@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch17_case_study'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study of DeFusco, Nathanson and Zwick (2022), Journal of Financial Economics 146(1), 205-229, at the national level: the U.S. housing cycle 2000-2011 (Figure 1, Panel A: prices and calendar-month adjusted volume, 2000 = 100, with the quiet from the peak of volume to the peak of prices) and the lead-lag relation of Eq. (1) (Figure 2: implied correlation of the demeaned log price with volume lagged k = -12, ..., 48 months, 2000-2011 with a 95% circular block bootstrap interval, and 1990-2011).'
+
+Keywords: 'housing bubble, speculation, trading volume, lead-lag, Case-Shiller, new home sales, FRED, block bootstrap'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'FRED: S&P CoreLogic Case-Shiller U.S. National Home Price Index (CSUSHPINSA); New One Family Houses Sold, United States (HSN1FNSA)'
+
+Output: 'ch17_dnz_cycle.pdf, ch17_dnz_leadlag.pdf, case17.json'
