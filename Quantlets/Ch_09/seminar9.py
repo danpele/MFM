@@ -677,6 +677,627 @@ def ex_a6_jensen():
     return out
 
 
+
+# =============================================================================
+# GRAFICELE SEMINARULUI (cate unul pentru fiecare problema; cifrele noi intra in blocul SC din sem9_results.json)
+# =============================================================================
+DAY = '2025-04-07'
+
+
+def sc_day(day=DAY):
+    """De la bare la randamente: grila de preturi SPY intr-o zi (deschiderea + 78 de inchideri), randamentele si RV cumulata."""
+    d = pd.Timestamp(day)
+    p = P_SPY.loc[d].dropna().values
+    r = 100 * np.diff(np.log(p))
+    on = float(ON[d])
+    prev = p[0] * np.exp(-on / 100)
+    t = pd.date_range(d + pd.Timedelta('09:30:00'), periods=len(p), freq='5min')
+    fig, axes = plt.subplots(1, 3, figsize=(10.2, 3.0))
+    axes[0].plot(t[1:], p[1:], color=MainBlue, lw=1.0, label='Bar closes $P_1, \\ldots, P_{78}$')
+    axes[0].scatter([t[0]], [p[0]], color=Orange, s=26, zorder=3, label='Opening price $P_0$ (09:30)')
+    axes[0].axhline(prev, color=Gray, lw=0.8, ls='--', label=f'Previous close (overnight return {on:+.2f}%)')
+    axes[0].set_ylabel('USD')
+    axes[0].set_title('Price grid: 79 prices', fontsize=9, loc='left')
+    axes[1].bar(t[1:], r, width=0.0028, color=np.where(r > 0, Forest, IDAred), label='5-minute log return $r_i$ (%): green up, red down')
+    axes[1].axhline(0, color=Gray, lw=0.6)
+    axes[1].set_title('78 returns', fontsize=9, loc='left')
+    axes[1].set_ylabel('%')
+    cum = np.cumsum(r ** 2)
+    axes[2].step(t[1:], cum, where='post', color=IDAred, lw=1.2, label='Cumulative $\\sum r_i^2$ = RV (%$^2$)')
+    axes[2].axhline(cum[-1] + on ** 2, color=Purple, lw=1.0, ls='-.', label='RV + squared overnight return (total variance)')
+    axes[2].set_title('Realised variance', fontsize=9, loc='left')
+    axes[2].set_ylabel('%$^2$')
+    for ax in axes:
+        ax.tick_params(axis='x', labelsize=7)
+        ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%H:%M'))
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=3, y=0.0)
+    save_fig('ch9_sem_day')
+    nr = R_SPY.notna().sum(axis=1)
+    return {'spy_days': int(len(P_SPY)), 'spy_cols': int(P_SPY.shape[1]), 'full': int((nr == 78).sum()),
+            'half': int((nr == 43).sum()), 'other': int(((nr != 78) & (nr != 43)).sum()),
+            'first': str(P_SPY.index[0].date()), 'last': str(P_SPY.index[-1].date()),
+            'btc_days': int(len(P_BTC)), 'btc_cols': int(P_BTC.shape[1]),
+            'btc_first': str(P_BTC.index[0].date()), 'btc_last': str(P_BTC.index[-1].date()),
+            'p': [float(x) for x in p[:3]], 'r': [float(x) for x in r[:2]], 'p_last': float(p[-1]), 'n': int(len(r)),
+            'rv': float(cum[-1]), 'on': on, 'total': float(cum[-1] + on ** 2)}
+
+
+def sc_a1(B=200000):
+    """A1: distributia exacta a RV/IV = chi2_M / M pentru M = 6 si 78; acoperirea simulata a CI log cu RQ."""
+    rng = np.random.default_rng(SEED)
+    x = np.linspace(0.01, 2.6, 600)
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 3.0))
+    cov = {}
+    for M_, col in [(6, Amber), (78, MainBlue)]:
+        axes[0].plot(x, stats.chi2.pdf(x * M_, M_) * M_, color=col, lw=1.3, label=f'Density of RV/IV, M = {M_}')
+        Z = rng.standard_normal((B, M_)) / np.sqrt(M_)             # r_i = sigma sqrt(Delta) Z_i cu IV = 1
+        rv = (Z ** 2).sum(axis=1)
+        se = np.sqrt(2 / 3 * (Z ** 4).sum(axis=1)) / rv
+        cov[str(M_)] = float(np.mean((rv * np.exp(-1.96 * se) <= 1) & (1 <= rv * np.exp(1.96 * se))))
+    axes[0].axvline(1, color=Gray, lw=0.8, ls=':', label='True IV = 1')
+    axes[0].set_xlabel('RV / IV')
+    lo, hi = np.exp(-1.96 * np.sqrt(2 / 78)), np.exp(1.96 * np.sqrt(2 / 78))
+    lo6, hi6 = np.exp(-1.96 * np.sqrt(2 / 6)), np.exp(1.96 * np.sqrt(2 / 6))
+    axes[1].plot([lo6, hi6], [0.3, 0.3], color=Amber, lw=3, label=f'M = 6: [{lo6:.2f}, {hi6:.2f}]')
+    axes[1].plot([lo, hi], [0.7, 0.7], color=MainBlue, lw=3, label=f'M = 78: [{lo:.2f}, {hi:.2f}]')
+    axes[1].scatter([1, 1], [0.3, 0.7], color=IDAred, zorder=3, s=18, label='Observed RV = 1')
+    axes[1].set_ylim(0, 1)
+    axes[1].set_yticks([])
+    axes[1].set_xlabel('IV (log-scale interval $\\mathrm{RV}\\,e^{\\pm 1.96\\sqrt{2/M}}$)')
+    handles, labels = [], []
+    for ax in axes:
+        h, l = ax.get_legend_handles_labels()
+        handles += h
+        labels += l
+    plt.tight_layout()
+    fig_legend_bottom(fig, handles, labels, ncol=3, y=0.0)
+    save_fig('ch9_sem_a1')
+    return {'cov6': cov['6'], 'cov78': cov['78'], 'lo6': lo6, 'hi6': hi6, 'lo78': lo, 'hi78': hi}
+
+
+def sc_a2(A2):
+    """A2: contributiile la RV si la BV ale celor sase randamente; statistica z fata de valoarea critica."""
+    r = np.array([0.08, -0.15, 0.03, 0.10, -0.04, -0.90])
+    M_ = len(r)
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 3.0))
+    i = np.arange(1, M_ + 1)
+    axes[0].bar(i - 0.2, r ** 2, 0.4, color=MainBlue, label='$r_i^2$ (contribution to RV)')
+    bvc = np.r_[0, (np.pi / 2) * M_ / (M_ - 1) * np.abs(r[1:] * r[:-1])]
+    axes[0].bar(i + 0.2, bvc, 0.4, color=Amber, label='$\\frac{\\pi}{2}\\frac{M}{M-1}|r_i r_{i-1}|$ (contribution to BV)')
+    axes[0].set_xticks(i)
+    axes[0].set_xlabel('Interval $i$ (the jump is in interval 6)')
+    axes[0].set_ylabel('%$^2$')
+    x = np.linspace(-4, 4.5, 400)
+    axes[1].plot(x, stats.norm.pdf(x), color=MainBlue, lw=1.2, label='N(0,1) under no jump')
+    axes[1].axvline(A2['z'], color=IDAred, lw=1.4, label=f"Observed z = {A2['z']:.2f}")
+    axes[1].axvline(A2['crit'], color=Forest, lw=1.2, ls='--', label=f"Critical value 0.1%: {A2['crit']:.2f}")
+    axes[1].axvline(np.sqrt(M_ / A2['theta']), color=Purple, lw=1.2, ls='-.',
+                    label=f"Largest possible z with M = 6: {np.sqrt(M_ / A2['theta']):.2f}")
+    axes[1].set_xlabel('z')
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=3, y=0.0)
+    save_fig('ch9_sem_a2')
+    return {'bvc': [float(v) for v in bvc]}
+
+
+def _mse_parts(omega, iq=1.0):
+    n = np.unique(np.round(np.logspace(np.log10(6), np.log10(23400), 400))).astype(float)
+    return n, 2 * iq / n, 4 * n ** 2 * omega ** 4
+
+
+def sc_a3():
+    """A3: MSE(n) = 2 IQ/n + 4 n^2 omega^4 cu omega = 0,01%: descompunerea si optimul."""
+    n, disc, bias2 = _mse_parts(0.01)
+    secs = 23400 / n
+    nstar = (1 / (4 * 0.01 ** 4)) ** (1 / 3)
+    fig, ax = plt.subplots(figsize=(7.6, 3.1))
+    ax.plot(secs, disc, color=MainBlue, lw=1.2, label='Discretisation variance $2\\,\\mathrm{IQ}/n$')
+    ax.plot(secs, bias2, color=Amber, lw=1.2, label='Squared noise bias $4n^2\\omega^4$')
+    ax.plot(secs, disc + bias2, color=IDAred, lw=1.6, label='MSE')
+    for s_, lab, c in [(23400 / nstar, f'Optimum: one return every {23400 / nstar:.0f} s', Forest), (60, '1 minute', Purple),
+                       (300, '5 minutes', Teal)]:
+        nn = 23400 / s_
+        ax.scatter([s_], [2 / nn + 4 * nn ** 2 * 1e-8], color=c, zorder=3, s=26, label=lab)
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.set_xlabel('Sampling interval (seconds, 6.5-hour session)')
+    ax.set_ylabel('%$^4$')
+    legend_outside_bottom(ax, ncol=3, y=-0.2)
+    save_fig('ch9_sem_a3')
+    tab = {}
+    for lab, nn in [('5min', 78), ('1min', 390), ('1s', 23400), ('opt', nstar)]:
+        tab[lab] = {'n': float(nn), 'bias': float(2 * nn * 1e-4), 'erv': float(1 + 2 * nn * 1e-4),
+                    'mse': float(2 / nn + 4 * nn ** 2 * 1e-8), 'disc': float(2 / nn), 'bias2': float(4 * nn ** 2 * 1e-8)}
+    return tab
+
+
+def sc_a4(A4):
+    """A4: MSE cu omega = 0,03% si estimatorii zilei: RV pe toate datele, media grilelor decalate, TSRV."""
+    n, disc, bias2 = _mse_parts(0.03)
+    secs = 23400 / n
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 3.0))
+    axes[0].plot(secs, disc, color=MainBlue, lw=1.2, label='$2\\,\\mathrm{IQ}/n$')
+    axes[0].plot(secs, bias2, color=Amber, lw=1.2, label='$4n^2\\omega^4$, $\\omega = 0.03\\%$')
+    axes[0].plot(secs, disc + bias2, color=IDAred, lw=1.6, label='MSE')
+    axes[0].scatter([A4['secs']], [2 / A4['nstar'] + 4 * A4['nstar'] ** 2 * 0.03 ** 4], color=Forest, s=26, zorder=3,
+                    label=f"Optimum: every {A4['secs']:.0f} s")
+    axes[0].set_xscale('log')
+    axes[0].set_yscale('log')
+    axes[0].set_xlabel('Sampling interval (seconds)')
+    vals = [1.70, 1.10, A4['tsrv'], A4['tsrv_adj']]
+    labs = ['RV, all 1-min', 'RV avg., 5 grids', 'TSRV', 'TSRV, adjusted']
+    axes[1].bar(labs, vals, color=[IDAred, Amber, Purple, Forest], label='Estimates of IV on the day (%$^2$)')
+    axes[1].axhline(1.0, color=Gray, lw=0.9, ls='--', label='True IV = 1')
+    axes[1].tick_params(axis='x', labelsize=7)
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=3, y=0.0)
+    save_fig('ch9_sem_a4')
+    return {'om2_oracle': float((1.70 - 1) / 780), 'om2_all': float(1.70 / 780)}
+
+
+def sc_a5(b=(-0.08, 0.36, 0.34, 0.17)):
+    """A5: ponderile HAR pe intarzieri, descompuse pe componente (zilnica, saptamanala, lunara)."""
+    k = np.arange(1, 26)
+    dd = np.where(k == 1, b[1], 0.0)
+    ww = np.where(k <= 5, b[2] / 5, 0.0)
+    mm = np.where(k <= 22, b[3] / 22, 0.0)
+    fig, ax = plt.subplots(figsize=(7.8, 3.0))
+    ax.bar(k, mm, color=MainBlue, label='Monthly: $\\beta_m/22$ on lags 1-22')
+    ax.bar(k, ww, bottom=mm, color=Amber, label='Weekly: $\\beta_w/5$ on lags 1-5')
+    ax.bar(k, dd, bottom=mm + ww, color=IDAred, label='Daily: $\\beta_d$ on lag 1')
+    ax.set_xlabel('Lag $k$ (trading days)')
+    ax.set_ylabel('Implied AR weight $\\phi_k$')
+    ax.set_xticks([1, 2, 5, 6, 10, 15, 22, 25])
+    legend_outside_bottom(ax, ncol=3, y=-0.2)
+    save_fig('ch9_sem_a5')
+    return {}
+
+
+def sc_a6(XA6):
+    """A6: QLIKE si MSE pe varianta in functie de F/IV; minimizantul MSE pe volatilitate."""
+    f = np.linspace(0.2, 3.0, 300)
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 3.0))
+    axes[0].plot(f, 1 / f - np.log(1 / f) - 1, color=IDAred, lw=1.4, label='QLIKE$(1, F)$')
+    axes[0].plot(f, (1 - f) ** 2, color=MainBlue, lw=1.4, label='Variance MSE $(1 - F)^2$')
+    for x_, c in [(0.5, Forest), (2.0, Purple)]:
+        axes[0].scatter([x_, x_], [1 / x_ - np.log(1 / x_) - 1, (1 - x_) ** 2], color=c, s=22, zorder=3,
+                        label=f'Forecast F = {x_}')
+    axes[0].set_xlabel('Forecast / true variance')
+    axes[0].set_ylim(0, 1.2)
+    ms = ['1', '6', '78']
+    axes[1].bar([f'M = {m}' for m in ms], [XA6[m] for m in ms], color=Amber, label='Volatility-MSE optimum $F^*/\\mathrm{IV}$')
+    axes[1].axhline(1, color=Gray, lw=0.9, ls='--', label='Unbiased: $F = \\mathrm{IV}$')
+    axes[1].set_ylim(0, 1.1)
+    for i, m in enumerate(ms):
+        axes[1].text(i, XA6[m] + 0.02, f'{XA6[m]:.3f}', ha='center', fontsize=8, color='black')
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=3, y=0.0)
+    save_fig('ch9_sem_a6')
+    return {}
+
+
+def sc_a7(beta=0.8, s_eta=0.3, n=20000):
+    """A7: simulare erori-in-variabile: panta OLS a RV_{t+1} pe RV_t scade cu varianta erorii; ponderea conditionata."""
+    rng = np.random.default_rng(SEED)
+    iv = np.empty(n)
+    iv[0] = 1.0
+    eta = s_eta * rng.standard_normal(n)
+    for t in range(1, n):
+        iv[t] = (1 - beta) + beta * iv[t - 1] + eta[t]
+    viv = s_eta ** 2 / (1 - beta ** 2)
+    su = np.linspace(0, 0.6, 13)
+    slope = []
+    for s2 in su:
+        rv = iv + np.sqrt(s2) * rng.standard_normal(n)
+        slope.append(np.polyfit(rv[:-1], rv[1:], 1)[0])
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 3.0))
+    axes[0].plot(su, slope, 'o', color=IDAred, ms=4, label='Simulated OLS slope')
+    g = np.linspace(0, 0.6, 100)
+    axes[0].plot(g, beta * viv / (viv + g), color=MainBlue, lw=1.3, label='plim: $\\beta\\,\\mathrm{Var(IV)}/(\\mathrm{Var(IV)} + \\sigma_u^2)$')
+    axes[0].axhline(beta, color=Gray, lw=0.8, ls='--', label=f'True slope $\\beta$ = {beta}')
+    axes[0].set_xlabel('Measurement-error variance $\\sigma_u^2$')
+    iq = np.linspace(0, 40, 200)
+    axes[1].plot(iq, viv / (viv + 2 * iq / 78), color=Forest, lw=1.4,
+                 label='Weight $\\lambda = \\sigma^2_{IV}/(\\sigma^2_{IV} + 2\\,\\mathrm{IQ}_t/M)$, M = 78 (illustration)')
+    axes[1].set_xlabel('$\\mathrm{IQ}_t$')
+    axes[1].set_ylim(0, 1.05)
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=2, y=0.0)
+    save_fig('ch9_sem_a7')
+    k = int(np.argmin(np.abs(su - 0.25)))
+    return {'viv': float(viv), 'slope25': float(slope[k]), 'plim25': float(beta * viv / (viv + 0.25))}
+
+
+def sc_a8(X):
+    """A8: testul DM fata de N(0,1) si elipsa de incredere de 95% pentru (a, b) din regresia MZ."""
+    V = np.array([[X['se_a'] ** 2, X['cov']], [X['cov'], X['se_b'] ** 2]])
+    est = np.array([X['a'], X['b']])
+    c2 = stats.chi2.ppf(0.95, 2)
+    w, U = np.linalg.eigh(V)
+    th = np.linspace(0, 2 * np.pi, 400)
+    ell = est[:, None] + U @ (np.sqrt(w * c2)[:, None] * np.vstack([np.cos(th), np.sin(th)]))
+    v = U[:, 0]                                                      # directia axei mici
+    s_ = np.sqrt(25.0 / (v @ np.linalg.solve(V, v)))                  # punct ipotetic cu W = 25
+    hyp = est + s_ * v
+    t_h = (hyp - est) / np.sqrt(np.diag(V))
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 3.2), gridspec_kw={'width_ratios': [1, 1.3]})
+    x = np.linspace(-4, 4, 300)
+    axes[0].plot(x, stats.norm.pdf(x), color=MainBlue, lw=1.2, label='N(0,1) under equal accuracy')
+    axes[0].axvline(X['dm_t'], color=IDAred, lw=1.4, label=f"DM t = {X['dm_t']:.2f}")
+    for s in (-1.96, 1.96):
+        axes[0].axvline(s, color=Forest, lw=1.0, ls='--', label='$\\pm 1.96$' if s > 0 else None)
+    axes[0].set_xlabel('DM statistic')
+    axes[1].plot(ell[0], ell[1], color=MainBlue, lw=1.4, label='95% joint confidence ellipse')
+    axes[1].scatter(*est, color=MainBlue, s=22, zorder=3, label=f"Estimate ({X['a']:.2f}, {X['b']:.2f})")
+    axes[1].scatter([0], [1], color=IDAred, marker='x', s=40, zorder=3, label='Null (0, 1): inside, W = %.2f' % X['wald'])
+    axes[1].scatter(*hyp, color=Purple, marker='D', s=20, zorder=3, label='Hypothetical null: W = 25, both |t| < 1.96')
+    for k, (e, se) in enumerate([(X['a'], X['se_a']), (X['b'], X['se_b'])]):
+        f = axes[1].axvline if k == 0 else axes[1].axhline
+        for s in (-1, 1):
+            f(e + s * 1.96 * se, color=Gray, lw=0.7, ls=':')
+    axes[1].set_xlabel('Intercept $a$')
+    axes[1].set_ylabel('Slope $b$')
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=3, y=0.0)
+    save_fig('ch9_sem_a8')
+    return {'hyp_a': float(hyp[0]), 'hyp_b': float(hyp[1]), 'hyp_ta': float(t_h[0]), 'hyp_tb': float(t_h[1])}
+
+
+def sc_b1(day='2021-08-27'):
+    """B1: o zi calculata pas cu pas; z brut vs ajustat de periodicitate; valorile p ordonate vs pragul BH; factorii f_i."""
+    j = T.jump_test(R_SPY)
+    N = len(j)
+    p = np.sort(stats.norm.sf(j['z'].values))
+    f = periodicity_sd(R_SPY, j['bv'])
+    js = T.jump_test(R_SPY / f.values[None, :])
+    fig, axes = plt.subplots(1, 3, figsize=(10.4, 3.0))
+    bins = np.linspace(-4, 8, 61)
+    axes[0].hist(j['z'], bins=bins, density=True, histtype='step', color=IDAred, lw=1.2, label='z, raw returns')
+    axes[0].hist(js['z'], bins=bins, density=True, histtype='step', color=MainBlue, lw=1.2, label='z, returns divided by $f_i$')
+    xx = np.linspace(-4, 8, 300)
+    axes[0].plot(xx, stats.norm.pdf(xx), color=Forest, lw=1.0, ls='--', label='N(0,1)')
+    axes[0].set_xlabel('Daily ratio statistic z')
+    k = np.arange(1, 121)
+    axes[1].plot(k, p[:120], 'o', ms=2.5, color=MainBlue, label='Ordered p-values $p_{(k)}$')
+    axes[1].plot(k, 0.05 * k / N, color=IDAred, lw=1.2, label='BH line $0.05\\,k/N$')
+    axes[1].set_yscale('log')
+    axes[1].set_xlabel('Rank $k$ (first 120 of %d)' % N)
+    kbh = bh_count(p, 0.05)
+    axes[1].axvline(kbh, color=Purple, lw=0.9, ls='-.', label=f'Largest k below the line: {kbh}')
+    lab = pd.date_range('2000-01-01 09:35', periods=78, freq='5min')
+    axes[2].bar(np.arange(78), f.values, color=Amber, width=0.8, label='Periodicity factor $f_i$ (mean of $f_i^2$ = 1)')
+    ticks = [0, 12, 24, 36, 48, 60, 72]
+    axes[2].set_xticks(ticks)
+    axes[2].set_xticklabels([lab[i].strftime('%H:%M') for i in ticks], fontsize=7)
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=4, y=0.0)
+    save_fig('ch9_sem_b1')
+    d = pd.Timestamp(day)
+    r = R_SPY.loc[d].dropna().values
+    M_ = len(r)
+    row = j.loc[d]
+    big = int(np.argmax(np.abs(r)))
+    return {'day': day, 'M': M_, 'rv': float(row['rv']), 'bv': float(row['bv']), 'tq': float(row['tq']),
+            'tqbv': float(row['tq'] / row['bv'] ** 2), 'ratio': float((row['rv'] - row['bv']) / row['rv']),
+            'z': float(row['z']), 'p': float(stats.norm.sf(row['z'])), 'J': float(row['J']), 'rmax': float(r[big]),
+            'rmax_share': float(r[big] ** 2 / row['rv']), 'kbh': int(kbh), 'bh_thr': float(0.05 * kbh / N),
+            'p_k': float(p[kbh - 1]), 'N': int(N)}
+
+
+def sc_b2():
+    """B2: Bitcoin, weekend vs zile lucratoare: rata de respingere, BV/RV, seria zilnica cu zilele lipsa."""
+    j = T.jump_test(R_BTC)
+    wk = j.index.dayofweek >= 5
+    fig, axes = plt.subplots(1, 3, figsize=(10.4, 3.0), gridspec_kw={'width_ratios': [0.8, 1, 1.6]})
+    grp = {'Weekdays': ~wk, 'Weekends': wk}
+    rates = [j.loc[m, 'jump'].mean() for m in grp.values()]
+    axes[0].bar(list(grp), rates, color=[MainBlue, Amber], label='Share of jump days (0.1% level)')
+    for i, m in enumerate(grp.values()):
+        axes[0].text(i, rates[i] + 0.005, f"{int(j.loc[m, 'jump'].sum())}/{int(m.sum())}", ha='center', fontsize=8, color='black')
+    axes[0].axhline(0.001, color=Gray, lw=0.8, ls='--', label='Nominal level 0.001')
+    bins = np.linspace(0.4, 1.3, 46)
+    axes[1].hist((j['bv'] / j['rv'])[~wk], bins=bins, density=True, histtype='step', color=MainBlue, lw=1.2, label='BV/RV, weekdays')
+    axes[1].hist((j['bv'] / j['rv'])[wk], bins=bins, density=True, histtype='step', color=Amber, lw=1.2, label='BV/RV, weekends')
+    axes[1].set_xlabel('BV / RV')
+    full = j['rv'].asfreq('D')
+    axes[2].plot(full.index, np.sqrt(365 * full), color=MainBlue, lw=0.6, label='Bitcoin realised volatility (% p.a.)')
+    jj = j[j['jump']]
+    axes[2].scatter(jj.index, np.sqrt(365 * jj['rv']), color=IDAred, s=8, zorder=3, label='Jump day (0.1%)')
+    miss = full.index[full.isna()]
+    for dd in miss:
+        axes[2].axvspan(dd, dd + pd.Timedelta('1D'), color=LightGray, lw=0, alpha=0.8)
+    axes[2].axvspan(miss[0], miss[0], color=LightGray, label='Dropped day (< 95% of bars)')
+    axes[2].tick_params(axis='x', labelsize=7)
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=3, y=0.0)
+    save_fig('ch9_sem_b2')
+    return {'n_wd': int((~wk).sum()), 'n_we': int(wk.sum()), 'j_wd': int(j.loc[~wk, 'jump'].sum()),
+            'j_we': int(j.loc[wk, 'jump'].sum()), 'missing': int(len(miss))}
+
+
+def sc_b3(B3, XRK):
+    """B3: volatilitatea din RV medie pe o grila vs media grilelor; raportul mediilor cu CI bootstrap."""
+    ks = ['5', '15', '30', '65']
+    x = [int(k) for k in ks]
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 3.0))
+    axes[0].plot(x, [B3[k]['vol'] for k in ks], 'o-', color=MainBlue, label='One grid (sparse sampling)')
+    axes[0].plot(x, [B3[k]['vol_sub'] for k in ks], 's--', color=IDAred, label='Average over shifted grids')
+    axes[0].set_xticks(x)
+    axes[0].set_xlabel('Sampling interval (minutes)')
+    axes[0].set_ylabel('$\\sqrt{252\\,\\overline{\\mathrm{RV}}}$ (% p.a.)')
+    axes[0].set_ylim(11.5, 14)
+    lab = ['15 min', '30 min', '65 min', 'Kernel (5 min)']
+    est = [B3[k]['ratio'] for k in ks[1:]] + [XRK['ratio']]
+    lo = [B3[k]['lo'] for k in ks[1:]] + [XRK['lo']]
+    hi = [B3[k]['hi'] for k in ks[1:]] + [XRK['hi']]
+    yy = np.arange(len(lab))
+    axes[1].errorbar(est, yy, xerr=[np.subtract(est, lo), np.subtract(hi, est)], fmt='o', color=MainBlue, capsize=3,
+                     label='Ratio of means to 5-minute RV, 95% block-bootstrap CI')
+    axes[1].axvline(1, color=Gray, lw=0.9, ls='--', label='Ratio = 1')
+    axes[1].set_yticks(yy)
+    axes[1].set_yticklabels(lab)
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=2, y=0.0)
+    save_fig('ch9_sem_b3')
+    return {}
+
+
+def sc_b4(day=DAY):
+    """B4: randamente standardizate cu sd(r) si cu sqrt(RV): histograme si grafice QQ, SPY si Bitcoin."""
+    btc_oc = 100 * np.log(P_BTC.iloc[:, -1] / P_BTC[0])
+    fig, axes = plt.subplots(1, 4, figsize=(10.6, 2.9))
+    xx = np.linspace(-5, 5, 300)
+    for c, (name, r, v) in enumerate([('SPY', OC, RV_SPY), ('Bitcoin', btc_oc, RV_BTC)]):
+        z = (r / np.sqrt(v)).values
+        u = (r / r.std()).values
+        ax = axes[2 * c]
+        ax.hist(np.clip(u, -6, 6), bins=np.linspace(-6, 6, 49), density=True, color=Amber, alpha=0.6, label='$r_t/\\mathrm{sd}(r)$')
+        ax.hist(z, bins=np.linspace(-6, 6, 49), density=True, histtype='step', color=MainBlue, lw=1.2, label='$r_t/\\sqrt{\\mathrm{RV}_t}$')
+        ax.plot(xx, stats.norm.pdf(xx), color=IDAred, lw=1.0, ls='--', label='N(0,1)')
+        ax.set_title(name, fontsize=9, loc='left')
+        ax = axes[2 * c + 1]
+        q = stats.norm.ppf((np.arange(1, len(z) + 1) - 0.5) / len(z))
+        ax.plot(q, np.sort(u), '.', ms=2, color=Amber, label=None)
+        ax.plot(q, np.sort(z), '.', ms=2, color=MainBlue, label=None)
+        ax.plot([-4, 4], [-4, 4], color=Gray, lw=0.8, ls=':', label='45-degree line')
+        ax.set_xlim(-4, 4)
+        ax.set_ylim(-8, 8)
+        ax.set_title(f'{name}: QQ plot', fontsize=9, loc='left')
+        ax.set_xlabel('Normal quantile')
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=4, y=0.0)
+    save_fig('ch9_sem_b4')
+    d = pd.Timestamp(day)
+    return {'day': day, 'r': float(OC[d]), 'rv': float(RV_SPY[d]), 'z': float(OC[d] / np.sqrt(RV_SPY[d])),
+            'kbench': 3 * 78 / 80}
+
+
+def sc_b5(day='2025-04-08'):
+    """B5: un rand al matricei de design (log-HAR), intervalele coeficientilor OLS vs Newey-West, ACF brut si al reziduurilor."""
+    res, X, ok = T.har_fit(RVT_SPY, log=True)
+    y = np.log(RVT_SPY)
+    Xc = np.column_stack([np.ones(ok.sum()), X[ok].values])
+    e = res['resid']
+    se_ols = np.sqrt(np.diag(e @ e / (len(e) - 4) * np.linalg.inv(Xc.T @ Xc)))
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 3.0))
+    names = ['$\\beta_0$', '$\\beta_d$', '$\\beta_w$', '$\\beta_m$']
+    yy = np.arange(4)
+    axes[0].errorbar(res['b'], yy - 0.12, xerr=1.96 * se_ols, fmt='o', color=Amber, capsize=3, label='95% CI, OLS standard errors')
+    axes[0].errorbar(res['b'], yy + 0.12, xerr=1.96 * res['se'], fmt='s', color=MainBlue, capsize=3, label='95% CI, Newey-West standard errors')
+    axes[0].axvline(0, color=Gray, lw=0.8, ls='--')
+    axes[0].set_yticks(yy)
+    axes[0].set_yticklabels(names)
+    axes[0].invert_yaxis()
+    lags = np.arange(1, 41)
+    yv = y[ok].values - y[ok].mean()
+    ac_y = [np.corrcoef(yv[l:], yv[:-l])[0, 1] for l in lags]
+    ac_e = [np.corrcoef(e[l:], e[:-l])[0, 1] for l in lags]
+    axes[1].bar(lags - 0.2, ac_y, 0.4, color=MainBlue, label='ACF of $\\ln V_t$')
+    axes[1].bar(lags + 0.2, ac_e, 0.4, color=IDAred, label='ACF of log-HAR residuals')
+    band = 1.96 / np.sqrt(len(e))
+    axes[1].axhspan(-band, band, color=LightGray, alpha=0.7, lw=0, zorder=0, label='$\\pm 1.96/\\sqrt{T}$')
+    axes[1].set_xlabel('Lag (trading days)')
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=3, y=0.0)
+    save_fig('ch9_sem_b5')
+    d = pd.Timestamp(day)
+    xr = X.loc[d]
+    return {'day': day, 'y': float(y[d]), 'xd': float(xr['d']), 'xw': float(xr['w']), 'xm': float(xr['m']),
+            'fit': float(res['b'][0] + res['b'][1:] @ xr.values), 'T': int(res['T']), 'N': int(len(RVT_SPY)),
+            'ac_e1': float(ac_e[0]), 'ac_y1': float(ac_y[0])}
+
+
+def sc_b6():
+    """B6: tinta pe 5 zile, prognozele log-HAR direct si GARCH(1,1)-t, diferenta cumulata a QLIKE."""
+    v = RVT_SPY
+    y5 = v[::-1].rolling(5).sum()[::-1]
+    X = T.har_design(np.log(v))
+    ok = X.notna().all(axis=1) & y5.notna()
+    Xc = np.column_stack([np.ones(len(X)), X.values])
+    ly = np.log(y5).values
+    idx = np.where((v.index >= pd.Timestamp('2022-01-03')) & ok.values)[0]
+    fh = {}
+    for t in idx:
+        tr = np.where(ok.values[:t - 4])[0]
+        b, *_ = np.linalg.lstsq(Xc[tr], ly[tr], rcond=None)
+        fh[v.index[t]] = np.exp(Xc[t] @ b + np.var(ly[tr] - Xc[tr] @ b) / 2)
+    fh = pd.Series(fh)
+    G = garch_params_blocks(D_SPY, fh.index)
+    pers = G['alpha'] + G['beta']
+    lr = G['omega'] / (1 - pers)
+    fg = sum(lr + pers ** h * (G['s2'] - lr) for h in range(5))
+    yy = y5.reindex(fh.index)
+    fig, axes = plt.subplots(2, 1, figsize=(9.4, 4.2), sharex=True, gridspec_kw={'height_ratios': [2, 1]})
+    axes[0].plot(yy.index, yy, color=MainBlue, lw=0.6, label='Realised 5-day variance $Y_t$ (%$^2$)')
+    axes[0].plot(fh.index, fh, color=IDAred, lw=0.9, label='Direct log-HAR forecast')
+    axes[0].plot(fg.index, fg, color=Forest, lw=0.9, label='GARCH(1,1)-t forecast')
+    axes[0].set_yscale('log')
+    cd = (T.qlike(yy, fg) - T.qlike(yy, fh)).cumsum()
+    axes[1].plot(cd.index, cd, color=Purple, lw=1.1, label='Cumulative QLIKE: GARCH minus log-HAR (rising = log-HAR better)')
+    axes[1].axhline(0, color=Gray, lw=0.7)
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=2, y=0.0)
+    save_fig('ch9_sem_b6')
+    return {'cum_end': float(cd.iloc[-1]), 'first': str(fh.index[0].date()), 'last': str(fh.index[-1].date())}
+
+
+def sc_b7():
+    """B7: componenta continua si de salt a variantei SPY; coeficientii salturilor; QLIKE cumulata HAR-CJ minus log-HAR."""
+    j = T.jump_test(R_SPY)
+    C = j['C'] + ON ** 2
+    Jc = j['J']
+    v = RVT_SPY
+    X = pd.DataFrame({'cd': np.log(C).shift(1), 'cw': np.log(C.rolling(5).mean()).shift(1),
+                      'cm': np.log(C.rolling(22).mean()).shift(1), 'jd': np.log1p(Jc).shift(1),
+                      'jw': np.log1p(Jc.rolling(5).mean()).shift(1), 'jm': np.log1p(Jc.rolling(22).mean()).shift(1)})
+    y = np.log(v)
+    ok = X.notna().all(axis=1)
+    res = T.ols_nw(y[ok], X[ok])
+    Xc = np.column_stack([np.ones(len(X)), X.values])
+    f = {}
+    for t in np.where((v.index >= pd.Timestamp('2022-01-03')) & ok.values)[0]:
+        tr = np.where(ok.values[:t])[0]
+        b, *_ = np.linalg.lstsq(Xc[tr], y.values[tr], rcond=None)
+        f[v.index[t]] = np.exp(Xc[t] @ b + np.var(y.values[tr] - Xc[tr] @ b) / 2)
+    f = pd.Series(f)
+    fl = T.har_expanding(v, '2022-01-03', log=True).reindex(f.index)
+    yy = v.reindex(f.index)
+    fig, axes = plt.subplots(1, 3, figsize=(10.4, 3.0), gridspec_kw={'width_ratios': [1.6, 0.9, 1.2]})
+    axes[0].plot(C.index, C, color=MainBlue, lw=0.5, label='Continuous part $C_t$ (incl. overnight, %$^2$)')
+    jj = Jc[Jc > 0]
+    axes[0].scatter(jj.index, jj, color=IDAred, s=8, zorder=3, label='Jump part $J_t > 0$ (%$^2$)')
+    axes[0].set_yscale('log')
+    axes[0].tick_params(axis='x', labelsize=7)
+    nm = ['$\\beta_{Jd}$', '$\\beta_{Jw}$', '$\\beta_{Jm}$']
+    axes[1].errorbar(res['b'][4:], np.arange(3), xerr=1.96 * res['se'][4:], fmt='o', color=IDAred, capsize=3,
+                     label='Jump coefficients, 95% Newey-West CI')
+    axes[1].axvline(0, color=Gray, lw=0.8, ls='--')
+    axes[1].set_yticks(range(3))
+    axes[1].set_yticklabels(nm)
+    axes[1].invert_yaxis()
+    cd = (T.qlike(yy, f) - T.qlike(yy, fl)).cumsum()
+    axes[2].plot(cd.index, cd, color=Purple, lw=1.1, label='Cumulative QLIKE: HAR-CJ minus log-HAR (rising = log-HAR better)')
+    axes[2].axhline(0, color=Gray, lw=0.7)
+    axes[2].tick_params(axis='x', labelsize=7)
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=2, y=0.0)
+    save_fig('ch9_sem_b7')
+    return {'n_jump_days': int((Jc > 0).sum()), 'cum_end': float(cd.iloc[-1])}
+
+
+def sc_b8():
+    """B8: log m(q, D) fata de log D (SPY, varianta totala), pantele zeta_q pentru patru masuri, puntea simulata cu si fara zgomot."""
+    series = {'Total variance': RVT_SPY, 'Intraday RV': RV_SPY, 'BV': T.bv(R_SPY), 'RV 30 min, subsampled': T.subsampled_rv(P_SPY, 6)}
+    qs = (0.5, 1.0, 1.5, 2.0, 3.0)
+    x = 0.5 * np.log(RVT_SPY.values)
+    ro = T.roughness(x, qs)
+    fig, axes = plt.subplots(1, 3, figsize=(10.4, 3.1))
+    cols = [MainBlue, Forest, Amber, IDAred, Purple]
+    L = np.log(ro['lags'])
+    for q, c in zip(qs, cols):
+        axes[0].plot(L, np.log(ro['m'][q]), 'o', ms=2.5, color=c, label=f'q = {q}')
+        a1, a0 = np.polyfit(L, np.log(ro['m'][q]), 1)
+        axes[0].plot(L, a0 + a1 * L, color=c, lw=0.9)
+    axes[0].set_xlabel('$\\ln \\Delta$ (trading days)')
+    axes[0].set_ylabel('$\\ln m(q, \\Delta)$')
+    axes[0].set_title('SPY, total variance', fontsize=9, loc='left')
+    for (name, s), c in zip(series.items(), [MainBlue, Forest, Amber, Purple]):
+        r = rough_H(0.5 * np.log(s.values))
+        axes[1].plot(qs, [r['zeta'][q] for q in qs], 'o-', color=c, ms=3, lw=0.9, label=f"{name}: H = {r['H']:.2f}")
+    axes[1].plot(qs, [0.5 * q for q in qs], color=Gray, lw=0.8, ls=':', label='H = 0.5')
+    axes[1].set_xlabel('q')
+    axes[1].set_ylabel('Slope $\\zeta_q$')
+    rng = np.random.default_rng(SEED)
+    n = len(RVT_SPY)
+    z = np.cumsum(0.1 * rng.standard_normal(n))
+    z = z - np.linspace(0, z[-1], n)
+    zn = z + 0.25 * rng.standard_normal(n)
+    for arr, c, lab in [(z, Teal, 'Simulated bridge, H = 0.5'), (zn, Orange, 'Same bridge plus i.i.d. noise')]:
+        rr = T.roughness(arr, (2.0,))
+        axes[2].plot(np.log(rr['lags']), np.log(rr['m'][2.0]), 'o-', ms=2.5, lw=0.8, color=c, label=lab)
+    axes[2].plot(L, np.log(ro['m'][2.0]), 'o-', ms=2.5, lw=0.8, color=MainBlue, label='SPY total variance')
+    axes[2].set_xlabel('$\\ln \\Delta$')
+    axes[2].set_ylabel('$\\ln m(2, \\Delta)$')
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=4, y=0.0)
+    save_fig('ch9_sem_b8')
+    a1, a0 = np.polyfit(L, np.log(ro['m'][2.0]), 1)
+    return {'m21': float(ro['m'][2.0][0]), 'zeta2': float(a1), 'icpt2': float(a0), 'n_pairs1': int(np.isfinite(x).sum() - 1)}
+
+
+def sc_b9(XQS):
+    """B9: valorile p MCS (linii la 0,10 si 0,25) si QLIKE medie pe modele."""
+    pv = XQS['mcs']['pvalues']
+    order = sorted(pv, key=lambda m: pv[m])
+    lab = {'logHAR': 'log-HAR', 'GARCH-t': 'GARCH(1,1)-t', 'RW': "Yesterday's RV"}
+    names = [lab.get(m, m) for m in order]
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 3.0))
+    yy = np.arange(len(order))
+    axes[0].scatter([pv[m] for m in order], yy, color=[IDAred if m in XQS['mcs']['included'] else MainBlue for m in order],
+                    s=26, zorder=3, label='MCS p-value (red: in the 90% set)')
+    axes[0].axvline(0.10, color=Forest, lw=1.0, ls='--', label='Size 0.10 (90% set)')
+    axes[0].axvline(0.25, color=Purple, lw=1.0, ls='-.', label='Size 0.25 (75% set)')
+    axes[0].set_yticks(yy)
+    axes[0].set_yticklabels(names)
+    axes[0].set_xlabel('MCS p-value (elimination order from top)')
+    axes[1].barh(yy, [XQS['qlike'][m] for m in order], color=Amber, label=f"Mean QLIKE, {XQS['mcs']['T']:,} days")
+    axes[1].set_yticks(yy)
+    axes[1].set_yticklabels(names)
+    axes[1].set_xlim(0.25, 0.52)
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=2, y=0.0)
+    save_fig('ch9_sem_b9')
+    return {'order': order}
+
+
+def sc_c1(C1):
+    """C1: distributia bootstrap (blocuri calendaristice de 28 de zile) a diferentei de R^2, Bitcoin minus SPY."""
+    F = pd.read_csv(os.path.join(HERE, 'ch9_forecasts_spy.csv'), index_col=0, parse_dates=True).loc[C_START:]
+    Fb = pd.read_csv(os.path.join(HERE, 'ch9_forecasts_btc.csv'), index_col=0, parse_dates=True).loc[C_START:]
+    a = np.c_[np.log(F['proxy']), np.log(F['logHAR'])]
+    b = np.c_[np.log(Fb['proxy']), np.log(Fb['logHAR'])]
+    cal = pd.date_range(min(F.index[0], Fb.index[0]), max(F.index[-1], Fb.index[-1]), freq='D')
+    rowa = np.full(len(cal), -1)
+    rowa[cal.get_indexer(F.index)] = np.arange(len(F))
+    rowb = np.full(len(cal), -1)
+    rowb[cal.get_indexer(Fb.index)] = np.arange(len(Fb))
+    rng = np.random.default_rng(SEED)
+    block, ncal = 28, len(cal)
+    nb = int(np.ceil(ncal / block))
+
+    def r2(x, rows):
+        rows = rows[rows >= 0]
+        return np.corrcoef(x[rows, 0], x[rows, 1])[0, 1] ** 2
+    d = np.empty(B_BOOT)
+    for i in range(B_BOOT):
+        st = rng.integers(0, ncal - block + 1, nb)
+        days = (st[:, None] + np.arange(block)[None, :]).ravel()[:ncal]
+        d[i] = r2(b, rowb[days]) - r2(a, rowa[days])
+    fig, ax = plt.subplots(figsize=(7.4, 2.9))
+    ax.hist(d, bins=50, color=Amber, alpha=0.8, label=f'Bootstrap $R^2$ difference, Bitcoin minus SPY ({B_BOOT:,} resamples)')
+    ax.axvline(0, color=Gray, lw=0.9, ls='--', label='No difference')
+    ax.axvline(C1['r2diff'], color=IDAred, lw=1.4, label=f"Observed difference {C1['r2diff']:.2f}")
+    for q in (2.5, 97.5):
+        ax.axvline(np.percentile(d, q), color=MainBlue, lw=1.0, ls=':', label='95% percentile interval' if q < 50 else None)
+    ax.set_xlabel('$R^2$ difference (log RV on log forecast)')
+    legend_outside_bottom(ax, ncol=2, y=-0.22)
+    save_fig('ch9_sem_c1_boot')
+    return {'lo': float(np.percentile(d, 2.5)), 'hi': float(np.percentile(d, 97.5)), 'cal_days': int(ncal),
+            'spy_T': int(len(F)), 'btc_T': int(len(Fb))}
+
+
+def sem_charts():
+    """Toate graficele seminarului; foloseste rezultatele deja salvate in sem9_results.json pentru blocurile costisitoare."""
+    with open(os.path.join(HERE, 'sem9_results.json')) as fh:
+        R_ = json.load(fh)
+    out = {'day': sc_day(), 'a1': sc_a1(), 'a2': sc_a2(R_['A2']), 'a3': sc_a3(), 'a4': sc_a4(R_['A4']), 'a5': sc_a5(),
+           'a6': sc_a6(R_['XA6']), 'a7': sc_a7(), 'a8': sc_a8(R_['XA8']), 'b1': sc_b1(), 'b2': sc_b2(),
+           'b3': sc_b3(R_['B3'], R_['XRK']), 'b4': sc_b4(), 'b5': sc_b5(), 'b6': sc_b6(), 'b7': sc_b7(), 'b8': sc_b8(),
+           'b9': sc_b9(R_['XQS']), 'c1': sc_c1(R_['C1'])}
+    return out
+
+
 if __name__ == '__main__':
     ONLY = sys.argv[1:]                              # optional: recalculeaza doar blocurile numite, restul raman din json
     S = {}
@@ -688,7 +1309,7 @@ if __name__ == '__main__':
                     ('B4', b4_standardised), ('B5', b5_har_insample), ('B6', b6_week), ('B7', b7_harcj), ('B8', b8_rough),
                     ('C1', c1_predictability), ('XJ', ex_jump_inference), ('XAR', ex_har_ar22),
                     ('XQS', ex_harq_shar), ('XGW', ex_gw_week), ('XRK', ex_rk_ratio), ('XA8', ex_a8_mz),
-                    ('XA6', ex_a6_jensen)]:
+                    ('XA6', ex_a6_jensen), ('SC', sem_charts)]:
         if ONLY and name not in ONLY:
             continue
         print(name)

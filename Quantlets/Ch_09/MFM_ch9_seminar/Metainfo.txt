@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch9_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 9 computations: realised and bipower variation step by step, jump test, microstructure noise and optimal sampling, two-scale RV, log-HAR forecasts, QLIKE and MSE, Diebold-Mariano; jump tests on SPY and Bitcoin, sampling frequency with block bootstrap intervals, returns standardised by RV, log-HAR with Newey-West errors, 5-day forecasts, HAR-CJ, roughness with bootstrap intervals, and whether Bitcoin volatility is more predictable than that of the S&P 500 ETF; jump inference with Benjamini-Hochberg FDR control, intraday periodicity, Lee-Mykland, truncated RV and MedRV; Wald test of HAR as a restricted AR(22); HARQ, SHAR and the model confidence set; Giacomini-White test; realised kernel ratio with bootstrap CI.'
+Description: 'Seminar 9 computations: realised and bipower variation step by step, jump test, microstructure noise and optimal sampling, two-scale RV, log-HAR forecasts, QLIKE and MSE, Diebold-Mariano; jump tests on SPY and Bitcoin, sampling frequency with block bootstrap intervals, returns standardised by RV, log-HAR with Newey-West errors, 5-day forecasts, HAR-CJ, roughness with bootstrap intervals, and whether Bitcoin volatility is more predictable than that of the S&P 500 ETF; jump inference with Benjamini-Hochberg FDR control, intraday periodicity, Lee-Mykland, truncated RV and MedRV; Wald test of HAR as a restricted AR(22); HARQ, SHAR and the model confidence set; Giacomini-White test; realised kernel ratio with bootstrap CI; one chart per seminar exercise.'
 
 Keywords: 'realised variance, bipower variation, jumps, false discovery rate, microstructure noise, HAR-RV, HARQ, model confidence set, GARCH, block bootstrap, rough volatility, SPY, Bitcoin'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
 
-Output: 'ch9_sem_jump_times.pdf, ch9_sem_frequency.pdf, ch9_sem_c1.pdf'
+Output: 'ch9_sem_jump_times.pdf, ch9_sem_frequency.pdf, ch9_sem_c1.pdf, ch9_sem_day.pdf, ch9_sem_a1.pdf, ch9_sem_a2.pdf, ch9_sem_a3.pdf, ch9_sem_a4.pdf, ch9_sem_a5.pdf, ch9_sem_a6.pdf, ch9_sem_a7.pdf, ch9_sem_a8.pdf, ch9_sem_b1.pdf, ch9_sem_b2.pdf, ch9_sem_b3.pdf, ch9_sem_b4.pdf, ch9_sem_b5.pdf, ch9_sem_b6.pdf, ch9_sem_b7.pdf, ch9_sem_b8.pdf, ch9_sem_b9.pdf, ch9_sem_c1_boot.pdf'
