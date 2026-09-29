@@ -28,7 +28,7 @@ from option_tools import (bs_price, bs_greeks, implied_vol, newton_iv, crr_price
 from generate_all_charts import (plt, MainBlue, IDAred, Forest, Amber, Orange, Purple, Teal, Gray, LightGray,  # noqa: E402
                                  save_fig, legend_outside_bottom, fig_legend_bottom, nw_mean, gbm_paths, btc_surface,
                                  pick, vrp_sp500, vrp_btc, delta_hedged_history, jsonable, SEED, HERE,
-                                 rnd_from_svi)
+                                 rnd_from_svi, cboe_strip)
 
 B_BOOT = 1000
 
@@ -234,20 +234,40 @@ def b8_rnd_band(days=90, B=300):
     atm = np.sqrt(svi_w(0.0, *p0) / T)
     ln = lambda x: float(stats.lognorm.cdf(x * F, s=atm * np.sqrt(T), scale=F * np.exp(-0.5 * atm ** 2 * T)))
     rng = np.random.default_rng(SEED)
-    P80, P120, D80, D120 = [], [], [], []   # D: SVI minus log-normal, cu volatilitatea ATM a fiecarei reestimari
+    P80, P120, D80, D120, QB = [], [], [], [], []   # D: SVI minus log-normal, cu volatilitatea ATM a fiecarei reestimari
     while len(P80) < B:
         i = rng.integers(0, len(kq), len(kq))
         if len(np.unique(kq[i])) < 6:
             continue
         pb = svi_fit(kq[i], wq[i])
         pbv = [pb[x] for x in ['a', 'b', 'rho', 'm', 's']]
-        a_, b_ = probs(rnd_from_svi(pbv, F, T, K))
-        P80.append(a_); P120.append(b_)
+        qb = rnd_from_svi(pbv, F, T, K)
+        a_, b_ = probs(qb)
+        P80.append(a_); P120.append(b_); QB.append(qb / integrate.trapezoid(qb, K))
         sb = np.sqrt(svi_w(0.0, *pbv) / T)
         lnb = lambda x: float(stats.lognorm.cdf(x * F, s=sb * np.sqrt(T), scale=F * np.exp(-0.5 * sb ** 2 * T)))
         D80.append(a_ - lnb(0.8)); D120.append(b_ - (1 - lnb(1.2)))
     kmin, kmax = float(np.exp(kq.min())), float(np.exp(kq.max()))
     A0 = integrate.trapezoid(q0, K)
+    # grafic: densitatea cu banda bootstrap, densitatea log-normala, pragurile 0.8F si 1.2F si intervalul cotat
+    QB = np.array(QB); x = K / F
+    lnd = stats.lognorm.pdf(K, s=atm * np.sqrt(T), scale=F * np.exp(-0.5 * atm ** 2 * T)) * F
+    fig, ax = plt.subplots(figsize=(6.6, 3.3))
+    ax.axvspan(x.min(), kmin, color=Amber, alpha=0.15, lw=0, label='Outside the quoted strikes (SVI extrapolation)')
+    ax.axvspan(kmax, x.max(), color=Amber, alpha=0.15, lw=0)
+    ax.fill_between(x, np.quantile(QB, 0.025, axis=0) * F, np.quantile(QB, 0.975, axis=0) * F, color=Teal, alpha=0.35,
+                    lw=0, label='95% pairs-bootstrap band (300 SVI refits)')
+    ax.plot(x, q0 / A0 * F, color=MainBlue, lw=1.4, label='Risk-neutral density from the SVI smile')
+    ax.plot(x, lnd, color=IDAred, lw=1.1, ls='--', label=f'Log-normal density, ATM volatility {100 * atm:.1f}%')
+    for thr in (0.8, 1.2):
+        ax.axvline(thr, color=Gray, lw=0.8, ls=':')
+    ax.text(0.8, ax.get_ylim()[1] * 0.92, ' $0.8F$', color='black', fontsize=8)
+    ax.text(1.2, ax.get_ylim()[1] * 0.92, ' $1.2F$', color='black', fontsize=8)
+    ax.set_xlim(0.3, 2.0)
+    ax.set_xlabel('$S_T/F$ at expiry'); ax.set_ylabel('Density (per unit of $S_T/F$)')
+    ax.set_title(f"Bitcoin, expiry {pd.Timestamp(e).strftime('%d %b %Y')} ({f['days']:.0f} days)", fontsize=9, loc='left')
+    legend_outside_bottom(ax, ncol=2, y=-0.2)
+    save_fig('ch12_sem_b8_density')
     ext_lo = float(integrate.trapezoid(q0[K <= kmin * F], K[K <= kmin * F]) / A0)       # masa sub ultima cotatie
     ext_hi = float(1 - integrate.trapezoid(q0[K <= kmax * F], K[K <= kmax * F]) / A0)   # masa peste ultima cotatie
     return dict(expiry=str(pd.Timestamp(e).date()), days=float(f['days']), n=int(len(kq)), atm=float(100 * atm),
@@ -463,6 +483,253 @@ def c1_vrp_signal():
     return res
 
 
+
+# =============================================================================
+# GRAFICE SUPLIMENTARE PENTRU SEMINAR (aceleasi cifre ca in functiile de mai sus)
+# =============================================================================
+def setup_check():
+    """Verificarea datelor: S&P 500 si VIX imbinate pe zilele comune; lantul Deribit al cursului."""
+    px = pd.concat([load_close('sp500'), load_close('vix')], axis=1, join='inner').dropna()
+    c = deribit_chain()
+    return dict(n=int(len(px)), first=str(px.index[0].date()), last=str(px.index[-1].date()),
+                sp0=float(px['sp500'].iloc[0]), vix0=float(px['vix'].iloc[0]), sp1=float(px['sp500'].iloc[-1]),
+                vix1=float(px['vix'].iloc[-1]), n_opt=int(len(c)), n_exp=int(c['expiry'].nunique()),
+                snap=str(c['snapshot_utc'].iloc[0]))
+
+
+def a1_chart():
+    """Densitatea implicita din tripletele de call-uri vecine (preturi de referinta in USD) pentru scadenta din A1."""
+    c = deribit_chain()
+    g = c[(c['expiry'] == pd.Timestamp(BFLY_EXPIRY)) & (c['type'] == 'call')].set_index('strike').sort_index()
+    F, S = float(g['forward'].iloc[0]), float(g['index'].iloc[0])
+    K = g.index.values.astype(float); C = g['mark_price'].values * S
+    Km, qd = [], []
+    for i in range(1, len(K) - 1):
+        h1, h2 = K[i] - K[i - 1], K[i + 1] - K[i]
+        d2 = 2 * (C[i - 1] / (h1 * (h1 + h2)) - C[i] / (h1 * h2) + C[i + 1] / (h2 * (h1 + h2)))
+        Km.append(K[i]); qd.append(F / S * d2)
+    Km, qd = np.array(Km), np.array(qd)
+    fig, ax = plt.subplots(figsize=(6.6, 3.2))
+    ax.bar(Km / 1000, qd * 1e5, width=0.8, color=np.where(qd >= 0, MainBlue, IDAred))
+    i85 = np.argmin(abs(Km - 85000))
+    ax.bar([85], [qd[i85] * 1e5], width=0.8, color=Amber)
+    ax.axhline(0, color=Gray, lw=0.6)
+    ax.set_xlabel('Strike $K$ (thousand USD)'); ax.set_ylabel('$e^{r\\tau}\\,\\partial^2 C/\\partial K^2$ ($10^{-5}$ per USD)')
+    from matplotlib.patches import Patch
+    fig_legend_bottom(fig, [Patch(color=MainBlue, label='Adjacent strikes, convex (density $\\geq 0$)'),
+                            Patch(color=IDAred, label='Adjacent strikes, not convex at mark prices'),
+                            Patch(color=Amber, label='The 84/85/86 thousand butterfly of the task')], ncol=1, y=-0.02)
+    save_fig('ch12_sem_a1_butterfly')
+    return dict(n_adj=int(len(qd)), n_adj_neg=int((qd < 0).sum()))
+
+
+def a4_chart():
+    """N x (C_N - C_BS) pentru arborele CRR, N par vs impar."""
+    S, K, T, r, s = 100.0, 100.0, 1.0, 0.05, 0.20
+    bs = float(bs_price(S, K, T, r, s))
+    Ns = np.arange(20, 301)
+    e = np.array([N * (float(crr_price(S, K, T, r, s, int(N))) - bs) for N in Ns])
+    avg = np.array([N * (0.5 * (float(crr_price(S, K, T, r, s, int(N))) + float(crr_price(S, K, T, r, s, int(N) + 1))) - bs)
+                    for N in Ns[Ns % 2 == 0]])
+    fig, ax = plt.subplots(figsize=(6.6, 3.1))
+    ax.plot(Ns[Ns % 2 == 0], e[Ns % 2 == 0], 'o', ms=2.5, color=MainBlue, label='Even $N$ (strike on a node)')
+    ax.plot(Ns[Ns % 2 == 1], e[Ns % 2 == 1], 'o', ms=2.5, color=IDAred, label='Odd $N$ (strike between two nodes)')
+    ax.plot(Ns[Ns % 2 == 0], avg, color=Forest, lw=1.2, label='Average of $N$ and $N + 1$')
+    ax.axhline(0, color=Gray, lw=0.6)
+    ax.set_xlabel('Number of steps $N$'); ax.set_ylabel('$N\\,(C_N - C_{BS})$')
+    legend_outside_bottom(ax, ncol=3, y=-0.22)
+    save_fig('ch12_sem_a4_crr')
+    return {}
+
+
+def a5_chart():
+    """Delta, gamma si vega ale call-ului din A5 in functie de S, cu punctul S = 100 marcat."""
+    K, T, r, sg = 100.0, 0.5, 0.03, 0.25
+    Sg = np.linspace(60, 140, 401)
+    gk = bs_greeks(Sg, K, T, r, sg)
+    g0 = bs_greeks(100.0, K, T, r, sg)
+    fig, axes = plt.subplots(1, 3, figsize=(10, 2.9))
+    for ax, key, lab, col in zip(axes, ['delta', 'gamma', 'vega'],
+                                 ['Delta $\\Phi(d_1)$', 'Gamma $\\varphi(d_1)/(S\\sigma\\sqrt{\\tau})$',
+                                  'Vega per vol point $S\\varphi(d_1)\\sqrt{\\tau}/100$'], [MainBlue, IDAred, Forest]):
+        ax.plot(Sg, gk[key], color=col, lw=1.4)
+        ax.plot([100], [float(g0[key])], 'o', color=Amber, ms=6)
+        ax.annotate(f"{float(g0[key]):.4f}", (100, float(g0[key])), textcoords='offset points', xytext=(6, -12),
+                    fontsize=8, color='black')
+        ax.axvline(100, color=Gray, lw=0.6, ls=':')
+        ax.set_title(lab, fontsize=9, loc='left'); ax.set_xlabel('$S$')
+    from matplotlib.lines import Line2D
+    fig_legend_bottom(fig, [Line2D([], [], color=MainBlue, label='Delta'), Line2D([], [], color=IDAred, label='Gamma'),
+                            Line2D([], [], color=Forest, label='Vega'),
+                            Line2D([], [], marker='o', ls='', color=Amber, label='The A5 option: $S = K = 100$, $\\tau = 0.5$')],
+                      ncol=4, y=0.0)
+    plt.tight_layout(rect=(0, 0.08, 1, 1))
+    save_fig('ch12_sem_a5_greeks')
+    return {}
+
+
+def a7_chart():
+    """Pretul Black-Scholes ca functie de sigma, pretul de piata 4.50, valorile de pornire si pasul Newton."""
+    S, K, T, r, P = 100.0, 100.0, 0.25, 0.02, 4.50
+    sg = np.linspace(0.02, 0.40, 300)
+    price = bs_price(S, K, T, r, sg)
+    pvk = K * np.exp(-r * T)
+    s_bs0 = P * np.sqrt(2 * np.pi) / (S * np.sqrt(T))
+    s_bs1 = (P - (S - pvk) / 2) * np.sqrt(2 * np.pi) / (S * np.sqrt(T))
+    s0 = 0.20
+    p0 = float(bs_price(S, K, T, r, s0)); v0 = float(bs_greeks(S, K, T, r, s0)['vega']) * 100
+    s1 = s0 - (p0 - P) / v0
+    ex = implied_vol(P, S, K, T, r)
+    fig, ax = plt.subplots(figsize=(6.6, 3.2))
+    ax.plot(100 * sg, price, color=MainBlue, lw=1.5, label='Black–Scholes price $BS(\\sigma)$')
+    ax.axhline(P, color=Gray, lw=0.8, ls='--')
+    ax.text(14.3, P + 0.08, 'market price 4.50', color='black', fontsize=8)
+    tt = np.linspace(0.17, 0.25, 20)
+    ax.plot(100 * tt, p0 + v0 * (tt - s0), color=IDAred, lw=1.2, label='Tangent at $\\sigma_0 = 20\\%$ (Newton step)')
+    ax.plot([100 * s0], [p0], 'o', color=IDAred, ms=5)
+    ax.plot([100 * s1], [P], 'o', color=Forest, ms=6, label=f'Newton $\\sigma_1 = {100 * s1:.2f}\\%$ (exact {100 * ex:.2f}%)')
+    ax.plot([100 * s_bs0], [float(bs_price(S, K, T, r, s_bs0))], 's', color=Purple, ms=5,
+            label=f'Start without correction {100 * s_bs0:.2f}%')
+    ax.plot([100 * s_bs1], [float(bs_price(S, K, T, r, s_bs1))], 'D', color=Amber, ms=5,
+            label=f'Start with correction {100 * s_bs1:.2f}%')
+    ax.set_xlim(14, 28); ax.set_ylim(3, 6.2)
+    ax.set_xlabel('Volatility $\\sigma$ (%)'); ax.set_ylabel('Call price')
+    legend_outside_bottom(ax, ncol=2, y=-0.2)
+    save_fig('ch12_sem_a7_newton')
+    return dict(s1=float(s1), s_bs0=float(s_bs0), s_bs1=float(s_bs1))
+
+
+def a8_chart():
+    """Integrandul benzii de varianta (log-normal, 90 de zile): dreptunghiurile Cboe pe [80, 120] si cozile trunchiate."""
+    F, T, s = 100.0, 90 / 365, 0.20
+    q = lambda K: np.where(K < F, bs_price(F, K, T, 0.0, s, 'put'), bs_price(F, K, T, 0.0, s, 'call'))
+    Kd = np.linspace(50, 160, 2201)
+    f = 2 / T * q(Kd) / Kd ** 2
+    K5 = np.arange(80.0, 120.1, 5.0)
+    Q5 = np.where(K5 == F, 0.5 * (bs_price(F, K5, T, 0.0, s, 'put') + bs_price(F, K5, T, 0.0, s, 'call')), q(K5))
+    fig, ax = plt.subplots(figsize=(6.6, 3.1))
+    ax.bar(K5, 2 / T * Q5 / K5 ** 2, width=5, color=Teal, alpha=0.45, edgecolor=MainBlue, lw=0.6,
+           label='Cboe rectangles, $\\Delta K = 5$ on $[80, 120]$')
+    ax.plot(Kd, f, color=MainBlue, lw=1.4, label='Integrand $2\\,Q(K)/(T K^2)$')
+    ax.fill_between(Kd, 0, f, where=(Kd < 80) | (Kd > 120), color=IDAred, alpha=0.3, lw=0,
+                    label='Truncated tails (outside $[80, 120]$)')
+    ax.set_xlabel('Strike $K$'); ax.set_ylabel('Contribution to $\\sigma^2$ per unit of $K$')
+    legend_outside_bottom(ax, ncol=2, y=-0.22)
+    save_fig('ch12_sem_a8_strip')
+    return {}
+
+
+def b2_chart():
+    """P&L cumulat al vanzatorului de optiuni acoperite delta (S&P 500), cu cele mai rele cinci luni marcate."""
+    d = delta_hedged_history()
+    cum = d['pnl'].cumsum()
+    w5 = d['pnl'].nsmallest(5)
+    fig, ax = plt.subplots(figsize=(6.8, 3.1))
+    ax.plot(cum.index, cum, color=MainBlue, lw=1.3, label='Cumulative P&L of the seller (% of the index, summed)')
+    ax.plot(w5.index, cum.loc[w5.index], 'o', color=IDAred, ms=6, label='The five worst months')
+    for dt in w5.index:
+        ax.annotate(f"{dt.strftime('%Y-%m')}: {w5[dt]:.2f}%", (dt, cum[dt]), textcoords='offset points', xytext=(-20, -14),
+                    fontsize=7, color='black')
+    ax.set_ylabel('Cumulative P&L (%)')
+    legend_outside_bottom(ax, ncol=2, y=-0.14)
+    save_fig('ch12_sem_b2_cum')
+    return {}
+
+
+def b4_chart():
+    """Contributia fiecarui pret de exercitare la varianta implicita (formula Cboe), cele doua scadente din jurul a 30 de zile."""
+    c = deribit_chain()
+    t0 = c['snapshot_utc'].iloc[0]
+    c = c.assign(T=(c['expiry'] - t0).dt.total_seconds() / (365 * 86400))
+    exps = sorted(c['expiry'].unique())
+    Td = {e: c.loc[c['expiry'] == e, 'T'].iloc[0] * 365 for e in exps}
+    near = max(e for e in exps if Td[e] < 30); nxt = min(e for e in exps if Td[e] >= 30)
+    fig, ax = plt.subplots(figsize=(6.6, 3.1))
+    out = {}
+    for tag, e, col in [('near', near, MainBlue), ('next', nxt, IDAred)]:
+        g = c[c['expiry'] == e]
+        F = float(g['forward'].iloc[0]); S = float(g['index'].iloc[0]); T = float(g['T'].iloc[0])
+        K, Q, K0 = cboe_strip(g, F, S)
+        dK = np.empty_like(K); dK[1:-1] = (K[2:] - K[:-2]) / 2; dK[0], dK[-1] = K[1] - K[0], K[-1] - K[-2]
+        R = np.log(F / S) / T
+        contrib = 2 / T * dK / K ** 2 * np.exp(R * T) * Q
+        share = contrib / contrib.sum()
+        ax.plot(K / F, 100 * share, 'o-', ms=3, lw=1.0, color=col,
+                label=f"{pd.Timestamp(e).strftime('%d %b %Y')} ({T * 365:.0f} days, {len(K)} options)")
+        out[tag] = dict(put_share=float(share[K < K0].sum()), atm_share=float(share[K == K0].sum()))
+    ax.axvline(1, color=Gray, lw=0.6, ls=':')
+    ax.set_xlabel('Strike / forward $K/F$'); ax.set_ylabel('Share of the strip variance (%)')
+    legend_outside_bottom(ax, ncol=2, y=-0.22)
+    save_fig('ch12_sem_b4_strip')
+    return out
+
+
+def b5_chart():
+    """VRP zilnica S&P 500 in puncte de volatilitate, cu mediile pe subperioade si intervalele Newey-West de 95%."""
+    d = vrp_sp500()
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.6), gridspec_kw={'width_ratios': [2.2, 1]})
+    ax = axes[0]
+    ax.plot(d.index, d['vrp_vol'], color=MainBlue, lw=0.4, label='Daily premium $VIX_t - \\sqrt{RV_{t,t+21}}$')
+    for (a, b), col in [(('1990', '2007'), IDAred), (('2008', '2026'), Forest)]:
+        x = d.loc[a:b, 'vrp_vol']
+        m, se = nw_mean(x, 21)
+        ax.hlines(m, x.index[0], x.index[-1], color=col, lw=2, label=f'Mean {a}–{b}: {m:.2f} (NW 95%: $\\pm${1.96 * se:.2f})')
+        ax.fill_between([x.index[0], x.index[-1]], m - 1.96 * se, m + 1.96 * se, color=col, alpha=0.25, lw=0)
+    ax.axhline(0, color=Gray, lw=0.5)
+    ax.set_ylim(-45, 30); ax.set_ylabel('Volatility points')
+    legend_outside_bottom(ax, ncol=1, y=-0.12)
+    ax = axes[1]
+    m, se = nw_mean(d['vrp'], 21)
+    naive = d['vrp'].std() / np.sqrt(len(d))
+    ax.errorbar([0], [m], yerr=[[1.96 * naive], [1.96 * naive]], fmt='o', color=Amber, capsize=6, label='Naive $s/\\sqrt{n}$ interval')
+    ax.errorbar([1], [m], yerr=[[1.96 * se], [1.96 * se]], fmt='o', color=Purple, capsize=6, label='Newey–West (21 lags) interval')
+    ax.set_xlim(-0.8, 1.8); ax.set_xticks([0, 1]); ax.set_xticklabels(['naive', 'Newey–West'])
+    ax.set_ylabel('Mean VRP (%$^2$), 95% interval')
+    legend_outside_bottom(ax, ncol=1, y=-0.12)
+    plt.tight_layout()
+    save_fig('ch12_sem_b5_vrp')
+    return {}
+
+
+def b6_chart():
+    """Elipsa de incredere comuna de 95% pentru (alpha, beta) in regresia Mincer-Zarnowitz, cu punctul (0, 1)."""
+    d = vrp_sp500()
+    m = sm.OLS(d['rv'], sm.add_constant(d[['iv2']])).fit(cov_type='HAC', cov_kwds={'maxlags': 21})
+    b = m.params.values; V = m.cov_params().values
+    c2 = stats.chi2.ppf(0.95, 2)
+    th = np.linspace(0, 2 * np.pi, 400)
+    L = np.linalg.cholesky(V)
+    ell = b[:, None] + np.sqrt(c2) * L @ np.vstack([np.cos(th), np.sin(th)])
+    fig, ax = plt.subplots(figsize=(6.2, 3.3))
+    ax.plot(ell[0], ell[1], color=MainBlue, lw=1.5, label='Joint 95% confidence ellipse (Wald, HAC 21 lags)')
+    se = np.sqrt(np.diag(V))
+    ax.axvspan(b[0] - 1.96 * se[0], b[0] + 1.96 * se[0], color=Teal, alpha=0.12, lw=0, label='Marginal 95% interval for $\\alpha$')
+    ax.axhspan(b[1] - 1.96 * se[1], b[1] + 1.96 * se[1], color=Amber, alpha=0.15, lw=0, label='Marginal 95% interval for $\\beta$')
+    ax.plot([b[0]], [b[1]], 'o', color=MainBlue, ms=5, label=f'Estimate ({b[0]:.1f}, {b[1]:.2f})')
+    ax.plot([0], [1], '*', color=IDAred, ms=11, label='Unbiased forecast (0, 1)')
+    ax.set_xlabel('Intercept $\\alpha$ (%$^2$)'); ax.set_ylabel('Slope $\\beta$')
+    legend_outside_bottom(ax, ncol=2, y=-0.2)
+    save_fig('ch12_sem_b6_ellipse')
+    return dict(corr=float(V[0, 1] / np.sqrt(V[0, 0] * V[1, 1])))
+
+
+def b7_chart():
+    """Prima Bitcoin zilnica (DVOL minus volatilitatea realizata pe 30 de zile), cu media si intervalul Newey-West."""
+    d = vrp_btc()
+    m, se = nw_mean(d['vrp_vol'], 30)
+    s = vrp_sp500()
+    ms_, ses = nw_mean(s['vrp_vol'], 21)
+    fig, ax = plt.subplots(figsize=(6.8, 3.1))
+    ax.plot(d.index, d['vrp_vol'], color=Amber, lw=0.7, label='Bitcoin: DVOL$_t - \\sqrt{RV_{t,t+30}}$')
+    ax.hlines(m, d.index[0], d.index[-1], color=MainBlue, lw=2, label=f'Bitcoin mean {m:.1f}, Newey–West 95% $\\pm${1.96 * se:.1f}')
+    ax.fill_between([d.index[0], d.index[-1]], m - 1.96 * se, m + 1.96 * se, color=MainBlue, alpha=0.2, lw=0)
+    ax.hlines(ms_, d.index[0], d.index[-1], color=Forest, lw=1.5, ls='--', label=f'S&P 500 mean premium 1990–2026: {ms_:.1f}')
+    ax.axhline(0, color=Gray, lw=0.5)
+    ax.set_ylabel('Volatility points')
+    legend_outside_bottom(ax, ncol=2, y=-0.14)
+    save_fig('ch12_sem_b7_btc')
+    return {}
+
 if __name__ == '__main__':
     RES = dict(A1=a1_parity(), A2=a2_parity_div(), A3=a3_binomial(), A4=a4_american(), A5=a5_bs(), A6=a6_delta_gamma(),
                A7=a7_newton(), A8=a8_strip(), A1b=a1_butterfly(), A2b=a2_implied_forward(), A4b=a4_crr_error(),
@@ -475,6 +742,9 @@ if __name__ == '__main__':
     RES['B7'] = b7_vrp_btc()
     RES['B8'] = b8_rnd_band()
     RES['C1'] = c1_vrp_signal()
+    RES['SETUP'] = setup_check()
+    RES['CH'] = dict(a1=a1_chart(), a4=a4_chart(), a5=a5_chart(), a7=a7_chart(), a8=a8_chart(), b2=b2_chart(),
+                     b4=b4_chart(), b5=b5_chart(), b6=b6_chart(), b7=b7_chart())
     with open(os.path.join(HERE, 'sem12_results.json'), 'w') as f:
         json.dump(jsonable(RES), f, indent=1)
     print('saved sem12_results.json')

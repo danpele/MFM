@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily market data (data/market): S&P 500, SPY, Bitcoin, VIX, VIX9D, VIX3M, VVIX; Bitcoin option chain (Deribit, snapshot of 22 September 2026, ch12_deribit_snapshot.csv) and the DVOL index (Deribit)'
 
-Output: 'ch12_sem_hedge.pdf, ch12_sem_svi.pdf, ch12_sem_vrp_signal.pdf'
+Output: 'ch12_sem_hedge.pdf, ch12_sem_svi.pdf, ch12_sem_vrp_signal.pdf, ch12_sem_a1_butterfly.pdf, ch12_sem_a4_crr.pdf, ch12_sem_a5_greeks.pdf, ch12_sem_a7_newton.pdf, ch12_sem_a8_strip.pdf, ch12_sem_b2_cum.pdf, ch12_sem_b4_strip.pdf, ch12_sem_b5_vrp.pdf, ch12_sem_b6_ellipse.pdf, ch12_sem_b7_btc.pdf, ch12_sem_b8_density.pdf'
