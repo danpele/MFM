@@ -66,6 +66,8 @@ SERIES = {
     'USD per EUR':        ('fred', 'DEXUSEU', None),   # cursuri FRED (H.10), pentru conversia in USD
     'JPY per USD':        ('fred', 'DEXJPUS', None),
     'T10Y2Y':             ('fred', 'T10Y2Y', None),
+    'ETF equities':       ('fred', 'BOGZ1LM563064100Q', None),   # Financial Accounts of the US, trimestrial, mil. USD
+    'All equities':       ('fred', 'BOGZ1LM893064105Q', None),
     'Stablecoins':        ('defillama', 'stablecoincharts/all', None),
 }
 

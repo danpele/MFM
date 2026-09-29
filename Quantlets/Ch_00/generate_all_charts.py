@@ -538,6 +538,88 @@ def fig_bvb_history():
                 multiple_1997_2026=bet.iloc[-1] / bet.iloc[0])
 
 # =============================================================================
+# STUDIU DE CAZ: Haddad, Huebner si Loualiche (2025), "How Competitive Is the Stock Market?"
+# =============================================================================
+HHL = dict(active0=0.81, chi=2.97, pass_through=0.33)   # Sectiunea V.A; Tabelul 2, randul 1; ec. (28)
+
+
+def etf_share():
+    """Ponderea ETF-urilor in actiunile corporative SUA (Financial Accounts of the US), trimestrial, 2001 Q1 - ultimul trimestru."""
+    q = load_panel(['ETF equities', 'All equities'], start='2001-01-01').dropna()
+    return (q['ETF equities'] / q['All equities']).rename('ETF share')
+
+
+def fig_hhl_passive():
+    """Stanga: ponderea ETF. Dreapta: regula din Sectiunea V.A (81% activi la start, transmisie 0,33):
+    scaderea ponderii active si scaderea implicita a elasticitatii agregate E_agg fata de 2001 Q1."""
+    s = etf_share()
+    active = HHL['active0'] - (s - s.iloc[0])
+    d_active = active / HHL['active0'] - 1
+    d_elast = HHL['pass_through'] * d_active
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.9))
+    axes[0].plot(s.index, 100 * s.values, color=Teal, lw=1.1, label='ETF share of US corporate equities')
+    for d in [s.index[0], pd.Timestamp('2020-10-01'), s.index[-1]]:
+        axes[0].plot(d, 100 * s.loc[d], 'o', ms=3.5, color=Teal)
+        axes[0].annotate(f'{100 * s.loc[d]:.1f}%', xy=(d, 100 * s.loc[d]), xytext=(0, 6),
+                         textcoords='offset points', ha='center', fontsize=7, color='black')
+    axes[0].set_ylabel('Share of market value (%)')
+    axes[0].set_ylim(0, 12.5)
+    axes[0].set_xlim(pd.Timestamp('2000-01-01'), pd.Timestamp('2027-12-31'))
+    axes[0].set_title('ETF share, 2001 Q1 - ' + f'{s.index[-1].year} Q{s.index[-1].quarter}', fontsize=9, loc='left')
+    axes[1].plot(d_active.index, 100 * d_active.values, color=IDAred, lw=1.1,
+                 label='Active share = elasticity if $\\chi = 0$')
+    axes[1].plot(d_elast.index, 100 * d_elast.values, color=MainBlue, lw=1.1,
+                 label='Elasticity, pass-through 0.33 ($\\chi = 2.97$)')
+    axes[1].axhline(0, color=Gray, lw=0.5, ls=':')
+    for d in [pd.Timestamp('2020-10-01'), s.index[-1]]:
+        for ser, c in [(d_active, IDAred), (d_elast, MainBlue)]:
+            axes[1].plot(d, 100 * ser.loc[d], 'o', ms=3.5, color=c)
+            axes[1].annotate(f'{100 * ser.loc[d]:.1f}%', xy=(d, 100 * ser.loc[d]), xytext=(-4, -9),
+                             textcoords='offset points', ha='right', fontsize=7, color='black')
+    axes[1].set_ylabel('Change since 2001 Q1 (%)')
+    axes[1].set_ylim(-15, 1.5)
+    axes[1].set_title('Implied change (81% active in 2001)', fontsize=9, loc='left')
+    for ax in axes:
+        ax.xaxis.set_major_locator(mdates.YearLocator(5))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+        ax.tick_params(axis='x', labelsize=7.5)
+    h0, l0 = axes[0].get_legend_handles_labels()
+    h1, l1 = axes[1].get_legend_handles_labels()
+    fig.legend(h0 + h1, l0 + l1, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=3, frameon=False, fontsize=7.5)
+    plt.tight_layout()
+    save_fig('ch0_hhl_passive')
+    pick = lambda d: dict(etf=round(s.loc[d], 4), active=round(d_active.loc[d], 4), elast=round(d_elast.loc[d], 4))
+    return {str(d.date()): pick(d) for d in [s.index[0], pd.Timestamp('2020-10-01'), s.index[-1]]}
+
+
+def fig_hhl_elasticity():
+    """Ec. (5): elasticitatea agregata dupa ce o fractie 1 - alpha din investitori devine pasiva,
+    relativ la piata fara investitori pasivi: alpha (1 + chi) / (1 + chi alpha)."""
+    alpha = np.linspace(0, 1, 401)
+    rel = lambda chi: alpha * (1 + chi) / (1 + chi * alpha)
+    fig, ax = plt.subplots(figsize=(6.4, 3.0))
+    passive = 100 * (1 - alpha)
+    for chi, c, lab in [(0, IDAred, '$\\chi = 0$: no strategic response (Koijen and Yogo)'),
+                        (HHL['chi'], MainBlue, '$\\chi = 2.97$: estimate (Table 2, row 1)'),
+                        (10, Forest, '$\\chi = 10$: strong response')]:
+        ax.plot(passive, rel(chi), color=c, lw=1.3, label=lab)
+    ax.axvline(30, color=Gray, lw=0.5, ls=':')
+    for chi, c, dy in [(0, IDAred, -5), (HHL['chi'], MainBlue, -5), (10, Forest, 5)]:
+        v = 0.70 * (1 + chi) / (1 + chi * 0.70)
+        ax.plot(30, v, 'o', ms=4, color=c)
+        ax.annotate(f'{v:.2f}', xy=(30, v), xytext=(-6, dy), textcoords='offset points', ha='right',
+                    va='top' if dy < 0 else 'bottom', fontsize=7.5, color='black')
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 1.1)
+    ax.set_xlabel('Share of investors turned passive, $1 - \\alpha$ (%)')
+    ax.set_ylabel('$\\mathcal{E}_{agg}$ relative to all active')
+    ax.set_title('Aggregate elasticity when investors turn passive, eq. (5)', fontsize=9, loc='left')
+    legend_outside_bottom(ax, ncol=2, y=-0.27)
+    plt.tight_layout()
+    save_fig('ch0_hhl_elasticity')
+    return {chi: round(0.70 * (1 + chi) / (1 + chi * 0.70), 3) for chi in (0, HHL['chi'], 10)}
+
+# =============================================================================
 # MAIN
 # =============================================================================
 if __name__ == '__main__':
@@ -555,3 +637,5 @@ if __name__ == '__main__':
     print(fig_romania())
     print(fig_bvb_history())
     print(data_pitfall())
+    print(fig_hhl_passive())
+    print(fig_hhl_elasticity())
