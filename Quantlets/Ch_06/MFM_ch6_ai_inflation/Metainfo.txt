@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_ai_inflation'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'AI for scientific discovery, mini-case: monthly realised SPY-TLT correlation (Fisher scale) regressed on the US CPI inflation known at the start of the month (lag 2), HAC standard errors with 12 lags, for the full sample and for 2002-2021 only; scatter by period with the fitted relations and the two slope intervals.'
+
+Keywords: 'stock-bond correlation, inflation, CPI, HAC, identification, subsample, AI-assisted research'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily market data (data/market): SPY, TLT; CPIAUCSL (U.S. Bureau of Labor Statistics) from FRED'
+
+Output: 'ch6_ai_inflation.pdf, ai_discovery_case.json'

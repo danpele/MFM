@@ -100,14 +100,14 @@ def corr_hac_path(R, window=252, step=5):
 def fig_corr_hac():
     R = joint_returns(['spy', 'tlt'])
     P = corr_hac_path(R)
-    fig, ax = plt.subplots(figsize=(7.0, 3.0))
+    fig, ax = plt.subplots(figsize=(5.6, 3.5))
     shade_crises(ax)
     ax.fill_between(P.index, P['lo_h'], P['hi_h'], color=IDAred, alpha=0.18, lw=0, label='95% HAC delta-method interval')
     ax.fill_between(P.index, P['lo_f'], P['hi_f'], color=MainBlue, alpha=0.30, lw=0, label='95% Fisher interval (i.i.d. Normal)')
     ax.plot(P.index, P['rho'], color=MainBlue, lw=1.0, label='252-day rolling correlation SPY-TLT')
     ax.axhline(0, color='black', lw=0.6)
     ax.set_ylabel('Correlation')
-    legend_outside_bottom(ax, ncol=3)
+    legend_outside_bottom(ax, ncol=1, y=-0.1)
     save_fig('ch6_corr_hac')
     ratio = (P['hi_h'] - P['lo_h']) / (P['hi_f'] - P['lo_f'])
     sig_f = (P['lo_f'] > 0) | (P['hi_f'] < 0)
@@ -153,12 +153,12 @@ def fig_wkd():
     w = wkd_test(Z['spy'], Z['tlt'])
     brk = Z.index[w['j']]
     z0, z1 = Z.loc[:brk], Z.loc[brk:].iloc[1:]
-    fig, ax = plt.subplots(figsize=(7.0, 2.8))
+    fig, ax = plt.subplots(figsize=(5.6, 3.5))
     ax.plot(Z.index, w['path'], color=MainBlue, lw=1.0, label='WKD process (j / sqrt(T)) |rho_j - rho_T| / D')
     ax.axhline(stats.kstwobign.ppf(0.95), color='black', ls='--', lw=0.8, label='5% critical value (1.358)')
     ax.axvline(brk, color=IDAred, ls=':', lw=1.0, label=f'Estimated break: {brk.date()}')
     ax.set_ylabel('Scaled CUSUM of correlation')
-    legend_outside_bottom(ax, ncol=3)
+    legend_outside_bottom(ax, ncol=1, y=-0.1)
     save_fig('ch6_wkd')
     w0, w1 = wkd_test(z0['spy'], z0['tlt']), wkd_test(z1['spy'], z1['tlt'])
     N.update(wkd_Q=w['Q'], wkd_p=w['p'], wkd_break=str(brk.date()), wkd_T=len(Z), wkd_bw=int(np.floor(len(Z) ** 0.25)),
@@ -230,6 +230,32 @@ def nw_tstat(d):
     return d.mean() / np.sqrt(bartlett_lrv(d[:, None], L)[0, 0] / T)
 
 
+def fig_hedge_oos(h_all, h_static, h_expost, e_un, e_st, e_dc, split):
+    """Raportul de acoperire DCC (parametri estimati pana in 2019, apoi fixati) fata de acoperirea statica si
+    suma cumulata a patratelor randamentelor acoperite in perioada de evaluare."""
+    fig, axes = plt.subplots(2, 1, figsize=(5.6, 4.0))
+    ax = axes[0]
+    h = h_all.loc['2017-01-01':]
+    ax.plot(h.index, h, color=IDAred, lw=0.7, label='DCC hedge ratio h_t (parameters frozen after 2019)')
+    ax.axhline(h_static, color=MainBlue, lw=1.3, label=f'Static hedge, 2010-2019 slope = {h_static:.3f}')
+    ax.axhline(h_expost, color=Forest, lw=1.1, ls='--', label=f'Best constant hedge chosen ex post = {h_expost:.2f}')
+    ax.axvline(pd.Timestamp(split), color='black', lw=0.8, ls=':')
+    ax.text(pd.Timestamp(split), ax.get_ylim()[1], ' evaluation starts', va='top', fontsize=7.5, color='black')
+    ax.set_ylabel('Hedge ratio')
+    ax = axes[1]
+    for e, col, lab in ((e_un, Amber, 'Unhedged BET'), (e_st, MainBlue, 'Static hedge'), (e_dc, IDAred, 'DCC hedge')):
+        ax.plot(e.index, np.cumsum((100 * e) ** 2), color=col, lw=1.1, label=f'{lab}: cumulative squared return')
+    ax.set_ylabel('Cum. squared return (%^2)')
+    hs, ls_ = [], []
+    for a_ in axes:
+        h_, l_ = a_.get_legend_handles_labels()
+        hs += h_
+        ls_ += l_
+    fig.tight_layout()
+    fig.legend(hs, ls_, loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=2, frameon=False, fontsize=7)
+    save_fig('ch6_hedge_oos')
+
+
 def hedge_oos(split='2019-12-31'):
     R = joint_returns(['bet', 'stoxx'], start='2010-01-01')
     est, oos = R.loc[R.index <= pd.Timestamp(split)], R.loc[R.index > pd.Timestamp(split)]
@@ -250,6 +276,8 @@ def hedge_oos(split='2019-12-31'):
     e_ex = oos['bet'] - b_oos * oos['stoxx']
     vr = lambda e: 1 - e.var() / e_un.var()
     dm = nw_tstat((1e4 * e_st) ** 2 - (1e4 * e_dc) ** 2)
+    fig_hedge_oos(pd.Series(Rt[:, 0, 1] * V['bet'].values / V['stoxx'].values, index=R.index), h_static, b_oos,
+                  e_un, e_st, e_dc, split)
     N.update(ho_h_static=h_static, ho_h_mean=h.mean(), ho_h_min=h.min(), ho_h_max=h.max(), ho_vr_static=vr(e_st),
              ho_vr_dcc=vr(e_dc), ho_vr_expost=vr(e_ex), ho_h_expost=b_oos, ho_dm=dm, ho_dm_p=1 - stats.norm.cdf(dm),
              ho_n_est=len(est), ho_n_oos=len(oos), ho_a=d['a'], ho_b=d['b'], ho_start=str(R.index[0].date()))
@@ -515,7 +543,7 @@ def fig_gas_copula():
     lam = pd.Series(2 * stats.t.cdf(-np.sqrt((g['nu'] + 1) * (1 - rho) / (1 + rho)), g['nu'] + 1), index=rho.index)
     lam_s = 2 * stats.t.cdf(-np.sqrt((g['nu_static'] + 1) * (1 - g['rho_static']) / (1 + g['rho_static'])),
                             g['nu_static'] + 1)
-    fig, ax = plt.subplots(figsize=(7.0, 3.0))
+    fig, ax = plt.subplots(figsize=(5.6, 3.5))
     shade_crises(ax)
     ax.plot(rho.index, rho, color=IDAred, lw=0.9, label='GAS t copula: correlation rho_t')
     ax.plot(lam.index, lam, color=MainBlue, lw=0.9, label='Implied tail dependence lambda_t')
@@ -523,7 +551,7 @@ def fig_gas_copula():
     ax.axhline(lam_s, color=MainBlue, ls='--', lw=0.8, label='Static t copula lambda')
     ax.set_ylabel('JPM-BAC dependence')
     ax.set_ylim(0, 1)
-    legend_outside_bottom(ax, ncol=2)
+    legend_outside_bottom(ax, ncol=2, y=-0.1)
     save_fig('ch6_gas_copula')
     N.update(gas_om=g['om'], gas_A=g['A'], gas_B=g['B'], gas_nu=g['nu'], gas_ll=g['ll'], gas_ll_static=g['ll_static'],
              gas_lr=g['lr'], gas_rho_min=rho.min(), gas_rho_min_date=str(rho.idxmin().date()), gas_rho_max=rho.max(),

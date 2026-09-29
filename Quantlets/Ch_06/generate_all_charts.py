@@ -59,6 +59,7 @@ Gray     = '#7F7F7F'
 LightGray = '#DADADA'
 FAM_COL = {'gaussian': MainBlue, 't': IDAred, 'clayton': Forest, 'gumbel': Amber, 'frank': Purple}
 
+SIDE = (5.6, 3.5)   # graficele asezate langa text pe slide (coloana de 0.55 din latime)
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 TABLE_DIR = HERE
@@ -118,14 +119,14 @@ def fig_spy_tlt_rolling():
     R = joint_returns(['spy', 'tlt'])
     rc = rolling_corr(R, 252).dropna()
     lo, hi = fisher_ci(rc, 252)
-    fig, ax = plt.subplots(figsize=(7.0, 3.0))
+    fig, ax = plt.subplots(figsize=SIDE)
     shade_crises(ax)
     ax.fill_between(rc.index, lo, hi, color=MainBlue, alpha=0.15, lw=0, label='95% Fisher interval (i.i.d.)')
     ax.plot(rc.index, rc, color=MainBlue, label='252-day rolling correlation')
     ax.axhline(0, color='black', lw=0.6)
     ax.set_ylabel('Correlation SPY-TLT')
     ax.plot([], [], color=Gray, alpha=0.35, lw=6, label='2008-09, 2020 and 2022 stress windows')
-    legend_outside_bottom(ax, ncol=3)
+    legend_outside_bottom(ax, ncol=2, y=-0.1)
     save_fig('ch6_spy_tlt_rolling')
     NUM.update(roll_min=rc.min(), roll_min_date=str(rc.idxmin().date()), roll_max=rc.max(),
                roll_max_date=str(rc.idxmax().date()), roll_last=rc.iloc[-1], roll_last_date=str(rc.index[-1].date()),
@@ -144,14 +145,14 @@ def fig_ewma_rolling():
     r60 = rolling_corr(X, 60)
     r250 = rolling_corr(X, 250)
     sl = slice('2019-01-01', None)
-    fig, ax = plt.subplots(figsize=(7.0, 3.0))
+    fig, ax = plt.subplots(figsize=SIDE)
     ax.plot(e94.loc[sl].index, e94.loc[sl], color=IDAred, lw=0.9, label='EWMA, lambda = 0.94')
     ax.plot(e97.loc[sl].index, e97.loc[sl], color=Amber, lw=1.0, label='EWMA, lambda = 0.97')
     ax.plot(r60.loc[sl].index, r60.loc[sl], color=Forest, lw=0.8, ls='--', label='60-day rolling')
     ax.plot(r250.loc[sl].index, r250.loc[sl], color=MainBlue, lw=1.5, label='250-day rolling')
     ax.axhline(0, color='black', lw=0.6)
     ax.set_ylabel('Correlation SPY-TLT')
-    legend_outside_bottom(ax, ncol=4)
+    legend_outside_bottom(ax, ncol=2, y=-0.1)
     save_fig('ch6_ewma_rolling')
     # exemplu pas cu pas: ultima zi a esantionului
     S = ewma_cov(X.values, 0.94)
@@ -191,7 +192,7 @@ def fig_async():
     t = async_table()
     t.to_csv(os.path.join(TABLE_DIR, 'ch6_async_table.csv'), index=False, float_format='%.6g')
     pairs = t['pair'].unique()
-    fig, ax = plt.subplots(figsize=(6.6, 3.0))
+    fig, ax = plt.subplots(figsize=SIDE)
     cols = {'daily': Forest, '2-day': Amber, 'weekly': MainBlue}
     for k, f in enumerate(['daily', '2-day', 'weekly']):
         s = t[t['freq'] == f].set_index('pair').loc[pairs]
@@ -201,7 +202,7 @@ def fig_async():
     ax.set_xticks(np.arange(len(pairs)))
     ax.set_xticklabels(pairs)
     ax.set_ylabel('Correlation')
-    legend_outside_bottom(ax, ncol=3, y=-0.14)
+    legend_outside_bottom(ax, ncol=3, y=-0.1)
     save_fig('ch6_async')
     g = lambda p, f: float(t[(t.pair == p) & (t.freq == f)]['rho'].iloc[0])
     NUM.update(as_ss_d=g('SPY / Euro Stoxx 50', 'daily'), as_ss_2=g('SPY / Euro Stoxx 50', '2-day'),
@@ -226,14 +227,14 @@ def dcc_pair(names, start=None):
 def fig_dcc_spy_tlt():
     R, P, V, Z, d, rc, ll1 = dcc_pair(['spy', 'tlt'])
     roll = rolling_corr(R, 252)
-    fig, ax = plt.subplots(figsize=(7.0, 3.0))
+    fig, ax = plt.subplots(figsize=SIDE)
     shade_crises(ax)
     ax.plot(rc.index, rc, color=IDAred, lw=0.7, label='DCC(1,1) conditional correlation')
     ax.plot(roll.index, roll, color=MainBlue, lw=1.5, label='252-day rolling correlation')
     ax.axhline(d['Qbar'][0, 1], color=Gray, ls='--', lw=0.9, label='Unconditional correlation of z (Qbar)')
     ax.axhline(0, color='black', lw=0.6)
     ax.set_ylabel('Correlation SPY-TLT')
-    legend_outside_bottom(ax, ncol=3)
+    legend_outside_bottom(ax, ncol=2, y=-0.1)
     save_fig('ch6_dcc_spy_tlt')
     lr = 2 * (d['loglik'] - d['ccc_loglik'])
     NUM.update(dcc_a=d['a'], dcc_b=d['b'], dcc_se_a=d['se_a'], dcc_se_b=d['se_b'], dcc_ab=d['a'] + d['b'],
@@ -263,7 +264,7 @@ def fig_dcc_minvar(R, V, rc):
     p_dcc = w_dcc * X['spy'] + (1 - w_dcc) * X['tlt']
     p_ccc = w_ccc * X['spy'] + (1 - w_ccc) * X['tlt']
     p_6040 = 0.6 * X['spy'] + 0.4 * X['tlt']
-    fig, (ax, ax2) = plt.subplots(2, 1, figsize=(7.0, 3.4), sharex=True, gridspec_kw=dict(height_ratios=[2, 1]))
+    fig, (ax, ax2) = plt.subplots(2, 1, figsize=(5.6, 3.8), sharex=True, gridspec_kw=dict(height_ratios=[2, 1]))
     ax.plot(w_ccc.index, w_ccc, color=MainBlue, lw=0.6, label='GARCH + constant correlation')
     ax.plot(w_dcc.index, w_dcc, color=IDAred, lw=0.6, label='GARCH + DCC')
     ax.set_ylabel('Weight in SPY')
@@ -273,7 +274,7 @@ def fig_dcc_minvar(R, V, rc):
     ax2.set_ylabel('Difference')
     h1, l1 = ax.get_legend_handles_labels()
     h2, l2 = ax2.get_legend_handles_labels()
-    ax2.legend(h1 + h2, l1 + l2, loc='upper center', bbox_to_anchor=(0.5, -0.35), ncol=3, frameon=False)
+    ax2.legend(h1 + h2, l1 + l2, loc='upper center', bbox_to_anchor=(0.5, -0.3), ncol=2, frameon=False)
     save_fig('ch6_dcc_minvar')
     ann = lambda p: p.std() * np.sqrt(252)
     NUM.update(mv_vol_dcc=ann(p_dcc), mv_vol_ccc=ann(p_ccc), mv_vol_6040=ann(p_6040),
@@ -285,12 +286,12 @@ def fig_dcc_minvar(R, V, rc):
 def fig_dcc_btc_spy():
     R, P, V, Z, d, rc, ll1 = dcc_pair(['btc', 'spy'])
     roll = rolling_corr(R, 252)
-    fig, ax = plt.subplots(figsize=(7.0, 3.0))
+    fig, ax = plt.subplots(figsize=SIDE)
     ax.plot(rc.index, rc, color=Amber, lw=0.8, label='DCC(1,1) conditional correlation')
     ax.plot(roll.index, roll, color=MainBlue, lw=1.5, label='252-day rolling correlation')
     ax.axhline(0, color='black', lw=0.6)
     ax.set_ylabel('Correlation Bitcoin-SPY')
-    legend_outside_bottom(ax, ncol=2)
+    legend_outside_bottom(ax, ncol=2, y=-0.1)
     save_fig('ch6_dcc_btc_spy')
     yr = rc.groupby(rc.index.year).mean()
     NUM.update(btc_a=d['a'], btc_b=d['b'], btc_se_a=d['se_a'], btc_se_b=d['se_b'], btc_ab=d['a'] + d['b'],
@@ -317,7 +318,7 @@ def fig_forbes_rigobon():
     r2 = two_day_returns(['sp500', 'stoxx', 'bet'])
     t = crisis_table(r2, 'sp500', ['stoxx', 'bet'], CALM08, CRISIS08)
     t.to_csv(os.path.join(TABLE_DIR, 'ch6_forbes_rigobon_2008.csv'), float_format='%.6g')
-    fig, ax = plt.subplots(figsize=(6.0, 3.0))
+    fig, ax = plt.subplots(figsize=SIDE)
     x = np.arange(len(t))
     ax.bar(x - 0.26, t['rho_calm'], 0.24, color=Forest, label='Calm year before (Sep 2007 - Sep 2008)')
     ax.bar(x, t['rho_crisis'], 0.24, color=IDAred, label='Crisis (15 Sep 2008 - 31 Mar 2009), raw')
@@ -325,7 +326,7 @@ def fig_forbes_rigobon():
     ax.set_xticks(x)
     ax.set_xticklabels([f'S&P 500 / {SHORT[k]}' for k in t.index])
     ax.set_ylabel('Correlation of 2-day returns')
-    legend_outside_bottom(ax, ncol=1, y=-0.14)
+    legend_outside_bottom(ax, ncol=1, y=-0.1)
     save_fig('ch6_forbes_rigobon')
     for k in t.index:
         for c in ('rho_calm', 'rho_crisis', 'rho_adj', 'z_raw', 'p_raw', 'z_adj', 'p_adj'):
@@ -337,14 +338,14 @@ def fig_forbes_rigobon():
 
 def fig_fr_bias():
     delta = np.linspace(0, 10, 201)
-    fig, ax = plt.subplots(figsize=(6.0, 3.0))
+    fig, ax = plt.subplots(figsize=SIDE)
     for rho, c in ((0.2, Forest), (0.4, MainBlue), (0.6, IDAred)):
         ax.plot(delta, fr_inflation(rho, delta), color=c, lw=1.5, label=f'true correlation {rho}')
         ax.axhline(rho, color=c, lw=0.6, ls=':')
     ax.axvline(NUM['fr_delta'], color=Gray, ls='--', lw=0.9, label=f'S&P 500 in 2008: delta = {NUM["fr_delta"]:.1f}')
     ax.set_xlabel('delta = Var(crisis) / Var(calm) - 1 for the source market')
     ax.set_ylabel('Measured crisis correlation')
-    legend_outside_bottom(ax, ncol=4, y=-0.25)
+    legend_outside_bottom(ax, ncol=2, y=-0.18)
     save_fig('ch6_fr_bias')
     NUM.update(frb_04=fr_inflation(0.4, NUM['fr_delta']), frb_02=fr_inflation(0.2, NUM['fr_delta']))
 
@@ -358,7 +359,7 @@ def fig_exceedance():
     rng = np.random.default_rng(SEED)
     Zs = rng.multivariate_normal([0, 0], [[1, rho], [rho, 1]], 2_000_000)
     en = exceedance_corr(Zs[:, 0], Zs[:, 1], qs)
-    fig, ax = plt.subplots(figsize=(6.4, 3.0))
+    fig, ax = plt.subplots(figsize=SIDE)
     xl = np.concatenate([qs, 1 - qs[::-1]])
     ax.plot(qs, e['rho_low'], 'o-', color=IDAred, label='Data: both below quantile q (joint losses)')
     ax.plot(1 - qs, e['rho_high'], 's-', color=Forest, label='Data: both above quantile 1-q (joint gains)')
@@ -368,7 +369,7 @@ def fig_exceedance():
     ax.set_xticklabels([f'{v:.2f}' for v in xl], fontsize=7)
     ax.set_xlabel('Threshold quantile')
     ax.set_ylabel('Exceedance correlation')
-    legend_outside_bottom(ax, ncol=2, y=-0.25)
+    legend_outside_bottom(ax, ncol=1, y=-0.18)
     save_fig('ch6_exceedance')
     e.to_csv(os.path.join(TABLE_DIR, 'ch6_exceedance.csv'), float_format='%.6g')
     NUM.update(ex_rho=rho, ex_n=len(W), ex_low10=e.loc[0.10, 'rho_low'], ex_high10=e.loc[0.10, 'rho_high'],
@@ -441,7 +442,7 @@ def copula_table(U, B=200, B_t=100):
 def fig_copula_fit(U):
     t = copula_table(U)
     t.to_csv(os.path.join(TABLE_DIR, 'ch6_copula_jpm_bac.csv'), float_format='%.6g')
-    fig, ax = plt.subplots(figsize=(6.2, 2.9))
+    fig, ax = plt.subplots(figsize=SIDE)
     d = t['aic'] - t['aic'].min()
     ax.bar(np.arange(5), d, color=[FAM_COL[f] for f in t.index])
     for i, (fam, val) in enumerate(d.items()):
@@ -449,8 +450,8 @@ def fig_copula_fit(U):
     ax.set_xticks(np.arange(5))
     ax.set_xticklabels([FAM_LABEL[f] for f in t.index])
     ax.set_ylabel('AIC minus best AIC')
-    ax.plot([], [], ' ', label='Numbers above bars: goodness-of-fit p-value (Rosenblatt Cramer-von Mises, parametric bootstrap)')
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.14), ncol=1, frameon=False, handlelength=0)
+    ax.plot([], [], ' ', label='Numbers above bars: goodness-of-fit p-value\n(Rosenblatt Cramer-von Mises, parametric bootstrap)')
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=1, frameon=False, handlelength=0)
     save_fig('ch6_copula_fit')
     u, v = U[:, 0], U[:, 1]
     NUM.update(cop_n=len(U), cop_tau=kendall_tau(u, v), cop_rhoS=spearman_rho(u, v))
@@ -474,7 +475,7 @@ def fig_tail_dep(U, t):
         X = pseudo_obs(simulate('t', par_t, len(u), rng))
         sims.append([empirical_tail_dep(X[:, 0], X[:, 1], q)[0] for q in qs])
     sims = np.array(sims)
-    fig, ax = plt.subplots(figsize=(6.4, 3.0))
+    fig, ax = plt.subplots(figsize=SIDE)
     ax.fill_between(qs, np.percentile(sims, 5, axis=0), np.percentile(sims, 95, axis=0), color=IDAred, alpha=0.15, lw=0,
                     label='90% band of the estimator under the fitted t copula')
     ax.plot(qs, emp[:, 0], 'o-', ms=3, color=IDAred, label='Empirical lower tail: P(U<=q, V<=q) / q')
@@ -485,7 +486,7 @@ def fig_tail_dep(U, t):
     ax.set_xlabel('q')
     ax.set_ylabel('Tail dependence estimate')
     ax.set_ylim(0, 1)
-    legend_outside_bottom(ax, ncol=2, y=-0.22)
+    legend_outside_bottom(ax, ncol=2, y=-0.16)
     save_fig('ch6_tail_dep')
     i5 = np.argmin(np.abs(qs - 0.05))
     NUM.update(td_L05=emp[i5, 0], td_U05=emp[i5, 1], td_L01=emp[0, 0], td_U01=emp[0, 1],
@@ -498,7 +499,7 @@ def fig_tail_dep(U, t):
 def fig_integration():
     W = weekly_returns(['sp500', 'stoxx', 'bet'], start='2000-01-01')
     win = 104
-    fig, ax = plt.subplots(figsize=(7.0, 3.0))
+    fig, ax = plt.subplots(figsize=SIDE)
     for (a, b), c in ((('sp500', 'stoxx'), MainBlue), (('stoxx', 'bet'), IDAred), (('sp500', 'bet'), Amber)):
         rc = W[a].rolling(win).corr(W[b])
         ax.plot(rc.index, rc, color=c, lw=1.2, label=f'{SHORT[a]} / {SHORT[b]}')
@@ -507,7 +508,7 @@ def fig_integration():
         NUM[f'int_{a}_{b}_00s'] = W.loc[:'2009-12-31', a].corr(W.loc[:'2009-12-31', b])
     ax.axhline(0, color='black', lw=0.6)
     ax.set_ylabel('104-week rolling correlation')
-    legend_outside_bottom(ax, ncol=3)
+    legend_outside_bottom(ax, ncol=3, y=-0.1)
     save_fig('ch6_integration')
     NUM.update(int_n=len(W), int_start=str(W.index[0].date()))
 
@@ -542,7 +543,7 @@ def fig_banks():
     grp = {'Within region (US-US, EA-EA, RO-RO)': [p for p in pairs if region[p[0]] == region[p[1]]],
            'US - euro area': [p for p in pairs if {region[p[0]], region[p[1]]} == {'US', 'EA'}],
            'Romania - US / euro area': [p for p in pairs if 'RO' in (region[p[0]], region[p[1]]) and region[p[0]] != region[p[1]]]}
-    fig, ax = plt.subplots(figsize=(7.0, 3.0))
+    fig, ax = plt.subplots(figsize=SIDE)
     for (g, ps), c in zip(grp.items(), (MainBlue, Amber, IDAred)):
         m = pd.concat([rc[p] for p in ps], axis=1).mean(axis=1)
         ax.plot(m.index, m, color=c, lw=1.3, label=g)
@@ -551,7 +552,7 @@ def fig_banks():
         NUM[f'bk_{["within", "useu", "ro"][list(grp).index(g)]}_last'] = m.dropna().iloc[-1]
     ax.axhline(0, color='black', lw=0.6)
     ax.set_ylabel('Average 52-week correlation')
-    legend_outside_bottom(ax, ncol=3)
+    legend_outside_bottom(ax, ncol=1, y=-0.1)
     save_fig('ch6_banks_avgcorr')
     # arborele de acoperire minima pe distanta d = sqrt(2(1 - rho)) (Mantegna, 1999)
     G = nx.Graph()
@@ -560,9 +561,9 @@ def fig_banks():
     T = nx.minimum_spanning_tree(G)
     pos = {'JPM': (-1.0, 0.6), 'BAC': (-1.0, -0.6), 'DBK': (0.3, 0.6), 'BNP': (0.3, -0.6), 'TLV': (1.6, 0.6), 'BRD': (1.6, -0.6)}
     colr = {'JPM': MainBlue, 'BAC': MainBlue, 'DBK': Amber, 'BNP': Amber, 'TLV': IDAred, 'BRD': IDAred}
-    fig, ax = plt.subplots(figsize=(6.0, 2.8))
+    fig, ax = plt.subplots(figsize=(5.6, 3.2))
     for a, b, dd in T.edges(data=True):
-        ax.plot([pos[a][0], pos[b][0]], [pos[a][1], pos[b][1]], color=Gray, lw=1 + 5 * dd['rho'], zorder=1)
+        ax.plot([pos[a][0], pos[b][0]], [pos[a][1], pos[b][1]], color=MainBlue, alpha=0.45, lw=1 + 5 * dd['rho'], zorder=1)
         vert = pos[a][0] == pos[b][0]
         ax.text((pos[a][0] + pos[b][0]) / 2 + (0.14 if vert else 0), (pos[a][1] + pos[b][1]) / 2 + (0 if vert else 0.1),
                 f'{dd["rho"]:.2f}', ha='center', va='center', fontsize=8)
@@ -695,8 +696,8 @@ def fig_covol():
     pre = x.loc[:ECM_END].sort_values(ascending=False)
     post = x.loc[pd.Timestamp(ECM_END) + pd.Timedelta(days=1):].sort_values(ascending=False)
     paper = pd.Series({pd.Timestamp(d): v for d, v in ECM_TABLE15})
-    fig, ax = plt.subplots(figsize=(7.0, 3.0))
-    ax.plot(x.index, x.values, color=MainBlue, lw=0.5, label='Squared USCOVOL $\\hat x_t$, course ETF panel (ours)')
+    fig, ax = plt.subplots(figsize=(5.6, 3.6))
+    ax.plot(x.index, x.values, color=MainBlue, lw=0.5, label='Squared USCOVOL $\\hat x_t$, course ETF panel')
     ax.scatter(paper.index, paper.values, marker='D', s=16, facecolors='none', edgecolors=Orange, lw=0.9, zorder=4,
                label='Top 20 in Table 15 of Engle and Campos-Martins (2023)')
     ax.axvline(pd.Timestamp(ECM_END), color=Gray, ls='--', lw=0.8, label='End of the paper sample (1 March 2021)')
@@ -707,7 +708,7 @@ def fig_covol():
     ax.set_ylabel('Squared common volatility $\\hat x_t$')
     ax.set_xlim(pd.Timestamp('1999-10-01'), x.index[-1] + pd.Timedelta(days=90))
     ax.set_ylim(0, 1.08 * max(top.iloc[0], paper.max()))
-    legend_outside_bottom(ax, ncol=2, y=-0.14)
+    legend_outside_bottom(ax, ncol=1, y=-0.1)
     save_fig('ch6_covol_replication')
     common = set(pre.index[:20]) & set(paper.index)
     NUM.update(cv_n=E.shape[1], cv_T=len(x), cv_start=str(x.index[0].date()), cv_end=str(x.index[-1].date()),

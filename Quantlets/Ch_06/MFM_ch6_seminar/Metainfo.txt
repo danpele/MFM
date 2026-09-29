@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
 
-Output: 'ch6_sem_tail_gauss_t.pdf, ch6_sem_losses_copula.pdf, ch6_sem_forbes_rigobon.pdf, ch6_sem_btc_bands.pdf, ch6_sem_integration.pdf, ch6_sem_fr_2008.csv, ch6_sem_fr_2020.csv'
+Output: 'ch6_sem_tail_gauss_t.pdf, ch6_sem_losses_copula.pdf, ch6_sem_forbes_rigobon.pdf, ch6_sem_btc_bands.pdf, ch6_sem_integration.pdf, ch6_sem_b1_returns.pdf, ch6_sem_b1_garch.pdf, ch6_sem_b1_lr.pdf, ch6_sem_b2_scatter.pdf, ch6_sem_b2_tails.pdf, ch6_sem_b2_boot.pdf, ch6_sem_a2_gap.pdf, ch6_sem_a3_curve.pdf, ch6_sem_a3_se.pdf, ch6_sem_a5_dcc.pdf, ch6_sem_a6_lognormal.pdf, ch6_sem_b3_tails.pdf, ch6_sem_b4_windows.pdf, ch6_sem_b6_gas.pdf, ch6_sem_c1_change.pdf, ch6_sem_fr_2008.csv, ch6_sem_fr_2020.csv'
