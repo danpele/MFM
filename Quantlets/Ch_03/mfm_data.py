@@ -66,6 +66,8 @@ def log_returns(p):
 # KENNETH FRENCH DATA LIBRARY)
 # =============================================================================
 FILES = {
+    ('ff3', 'M'): 'F-F_Research_Data_Factors_CSV.zip',
+    ('ff3', 'D'): 'F-F_Research_Data_Factors_daily_CSV.zip',
     ('ff5', 'M'): 'F-F_Research_Data_5_Factors_2x3_CSV.zip',
     ('ff5', 'D'): 'F-F_Research_Data_5_Factors_2x3_daily_CSV.zip',
     ('mom', 'M'): 'F-F_Momentum_Factor_CSV.zip',
@@ -114,8 +116,14 @@ def french(name='ff5', freq='M'):
 
 
 def factors(freq='M'):
-    """Mkt-RF, SMB, HML, RMW, CMA, RF si MOM pe perioada comuna."""
-    return pd.concat([french('ff5', freq), french('mom', freq)], axis=1).dropna()
+    """Mkt-RF, SMB, HML, RMW, CMA, RF, MOM si SMB_FF3 pe perioada comuna.
+
+    SMB din fisierul cu cinci factori (sortari dupa B/M, profitabilitate si investitii) intra in FF5;
+    SMB_FF3 este SMB-ul publicat al modelului cu trei factori (sortari 2x3 dupa marime si B/M),
+    folosit in FF3 si Carhart. HML, Mkt-RF si RF sunt aceleasi in cele doua fisiere.
+    """
+    f3 = french('ff3', freq)[['SMB']].rename(columns={'SMB': 'SMB_FF3'})
+    return pd.concat([french('ff5', freq), french('mom', freq), f3], axis=1).dropna()
 
 
 # =============================================================================

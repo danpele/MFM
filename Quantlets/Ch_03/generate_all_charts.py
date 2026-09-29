@@ -53,6 +53,12 @@ Gray     = '#7F7F7F'
 LightGray = '#DADADA'
 PALETTE = [MainBlue, IDAred, Forest, Amber, Orange, Purple, Crimson, '#795548', '#17A2B8', '#6F42C1', '#20C997']
 
+# modelele: FF3 si Carhart folosesc SMB-ul publicat al modelului cu trei factori; FF5 pe cel din fisierul cu cinci
+FF3 = ['Mkt-RF', 'SMB_FF3', 'HML']
+CARHART = FF3 + ['MOM']
+FF5 = ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA']
+FF6 = FF5 + ['MOM']
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 SEED = 42
@@ -95,7 +101,7 @@ def daily_excess_one(symbol, start=None):
     (altfel randamentul ar acoperi mai multe zile, iar factorii doar una).
     """
     s = price(symbol)
-    F = factors('D')
+    F = factors('D').loc[:END]                         # acelasi sfarsit de esantion ca datele lunare
     s = s.loc[s.index.isin(F.index)]
     cal = pd.Series(np.arange(len(F)), index=F.index)
     pos = cal.loc[s.index].values
@@ -130,7 +136,9 @@ def fig_frontier():
     targets = np.linspace(-0.02, 0.20, 200)
     sd_f = np.sqrt((A * targets ** 2 - 2 * B * targets + C) / (A * C - B ** 2))
     fig, ax = plt.subplots(figsize=(6.6, 3.4))
-    ax.plot(sd_f, targets, color=MainBlue, lw=1.2, label='Efficient frontier (risky sectors)')
+    eff = targets >= B / A                               # ramura eficienta: media >= media portofoliului de varianta minima
+    ax.plot(sd_f[eff], targets[eff], color=MainBlue, lw=1.2, label='Efficient frontier (risky sectors)')
+    ax.plot(sd_f[~eff], targets[~eff], color=MainBlue, lw=1.0, ls=':', label='Inefficient branch (minimum-variance boundary)')
     xs = np.linspace(0, 0.30, 50)
     ax.plot(xs, mu_t / sd_t * xs, color=IDAred, lw=1.0, ls='--', label='Capital market line (CML)')
     ax.plot(sd_t, mu_t, '*', ms=11, color=IDAred, label='Tangency portfolio')
@@ -297,7 +305,7 @@ def fig_factor_cum():
         ax.plot(wealth.index, wealth.values, color=col, lw=0.9, label=c)
         out[c] = float(wealth.iloc[-1])
     ax.set_yscale('log')
-    ax.set_ylabel('Growth of 1 USD (log scale)')
+    ax.set_ylabel('Compounded return index, start = 1')
     ax.set_title(f'Long-short factor returns, {F.index[0]:%b %Y} - {F.index[-1]:%b %Y} (Kenneth French data)',
                  fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=6, y=-0.13)
@@ -548,7 +556,7 @@ def fama_macbeth(ex, F, fac, nw_lags=6):
 def fig_fama_macbeth():
     res, ex, mk = sml_data()
     F = factors('M').loc[ex.index]
-    models = {'CAPM': ['Mkt-RF'], 'FF3': ['Mkt-RF', 'SMB', 'HML'], 'FF5': ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA']}
+    models = {'CAPM': ['Mkt-RF'], 'FF3': FF3, 'FF5': FF5}
     out = {k: fama_macbeth(ex, F, v) for k, v in models.items()}
     fig, ax = plt.subplots(figsize=(6.8, 3.0))
     labels, x0 = [], 0
@@ -557,7 +565,7 @@ def fig_fama_macbeth():
         xs = np.arange(len(d)) + x0
         ax.errorbar(xs, d['lambda'], yerr=1.96 * d['se_shanken'], fmt='o', color=c, capsize=2, lw=0.8, label=k)
         ax.plot(xs[1:], d['factor_mean'].iloc[1:], 'x', color=Purple, ms=5)
-        labels += [f'{k}: {n}' for n in d.index]
+        labels += [f'{k}: {n.replace("SMB_FF3", "SMB")}' for n in d.index]
         x0 += len(d) + 1
     ax.plot([], [], 'x', color=Purple, label='Time-series mean of the factor')
     ax.axhline(0, color=Gray, lw=0.5)
@@ -716,7 +724,7 @@ def lns_r2(start='1963-07-31'):
     I30 = french('ind30', 'M').loc[start:END]
     Fx = F.loc[P25.index]
     sets = {'25': P25, '25+30': pd.concat([P25, I30.add_prefix('IND_')], axis=1)}
-    models = {'CAPM': ['Mkt-RF'], 'FF3': ['Mkt-RF', 'SMB', 'HML'], 'FF5': ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA']}
+    models = {'CAPM': ['Mkt-RF'], 'FF3': FF3, 'FF5': FF5}
     out = {}
     for sname, P in sets.items():
         ex = P.sub(Fx['RF'], axis=0).values
@@ -791,9 +799,9 @@ def model_comparison(B=2000, mean_block=6, seed=SEED):
     """Barillas & Shanken (2018): SR^2 maxim al factorilor fiecarui model; intervale bootstrap stationar."""
     rng = np.random.default_rng(seed)
     F = factors('M')
-    models = {'CAPM': ['Mkt-RF'], 'FF3': ['Mkt-RF', 'SMB', 'HML'], 'Carhart': ['Mkt-RF', 'SMB', 'HML', 'MOM'],
-              'FF5': ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA'], 'FF5+MOM': ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA', 'MOM']}
-    # perechi imbricate (diferenta >= 0 in esantion) si o pereche neimbricata (FF5 vs Carhart)
+    models = {'CAPM': ['Mkt-RF'], 'FF3': FF3, 'Carhart': CARHART, 'FF5': FF5, 'FF5+MOM': FF6}
+    # perechi imbricate (FF3 - CAPM, FF5+MOM - FF5: diferenta >= 0 in esantion) si neimbricate
+    # (FF5 - FF3: SMB diferit in cele doua modele; FF5 - Carhart)
     pairs = [('FF3', 'CAPM'), ('FF5', 'FF3'), ('FF5+MOM', 'FF5'), ('FF5', 'Carhart')]
     out = {}
     for lab, a, b in [('1963-2026', '1963-07-31', END), ('2000-2026', '2000-01-31', END)]:
@@ -823,7 +831,8 @@ def model_comparison(B=2000, mean_block=6, seed=SEED):
 
 
 def eiv_attenuation():
-    """Erori in variabile in etapa a doua: plim lambda_OLS / lambda = Var(beta) / (Var(beta) + s2_eps / (T s2_f))."""
+    """Erori in variabile in etapa a doua, conditionat pe traiectoria realizata a factorului:
+    plim_N lambda_OLS / lambda_realizat = Var(beta) / (Var(beta) + s2_eps / sum_t (f_t - f_bar)^2)."""
     out = {}
     res, ex, mk = sml_data()
     cases = {'25 size x B/M': (ex, mk)}
@@ -838,7 +847,7 @@ def eiv_attenuation():
         AB = np.linalg.lstsq(Z, R, rcond=None)[0]
         E = R - Z @ AB
         s2e = (E ** 2).sum(0) / (T - 2)
-        noise = s2e.mean() / (T * f.var(ddof=1))
+        noise = s2e.mean() / ((f - f.mean()) ** 2).sum()          # = s2_eps / (T * var_ML(f))
         vb_hat = AB[1].var(ddof=1)
         vb = vb_hat - noise
         out[k] = dict(T=T, N=R.shape[1], var_beta_hat=vb_hat, noise=noise, var_beta=vb,
@@ -854,8 +863,7 @@ def advanced():
     exs, Fs = monthly_excess(S)
     out['grs_sharpe_sectors'] = grs_sharpe(exs.values, Fs['Mkt-RF'].values)
     out['fm_krs'] = {k: fm_krs_table(ex, F, v).round(4).reset_index().to_dict(orient='records')
-                     for k, v in {'CAPM': ['Mkt-RF'], 'FF3': ['Mkt-RF', 'SMB', 'HML'],
-                                  'FF5': ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA']}.items()}
+                     for k, v in {'CAPM': ['Mkt-RF'], 'FF3': FF3, 'FF5': FF5}.items()}
     out['useless'] = useless_factor_sim()
     out['lns'] = lns_r2()
     out['nfac'] = number_of_factors()

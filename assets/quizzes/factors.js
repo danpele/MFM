@@ -342,7 +342,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "A cross-sectional regression of returns on estimated betas for each period; the premia are the averages of these slopes",
                     "The GRS statistic"
                 ],
-                correctExplanation: "Pass 1 estimates betas; pass 2 runs T cross-sectional regressions and averages the slopes λ̂_t, whose standard deviation gives the standard error.",
+                correctExplanation: "Pass 1 estimates betas; pass 2 runs T cross-sectional regressions and averages the slopes λ̂_t; the standard error is their standard deviation divided by √T (Newey–West if the slopes are autocorrelated).",
                 incorrectExplanation: "The time-series betas come from the first pass; the second pass is cross-sectional, period by period."
             },
             ro: {
@@ -354,7 +354,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "O regresie transversală a randamentelor pe valorile beta estimate, pentru fiecare perioadă; primele sunt mediile acestor pante",
                     "Statistica GRS"
                 ],
-                correctExplanation: "Etapa 1 estimează beta; etapa 2 face T regresii transversale și mediază pantele λ̂_t, a căror abatere standard dă eroarea standard.",
+                correctExplanation: "Etapa 1 estimează beta; etapa 2 face T regresii transversale și mediază pantele λ̂_t; eroarea standard este abaterea lor standard împărțită la √T (Newey–West dacă pantele sunt autocorelate).",
                 incorrectExplanation: "Beta din serii de timp provine din prima etapă; a doua etapă este transversală, perioadă cu perioadă."
             }
         },
@@ -416,7 +416,7 @@ window.MFM_DATA.quizzes['factors'] = {
             correct: 1,
             en: {
                 title: "Comparing models",
-                text: "Barillas and Shanken (2018): which test assets are needed to compare two factor models?",
+                text: "Barillas and Shanken (2018): which test assets are needed to compare two factor models whose factors are traded excess returns?",
                 options: [
                     "The 25 size × B/M portfolios",
                     "None beyond the factors themselves: compare the maximum squared Sharpe ratios of the two factor sets",
@@ -428,7 +428,7 @@ window.MFM_DATA.quizzes['factors'] = {
             },
             ro: {
                 title: "Compararea modelelor",
-                text: "Barillas și Shanken (2018): ce active de test sunt necesare pentru a compara două modele factoriale?",
+                text: "Barillas și Shanken (2018): ce active de test sunt necesare pentru a compara două modele factoriale ai căror factori sunt randamente în exces tranzacționate?",
                 options: [
                     "Cele 25 de portofolii mărime × B/M",
                     "Niciunul în afara factorilor înșiși: se compară rapoartele Sharpe maxime la pătrat ale celor două seturi de factori",
@@ -497,27 +497,27 @@ window.MFM_DATA.quizzes['factors'] = {
             correct: 1,
             en: {
                 title: "Multiple testing",
-                text: "Which procedure controls the false discovery rate (the expected share of false rejections among rejections)?",
+                text: "Which procedure targets the false discovery rate (the expected share of false rejections among rejections) directly, allowing more discoveries than family-wise error control?",
                 options: [
                     "Bonferroni",
                     "Benjamini–Hochberg",
                     "Holm",
                     "The naive 5% test"
                 ],
-                correctExplanation: "Benjamini–Hochberg rejects the hypotheses up to the largest j with p_(j) ≤ jα/M and controls the FDR; Bonferroni and Holm control the family-wise error rate.",
-                incorrectExplanation: "Bonferroni and Holm control the probability of any false rejection (FWER), not the FDR."
+                correctExplanation: "Benjamini–Hochberg rejects the hypotheses up to the largest j with p_(j) ≤ jα/M and controls the FDR for independent tests or under positive regression dependence; Bonferroni and Holm control the stricter family-wise error rate.",
+                incorrectExplanation: "Bonferroni and Holm control the probability of any false rejection (FWER); since FDR ≤ FWER they also bound the FDR, but they are more conservative and do not target it."
             },
             ro: {
                 title: "Testare multiplă",
-                text: "Ce procedură controlează rata descoperirilor false (ponderea așteptată a respingerilor false în totalul respingerilor)?",
+                text: "Ce procedură vizează direct rata descoperirilor false (ponderea așteptată a respingerilor false în totalul respingerilor), permițând mai multe descoperiri decât controlul erorii pe familie?",
                 options: [
                     "Bonferroni",
                     "Benjamini–Hochberg",
                     "Holm",
                     "Testul naiv de 5%"
                 ],
-                correctExplanation: "Benjamini–Hochberg respinge ipotezele până la cel mai mare j cu p_(j) ≤ jα/M și controlează FDR; Bonferroni și Holm controlează rata erorii pe familie.",
-                incorrectExplanation: "Bonferroni și Holm controlează probabilitatea oricărei respingeri false (FWER), nu FDR."
+                correctExplanation: "Benjamini–Hochberg respinge ipotezele până la cel mai mare j cu p_(j) ≤ jα/M și controlează FDR pentru teste independente sau sub dependență de regresie pozitivă; Bonferroni și Holm controlează rata erorii pe familie, mai strictă.",
+                incorrectExplanation: "Bonferroni și Holm controlează probabilitatea oricărei respingeri false (FWER); deoarece FDR ≤ FWER, ele limitează și FDR, dar sunt mai conservatoare și nu îl vizează."
             }
         },
         {
@@ -639,8 +639,8 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Alphas close to zero, with loadings that match the labels (MTUM on MOM, QUAL on RMW)",
                     "Negative loadings on their own factor"
                 ],
-                correctExplanation: "MTUM had alpha −0.2% (t = −0.11) and a MOM loading of 0.36; factor ETFs deliver exposure, not skill.",
-                incorrectExplanation: "The alphas were statistically zero and the market betas close to one."
+                correctExplanation: "MTUM had alpha −0.2% (t = −0.11) and a MOM loading of 0.36; no evidence of skill beyond factor exposure.",
+                incorrectExplanation: "The alphas were not statistically distinguishable from zero, and the market betas ranged from 0.74 to 1.04."
             },
             ro: {
                 title: "ETF-uri factoriale",
@@ -651,15 +651,15 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Valori alfa apropiate de zero, cu încărcări care corespund denumirilor (MTUM pe MOM, QUAL pe RMW)",
                     "Încărcări negative pe propriul factor"
                 ],
-                correctExplanation: "MTUM a avut alfa −0,2% (t = −0,11) și încărcarea pe MOM 0,36; ETF-urile factoriale oferă expunere, nu abilitate.",
-                incorrectExplanation: "Valorile alfa au fost statistic zero, iar beta de piață apropiat de unu."
+                correctExplanation: "MTUM a avut alfa −0,2% (t = −0,11) și încărcarea pe MOM 0,36; nicio dovadă de abilitate dincolo de expunerea factorială.",
+                incorrectExplanation: "Valorile alfa nu s-au distins statistic de zero, iar beta de piață a variat între 0,74 și 1,04."
             }
         },
         {
             correct: 1,
             en: {
                 title: "Spot the AI error: a momentum signal",
-                text: "An AI assistant writes this momentum backtest: \"mom = P.pct_change(12); at each month-end t, rank the stocks on mom at t and record the return of the top minus bottom stocks over month t.\" The result is 49% a year. What is wrong?",
+                text: "An AI assistant writes this momentum backtest: \"mom = P.pct_change(12); at each month-end t, rank the stocks on mom at t and record the return of the top minus bottom stocks over month t.\" The result is about 50% a year. What is wrong?",
                 options: [
                     "Momentum must be computed on 36 months, not 12",
                     "Look-ahead bias: the signal at t contains the return of month t, the month being held; the signal must be known before the month starts",
@@ -671,7 +671,7 @@ window.MFM_DATA.quizzes['factors'] = {
             },
             ro: {
                 title: "Găsiți eroarea AI: un semnal de momentum",
-                text: "Un asistent AI scrie acest backtest de momentum: „mom = P.pct_change(12); la fiecare sfârșit de lună t, ordonați acțiunile după mom la t și înregistrați randamentul primelor minus ultimelor acțiuni în luna t.” Rezultatul este 49% pe an. Ce este greșit?",
+                text: "Un asistent AI scrie acest backtest de momentum: „mom = P.pct_change(12); la fiecare sfârșit de lună t, ordonați acțiunile după mom la t și înregistrați randamentul primelor minus ultimelor acțiuni în luna t.” Rezultatul este circa 50% pe an. Ce este greșit?",
                 options: [
                     "Momentum-ul se calculează pe 36 de luni, nu pe 12",
                     "Informații din viitor (look-ahead bias): semnalul la t conține randamentul lunii t, luna în care portofoliul este deținut; semnalul trebuie să fie cunoscut înainte de începutul lunii",

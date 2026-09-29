@@ -33,7 +33,7 @@ def block_bootstrap_alpha(y, X, B=2000, block=20, periods=252, seed=SEED):
     out = np.empty(B)
     Z = np.column_stack([np.ones(n), X])
     for b in range(B):
-        starts = rng.integers(0, n - block, nb)
+        starts = rng.integers(0, n - block + 1, nb)          # ultimul bloc valid incepe la n - block
         idx = (starts[:, None] + np.arange(block)).ravel()[:n]
         coef = np.linalg.lstsq(Z[idx], y[idx], rcond=None)[0]
         out[b] = coef[0] * periods
@@ -53,8 +53,12 @@ def part_a():
                    prior_var=pv, w=w, vasicek=w * b1['XLK'] + (1 - w) * pm, beta_later=b2['XLK'],
                    blume=0.33 + 0.67 * b1['XLK'])
     # A4 [Propus] panta Blume ca pondere de contractie: plim = Var(beta) / (Var(beta) + se^2) daca beta e constant
-    c, a = np.polyfit(b1, b2, 1)
-    R['A4'] = dict(a=a, c=c, w_implied=pv / (pv + (se1 ** 2).mean()), a_implied=(1 - pv / (pv + (se1 ** 2).mean())) * pm)
+    fit = stats.linregress(b1, b2)
+    c, a = fit.slope, fit.intercept
+    w_imp = pv / (pv + (se1 ** 2).mean())
+    t_gap = (c - w_imp) / fit.stderr                       # abaterea pantei estimate de la valoarea implicata
+    R['A4'] = dict(a=a, c=c, se_c=fit.stderr, w_implied=w_imp, a_implied=(1 - w_imp) * pm,
+                   t_gap=t_gap, p_gap=2 * stats.t.sf(abs(t_gap), len(b1) - 2))
     # A5 [Rezolvat] 10 valori p ipotetice
     p = np.array([0.001, 0.004, 0.009, 0.012, 0.021, 0.035, 0.048, 0.060, 0.20, 0.55])
     m = len(p)
@@ -113,10 +117,14 @@ def b3_pca():
                 n_eig_gt1=int((vals > 1).sum()), nfac=g.n_factors(r[S].values, 5))
 
 
-def dimson_beta(y, m, k=1):
-    """Beta Dimson (1979): suma pantelor pe BET_{t+k}, ..., BET_t, ..., BET_{t-k} (tranzactionare rara)."""
+def dimson_beta(y, m, keep, k=1):
+    """Beta Dimson (1979): suma pantelor pe BET_{t+k}, ..., BET_t, ..., BET_{t-k} (tranzactionare rara).
+
+    Lead-urile si lag-urile lui BET se formeaza pe calendarul complet al perechii (actiune, BET),
+    INAINTE de eliminarea zilelor cu erori de date (keep = False), deci nu se sare peste zilele eliminate.
+    """
     X = pd.concat({j: m.shift(j) for j in range(-k, k + 1)}, axis=1)
-    d = pd.concat([y.rename('y'), X], axis=1).dropna()
+    d = pd.concat([y.rename('y'), X], axis=1)[keep].dropna()
     b, se, t, e, r2 = ols_hac(d['y'].values, d.drop(columns='y').values)
     return float(b[1:].sum())
 
@@ -125,10 +133,10 @@ def b4_bvb(start='2015-01-01'):
     res = g.bvb_betas()
     dims = {}
     for s in BVB:
-        p = prices([s + '.RO', 'BET']).loc[start:]
+        p = prices([s + '.RO', 'BET']).loc[start:]          # fiecare actiune aliniata separat cu BET
         r = log_returns(p)
-        r = r[~(r.abs() > g.MAX_ABS_RET).any(axis=1)]
-        dims[s] = dimson_beta(r[s + '.RO'], r['BET'])
+        keep = ~(r.abs() > g.MAX_ABS_RET).any(axis=1)      # pragul se aplica perechii (actiune, BET)
+        dims[s] = dimson_beta(r[s + '.RO'], r['BET'], keep)
     res['dimson'] = pd.Series(dims)
     return res.round(3).reset_index().to_dict(orient='records')
 
@@ -136,7 +144,7 @@ def b4_bvb(start='2015-01-01'):
 def b5_fama_macbeth():
     E = [s + '.US' for s in SECTORS] + [e + '.US' for e in FACTOR_ETFS]
     ex, F = g.monthly_excess(E, start='2013-08-01')
-    out = g.fm_krs_table(ex, F, ['Mkt-RF', 'SMB', 'HML'])
+    out = g.fm_krs_table(ex, F, g.FF3)
     return dict(T=len(ex), N=len(E), start=str(ex.index[0].date()), end=str(ex.index[-1].date()),
                 table=out.round(4).reset_index().to_dict(orient='records'))
 
@@ -155,10 +163,10 @@ def b6_etf_bootstrap():
 
 def b7_multiple_testing():
     F = factors('M')
-    P = french('p25', 'M').loc['1963-07-31':F.index[-1]]
+    P = french('p25', 'M').loc['1963-07-31':g.END]
     Fx = F.loc[P.index]
     ex = P.sub(Fx['RF'], axis=0)
-    X = Fx[['Mkt-RF', 'SMB', 'HML']].values
+    X = Fx[g.FF3].values
     rows = []
     for c in ex.columns:
         b, se, t, _, _ = ols_hac(ex[c].values, X)
@@ -173,7 +181,10 @@ def b7_multiple_testing():
         else:
             break
     bh = max([k + 1 for k in range(m) if ps[k] <= 0.05 * (k + 1) / m], default=0)
-    return dict(naive=int((d['p'] < 0.05).sum()), bonferroni=int((d['p'] < 0.05 / m).sum()), holm=holm, bh=bh,
+    # Benjamini-Yekutieli (2001): valid sub orice dependenta, praguri BH impartite la sum_j 1/j
+    cm = (1 / np.arange(1, m + 1)).sum()
+    by = max([k + 1 for k in range(m) if ps[k] <= 0.05 * (k + 1) / (m * cm)], default=0)
+    return dict(T=len(ex), naive=int((d['p'] < 0.05).sum()), bonferroni=int((d['p'] < 0.05 / m).sum()), holm=holm, bh=bh, by=by,
                 t_gt3=int((d['t'].abs() > 3).sum()), smallgrowth_alpha=d.loc['SMALL LoBM', 'alpha'],
                 smallgrowth_t=d.loc['SMALL LoBM', 't'], max_abs_t=float(d['t'].abs().max()))
 
@@ -191,7 +202,17 @@ def b8_pca_bvb():
     if vecs[:, 0].sum() < 0:
         vecs[:, 0] *= -1
     pc1 = Z.values @ vecs[:, 0]
+    # corelatia medie efectiva (in afara diagonalei), comparata cu sectoarele SUA pe aceeasi perioada
+    def avg_corr(Y):
+        C = np.corrcoef(np.asarray(Y, float).T)
+        n = C.shape[0]
+        return float((C.sum() - n) / (n * (n - 1)))
+    vals_us, vecs_us, r_us, _ = g.pca_sectors()
+    a0 = r_us.index[0]
+    us = r_us[[x + '.US' for x in SECTORS_ALL]]
     return dict(T=len(r), start=str(r.index[0].date()), N=len(names), share1=vals[0] / vals.sum(),
+                avg_corr=avg_corr(X), avg_corr_common=avg_corr(X.loc[a0:]), common_from=str(a0.date()),
+                avg_corr_us=avg_corr(us),
                 nfac=g.n_factors(X.values, 5),
                 share2=vals[1] / vals.sum(), corr_pc1_bet=float(np.corrcoef(pc1, r['BET'].values)[0, 1]),
                 load_pc1=dict(zip(names, np.round(vecs[:, 0], 3))))
@@ -205,7 +226,7 @@ def b9_lns(B=500, seed=SEED):
     I30 = french('ind30', 'M').loc['1963-07-31':g.END]
     Fx = F.loc[P25.index]
     sets = {'25': P25, '25+30': pd.concat([P25, I30.add_prefix('IND_')], axis=1)}
-    models = {'CAPM': ['Mkt-RF'], 'FF3': ['Mkt-RF', 'SMB', 'HML'], 'FF5': ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA']}
+    models = {'CAPM': ['Mkt-RF'], 'FF3': g.FF3, 'FF5': g.FF5}
 
     def r2s(ex, f):
         T, N = ex.shape
@@ -274,7 +295,8 @@ def b11_grs_robust(B=2000, lags=6, seed=SEED):
     W0 = alpha @ np.linalg.solve(V0, alpha)
     # reziduuri: asimetrie si aplatizare (motivul bootstrap-ului)
     kurt = float(np.mean(stats.kurtosis(E, axis=0, fisher=False)))
-    return dict(T=T, N=N, grs=stat, p_F=p, p_boot=float((boot >= stat).mean()), boot_q95=float(np.percentile(boot, 95)),
+    return dict(T=T, N=N, grs=stat, p_F=p, p_boot=float((boot >= stat).mean()), n_exceed=int((boot >= stat).sum()),
+                p_boot_plus1=float(((boot >= stat).sum() + 1) / (B + 1)), boot_q95=float(np.percentile(boot, 95)),
                 wald_hac=W, p_wald_hac=1 - stats.chi2.cdf(W, N), wald_white=W0, p_wald_white=1 - stats.chi2.cdf(W0, N),
                 mean_kurtosis=kurt)
 
@@ -283,25 +305,36 @@ def b11_grs_robust(B=2000, lags=6, seed=SEED):
 # PARTEA C: prime factoriale pe BVB (momentum si beta scazut), analiza de referinta
 # =============================================================================
 def part_c():
+    """Momentum 12-1 si beta scazut pe blue chips BVB, doar cu informatie disponibila la formarea portofoliului.
+
+    * lunile incomplete (ultima luna, daca datele se opresc inainte de sfarsitul ei) se elimina;
+    * |r| > 50% intr-o luna = eroare de date (eveniment de capital neajustat): in semnal conteaza ca 0,
+      iar in luna de detinere randamentul invalid se inlocuieste cu 0 (regula fixata dinainte);
+    * eligibilitatea in luna t foloseste doar informatie de la sfarsitul lunii t-1 (semnal si pret disponibile).
+    """
     names = [s for s in BVB if s not in ('H2O',)]
     px = pd.concat([g.price(s + '.RO') for s in names] + [g.price('BET')], axis=1)
     m = px.resample('ME').last().loc['2015-12-31':]
-    rets = m.pct_change()
-    # eliminarea lunilor cu erori de date (|r| > 50%)
-    rets = rets.mask(rets.abs() > 0.5)
+    last = px.index[-1]
+    if (last + pd.offsets.BDay(1)).month == last.month:          # ultima luna nu e completa
+        m = m.iloc[:-1]
     stocks = [s + '.RO' for s in names]
-    mom = m[stocks].shift(1) / m[stocks].shift(12) - 1          # 12-1 luni
-    # beta pe 36 de luni, fata de BET
+    raw = m.pct_change()
+    flag = raw.abs() > 0.5
+    rets = raw.mask(flag)                                         # randamente valide (NaN = eroare sau lipsa)
+    gross = (1 + rets[stocks]).where(~flag[stocks], 1.0)          # eroare de date -> randament 0 in semnal
+    mom = gross.rolling(11, min_periods=11).apply(np.prod, raw=True).shift(2) - 1   # lunile t-12 ... t-2
+    hold = rets[stocks].fillna(0.0).where(m[stocks].shift(1).notna())                # randamentul lunii t
     rows = []
     for t in range(13, len(m)):
         date = m.index[t]
-        avail = [s for s in stocks if pd.notna(mom[s].iloc[t - 1]) and pd.notna(rets[s].iloc[t])]
+        avail = [s for s in stocks if pd.notna(mom[s].iloc[t]) and pd.notna(m[s].iloc[t - 1])]
         if len(avail) < 6:
             continue
-        ms = mom.iloc[t - 1][avail].sort_values()
+        ms = mom.iloc[t][avail].sort_values()
         k = 3
-        mom_ls = rets.iloc[t][ms.index[-k:]].mean() - rets.iloc[t][ms.index[:k]].mean()
-        win = rets.iloc[max(0, t - 36):t]
+        mom_ls = hold.iloc[t][ms.index[-k:]].mean() - hold.iloc[t][ms.index[:k]].mean()
+        win = rets.iloc[max(0, t - 36):t]                         # doar lunile t-36 ... t-1
         betas = {}
         for s in avail:
             d = win[[s, 'BET']].dropna()
@@ -309,7 +342,7 @@ def part_c():
                 betas[s] = np.cov(d[s], d['BET'])[0, 1] / d['BET'].var()
         if len(betas) >= 6:
             bs = pd.Series(betas).sort_values()
-            lowb = rets.iloc[t][bs.index[:k]].mean() - rets.iloc[t][bs.index[-k:]].mean()
+            lowb = hold.iloc[t][bs.index[:k]].mean() - hold.iloc[t][bs.index[-k:]].mean()
         else:
             lowb = np.nan
         rows.append((date, mom_ls, lowb, len(avail)))
@@ -322,6 +355,21 @@ def part_c():
     out['start'] = str(d.index[0].date())
     out['end'] = str(d.index[-1].date())
     out['n_median'] = float(d['n'].median())
+    out['n_flagged'] = int(flag[stocks].sum().sum())
+    # C2: raspunsul AI pe acelasi esantion (semnal cu luna t inclusa, randamente log) si fiecare eroare separat
+    look = (1 + rets[stocks].fillna(0.0)).rolling(12, min_periods=12).apply(np.prod, raw=True) - 1
+    logh = np.log1p(hold)
+    var = {}
+    for lab, sig, h in [('lookahead', look, hold), ('log', mom, logh), ('ai_answer', look, logh)]:
+        v = []
+        for t in d.index:
+            avail = [s for s in stocks if pd.notna(sig.loc[t, s]) and pd.notna(h.loc[t, s])]
+            ss = sig.loc[t, avail].sort_values()
+            v.append(h.loc[t, ss.index[-3:]].mean() - h.loc[t, ss.index[:3]].mean())
+        v = pd.Series(v, index=d.index)
+        var[lab] = dict(mean_ann=v.mean() * 12, sd_ann=v.std() * np.sqrt(12),
+                        t_nw=ols_hac(v.values, np.zeros((len(v), 0)), lags=3)[2][0])
+    out['c2_variants'] = var
     fig_part_c(d)
     return out
 

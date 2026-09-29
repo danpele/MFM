@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch3_factor_cum'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Cumulative growth of the long-short factors Mkt-RF, SMB, HML, RMW, CMA and momentum, July 1963 - 2026.'
+Description: 'Compounded monthly returns (index starting at 1) of the factors Mkt-RF, SMB, HML, RMW, CMA and momentum, July 1963 - 2026; excess and long-short returns, no interest on capital or collateral.'
 
 Keywords: 'Fama-French factors, momentum, SMB, HML, RMW, CMA, factor returns'
 
