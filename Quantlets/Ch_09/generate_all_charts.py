@@ -619,6 +619,101 @@ def fig_rough():
 
 
 # =============================================================================
+# 12. STUDIU DE CAZ: Christensen, Siggaard & Veliyev (2023), JFEc 21(5)
+# Cifre publicate: randul "HAR" din Tabelele 2-7 (MSE in afara esantionului relativ la HAR, medie pe 29 de actiuni DJIA,
+# setul de test = ultimele 20% din 2001-2017), versiunea acceptata a autorilor (arXiv:2601.13014).
+# =============================================================================
+CSV_MODELS = ['HAR-X', 'LogHAR', 'LevHAR', 'SHAR', 'HARQ', 'RR', 'LA', 'EN', 'A-LA', 'P-LA', 'BG', 'RF', 'GB',
+              'NN1_1', 'NN10_1', 'NN1_2', 'NN10_2', 'NN1_3', 'NN10_3', 'NN1_4', 'NN10_4']
+CSV_REL_MSE = {   # (orizont, set de informatii): (tabel, randul HAR pe coloanele CSV_MODELS)
+    ('day', 'HAR'):   (2, [1.000, 0.995, 1.073, 1.009, 1.059, 1.000, 1.003, 0.999, 1.007, 1.005, 1.147, 1.020, 1.054,
+                           0.980, 0.969, 0.966, 0.958, 0.955, 0.954, 0.984, 0.990]),
+    ('day', 'ALL'):   (3, [0.966, 0.901, 1.003, 1.080, 1.289, 0.919, 0.936, 0.916, 0.957, 0.987, 0.961, 0.901, 0.962,
+                           0.902, 0.889, 0.893, 0.885, 0.910, 0.898, 0.929, 0.944]),
+    ('week', 'HAR'):  (4, [1.000, 1.091, 1.089, 0.937, 1.043, 1.019, 1.024, 1.019, 1.033, 1.016, 1.056, 0.959, 1.164,
+                           0.955, 0.951, 0.947, 0.937, 0.929, 0.925, 1.000, 1.011]),
+    ('week', 'ALL'):  (5, [1.037, 0.970, 1.076, 0.913, 1.459, 0.954, 0.958, 0.925, 1.026, 1.033, 0.840, 0.796, 0.930,
+                           0.877, 0.857, 0.865, 0.846, 0.882, 0.855, 0.913, 0.945]),
+    ('month', 'HAR'): (6, [1.000, 1.052, 1.030, 1.034, 0.994, 1.100, 1.107, 1.111, 1.118, 1.057, 1.171, 1.019, 1.219,
+                           0.993, 0.970, 0.989, 0.958, 0.904, 0.905, 1.027, 1.068]),
+    ('month', 'ALL'): (7, [1.290, 0.919, 1.328, 1.312, 1.569, 1.111, 1.378, 1.107, 1.386, 1.363, 0.621, 0.604, 0.829,
+                           0.800, 0.789, 0.816, 0.786, 0.788, 0.795, 0.902, 0.964]),
+}
+CSV_LABEL = {'HAR-X': 'HAR-X (OLS, all predictors)', 'LogHAR': 'log-HAR', 'LevHAR': 'HAR with leverage', 'SHAR': 'SHAR',
+             'HARQ': 'HARQ', 'RR': 'Ridge', 'LA': 'Lasso', 'EN': 'Elastic net', 'A-LA': 'Adaptive lasso',
+             'P-LA': 'Post-lasso', 'BG': 'Bagging', 'RF': 'Random forest', 'GB': 'Gradient boosting'}
+CSV_FAMILY = [('HAR family (OLS)', Orange, ['HAR-X', 'LogHAR', 'LevHAR', 'SHAR', 'HARQ']),
+              ('Penalised regression', Purple, ['RR', 'LA', 'EN', 'A-LA', 'P-LA']),
+              ('Regression trees', Forest, ['BG', 'RF', 'GB']),
+              ('Neural networks', MainBlue, ['NN1_1', 'NN10_1', 'NN1_2', 'NN10_2', 'NN1_3', 'NN10_3', 'NN1_4', 'NN10_4'])]
+
+
+def csv_label(m):
+    """Eticheta unui model; NNe_k -> NN_k^e, ca in lucrare."""
+    if m.startswith('NN'):
+        e, k = m[2:].split('_')
+        return rf'NN$_{k}^{{{e}}}$'
+    return CSV_LABEL[m]
+
+
+def csv_table():
+    """Cifrele publicate: rand = (orizont, set de informatii), coloane = modele."""
+    return pd.DataFrame({k: v[1] for k, v in CSV_REL_MSE.items()}, index=CSV_MODELS).T
+
+
+def fig_csv_horizons():
+    """MSE relativ la HAR pe orizonturi (zi, saptamana, luna), pentru M_HAR si M_ALL (Tabelele 2-7)."""
+    tab = csv_table()
+    hz = ['day', 'week', 'month']
+    show = [('HAR-X', Amber, 'D'), ('LogHAR', IDAred, 'o'), ('HARQ', Orange, 'v'), ('EN', Purple, 's'),
+            ('RF', Forest, '^'), ('NN10_2', MainBlue, 'P')]
+    fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.4), sharey=True)
+    for ax, info, ttl in [(axes[0], 'HAR', r'$\mathcal{M}_{HAR}$: daily, weekly, monthly RV (Tables 2, 4, 6)'),
+                          (axes[1], 'ALL', r'$\mathcal{M}_{ALL}$: RV lags + 9 predictors (Tables 3, 5, 7)')]:
+        ax.axhline(1.0, color=Gray, lw=0.8, ls='--', label='HAR = 1')
+        for m, c, mk in show:
+            ax.plot(range(3), [tab.loc[(h, info), m] for h in hz], marker=mk, ms=5, color=c, lw=1.3, label=csv_label(m))
+        ax.set_xticks(range(3))
+        ax.set_xticklabels(['1 day', '1 week', '1 month'])
+        ax.set_xlim(-0.25, 2.45)
+        ax.set_title(ttl, fontsize=9.5)
+        ax.set_xlabel('Forecast horizon')
+    axes[0].set_ylabel('Out-of-sample MSE relative to HAR')
+    for m in ['RF', 'NN10_2', 'HARQ', 'HAR-X']:
+        v = tab.loc[('month', 'ALL'), m]
+        axes[1].annotate(f'{v:.3f}', (2, v), xytext=(7, 0), textcoords='offset points', va='center', fontsize=8,
+                         color='black')
+    plt.tight_layout()
+    fig_legend_bottom(fig, ncol=4, y=0.0)
+    save_fig('ch9_csv_horizons')
+    return {'rf_all': [tab.loc[(h, 'ALL'), 'RF'] for h in hz], 'nn_all': [tab.loc[(h, 'ALL'), 'NN10_2'] for h in hz]}
+
+
+def fig_csv_ranking():
+    """Clasamentul celor 21 de modele, o luna inainte, M_ALL (Tabelul 7), colorat pe familii."""
+    s = csv_table().loc[('month', 'ALL')].sort_values(ascending=False)
+    col = {m: c for _, c, ms in CSV_FAMILY for m in ms}
+    fig, ax = plt.subplots(figsize=(6.6, 4.8))
+    y = np.arange(len(s))
+    ax.barh(y, s.values - 1.0, left=1.0, color=[col[m] for m in s.index], height=0.7)
+    for yi, (m, v) in zip(y, s.items()):
+        ax.text(v + (0.012 if v >= 1 else -0.012), yi, f'{v:.3f}', va='center', ha='left' if v >= 1 else 'right',
+                fontsize=10, color='black')
+    ax.axvline(1.0, color=Gray, lw=0.8, ls='--')
+    ax.set_yticks(y)
+    ax.set_yticklabels([csv_label(m) for m in s.index], fontsize=10.5)
+    ax.set_xlim(0.45, 1.78)
+    ax.set_xlabel('Out-of-sample MSE relative to HAR (below 1: more accurate)', fontsize=11)
+    ax.tick_params(axis='x', labelsize=10)
+    handles = [plt.Rectangle((0, 0), 1, 1, color=c) for _, c, _ in CSV_FAMILY]
+    fig.legend(handles, [f for f, _, _ in CSV_FAMILY], loc='upper center', bbox_to_anchor=(0.5, 0.01), ncol=4,
+               frameon=False, fontsize=9.5, handlelength=1.2, columnspacing=1.0)
+    plt.tight_layout(rect=(0, 0.03, 1, 1))
+    save_fig('ch9_csv_ranking')
+    return s.to_dict()
+
+
+# =============================================================================
 if __name__ == '__main__':
     res = {}
     print('1. intraday day');   res['day'] = fig_intraday_day()
@@ -643,6 +738,7 @@ if __name__ == '__main__':
     fig_oos(F, y, Fb, yb)
     fig_mz(F, y)
     print('11. rough');         res['rough'] = fig_rough()
+    print('12. case study');    fig_csv_horizons(); fig_csv_ranking()
     pd.DataFrame({'rv_intraday': RV_SPY, 'overnight': ON, 'rv_total': RVT_SPY}).to_csv(os.path.join(HERE, 'ch9_rv_spy.csv'))
     RV_BTC.rename('rv').to_csv(os.path.join(HERE, 'ch9_rv_btc.csv'))
     with open(os.path.join(HERE, 'ch9_results.json'), 'w') as f:

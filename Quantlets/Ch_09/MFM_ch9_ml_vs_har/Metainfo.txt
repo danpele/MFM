@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_ml_vs_har'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Christensen, Siggaard and Veliyev (2023, Journal of Financial Econometrics): out-of-sample MSE of HAR models, penalised regressions, regression trees and neural networks relative to HAR, averaged over 29 DJIA stocks (2001-2017), by forecast horizon (1 day, 1 week, 1 month) and information set (RV lags only vs RV lags plus 9 predictors); ranking of the 21 models one month ahead. Published numbers from Tables 2-7 of the paper.'
+
+Keywords: 'volatility forecasting, machine learning, HAR-RV, random forest, neural networks, elastic net, realised variance, forecast horizon'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Published results: Christensen, Siggaard and Veliyev (2023), Journal of Financial Econometrics 21(5), Tables 2-7 (out-of-sample MSE relative to HAR)'
+
+Output: 'ch9_csv_horizons.pdf, ch9_csv_ranking.pdf'
