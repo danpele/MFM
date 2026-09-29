@@ -11,6 +11,7 @@ Modelling Financial Markets - Daniel Traian PELE
 import os
 import sys
 import json
+import tempfile
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -867,6 +868,174 @@ def extras(R):
     return R
 
 
+# =============================================================================
+# CASE STUDY: Bayer & Dimitriadis (2022), regression-based ES backtesting
+# =============================================================================
+# Table 3 of the paper (accepted version, arXiv:1801.04112v2): share of the 200 largest S&P 500 stocks for which
+# the one-sided Intercept ESR test rejects the ES 2.5% forecasts at 5%; out-of-sample Jan 2010 - Aug 2019.
+BD_WINDOWS = (250, 500, 1000, 1500, 2000)
+BD_REFITS = (5, 21, 62, 125, 250)
+BD_TABLE3 = {
+    'GARCH-N': [[1.00, 1.00, 1.00, 1.00, 1.00], [0.99, 0.99, 0.99, 0.99, 0.99], [0.98, 0.97, 0.98, 0.96, 0.96],
+                [0.97, 0.97, 0.97, 0.97, 0.96], [0.96, 0.96, 0.94, 0.95, 0.94]],
+    'GJR-GARCH-N': [[1.00, 1.00, 1.00, 1.00, 1.00], [1.00, 1.00, 1.00, 0.99, 1.00], [0.99, 0.99, 0.99, 0.99, 0.99],
+                    [0.98, 0.99, 0.99, 0.99, 0.99], [0.98, 0.98, 0.98, 0.98, 0.97]],
+    'GARCH-t': [[0.26, 0.32, 0.32, 0.36, 0.59], [0.10, 0.09, 0.12, 0.12, 0.20], [0.07, 0.07, 0.07, 0.08, 0.09],
+                [0.09, 0.09, 0.09, 0.10, 0.09], [0.10, 0.08, 0.08, 0.08, 0.09]],
+    'GJR-GARCH-t': [[0.28, 0.32, 0.29, 0.37, 0.42], [0.13, 0.17, 0.17, 0.22, 0.25], [0.14, 0.11, 0.11, 0.12, 0.14],
+                    [0.08, 0.10, 0.09, 0.09, 0.09], [0.09, 0.09, 0.10, 0.09, 0.10]],
+}
+# large S&P 500 stocks in data/market with daily prices from 2002 (2000-day window before January 2010)
+BD_STOCKS = ['AAPL.US', 'MSFT.US', 'AMZN.US', 'NVDA.US', 'CSCO.US', 'JPM.US', 'BAC.US', 'C.US', 'WFC.US', 'GS.US',
+             'MS.US']
+BD_OOS = ('2010-01-01', '2019-08-31')
+BD_TAU = 0.025
+
+
+ESBACK_R = r"""
+lib <- Sys.getenv('MFM_RLIB'); dir.create(lib, showWarnings = FALSE, recursive = TRUE); .libPaths(c(lib, .libPaths()))
+if (!requireNamespace('esback', quietly = TRUE))
+  install.packages('esback', lib = lib, repos = 'https://cloud.r-project.org', quiet = TRUE)
+args <- commandArgs(trailingOnly = TRUE)
+d <- read.csv(args[1]); tau <- as.numeric(args[3])
+RNGkind("L'Ecuyer-CMRG"); set.seed(8)
+p <- parallel::mclapply(split(d, d$id), function(s) {
+  b <- suppressWarnings(esback::esr_backtest(r = s$r, e = s$e, alpha = tau, version = 3))
+  data.frame(id = s$id[1], p = b$pvalue_onesided_asymptotic, p2 = b$pvalue_twosided_asymptotic)
+}, mc.cores = max(1, parallel::detectCores() - 1))
+write.csv(do.call(rbind, p), args[2], row.names = FALSE)
+"""
+
+
+def esr_intercept(series, tau=BD_TAU):
+    """One-sided Intercept ESR test of Bayer-Dimitriadis (Eq. 2.14-2.15) with the authors' R package esback:
+    joint regression of r_t - e_t on (1, e_t) for the quantile and on a constant for the ES, FZ0-type loss
+    (esreg, G1 = 2, G2 = 1), misspecification-robust covariance (sparsity 'nid', 'scl_sp'); H0: gamma_1 >= 0.
+    series: dict id -> DataFrame with columns r (return) and e (ES forecast, return units). Needs R (Rscript)."""
+    import subprocess
+    tmp = tempfile.mkdtemp()
+    d = pd.concat([df.assign(id=k)[['id', 'r', 'e']] for k, df in series.items()])
+    d.to_csv(os.path.join(tmp, 'in.csv'), index=False)
+    with open(os.path.join(tmp, 'esback.R'), 'w') as f:
+        f.write(ESBACK_R)
+    env = dict(os.environ, MFM_RLIB=os.path.join(tempfile.gettempdir(), 'mfm_rlib'))
+    subprocess.run(['Rscript', os.path.join(tmp, 'esback.R'), os.path.join(tmp, 'in.csv'),
+                    os.path.join(tmp, 'out.csv'), str(tau)], check=True, env=env)
+    return pd.read_csv(os.path.join(tmp, 'out.csv')).set_index('id')
+
+
+def garch_es_forecasts(r, dist, w, refit, oos):
+    """Rolling one-day-ahead ES_tau forecasts (return units, negative) of a constant-mean GARCH(1,1) with Normal
+    or Student-t innovations: window of w days, parameters re-estimated every `refit` days, volatility updated
+    daily with the last parameters. r: log returns in percent (Series); oos: (start, end)."""
+    from arch import arch_model
+    idx = np.where((r.index >= oos[0]) & (r.index <= oos[1]))[0]
+    x = r.values
+    e = np.full(len(idx), np.nan)
+    for j0 in range(0, len(idx), refit):
+        s = idx[j0]
+        res = arch_model(x[s - w:s], mean='Constant', vol='GARCH', p=1, q=1,
+                         dist='t' if dist == 't' else 'normal').fit(disp='off', show_warning=False)
+        mu, om, al, be = (res.params[k] for k in ('mu', 'omega', 'alpha[1]', 'beta[1]'))
+        esz = (M.t_std_es(res.params['nu'], BD_TAU) if dist == 't'
+               else stats.norm.pdf(stats.norm.ppf(BD_TAU)) / BD_TAU)
+        s2 = res.conditional_volatility[-1] ** 2
+        eps = x[s - 1] - mu
+        for j in range(j0, min(j0 + refit, len(idx))):
+            s2 = om + al * eps ** 2 + be * s2
+            e[j] = mu - np.sqrt(s2) * esz
+            eps = x[idx[j]] - mu
+    return pd.Series(e, index=r.index[idx])
+
+
+def _bd_one(sym, dist, w, refit):
+    r = 100 * np.log(M.read_market(sym)['adjusted_close']).diff().dropna()
+    e = garch_es_forecasts(r, dist, w, refit, BD_OOS)
+    return f'{sym}|{dist}|{w}|{refit}', pd.DataFrame({'r': r.loc[e.index].values, 'e': e.values})
+
+
+def bd_replication(n_jobs=-1):
+    """Table 3 design on the course data: GARCH(1,1)-N and GARCH(1,1)-t, five windows x five refit frequencies,
+    one-sided Intercept ESR at 5%; share of the stocks rejected."""
+    from joblib import Parallel, delayed
+    jobs = [(s, d, w, k) for s in BD_STOCKS for d in ('normal', 't') for w in BD_WINDOWS for k in BD_REFITS]
+    series = dict(Parallel(n_jobs=n_jobs)(delayed(_bd_one)(*j) for j in jobs))
+    pv = esr_intercept(series)
+    rows = pd.DataFrame([dict(zip(('sym', 'dist', 'w', 'refit'), k.split('|')), T=len(series[k]),
+                              p=pv.loc[k, 'p'], p2=pv.loc[k, 'p2']) for k in series])
+    rows[['w', 'refit']] = rows[['w', 'refit']].astype(int)
+    rows['reject'] = rows['p'] < 0.05
+    share = {d: rows[rows.dist == d].pivot_table(index='w', columns='refit', values='reject', aggfunc='mean')
+             for d in ('normal', 't')}
+    return rows, share
+
+
+def fig_bd_table3():
+    """Table 3 of Bayer-Dimitriadis: rejection shares by estimation window, weekly and yearly refit."""
+    fig, axs = plt.subplots(1, 2, figsize=(7.2, 2.9), sharey=True)
+    x = np.arange(len(BD_WINDOWS))
+    for ax, fam in zip(axs, ('GARCH', 'GJR-GARCH')):
+        for d, col in (('N', IDAred), ('t', MainBlue)):
+            tab = np.array(BD_TABLE3[f'{fam}-{d}'])
+            lab = 'Normal' if d == 'N' else 'Student-t'
+            ax.plot(x, tab[:, 0], '-o', color=col, ms=4, label=f'{lab} innovations, weekly refit (5 days)')
+            ax.plot(x, tab[:, 4], '--s', color=col, ms=4, label=f'{lab} innovations, yearly refit (250 days)')
+        ax.axhline(0.05, color=Gray, lw=0.8, ls=':', label='Nominal size 5%')
+        ax.set_xticks(x, [str(v) for v in BD_WINDOWS])
+        ax.set_xlabel('Rolling estimation window (days)')
+        ax.set_title(f'{fam}(1,1)', fontsize=10)
+        ax.set_ylim(0, 1.05)
+    axs[0].set_ylabel('Share of stocks rejected')
+    h, l = axs[0].get_legend_handles_labels()
+    fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=3, frameon=False)
+    plt.tight_layout()
+    save_fig('ch8_bd_table3')
+
+
+def fig_bd_replication(rows, share):
+    """Course-data replication of Table 3 (GARCH(1,1)): share of stocks rejected, Normal versus Student-t."""
+    fig, axs = plt.subplots(1, 2, figsize=(7.2, 2.9), sharey=True)
+    x = np.arange(len(BD_WINDOWS))
+    paperN, papert = np.array(BD_TABLE3['GARCH-N']), np.array(BD_TABLE3['GARCH-t'])
+    for ax, k, ttl in zip(axs, (0, 4), ('Weekly refit (5 days)', 'Yearly refit (250 days)')):
+        ref = BD_REFITS[k]
+        ax.plot(x, share['normal'][ref].values, '-o', color=IDAred, ms=4,
+                label=f'Normal innovations, {len(BD_STOCKS)} stocks (course data)')
+        ax.plot(x, share['t'][ref].values, '-o', color=MainBlue, ms=4,
+                label=f'Student-t innovations, {len(BD_STOCKS)} stocks (course data)')
+        ax.plot(x, paperN[:, k], '--s', color=Orange, ms=3.5, label='Normal innovations, 200 stocks (Table 3)')
+        ax.plot(x, papert[:, k], '--s', color=Teal, ms=3.5, label='Student-t innovations, 200 stocks (Table 3)')
+        ax.axhline(0.05, color=Gray, lw=0.8, ls=':', label='Nominal size 5%')
+        ax.set_xticks(x, [str(v) for v in BD_WINDOWS])
+        ax.set_xlabel('Rolling estimation window (days)')
+        ax.set_title(ttl, fontsize=10)
+        ax.set_ylim(-0.03, 1.05)
+    axs[0].set_ylabel('Share of stocks rejected')
+    h, l = axs[0].get_legend_handles_labels()
+    fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=2, frameon=False)
+    plt.tight_layout()
+    save_fig('ch8_bd_replication')
+    t = rows[rows.dist == 't']
+    n = rows[rows.dist == 'normal']
+    return dict(T=int(rows['T'].iloc[0]), n_stocks=len(BD_STOCKS),
+                share_n={str(w): {str(k): float(share['normal'].loc[w, k]) for k in BD_REFITS} for w in BD_WINDOWS},
+                share_t={str(w): {str(k): float(share['t'].loc[w, k]) for k in BD_REFITS} for w in BD_WINDOWS},
+                n_min=float(share['normal'].values.min()), n_max=float(share['normal'].values.max()),
+                t_min=float(share['t'].values.min()), t_max=float(share['t'].values.max()),
+                p_n_median=float(n['p'].median()), p_t_median=float(t['p'].median()),
+                t_250_250=float(share['t'].loc[250, 250]),
+                t_long=float(share['t'].loc[[1500, 2000], [5, 21, 62]].values.mean()),
+                t_long_max=float(share['t'].loc[[1500, 2000], [5, 21, 62]].values.max()))
+
+
+def case_study(R):
+    """Case study (Bayer-Dimitriadis, 2022): Table 3 chart and its replication on the course data."""
+    fig_bd_table3()
+    rows, share = bd_replication()
+    R['bd'] = fig_bd_replication(rows, share)
+    return R
+
+
 def to_py(o):
     if isinstance(o, dict):
         return {(k if isinstance(k, str) else '|'.join(map(str, k)) if isinstance(k, tuple) else str(k)): to_py(v)
@@ -880,7 +1049,14 @@ def to_py(o):
     return o
 
 
-if __name__ == '__main__' and '--extras' in sys.argv:
+if __name__ == '__main__' and '--case' in sys.argv:
+    # only the case study block, added to the existing results
+    R = json.load(open(os.path.join(HERE, 'ch8_results.json')))
+    case_study(R)
+    with open(os.path.join(HERE, 'ch8_results.json'), 'w') as f:
+        json.dump(to_py(R), f, indent=1, default=str)
+    print('case study done')
+elif __name__ == '__main__' and '--extras' in sys.argv:
     # only the inference blocks, added to the existing results
     R = json.load(open(os.path.join(HERE, 'ch8_results.json')))
     extras(R)
@@ -919,6 +1095,7 @@ elif __name__ == '__main__':
     fig_conformal_regimes(R['conformal5'])
     R['worked'] = worked_examples()
     extras(R)
+    case_study(R)
     with open(os.path.join(HERE, 'ch8_results.json'), 'w') as f:
         json.dump(to_py(R), f, indent=1, default=str)
     print('done')

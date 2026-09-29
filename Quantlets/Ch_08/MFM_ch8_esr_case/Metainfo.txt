@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_esr_case'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Bayer and Dimitriadis (2022), regression-based expected shortfall backtesting: Table 3 of the paper (share of the 200 largest S&P 500 stocks for which the one-sided Intercept ESR test rejects the ES 2.5% forecasts at 5%) and its replication on 11 large S&P 500 stocks, January 2010 - August 2019: GARCH(1,1) with Normal or Student-t innovations, rolling windows of 250-2000 days, refits every 5-250 days, one-sided Intercept ESR test with the esback package of the authors.'
+
+Keywords: 'expected shortfall, ESR backtest, Intercept ESR, joint quantile and ES regression, GARCH, estimation window, refit frequency, replication'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Daily adjusted closes (data/market): AAPL.US, MSFT.US, AMZN.US, NVDA.US, CSCO.US, JPM.US, BAC.US, C.US, WFC.US, GS.US, MS.US'
+
+Output: 'ch8_bd_table3.pdf, ch8_bd_replication.pdf'
