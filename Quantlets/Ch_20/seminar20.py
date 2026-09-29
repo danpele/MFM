@@ -26,7 +26,7 @@ warnings.filterwarnings('ignore')
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import sigvol as S                    # noqa: E402
-from generate_all_charts import (save_fig, legend_outside_bottom, MainBlue, IDAred, Forest, Orange, Purple,  # noqa: E402
+from generate_all_charts import (save_fig, legend_outside_bottom, fig_legend_bottom, MainBlue, IDAred, Forest, Orange, Purple,  # noqa: E402
                                  Teal, Gray, COL)
 
 if not os.path.isdir(S.VOLARE_DIR):
@@ -42,6 +42,19 @@ def lecture_results():
     import urllib.request
     url = 'https://raw.githubusercontent.com/danpele/MFM/main/Quantlets/Ch_20/MFM_ch20_case_study/ch20_results.json'
     return json.load(urllib.request.urlopen(url))
+
+
+# seminar charts sit next to the solution bullets: larger fonts than the lecture charts
+BIG = {'font.size': 11, 'axes.labelsize': 11, 'axes.titlesize': 11, 'xtick.labelsize': 10.5,
+       'ytick.labelsize': 10.5, 'legend.fontsize': 10.5}
+
+
+def big(fn):
+    def wrapped(*a, **k):
+        with plt.rc_context(BIG):
+            return fn(*a, **k)
+    wrapped.__name__ = fn.__name__
+    return wrapped
 
 
 def ols_hac(y, X, lag):
@@ -97,12 +110,95 @@ def part_a():
         w = np.exp(-g * d) / np.exp(-g * d).sum()
         A[f'a9_g{int(g)}'] = {'w': w.tolist(), 'ess': float(1 / np.sum(w ** 2))}
     RES['A'] = A
+    chart_a1(P)
+    chart_a5(phi)
+    chart_a7()
+    chart_a9(d)
+
+
+def setup_check():
+    """What the setup cell must print: size and first rows of the JPM file."""
+    a = S.load_asset('stocks', 'JPM')
+    RES['setup'] = {'n': int(len(a)), 'start': str(a.index[0].date()), 'end': str(a.index[-1].date()),
+                    'head': [[str(i.date()), float(r.rv), float(r.r)] for i, r in a.head(3).iterrows()],
+                    'n_stocks': len(S.symbols('stocks')), 'n_futures': len(S.symbols('futures')),
+                    'n_forex': len(S.symbols('forex'))}
+
+
+@big
+def chart_a1(P):
+    """A1: the time-augmented path, its chord and the enclosed signed area."""
+    fig, ax = plt.subplots(figsize=(4.2, 3.4))
+    ax.fill(np.r_[P[:, 0], P[0, 0]], np.r_[P[:, 1], P[0, 1]], color=IDAred, alpha=0.18,
+            label='Area between path and chord (2, run clockwise: A = -2)')
+    ax.plot(P[:, 0], P[:, 1], color=MainBlue, lw=1.8, marker='o', label='Path X = (t, y)')
+    ax.plot([P[0, 0], P[-1, 0]], [P[0, 1], P[-1, 1]], color=Gray, ls='--', lw=1.0, label='Chord from start to end')
+    for t_, y_ in P:
+        ax.annotate(f'({t_:.0f}, {y_:.0f})', (t_, y_), xytext=(4, -11), textcoords='offset points', fontsize=8,
+                    color='black')
+    ax.set_xlabel('Time t (channel 1)')
+    ax.set_ylabel('y (channel 2)')
+    ax.set_xlim(-0.3, 3.5)
+    ax.set_ylim(-0.6, 3.6)
+    legend_outside_bottom(ax, ncol=1, y=-0.18)
+    save_fig('ch20_sem_a1_path')
+
+
+@big
+def chart_a5(phi):
+    """A5: the AR(22) coefficients implied by the HAR with averages of logs (JPM)."""
+    fig, ax = plt.subplots(figsize=(5.6, 3.0))
+    lags = np.arange(1, 23)
+    col = [IDAred] + [Orange] * 4 + [MainBlue] * 17
+    ax.bar(lags, phi, color=col, width=0.7)
+    for c_, lab in [(IDAred, 'Lag 1: daily + weekly + monthly terms'), (Orange, 'Lags 2-5: weekly + monthly terms'),
+                    (MainBlue, 'Lags 6-22: monthly term only')]:
+        ax.bar([np.nan], [np.nan], color=c_, label=lab)
+    ax.set_xlabel('Lag j (days)')
+    ax.set_ylabel('Implied coefficient phi_j')
+    ax.set_xticks([1, 5, 10, 15, 22])
+    legend_outside_bottom(ax, ncol=1, y=-0.22)
+    save_fig('ch20_sem_a5_phi')
+
+
+@big
+def chart_a7():
+    """A7: QLIKE(1, F) against the squared error as functions of the forecast F."""
+    F = np.linspace(0.25, 2.5, 400)
+    fig, ax = plt.subplots(figsize=(5.0, 3.3))
+    ax.plot(F, S.qlike(1.0, F), color=MainBlue, lw=1.6, label='QLIKE(RV = 1, F)')
+    ax.plot(F, (1 - F) ** 2, color=Orange, lw=1.6, ls='-.', label='Squared error (1 - F)^2')
+    for f_ in (0.5, 1.5):
+        ax.plot([f_], [S.qlike(1.0, f_)], 'o', color=IDAred if f_ < 1 else Forest,
+                label=f'F = {f_}: QLIKE {float(S.qlike(1.0, f_)):.3f}')
+    ax.axvline(1, color=Gray, ls='--', lw=0.8)
+    ax.set_xlabel('Forecast F (true RV = 1)')
+    ax.set_ylabel('Loss')
+    ax.set_ylim(0, 0.8)
+    legend_outside_bottom(ax, ncol=2, y=-0.2)
+    save_fig('ch20_sem_a7_qlike')
+
+
+@big
+def chart_a9(d):
+    """A9: softmax kernel weights for three temperatures and their effective sample sizes."""
+    fig, ax = plt.subplots(figsize=(5.4, 3.2))
+    x = np.arange(len(d))
+    for i, (g, c_) in enumerate([(0.0, Teal), (1.0, MainBlue), (3.0, IDAred)]):
+        w = np.exp(-g * d) / np.exp(-g * d).sum()
+        ax.bar(x + (i - 1) * 0.26, w, width=0.26, color=c_,
+               label=f'gamma = {g:.0f}: n_eff = {1 / np.sum(w ** 2):.2f}')
+    ax.set_xticks(x)
+    ax.set_xticklabels([f'window {k + 1}\ndistance {v}' for k, v in enumerate(d)])
+    ax.set_ylabel('Weight w')
+    legend_outside_bottom(ax, ncol=1, y=-0.28)
+    save_fig('ch20_sem_a9_weights')
 
 
 # -----------------------------------------------------------------------------
 # PARTEA B
 # -----------------------------------------------------------------------------
-def levy_regression(kind, sym):
+def levy_regression(kind, sym, chart):
     """Does the Levy area (return, log RV) of the last 22 days predict the next-month change of log RV?"""
     a = S.load_asset(kind, sym)
     D = S.build_design(a, 22)
@@ -118,9 +214,78 @@ def levy_regression(kind, sym):
     e0 = y[ok] - np.c_[np.ones(ok.sum()), X[ok][:, :3]] @ b0
     r2 = 1 - e1.var() / y[ok].var()
     r20 = 1 - e0.var() / y[ok].var()
+    chart_levy(y[ok], X[ok][:, :3], X[ok][:, 3], b[4], se[4], sym, chart)
     return {'b_levy': b[4], 'se_levy': se[4], 't_levy': b[4] / se[4], 'r2': r2, 'r2_base': r20,
             'N': int(ok.sum()), 'mean_levy': float(np.nanmean(levy)),
             'frac_neg': float(np.mean(levy[np.isfinite(levy)] < 0))}
+
+
+@big
+def chart_levy(y, Xb, A, b, se, sym, name):
+    """Binned scatter (Frisch-Waugh): target and Levy area, both residualised on the log-HAR terms."""
+    Z = np.c_[np.ones(len(y)), Xb]
+    res = y - Z @ np.linalg.lstsq(Z, y, rcond=None)[0]
+    A = A - Z @ np.linalg.lstsq(Z, A, rcond=None)[0]
+    q = pd.qcut(A, 20, labels=False)
+    xb = pd.Series(A).groupby(q).mean()
+    yb = pd.Series(res).groupby(q).mean()
+    fig, ax = plt.subplots(figsize=(5.4, 3.3))
+    ax.scatter(xb, yb, color=MainBlue, s=22, zorder=3, label=f'{sym}: mean of 20 equal-count bins')
+    xx = np.linspace(xb.min(), xb.max(), 50)
+    ax.plot(xx, b * xx, color=IDAred, lw=1.5, label=f'OLS slope {b:.3f} (HAC s.e. {se:.3f})')
+    ax.fill_between(xx, (b - 1.96 * se) * xx, (b + 1.96 * se) * xx, color=Gray, alpha=0.2,
+                    label='95% HAC band of the slope')
+    ax.axhline(0, color=Gray, ls='--', lw=0.8)
+    ax.set_xlabel('Standardised Levy area A_t, residual on log-HAR terms')
+    ax.set_ylabel('Next-month change of log RV,\nresidual on log-HAR terms')
+    legend_outside_bottom(ax, ncol=1, y=-0.22)
+    save_fig(name)
+
+
+@big
+def chart_coef(out, sym, name):
+    """SHAR semivariance coefficients and the HARQ coefficient with 95% HAC intervals."""
+    fig, axes = plt.subplots(1, 2, figsize=(5.8, 3.1), gridspec_kw={'width_ratios': [2, 1]})
+    b, se = out['shar']['b'], out['shar']['se']
+    ax = axes[0]
+    for i, (k, lab, c_) in enumerate([(1, 'beta+ (positive semivariance)', Forest),
+                                      (2, 'beta- (negative semivariance)', IDAred)]):
+        ax.errorbar([i], [b[k]], yerr=[1.96 * se[k]], fmt='o', color=c_, capsize=4, label=f'SHAR {lab}')
+    ax.axhline(0, color=Gray, ls='--', lw=0.8)
+    ax.set_xticks([0, 1])
+    ax.set_xticklabels(['beta+', 'beta-'])
+    ax.set_xlim(-0.6, 1.6)
+    ax.set_ylabel('Coefficient, 95% HAC interval')
+    ax.set_title(f'{sym}: SHAR', fontsize=9)
+    ax = axes[1]
+    bq, sq = out['harq']['b'][2], out['harq']['se'][2]
+    ax.errorbar([0], [bq], yerr=[1.96 * sq], fmt='s', color=Purple, capsize=4, label='HARQ beta_Q')
+    ax.axhline(0, color=Gray, ls='--', lw=0.8)
+    ax.set_xticks([0])
+    ax.set_xticklabels(['beta_Q'])
+    ax.set_xlim(-0.8, 0.8)
+    ax.set_title(f'{sym}: HARQ', fontsize=9)
+    fig_legend_bottom(fig, axes, ncol=1, y=0.0)
+    plt.tight_layout(rect=(0, 0.2, 1, 1))
+    save_fig(name)
+
+
+@big
+def chart_pvalues(p, h, comp, name):
+    """Sorted one-sided DM p-values of the 50 assets against the 5%, Holm and BH thresholds."""
+    m = len(p)
+    k = np.arange(1, m + 1)
+    ps = np.sort(p)
+    fig, ax = plt.subplots(figsize=(5.4, 3.3))
+    ax.scatter(k, ps, color=MainBlue, s=14, zorder=3, label=f'Sorted p-values, {comp}, h = {h}')
+    ax.axhline(0.05, color=Orange, lw=1.2, label='5% without correction')
+    ax.step(k, 0.05 / (m - k + 1), where='mid', color=IDAred, lw=1.2, label='Holm: 0.05 / (m - k + 1)')
+    ax.plot(k, 0.05 * k / m, color=Forest, lw=1.2, ls='-.', label='BH: 0.05 k / m')
+    ax.set_yscale('log')
+    ax.set_xlabel('Rank k of the p-value (m = 50 assets)')
+    ax.set_ylabel('One-sided DM p-value (log scale)')
+    legend_outside_bottom(ax, ncol=1, y=-0.2)
+    save_fig(name)
 
 
 def har_family(kind, sym):
@@ -140,6 +305,7 @@ def har_family(kind, sym):
     Xq = np.c_[D['X_har'][ok, 0], D['X_har'][ok, 0] * (sq - sq.mean()), D['X_har'][ok, 1:]]
     b, se, _ = ols_hac(y, Xq, 5)
     out['harq'] = {'b': b.tolist(), 'se': se.tolist(), 't_q': b[2] / se[2]}
+    chart_coef(out, sym, f'ch20_sem_{"b3" if sym == "JPM" else "b4"}_coef')
     return out
 
 
@@ -174,25 +340,32 @@ def sig_vs_loghar(kind, sym, h, c, cutoff=None):
             'k': float(info['k_Sig-LK'].mean()), 'ess': float(info['ess'].mean())}, fc
 
 
+@big
+def chart_cumloss(fc, sym, h, name):
+    """Cumulative QLIKE difference Sig-LK minus log-HAR: upward = log-HAR better."""
+    d = (S.qlike(fc.y, fc['Sig-LK']) - S.qlike(fc.y, fc['logHAR'])).cumsum()
+    fig, ax = plt.subplots(figsize=(5.6, 3.0))
+    ax.plot(d.index, d, color=IDAred, lw=1.1, label=f'Cumulative QLIKE(Sig-LK) - QLIKE(log-HAR), {sym}, h = {h}')
+    ax.axhline(0, color=Gray, ls='--', lw=0.8)
+    ax.set_ylabel('Cumulative loss difference')
+    legend_outside_bottom(ax, ncol=1, y=-0.14)
+    save_fig(name)
+
+
 def part_b():
     B = {}
-    B['b1'] = levy_regression('stocks', 'JPM')
-    B['b2'] = levy_regression('futures', 'ES')
+    B['b1'] = levy_regression('stocks', 'JPM', 'ch20_sem_b1_levy')
+    B['b2'] = levy_regression('futures', 'ES', 'ch20_sem_b2_levy')
     B['b3'] = har_family('stocks', 'JPM')
     B['b4'] = har_family('futures', 'CL')
     LR = lecture_results()
     c1, _, cut1 = S.tuned(LR, 'stocks', 1)
     c5, _, cut5 = S.tuned(LR, 'futures', 5)
     B['b5'], fc = sig_vs_loghar('stocks', 'JPM', 1, c1, cut1)
-    B['b6'], _ = sig_vs_loghar('futures', 'ES', 5, c5, cut5)
+    B['b6'], fc6 = sig_vs_loghar('futures', 'ES', 5, c5, cut5)
+    chart_cumloss(fc6, 'ES', 5, 'ch20_sem_b6_cumloss')
     # B5 chart: cumulative QLIKE difference
-    d = (S.qlike(fc.y, fc['Sig-LK']) - S.qlike(fc.y, fc['logHAR'])).cumsum()
-    fig, ax = plt.subplots(figsize=(8.5, 3.2))
-    ax.plot(d.index, d, color=IDAred, lw=1.0, label='Cumulative QLIKE(Sig-LK) - QLIKE(log-HAR), JPM, h = 1')
-    ax.axhline(0, color=Gray, ls='--', lw=0.8)
-    ax.set_ylabel('Cumulative loss difference')
-    legend_outside_bottom(ax, ncol=1, y=-0.12)
-    save_fig('ch20_sem_cumloss')
+    chart_cumloss(fc, 'JPM', 1, 'ch20_sem_cumloss')
     # B7/B8: multiple testing on the lecture's 50 DM p-values
     for key, h, comp in [('b7', 1, 'Sig-LK|logHAR'), ('b8', 22, 'Sig-LK|HAR')]:
         dmp = LR['dm_p'][str(h)][comp]                      # {kind|sym: one-sided DM p-value}
@@ -204,6 +377,7 @@ def part_b():
         B[key] = {'n': len(p), 'raw': int((p < 0.05).sum()), 'holm': int((S.holm(p) < 0.05).sum()),
                   'bh': int((S.bh(p) < 0.05).sum()), 'smallest': [(rows[i][0], float(p[i])) for i in o[:5]],
                   'fx': fx, 'fx_holm': S.holm(pf).tolist(), 'fx_bh': S.bh(pf).tolist()}
+        chart_pvalues(p, h, comp.replace('|', ' vs ').replace('logHAR', 'log-HAR'), f'ch20_sem_{key}_pvalues')
     RES['B'] = B
 
 
@@ -308,9 +482,13 @@ def part_c(syms=None):
 
 
 if __name__ == '__main__':
+    setup_check()
     part_a()
     part_b()
-    part_c()
+    if os.environ.get('SEM20_SKIP_C'):          # reuse the reference analysis of Part C (40 stocks, slow)
+        RES['C'] = json.load(open(os.path.join(HERE, 'sem20_results.json')))['C']
+    else:
+        part_c()
     with open(os.path.join(HERE, 'sem20_results.json'), 'w') as f:
         json.dump(RES, f, indent=1, default=float)
     print(json.dumps(RES, indent=1, default=float)[:3000])
