@@ -68,7 +68,7 @@ def robust_q(x, m=10):
 def part_facts():
     for k, r in [('bet', bet), ('btc', btc)]:
         sf = stylised_facts(r)
-        h = hill_ci(r.values, seed=1)
+        h = hill_ci(r.values, seed=0)
         sf['hill'] = {kk: v for kk, v in h.items() if kk != 'draws'}
         sf['q_robust'], sf['q_robust_p'] = robust_q(r.values)
         sf['q_r_raw'], sf['q_r_raw_p'] = ljung_box(r.values)

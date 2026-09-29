@@ -4,7 +4,7 @@ nonstandard_errors.py -- Studiul de caz al Capitolului 19: erorile nestandard (M
 Un mini-multivers pentru ipoteza „eficienta pietei nu s-a schimbat in timp” (Sec. I.A din articol), pe
 indicele Euro Stoxx 50 si pe BET (inchideri zilnice, data/market), 2002-2018, perioada din articol.
 Bifurcatiile din Tabelul V permise de datele zilnice (Seminarul 19, C3):
-  * valori extreme: nimic; winsorizare; eliminare (percentilele 2.5 si 97.5 ale randamentelor din fiecare an)
+  * valori extreme: nimic; winsorizare; eliminare (percentilele 2.5 si 97.5 ale masurii anuale m_t, Tabelul V)
   * masura anuala m_t: |VR(5) - 1|, |VR(21) - 1| (raportul variantelor, randamente suprapuse pe q zile),
     R^2 al unui AR(1) pentru randamentele zilnice
   * modelul variatiei anuale medii (in %): tendinta liniara 100 b / mean(m); media lui 100 dln m_t;
@@ -89,30 +89,40 @@ def variance_ratio(x, q):
 
 
 def annual_measure(r, outlier, measure):
-    """Masura anuala a (in)eficientei m_t, dupa tratamentul valorilor extreme din fiecare an."""
+    """Masura anuala a (in)eficientei m_t, calculata pe randamentele zilnice din fiecare an; tratamentul valorilor
+    extreme se aplica masurii, la frecventa analizei (anuala), ca in Tabelul V (fork 3, nota a): winsorizare sau
+    eliminare la percentilele 2.5 si 97.5 ale celor m_t; anii eliminati raman lipsa (NaN), spatierea calendaristica
+    se pastreaza."""
     m = []
     for _, g in r.groupby(r.index.year):
         x = g.values
-        lo, hi = np.percentile(x, [2.5, 97.5])
-        if outlier == 'Winsorised':
-            x = np.clip(x, lo, hi)
-        elif outlier == 'Trimmed':
-            x = x[(x >= lo) & (x <= hi)]
         if measure == '|VR(5) - 1|':
             m.append(abs(variance_ratio(x, 5) - 1))
         elif measure == '|VR(21) - 1|':
             m.append(abs(variance_ratio(x, 21) - 1))
         else:
             m.append(np.corrcoef(x[1:], x[:-1])[0, 1] ** 2)
-    return np.array(m)
+    m = np.array(m)
+    lo, hi = np.percentile(m, [2.5, 97.5])
+    if outlier == 'Winsorised':
+        m = np.clip(m, lo, hi)
+    elif outlier == 'Trimmed':
+        m = np.where((m >= lo) & (m <= hi), m, np.nan)
+    return m
 
 
 def yearly_change(m, model):
-    """Variatia anuala medie (%) si SE-ul ei, dupa bifurcatia modelului."""
+    """Variatia anuala medie (%) si SE-ul ei, dupa bifurcatia modelului. Anii lipsa (NaN) raman pe calendar:
+    tendinta se estimeaza pe anii observati, variatiile doar intre ani consecutivi observati.
+    SE: OLS pentru tendinta; sd / sqrt(n) pentru media variatiilor (aproximare care ignora dependenta MA(1)
+    dintre variatiile succesive)."""
+    t = np.arange(len(m))
+    ok = ~np.isnan(m)
     if model == 'Linear trend':
-        lr = stats.linregress(np.arange(len(m)), m)
-        return 100 * lr.slope / m.mean(), 100 * lr.stderr / m.mean()
+        lr = stats.linregress(t[ok], m[ok])
+        return 100 * lr.slope / m[ok].mean(), 100 * lr.stderr / m[ok].mean()
     d = 100 * (np.diff(np.log(m)) if model == 'Log difference' else m[1:] / m[:-1] - 1)
+    d = d[~np.isnan(d)]
     return d.mean(), d.std(ddof=1) / np.sqrt(len(d))
 
 
@@ -190,12 +200,11 @@ def part_nse():
         for yi, vi in zip(y, v):
             ax.text(max(vi, 0) + 0.15, yi + (-0.18 if k == 0 else 0.18), f'{vi:.2f}', va='center', fontsize=8,
                     color='black')
-    ax.axvline(NSE['ad_crit5'], color='black', lw=0.8, ls=':', label='5% critical value')
     ax.set_yticks(y)
     ax.set_yticklabels(names)
     ax.invert_yaxis()
     ax.set_xlabel('k-sample Anderson-Darling statistic (larger = bigger effect)')
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.22), ncol=3, frameon=False)
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.22), ncol=2, frameon=False)
     save_nse_fig('ch19_nse_forks')
     return NSE
 
