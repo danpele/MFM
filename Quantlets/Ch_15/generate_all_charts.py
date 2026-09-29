@@ -588,6 +588,69 @@ def fig_subperiods():
     save_fig('ch15_subperiods')
 
 
+# =============================================================================
+# STUDIUL DE CAZ: LOPEZ-LIRA & TANG (JFE 2026), cifrele publicate
+# arXiv:2304.07619v6, Table 5 (portofolii long-short pe stirile de peste noapte) si Figure 8 / Section 8.2
+# =============================================================================
+# model: (HR-I, HR-D, SharpeLS, mu_LS in % pe zi)
+LLT_TABLE5 = {'GPT-4': (0.93, 0.58, 2.97, 0.34), 'GPT-3.5': (0.93, 0.56, 1.66, 0.29),
+              'FinBERT': (0.90, 0.48, -0.33, -0.07), 'DistilBart': (0.87, 0.56, 1.26, 0.14),
+              'BART-Large': (0.86, 0.57, 1.05, 0.12), 'Llama2-70b': (0.86, 0.53, 0.97, 0.14),
+              'Llama2-13b': (0.86, 0.52, 0.78, 0.11), 'BERT-Large': (0.70, 0.50, 1.05, 0.16),
+              'Llama2-7b': (0.66, 0.48, -0.43, -0.05), 'BERT': (0.64, 0.46, -0.47, -0.06),
+              'GPT-2': (0.55, 0.53, -0.11, -0.01), 'GPT-1': (0.53, 0.48, -0.64, -0.07)}
+LLT_FIG8 = {'2021Q4': 6.54, '2022': 3.68, '2023': 2.33, '2024\nJan-May': 1.22}
+LLT_FULL_SR = 2.97
+
+
+def fig_llt_models():
+    """Tabelul 5 din Lopez-Lira & Tang (2026): ratele de succes si raportul Sharpe al derivei, pe modele."""
+    from matplotlib.patches import Patch
+    names = list(LLT_TABLE5)[::-1]
+    T = np.array([LLT_TABLE5[m] for m in names])
+    y = np.arange(len(names))
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.2, 3.4), sharey=True, gridspec_kw={'width_ratios': [1.25, 1]})
+    a1.barh(y + 0.2, 100 * T[:, 0], 0.38, color=MainBlue)
+    a1.barh(y - 0.2, 100 * T[:, 1], 0.38, color=Orange)
+    a1.axvline(50, color=Gray, lw=0.7, ls='--')
+    a1.set_xlim(40, 100)
+    a1.set_yticks(y)
+    a1.set_yticklabels(names)
+    a1.set_xlabel('Hit rate: share of days with a positive return (%)')
+    a1.set_title('Does the long-short portfolio point the right way?')
+    a2.barh(y, T[:, 2], 0.6, color=[Forest if v > 0 else IDAred for v in T[:, 2]])
+    for yi, v in zip(y, T[:, 2]):
+        a2.text(v + (0.06 if v >= 0 else -0.06), yi, f'{v:.2f}', va='center', ha='left' if v >= 0 else 'right',
+                fontsize=7.5, color='black')
+    a2.axvline(0, color=Gray, lw=0.7)
+    a2.set_xlim(-1.2, 3.6)
+    a2.set_xlabel('Annualised Sharpe ratio of the drift')
+    a2.set_title('Is the drift profitable?')
+    h = [Patch(color=MainBlue), Patch(color=Orange), Patch(color=Forest), Patch(color=IDAred)]
+    lab = ['Hit rate, initial reaction', 'Hit rate, drift', 'Sharpe ratio > 0', 'Sharpe ratio < 0']
+    fig.tight_layout()
+    fig_legend_bottom(fig, h, lab, ncol=4, y=0.0)
+    save_fig('ch15_llt_models')
+
+
+def fig_llt_decay():
+    """Figura 8 din Lopez-Lira & Tang (2026): raportul Sharpe anualizat al derivei GPT-4, pe subperioade."""
+    per = list(LLT_FIG8)
+    v = [LLT_FIG8[p] for p in per]
+    fig, ax = plt.subplots(figsize=(5.6, 2.9))
+    x = np.arange(len(per))
+    ax.bar(x, v, 0.55, color=MainBlue, label='GPT-4 drift strategy, overnight news (Figure 8)')
+    for xi, vi in zip(x, v):
+        ax.text(xi, vi + 0.12, f'{vi:.2f}', ha='center', va='bottom', fontsize=8.5, color='black')
+    ax.axhline(LLT_FULL_SR, color=IDAred, lw=1.0, ls='--', label=f'Full sample, Oct 2021 - May 2024 (Table 1): {LLT_FULL_SR:.2f}')
+    ax.set_xticks(x)
+    ax.set_xticklabels(per)
+    ax.set_ylim(0, 7.4)
+    ax.set_ylabel('Annualised Sharpe ratio')
+    legend_outside_bottom(ax, ncol=1, y=-0.22)
+    save_fig('ch15_llt_decay')
+
+
 def jsonable(o):
     if isinstance(o, dict):
         return {str(k): jsonable(v) for k, v in o.items() if not isinstance(v, pd.DataFrame)}
@@ -620,6 +683,8 @@ if __name__ == '__main__':
     fig_event_study()
     fig_strategy()
     fig_subperiods()
+    fig_llt_models()
+    fig_llt_decay()
     with open(os.path.join(HERE, 'ch15_results.json'), 'w') as f:
         json.dump(jsonable(RES), f, indent=1, default=float)
     print('saved ch15_results.json')

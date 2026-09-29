@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch15_llt_case'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study of Lecture 15, Lopez-Lira and Tang (2026, Journal of Financial Economics): hit rates and drift Sharpe ratios of long-short portfolios built from twelve language models, from GPT-1 to GPT-4, on overnight news (Table 5), and the annualised Sharpe ratio of the GPT-4 drift strategy by subperiod, 2021Q4 to January-May 2024 (Figure 8), against the full-sample value (Table 1).'
+
+Keywords: 'large language model, ChatGPT, news, return predictability, post-announcement drift, Sharpe ratio, case study'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'Published results of Lopez-Lira, A. and Tang, Y. (2026), Can ChatGPT forecast stock price movements? Return predictability and large language models, Journal of Financial Economics 184, 104335 (https://doi.org/10.1016/j.jfineco.2026.104335): Table 1, Table 5 and Figure 8'
+
+Output: 'ch15_llt_models.pdf, ch15_llt_decay.pdf'
