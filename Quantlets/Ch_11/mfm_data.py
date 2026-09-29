@@ -119,3 +119,27 @@ def load_vix(start='1990-01-01', end=END):
     s = read_market('VIX.INDX')['close'].loc[start:end]
     s = s[(s > 0) & (s.index.dayofweek < 5)].dropna()
     return s.rename('vix')
+
+
+def load_spy_5m(end=END):
+    """Bare de 5 minute SPY (data/market/intraday), sesiunea 09:30-16:00 ora New York, doar zilele complete
+    (78 de bare). Randamente log: primul randament al zilei = close/open al primei bare, apoi close/close."""
+    fname = 'intraday/SPY.US_5m.csv'
+    path = os.path.join(MARKET_DIR, fname)
+    src = path if os.path.exists(path) else REPO_RAW + fname
+    d = pd.read_csv(src, index_col='datetime_utc', parse_dates=True).sort_index()
+    d = d.dropna(subset=['open', 'close'])
+    d = d[~d.index.duplicated()]
+    d.index = d.index.tz_localize('UTC').tz_convert('America/New_York')
+    mins = d.index.hour * 60 + d.index.minute
+    d = d[(mins >= 570) & (mins < 960)]
+    day = pd.Index(d.index.date)
+    full = day.value_counts()
+    d = d[day.isin(full[full == 78].index)]
+    d = d[d.index.date <= pd.Timestamp(end).date()]
+    day = d.index.date
+    lc, lo = np.log(d['close'].values), np.log(d['open'].values)
+    r = np.r_[np.nan, np.diff(lc)]
+    first = np.r_[True, day[1:] != day[:-1]]
+    r[first] = lc[first] - lo[first]
+    return pd.Series(r, index=d.index, name='spy_5m')

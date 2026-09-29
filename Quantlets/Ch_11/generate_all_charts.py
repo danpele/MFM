@@ -14,12 +14,12 @@ import json
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy import stats
+from scipy import stats, optimize
 import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from mfm_data import LABELS, log_returns, load_close, load_vix, read_fred, periods_per_year  # noqa: E402
+from mfm_data import LABELS, log_returns, load_close, load_vix, read_fred, periods_per_year, load_spy_5m  # noqa: E402
 from ct_models import (scaled_random_walk, bm_paths, quadratic_variation, total_variation, ito_stratonovich,  # noqa: E402
                        max_prob, convergence_study, slope_ci, slope_boot, gbm_paths, gbm_mle, gbm_simulate_returns,
                        ou_exact_path, ou_mle, merton_logpdf, merton_mle, merton_moments, merton_simulate_returns,
@@ -794,6 +794,163 @@ def fig_models_vs_data(g, me, hp):
 
 
 # =============================================================================
+# 8. STUDIU DE CAZ: Bennedsen, Lunde & Pakkanen (2022), volatilitate rugoasa si persistenta
+#    Replicare pe SPY (bare de 5 minute, 2020-2026), Delta = 1 zi; reperele din Tabelul 3, Panoul A
+#    (versiunea acceptata arXiv:1610.00332v3)
+# =============================================================================
+def variogram(x, ks):
+    """Variograma empirica de ordinul 2: media (x_{i+k} - x_i)^2."""
+    x = np.asarray(x)
+    return np.array([np.mean((x[k:] - x[:-k]) ** 2) for k in ks])
+
+
+def alpha_ols(x, m=6):
+    """ec. (3.1): OLS pentru log gamma_2(k) pe log k, k = 1..m; alpha = (a1 - 1)/2."""
+    ks = np.arange(1, m + 1)
+    a1 = np.polyfit(np.log(ks), np.log(variogram(x, ks)), 1)[0]
+    return (a1 - 1) / 2
+
+
+def alpha_nlls_m(x, m, delta=1.0):
+    """NLLS robust la zgomot (Sectiunea 3.1): gamma_2(k) = b0 + b1 (k Delta)^(2 alpha + 1), k = 1..m."""
+    ks = np.arange(1, m + 1)
+    g = variogram(x, ks)
+    f = lambda p: np.sum((g - p[0] - p[1] * (ks * delta) ** (2 * p[2] + 1)) ** 2)
+    best = None
+    for a0 in (-0.4, -0.2, 0.0, 0.2):
+        res = optimize.minimize(f, [g[0] / 4, g[0] / 2, a0], method='L-BFGS-B',
+                                bounds=[(0, None), (1e-10, None), (-0.499, 0.499)])
+        if best is None or res.fun < best.fun:
+            best = res
+    return best.x
+
+
+def cauchy_acf(h, a, b):
+    """ACF a clasei Cauchy (Sectiunea 2.1.1): (1 + |h|^(2 alpha + 1))^(-beta/(2 alpha + 1))."""
+    return (1 + np.abs(h) ** (2 * a + 1)) ** (-b / (2 * a + 1))
+
+
+def rough_vol_spy():
+    """log sigma_t zilnic din variatia bipower a randamentelor SPY la 5 minute; alpha (OLS, NLLS) si beta (Cauchy)."""
+    r = load_spy_5m()
+    day = r.index.date
+    bv = r.groupby(day).apply(lambda x: np.pi / 2 * np.sum(np.abs(x.values[1:]) * np.abs(x.values[:-1])))
+    x = 0.5 * np.log(bv.values)                 # log sigma, Delta = 1 zi (constanta 1/Delta nu schimba alpha, beta)
+    n = len(x)
+    a_ols = alpha_ols(x)
+    nl = [alpha_nlls_m(x, m) for m in range(10, 21)]
+    a_nl = float(np.mean([p[2] for p in nl]))
+    H = int(np.ceil(n ** (1 / 3)))
+    lags = np.arange(1, 101)
+    rho = acf(x, lags)
+    hh = np.arange(1, H + 1)
+    b = optimize.minimize_scalar(lambda b: np.sum((rho[:H] - cauchy_acf(hh, a_ols, b)) ** 2),
+                                 bounds=(0, 5), method='bounded').x
+    rob = optimize.minimize(lambda p: np.sum((np.log(rho[:H]) - p[0] - np.log(cauchy_acf(hh, a_nl, p[1]))) ** 2),
+                            [-0.1, 0.2], method='L-BFGS-B', bounds=[(None, 0), (0, 5)]).x
+    # contrast cu memorie scurta (OU, alpha = 0): log rho(h) = c - lambda h, pe aceleasi H laguri
+    ou = np.polyfit(hh, np.log(rho[:H]), 1)
+    return dict(n=n, start=str(bv.index[0]), end=str(bv.index[-1]), H=H, x=x, rho=rho,
+                alpha_ols=a_ols, alpha_nlls=a_nl, alpha_nlls_m=[float(p[2]) for p in nl],
+                nlls_m15=nl[5], beta_cau=b, beta_cau_star=rob[1], c_star=rob[0],
+                ou_lambda=-ou[0], ou_c=ou[1], rho1=rho[0], rho20=rho[19], rho100=rho[99],
+                half_life_ou=np.log(2) / -ou[0])
+
+
+def fig_rough_vol(rv):
+    """Stanga: variograma log-log a lui log sigma (SPY, Delta = 1 zi) cu dreapta OLS (k = 1..6) si NLLS;
+    dreapta: ACF empirica fata de clasa Cauchy (rugoasa + persistenta) si de OU (memorie scurta)."""
+    x = rv['x']
+    ks = np.arange(1, 31)
+    g = variogram(x, ks)
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
+    ax = axes[0]
+    ax.loglog(ks, g, 'o', color=MainBlue, ms=4, label=r'Empirical variogram of $\log\hat\sigma_t$')
+    a1 = 2 * rv['alpha_ols'] + 1
+    c0 = np.exp(np.mean(np.log(g[:6]) - a1 * np.log(ks[:6])))
+    ax.loglog(ks, c0 * ks ** a1, color=IDAred, lw=1.4,
+              label=rf'OLS, k = 1..6: $\hat\alpha$ = {rv["alpha_ols"]:.2f}')
+    b0, b1, a = rv['nlls_m15']
+    ax.loglog(ks, b0 + b1 * ks ** (2 * a + 1), color=Forest, lw=1.4, ls='--',
+              label=rf'NLLS fit, m = 15; mean over m = 10..20: $\hat\alpha^*$ = {rv["alpha_nlls"]:.2f}')
+    k10 = ks[:10]
+    ax.loglog(k10, g[0] * k10 ** 1.0, color=Orange, lw=1.1, ls=':', label=r'Brownian roughness, $\alpha$ = 0 (slope 1)')
+    ax.set_xticks([1, 2, 5, 10, 20, 30])
+    ax.set_xticklabels(['1', '2', '5', '10', '20', '30'])
+    ax.set_yticks([0.1, 0.2, 0.5, 1.0])
+    ax.set_yticklabels(['0.1', '0.2', '0.5', '1.0'])
+    ax.minorticks_off()
+    ax.set_xlabel('Lag k (trading days)')
+    ax.set_ylabel(r'$\hat\gamma_2(k)$')
+    ax.set_title('Roughness: variogram of daily log-volatility (log-log)', loc='left')
+    legend_outside_bottom(ax, ncol=1, y=-0.2)
+    ax = axes[1]
+    lags = np.arange(1, len(rv['rho']) + 1)
+    ax.plot(lags, rv['rho'], color=MainBlue, lw=1.6, label=r'Empirical ACF of $\log\hat\sigma_t$')
+    ax.plot(lags, np.exp(rv['c_star']) * cauchy_acf(lags, rv['alpha_nlls'], rv['beta_cau_star']), color=Purple, lw=1.4,
+            label=rf'Cauchy class, noise-robust: $\hat\beta^*$ = {rv["beta_cau_star"]:.2f} (long memory)')
+    ax.plot(lags, np.exp(rv['ou_c'] - rv['ou_lambda'] * lags), color=Amber, lw=1.4, ls='--',
+            label=rf'Exponential decay (OU, short memory): half-life {rv["half_life_ou"]:.0f} days')
+    ax.axvline(rv['H'], color=Gray, lw=0.6, ls=':')
+    ax.text(rv['H'] + 1.5, 0.85, rf'fit on lags 1..{rv["H"]} = $\lceil n^{{1/3}}\rceil$', fontsize=7.5, color='black')
+    ax.axhline(0, color=Gray, lw=0.5)
+    ax.set_ylim(-0.1, 1.0)
+    ax.set_xlabel('Lag h (trading days)')
+    ax.set_title('Persistence: ACF of daily log-volatility', loc='left')
+    legend_outside_bottom(ax, ncol=1, y=-0.2)
+    plt.tight_layout()
+    save_fig('ch11_case_rough_spy')
+
+
+def fig_rough_vs_paper(rv):
+    """Tabelul 3, Panoul A (E-mini S&P 500, 2011-2014) pe scale Delta, fata de estimarile noastre pentru SPY, Delta = 1 zi."""
+    # Tabelul 3, Panoul A (log-volatilitatea E-mini S&P 500, 2011-2014): Delta in minute (390 = o zi de tranzactionare)
+    T = {'delta_min': [10, 15, 30, 65, 130, 390],
+         'alpha_ols': [-0.38, -0.35, -0.31, -0.30, -0.32, -0.30],
+         'alpha_nlls': [-0.38, -0.37, -0.35, -0.35, -0.35, -0.33],
+         'beta_cau': [0.17, 0.18, 0.18, 0.18, 0.00, 0.00],
+         'beta_cau_star': [0.18, 0.18, 0.18, 0.18, 0.17, 0.18]}
+    xd = np.arange(len(T['delta_min']))
+    labs = ['10 min', '15 min', '30 min', '65 min', '130 min', '1 day']
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.2))
+    for ax, (k1, l1), (k2, l2), ttl, ours in [
+            (axes[0], ('alpha_ols', r'Paper: $\hat\alpha_{OLS}$'), ('alpha_nlls', r'Paper: $\hat\alpha^*_{NLLS}$'),
+             r'Roughness index $\hat\alpha$', ('alpha_ols', 'alpha_nlls')),
+            (axes[1], ('beta_cau', r'Paper: $\hat\beta_{Cauchy}$'), ('beta_cau_star', r'Paper: $\hat\beta^*_{Cauchy}$'),
+             r'Memory parameter $\hat\beta$ (Cauchy class)', ('beta_cau', 'beta_cau_star'))]:
+        ax.plot(xd - 0.08, T[k1], 'o-', color=MainBlue, ms=5, lw=1, label=l1)
+        ax.plot(xd + 0.08, T[k2], 's--', color=IDAred, ms=5, lw=1, label=l2)
+        ax.plot([xd[-1] + 0.35], [rv[ours[0]]], 'D', color=Forest, ms=7, label='SPY 2020-2026, ours: OLS / plain')
+        ax.plot([xd[-1] + 0.55], [rv[ours[1]]], '^', color=Orange, ms=8, label='SPY 2020-2026, ours: noise-robust')
+        ax.annotate('SPY,\n1 day', xy=(xd[-1] + 0.45, max(rv[ours[0]], rv[ours[1]])), xytext=(0, 12),
+                    textcoords='offset points', ha='center', fontsize=7.5, color=Forest)
+        ax.set_xticks(xd)
+        ax.set_xticklabels(labs, fontsize=8)
+        ax.set_xlim(-0.4, xd[-1] + 0.9)
+        ax.set_xlabel(r'Sampling interval $\Delta$')
+        ax.set_title(ttl, loc='left')
+    axes[0].axhline(0, color=Gray, lw=0.6, ls=':')
+    axes[0].text(0, 0.02, r'$\alpha$ = 0: Brownian roughness', fontsize=7.5, color='black')
+    axes[0].set_ylim(-0.5, 0.1)
+    axes[1].axhline(1, color=Gray, lw=0.6, ls=':')
+    axes[1].text(0, 1.03, r'$\beta$ = 1: long-memory boundary', fontsize=7.5, color='black')
+    axes[1].set_ylim(-0.05, 1.2)
+    fig_legend_bottom(fig, handles=axes[0].get_legend_handles_labels()[0],
+                      labels=['Paper, Table 3A: OLS / plain', 'Paper, Table 3A: noise-robust (*)',
+                              'SPY 2020-2026 (ours): OLS / plain', 'SPY 2020-2026 (ours): noise-robust (*)'],
+                      ncol=2, y=0.1)
+    plt.tight_layout(rect=(0, 0.1, 1, 1))
+    save_fig('ch11_case_rough_paper')
+
+
+def rough_case():
+    rv = rough_vol_spy()
+    fig_rough_vol(rv)
+    fig_rough_vs_paper(rv)
+    return {k: v for k, v in rv.items() if k not in ('x', 'rho', 'nlls_m15')}
+
+
+# =============================================================================
 if __name__ == '__main__' and sys.argv[1:] == ['extra']:
     # doar sectiunile noi (estimarea difuziilor, schimbarea masurii), fara a recalcula restul
     with open(os.path.join(HERE, 'ch11_results.json')) as f:
@@ -801,6 +958,14 @@ if __name__ == '__main__' and sys.argv[1:] == ['extra']:
     R['diffusion'] = diffusion_fits()
     R['np_diffusion'] = fig_np_diffusion(R['diffusion'])
     R['measure'] = measure_change(R['gbm'], R['vasicek'], R['heston'])
+    with open(os.path.join(HERE, 'ch11_results.json'), 'w') as f:
+        json.dump(jsonable(R), f, indent=1)
+    print('updated ch11_results.json')
+elif __name__ == '__main__' and sys.argv[1:] == ['case']:
+    # doar studiul de caz (volatilitate rugoasa si persistenta), fara a recalcula restul
+    with open(os.path.join(HERE, 'ch11_results.json')) as f:
+        R = json.load(f)
+    R['rough'] = rough_case()
     with open(os.path.join(HERE, 'ch11_results.json'), 'w') as f:
         json.dump(jsonable(R), f, indent=1)
     print('updated ch11_results.json')
@@ -840,6 +1005,8 @@ elif __name__ == '__main__':
     R['diffusion'] = diffusion_fits()
     R['np_diffusion'] = fig_np_diffusion(R['diffusion'])
     R['measure'] = measure_change(g, R['vasicek'], hp)
+    print('8. Case study: rough and persistent volatility')
+    R['rough'] = rough_case()
     R['data'] = {k: dict(n=len(v), start=str(v.index[0].date()), end=str(v.index[-1].date())) for k, v in rets.items()}
     with open(os.path.join(HERE, 'ch11_results.json'), 'w') as f:
         json.dump(jsonable(R), f, indent=1)

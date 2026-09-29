@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_rough_vol'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Bennedsen, Lunde and Pakkanen (2022): daily log-volatility of SPY from the bipower variation of 5-minute returns (09:30-16:00 New York time, full trading days, 2020-2026); roughness index alpha by OLS on the log-variogram (k = 1..6) and by noise-robust NLLS averaged over m = 10..20; Cauchy-class memory parameter beta (plain and noise-robust) from the first ceil(n^(1/3)) autocorrelations; comparison with Table 3, Panel A (E-mini S&P 500 futures, 2011-2014).'
+
+Keywords: 'rough volatility, long memory, variogram, Brownian semistationary process, Cauchy class, bipower variation, SPY'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: '5-minute SPY bars (data/market/intraday/SPY.US_5m.csv), 2020-2026'
+
+Output: 'ch11_case_rough_spy.pdf, ch11_case_rough_paper.pdf'
