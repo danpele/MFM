@@ -16,7 +16,7 @@ import json
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy import stats
+from scipy import stats, integrate
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -36,6 +36,19 @@ S = {}
 # =============================================================================
 # PARTEA A
 # =============================================================================
+def joint_tail_prob(q, rho, nu=None):
+    """P(U <= q, V <= q) pentru copula Gaussiana (nu=None) sau t (nu grade de libertate), prin cuadratura
+    unidimensionala deterministica: Y | X = x este Normal(rho x, 1 - rho^2), respectiv
+    t_{nu+1}(rho x, (nu + x^2)(1 - rho^2)/(nu + 1))."""
+    if nu is None:
+        a = stats.norm.ppf(q)
+        f = lambda x: stats.norm.pdf(x) * stats.norm.cdf((a - rho * x) / np.sqrt(1 - rho ** 2))
+    else:
+        a = stats.t.ppf(q, nu)
+        f = lambda x: stats.t.pdf(x, nu) * stats.t.cdf((a - rho * x) / np.sqrt((nu + x * x) * (1 - rho ** 2) / (nu + 1)), nu + 1)
+    return integrate.quad(f, -np.inf, a, epsabs=1e-14, epsrel=1e-10, limit=200)[0]
+
+
 def a_tail_gauss_t(rho=0.5, nus=(3, 4, 10, 30)):
     """A1: lambda pentru copula t si probabilitatea conditionata P(V<=q | U<=q) la nivel finit."""
     out = {}
@@ -43,22 +56,18 @@ def a_tail_gauss_t(rho=0.5, nus=(3, 4, 10, 30)):
         arg = np.sqrt((nu + 1) * (1 - rho) / (1 + rho))
         out[nu] = dict(arg=arg, lam=2 * stats.t.cdf(-arg, nu + 1))
     qs = np.array([0.10, 0.05, 0.01, 0.001])
-    mvn = stats.multivariate_normal([0, 0], [[1, rho], [rho, 1]])
-    gauss = np.array([mvn.cdf([stats.norm.ppf(q)] * 2) / q for q in qs])
-    mvt = stats.multivariate_t([0, 0], [[1, rho], [rho, 1]], df=4)
-    t4 = np.array([mvt.cdf([stats.t.ppf(q, 4)] * 2) / q for q in qs])
+    gauss = np.array([joint_tail_prob(q, rho) / q for q in qs])
+    t4 = np.array([joint_tail_prob(q, rho, 4) / q for q in qs])
     return out, qs, gauss, t4
 
 
 def fig_tail_gauss_t(rho=0.5):
     qs = np.geomspace(0.001, 0.2, 30)
-    mvn = stats.multivariate_normal([0, 0], [[1, rho], [rho, 1]])
-    g = [mvn.cdf([stats.norm.ppf(q)] * 2) / q for q in qs]
+    g = [joint_tail_prob(q, rho) / q for q in qs]
     fig, ax = plt.subplots(figsize=(6.2, 2.9))
     ax.plot(qs, g, color=MainBlue, lw=1.6, label='Gaussian copula (rho = 0.5)')
     for nu, c in ((4, IDAred), (10, Amber)):
-        mvt = stats.multivariate_t([0, 0], [[1, rho], [rho, 1]], df=nu)
-        ax.plot(qs, [mvt.cdf([stats.t.ppf(q, nu)] * 2) / q for q in qs], color=c, lw=1.6, label=f't copula (rho = 0.5, nu = {nu})')
+        ax.plot(qs, [joint_tail_prob(q, rho, nu) / q for q in qs], color=c, lw=1.6, label=f't copula (rho = 0.5, nu = {nu})')
         lam = 2 * stats.t.cdf(-np.sqrt((nu + 1) * (1 - rho) / (1 + rho)), nu + 1)
         ax.axhline(lam, color=c, ls=':', lw=0.9)
     ax.set_xscale('log')

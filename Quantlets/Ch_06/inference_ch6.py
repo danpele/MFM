@@ -31,7 +31,8 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import joint_returns, weekly_returns   # noqa: E402
 from dep_tools import (garch_all, dcc_fit, dcc_path, fr_adjust, pseudo_obs, kendall_tau, spearman_rho,  # noqa: E402
-                       simulate, fit_copula, log_density, empirical_tail_dep, fisher_ci)
+                       simulate, fit_copula, log_density, empirical_tail_dep, fisher_ci, njit)
+from scipy.special import gammaln   # noqa: E402
 from generate_all_charts import (save_fig, legend_outside_bottom, shade_crises, two_day_returns, MainBlue,  # noqa: E402
                                  IDAred, Forest, Amber, Purple, CALM08, CRISIS08, CALM20, CRISIS20, SEED,
                                  bank_copula_data)
@@ -231,7 +232,7 @@ def nw_tstat(d):
 
 def hedge_oos(split='2019-12-31'):
     R = joint_returns(['bet', 'stoxx'], start='2010-01-01')
-    est, oos = R.loc[:split], R.loc[split:].iloc[1:]
+    est, oos = R.loc[R.index <= pd.Timestamp(split)], R.loc[R.index > pd.Timestamp(split)]
     h_static = np.cov(est['bet'], est['stoxx'])[0, 1] / est['stoxx'].var()
     vols, Zs = {}, {}
     for c in R.columns:
@@ -258,12 +259,16 @@ def hedge_oos(split='2019-12-31'):
 # 5. Forbes-Rigobon cu delta aleator
 # =============================================================================
 def fr_delta_method(rc, delta, n_c, n_0):
-    """Eroarea standard a lui rho* = rho_c / sqrt(1 + delta (1 - rho_c^2)): cu delta fixat si cu delta aleator
-    (i.i.d. Normal: Var(rho_c) ~ (1 - rho_c^2)^2 / n_c, Var(delta) ~ 2 (1 + delta)^2 (1/(n_c-1) + 1/(n_0-1)))."""
+    """Eroarea standard a lui rho* = rho_c / sqrt(1 + delta (1 - rho_c^2)): cu delta fixat si cu delta aleator.
+    Aproximari i.i.d. Normale, ferestre independente: Var(rho_c) ~ (1 - rho_c^2)^2 / n_c,
+    Var(delta) ~ 2 (1 + delta)^2 (1/(n_c-1) + 1/(n_0-1)) si covarianta Cov(rho_c, delta) ~ (1 + delta) rho_c (1 - rho_c^2) / n_c
+    (corelatia si varianta sursei sunt estimate din aceeasi fereastra de criza)."""
     k = 1 + delta * (1 - rc ** 2)
     g_r, g_d = (1 + delta) / k ** 1.5, -rc * (1 - rc ** 2) / (2 * k ** 1.5)
     v_r, v_d = (1 - rc ** 2) ** 2 / n_c, 2 * (1 + delta) ** 2 * (1 / (n_c - 1) + 1 / (n_0 - 1))
-    return np.sqrt(g_r ** 2 * v_r), np.sqrt(g_r ** 2 * v_r + g_d ** 2 * v_d), g_r, g_d, np.sqrt(v_d)
+    c_rd = (1 + delta) * rc * (1 - rc ** 2) / n_c
+    return (np.sqrt(g_r ** 2 * v_r), np.sqrt(g_r ** 2 * v_r + g_d ** 2 * v_d + 2 * g_r * g_d * c_rd), g_r, g_d,
+            np.sqrt(v_d), c_rd)
 
 
 def fr_bootstrap(calm, crisis, tag, B=1999, block=10):
@@ -284,11 +289,14 @@ def fr_bootstrap(calm, crisis, tag, B=1999, block=10):
             dif.append((fr_adjust(np.corrcoef(b[:, 0], b[:, j])[0, 1], dl) - np.corrcoef(a[:, 0], a[:, j])[0, 1], dl,
                         fr_adjust(np.corrcoef(b[:, 0], b[:, j])[0, 1], dl)))
         dif = np.array(dif)
-        se_fix, se_rand, g_r, g_d, se_d = fr_delta_method(rc, delta, len(c1) // 2, len(c0) // 2)
+        se_fix, se_rand, g_r, g_d, se_d, c_rd = fr_delta_method(rc, delta, len(c1) // 2, len(c0) // 2)
         z_fix = (np.arctanh(adj) - np.arctanh(r0)) / np.sqrt(1 / (len(c1) // 2 - 3) + 1 / (len(c0) // 2 - 3))
-        # test pe scara rho cu eroarea standard a diferentei (delta aleator), calm tratat ca i.i.d. Normal
+        # test pe scara rho cu eroarea standard a diferentei (delta aleator), calm tratat ca i.i.d. Normal;
+        # rho_calm si delta folosesc aceeasi fereastra calma: Cov(rho*, rho_calm) = g_d Cov(delta, rho_calm),
+        # Cov(delta, rho_calm) ~ -(1 + delta) rho_calm (1 - rho_calm^2) / n_0
         se0 = (1 - r0 ** 2) / np.sqrt(len(c0) // 2)
-        z_rand = (adj - r0) / np.sqrt(se_rand ** 2 + se0 ** 2)
+        c_s0 = -g_d * (1 + delta) * r0 * (1 - r0 ** 2) / (len(c0) // 2)
+        z_rand = (adj - r0) / np.sqrt(se_rand ** 2 + se0 ** 2 - 2 * c_s0)
         z_fixr = (adj - r0) / np.sqrt(se_fix ** 2 + se0 ** 2)
         N.update({f'frb_{tag}_{tg}_adj': adj, f'frb_{tag}_{tg}_r0': r0, f'frb_{tag}_{tg}_rc': rc,
                   f'frb_{tag}_{tg}_p_boot': np.mean(dif[:, 0] <= 0), f'frb_{tag}_{tg}_ci_lo': np.percentile(dif[:, 2], 5),
@@ -296,7 +304,9 @@ def fr_bootstrap(calm, crisis, tag, B=1999, block=10):
                   f'frb_{tag}_{tg}_se_fix': se_fix, f'frb_{tag}_{tg}_se_rand': se_rand, f'frb_{tag}_{tg}_g_r': g_r,
                   f'frb_{tag}_{tg}_g_d': g_d, f'frb_{tag}_{tg}_z_fixr': z_fixr, f'frb_{tag}_{tg}_z_rand': z_rand,
                   f'frb_{tag}_{tg}_p_fixr': 1 - stats.norm.cdf(z_fixr), f'frb_{tag}_{tg}_p_rand': 1 - stats.norm.cdf(z_rand),
-                  f'frb_{tag}_{tg}_z_fisher': z_fix})
+                  f'frb_{tag}_{tg}_z_fisher': z_fix, f'frb_{tag}_{tg}_c_rd': c_rd,
+                  f'frb_{tag}_{tg}_z_fisher_k': (np.arctanh(adj) - np.arctanh(r0))
+                  / np.sqrt(1 / ((len(c1) // 2) * (1 + delta * (1 - rc ** 2))) + 1 / (len(c0) // 2))})
         N[f'frb_{tag}_se_delta'] = se_d
         N[f'frb_{tag}_delta_boot_lo'], N[f'frb_{tag}_delta_boot_hi'] = np.percentile(dif[:, 1], [5, 95])
     N[f'frb_{tag}_nc'], N[f'frb_{tag}_n0'] = len(c1) // 2, len(c0) // 2
@@ -440,6 +450,25 @@ def t_score_rho(rho, nu, x, y):
     return rho / (1 - rho ** 2) - (nu + 2) / 2 * dQD / (1 + Q / D)
 
 
+@njit(cache=True)
+def gas_t_nll(om, A, Bp, nu, x, y, cst):
+    """Minus log-verosimilitatea copulei t GAS (aceeasi recursie ca gas_filter); x, y = cuantilele t_nu."""
+    f = om / (1.0 - Bp)
+    ll = 0.0
+    for t in range(len(x)):
+        r = np.tanh(f)
+        if abs(r) >= 0.9999:
+            return 1e10
+        Q = x[t] * x[t] + y[t] * y[t] - 2.0 * r * x[t] * y[t]
+        D = nu * (1.0 - r * r)
+        ll += (cst - 0.5 * np.log(1.0 - r * r) - (nu + 2.0) / 2.0 * np.log1p(Q / D)
+               + (nu + 1.0) / 2.0 * (np.log1p(x[t] * x[t] / nu) + np.log1p(y[t] * y[t] / nu)))
+        dQD = (-2.0 * x[t] * y[t] * (1.0 - r * r) + 2.0 * r * Q) / (nu * (1.0 - r * r) ** 2)
+        s = (r / (1.0 - r * r) - (nu + 2.0) / 2.0 * dQD / (1.0 + Q / D)) * (1.0 - r * r)
+        f = om + A * s + Bp * f
+    return -ll
+
+
 def gas_filter(theta, u, v):
     om, A, Bp, nu = theta
     x, y = stats.t.ppf(u, nu), stats.t.ppf(v, nu)
@@ -457,15 +486,15 @@ def gas_t_copula(u, v):
     fs = fit_copula('t', u, v)
     r0, nu0 = fs['par']
 
+    uc, vc = np.clip(u, 1e-10, 1 - 1e-10), np.clip(v, 1e-10, 1 - 1e-10)
+
     def nll(p):
         om, A, Bp, lnu = p
         nu = 2.01 + np.exp(lnu)
         if not (0 <= Bp < 0.9995) or A < 0 or A > 1:
             return 1e10
-        rho = gas_filter((om, A, Bp, nu), u, v)
-        if np.any(np.abs(rho) >= 0.9999):
-            return 1e10
-        return -np.sum(log_density('t', [rho, nu], u, v))
+        cst = gammaln((nu + 2) / 2) + gammaln(nu / 2) - 2 * gammaln((nu + 1) / 2)
+        return gas_t_nll(om, A, Bp, nu, stats.t.ppf(uc, nu), stats.t.ppf(vc, nu), cst)
     best = None
     for Bp, A in ((0.98, 0.03), (0.95, 0.05), (0.99, 0.01)):
         p0 = [(1 - Bp) * np.arctanh(r0), A, Bp, np.log(nu0 - 2.01)]
@@ -512,6 +541,77 @@ def fig_gas_copula():
     return g
 
 
+# =============================================================================
+# 9. Calibrarea testelor sub ipoteza nula (bootstrap parametric): CCC contra DCC, simetria cozilor, GAS contra static
+# =============================================================================
+def ccc_null_bootstrap(names, tag, B=199):
+    """p-valoarea statisticii DCC contra CCC sub H0: CCC. Inovatii cu corelatie constanta din reziduurile decorelate
+    reesantionate, randamente GARCH(1,1) simulate cu parametrii estimati, apoi AMBII pasi reestimati pe fiecare traiectorie
+    (GARCH univariat, tinta Qbar, (a, b)); statistica observata se calculeaza cu aceeasi procedura."""
+    R = joint_returns(names)
+    P, V, Z, _ = garch_all(R)
+    d = dcc_fit(Z)
+    lr_obs = 2 * (d['loglik'] - d['ccc_loglik'])
+    X = Z.values
+    Qbar = np.cov(X.T, bias=True)
+    C = Qbar / np.sqrt(np.outer(np.diag(Qbar), np.diag(Qbar)))
+    eta = np.linalg.solve(np.linalg.cholesky(C), X.T).T
+    eta = (eta - eta.mean(0)) / eta.std(0)
+    rng = np.random.default_rng(SEED)
+    lrs = []
+    for _ in range(B):
+        eps = simulate_dcc2(0.0, 0.0, C, eta[rng.integers(0, len(eta), len(eta))])
+        sim = {c: simulate_garch(P.loc['mu', c], P.loc['omega', c], P.loc['alpha[1]', c], P.loc['beta[1]', c], eps[:, k])
+               for k, c in enumerate(R.columns)}
+        _, _, Zs, _ = garch_all(pd.DataFrame(sim, index=R.index) / 100)
+        ds = dcc_fit(Zs)
+        lrs.append(2 * (ds['loglik'] - ds['ccc_loglik']))
+    lrs = np.array(lrs)
+    N.update({f'{tag}_lr_obs': lr_obs, f'{tag}_lr_null_q95': np.percentile(lrs, 95), f'{tag}_lr_null_max': lrs.max(),
+              f'{tag}_lr_p_boot': (1 + np.sum(lrs >= lr_obs)) / (B + 1), f'{tag}_lr_B': B})
+
+
+def tail_symmetry_block(q_list=((0.05, '05'), (0.01, '01')), B=999):
+    """lambda_L(q) - lambda_U(q) la prag fixat q, cu bootstrap stationar pe blocuri (Politis & Romano, 1994); lungimea
+    medie a blocului: regula automata a lui Politis & White (2004), aplicata indicatorului 1{colt inferior} - 1{colt superior}."""
+    from arch.bootstrap import optimal_block_length
+    Rb, Zb, U = bank_copula_data()
+    u, v = U[:, 0], U[:, 1]
+    X = Zb.values
+    rng = np.random.default_rng(SEED)
+    for q, tag in q_list:
+        ind = ((u <= q) & (v <= q)).astype(float) - ((u > 1 - q) & (v > 1 - q)).astype(float)
+        blk = max(1.0, float(optimal_block_length(ind)['stationary'].iloc[0]))
+        L0, U0 = empirical_tail_dep(u, v, q)
+        db = []
+        for _ in range(B):
+            Ub = pseudo_obs(X[stationary_bootstrap_idx(len(X), blk, rng)])
+            lb, ub = empirical_tail_dep(Ub[:, 0], Ub[:, 1], q)
+            db.append(lb - ub)
+        db = np.array(db)
+        ac = [np.corrcoef(ind[:-l], ind[l:])[0, 1] for l in range(1, 11)]
+        N.update({f'tsb_blk{tag}': blk, f'tsb_lo{tag}': np.percentile(db, 2.5), f'tsb_hi{tag}': np.percentile(db, 97.5),
+                  f'tsb_se{tag}': db.std(ddof=1), f'tsb_acmax{tag}': float(np.max(np.abs(ac)))})
+    N['tsb_B'] = B
+
+
+def gas_null_bootstrap(B=199):
+    """Seminarul, B6: p-valoarea raportului de verosimilitate GAS contra t static, prin bootstrap parametric sub copula t
+    statica estimata (n perechi simulate, transformate in pseudo-observatii, ambele modele reestimate)."""
+    W = weekly_returns(['sp500', 'stoxx'], start='2000-01-01')
+    U2 = pseudo_obs(W.values)
+    g = gas_t_copula(U2[:, 0], U2[:, 1])
+    lr_obs = g['lr']
+    rng = np.random.default_rng(SEED)
+    lrs = []
+    for _ in range(B):
+        Us = pseudo_obs(simulate('t', [g['rho_static'], g['nu_static']], len(U2), rng))
+        lrs.append(gas_t_copula(Us[:, 0], Us[:, 1])['lr'])
+    lrs = np.array(lrs)
+    N.update(b6g_lr_obs=lr_obs, b6g_lr_null_q95=np.percentile(lrs, 95), b6g_lr_null_max=lrs.max(),
+             b6g_p_boot=(1 + np.sum(lrs >= lr_obs)) / (B + 1), b6g_B=B)
+
+
 def save(path='ch6_inference_numbers.json'):
     """Adauga cifrele calculate la fisierul existent (etapele pot fi rulate separat)."""
     fn = os.path.join(HERE, path)
@@ -531,6 +631,9 @@ STAGES = {
     'gas': fig_gas_copula,
     'chenfan': chen_fan_mc,
     'twostep': two_step_bootstrap,
+    'cccboot': lambda: (ccc_null_bootstrap(['spy', 'tlt'], 'cccb'), ccc_null_bootstrap(['btc', 'spy'], 'cccb_btc')),
+    'tailblock': tail_symmetry_block,
+    'gasboot': gas_null_bootstrap,
 }
 
 if __name__ == '__main__':

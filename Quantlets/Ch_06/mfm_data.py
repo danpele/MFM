@@ -5,8 +5,8 @@ mfm_data.py -- Incarcarea datelor pentru Capitolul 6 (MFM): volatilitate multiva
   * joint_returns(names, ...) -- JOIN pe preturi in zilele comune, APOI randamente log (regula pentru analize comune)
   * weekly_returns(names,...) -- preturi comune de vineri (ultima zi de tranzactionare a saptamanii), apoi randamente
 
-Conventii: indicii si actiunile doar in zilele lucratoare, fara zilele cu pret identic cu ziua precedenta
-(sarbatori completate cu ultimul pret); Bitcoin: 7 zile din 7 pe calendarul propriu, dar in analizele comune
+Conventii: indicii si actiunile doar in zilele lucratoare, fara zilele cu pret identic cu ziua precedenta si
+volum zero (sarbatori completate cu ultimul pret); zilele de tranzactionare cu pret neschimbat raman; Bitcoin: 7 zile din 7 pe calendarul propriu, dar in analizele comune
 intra doar zilele in care tranzactioneaza si celelalte active.
 
 Modelarea Pietelor Financiare - Daniel Traian PELE
@@ -56,11 +56,14 @@ def read_market(symbol):
 def load_price(name, start=None, end=END):
     """Pretul zilnic curatat dupa conventiile capitolului."""
     symbol, col, _, start0 = ASSETS[name]
-    s = read_market(symbol)[col].loc[start or start0:end]
-    s = s[s > 0].dropna()
+    d = read_market(symbol).loc[start or start0:end]
+    d = d[d[col] > 0].dropna(subset=[col])
+    s = d[col]
     if name != 'btc':
-        s = s[s.index.dayofweek < 5]          # fara cotatii de weekend
-        s = s[s.diff() != 0]                  # fara sarbatori completate cu pretul anterior
+        keep = s.index.dayofweek < 5                                   # fara cotatii de weekend
+        vol = d['volume'].fillna(0) if 'volume' in d else pd.Series(0.0, index=d.index)
+        keep &= ~((s.diff() == 0) & (vol <= 0)).values                # sarbatori: pret neschimbat SI volum zero
+        s = s[keep]                                                    # (zilele cu volum si pret neschimbat raman)
     return s.rename(name)
 
 

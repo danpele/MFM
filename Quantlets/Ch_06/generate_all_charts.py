@@ -254,8 +254,10 @@ def fig_dcc_minvar(R, V, rc):
     rho0 = R.corr().iloc[0, 1]
     c0 = rho0 * s1 * s2
     w_ccc = ((s2 ** 2 - c0) / (s1 ** 2 + s2 ** 2 - 2 * c0)).clip(0, 1)
-    X = 100 * R.loc[w_dcc.index]
-    # ponderile folosesc informatia pana in ziua t-1 (volatilitatile GARCH si R_t sunt prognoze pentru ziua t)
+    # randamente simple ale activelor (R are randamente log): randamentul portofoliului este sum_i w_i (e^{r_i} - 1)
+    X = 100 * np.expm1(R.loc[w_dcc.index])
+    # filtrele (volatilitatile GARCH, R_t) folosesc doar informatia pana in ziua t-1, dar parametrii GARCH, DCC si
+    # corelatia constanta sunt estimati pe tot esantionul: o ilustrare IN esantion, nu o evaluare in afara esantionului
     p_dcc = w_dcc * X['spy'] + (1 - w_dcc) * X['tlt']
     p_ccc = w_ccc * X['spy'] + (1 - w_ccc) * X['tlt']
     p_6040 = 0.6 * X['spy'] + 0.4 * X['tlt']

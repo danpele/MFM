@@ -18,18 +18,24 @@ from scipy import stats, optimize, integrate
 from scipy.signal import lfilter
 from scipy.special import gammaln
 from arch import arch_model
+try:
+    from numba import njit
+except ImportError:                      # without numba the same functions run as plain Python (slower)
+    def njit(*args, **kwargs):
+        return args[0] if (len(args) == 1 and callable(args[0])) else (lambda f: f)
 
 
 # =============================================================================
 # EWMA si fereastra mobila
 # =============================================================================
 def ewma_cov(R, lam=0.94, init=100):
-    """Sigma_t = lam*Sigma_{t-1} + (1-lam) r_{t-1} r_{t-1}'  (prognoza pentru ziua t, fara r_t)."""
+    """Sigma_t = lam*Sigma_{t-1} + (1-lam) r_{t-1} r_{t-1}'  (prognoza pentru ziua t, fara r_t).
+    Primele init observatii servesc doar la initializare: Sigma_init = covarianta lor; inainte de init, NaN."""
     X = np.asarray(R, dtype=float)
     T, N = X.shape
-    S = np.empty((T, N, N))
-    S[0] = np.cov(X[:init].T)
-    for t in range(1, T):
+    S = np.full((T, N, N), np.nan)
+    S[init] = np.cov(X[:init].T)
+    for t in range(init + 1, T):
         S[t] = lam * S[t - 1] + (1 - lam) * np.outer(X[t - 1], X[t - 1])
     return S
 
@@ -90,9 +96,29 @@ def dcc_path(Z, a, b, Qbar=None):
     return Q / (d[:, :, None] * d[:, None, :])
 
 
+@njit(cache=True)
+def dcc2_corr_loglik(x, y, a, b, q11b, q22b, q12b):
+    """Cazul bivariat al lui dcc_corr_loglik, scris ca o singura bucla (aceeasi recursie ca dcc_path)."""
+    q11, q22, q12 = q11b, q22b, q12b
+    c = 1.0 - a - b
+    ll = 0.0
+    for t in range(len(x)):
+        r = q12 / np.sqrt(q11 * q22)
+        d = 1.0 - r * r
+        ll += -0.5 * (np.log(d) + (x[t] * x[t] + y[t] * y[t] - 2.0 * r * x[t] * y[t]) / d - x[t] * x[t] - y[t] * y[t])
+        q11 = c * q11b + a * x[t] * x[t] + b * q11
+        q22 = c * q22b + a * y[t] * y[t] + b * q22
+        q12 = c * q12b + a * x[t] * y[t] + b * q12
+    return ll
+
+
 def dcc_corr_loglik(Z, a, b, Qbar=None):
     """Partea de corelatie a log-verosimilitatii: -1/2 sum(log|R_t| + z'R_t^{-1}z - z'z)."""
     X = np.asarray(Z, dtype=float)
+    if X.shape[1] == 2:
+        Q = np.cov(X.T, bias=True) if Qbar is None else Qbar
+        return dcc2_corr_loglik(np.ascontiguousarray(X[:, 0]), np.ascontiguousarray(X[:, 1]), float(a), float(b),
+                                Q[0, 0], Q[1, 1], Q[0, 1])
     R = dcc_path(X, a, b, Qbar)
     sign, logdet = np.linalg.slogdet(R)
     quad = np.einsum('ti,tij,tj->t', X, np.linalg.inv(R), X)

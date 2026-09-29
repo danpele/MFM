@@ -255,26 +255,26 @@ window.MFM_DATA.quizzes['dependence'] = {
             correct: 1,
             en: {
                 title: 'DCC persistence',
-                text: 'For SPY–TLT the DCC estimates are a = 0.053, b = 0.933. What is the half-life of a correlation shock?',
+                text: 'For SPY–TLT the DCC estimates are a = 0.052, b = 0.934. What is the approximate half-life of a shock to the DCC recursion Q_t?',
                 options: [
                     'About 1 day',
                     'About 48 days',
                     'About 1 year',
                     'Infinite'
                 ],
-                correctExplanation: 'Half-life = ln 0.5 / ln(a + b) = ln 0.5 / ln 0.986 ≈ 48 trading days.',
+                correctExplanation: 'Half-life ≈ ln 0.5 / ln(a + b) = ln 0.5 / ln 0.986 ≈ 48 trading days; only approximate for the standard DCC, because E[ε_t ε_t′ | past] = R_t, not Q_t.',
                 incorrectExplanation: 'Use ln 0.5 / ln(a + b) with a + b close to but below 1.'
             },
             ro: {
                 title: 'Persistența DCC',
-                text: 'Pentru SPY–TLT estimările DCC sunt a = 0,053, b = 0,933. Care este timpul de înjumătățire al unui șoc de corelație?',
+                text: 'Pentru SPY–TLT estimările DCC sunt a = 0,052, b = 0,934. Care este timpul de înjumătățire aproximativ al unui șoc asupra recursiei DCC Q_t?',
                 options: [
                     'Aproximativ 1 zi',
                     'Aproximativ 48 de zile',
                     'Aproximativ 1 an',
                     'Infinit'
                 ],
-                correctExplanation: 'Timpul de înjumătățire = ln 0,5 / ln(a + b) = ln 0,5 / ln 0,986 ≈ 48 de zile de tranzacționare.',
+                correctExplanation: 'Timpul de înjumătățire ≈ ln 0,5 / ln(a + b) = ln 0,5 / ln 0,986 ≈ 48 de zile de tranzacționare; doar aproximativ pentru DCC-ul standard, deoarece E[ε_t ε_t′ | trecut] = R_t, nu Q_t.',
                 incorrectExplanation: 'Folosiți ln 0,5 / ln(a + b), cu a + b aproape de 1, dar sub 1.'
             }
         },
@@ -478,8 +478,8 @@ window.MFM_DATA.quizzes['dependence'] = {
                     "Undersized, because the chart smooths the data",
                     "Valid whenever the sample is large"
                 ],
-                correctExplanation: "Choosing the date after looking turns the statistic into a maximum over dates, whose limit is the supremum of a Brownian bridge; on the SPY–TLT residuals the unknown-date test puts the break in August 2020, not January 2022.",
-                incorrectExplanation: "A date selected from the data makes the statistic a maximum over dates, so Normal critical values reject too often."
+                correctExplanation: "A date chosen after looking at the data is itself random, so the null distribution of the statistic depends on the selection rule and Normal critical values reject too often; an unknown-date test such as Wied, Krämer and Dehling (2012) is defined with its own Brownian-bridge limit. On the SPY–TLT residuals it puts the break in August 2020, not January 2022.",
+                incorrectExplanation: "A date selected from the data makes the null distribution depend on how the date was chosen, so Normal critical values reject too often."
             },
             ro: {
                 title: "O dată de ruptură aleasă din ochi",
@@ -490,8 +490,8 @@ window.MFM_DATA.quizzes['dependence'] = {
                     "Cu nivel real prea mic, pentru că graficul netezește datele",
                     "Valid oricând eșantionul este mare"
                 ],
-                correctExplanation: "Alegerea datei după ce am văzut datele transformă statistica într-un maxim după date, a cărui limită este supremumul unei punți browniene; pe reziduurile SPY–TLT testul cu dată necunoscută pune ruptura în august 2020, nu în ianuarie 2022.",
-                incorrectExplanation: "O dată aleasă din date face ca statistica să fie un maxim după date, deci valorile critice Normale resping prea des."
+                correctExplanation: "O dată aleasă după ce am văzut datele este ea însăși aleatoare, deci distribuția statisticii sub ipoteza nulă depinde de regula de alegere, iar valorile critice Normale resping prea des; un test cu dată necunoscută, precum Wied, Krämer și Dehling (2012), este definit cu propria limită de tip punte browniană. Pe reziduurile SPY–TLT el pune ruptura în august 2020, nu în ianuarie 2022.",
+                incorrectExplanation: "O dată aleasă din date face ca distribuția sub ipoteza nulă să depindă de modul de alegere a datei, deci valorile critice Normale resping prea des."
             }
         },
         {
@@ -525,27 +525,27 @@ window.MFM_DATA.quizzes['dependence'] = {
             correct: 2,
             en: {
                 title: 'Goodness of fit',
-                text: 'For JPM–BAC (T = 4122), all five static copulas are rejected by the Rosenblatt test, although the t copula has by far the best AIC. The most sensible conclusion is:',
+                text: 'For JPM–BAC (T = 4202), all five static copulas are rejected by the Rosenblatt test, although the t copula has by far the best AIC. The most sensible conclusion is:',
                 options: [
                     'The t copula is useless',
                     'The test is wrong',
-                    'With thousands of observations even small misfits are detected; a static copula also ignores time-varying dependence',
+                    'With thousands of observations even small misfits are detected; a static copula may also miss time-varying dependence',
                     'AIC and goodness-of-fit tests always agree'
                 ],
-                correctExplanation: 'Large samples give high power; dependence moves over time, so a static model is an approximation. AIC ranks models, the test checks absolute fit.',
-                incorrectExplanation: 'Rejection reflects high power and time variation, not that the best model is useless.'
+                correctExplanation: 'Large samples give high power against small departures; time-varying dependence is one candidate (a dynamic t copula fits JPM–BAC far better). AIC ranks models, the test checks absolute fit.',
+                incorrectExplanation: 'Rejection reflects high power against some misfit, not that the best model is useless.'
             },
             ro: {
                 title: 'Adecvarea',
-                text: 'Pentru JPM–BAC (T = 4122), toate cele cinci copule statice sunt respinse de testul Rosenblatt, deși copula t are de departe cel mai bun AIC. Concluzia cea mai rezonabilă este:',
+                text: 'Pentru JPM–BAC (T = 4202), toate cele cinci copule statice sunt respinse de testul Rosenblatt, deși copula t are de departe cel mai bun AIC. Concluzia cea mai rezonabilă este:',
                 options: [
                     'Copula t este inutilă',
                     'Testul este greșit',
-                    'Cu mii de observații sunt detectate și abateri mici; o copulă statică ignoră și dependența variabilă în timp',
+                    'Cu mii de observații sunt detectate și abateri mici; o copulă statică poate rata și dependența variabilă în timp',
                     'AIC și testele de adecvare coincid întotdeauna'
                 ],
-                correctExplanation: 'Eșantioanele mari dau putere mare; dependența se mișcă în timp, deci un model static este o aproximare. AIC ordonează modelele, testul verifică adecvarea absolută.',
-                incorrectExplanation: 'Respingerea reflectă puterea mare și variația în timp, nu faptul că cel mai bun model ar fi inutil.'
+                correctExplanation: 'Eșantioanele mari dau putere mare împotriva abaterilor mici; dependența variabilă în timp este o explicație posibilă (o copulă t dinamică se potrivește mult mai bine pentru JPM–BAC). AIC ordonează modelele, testul verifică adecvarea absolută.',
+                incorrectExplanation: 'Respingerea reflectă puterea mare împotriva unei abateri, nu faptul că cel mai bun model ar fi inutil.'
             }
         },
         {
@@ -582,24 +582,24 @@ window.MFM_DATA.quizzes['dependence'] = {
                 text: 'Why is the Gaussian copula of Li (2000) often blamed in accounts of the 2008 credit crisis?',
                 options: [
                     'It overstated tail dependence',
-                    'It has zero tail dependence, so joint defaults in a crisis were treated as almost impossible',
+                    'It has zero asymptotic tail dependence and, calibrated with one static correlation, understated the probability of many extreme defaults at once',
                     'It could not be calibrated',
                     'It used Kendall\'s tau'
                 ],
-                correctExplanation: 'With λ = 0 and one static correlation calibrated in calm years, the model understated the probability of many defaults at once.',
-                incorrectExplanation: 'The problem was zero tail dependence combined with a static calibration.'
+                correctExplanation: 'Joint defaults were not impossible in the model (at a finite default probability they still occur), but with λ = 0 and one static correlation calibrated in calm years it gave lower probabilities of many extreme defaults than tail-dependent models.',
+                incorrectExplanation: 'The problem was zero asymptotic tail dependence combined with a static calibration, not an impossibility of joint defaults.'
             },
             ro: {
                 title: 'Copula Gaussiană și 2008',
                 text: 'De ce este adesea învinuită copula Gaussiană a lui Li (2000) în relatările despre criza creditelor din 2008?',
                 options: [
                     'A supraestimat dependența în cozi',
-                    'Are dependență zero în cozi, deci falimentele comune din criză erau tratate ca aproape imposibile',
+                    'Are dependență asimptotică zero în cozi și, calibrată cu o singură corelație statică, subestima probabilitatea multor falimente extreme simultane',
                     'Nu putea fi calibrată',
                     'Folosea tau al lui Kendall'
                 ],
-                correctExplanation: 'Cu λ = 0 și o singură corelație statică, calibrată în anii calmi, modelul subestima probabilitatea multor falimente simultane.',
-                incorrectExplanation: 'Problema a fost dependența zero în cozi combinată cu o calibrare statică.'
+                correctExplanation: 'Falimentele comune nu erau imposibile în model (la o probabilitate de faliment finită ele apar), dar cu λ = 0 și o singură corelație statică, calibrată în anii calmi, modelul dădea probabilități ale multor falimente extreme mai mici decât modelele cu dependență în cozi.',
+                incorrectExplanation: 'Problema a fost dependența asimptotică zero în cozi combinată cu o calibrare statică, nu imposibilitatea falimentelor comune.'
             }
         },
         {
@@ -611,10 +611,10 @@ window.MFM_DATA.quizzes['dependence'] = {
                     'Through JPM',
                     'They are not attached',
                     'Through Deutsche Bank only, with the highest correlation of the tree',
-                    'Through the BNP–TLV link, one of the weakest edges (0.35)'
+                    'Through the BNP–BRD link, one of the weakest edges (0.35)'
                 ],
-                correctExplanation: 'The tree links TLV and BRD (0.65) and attaches them to the euro area through BNP–TLV (0.35): Romanian banks are the least connected.',
-                incorrectExplanation: 'The Romanian block is attached through BNP–TLV, a weak link.'
+                correctExplanation: 'The tree links TLV and BRD (0.65) and attaches them to the euro area through BNP–BRD (0.35): Romanian banks are the least connected.',
+                incorrectExplanation: 'The Romanian block is attached through BNP–BRD, a weak link.'
             },
             ro: {
                 title: 'Rețeaua băncilor',
@@ -623,10 +623,10 @@ window.MFM_DATA.quizzes['dependence'] = {
                     'Prin JPM',
                     'Nu sunt legate',
                     'Doar prin Deutsche Bank, cu cea mai mare corelație din arbore',
-                    'Prin legătura BNP–TLV, una dintre cele mai slabe muchii (0,35)'
+                    'Prin legătura BNP–BRD, una dintre cele mai slabe muchii (0,35)'
                 ],
-                correctExplanation: 'Arborele leagă TLV și BRD (0,65) și le atașează zonei euro prin BNP–TLV (0,35): băncile românești sunt cele mai puțin conectate.',
-                incorrectExplanation: 'Blocul românesc este legat prin BNP–TLV, o legătură slabă.'
+                correctExplanation: 'Arborele leagă TLV și BRD (0,65) și le atașează zonei euro prin BNP–BRD (0,35): băncile românești sunt cele mai puțin conectate.',
+                incorrectExplanation: 'Blocul românesc este legat prin BNP–BRD, o legătură slabă.'
             }
         },
         {
@@ -664,11 +664,11 @@ window.MFM_DATA.quizzes['dependence'] = {
                 options: [
                     "The lower tail dependence of the Gaussian copula is rho, not rho^2",
                     "The Gaussian copula has upper but not lower tail dependence",
-                    "For any rho < 1 the Gaussian copula has zero tail dependence, so it does not capture joint crashes",
+                    "For any rho < 1 the Gaussian copula has zero (asymptotic) tail dependence, so lambda_L = rho^2 is wrong",
                     "Tail dependence can only be computed for Archimedean copulas"
                 ],
-                correctExplanation: "The Gaussian copula is asymptotically independent in both tails: lambda_L = lambda_U = 0 for rho < 1. Joint extremes need a t copula (symmetric tail dependence) or a Clayton copula (lower tail).",
-                incorrectExplanation: "No positive formula in rho is correct here: the Gaussian copula has lambda_L = lambda_U = 0 for every rho < 1, so it understates joint crashes."
+                correctExplanation: "The Gaussian copula is asymptotically independent in both tails: lambda_L = lambda_U = 0 for rho < 1. Joint extremes at a fixed threshold still occur (for rho = 0.7, P(V ≤ 0.01 | U ≤ 0.01) ≈ 0.27), but positive limiting tail dependence needs e.g. a t copula (symmetric) or a Clayton copula (lower tail).",
+                incorrectExplanation: "No positive formula in rho is correct here: the Gaussian copula has lambda_L = lambda_U = 0 for every rho < 1, so joint crashes become asymptotically independent."
             },
             ro: {
                 title: "Găsiți eroarea: cozile copulei Gaussiene",
@@ -676,11 +676,11 @@ window.MFM_DATA.quizzes['dependence'] = {
                 options: [
                     "Dependența în coada inferioară a copulei Gaussiene este rho, nu rho^2",
                     "Copula Gaussiană are dependență în coada superioară, dar nu și în cea inferioară",
-                    "Pentru orice rho < 1 copula Gaussiană are dependență zero în cozi, deci nu surprinde prăbușirile comune",
+                    "Pentru orice rho < 1 copula Gaussiană are dependență (asimptotică) zero în cozi, deci lambda_L = rho^2 este greșit",
                     "Dependența în cozi se poate calcula doar pentru copulele arhimediene"
                 ],
-                correctExplanation: "Copula Gaussiană este asimptotic independentă în ambele cozi: lambda_L = lambda_U = 0 pentru rho < 1. Extremele comune cer o copulă t (dependență simetrică în cozi) sau o copulă Clayton (coada inferioară).",
-                incorrectExplanation: "Nicio formulă pozitivă în rho nu este corectă aici: copula Gaussiană are lambda_L = lambda_U = 0 pentru orice rho < 1, deci subestimează prăbușirile comune."
+                correctExplanation: "Copula Gaussiană este asimptotic independentă în ambele cozi: lambda_L = lambda_U = 0 pentru rho < 1. Extremele comune la un prag fixat apar totuși (pentru rho = 0,7, P(V ≤ 0,01 | U ≤ 0,01) ≈ 0,27), dar o dependență în cozi pozitivă la limită cere de exemplu o copulă t (simetrică) sau o copulă Clayton (coada inferioară).",
+                incorrectExplanation: "Nicio formulă pozitivă în rho nu este corectă aici: copula Gaussiană are lambda_L = lambda_U = 0 pentru orice rho < 1, deci prăbușirile comune devin asimptotic independente."
             }
         },
         {
