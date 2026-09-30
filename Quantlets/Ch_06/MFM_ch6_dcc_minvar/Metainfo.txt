@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Daily market data (data/market): SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
+Datafile: 'Daily market data of the course: SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
 
 Output: 'ch6_dcc_minvar.pdf'

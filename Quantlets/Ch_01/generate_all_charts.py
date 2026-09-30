@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import (load_data, load_close, read_market, LABELS, vol_close_to_close, vol_parkinson,
                       vol_garman_klass, vol_rogers_satchell, vol_yang_zhang, drawdown)
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -41,7 +41,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Chart colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -63,7 +63,7 @@ PERIODS = {'sp500': 252, 'bettr': 252, 'btc': 365, 'eurron': 252, 'gold': 252}
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as PDF and transparent PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -72,7 +72,7 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
@@ -81,7 +81,7 @@ def legend_outside_bottom(ax, ncol=2, y=-0.22):
 # =============================================================================
 closes = {a: load_close(a) for a in ASSETS}
 rets = {a: np.log(c).diff().dropna() for a, c in closes.items()}
-# aurul (doar zile lucratoare) se anualizeaza cu frecventa efectiva a observatiilor
+# gold (weekdays only) is annualised with its actual number of observations per year
 _years_gold = (closes['gold'].index[-1] - closes['gold'].index[0]).days / 365.25
 PERIODS['gold'] = len(rets['gold']) / _years_gold
 spx_ohlc = load_data('sp500')
@@ -117,13 +117,13 @@ def summary_table():
 def risk_table():
     rows = []
     for a in ASSETS:
-        # Sharpe si Sortino pe randamente SIMPLE (aritmetice), r_f = 0: aceeasi definitie in tot cursul
+        # Sharpe and Sortino on SIMPLE (arithmetic) returns, r_f = 0: the same definition throughout the course
         c, P = closes[a], PERIODS[a]
         R = c.pct_change().dropna()
         years = (c.index[-1] - c.index[0]).days / 365.25
         cagr = (c.iloc[-1] / c.iloc[0]) ** (1 / years) - 1
         mu, vol = R.mean() * P, R.std() * np.sqrt(P)
-        downside = np.sqrt((np.minimum(R, 0) ** 2).mean()) * np.sqrt(P)   # medie peste TOATE zilele
+        downside = np.sqrt((np.minimum(R, 0) ** 2).mean()) * np.sqrt(P)   # mean over ALL days
         mdd = drawdown(c).min()
         sr_d = R.mean() / R.std()
         rows.append({'asset': LABELS[a], 'CAGR_pct': 100 * cagr, 'mean_simple_pct': 100 * mu,
@@ -223,16 +223,16 @@ def aggregation_kurtosis():
         r = rets[a]
         ks = []
         for h in HORIZONS:
-            m = (len(r) // h) * h                                # doar ferestre complete de h zile
-            agg = r.iloc[:m].groupby(np.arange(m) // h).sum()   # sume nesuprapuse
+            m = (len(r) // h) * h                                # complete h-day windows only
+            agg = r.iloc[:m].groupby(np.arange(m) // h).sum()   # non-overlapping sums
             ks.append(stats.kurtosis(agg))
         out[a] = ks
     return pd.DataFrame(out, index=HORIZONS)
 
 
 def aggregation_counts():
-    """Numarul de randamente nesuprapuse pe h zile si eroarea standard aproximativa a excesului
-    de kurtosis sub normalitate, sqrt(24/n)."""
+    """Number of non-overlapping h-day returns and the approximate standard error of the excess
+    kurtosis under the Normal distribution, sqrt(24/n)."""
     n = pd.DataFrame({a: [len(rets[a]) // h for h in HORIZONS] for a in ASSETS}, index=HORIZONS)
     se = np.sqrt(24 / n)
     n.to_csv(os.path.join(TABLE_DIR, 'ch1_aggregation_n.csv'))
@@ -340,7 +340,7 @@ def fig_volume_volatility():
     for ax, a in zip(axes, ['sp500', 'btc']):
         d = load_data(a)
         v = np.log(d['Volume'].replace(0, np.nan))
-        v_rel = (v - v.rolling(250).mean()).dropna()               # volum anormal (detrended)
+        v_rel = (v - v.rolling(250).mean()).dropna()               # abnormal (detrended) volume
         r_abs = np.log(d['Close']).diff().abs()
         df = pd.DataFrame({'v': v_rel, 'a': r_abs}).dropna()
         df = df[df['a'] > 0]
@@ -414,7 +414,7 @@ def fig_gain_loss():
 # FIG 11: Estimatori de volatilitate (S&P 500 OHLC)
 # =============================================================================
 def fig_vol_estimators():
-    # inainte de 2007 'open' este egal cu inchiderea precedenta (artefact de date) -> folosim 2008-2026
+    # before 2007 the index open equals the previous close (data artefact) -> use 2008-2026
     d = spx_ohlc.loc['2008-01-01':]
     est = pd.DataFrame({
         'Close-to-close': vol_close_to_close(d), 'Parkinson': vol_parkinson(d),
@@ -432,7 +432,7 @@ def fig_vol_estimators():
     axes[0].set_ylabel('Annualised volatility (%, 21-day)')
     axes[0].set_title('S&P 500 around the COVID-19 crash', fontsize=8.5, loc='left')
     axes[0].legend(loc='upper center', bbox_to_anchor=(0.5, -0.28), ncol=3, frameon=False, fontsize=7)
-    # eficienta relativa: variabilitatea saptamanala a estimatorului (zgomot) vs close-to-close
+    # relative efficiency: weekly variability of the estimator (noise) vs close-to-close
     noise = est.diff().std()
     eff = (noise['Close-to-close'] / noise) ** 2
     axes[1].barh(eff.index, eff.values, color=cols, alpha=0.85)
@@ -521,7 +521,7 @@ HILL_FRACS = np.round(np.arange(0.005, 0.1001, 0.0025), 4)
 
 
 def hill_table(frac=0.025):
-    """Indicele de coada Hill pentru |r_t|, pierderi (-r_t) si castiguri (r_t) la k = frac * n."""
+    """Hill tail index for |r_t|, losses (-r_t) and gains (r_t) at k = frac * n."""
     rows = []
     for a in ASSETS:
         r = rets[a].values
@@ -557,22 +557,22 @@ def fig_hill():
 
 
 def moving_block_indices(T, block, rng):
-    """Indicii unui esantion bootstrap pe blocuri mobile (moving-block) de lungime `block`."""
+    """Indices of one moving-block bootstrap sample with blocks of length `block`."""
     nb = int(np.ceil(T / block))
-    st = rng.integers(0, T - block + 1, nb)      # toate cele T - block + 1 inceputuri valide
+    st = rng.integers(0, T - block + 1, nb)      # all T - block + 1 valid block starts
     return (st[:, None] + np.arange(block)[None, :]).ravel()[:T]
 
 
 def hill_threshold(x, u):
-    """Hill cu prag fix u: k = #{x > u}, alpha_hat = k / sum ln(x_i / u) pe x_i > u."""
+    """Hill with a fixed threshold u: k = #{x > u}, alpha_hat = k / sum ln(x_i / u) over x_i > u."""
     x = np.asarray(x)
     e = x[x > u]
     return len(e) / np.sum(np.log(e / u))
 
 
 def hill_inference(frac=0.025, n_boot=500, block=20, seed=42):
-    """Hill pentru |r_t| la k = frac*n: IC i.i.d. alpha(1 +/- 1.96/sqrt(k)), EE bootstrap pe blocuri
-    si comparatia cu cozile unilaterale la ACELASI prag u (min al pragurilor unilaterale)."""
+    """Hill for |r_t| at k = frac*n: i.i.d. CI alpha(1 +/- 1.96/sqrt(k)), block-bootstrap SE,
+    and the comparison with the one-sided tails at the SAME threshold u (min of the one-sided thresholds)."""
     rng = np.random.default_rng(seed)
     rows = []
     for a in ASSETS:
@@ -595,8 +595,8 @@ def hill_inference(frac=0.025, n_boot=500, block=20, seed=42):
 
 
 def robust_moments(n_boot=1000, block=20, seed=42):
-    """Asimetrie si aplatizare pe cuantile (Kim & White 2004): Hinkley (5%-95%) si Crow-Siddiqui
-    (2.5%, 97.5% fata de quartile, minus 2.91, valoarea distributiei Normale); IC bootstrap pe blocuri."""
+    """Quantile-based skewness and kurtosis (Kim & White 2004): Hinkley (5%-95%) and Crow-Siddiqui
+    (2.5%, 97.5% relative to the quartiles, minus 2.91, the value for the Normal distribution); block-bootstrap CIs."""
     def qstats(v):
         q = np.quantile(v, [0.025, 0.05, 0.25, 0.5, 0.75, 0.95, 0.975])
         return ((q[5] + q[1] - 2 * q[3]) / (q[5] - q[1]), (q[6] - q[0]) / (q[4] - q[2]) - 2.91)
@@ -616,7 +616,7 @@ def robust_moments(n_boot=1000, block=20, seed=42):
 
 
 def acf_robust_lag1():
-    """rho_1 cu banda i.i.d. 1.96/sqrt(T) si banda robusta 1.96 sqrt(tau_1) (Romano & Thombs 1996)."""
+    """rho_1 with the i.i.d. band 1.96/sqrt(T) and the robust band 1.96 sqrt(tau_1) (Romano & Thombs 1996)."""
     rows = []
     for a in ASSETS:
         x = (rets[a] - rets[a].mean()).values
@@ -635,7 +635,7 @@ def periodogram(x):
 
 
 def local_whittle(x, m):
-    """Robinson (1995): d minimizeaza R(d) = ln(mean(lambda_j^{2d} I_j)) - 2d mean(ln lambda_j); EE = 1/(2 sqrt m)."""
+    """Robinson (1995): d minimises R(d) = ln(mean(lambda_j^{2d} I_j)) - 2d mean(ln lambda_j); SE = 1/(2 sqrt m)."""
     from scipy.optimize import minimize_scalar
     lam, I = periodogram(x)
     l, Ij = lam[1:m + 1], I[1:m + 1]
@@ -644,14 +644,14 @@ def local_whittle(x, m):
 
 
 def gph(x, m):
-    """Geweke & Porter-Hudak (1983): panta lui ln I_j pe -2 ln(2 sin(lambda_j/2)); EE = pi/sqrt(24 m)."""
+    """Geweke & Porter-Hudak (1983): slope of ln I_j on -2 ln(2 sin(lambda_j/2)); SE = pi/sqrt(24 m)."""
     lam, I = periodogram(x)
     X = -2 * np.log(2 * np.sin(lam[1:m + 1] / 2))
     return np.polyfit(X, np.log(I[1:m + 1]), 1)[0], np.pi / np.sqrt(24 * m)
 
 
 def cusum_squares_break(r):
-    """Data rupturii in varianta necoditionata: argmax |C_k/C_T - k/T| (Inclan & Tiao 1994)."""
+    """Date of the break in the unconditional variance: argmax |C_k/C_T - k/T| (Inclan & Tiao 1994)."""
     x = np.asarray(r) - np.mean(r)
     C = np.cumsum(x ** 2)
     T = len(x)
@@ -661,8 +661,8 @@ def cusum_squares_break(r):
 
 
 def long_memory_table(power=0.65):
-    """d pentru |r_t|: local Whittle si GPH cu m = T^0.65; apoi re-estimare de o parte si de alta
-    a rupturii de varianta estimate (verificarea 'memorie lunga sau rupturi?')."""
+    """d for |r_t|: local Whittle and GPH with m = T^0.65; then re-estimation on each side
+    of the estimated variance break (the 'long memory or breaks?' check)."""
     rows = []
     for a in ASSETS:
         r = rets[a]
@@ -690,7 +690,7 @@ def long_memory_table(power=0.65):
 # VERIFICARE: deschideri "stale" ale indicelui S&P 500 (Yang-Zhang)
 # =============================================================================
 def stale_open_check(start='2008-01-01'):
-    """Compara indicele S&P 500 cu ETF-ul SPY (deschidere = pret tranzactionat)."""
+    """Compare the S&P 500 index with the SPY ETF (open = traded price)."""
     g = spx_ohlc.loc[start:]
     spy = read_market('SPY.US').loc[start:]
     f = spy['adjusted_close'] / spy['close']
@@ -777,9 +777,9 @@ def fig_cs_pdv_vix(vix, fit, scores):
     fig, (ax, ax2) = plt.subplots(2, 1, figsize=(7.6, 3.7), sharex=True, gridspec_kw={'height_ratios': [2.3, 1]})
     v, f = 100 * vix.loc[PDV_TRAIN[0]:], 100 * fit.loc[PDV_TRAIN[0]:]
     ax.plot(v.index, v, color=MainBlue, lw=0.7, label='VIX (observed)')
-    ax.plot(f.index, f, color=IDAred, lw=0.7, label='Predicted from past S&P 500 returns, eq. (3.7)')
+    ax.plot(f.index, f, color=IDAred, lw=0.7, label='Fitted from past S&P 500 returns (path-dependent volatility model)')
     ratio = vix.loc[PDV_TRAIN[0]:] / fit.loc[PDV_TRAIN[0]:]
-    ax2.plot(ratio.index, ratio, color=Forest, lw=0.6, label='Ratio observed / predicted VIX')
+    ax2.plot(ratio.index, ratio, color=Forest, lw=0.6, label='Ratio observed / fitted VIX')
     ax2.axhline(1, color=Gray, lw=0.6, ls='--')
     for a in (ax, ax2):
         a.axvspan(pd.Timestamp(PDV_TEST[0]), pd.Timestamp(PDV_TEST[1]), color=Amber, alpha=0.15, lw=0)
@@ -807,13 +807,13 @@ def fig_cs_pdv_kernels(params):
     p3 = PDV_TABLE3_VIX
     fig, ax = plt.subplots(figsize=(6.4, 3.2))
     ax.loglog(lag, pdv_kernel(params['alpha1'], params['delta1'])[1:] * PDV_DT, color=IDAred, lw=1.4,
-              label=f"$K_1$ (trend $R_1$), ours: $\\alpha_1$ = {params['alpha1']:.2f}, $\\delta_1$ = {params['delta1']:.3f}")
+              label=f"$K_1$ (trend $R_1$), estimated on course data: $\\alpha_1$ = {params['alpha1']:.2f}, $\\delta_1$ = {params['delta1']:.3f}")
     ax.loglog(lag, pdv_kernel(p3[3], p3[4])[1:] * PDV_DT, color=Orange, lw=1.2, ls='--',
-              label=f"$K_1$, Table 3: $\\alpha_1$ = {p3[3]:.2f}, $\\delta_1$ = {p3[4]:.3f}")
+              label=f"$K_1$, Guyon & Lekeufack (2023), Table 3: $\\alpha_1$ = {p3[3]:.2f}, $\\delta_1$ = {p3[4]:.3f}")
     ax.loglog(lag, pdv_kernel(params['alpha2'], params['delta2'])[1:] * PDV_DT, color=MainBlue, lw=1.4,
-              label=f"$K_2$ (volatility $\\Sigma$), ours: $\\alpha_2$ = {params['alpha2']:.2f}, $\\delta_2$ = {params['delta2']:.3f}")
+              label=f"$K_2$ (volatility $\\Sigma$), estimated on course data: $\\alpha_2$ = {params['alpha2']:.2f}, $\\delta_2$ = {params['delta2']:.3f}")
     ax.loglog(lag, pdv_kernel(p3[5], p3[6])[1:] * PDV_DT, color=Teal, lw=1.4, ls=(0, (2, 2)),
-              label=f"$K_2$, Table 3: $\\alpha_2$ = {p3[5]:.2f}, $\\delta_2$ = {p3[6]:.3f}")
+              label=f"$K_2$, Guyon & Lekeufack (2023), Table 3: $\\alpha_2$ = {p3[5]:.2f}, $\\delta_2$ = {p3[6]:.3f}")
     ax.set_xlabel('Lag i (trading days, log scale)')
     ax.set_ylabel('Weight $K(i\\Delta t)\\Delta t$ (log scale)')
     ax.set_title('Fitted kernels of the VIX model')

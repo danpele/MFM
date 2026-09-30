@@ -28,7 +28,7 @@ REPO_RAW = 'https://raw.githubusercontent.com/danpele/MFM/main/data/market/'
 MARKET_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'data', 'market')
 END = '2026-09-18'
 
-# nume -> (simbol, eticheta, tip, coloana, data de start)
+# name -> (symbol, label, type, price field, start date)
 MARKETS = {
     'sp500': ('GSPC.INDX',   'S&P 500',        'index',  'close',          '1990-01-01'),
     'ndx':   ('NDX.INDX',    'Nasdaq 100',     'index',  'close',          '1990-01-01'),
@@ -53,7 +53,7 @@ _CACHE = {}
 
 
 def read_market(symbol):
-    """Citeste data/market/<SIMBOL>.csv local sau din repo-ul GitHub."""
+    """Read the daily prices of one asset from the course data."""
     fname = f'{symbol}.csv'
     path = os.path.join(MARKET_DIR, fname)
     src = path if os.path.exists(path) else REPO_RAW + fname
@@ -61,26 +61,26 @@ def read_market(symbol):
 
 
 def price(name, freq='D', start=None, end=END):
-    """Nivelul seriei: 'D' zilnic (curatat), 'W' ultimul pret al saptamanii, 'M' ultimul pret al lunii."""
+    """Price level: 'D' daily (cleaned), 'W' last price of the week, 'M' last price of the month."""
     symbol, _, kind, col, start0 = MARKETS[name]
     s = read_market(symbol)[col].loc[start or start0:end]
     s = s[s > 0].dropna()
     if kind != 'crypto':
-        s = s[s.index.dayofweek < 5]          # fara cotatii de weekend
+        s = s[s.index.dayofweek < 5]          # no weekend quotes
     if kind == 'index':
-        s = s[s.diff() != 0]                  # fara sarbatori completate cu pretul anterior
+        s = s[s.diff() != 0]                  # drop holidays filled with the previous price
     last = s.index[-1]
     if freq == 'W':
         s = s.resample('W-FRI').last().dropna()
     elif freq == 'M':
         s = s.resample('ME').last().dropna()
     if freq in ('W', 'M') and s.index[-1] > last:
-        s.index = s.index[:-1].append(pd.DatetimeIndex([last]))   # ultima perioada incompleta: datata la ultima observatie
+        s.index = s.index[:-1].append(pd.DatetimeIndex([last]))   # last incomplete period: dated at its last observation
     return s.rename(name)
 
 
 def shiller_urls():
-    """Adresele fisierului ie_data.xls: legatura curenta de pe shillerdata.com, apoi copiile cunoscute."""
+    """Addresses of Shiller's ie_data.xls: the current shillerdata.com link, then known copies."""
     urls = []
     try:
         html = urllib.request.urlopen(urllib.request.Request('https://shillerdata.com/', headers={'User-Agent': 'Mozilla/5.0'}),
@@ -93,7 +93,7 @@ def shiller_urls():
 
 
 def shiller():
-    """S&P Composite lunar (Shiller): pret real, dividend real si raportul pret/dividend (P/D)."""
+    """Monthly S&P Composite (Shiller): real price, real dividend and the price-dividend ratio (P/D)."""
     if 'shiller' in _CACHE:
         return _CACHE['shiller']
     raw = None
@@ -119,8 +119,8 @@ def shiller():
 
 
 def _french_table(fname, section=None, scale=100.0):
-    """Un tabel lunar (YYYYMM) dintr-un fisier Kenneth French: primul (implicit) sau cel cu titlul `section`;
-    randamentele sunt impartite la `scale` (100: in zecimal), numarul de firme se citeste cu scale=1."""
+    """One monthly table (YYYYMM) from a Kenneth French file: the first (default) or the one titled `section`;
+    returns are divided by `scale` (100: decimal), firm counts are read with scale=1."""
     raw = urllib.request.urlopen(urllib.request.Request(FRENCH + fname, headers={'User-Agent': 'Mozilla/5.0'}),
                                  timeout=120).read()
     text = zipfile.ZipFile(io.BytesIO(raw)).read(zipfile.ZipFile(io.BytesIO(raw)).namelist()[0]).decode('latin-1')
@@ -140,7 +140,7 @@ def _french_table(fname, section=None, scale=100.0):
 
 
 def industries():
-    """49 de industrii (randamente lunare ponderate cu valoarea) si randamentul pietei (Mkt-RF + RF)."""
+    """49 industries (value-weighted monthly returns) and the market return (Mkt-RF + RF)."""
     if 'ind' in _CACHE:
         return _CACHE['ind']
     ind = _french_table('49_Industry_Portfolios_CSV.zip')
@@ -151,7 +151,7 @@ def industries():
 
 
 def industry_firms():
-    """Numarul lunar de firme din fiecare dintre cele 49 de portofolii sectoriale (Kenneth French)."""
+    """Monthly number of firms in each of the 49 industry portfolios (Kenneth French)."""
     if 'firms' not in _CACHE:
         _CACHE['firms'] = _french_table('49_Industry_Portfolios_CSV.zip', 'Number of Firms in Portfolios', 1.0)
     return _CACHE['firms']

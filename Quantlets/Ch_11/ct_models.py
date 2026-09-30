@@ -1,18 +1,18 @@
 """
-ct_models.py -- Modele in timp continuu pentru Capitolul 11 (MFM): simulare si estimare
+ct_models.py -- Continuous-time models for Chapter 11 (MFM): simulation and estimation
 ======================================================================================
-  * miscarea browniana: mers aleator scalat (Donsker), traiectorii, variatia patratica, integrala Ito
-  * scheme de discretizare: Euler-Maruyama, Milstein; convergenta tare si slaba
-  * miscarea browniana geometrica (GBM): solutie exacta, estimare de verosimilitate maxima
-  * Ornstein-Uhlenbeck / Vasicek: discretizare exacta AR(1), estimare, timpul de injumatatire
-  * Merton (difuzie cu salturi): densitate ca mixtura Poisson, verosimilitate maxima, simulare
-  * difuzii neliniare: verosimilitate exacta CIR, pseudo-verosimilitate Euler, CKLS, drift si difuzie neparametrice
-  * testul de salturi Lee-Mykland
-  * Heston (volatilitate stochastica): simulare cu trunchiere completa, parametri din VIX, zambetul volatilitatii
-  * fapte stilizate: aplatizare, indicele de coada Hill, autocorelatia |r|
+  * Brownian motion: scaled random walk (Donsker), paths, quadratic variation, the Ito integral
+  * discretisation schemes: Euler-Maruyama, Milstein; strong and weak convergence
+  * geometric Brownian motion (GBM): exact solution, maximum likelihood estimation
+  * Ornstein-Uhlenbeck / Vasicek: exact AR(1) discretisation, estimation, half-life
+  * Merton (jump-diffusion): density as a Poisson mixture, maximum likelihood, simulation
+  * nonlinear diffusions: exact CIR likelihood, Euler pseudo-likelihood, CKLS, nonparametric drift and diffusion
+  * the Lee-Mykland jump test
+  * Heston (stochastic volatility): full-truncation simulation, parameters from the VIX, the volatility smile
+  * stylised facts: kurtosis, the Hill tail index, autocorrelation of |r|
 
-Conventie: timpul in ani; randamente log zilnice (nu in %) in functiile de estimare.
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Convention: time in years; daily log returns (not in %) in the estimation functions.
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import numpy as np
@@ -21,17 +21,17 @@ from scipy import stats, optimize
 
 
 # =============================================================================
-# MISCAREA BROWNIANA
+# BROWNIAN MOTION
 # =============================================================================
 def scaled_random_walk(n, n_paths, rng):
-    """Mersul aleator scalat W_n(t) = S_[nt] / sqrt(n), cu pasi +1/-1 egal probabili, pe grila t = k/n."""
+    """Scaled random walk W_n(t) = S_[nt] / sqrt(n), with equally likely +1/-1 steps, on the grid t = k/n."""
     steps = rng.choice([-1.0, 1.0], size=(n_paths, n))
     S = np.concatenate([np.zeros((n_paths, 1)), np.cumsum(steps, axis=1)], axis=1)
     return np.linspace(0, 1, n + 1), S / np.sqrt(n)
 
 
 def bm_paths(n_paths, n_steps, T, rng):
-    """Traiectorii ale miscarii browniene standard pe [0, T]: W_0 = 0, cresteri N(0, dt) independente."""
+    """Standard Brownian motion paths on [0, T]: W_0 = 0, independent N(0, dt) increments."""
     dt = T / n_steps
     dW = rng.standard_normal((n_paths, n_steps)) * np.sqrt(dt)
     W = np.concatenate([np.zeros((n_paths, 1)), np.cumsum(dW, axis=1)], axis=1)
@@ -39,17 +39,17 @@ def bm_paths(n_paths, n_steps, T, rng):
 
 
 def quadratic_variation(W):
-    """Suma patratelor cresterilor (variatia patratica pe grila data)."""
+    """Sum of squared increments (quadratic variation on the given grid)."""
     return np.sum(np.diff(W, axis=-1) ** 2, axis=-1)
 
 
 def total_variation(W):
-    """Suma valorilor absolute ale cresterilor (variatia totala pe grila data)."""
+    """Sum of absolute increments (total variation on the given grid)."""
     return np.sum(np.abs(np.diff(W, axis=-1)), axis=-1)
 
 
 def ito_stratonovich(W):
-    """Sumele Ito (capatul stang) si Stratonovich (punctul de mijloc) pentru integrala lui W dupa W."""
+    """Ito (left endpoint) and Stratonovich (midpoint) sums for the integral of W with respect to W."""
     dW = np.diff(W, axis=-1)
     ito = np.sum(W[..., :-1] * dW, axis=-1)
     strat = np.sum(0.5 * (W[..., :-1] + W[..., 1:]) * dW, axis=-1)
@@ -57,15 +57,15 @@ def ito_stratonovich(W):
 
 
 def max_prob(W, level=1.0):
-    """Proportia traiectoriilor al caror maxim pe [0, T] depaseste nivelul dat."""
+    """Share of paths whose maximum on [0, T] exceeds the given level."""
     return float(np.mean(W.max(axis=1) > level))
 
 
 # =============================================================================
-# SCHEME DE DISCRETIZARE (ecuatia de test a lui Higham: dX = lam X dt + mu X dW)
+# DISCRETISATION SCHEMES (Higham's test equation: dX = lam X dt + mu X dW)
 # =============================================================================
 def em_milstein_gbm(x0, lam, mu, dW, dt):
-    """Euler-Maruyama si Milstein pentru dX = lam X dt + mu X dW, cu cresterile browniene dW (n_paths x n)."""
+    """Euler-Maruyama and Milstein for dX = lam X dt + mu X dW, with Brownian increments dW (n_paths x n)."""
     xe = np.full(dW.shape[0], x0, dtype=float)
     xm = xe.copy()
     for k in range(dW.shape[1]):
@@ -77,9 +77,9 @@ def em_milstein_gbm(x0, lam, mu, dW, dt):
 
 def convergence_study(rng, x0=1.0, lam=2.0, mu=1.0, T=1.0, n_fine=2 ** 11, n_paths=20000,
                       ratios=(1, 2, 4, 8, 16, 32, 64), return_paths=False):
-    """Eroarea tare E|X_T - X^h_T| si eroarea slaba |E X^h_T - E X_T| pentru pasi dt = ratio * T / n_fine.
-    Cu return_paths=True intoarce si matricele traiectorie x pas (erorile absolute EM si Milstein, X^h_T EM),
-    folosite pentru bootstrapul pe traiectorii intregi (aceleasi traiectorii la toti pasii)."""
+    """Strong error E|X_T - X^h_T| and weak error |E X^h_T - E X_T| for steps dt = ratio * T / n_fine.
+    With return_paths=True it also returns the path x step matrices (absolute EM and Milstein errors, EM X^h_T),
+    used for the whole-path bootstrap (the same paths at every step size)."""
     dt_f = T / n_fine
     dW = rng.standard_normal((n_paths, n_fine)) * np.sqrt(dt_f)
     WT = dW.sum(axis=1)
@@ -105,9 +105,9 @@ def convergence_study(rng, x0=1.0, lam=2.0, mu=1.0, T=1.0, n_fine=2 ** 11, n_pat
 
 
 def slope_boot(dt, M, rng, n_boot=1000, level=0.95, target=None):
-    """Panta log-log cu interval bootstrap pe traiectorii intregi: se reesantioneaza randurile matricei M
-    (traiectorie x pas), pastrand toate rezolutiile impreuna; eroarea la fiecare pas este media coloanei
-    (target=None, eroare tare) sau |media coloanei - target| (eroare slaba Monte Carlo)."""
+    """Log-log slope with a whole-path bootstrap interval: the rows of M (path x step) are resampled,
+    keeping all resolutions together; the error at each step is the column mean
+    (target=None, strong error) or |column mean - target| (Monte Carlo weak error)."""
     x = np.log(np.asarray(dt))
     f = (lambda A: A.mean(axis=0)) if target is None else (lambda A: np.abs(A.mean(axis=0) - target))
     slope = np.polyfit(x, np.log(f(M)), 1)[0]
@@ -120,7 +120,7 @@ def slope_boot(dt, M, rng, n_boot=1000, level=0.95, target=None):
 
 
 def slope_ci(dt, err, level=0.95):
-    """Panta regresiei log(eroare) pe log(dt), cu eroare standard si interval de incredere t."""
+    """Slope of the regression of log(error) on log(dt), with standard error and t confidence interval."""
     x, y = np.log(np.asarray(dt)), np.log(np.asarray(err))
     res = stats.linregress(x, y)
     q = stats.t.ppf(0.5 + level / 2, len(x) - 2)
@@ -129,30 +129,30 @@ def slope_ci(dt, err, level=0.95):
 
 
 # =============================================================================
-# MISCAREA BROWNIANA GEOMETRICA (GBM)
+# GEOMETRIC BROWNIAN MOTION (GBM)
 # =============================================================================
 def gbm_paths(S0, mu, sigma, T, n_steps, n_paths, rng):
-    """Solutia exacta S_t = S_0 exp((mu - sigma^2/2) t + sigma W_t) pe o grila regulata."""
+    """Exact solution S_t = S_0 exp((mu - sigma^2/2) t + sigma W_t) on a regular grid."""
     t, W = bm_paths(n_paths, n_steps, T, rng)
     return t, S0 * np.exp((mu - 0.5 * sigma ** 2) * t + sigma * W)
 
 
 def gbm_mle(r, dt):
-    """Verosimilitate maxima pentru GBM din randamente log r (aceeasi frecventa dt, in ani).
+    """Maximum likelihood for GBM from log returns r (same frequency dt, in years).
 
     r_t ~ N((mu - sigma^2/2) dt, sigma^2 dt), i.i.d.  =>  sigma^2 = var(r)/dt,  mu = mean(r)/dt + sigma^2/2.
-    Erori standard: se(sigma) = sigma / sqrt(2n); se(drift log) = sigma / sqrt(n dt) (depinde doar de durata)."""
+    Standard errors: se(sigma) = sigma / sqrt(2n); se(log drift) = sigma / sqrt(n dt) (depends only on the span)."""
     r = np.asarray(r)
     n = len(r)
     s2 = r.var() / dt
     sigma = np.sqrt(s2)
-    m = r.mean() / dt                       # drift-ul logaritmului (mu - sigma^2/2)
+    m = r.mean() / dt                       # log drift (mu - sigma^2/2)
     return dict(n=n, years=n * dt, sigma=sigma, se_sigma=sigma / np.sqrt(2 * n), m=m, se_m=sigma / np.sqrt(n * dt),
                 mu=m + 0.5 * s2)
 
 
 def gbm_simulate_returns(m, sigma, n, dt, rng):
-    """Randamente log i.i.d. Normale ale unei GBM (drift log m, volatilitate sigma)."""
+    """I.i.d. Normal log returns of a GBM (log drift m, volatility sigma)."""
     return m * dt + sigma * np.sqrt(dt) * rng.standard_normal(n)
 
 
@@ -160,7 +160,7 @@ def gbm_simulate_returns(m, sigma, n, dt, rng):
 # ORNSTEIN-UHLENBECK / VASICEK
 # =============================================================================
 def ou_exact_path(x0, kappa, theta, sigma, dt, n, rng, z=None):
-    """Discretizarea exacta: x_{t+dt} = theta + (x_t - theta) e^{-kappa dt} + eps, eps ~ N(0, sigma^2 (1 - e^{-2 kappa dt}) / (2 kappa))."""
+    """Exact discretisation: x_{t+dt} = theta + (x_t - theta) e^{-kappa dt} + eps, eps ~ N(0, sigma^2 (1 - e^{-2 kappa dt}) / (2 kappa))."""
     b = np.exp(-kappa * dt)
     sd = sigma * np.sqrt((1 - b ** 2) / (2 * kappa))
     z = rng.standard_normal(n) if z is None else z
@@ -172,10 +172,10 @@ def ou_exact_path(x0, kappa, theta, sigma, dt, n, rng, z=None):
 
 
 def ou_mle(x, dt):
-    """Estimatorul de verosimilitate maxima (conditionat de x_0) al procesului OU: regresia AR(1) exacta.
+    """Maximum likelihood estimator (conditional on x_0) of the OU process: the exact AR(1) regression.
 
     x_{t+1} = a + b x_t + e;  kappa = -ln b / dt;  theta = a / (1 - b);  sigma = s_e sqrt(2 kappa / (1 - b^2)).
-    Erorile standard ale lui kappa, theta si ale timpului de injumatatire: metoda delta din covarianta OLS a (a, b)."""
+    Standard errors of kappa, theta and the half-life: delta method from the OLS covariance of (a, b)."""
     x = np.asarray(x, dtype=float)
     y, z = x[1:], x[:-1]
     X = np.column_stack([np.ones_like(z), z])
@@ -198,7 +198,7 @@ def ou_mle(x, dt):
 
 
 def ou_bias_mc(kappa, theta, sigma, dt, n, n_sim, rng):
-    """Distributia de selectie a lui kappa estimat: n_sim traiectorii OU exacte (start din distributia stationara)."""
+    """Sampling distribution of the estimated kappa: n_sim exact OU paths (started from the stationary distribution)."""
     from scipy.signal import lfilter
     b = np.exp(-kappa * dt)
     sd = sigma * np.sqrt((1 - b ** 2) / (2 * kappa))
@@ -212,10 +212,10 @@ def ou_bias_mc(kappa, theta, sigma, dt, n, n_sim, rng):
 
 
 # =============================================================================
-# DIFUZII NELINIARE: VEROSIMILITATE EXACTA (CIR) VS EULER; CKLS; ESTIMARE NEPARAMETRICA
+# NONLINEAR DIFFUSIONS: EXACT (CIR) VS EULER LIKELIHOOD; CKLS; NONPARAMETRIC ESTIMATION
 # =============================================================================
 def vasicek_loglik(x, dt, kappa, theta, sigma, per_obs=False):
-    """Log-verosimilitatea exacta Vasicek (tranzitie Normala, AR(1) exact)."""
+    """Exact Vasicek log-likelihood (Normal transition, exact AR(1))."""
     r0, r1 = x[:-1], x[1:]
     b = np.exp(-kappa * dt)
     ll = stats.norm.logpdf(r1, theta + (r0 - theta) * b, sigma * np.sqrt((1 - b * b) / (2 * kappa)))
@@ -223,8 +223,8 @@ def vasicek_loglik(x, dt, kappa, theta, sigma, per_obs=False):
 
 
 def cir_loglik(x, dt, kappa, theta, sigma, per_obs=False):
-    """Log-verosimilitatea exacta CIR: 2c r_{t+dt} | r_t ~ chi-patrat necentral cu 4 kappa theta / sigma^2 grade de libertate
-    si parametrul de noncentralitate 2c r_t e^{-kappa dt}, c = 2 kappa / (sigma^2 (1 - e^{-kappa dt})) (Cox, Ingersoll, Ross 1985)."""
+    """Exact CIR log-likelihood: 2c r_{t+dt} | r_t ~ noncentral chi-square with 4 kappa theta / sigma^2 degrees of freedom
+    and noncentrality 2c r_t e^{-kappa dt}, c = 2 kappa / (sigma^2 (1 - e^{-kappa dt})) (Cox, Ingersoll, Ross 1985)."""
     r0, r1 = x[:-1], x[1:]
     c = 2 * kappa / (sigma ** 2 * (1 - np.exp(-kappa * dt)))
     ll = np.log(2 * c) + stats.ncx2.logpdf(2 * c * r1, 4 * kappa * theta / sigma ** 2, 2 * c * r0 * np.exp(-kappa * dt))
@@ -232,8 +232,8 @@ def cir_loglik(x, dt, kappa, theta, sigma, per_obs=False):
 
 
 def euler_loglik(x, dt, kappa, theta, sigma, gamma, per_obs=False):
-    """Pseudo-verosimilitatea Euler (Gaussiana) pentru dr = kappa (theta - r) dt + sigma r^gamma dW
-    (gamma = 0: Vasicek, gamma = 1/2: CIR, gamma liber: Chan, Karolyi, Longstaff, Sanders 1992)."""
+    """Euler (Gaussian) pseudo-likelihood for dr = kappa (theta - r) dt + sigma r^gamma dW
+    (gamma = 0: Vasicek, gamma = 1/2: CIR, free gamma: Chan, Karolyi, Longstaff, Sanders 1992)."""
     r0, r1 = x[:-1], x[1:]
     ll = stats.norm.logpdf(r1, r0 + kappa * (theta - r0) * dt, sigma * r0 ** gamma * np.sqrt(dt))
     return ll if per_obs else ll.sum()
@@ -252,8 +252,8 @@ def _fit(nll, p0):
 
 
 def short_rate_fits(x, dt):
-    """Vasicek (exact si Euler), CIR (exact si Euler) si CKLS (Euler) pe aceeasi serie; erori standard din hessiana
-    (pentru CKLS si erori robuste sandwich, deoarece verosimilitatea Gaussiana Euler este doar o cvasi-verosimilitate)."""
+    """Vasicek (exact and Euler), CIR (exact and Euler) and CKLS (Euler) on the same series; Hessian standard errors
+    (for CKLS also robust sandwich errors, since the Gaussian Euler likelihood is only a quasi-likelihood)."""
     x = np.asarray(x, dtype=float)
     specs = {
         'vasicek_exact': (lambda p: vasicek_loglik(x, dt, p[0], p[1], p[2]), lambda q: (q[0], q[1], np.exp(q[2])), 0.0),
@@ -278,7 +278,7 @@ def short_rate_fits(x, dt):
         se = np.sqrt(np.maximum(np.diag(np.linalg.inv(H)), 0))
         out[name] = dict(kappa=th[0], theta=th[1], sigma=th[2], gamma=g, se_kappa=se[0], se_theta=se[1], se_sigma=se[2],
                          loglik=-res.fun)
-    # CKLS: gamma liber
+    # CKLS: free gamma
     best = None
     for g0 in (0.5, 1.0, 1.5):
         def nll(q):
@@ -308,7 +308,7 @@ def short_rate_fits(x, dt):
     c['wald_g05'] = ((c['gamma'] - 0.5) / c['se_gamma_rob']) ** 2
     c['wald_g0_hac'] = (c['gamma'] / c['se_gamma_hac']) ** 2
     c['wald_g05_hac'] = ((c['gamma'] - 0.5) / c['se_gamma_hac']) ** 2
-    L0 = nw_lags(len(sc))                   # sensibilitate: de cinci ori mai multe laguri
+    L0 = nw_lags(len(sc))                   # sensitivity: five times as many lags
     se5 = float(np.sqrt((Hi @ hac_cov(sc, 5 * L0) @ Hi)[3, 3]))
     c.update(hac_lags5=5 * L0, se_gamma_hac5=se5, wald_g0_hac5=(c['gamma'] / se5) ** 2,
              wald_g05_hac5=((c['gamma'] - 0.5) / se5) ** 2)
@@ -317,13 +317,13 @@ def short_rate_fits(x, dt):
 
 
 def nw_lags(n):
-    """Numarul de laguri Newey-West: floor(4 (n / 100)^(2/9))."""
+    """Newey-West number of lags: floor(4 (n / 100)^(2/9))."""
     return int(np.floor(4 * (n / 100) ** (2 / 9)))
 
 
 def hac_cov(sc, L=None):
-    """Covarianta pe termen lung a scorurilor (Newey si West, 1987): nucleu Bartlett cu L laguri; tine cont de
-    autocorelatia scorurilor (de exemplu, din volatilitatea persistenta omisa din model)."""
+    """Long-run covariance of the scores (Newey and West, 1987): Bartlett kernel with L lags; accounts for
+    autocorrelation of the scores (for example, from persistent volatility omitted from the model)."""
     sc = np.asarray(sc) - np.asarray(sc).mean(axis=0)
     L = nw_lags(len(sc)) if L is None else L
     S = sc.T @ sc
@@ -334,9 +334,9 @@ def hac_cov(sc, L=None):
 
 
 def nw_drift_diffusion(x, dt, grid, h=None):
-    """Estimatori Nadaraya-Watson (nucleu Gaussian) pentru driftul a(r) = E[dr | r] / dt si difuzia
-    b^2(r) = E[(dr)^2 | r] / dt (Stanton 1997; Bandi si Phillips 2003); erori standard punctuale robuste la heteroscedasticitate
-    (dependenta seriala a erorilor este ignorata)."""
+    """Nadaraya-Watson estimators (Gaussian kernel) of the drift a(r) = E[dr | r] / dt and the diffusion
+    b^2(r) = E[(dr)^2 | r] / dt (Stanton 1997; Bandi and Phillips 2003); pointwise heteroskedasticity-robust standard errors
+    (serial dependence of the errors is ignored)."""
     x = np.asarray(x, dtype=float)
     r0, d = x[:-1], np.diff(x)
     if h is None:
@@ -355,11 +355,11 @@ def nw_drift_diffusion(x, dt, grid, h=None):
 
 
 # =============================================================================
-# MERTON: DIFUZIE CU SALTURI
+# MERTON: JUMP-DIFFUSION
 # =============================================================================
 def merton_logpdf(r, dt, m, sigma, lam, mu_j, s_j, kmax=12):
-    """Log-densitatea randamentelor log pe un pas dt:  r = m dt + sigma W_dt + suma a N salturi N(mu_j, s_j^2),
-    N ~ Poisson(lam dt). Densitatea este o mixtura de distributii Normale ponderate cu probabilitatile Poisson."""
+    """Log-density of log returns over a step dt:  r = m dt + sigma W_dt + the sum of N jumps N(mu_j, s_j^2),
+    N ~ Poisson(lam dt). The density is a mixture of Normal distributions weighted by the Poisson probabilities."""
     r = np.asarray(r)[:, None]
     k = np.arange(kmax + 1)[None, :]
     w = stats.poisson.pmf(k, lam * dt)
@@ -374,10 +374,10 @@ def _merton_unpack(p, sigma_min=0.0):
 
 
 def merton_mle(r, dt, starts=None, sigma_min=0.0):
-    """Verosimilitate maxima pentru Merton (m, sigma, lam, mu_j, s_j); mai multe puncte de start.
-    sigma_min > 0 restrange spatiul parametrilor la sigma >= sigma_min (sigma = sigma_min + e^q): verosimilitatea
-    nerestransa este nemarginita (sigma -> 0 cu m dt egal cu un randament observat), cea restransa este marginita.
-    Erorile standard: inversa hessianei numerice in parametrii originali (metoda delta)."""
+    """Maximum likelihood for Merton (m, sigma, lam, mu_j, s_j); several starting points.
+    sigma_min > 0 restricts the parameter space to sigma >= sigma_min (sigma = sigma_min + e^q): the unrestricted
+    likelihood is unbounded (sigma -> 0 with m dt equal to an observed return), the restricted one is bounded.
+    Standard errors: inverse of the numerical Hessian in the original parameters (delta method)."""
     r = np.asarray(r)
     sd = r.std()
     unpack = lambda p: _merton_unpack(p, sigma_min)
@@ -408,7 +408,7 @@ def merton_mle(r, dt, starts=None, sigma_min=0.0):
 
 
 def numerical_hessian(f, x, rel=1e-4):
-    """Hessiana prin diferente finite centrale."""
+    """Hessian by central finite differences."""
     x = np.asarray(x, dtype=float)
     k = len(x)
     h = rel * np.maximum(np.abs(x), 1e-3)
@@ -422,7 +422,7 @@ def numerical_hessian(f, x, rel=1e-4):
 
 
 def merton_moments(dt, sigma, lam, mu_j, s_j, m=0.0):
-    """Media, dispersia, asimetria si excesul de aplatizare ale randamentului Merton pe un pas dt (cumulanti)."""
+    """Mean, variance, skewness and excess kurtosis of the Merton return over a step dt (cumulants)."""
     k1 = m * dt + lam * dt * mu_j
     k2 = sigma ** 2 * dt + lam * dt * (mu_j ** 2 + s_j ** 2)
     k3 = lam * dt * (mu_j ** 3 + 3 * mu_j * s_j ** 2)
@@ -431,15 +431,15 @@ def merton_moments(dt, sigma, lam, mu_j, s_j, m=0.0):
 
 
 def merton_simulate_returns(m, sigma, lam, mu_j, s_j, n, dt, rng):
-    """Randamente log simulate din modelul Merton."""
+    """Log returns simulated from the Merton model."""
     N = rng.poisson(lam * dt, n)
     jumps = mu_j * N + s_j * np.sqrt(N) * rng.standard_normal(n)
     return m * dt + sigma * np.sqrt(dt) * rng.standard_normal(n) + jumps
 
 
 def _lr_stat(r, dt, sigma_min):
-    """Statistica LR GBM vs Merton pe spatiul restrans sigma >= sigma_min, cu aceeasi regula de optimizare
-    (cele sase puncte de start implicite din merton_mle) pentru orice esantion."""
+    """LR statistic, GBM vs Merton, on the restricted space sigma >= sigma_min, with the same optimisation rule
+    (the six default starting points of merton_mle) for every sample."""
     l0 = stats.norm.logpdf(r, r.mean(), r.std()).sum()
     mf = merton_mle(r, dt, sigma_min=sigma_min)
     return max(2 * (mf['loglik'] - l0), 0.0), mf
@@ -451,11 +451,11 @@ def _lr_boot_one(args):
 
 
 def lr_bootstrap(r, dt, n_boot, rng, sigma_min=0.05, n_jobs=1):
-    """Testul raportului de verosimilitate GBM (fara salturi) vs Merton, cu valoarea p din bootstrap parametric.
-    Sub ipoteza nula lam = 0 se afla pe frontiera, iar mu_j, s_j nu sunt identificati: distributia chi-patrat nu se aplica.
-    Verosimilitatea Merton nerestransa este nemarginita, deci statistica este definita pe spatiul restrans
-    sigma >= sigma_min; aceeasi restrictie si aceleasi puncte de start pentru esantionul observat si pentru fiecare
-    esantion bootstrap. Valoarea p: (1 + numarul depasirilor) / (1 + n_boot), cu limita superioara binomiala de 95%."""
+    """Likelihood-ratio test of GBM (no jumps) against Merton, with a parametric-bootstrap p-value.
+    Under the null, lam = 0 lies on the boundary and mu_j, s_j are unidentified: the chi-square distribution does not apply.
+    The unrestricted Merton likelihood is unbounded, so the statistic is defined on the restricted space
+    sigma >= sigma_min; the same restriction and the same starting points for the observed sample and for every
+    bootstrap sample. p-value: (1 + number of exceedances) / (1 + n_boot), with a 95% binomial upper bound."""
     r = np.asarray(r)
     g = gbm_mle(r, dt)
     lr, mf = _lr_stat(r, dt, sigma_min)
@@ -473,11 +473,11 @@ def lr_bootstrap(r, dt, n_boot, rng, sigma_min=0.05, n_jobs=1):
 
 
 # =============================================================================
-# TESTUL DE SALTURI LEE-MYKLAND
+# THE LEE-MYKLAND JUMP TEST
 # =============================================================================
 def lee_mykland(r, K=16, alpha=0.01):
-    """Statistica L_t = r_t / sigma_t, cu sigma_t^2 = variatia bipower pe cele K-1 randamente anterioare;
-    salt detectat daca (|L_t| - C_n) / S_n depaseste cuantila 1 - alpha a distributiei Gumbel (Lee & Mykland, 2008)."""
+    """Statistic L_t = r_t / sigma_t, with sigma_t^2 = bipower variation over the previous K-1 returns;
+    a jump is detected if (|L_t| - C_n) / S_n exceeds the 1 - alpha quantile of the Gumbel distribution (Lee & Mykland, 2008)."""
     r = pd.Series(r).dropna()
     a = r.abs()
     bpv = (a * a.shift(1)).rolling(K - 2).sum().shift(1) / (K - 2)
@@ -493,10 +493,10 @@ def lee_mykland(r, K=16, alpha=0.01):
 
 
 # =============================================================================
-# HESTON: VOLATILITATE STOCHASTICA
+# HESTON: STOCHASTIC VOLATILITY
 # =============================================================================
 def heston_paths(S0, v0, mu, kappa, theta, xi, rho, T, n_steps, n_paths, rng, antithetic=False):
-    """Schema Euler cu trunchiere completa (Lord et al., 2010) pentru log S si v.
+    """Full-truncation Euler scheme (Lord et al., 2010) for log S and v.
     d ln S = (mu - v/2) dt + sqrt(v) dW1;  dv = kappa (theta - v) dt + xi sqrt(v) dW2;  corr(dW1, dW2) = rho."""
     dt = T / n_steps
     m = n_paths // 2 if antithetic else n_paths
@@ -519,11 +519,11 @@ def heston_paths(S0, v0, mu, kappa, theta, xi, rho, T, n_steps, n_paths, rng, an
 
 
 def heston_from_vix(vix, price, dt):
-    """Parametrii Heston din VIX: v_t = (VIX_t / 100)^2 ca aproximare a variantei; regresia CIR discretizata
+    """Heston parameters from the VIX: v_t = (VIX_t / 100)^2 as a variance proxy; the discretised CIR regression
     (v_{t+1} - v_t) / sqrt(v_t) = kappa theta dt / sqrt(v_t) - kappa dt sqrt(v_t) + xi sqrt(dt) eps;
-    rho = corelatia dintre socurile de randament si socurile de varianta.
-    Pretul si VIX sunt aliniate intai pe zilele comune; randamentele se calculeaza apoi pe aceasta grila comuna,
-    astfel incat randamentul si variatia lui v acopera acelasi interval."""
+    rho = correlation between return shocks and variance shocks.
+    Price and VIX are first aligned on common days; returns are then computed on this common grid,
+    so that the return and the change in v cover the same interval."""
     d = pd.concat([vix.rename('vix'), price.rename('p')], axis=1, join='inner').dropna()
     d['r'] = np.log(d['p']).diff()
     d = d.dropna()
@@ -545,29 +545,29 @@ def heston_from_vix(vix, price, dt):
 
 
 def heston_from_proxy(logret, dt, window=21):
-    """Aceeasi regresie CIR, cu varianta aproximata prin varianta realizata anualizata pe o fereastra mobila
-    (pentru piete fara un indice de volatilitate, de exemplu BET si Bitcoin)."""
+    """The same CIR regression, with the variance proxied by annualised realised variance over a rolling window
+    (for markets without a volatility index, e.g. BET and Bitcoin)."""
     rv = (logret ** 2).rolling(window).mean() / dt          # RV_t = (1/21) sum_{j=0}^{20} r_{t-j}^2 / dt
     proxy = 100 * np.sqrt(rv)
-    price = np.exp(logret.cumsum())                           # pret reconstruit pe calendarul randamentelor
+    price = np.exp(logret.cumsum())                           # price rebuilt on the returns calendar
     return heston_from_vix(proxy.dropna(), price, dt)
 
 
 def heston_simulate_returns(p, n, dt, rng, mu=0.0, burn=500):
-    """Randamente log zilnice simulate din Heston (cu o perioada de incalzire de burn pasi)."""
+    """Daily log returns simulated from Heston (with a burn-in of burn steps)."""
     T = (n + burn) * dt
     _, S, _ = heston_paths(1.0, p['theta'], mu, p['kappa'], p['theta'], p['xi'], p['rho'], T, n + burn, 1, rng)
     return np.diff(np.log(S[:, 0]))[burn:]
 
 
 def bs_call(S, K, T, sigma, r=0.0):
-    """Pretul Black-Scholes al unei optiuni call europene."""
+    """Black-Scholes price of a European call option."""
     d1 = (np.log(S / K) + (r + 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
     return S * stats.norm.cdf(d1) - K * np.exp(-r * T) * stats.norm.cdf(d1 - sigma * np.sqrt(T))
 
 
 def implied_vol(price, S, K, T, r=0.0):
-    """Volatilitatea implicita Black-Scholes (radacina prin metoda Brent)."""
+    """Black-Scholes implied volatility (root by Brent's method)."""
     intrinsic = max(S - K * np.exp(-r * T), 0.0)
     if price <= intrinsic + 1e-10:
         return np.nan
@@ -575,15 +575,15 @@ def implied_vol(price, S, K, T, r=0.0):
 
 
 def heston_smile(p, T, strikes, rng, n_paths=100000, n_steps=126):
-    """Preturi Monte Carlo ale optiunilor call sub Heston (rata zero, mu = 0) si volatilitatile implicite."""
+    """Monte Carlo call prices under Heston (zero rate, mu = 0) and their implied volatilities."""
     _, S, _ = heston_paths(1.0, p['v0'], 0.0, p['kappa'], p['theta'], p['xi'], p['rho'], T, n_steps, n_paths, rng,
                            antithetic=True)
-    ST = S[-1] / S[-1].mean()                 # corectie de martingal: E[S_T] = S_0 = 1
+    ST = S[-1] / S[-1].mean()                 # martingale correction: E[S_T] = S_0 = 1
     return np.array([implied_vol(np.maximum(ST - K, 0).mean(), 1.0, K, T) for K in strikes])
 
 
 # =============================================================================
-# FAPTE STILIZATE
+# STYLISED FACTS
 # =============================================================================
 def acf(x, lags):
     x = np.asarray(x) - np.mean(x)
@@ -592,16 +592,16 @@ def acf(x, lags):
 
 
 def hill(x, share=0.05):
-    """Statistica Hill pentru cele mai mari k = share * n valori ale lui x (n = numarul total de observatii);
-    cu x = -r: cele mai mari pierderi, k = 5% din toate randamentele. Estimeaza indicele de coada doar sub
-    variatie regulata (coada de tip Pareto); pentru o coada Normala este o statistica descriptiva a formei cozii."""
+    """Hill statistic for the largest k = share * n values of x (n = total number of observations);
+    with x = -r: the largest losses, k = 5% of all returns. It estimates the tail index only under
+    regular variation (a Pareto-type tail); for a Normal tail it is a descriptive statistic of the tail shape."""
     x = np.sort(np.asarray(x))[::-1]
     k = int(share * len(x))
     return 1 / np.mean(np.log(x[:k] / x[k]))
 
 
 def stylised(r, lags=range(1, 51)):
-    """Faptele stilizate folosite pentru compararea modelelor cu datele."""
+    """Stylised facts used to compare the models with the data."""
     r = np.asarray(r)
     a = acf(np.abs(r), list(lags))
     return dict(exkurt=float(stats.kurtosis(r)), skew=float(stats.skew(r)), hill=float(hill(-r)),

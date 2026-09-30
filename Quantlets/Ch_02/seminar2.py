@@ -34,12 +34,12 @@ SEED = 42
 # PARTEA A
 # -----------------------------------------------------------------------------
 A_RETURNS = np.array([1.0, -0.5, 0.8, 0.3, -1.2, 0.6, 0.9, -0.4])          # %
-A_SIGNS = '++-+++--+-++---+-+++'                                            # 20 de zile
+A_SIGNS = '++-+++--+-++---+-+++'                                            # 20 days
 A4_SIGNS = '+++++-----+++++-----'
 
 
 def a_vr_by_hand(r=A_RETURNS, q=2):
-    """VR(q) fara corectii de deplasare: var(sume pe q zile, suprapuse) / (q * var zilnica)."""
+    """VR(q) without bias corrections: var(overlapping q-day sums) / (q * daily var)."""
     mu = r.mean()
     var1 = ((r - mu) ** 2).mean()
     sums = np.convolve(r, np.ones(q), mode='valid')
@@ -61,7 +61,7 @@ def a_runs(signs=A_SIGNS):
 
 
 def h_from_vr(vr, q):
-    """Pentru cresteri autosimilare, VR(q) = q^(2H-1), deci H = 0,5 + ln VR(q) / (2 ln q)."""
+    """For self-similar increments, VR(q) = q^(2H-1), so H = 0.5 + ln VR(q) / (2 ln q)."""
     return 0.5 + np.log(vr) / (2 * np.log(q))
 
 
@@ -82,9 +82,9 @@ def b_vr_table(names):
 
 
 def b_rolling_dfa(k='sp500', window=500, step=21, n_boot=199, seed=SEED):
-    """DFA pe ferestre mobile; banda nula wild bootstrap (semne Rademacher) calculata pentru FIECARE fereastra:
-    pastreaza volatilitatea ferestrei (permisa sub RW3) si distruge autocorelatia randamentelor.
-    Pentru comparatie: banda i.i.d. Student-t4 (aceeasi pentru toate ferestrele)."""
+    """Rolling DFA; wild-bootstrap null band (Rademacher signs) computed for EACH window:
+    keeps the window's volatility (allowed under RW3) and destroys the autocorrelation of returns.
+    For comparison: the i.i.d. Student-t4 band (the same for all windows)."""
     rng = np.random.default_rng(seed)
     null = [dfa_hurst(rng.standard_t(4, window))[0] for _ in range(300)]
     lo_t, hi_t = np.percentile(null, [2.5, 97.5])
@@ -109,8 +109,8 @@ def b_rolling_dfa(k='sp500', window=500, step=21, n_boot=199, seed=SEED):
 
 
 def wild_bootstrap_vr_band(x, q=5, n_boot=999, seed=SEED, sims=False):
-    """Banda 95% pentru z*(q) sub ipoteza de mers aleator cu heteroscedasticitate: semne Rademacher.
-    sims=True intoarce si cele n_boot statistici simulate."""
+    """95% band for z*(q) under a heteroskedastic random walk: Rademacher signs.
+    sims=True also returns the n_boot simulated statistics."""
     rng = np.random.default_rng(seed)
     e = x - x.mean()
     zs = np.array([variance_ratio(e * rng.choice([-1, 1], len(e)), q)[2] for _ in range(n_boot)])
@@ -119,8 +119,8 @@ def wild_bootstrap_vr_band(x, q=5, n_boot=999, seed=SEED, sims=False):
 
 
 def b_amh_bitcoin(window=365, step=30, q=5, n_boot=999, seed=SEED):
-    """z*(q) pe ferestre de un an (Bitcoin din 1 ian. 2011 pana la 18 sep. 2026); banda wild bootstrap
-    cu n_boot replicari in fiecare fereastra (999: cuantilele de 2,5% si 97,5% sunt stabile)."""
+    """z*(q) on one-year windows (Bitcoin from 1 Jan 2011 to 18 Sep 2026); wild-bootstrap band
+    with n_boot replications in each window (999: the 2.5% and 97.5% quantiles are stable)."""
     r = log_returns('btc', start='2011-01-01')
     rows = []
     x = r.values
@@ -135,7 +135,7 @@ def b_amh_bitcoin(window=365, step=30, q=5, n_boot=999, seed=SEED):
 
 
 def b_tom_ols_hac(k='sp500'):
-    """Efectul turn-of-month: aceeasi regresie cu erori OLS clasice si cu erori HAC (Newey-West, 5 decalaje)."""
+    """Turn-of-the-month effect: the same regression with classical OLS errors and with HAC errors (Newey-West, 5 lags)."""
     r = complete_months(log_returns(k)) * 1e4
     d = pd.DataFrame({'r': r})
     ym = d.index.to_period('M')
@@ -152,7 +152,7 @@ def b_tom_ols_hac(k='sp500'):
 
 
 def b_calendar_multiple(t):
-    """5 piete x 3 efecte (ziua saptamanii, ianuarie, turn-of-month) din calendar_table(); Bonferroni si Holm."""
+    """5 markets x 3 effects (day of the week, January, turn of the month) from calendar_table(); Bonferroni and Holm."""
     rows = []
     for m, row in t.iterrows():
         rows.append((m, 'day of week (equal means)', row['dow_equal_p']))
@@ -174,9 +174,9 @@ def b_calendar_multiple(t):
 
 
 def _segment_stats(x, keep, q=5):
-    """rho1, tau1 si z*(q) Lo-MacKinlay calculate DOAR in segmentele contigue pastrate:
-    perechile (t, t-k) si sumele pe q zile care traverseaza o perioada eliminata nu sunt folosite.
-    Cu keep = True peste tot, rezultatul coincide cu variance_ratio(x, q)."""
+    """rho1, tau1 and the Lo-MacKinlay z*(q) computed ONLY within the contiguous retained segments:
+    pairs (t, t-k) and q-day sums that cross a removed period are not used.
+    With keep = True everywhere, the result equals variance_ratio(x, q)."""
     x = np.asarray(x, dtype=float)
     keep = np.asarray(keep, dtype=bool)
     T = keep.sum()
@@ -184,7 +184,7 @@ def _segment_stats(x, keep, q=5):
     e = np.where(keep, x - mu, 0.0)
     s2 = (e ** 2).sum()
 
-    def pair(k):                          # ambele capete pastrate si toate zilele dintre ele pastrate
+    def pair(k):                          # both ends retained and every day between them retained
         ok = np.convolve(keep.astype(int), np.ones(k + 1, dtype=int), mode='valid') == k + 1
         return ok, e[k:] * ok, e[:-k] * ok
     ok1, a1, b1 = pair(1)
@@ -203,8 +203,8 @@ def _segment_stats(x, keep, q=5):
 
 
 def b_crisis_robustness():
-    """Autocorelatia S&P 500 cu si fara 2008-2009 si 2020; fara crize, statisticile se calculeaza doar in
-    segmentele contigue ramase (nicio pereche de zile si nicio suma pe 5 zile nu traverseaza o criza eliminata)."""
+    """S&P 500 autocorrelation with and without 2008-2009 and 2020; without the crises, the statistics are computed only
+    within the remaining contiguous segments (no pair of days and no 5-day sum crosses a removed crisis)."""
     r = log_returns('sp500')
     mask = ~(((r.index >= '2008-09-01') & (r.index <= '2009-06-30')) |
              ((r.index >= '2020-02-15') & (r.index <= '2020-06-30')))
@@ -214,7 +214,7 @@ def b_crisis_robustness():
 
 
 def b_bet_common_period():
-    """BET vs BET-TR pe perioada comuna (de la inceputul BET-TR): separa efectul selectiei de cel al dividendelor."""
+    """BET vs BET-TR on the common period (from the start of BET-TR): separates the sample effect from the dividend effect."""
     tr = np.log(read_market('BETTR.INDX')['close']).diff().dropna()
     b = log_returns('bet')
     out = {}
@@ -231,7 +231,7 @@ def b_bet_common_period():
 # PARTEA C
 # -----------------------------------------------------------------------------
 def rho1_robust(x):
-    """rho1 si eroarea standard robusta sqrt(tau1)."""
+    """rho1 and its robust standard error sqrt(tau1)."""
     x = np.asarray(x, dtype=float)
     e = x - x.mean()
     s2 = (e ** 2).sum()
@@ -239,8 +239,8 @@ def rho1_robust(x):
 
 
 def c_bvb_before_after(split='2020-09-21', years=5, n_boot=999, block=20, seed=SEED, k='bet'):
-    """rho1 si z*(5) cu 5 ani inainte si dupa reclasificare; bootstrap pe blocuri mobile, independent in fiecare
-    perioada, pentru diferenta rho1(dupa) - rho1(inainte). k = 'bet' (tratat), 'wig20' sau 'bux' (comparatie)."""
+    """rho1 and z*(5) over the 5 years before and after the upgrade; moving-block bootstrap, independent in each
+    period, for the difference rho1(after) - rho1(before). k = 'bet' (treated), 'wig20' or 'bux' (comparison)."""
     r = log_returns(k)
     s = pd.Timestamp(split)
     before = r.loc[s - pd.DateOffset(years=years):s - pd.Timedelta(days=1)]
@@ -269,7 +269,7 @@ def c_bvb_before_after(split='2020-09-21', years=5, n_boot=999, block=20, seed=S
 # CALCULE SUPLIMENTARE PENTRU GRAFICELE SEMINARULUI
 # -----------------------------------------------------------------------------
 def a2_null(T=1000, n_sim=2000, seed=SEED):
-    """z(2) si z*(2) simulate: randamente i.i.d. N(0,1) si randamente GARCH(1,1) (grupare a volatilitatii, RW3 adevarata)."""
+    """Simulated z(2) and z*(2): i.i.d. N(0,1) returns and GARCH(1,1) returns (volatility clustering, RW3 true)."""
     rng = np.random.default_rng(seed)
     z_iid, z_g, zs_g = [], [], []
     for _ in range(n_sim):
@@ -289,7 +289,7 @@ def a2_null(T=1000, n_sim=2000, seed=SEED):
 
 
 def a3_exact(n1=12, n2=8, runs=11):
-    """Distributia exacta a numarului de secvente conditionat de n1 si n2 (Wald si Wolfowitz, 1940)."""
+    """Exact distribution of the number of runs given n1 and n2 (Wald and Wolfowitz, 1940)."""
     n = n1 + n2
     tot = comb(n, n1)
     pmf = {}
@@ -307,7 +307,7 @@ def a3_exact(n1=12, n2=8, runs=11):
 
 
 def a4_sim(rho=0.98, T=60, corr=-0.9, su=0.17, sv=0.14, n_sim=10000, seed=SEED):
-    """Distributia de selectie a pantei predictive sub beta = 0 (sistemul din A4, date anuale ilustrative)."""
+    """Sampling distribution of the predictive slope under beta = 0 (the A4 system, illustrative annual data)."""
     rng = np.random.default_rng(seed)
     b, t = np.empty(n_sim), np.empty(n_sim)
     sx = sv / np.sqrt(1 - rho ** 2)
@@ -329,13 +329,13 @@ def a4_sim(rho=0.98, T=60, corr=-0.9, su=0.17, sv=0.14, n_sim=10000, seed=SEED):
 
 
 def ar1_vr(rho, q):
-    """VR(q) al unui AR(1) cu rho_k = rho^k."""
+    """VR(q) of an AR(1) with rho_k = rho^k."""
     k = np.arange(1, q)
     return 1 + 2 * np.sum((1 - k / q) * rho ** k)
 
 
 def b1_worked(k='sp500', q=2):
-    """Calculul pas cu pas al VR(q), z(q) si z*(q) (Lo si MacKinlay, 1988), randamente in %."""
+    """Step-by-step computation of VR(q), z(q) and z*(q) (Lo and MacKinlay, 1988), returns in %."""
     x = log_returns(k).values * 100
     T = len(x)
     mu = x.mean()
@@ -355,7 +355,7 @@ def b1_worked(k='sp500', q=2):
 
 
 def b3_window(k='sp500', window=500, box=50):
-    """DFA pe o singura fereastra (ultimele `window` randamente): profil, tendinte pe segmente, log F(n) ~ log n."""
+    """DFA on a single window (the last `window` returns): profile, segment trends, log F(n) on log n."""
     r = log_returns(k)
     w = r.iloc[-window:]
     x = w.values
@@ -368,7 +368,7 @@ def b3_window(k='sp500', window=500, box=50):
 
 
 def b5_strip(k='sp500', month_end='2026-07'):
-    """Zilele de tranzactionare in jurul unei schimbari de luna, cu indicatorul TOM si randamentul in bp."""
+    """Trading days around a month change, with the TOM indicator and the return in bp."""
     r = complete_months(log_returns(k)) * 1e4
     d = pd.DataFrame({'r': r})
     ym = d.index.to_period('M')
@@ -381,9 +381,9 @@ def b5_strip(k='sp500', month_end='2026-07'):
 
 
 def b9_event_path(event='2018-12-19', est=(-250, -11), days=(-10, 5)):
-    """AR zilnice, erorile standard de predictie si CAR pentru TLV, BRD si portofoliul egal ponderat."""
+    """Daily abnormal returns, prediction standard errors and CAR for TLV, BRD and the equally weighted portfolio."""
     px = pd.concat({'TLV': read_market('TLV.RO')['adjusted_close'], 'BRD': read_market('BRD.RO')['adjusted_close'],
-                    'BET': read_market('BET')['close']}, axis=1).dropna()        # join pe preturi, zile comune
+                    'BET': read_market('BET')['close']}, axis=1).dropna()        # align prices on common trading days
     px = px[px.index.dayofweek < 5]
     r = np.log(px).diff().dropna()
     t0 = r.index.get_loc(pd.Timestamp(event))
@@ -403,7 +403,7 @@ def b9_event_path(event='2018-12-19', est=(-250, -11), days=(-10, 5)):
 
 
 def c1_rolling(keys=('bet', 'wig20', 'bux'), window=250, start='2014-01-01'):
-    """rho1 pe ferestre mobile de `window` zile, cu eroarea standard robusta."""
+    """rho1 on rolling windows of `window` days, with its robust standard error."""
     out = {}
     for k in keys:
         x = log_returns(k, start=start)
@@ -419,7 +419,7 @@ CRISES = [('2008-09-01', '2009-06-30'), ('2020-02-15', '2020-06-30')]
 
 
 def fig_b2(t2, b1, b2c):
-    """B2: z(2) clasic vs z*(2) robust pe piete si valoarea p Chow-Denning (test comun pe q = 2, 5, 10, 20)."""
+    """B2: classical z(2) vs robust z*(2) across markets and the Chow-Denning p-value (joint test over q = 2, 5, 10, 20)."""
     rows = [(LABELS['bet'].split(' (')[0] + ', 2000-2026', b1.loc[LABELS['bet'], 'z2'], b1.loc[LABELS['bet'], 'zstar2'],
              b1.loc[LABELS['bet'], 'CD_p']),
             ('BET, BET-TR period', b2c['BET, BET-TR period']['z2'], b2c['BET, BET-TR period']['zstar2'],
@@ -453,7 +453,7 @@ def fig_b2(t2, b1, b2c):
 
 
 def setup_check():
-    """Verificarea datelor: primele inchideri si randamente S&P 500 si numarul de randamente."""
+    """Data check: the first S&P 500 closes and returns and the number of returns."""
     p = load_close('sp500')
     r = np.log(p).diff()
     rows = [dict(date=i.date(), close=float(p.loc[i]), r=float(r.loc[i]) if i != p.index[0] else None)
@@ -463,7 +463,7 @@ def setup_check():
 
 
 def fig_sem_data():
-    """Preturile (scara log) si randamentele log zilnice pentru S&P 500 si BET, 2000 -- 18 sep. 2026."""
+    """Prices (log scale) and daily log returns for the S&P 500 and BET, 2000 -- 18 Sep 2026."""
     fig, axes = plt.subplots(2, 2, figsize=(8.6, 3.6), sharex=True)
     for j, (k, c) in enumerate([('sp500', MainBlue), ('bet', IDAred)]):
         p = load_close(k)
@@ -485,7 +485,7 @@ def fig_sem_data():
 
 
 def fig_a1(a1):
-    """A1: cele opt randamente si sumele suprapuse pe doua zile."""
+    """A1: the eight returns and the overlapping two-day sums."""
     r = A_RETURNS
     t = np.arange(1, len(r) + 1)
     fig, axes = plt.subplots(1, 2, figsize=(8.6, 2.8))
@@ -522,7 +522,7 @@ def fig_a1(a1):
 
 
 def fig_a2(sim):
-    """A2: perechile de covariante pentru q = 3 si distributia lui z(2) sub i.i.d. si sub GARCH."""
+    """A2: the covariance pairs for q = 3 and the distribution of z(2) under i.i.d. and under GARCH."""
     fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.0), gridspec_kw={'width_ratios': [1, 2.3]})
     ax = axes[0]
     col = {0: MainBlue, 1: Forest, 2: Amber}
@@ -560,7 +560,7 @@ def fig_a2(sim):
 
 
 def fig_a3(a3, ex):
-    """A3: semnele numerotate cu granitele secventelor si distributia exacta a numarului de secvente."""
+    """A3: the numbered signs with the run boundaries and the exact distribution of the number of runs."""
     fig, axes = plt.subplots(2, 1, figsize=(8.6, 3.4), gridspec_kw={'height_ratios': [1, 2.2]})
     ax = axes[0]
     run = 1
@@ -596,7 +596,7 @@ def fig_a3(a3, ex):
 
 
 def fig_a4(sim, bias):
-    """A4: distributia pantei OLS sub beta = 0, T = 60, rho = 0,98, corr(u, v) = -0,9."""
+    """A4: distribution of the OLS slope under beta = 0, T = 60, rho = 0.98, corr(u, v) = -0.9."""
     fig, ax = plt.subplots(figsize=(8.6, 2.9))
     ax.hist(sim['beta'], bins=80, density=True, color=MainBlue, alpha=0.6, label=r'Simulated $\hat\beta$ (10,000 samples)')
     ax.axvline(0, color='black', lw=1.0, label=r'True $\beta = 0$')
@@ -611,7 +611,7 @@ def fig_a4(sim, bias):
 
 
 def fig_a56(rho_pos, rho_neg, h_bet, h_sp, qmax=500):
-    """A5-A6: VR(q) si H(q) implicat pentru doua AR(1) (memorie scurta) si valorile empirice la q = 20."""
+    """A5-A6: VR(q) and the implied H(q) for two AR(1) processes (short memory) and the empirical values at q = 20."""
     q = np.unique(np.logspace(np.log10(2), np.log10(qmax), 80).astype(int))
     fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.0))
     for rho, c, lab in [(rho_pos, IDAred, r'AR(1), $\rho_1$ = %.3f (BET)' % rho_pos),
@@ -628,7 +628,7 @@ def fig_a56(rho_pos, rho_neg, h_bet, h_sp, qmax=500):
         ax.set_xlabel('Horizon q (days, log scale)')
     axes[0].axhline(1, color=Gray, lw=0.6)
     axes[1].axhline(0.5, color=Gray, lw=0.6)
-    axes[0].set_title('VR(q): dotted line = limit (1 + rho)/(1 - rho)', fontsize=8.5, loc='left')
+    axes[0].set_title(r'VR(q): dotted line = limit $(1+\rho_1)/(1-\rho_1)$', fontsize=8.5, loc='left')
     axes[1].set_title('Implied H(q) = 0.5 + ln VR(q) / (2 ln q) tends to 0.5', fontsize=8.5, loc='left')
     h, l = axes[1].get_legend_handles_labels()
     fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=2, frameon=False)
@@ -637,7 +637,7 @@ def fig_a56(rho_pos, rho_neg, h_bet, h_sp, qmax=500):
 
 
 def fig_b1(t):
-    """B1: profilul VR(q) cu banda robusta si z(q) clasic vs z*(q) robust, S&P 500 si BET."""
+    """B1: the VR(q) profile with the robust band and classical z(q) vs robust z*(q), S&P 500 and BET."""
     fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.1))
     ax = axes[0]
     for k, c in [('sp500', MainBlue), ('bet', IDAred)]:
@@ -672,7 +672,7 @@ def fig_b1(t):
 
 
 def fig_b3_window(w):
-    """B3: DFA pe o fereastra de 500 de zile: profilul cu tendintele pe segmente si dreapta log F(n) ~ log n."""
+    """B3: DFA on a 500-day window: the profile with the segment trends and the line log F(n) on log n."""
     fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.0))
     ax = axes[0]
     y, n = w['y'], w['box']
@@ -702,7 +702,7 @@ def fig_b3_window(w):
 
 
 def fig_b3_rolling(d, lo_t, hi_t):
-    """B3: exponentul DFA al S&P 500 pe ferestre mobile, cu banda wild bootstrap pe fereastra si banda fixa t4."""
+    """B3: rolling DFA exponent of the S&P 500, with the per-window wild-bootstrap band and the fixed t4 band."""
     fig, ax = plt.subplots(figsize=(8.6, 3.0))
     ax.fill_between(d.index, d['lo'], d['hi'], color=LightGray, alpha=0.9, lw=0,
                     label='Sign-flip 95% band, recomputed in each window (199 draws)')
@@ -719,8 +719,8 @@ def fig_b3_rolling(d, lo_t, hi_t):
 
 
 def fig_amh_btc(d, sims=None, z0=None, date0=None):
-    """B4: z*(5) de Bitcoin pe ferestre de 365 de zile, banda wild bootstrap pe fereastra si +-1,96;
-    in dreapta, distributia bootstrap intr-o fereastra semnalata."""
+    """B4: Bitcoin z*(5) on 365-day windows, the per-window wild-bootstrap band and +-1.96;
+    right panel: the bootstrap distribution in one flagged window."""
     fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.1), gridspec_kw={'width_ratios': [2.6, 1]})
     ax = axes[0]
     ax.fill_between(d.index, d['lo'], d['hi'], color=LightGray, alpha=0.9, lw=0,
@@ -750,7 +750,7 @@ def fig_amh_btc(d, sims=None, z0=None, date0=None):
 
 
 def fig_b5(strip, res):
-    """B5: zilele TOM la o schimbare de luna si efectul TOM cu intervale OLS si HAC."""
+    """B5: the TOM days at a month change and the TOM effect with OLS and HAC intervals."""
     fig, axes = plt.subplots(1, 2, figsize=(8.6, 2.9), gridspec_kw={'width_ratios': [1.5, 1]})
     ax = axes[0]
     x = np.arange(len(strip))
@@ -782,7 +782,7 @@ def fig_b5(strip, res):
 
 
 def fig_b6(cm):
-    """B6: valorile p ordonate (scara log) cu pragurile brut, Bonferroni si Holm."""
+    """B6: the sorted p-values (log scale) with the raw, Bonferroni and Holm thresholds."""
     d = cm.sort_values('p').reset_index(drop=True)
     m = len(d)
     j = np.arange(1, m + 1)
@@ -813,7 +813,7 @@ def fig_b6(cm):
 
 
 def fig_b7(b7):
-    """B7: randamentele S&P 500 cu crizele eliminate si rho1 cu intervale robuste in cele doua selectii."""
+    """B7: S&P 500 returns with the crises removed and rho1 with robust intervals in the two samples."""
     r = log_returns('sp500') * 100
     fig, axes = plt.subplots(1, 2, figsize=(8.6, 2.9), gridspec_kw={'width_ratios': [2.2, 1]})
     ax = axes[0]
@@ -839,7 +839,7 @@ def fig_b7(b7):
 
 
 def fig_b8():
-    """B8: raportul log dividend-pret si castigul cumulat de erori patratice al prognozelor recursive."""
+    """B8: the log dividend-price ratio and the cumulative reduction in squared errors of the recursive forecasts."""
     import predictability as PRD
     df, _ = PRD.monthly_data()
     o = pd.read_csv(os.path.join(HERE, 'ch2_oos_dp.csv'), index_col=0, parse_dates=True)
@@ -850,7 +850,7 @@ def fig_b8():
     ax.set_title('Predictor: log dividend-price ratio', fontsize=8.5, loc='left')
     legend_outside_bottom(ax, ncol=1, y=-0.14)
     ax = axes[1]
-    ax.plot(o.index, o['cum_dsse'], color=Forest, lw=1.1, label='Cumulative SSE(mean) - SSE(dp model)')
+    ax.plot(o.index, o['cum_dsse'], color=Forest, lw=1.1, label='Cumulative reduction in squared forecast errors vs historical mean')
     ax.axhline(0, color=Gray, lw=0.6)
     ax.set_title('Rising: dp beats the historical mean', fontsize=8.5, loc='left')
     legend_outside_bottom(ax, ncol=1, y=-0.14)
@@ -859,7 +859,7 @@ def fig_b8():
 
 
 def fig_b9(ev):
-    """B9: AR zilnice (+-1,96 erori standard de predictie la portofoliu) si CAR din ziua 0."""
+    """B9: daily abnormal returns (+-1.96 portfolio prediction standard errors) and CAR from day 0."""
     fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.0))
     ax = axes[0]
     w = 0.27
@@ -888,7 +888,7 @@ def fig_b9(ev):
 
 
 def fig_c1(roll, res, split='2020-09-21', announce='2019-09-26'):
-    """C1: rho1 pe 250 de zile cu intervale robuste (BET, WIG20, BUX) si schimbarea pre/post cu bootstrap pe blocuri."""
+    """C1: 250-day rho1 with robust intervals (BET, WIG20, BUX) and the before/after change with a block bootstrap."""
     fig = plt.figure(figsize=(8.6, 3.6))
     gs = fig.add_gridspec(3, 2, width_ratios=[2.3, 1])
     cols = {'bet': IDAred, 'wig20': MainBlue, 'bux': Forest}
@@ -981,7 +981,7 @@ if __name__ == '__main__':
     S['setup'] = setup_check()
     S['C1'] = c_bvb_before_after()
     S['C1c'] = {k: c_bvb_before_after(k=k) for k in ['wig20', 'bux']}
-    # grafice noi
+    # new charts
     fig_sem_data()
     fig_a1(S['A1'])
     sim = a2_null()

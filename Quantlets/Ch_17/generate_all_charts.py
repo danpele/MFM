@@ -27,7 +27,7 @@ from bubbles import (psy, psy_cv, wild_cv, episodes, adf_stat, min_window, blanc
                      lppls_fit, lppls_path, lppls_qualified, lppls_conditions, lomb_pvalue, lppls_confidence, drawdown,
                      LPPLS_WINDOWS, LPPLS_STEP, LPPLS_FILTER, LPPLS_SEARCH)
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -46,7 +46,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Course colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -54,7 +54,7 @@ Amber    = '#B5853F'
 Orange   = '#E67E22'
 Purple   = '#8E44AD'
 Crimson  = '#DC3545'
-Gray     = '#7F7F7F'   # doar linii de referinta, benzi, grila
+Gray     = '#7F7F7F'   # reference lines, bands and grid only
 Teal     = '#17A2B8'
 Magenta  = '#D63384'
 Brown    = '#795548'
@@ -62,13 +62,13 @@ Brown    = '#795548'
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 SEED = 42
-R_MC = 2000            # replici Monte Carlo pentru valorile critice
-RECOMPUTE = os.environ.get('MFM_CH17_RECOMPUTE', '1') == '1'   # True: recalculeaza indicatorii LPPLS (zeci de minute); False: ii citeste din fisierele CSV
+R_MC = 2000            # Monte Carlo replications for the critical values
+RECOMPUTE = os.environ.get('MFM_CH17_RECOMPUTE', '1') == '1'   # True: recompute the LPPLS indicators (tens of minutes); False: use the precomputed values
 QL_RAW = 'https://raw.githubusercontent.com/danpele/MFM/main/Quantlets/Ch_17/'
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -77,12 +77,12 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
 def fig_legend(fig, axes, ncol=3, y=0.0):
-    """O singura legenda pentru o figura cu mai multe panouri, sub figura."""
+    """One legend for a multi-panel figure, below the figure."""
     h, l = [], []
     for ax in np.atleast_1d(axes):
         for hh, ll in zip(*ax.get_legend_handles_labels()):
@@ -105,7 +105,7 @@ def jsonable(o):
 
 
 def yrs(idx):
-    """Data -> ani zecimali."""
+    """Date -> decimal years."""
     idx = pd.DatetimeIndex(idx)
     return np.asarray(idx.year + (idx.dayofyear - 1) / 365.25)
 
@@ -121,25 +121,25 @@ def d2s(d):
 
 
 # =============================================================================
-# 1. BULE RATIONALE SIMULATE (Blanchard-Watson; Evans)
+# 1. SIMULATED RATIONAL BUBBLES (Blanchard-Watson; Evans)
 # =============================================================================
 def fig_rational_bubble():
-    """Pret = valoare fundamentala (dividende mers aleator, r = 1% pe perioada) + bula rationala care se prabuseste
-    si reporneste pozitiv, in forma Evans (1991): cu probabilitatea pi = 0.97 supravietuieste,
-    B_t = [b0 + (1+r)/pi * (B_{t-1} - b0/(1+r))] u_t; altfel B_t = b0 u_t, cu E[u_t] = 1 exact.
-    Termenul -b0/(1+r) plateste repornirea, deci E_{t-1}[B_t] = (1+r) B_{t-1} exact."""
+    """Price = fundamental value (random-walk dividends, r = 1% per period) + a rational bubble that collapses
+    and restarts at a positive value, in the Evans (1991) form: with probability pi = 0.97 it survives,
+    B_t = [b0 + (1+r)/pi * (B_{t-1} - b0/(1+r))] u_t; otherwise B_t = b0 u_t, with E[u_t] = 1 exactly.
+    The term -b0/(1+r) pays for the restart, so E_{t-1}[B_t] = (1+r) B_{t-1} exactly."""
     rng = np.random.default_rng(48)
     T, r, pi, b0, su = 400, 0.01, 0.97, 5.0, 0.03
     D = 1 + np.cumsum(0.01 * rng.standard_normal(T))
-    F = D / r                                           # E_t sum D_{t+i}/(1+r)^i cu dividende mers aleator
+    F = D / r                                           # E_t sum D_{t+i}/(1+r)^i with random-walk dividends
     Bb = np.empty(T)
     Bb[0] = b0
     alive = rng.random(T) < pi
-    u = np.exp(rng.normal(-su ** 2 / 2, su, T))         # lognormal cu E[u] = 1 exact
+    u = np.exp(rng.normal(-su ** 2 / 2, su, T))         # lognormal with E[u] = 1 exactly
     for t in range(1, T):
         Bb[t] = (b0 + (1 + r) / pi * (Bb[t - 1] - b0 / (1 + r))) * u[t] if alive[t] else b0 * u[t]
     Pp = F + Bb
-    collapses = int(sum(1 for t in range(1, T) if not alive[t] and Bb[t - 1] > 25))   # prabusiri vizibile (bula > 25)
+    collapses = int(sum(1 for t in range(1, T) if not alive[t] and Bb[t - 1] > 25))   # visible collapses (bubble > 25)
     fig, ax = plt.subplots(figsize=(7.2, 3.0))
     ax.plot(Pp, color=MainBlue, lw=1.0, label='Price = fundamental value + bubble')
     ax.plot(F, color=Forest, lw=1.2, label='Fundamental value $D_t / r$')
@@ -154,7 +154,7 @@ def fig_rational_bubble():
 
 
 def fig_evans():
-    """Bula Evans (1991) care se prabuseste periodic: ADF pe toata selectia vs GSADF / BSADF."""
+    """Evans (1991) periodically collapsing bubble: full-sample ADF vs GSADF / BSADF."""
     T = 400
     B = evans_bubble(T=T, seed=11)
     rng = np.random.default_rng(5)
@@ -186,9 +186,9 @@ def fig_evans():
 
 
 # =============================================================================
-# 2. EPISOADE ISTORICE IN DATE
+# 2. HISTORICAL EPISODES IN THE DATA
 # =============================================================================
-EPISODES = [  # (cheie, eticheta, fereastra in care se cauta maximul)
+EPISODES = [  # (key, label, window in which the peak is searched)
     ('ndx', 'Nasdaq 100, 2000', ('1999-01-01', '2000-12-31')),
     ('csco', 'Cisco, 2000', ('1999-01-01', '2000-12-31')),
     ('bet', 'BET, 2007', ('2006-01-01', '2008-06-30')),
@@ -202,7 +202,7 @@ EPISODES = [  # (cheie, eticheta, fereastra in care se cauta maximul)
 
 
 def episode_table():
-    """Varf, crestere pe 2 ani inainte de varf, drawdown maxim, minim si revenire."""
+    """Peak, 2-year run-up before the peak, maximum drawdown, trough and recovery."""
     rows = []
     for k, lab, (a, b) in EPISODES:
         p = price(k, 'D')
@@ -221,7 +221,7 @@ def episode_table():
 
 
 def fig_episodes(tab):
-    """Episoade aliniate la varf: pret normalizat = 100 la varf, +/- 2 ani calendaristici."""
+    """Episodes aligned at the peak: price normalised to 100 at the peak, +/- 2 calendar years."""
     cols = [MainBlue, Teal, IDAred, Amber, Purple, Orange, Forest, Magenta, Brown]
     fig, ax = plt.subplots(figsize=(7.2, 3.6))
     for (k, lab, _), row, c in zip(EPISODES, tab, cols):
@@ -241,11 +241,11 @@ def fig_episodes(tab):
 
 
 # =============================================================================
-# 3. BUBBLES FOR FAMA (Greenwood-Shleifer-You 2019) PE 49 DE INDUSTRII
+# 3. BUBBLES FOR FAMA (Greenwood-Shleifer-You 2019) ON 49 INDUSTRIES
 # =============================================================================
 def gsy_sample():
-    """Esantionul Greenwood, Shleifer & You (2019), sectiunea 2: primele 48 de industrii Fama-French (fara 'Other'),
-    luni-industrie cu cel putin zece firme."""
+    """Sample of Greenwood, Shleifer & You (2019), Section 2: the first 48 Fama-French industries (without 'Other'),
+    industry-months with at least ten firms."""
     ind, mkt = industries()
     firms = industry_firms().reindex(ind.index)
     ind = ind.loc[:, [c for c in ind.columns if c.strip().lower() != 'other' and ind[c].notna().mean() > 0]]
@@ -254,9 +254,9 @@ def gsy_sample():
 
 
 def gsy_events(thr, H=24, crash=0.40, H5=60, r5=0.50, r5_from='1931-01-01'):
-    """Cresteri GSY (2019, sectiunea 2): randament pe 2 ani peste thr, brut si peste piata, si randament brut pe 5 ani
-    de cel putin 50% (impus din 1931); prima luna a cresterii, fara un nou episod in aceeasi industrie timp de 2 ani;
-    prabusire = scadere de 40% fata de un maxim anterior in urmatorii 2 ani."""
+    """GSY (2019, Section 2) run-ups: 2-year return above thr, raw and net of the market, and a 5-year raw return
+    of at least 50% (imposed from 1931); first month of the run-up, no new episode in the same industry for 2 years;
+    crash = a 40% fall from a previous peak within the next 2 years."""
     ind, mkt, ok = gsy_sample()
     Pm = (1 + mkt.reindex(ind.index)).cumprod()
     runm = Pm / Pm.shift(H) - 1
@@ -283,7 +283,7 @@ def gsy_events(thr, H=24, crash=0.40, H5=60, r5=0.50, r5_from='1931-01-01'):
 
 
 def gsy_unconditional(H=24, crash=0.40):
-    """Probabilitatea neconditionata a unei scaderi de 40% in 2 ani (toate lunile-industrie din esantionul GSY)."""
+    """Unconditional probability of a 40% fall within 2 years (all industry-months of the GSY sample)."""
     ind, _, ok = gsy_sample()
     hits, n, rets = 0, 0, []
     for c in ind.columns:
@@ -301,7 +301,7 @@ def gsy_unconditional(H=24, crash=0.40):
 
 
 def cluster_boot(d, col, B=2000, seed=SEED):
-    """Interval bootstrap de 95% cu reesantionare pe ani calendaristici (episoadele din acelasi an sunt corelate)."""
+    """95% bootstrap interval resampling calendar years (episodes in the same year are correlated)."""
     rng = np.random.default_rng(seed)
     g = {y: grp[col].values for y, grp in d.groupby(d['date'].dt.year)}
     keys = list(g)
@@ -349,7 +349,7 @@ def fig_gsy():
 
 
 # =============================================================================
-# 4. TESTE DE EXPLOZIVITATE: FERESTRE, DISTRIBUTII SUB IPOTEZA NULA, APLICATII
+# 4. EXPLOSIVENESS TESTS: WINDOWS, NULL DISTRIBUTIONS, APPLICATIONS
 # =============================================================================
 def fig_windows():
     """Schema ferestrelor: ADF (toata selectia), SADF (inceput fix, sfarsit variabil), GSADF (ambele variabile)."""
@@ -374,7 +374,7 @@ def fig_windows():
 
 
 def fig_null(cv, T):
-    """Distributiile sub ipoteza nula (mers aleator) ale ADF, SADF si GSADF, cu valorile critice de 95%."""
+    """Null (random-walk) distributions of ADF, SADF and GSADF, with their 95% critical values."""
     fig, ax = plt.subplots(figsize=(7.0, 3.0))
     for k, c, lab in [('adf', MainBlue, 'ADF'), ('sadf', Forest, 'SADF'), ('gsadf', IDAred, 'GSADF')]:
         v = cv['null'][k]
@@ -388,7 +388,7 @@ def fig_null(cv, T):
 
 
 def run_psy(y, R=R_MC, wild=False):
-    """PSY complet pentru o serie log-nivel y (pd.Series): statistici, valori critice, episoade datate."""
+    """Full PSY analysis of a log-level series y (pd.Series): statistics, critical values, date-stamped episodes."""
     res = psy(y.values)
     cv = psy_cv(res['n'], res['w0'], R, SEED)
     L = int(np.ceil(np.log(res['n'])))
@@ -404,13 +404,13 @@ def run_psy(y, R=R_MC, wild=False):
 
 
 def _chg(y, s, e):
-    """Variatia pretului pe durata episodului (de la inceputul la sfarsitul semnalului): > 0 crestere, < 0 prabusire."""
+    """Price change over the episode (from the start to the end of the signal): > 0 rise, < 0 collapse."""
     e = y.index[-1] if e is None else e
     return float(np.exp(y.loc[e] - y.loc[s]) - 1)
 
 
 def summarise(o, y):
-    """Rezumat JSON-abil al unei analize PSY."""
+    """JSON-serialisable summary of a PSY analysis."""
     r, cv = o['res'], o['cv']
     out = dict(T=r['n'], w0=r['w0'], r0=r['r0'], L=o['L'], adf=r['adf'], sadf=r['sadf'], gsadf=r['gsadf'],
                cv_adf=cv['adf'], cv_sadf=cv['sadf'], cv_gsadf=cv['gsadf'], start=d2s(y.index[0]), end=d2s(y.index[-1]),
@@ -424,14 +424,14 @@ def summarise(o, y):
 
 
 def _shade(ax, ep, end, y=None, alpha=0.25):
-    """Episoadele datate: crestere (Amber) sau scadere accelerata (Teal)."""
+    """Date-stamped episodes: rise (Amber) or accelerating fall (Teal)."""
     for s, e, _ in ep:
         up = True if y is None else _chg(y, s, e) > 0
         ax.axvspan(s, e if e is not None else end, color=Amber if up else Teal, alpha=alpha, lw=0)
 
 
 def fig_psy(y, o, name, title, ylab, logscale=True, level=None, pwy=False, wild=False, level_label=None):
-    """Doua panouri: nivelul seriei (cu episoadele datate) si BSADF fata de valoarea critica de 95%."""
+    """Two panels: the level of the series (with the date-stamped episodes) and BSADF against its 95% critical value."""
     idx = o['idx']
     fig, axes = plt.subplots(2, 1, figsize=(7.4, 4.4), sharex=True, gridspec_kw=dict(height_ratios=[1.2, 1]))
     lv = np.exp(y) if level is None else level
@@ -462,7 +462,7 @@ def fig_psy(y, o, name, title, ylab, logscale=True, level=None, pwy=False, wild=
 
 
 def real_time(o, p, win_years=2):
-    """Pentru fiecare episod: primul semnal (timp real), varful pretului in episod si dupa, sfarsitul semnalului."""
+    """For each episode: first signal (real time), price peak within and after the episode, end of the signal."""
     rows = []
     for s, e, n in o['ep']:
         e2 = e if e is not None else p.index[-1]
@@ -477,9 +477,9 @@ def real_time(o, p, win_years=2):
 
 
 def signal_vs_peak(o, p, window, gap_days, dd_years=2):
-    """Primul semnal al grupului de episoade care precede varful din fereastra data vs varful.
-    Inceputul episodului este datat retrospectiv (prima depasire); in timp real episodul este confirmat abia dupa
-    L = ceil(ln T) depasiri consecutive, adica la observatia start + L - 1 a seriei testate ('confirm')."""
+    """First signal of the group of episodes preceding the peak in the given window vs the peak.
+    The start of the episode is dated in hindsight (first exceedance); in real time the episode is confirmed only after
+    L = ceil(ln T) consecutive exceedances, i.e. at observation start + L - 1 of the tested series ('confirm')."""
     pk = p.loc[window[0]:window[1]].idxmax()
     ep = sorted([(s, e if e is not None else p.index[-1]) for s, e, _ in o['ep'] if s <= pk])
     i = len(ep) - 1
@@ -503,7 +503,7 @@ COND_LABELS = {'B': 'B < 0', 'm': 'm in [0.01, 0.99]', 'w': 'omega in [2, 25]', 
 
 
 def fig_lppls_btc2017():
-    """LPPLS ajustat pe Bitcoin 2017-01-01 .. 2017-11-15 si traiectoria observata pana in martie 2018."""
+    """LPPLS fitted to Bitcoin 2017-01-01 .. 2017-11-15 and the observed path up to March 2018."""
     p = price('btc', 'D')
     t1, t2 = '2017-01-01', '2017-11-15'
     w = p.loc[t1:t2]
@@ -532,7 +532,7 @@ def fig_lppls_btc2017():
 
 
 def tc_path(key, t1, t2_from, t2_to, step_days=7):
-    """tc estimat pe ferestre [t1, t2] cu t2 mobil (la fiecare step_days zile)."""
+    """tc estimated on windows [t1, t2] with a moving t2 (every step_days days)."""
     p = price(key, 'D')
     rows = []
     for t2 in pd.date_range(t2_from, t2_to, freq=f'{step_days}D'):
@@ -572,7 +572,7 @@ def fig_tc_instability():
 
 
 def _ci_worker(args):
-    """Toate cele 141 de ferestre pentru un t2: indicatorul si numarul de ferestre care trec fiecare conditie."""
+    """All 141 windows for one t2: the indicator and the number of windows passing each condition."""
     t, y, i = args
     cnt = dict.fromkeys(COND_LABELS, 0)
     q, n = 0, 0
@@ -591,7 +591,7 @@ def _ci_worker(args):
 
 
 def confidence_series(key, start, t2_from, step=LPPLS_STEP, procs=None):
-    """Indicatorul de incredere LPPLS (Shu & Zhu 2020): t2 la fiecare 5 observatii, 141 de ferestre de 750-50 observatii."""
+    """LPPLS confidence indicator (Shu & Zhu 2020): t2 every 5 observations, 141 windows of 750 to 50 observations."""
     from multiprocessing import Pool
     p = price(key, 'D', start)
     t, y = yrs(p.index), np.log(p.values)
@@ -605,8 +605,8 @@ def confidence_series(key, start, t2_from, step=LPPLS_STEP, procs=None):
 
 
 def ci_evaluation(ci, p, horizon=90, fall=0.20):
-    """Semnal (indicator > 0) vs o scadere de cel putin 20% sub pretul curent in urmatoarele 90 de zile;
-    doar datele cu fereastra completa de 90 de zile calendaristice in date."""
+    """Signal (indicator > 0) vs a fall of at least 20% below the current price within the next 90 days;
+    only dates whose 90 calendar days are fully observed."""
     rows = []
     for d, v in ci.items():
         if d + pd.Timedelta(days=horizon) > p.index[-1]:
@@ -620,7 +620,7 @@ def ci_evaluation(ci, p, horizon=90, fall=0.20):
 
 
 def get_ci(key, start, t2_from, fname):
-    """Tabelul indicatorului (ci si ferestrele care trec fiecare conditie): recalculat sau citit din fisierul publicat."""
+    """Indicator table (ci and the windows passing each condition): recomputed or precomputed."""
     path = os.path.join(HERE, fname)
     if RECOMPUTE or not os.path.exists(path):
         confidence_series(key, start, t2_from).to_csv(path)
@@ -628,7 +628,7 @@ def get_ci(key, start, t2_from, fname):
 
 
 def condition_shares(tab):
-    """Ponderea ferestrelor (din toate datele t2) care trec fiecare conditie, luata separat."""
+    """Share of windows (over all t2 dates) passing each condition, taken separately."""
     n = tab['n'].sum()
     return {k: float(tab[f'pass_{k}'].sum() / n) for k in COND_LABELS}
 
@@ -661,14 +661,14 @@ def fig_lppls_ci(tab_btc, tab_ndx):
 
 
 # =============================================================================
-# 6. MODELE CU SCHIMBARE DE REGIM (Hamilton 1989)
+# 6. REGIME-SWITCHING MODELS (Hamilton 1989)
 # =============================================================================
 def ms_fit(key, start, freq='W', k=2):
-    """Markov-switching: medie si dispersie diferite pe regim, randamente log saptamanale in %."""
+    """Markov switching: regime-specific mean and variance, weekly log returns in %."""
     import statsmodels.api as sm
     p = price(key, freq, start)
     r = 100 * np.log(p).diff().dropna()
-    np.random.seed(SEED)                              # cautarea aleatoare a punctelor de start: reproductibila
+    np.random.seed(SEED)                              # random search over starting values: reproducible
     res = sm.tsa.MarkovRegression(r, k_regimes=k, trend='c', switching_variance=True).fit(search_reps=20, disp=False)
     hi = int(np.argmax([res.params[f'sigma2[{j}]'] for j in range(k)]))
     return p, r, res, hi
@@ -678,7 +678,7 @@ def ms_summary(res, hi, r, k=2):
     par = res.params
     se = res.bse
     lo = 1 - hi if k == 2 else None
-    P = np.asarray(res.regime_transition)[:, :, 0]         # P[i, j] = P(s_t = i | s_{t-1} = j)
+    P = np.asarray(res.regime_transition)[:, :, 0]         # statsmodels stores P[i, j] = P(s_t = i | s_{t-1} = j)
     out = dict(n=int(len(r)), start=d2s(r.index[0]), end=d2s(r.index[-1]), llf=float(res.llf), aic=float(res.aic),
                bic=float(res.bic))
     for j, tag in [(lo, 'calm'), (hi, 'turb')]:
@@ -704,14 +704,14 @@ def fig_ms(key, start, name, title):
     fig_legend(fig, axes, ncol=3, y=0.0)
     save_fig(name)
     out = ms_summary(res, hi, r)
-    # probabilitatea filtrata la varfuri si la 3 luni dupa
+    # filtered probability at the peaks and 3 months later
     return out, fp, sp
 
 
 # =============================================================================
-# 7. CRIPTO SI AI: CRONOLOGIA EPISOADELOR EXPLOZIVE (date saptamanale)
+# 7. CRYPTO AND AI: TIMELINE OF EXPLOSIVE EPISODES (weekly data)
 # =============================================================================
-TIMELINE = ['btc', 'eth', 'doge', 'mstr', 'nvda', 'tsla', 'gme', 'ndx', 'sp500']   # fiecare serie de la inceputul ei
+TIMELINE = ['btc', 'eth', 'doge', 'mstr', 'nvda', 'tsla', 'gme', 'ndx', 'sp500']   # each series from its own start
 
 
 def fig_timeline():
@@ -725,7 +725,7 @@ def fig_timeline():
         for s, e, _ in o['ep']:
             e2 = e if e is not None else y.index[-1]
             if e2 < pd.Timestamp('2014-01-01') or _chg(y, s, e) <= 0:
-                continue                                   # doar episoadele de crestere, 2014-2026
+                continue                                   # rising episodes only, 2014-2026
             ax.plot([max(s, pd.Timestamp('2014-01-01')), e2], [i, i], color=c, lw=7, solid_capstyle='butt')
         ax.plot([], [], color=c, lw=5, label=LABELS[k])
     ax.set_yticks(range(len(TIMELINE)))
@@ -740,12 +740,12 @@ def fig_timeline():
 
 
 def fig_ai_dotcom():
-    """Cisco (dot-com) vs NVIDIA (AI) si Nasdaq 100 1995 vs 2023: pret = 100 la inceputul episodului exploziv (lunar)."""
+    """Cisco (dot-com) vs NVIDIA (AI) and Nasdaq 100 1995 vs 2023: price = 100 at the start of the explosive episode (monthly)."""
     res = {}
     for k in ['csco', 'nvda', 'ndx']:
         y = np.log(price(k, 'M'))
         res[k] = (y, run_psy(y))
-    # inceputul primului episod dot-com (Cisco, Nasdaq 100) si al episodului curent (NVIDIA, Nasdaq 100)
+    # start of the first dot-com episode (Cisco, Nasdaq 100) and of the current episode (NVIDIA, Nasdaq 100)
     def first_after(o, date):
         return next(s for s, e, n in o['ep'] if s >= pd.Timestamp(date))
     starts = {'csco': first_after(res['csco'][1], '1995-01-01'), 'nvda': first_after(res['nvda'][1], '2023-01-01'),
@@ -788,7 +788,7 @@ def main():
     fig_episodes(tab)
     RES['gsy'] = fig_gsy()
     fig_windows()
-    # Shiller P/D, din 1871 pana la ultima luna disponibila
+    # Shiller P/D, from 1871 to the latest month available
     sh = shiller()
     y_pd = np.log(sh['PD'])
     o_pd = run_psy(y_pd, R=1000)
@@ -801,7 +801,7 @@ def main():
     RES['sp_pd']['pd_max_dotcom_date'] = d2s(sh['PD'].loc['1995':'2002'].idxmax())
     fig_psy(y_pd, o_pd, 'ch17_sp_pd', f'S&P Composite real price-dividend ratio, monthly {sh.index[0].year}-{sh.index[-1].year}',
             'Price / dividend (log scale)', level=sh['PD'], level_label='Real price-dividend ratio')
-    # Nasdaq 100 lunar (cu datarea PWY) si distributiile nule pentru T = 440
+    # Nasdaq 100 monthly (with PWY date-stamping) and the null distributions for T = 440
     y_ndx = np.log(price('ndx', 'M'))
     o_ndx = run_psy(y_ndx)
     RES['ndx'] = summarise(o_ndx, y_ndx)
@@ -809,25 +809,25 @@ def main():
     fig_psy(y_ndx, o_ndx, 'ch17_ndx', 'Nasdaq 100, monthly 1990-2026: GSADF date-stamping vs the recursive ADF (PWY)',
             'Index (log scale)', pwy=True, level_label='Nasdaq 100')
     fig_null(o_ndx['cv'], o_ndx['res']['n'])
-    # Bitcoin saptamanal (MC si wild bootstrap)
+    # Bitcoin weekly (MC and wild bootstrap)
     y_btc = np.log(price('btc', 'W'))
     o_btc = run_psy(y_btc, wild=True)
     RES['btc'] = summarise(o_btc, y_btc)
     RES['btc']['real_time'] = real_time(o_btc, price('btc', 'D'))
     fig_psy(y_btc, o_btc, 'ch17_btc', 'Bitcoin, weekly 2014-2026', 'USD (log scale)', level_label='Bitcoin')
-    # BET lunar 1997-2026
+    # BET monthly 1997-2026
     y_bet = np.log(price('bet', 'M'))
     o_bet = run_psy(y_bet)
     RES['bet'] = summarise(o_bet, y_bet)
     RES['bet']['real_time'] = real_time(o_bet, price('bet', 'D'))
     fig_psy(y_bet, o_bet, 'ch17_bet', 'BET index, monthly 1997-2026', 'Index points (log scale)', level_label='BET')
-    # GameStop zilnic 2020-2021
+    # GameStop daily 2020-2021
     y_gme = np.log(price('gme', 'D', '2020-01-01', '2021-12-31'))
     o_gme = run_psy(y_gme)
     RES['gme'] = summarise(o_gme, y_gme)
     RES['gme']['real_time'] = real_time(o_gme, price('gme', 'D'), win_years=1)
     fig_psy(y_gme, o_gme, 'ch17_gme', 'GameStop, daily 2020-2021', 'USD, adjusted (log scale)', level_label='GameStop')
-    # primul semnal (timp real) vs varf
+    # first signal (real time) vs peak
     RES['signal_peak'] = {
         'ndx': signal_vs_peak(o_ndx, price('ndx', 'D'), ('1999-01-01', '2000-12-31'), 93),
         'bet': signal_vs_peak(o_bet, price('bet', 'D'), ('2006-01-01', '2008-06-30'), 93),
@@ -858,7 +858,7 @@ def main():
     ms_ndx['fp_at_peak'] = float(fp_ndx.loc[:'2000-03-31'].iloc[-1])
     ms_ndx['fp_2000_12'] = float(fp_ndx.loc[:'2000-12-31'].iloc[-1])
     ms_ndx['fp_first_2000'] = d2s(fp_ndx.loc['2000-01-01':][fp_ndx.loc['2000-01-01':] > 0.5].index[0])
-    turb = sp_ndx > 0.5                                            # episodul turbulent (netezit) care contine martie 2000
+    turb = sp_ndx > 0.5                                            # turbulent (smoothed) episode containing March 2000
     k = turb.index.searchsorted(pd.Timestamp('2000-03-31')) - 1
     j = k
     while j > 0 and turb.iloc[j - 1]:
@@ -868,7 +868,7 @@ def main():
     ms_btc, fp_btc, sp_btc = fig_ms('btc', '2014-09-17', 'ch17_ms_btc',
                                     'Bitcoin, weekly log returns 2014-2026: two-regime Markov-switching model')
     RES['ms_btc'] = ms_btc
-    # cripto si AI
+    # crypto and AI
     RES['timeline'] = fig_timeline()
     RES['ai'] = fig_ai_dotcom()
     with open(os.path.join(HERE, 'ch17_results.json'), 'w') as f:

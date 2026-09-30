@@ -1,12 +1,12 @@
 """
-seminar7.py -- Calculele Seminarului 7 (MFM): VaR si Expected Shortfall
-======================================================================
-Partea A: VaR/ES pentru distributia Normala si Student-t pas cu pas, pierderi discrete, subaditivitate,
-          VaR pe componente pentru doua active, Cornish-Fisher.
-Partea B: HS pe BET cu interval bootstrap, GPD si EVT-VaR pe BET, FHS vs HS pe Bitcoin, Cornish-Fisher vs
-          empiric, VaR pe componente pentru un portofoliu, interval bootstrap pentru ES.
-Partea C: capitalul cerut de ES 2,5% pentru un portofoliu BVB de blue-chips vs un portofoliu S&P 500 (2016-2026).
-Cifrele sunt salvate in sem7_results.json.
+seminar7.py -- Computations of Seminar 7 (MFM): VaR and Expected Shortfall
+===========================================================================
+Part A: VaR/ES for the Normal and Student-t distributions step by step, discrete losses, subadditivity,
+        component VaR for two assets, Cornish-Fisher.
+Part B: HS on BET with a bootstrap interval, GPD and EVT VaR on BET, FHS vs HS on Bitcoin, Cornish-Fisher vs
+        empirical, component VaR for a portfolio, bootstrap interval for ES.
+Part C: capital required by ES 2.5% for a BVB blue-chip portfolio vs an S&P 500 portfolio (2016-2026).
+The numbers are written to sem7_results.json.
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """
 
@@ -32,10 +32,10 @@ B_BOOT = 2000
 
 
 # =============================================================================
-# PARTEA A
+# PART A
 # =============================================================================
 def a1_normal(mu=0.04, sigma=1.2, position=1_000_000):
-    """VaR si ES pentru distributia Normala, pas cu pas: X ~ N(mu, sigma^2) (randamente in %),
+    """VaR and ES for the Normal distribution, step by step: X ~ N(mu, sigma^2) (returns in %),
     VaR_alpha = -(mu + sigma z_alpha), ES_alpha = -mu + sigma phi(z_alpha) / alpha."""
     out = dict(mu=mu, sigma=sigma, position=position)
     for a, tag in [(0.01, '1'), (0.025, '2_5')]:
@@ -46,12 +46,12 @@ def a1_normal(mu=0.04, sigma=1.2, position=1_000_000):
         out[f'k{tag}'] = phi / a
         out[f'var{tag}'] = -(mu + sigma * z)
         out[f'es{tag}'] = -mu + sigma * phi / a
-    out['var1_10'] = -10 * mu - np.sqrt(10) * sigma * out['z1']   # 10 zile, randamente i.i.d. aditive
+    out['var1_10'] = -10 * mu - np.sqrt(10) * sigma * out['z1']   # 10 days, additive i.i.d. returns
     return out
 
 
 def a2_student(nu=4, mu=0.04, sigma=1.2):
-    """Student-t standardizata la aceeasi dispersie: X = mu + s T, s = sigma sqrt((nu-2)/nu);
+    """Student-t scaled to the same variance: X = mu + s T, s = sigma sqrt((nu-2)/nu);
     VaR_alpha = -(mu + s t_alpha), ES_alpha = -mu + s g(t_alpha)/alpha (nu + t_alpha^2)/(nu - 1)."""
     s = sigma * np.sqrt((nu - 2) / nu)
     out = dict(nu=nu, s=s)
@@ -86,7 +86,7 @@ def a4_bonds(p=0.007, lgd=100.0):
 
 
 def a5_components(pos=(600_000, 400_000), sig=(1.2, 0.9), rho=-0.2, alpha=0.01):
-    """VaR 1% pe componente pentru doua active, distributia Normala, media zero."""
+    """Component VaR 1% for two assets, Normal distribution, zero mean."""
     w = np.array(pos, float)
     s = np.array(sig) / 100
     S = np.array([[s[0] ** 2, rho * s[0] * s[1]], [rho * s[0] * s[1], s[1] ** 2]])
@@ -100,7 +100,7 @@ def a5_components(pos=(600_000, 400_000), sig=(1.2, 0.9), rho=-0.2, alpha=0.01):
 
 
 def a6_cf(S=-0.5, K=3.0, sigma=1.2, mu=0.0, alpha=0.01, K2=10.0):
-    """Cornish-Fisher pe randamente: asimetria S, excesul de aplatizare K; VaR_alpha = -(mu + sigma z~_alpha)."""
+    """Cornish-Fisher on returns: skewness S, excess kurtosis K; VaR_alpha = -(mu + sigma z~_alpha)."""
     z = stats.norm.ppf(alpha)                  # z_alpha < 0
     t1, t2, t3 = (z ** 2 - 1) * S / 6, (z ** 3 - 3 * z) * K / 24, -(2 * z ** 3 - 5 * z) * S ** 2 / 36
     zc = cf_quantile(z, S, K)
@@ -110,10 +110,10 @@ def a6_cf(S=-0.5, K=3.0, sigma=1.2, mu=0.0, alpha=0.01, K2=10.0):
 
 
 # =============================================================================
-# PARTEA B
+# PART B
 # =============================================================================
 def boot_ci(L, fun, B=B_BOOT, block=None, seed=SEED):
-    """Interval bootstrap percentil 95%: i.i.d. (block=None) sau pe blocuri mobile de lungime block."""
+    """95% percentile bootstrap interval: i.i.d. (block=None) or moving blocks of length block."""
     rng = np.random.default_rng(seed)
     L = np.asarray(L)
     n = len(L)
@@ -139,7 +139,7 @@ def b1_bet_hs():
         boots[tag] = bs
         out[tag] = dict(N=len(x), start=str(x.index[0].date()), var1=v1, es1=e1, var2_5=v2, es2_5=e2,
                         ci_lo=ci[0], ci_hi=ci[1], n_beyond=int((x >= v1).sum()))
-    # graficul: coada pierderilor + distributiile bootstrap
+    # chart: loss tail + bootstrap distributions
     _style()
     fig, axes = plt.subplots(1, 2, figsize=(W_FIG, 2.6))
     ax = axes[0]
@@ -172,8 +172,8 @@ def b2_bet_gpd():
         hv, he = hs_var_es(L, a)
         out.update({f'evt_var{tag}': v, f'evt_es{tag}': e, f'hs_var{tag}': hv, f'hs_es{tag}': he,
                     f'n_beyond{tag}': int((L >= hv).sum())})
-    # sensibilitatea la prag
-    qs = np.linspace(0.10, 0.015, 18)          # proportia pierderilor peste prag
+    # sensitivity to the threshold
+    qs = np.linspace(0.10, 0.015, 18)          # share of losses above the threshold
     xis, lo, hi, v01 = [], [], [], []
     for q in qs:
         g = gpd_fit(L, q)
@@ -203,7 +203,7 @@ def b2_bet_gpd():
     ax.fill_between(100 * qs, lo, hi, color=LightGray, label='95% confidence band')
     ax.plot(100 * qs, xis, 'o-', ms=3, color=IDAred, label='Estimated xi')
     ax.axhline(0, color=Gray, lw=0.6)
-    ax.set_xlabel('Losses above u (%)')
+    ax.set_xlabel('Share of losses above u (%)')
     ax.set_ylabel(r'Shape $\hat\xi$')
     ax.set_title(r'Stability of $\xi$ across thresholds')
     bottom_legend(fig, ncol=3, fontsize=8.5)
@@ -278,24 +278,24 @@ def b6_es_boot():
 
 
 # =============================================================================
-# PARTEA C: capitalul pentru ES 2,5%: BVB vs S&P 500
+# PART C: ES 2.5% capital: BVB vs S&P 500
 # =============================================================================
 BVB = ['TLV', 'SNP', 'BRD', 'TGN', 'SNG', 'SNN', 'EL', 'TEL']
-C_START = '2016-09-19'                  # ultimii zece ani
+C_START = '2016-09-19'                  # last ten years
 
 
 def c1_capital(position=1_000_000, B=B_BOOT):
-    """Ilustratie simplificata inspirata de FRTB (nu capitalul reglementat complet).
-    Randamente SIMPLE zilnice (in %): cosul BVB cu ponderi egale rebalansat zilnic, SPY.
-    Pierderea pe h zile = 100 (1 - prod(1 + R_t)) (compunere), deci ES in % din pozitie se transforma exact in bani.
-    Fereastra de stres: cele 250 de zile consecutive cu cel mai mare ES 2,5% ISTORIC PE O ZI; ES de stres pe 10 zile =
-    ES de stres pe o zi x sqrt(10); orizontul de lichiditate de 20 de zile: x sqrt(20/10) (MAR33). Capital = 1,5 x ES de stres.
-    Incertitudine: bootstrap pe blocuri mobile (20 de zile), fereastra de stres tinuta FIXA."""
+    """Simplified illustration inspired by FRTB (not the full regulatory capital).
+    Daily SIMPLE returns (in %): equally weighted BVB basket rebalanced daily, SPY.
+    h-day loss = 100 (1 - prod(1 + R_t)) (compounding), so ES in % of the position converts exactly into money.
+    Stress window: the 250 consecutive days with the largest ONE-DAY HISTORICAL ES 2.5%; 10-day stressed ES =
+    one-day stressed ES x sqrt(10); 20-day liquidity horizon: x sqrt(20/10) (MAR33). Capital = 1.5 x stressed ES.
+    Uncertainty: moving-block bootstrap (20 days), with the stress window held FIXED."""
     lr_b = joint_returns(BVB, start=C_START)
-    lr_b = lr_b[(lr_b != 0).any(axis=1)]                # fara zilele in care nicio actiune nu s-a schimbat
+    lr_b = lr_b[(lr_b != 0).any(axis=1)]                # drop the days on which no stock price changed
     start = str(lr_b.index[0].date())
     Rb = 100 * (np.exp(lr_b) - 1)
-    Rp_b = Rb.mean(axis=1)                               # randamentul simplu al cosului, ponderi egale, rebalansat zilnic
+    Rp_b = Rb.mean(axis=1)                               # simple return of the basket, equal weights, rebalanced daily
     Rp_s = 100 * (np.exp(joint_returns(['SPY']).loc[start:]['SPY']) - 1)
     out = dict(start=start, stocks=BVB)
     series = {'bvb': Rp_b, 'spy': Rp_s}
@@ -303,7 +303,7 @@ def c1_capital(position=1_000_000, B=B_BOOT):
     for k, R in series.items():
         L = -R
         v1, e1 = hs_var_es(L, 0.025)
-        L10 = 100 * (1 - (1 + R / 100).rolling(10).apply(np.prod, raw=True)).dropna()   # pierderi compuse pe 10 zile
+        L10 = 100 * (1 - (1 + R / 100).rolling(10).apply(np.prod, raw=True)).dropna()   # compounded 10-day losses
         e10 = hs_var_es(L10, 0.025)[1]
         roll = pd.Series([es25(L.iloc[i - 250:i]) for i in range(250, len(L) + 1)], index=L.index[249:])
         es_stress = roll.max()
@@ -311,14 +311,14 @@ def c1_capital(position=1_000_000, B=B_BOOT):
         i_end = L.index.get_loc(end_s)
         start_s = L.index[i_end - 249]
         Ls = L.iloc[i_end - 249:i_end + 1].values
-        # FHS: AR(1)-GARCH(1,1) pe randamentele log ale portofoliului; fiecare traiectorie convertita exact
+        # FHS: AR(1)-GARCH(1,1) on the portfolio log returns; each path converted exactly
         r = 100 * np.log(1 + R / 100)
         params, mu, sig = garch_filter(r)
         z = ((r - mu) / sig).dropna().values
         m1, s1 = garch_next(r, params)
-        sim_log = fhs_mc(r, params, z, 10, n_paths=100_000, seed=SEED)      # pierderi log pe 10 zile
+        sim_log = fhs_mc(r, params, z, 10, n_paths=100_000, seed=SEED)      # 10-day log losses
         fhs10 = hs_var_es(100 * (1 - np.exp(-sim_log / 100)), 0.025)[1]
-        # incertitudine: bootstrap pe blocuri mobile de 20 de zile
+        # uncertainty: moving-block bootstrap with 20-day blocks
         ci1, _ = boot_ci(L.values, es25, B=B, block=20)
         ci_s, _ = boot_ci(Ls, es25, B=B, block=20)
         out[k] = dict(N=len(R), sd=R.std(), es1=e1, var1=v1, es10_sqrt=np.sqrt(10) * e1, es10_hs=e10,
@@ -331,10 +331,10 @@ def c1_capital(position=1_000_000, B=B_BOOT):
                       ima10=1.5 * np.sqrt(10) * es_stress / 100 * position,
                       ima20=1.5 * np.sqrt(20) * es_stress / 100 * position,
                       cap_fhs=fhs10 / 100 * position, zero_share=float((Rb == 0).mean().mean()) if k == 'bvb' else 0.0)
-    # corelatia: intai join pe valorile portofoliilor (indice de avere BVB, pret SPY) in zilele comune, apoi randamente
+    # correlation: align the portfolio values (BVB wealth index, SPY price) on common days first, then returns
     W = pd.concat([(1 + Rp_b / 100).cumprod(), (1 + Rp_s / 100).cumprod()], axis=1, join='inner')
     out['corr_bvb_spy'] = float(W.pct_change().dropna().corr().iloc[0, 1])
-    # grafic
+    # chart
     _style()
     fig, ax = plt.subplots(figsize=(W_FIG, 2.6))
     labs = ['HS,\nsqrt(10) x 1-day', 'HS, 10-day\ncompounded', 'Stressed 250\ndays, sqrt(10)', 'FHS Monte\nCarlo, 10-day']
@@ -358,10 +358,10 @@ def c1_capital(position=1_000_000, B=B_BOOT):
 
 
 # =============================================================================
-# GRAFICELE SEMINARULUI RESTRUCTURAT (charts/ch7_sem_*.pdf|png)
-# Rulare:  python seminar7.py charts   (cifrele noi se adauga in sem7_results.json, cheia 'X')
+# SEMINAR CHARTS (charts/ch7_sem_*.pdf|png)
+# Run:  python seminar7.py charts   (the extra numbers are added to sem7_results.json, key 'X')
 # =============================================================================
-W_FIG = 5.6                                   # latimea figurilor de seminar (inch), ca in Seminarul 0
+W_FIG = 5.6                                   # width of the seminar figures (inches), as in Seminar 0
 
 
 def _style():
@@ -374,7 +374,7 @@ def _style():
 
 
 def bottom_legend(fig, ncol=3, handles=None, labels=None, fontsize=9):
-    """Legenda sub figura (in afara axelor), dupa tight_layout."""
+    """Legend below the figure (outside the axes), after tight_layout."""
     plt.tight_layout()
     if handles is None:
         handles, labels, seen = [], [], set()
@@ -389,7 +389,7 @@ def bottom_legend(fig, ncol=3, handles=None, labels=None, fontsize=9):
 
 
 def fig_bet_data():
-    """B1, inainte de estimare: pretul BET si pierderile zilnice, cu fereastra ultimelor 500 de zile."""
+    """B1, before estimation: BET price and daily losses, with the window of the last 500 days."""
     _style()
     P = load_close('bet')
     L = -100 * np.log(P).diff().dropna()
@@ -420,7 +420,7 @@ def fig_bet_data():
 
 
 def fig_a1a2_tails(A1, A2):
-    """A1-A2: pierderea sub distributia Normala si sub t4 cu aceeasi abatere standard; VaR si ES la 1% si 2,5%."""
+    """A1-A2: the loss under the Normal distribution and under a t4 with the same standard deviation; VaR and ES at 1% and 2.5%."""
     _style()
     mu, sig, s, nu = 0.04, 1.2, A2['s'], 4
     x = np.linspace(0.0, 8.0, 800)
@@ -465,7 +465,7 @@ def fig_a1a2_tails(A1, A2):
 
 
 def fig_a3_mass():
-    """A3: ce masa de probabilitate intra in ES 5% si ES 2,5% (pierdere 60 cu p = 3%, altfel 0)."""
+    """A3: which probability mass enters ES 5% and ES 2.5% (loss 60 with p = 3%, otherwise 0)."""
     _style()
     fig, axes = plt.subplots(1, 2, figsize=(W_FIG, 2.2), gridspec_kw={'width_ratios': [1, 1.35]})
     ax = axes[0]
@@ -487,13 +487,13 @@ def fig_a3_mass():
     ax.set_yticklabels([r[0] for r in rows])
     ax.set_xlim(0, 6.6)
     ax.set_xlabel('Tail probability used (%)')
-    ax.set_title('Worst alpha of outcomes')
+    ax.set_title('Probability mass in the worst α of outcomes')
     bottom_legend(fig, ncol=2)
     save_fig('ch7_sem_a3_mass')
 
 
 def fig_a4_var_alpha(p=0.007):
-    """A4: VaR si ES in functie de alpha pentru o obligatiune (x2) si pentru portofoliul A + B."""
+    """A4: VaR and ES as functions of alpha for one bond (x2) and for the portfolio A + B."""
     _style()
     al = np.linspace(0.002, 0.03, 700)
     one = [discrete_var_es([0, 100], [1 - p, p], a) for a in al]
@@ -515,7 +515,7 @@ def fig_a4_var_alpha(p=0.007):
 
 
 def fig_a5_shares(A5):
-    """A5: ponderi in bani vs cote din VaR; VaR individual insumat vs VaR diversificat."""
+    """A5: money weights vs VaR shares; summed stand-alone VaR vs diversified VaR."""
     _style()
     fig, axes = plt.subplots(1, 2, figsize=(W_FIG, 2.2), gridspec_kw={'width_ratios': [1.3, 1]})
     ax = axes[0]
@@ -549,7 +549,7 @@ def fig_a5_shares(A5):
 
 
 def risk_parity(S, tol=1e-12):
-    """Ponderi nenegative, integral investite, cu contributii egale la VaR Normal: w_i (S w)_i = constanta."""
+    """Non-negative, fully invested weights with equal contributions to the Normal VaR: w_i (S w)_i = constant."""
     from scipy import optimize
     d = S.shape[0]
 
@@ -563,7 +563,7 @@ def risk_parity(S, tol=1e-12):
 
 
 def fig_b5_shares(B5):
-    """B5: ponderi egale vs cote din VaR Normal 1% si din ES 2,5% istoric; plus ponderile de paritate a riscului."""
+    """B5: equal weights vs shares of the Normal VaR 1% and of the historical ES 2.5%; plus the risk-parity weights."""
     _style()
     names = ['SPY', 'TLT', 'GLD', 'Bitcoin']
     lr = joint_returns(['SPY', 'TLT', 'GLD', 'BTC'], start='2014-09-18')
@@ -610,7 +610,7 @@ def fig_b5_shares(B5):
 
 
 def fig_a6_cf(S=-0.5):
-    """A6: harta Cornish-Fisher z -> z~(z) si derivata ei pentru K = 3 si K = 10."""
+    """A6: the Cornish-Fisher map z -> z~(z) and its derivative for K = 3 and K = 10."""
     _style()
     z = np.linspace(stats.norm.ppf(0.001), 1.0, 500)
     fig, axes = plt.subplots(1, 2, figsize=(W_FIG, 2.3))
@@ -632,7 +632,7 @@ def fig_a6_cf(S=-0.5):
 
 
 def fig_a7_ru(p=0.007, alpha=0.01):
-    """A7: functia Rockafellar-Uryasev F(v) = v + E[(L - v)+]/alpha pentru portofoliul A4 si pentru o obligatiune."""
+    """A7: the Rockafellar-Uryasev function F(v) = v + E[(L - v)+]/alpha for the A4 portfolio and for one bond."""
     _style()
     v = np.linspace(-10, 220, 2301)
     vals_p, pr_p = np.array([0, 100, 200.]), np.array([(1 - p) ** 2, 2 * p * (1 - p), p ** 2])
@@ -659,7 +659,7 @@ def fig_a7_ru(p=0.007, alpha=0.01):
 
 
 def fig_a8_sim(R=4000, alpha=0.025, seed=SEED):
-    """A8 / B6: distributia de selectie a ES 2,5% istoric, simulare Monte Carlo (i.i.d.) vs SE asimptotic."""
+    """A8 / B6: sampling distribution of the historical ES 2.5%, Monte Carlo simulation (i.i.d.) vs asymptotic SE."""
     _style()
     rng = np.random.default_rng(seed)
     sig, nu = 1.2, 4
@@ -669,7 +669,7 @@ def fig_a8_sim(R=4000, alpha=0.025, seed=SEED):
     q_t = stats.t.ppf(1 - alpha, nu)
     v_t = s_t * q_t
     es_t = s_t * stats.t.pdf(q_t, nu) / alpha * (nu + q_t ** 2) / (nu - 1)
-    # dispersia asimptotica Var((L - v)+)/alpha^2, prin integrare numerica
+    # asymptotic variance Var((L - v)+)/alpha^2, by numerical integration
     from scipy import integrate as _int
     def avar(pdf, v, lim):
         m1 = _int.quad(lambda x: (x - v) * pdf(x), v, lim, limit=400)[0]
@@ -718,7 +718,7 @@ def fig_a8_sim(R=4000, alpha=0.025, seed=SEED):
 
 
 def _ci_panel(ax, rows, title, xlab, band=None):
-    """Grafic de tip punct + interval; rows = (eticheta, estimare, lo, hi, culoare, text din dreapta)."""
+    """Point-and-interval chart; rows = (label, estimate, lo, hi, colour, text on the right)."""
     for i, (lab, est, lo, hi, c, txt) in enumerate(rows):
         y = len(rows) - 1 - i
         if band is not None:
@@ -734,7 +734,7 @@ def _ci_panel(ax, rows, title, xlab, band=None):
 
 
 def fig_b1_ci(B1, SX):
-    """B1: intervale de 95% pentru VaR 1% BET pe doua selectii si patru metode."""
+    """B1: 95% intervals for the BET VaR 1% on two samples and four methods."""
     _style()
     fig, axes = plt.subplots(1, 2, figsize=(W_FIG, 2.35), sharex=True)
     for ax, k, t in [(axes[0], 'full', f"2000-2026 ({B1['full']['n_beyond']} beyond VaR)"),
@@ -754,7 +754,7 @@ def fig_b1_ci(B1, SX):
 
 
 def es_replicate_example(L, alpha=0.025, block=20, seed=SEED):
-    """Un singur replicat bootstrap (i.i.d. si pe blocuri), cu VaR si apartenenta la coada recalculate."""
+    """A single bootstrap resample (i.i.d. and by blocks), with VaR and tail membership recomputed."""
     rng = np.random.default_rng(seed)
     L = np.asarray(L)
     n = len(L)
@@ -772,7 +772,7 @@ def es_replicate_example(L, alpha=0.025, block=20, seed=SEED):
 
 
 def fig_b6_ci(B6):
-    """B6: intervale de 95% pentru ES 2,5% (i.i.d. vs blocuri), cu banda +/-0,3 puncte procentuale."""
+    """B6: 95% intervals for ES 2.5% (i.i.d. vs blocks), with a band of +/-0.3 percentage points."""
     _style()
     fig, ax = plt.subplots(figsize=(W_FIG, 2.6))
     labs = {'sp500_full': 'S&P 500, 2000-2026', 'sp500_w500': 'S&P 500, last 500', 'bet_full': 'BET, 2000-2026',
@@ -792,7 +792,7 @@ def fig_b6_ci(B6):
 
 
 def clusters_bet(L, tail=0.05):
-    """Depasirile pragului, grupurile (Ferro & Segers, 2003, regula egalitatilor) si maximele grupurilor."""
+    """Threshold exceedances, clusters (Ferro & Segers, 2003, tie rule) and cluster maxima."""
     L = np.asarray(L, float)
     u = np.quantile(L, 1 - tail)
     S = np.flatnonzero(L > u)
@@ -807,7 +807,7 @@ def clusters_bet(L, tail=0.05):
 
 
 def fig_b2_ext():
-    """B2 extins: cronologia depasirilor si a grupurilor, excesul mediu, stabilitatea VaR 0,1% in functie de prag."""
+    """B2 Extended: timeline of exceedances and clusters, mean excess, stability of VaR 0.1% across thresholds."""
     _style()
     Ls = -100 * log_returns('bet')
     L = Ls.values
@@ -850,7 +850,7 @@ def fig_b2_ext():
 
 
 def fig_btc_fhs3(B3):
-    """B3: pierderi Bitcoin, VaR HS pe 500 de zile si VaR FHS cu depasiri; volatilitatea conditionata; ACF z^2."""
+    """B3: Bitcoin losses, 500-day HS VaR and FHS VaR with exceedances; conditional volatility; ACF of z^2."""
     _style()
     r = 100 * log_returns('btc')
     params, mu, sig = garch_filter(r)
@@ -865,8 +865,8 @@ def fig_btc_fhs3(B3):
     ax.plot(rec.index, rec['fhs_var'], color=IDAred, lw=0.8, label='FHS VaR 1%')
     bh = rec[rec['loss'] > rec['hs_var']]
     bf = rec[rec['loss'] > rec['fhs_var']]
-    ax.plot(bh.index, bh['loss'] + 0.6, 'v', ms=4, color=MainBlue, label=f'HS breach ({len(bh)})')
-    ax.plot(bf.index, bf['loss'] + 1.6, 'v', ms=4, color=IDAred, label=f'FHS breach ({len(bf)})')
+    ax.plot(bh.index, bh['loss'] + 0.6, 'v', ms=4, color=MainBlue, label=f'HS exceedance ({len(bh)})')
+    ax.plot(bf.index, bf['loss'] + 1.6, 'v', ms=4, color=IDAred, label=f'FHS exceedance ({len(bf)})')
     ax.set_ylabel('Loss (%)')
     ax.set_title('Bitcoin, 18 Sep 2024 - 18 Sep 2026: one-day-ahead VaR 1%')
     ax2 = fig.add_subplot(gs[1, 0])
@@ -895,7 +895,7 @@ def fig_btc_fhs3(B3):
 
 
 def fig_b3_boot(draws, B3, boot):
-    """B3 extins: distributia bootstrap a VaR 1% FHS de maine pentru Bitcoin."""
+    """B3 Extended: bootstrap distribution of tomorrow's FHS VaR 1% for Bitcoin."""
     _style()
     fig, ax = plt.subplots(figsize=(W_FIG * 0.85, 2.2))
     ax.hist(draws, bins=45, color=IDAred, alpha=0.55, label=f'{len(draws)} bootstrap forecasts')
@@ -909,7 +909,7 @@ def fig_b3_boot(draws, B3, boot):
 
 
 def fig_b4_methods(B4, B=1000):
-    """B4: VaR istoric cu interval bootstrap, Normal si Cornish-Fisher, pe active si niveluri."""
+    """B4: historical VaR with a bootstrap interval, Normal and Cornish-Fisher, by asset and level."""
     _style()
     keys = ['sp500', 'bet', 'btc', 'eurron', 'gold']
     labs = {'sp500': 'S&P 500', 'bet': 'BET', 'btc': 'Bitcoin', 'eurron': 'EUR/RON', 'gold': 'Gold'}
@@ -940,11 +940,11 @@ def fig_b4_methods(B4, B=1000):
 
 
 def fig_b7_caviar(CV):
-    """B7: pierderile BET 2016-2026 cu VaR CAViaR, FHS si HS; fereastra COVID-19."""
+    """B7: BET losses 2016-2026 with CAViaR, FHS and HS VaR; the COVID-19 window."""
     _style()
     try:
         from estimation_risk import caviar_path as _cp, pinball as _pb
-    except ImportError:                              # in notebook-ul Quantlet functiile sunt deja definite
+    except ImportError:                              # in the Quantlet notebook these functions are already defined
         _cp, _pb = globals()['caviar_path'], globals()['pinball']
     r = 100 * log_returns('bet')
     v0 = -np.quantile(r.loc[:'2015-12-31'].values[:300], 0.01)
@@ -961,7 +961,7 @@ def fig_b7_caviar(CV):
         ax.plot(dd.index, dd['fhs_var'], color=IDAred, lw=0.8, label='FHS, re-estimated every January')
         ax.plot(dd.index, dd['hs_var'], color=Orange, lw=0.9, label='HS, rolling 500 days')
         br = dd[dd['loss'] > v.loc[dd.index]]
-        ax.plot(br.index, br['loss'] + 0.5, 'v', ms=3.5, color=MainBlue, label='CAViaR breach')
+        ax.plot(br.index, br['loss'] + 0.5, 'v', ms=3.5, color=MainBlue, label='CAViaR exceedance')
         ax.set_ylabel('Loss (%)')
         ax.set_title(ttl)
     bottom_legend(fig, ncol=3, fontsize=9.5)
@@ -978,7 +978,7 @@ def rolling_conditional_bet():
 
 
 def c1_series():
-    """Portofoliile din C1 (acelasi cod ca c1_capital): randamente simple zilnice in %."""
+    """The C1 portfolios (same code as c1_capital): daily simple returns in %."""
     lr_b = joint_returns(BVB, start=C_START)
     lr_b = lr_b[(lr_b != 0).any(axis=1)]
     start = str(lr_b.index[0].date())
@@ -989,7 +989,7 @@ def c1_series():
 
 
 def fig_c1_stress(C1):
-    """C1: ES 2,5% istoric pe ferestre mobile de 250 de zile; ferestrele de stres alese (hasurate)."""
+    """C1: historical ES 2.5% on rolling 250-day windows; the chosen stress windows (hatched)."""
     _style()
     ser = c1_series()
     es25 = lambda y: hs_var_es(y, 0.025)[1]   # noqa: E731
@@ -1010,7 +1010,7 @@ def fig_c1_stress(C1):
 
 
 def fig_c2_horizon(B1):
-    """C2: functiile de supravietuire ale pierderilor BET pe o zi si pe 10 zile suprapuse; VaR 1% corect si gresit."""
+    """C2: survival functions of one-day and overlapping 10-day BET losses; correct and wrong VaR 1%."""
     _style()
     r = 100 * log_returns('bet')
     L1 = (-r).values
@@ -1040,7 +1040,7 @@ def fig_c2_horizon(B1):
 
 
 def fig_c3_design():
-    """C3: impartirea esantionului (calibrare / evaluare), puncte CV cu intervalele de excludere, alinierea t -> t + 10."""
+    """C3: sample split (tuning / evaluation), cross-validation points with their exclusion windows, alignment t -> t + 10."""
     _style()
     r = log_returns('sp500', start='1990-01-01', end='2020-08-31')
     split = r.index[-2000]
@@ -1054,7 +1054,7 @@ def fig_c3_design():
     ax.plot(ev.index, 100 * ev.values, color=IDAred, lw=0.4, label=f'Evaluation sample (last {len(ev):,} days)')
     for i in cv:
         ax.axvspan(tune.index[i - 5], tune.index[i + 5], color=Amber, alpha=0.5, lw=0)
-    ax.plot([], [], color=Amber, lw=4, alpha=0.5, label='CV test day +/- 5 excluded days (20 random)')
+    ax.plot([], [], color=Amber, lw=4, alpha=0.5, label='Cross-validation: 20 random test days, each with ±5 neighbouring days excluded')
     ax.set_ylabel('Log return (%)')
     ax.set_title(f'S&P 500, Jan 1990 - Aug 2020; evaluation from {split.date()}')
     ax = axes[1]
@@ -1079,7 +1079,7 @@ def fig_c3_design():
 
 
 def fig_b5_rp(B5, RP):
-    """B5 extins: ponderi de paritate a riscului (VaR Normal) vs 1/sigma si cotele de risc rezultate."""
+    """B5 Extended: risk-parity weights (Normal VaR) vs 1/sigma and the resulting risk shares."""
     _style()
     names = ['SPY', 'TLT', 'GLD', 'Bitcoin']
     xx = np.arange(4)
@@ -1100,19 +1100,19 @@ def fig_b5_rp(B5, RP):
 
 
 def extra_numbers(S):
-    """Cifre suplimentare pentru pasii rezolvarilor (calculate din date, nu introduse de mana)."""
+    """Extra numbers for the solution steps (computed from the data)."""
     out = {}
     L = -100 * log_returns('bet')
     x = np.sort(L.iloc[-500:].values)
     n = len(x)
-    pos = 1 + (n - 1) * 0.99                          # pozitia (1-indexata) a cuantilei interpolate
+    pos = 1 + (n - 1) * 0.99                          # (1-indexed) position of the interpolated quantile
     lo = int(np.floor(pos))
     out['b1_w500'] = dict(pos=pos, l_lo=float(x[lo - 1]), l_hi=float(x[lo]), top5=[float(v) for v in x[-5:][::-1]],
                           var=float(np.quantile(x, 0.99)))
     xf = np.sort(L.values)
     posf = 1 + (len(xf) - 1) * 0.99
     out['b1_full'] = dict(pos=posf, l_lo=float(xf[int(np.floor(posf)) - 1]), l_hi=float(xf[int(np.floor(posf))]))
-    # k pentru ES 2,5% pe cele patru selectii din B6
+    # k for ES 2.5% on the four samples of B6
     ks = {}
     for k in ['sp500', 'bet']:
         Lk = (-100 * log_returns(k)).values
@@ -1120,7 +1120,7 @@ def extra_numbers(S):
             v = np.quantile(xx, 0.975)
             ks[f'{k}_{tag}'] = dict(nalpha=0.025 * len(xx), k=int((xx >= v).sum()))
     out['b6_k'] = ks
-    # B5: ziua cea mai rea a portofoliului cu ponderi egale si contributiile ei
+    # B5: worst day of the equally weighted portfolio and its contributions
     lr = joint_returns(['SPY', 'TLT', 'GLD', 'BTC'], start='2014-09-18')
     R = 100 * (np.exp(lr) - 1)
     Lp = -(R.values @ np.full(4, 0.25))
@@ -1128,7 +1128,7 @@ def extra_numbers(S):
     out['b5_worst'] = dict(date=str(R.index[i].date()), Lp=float(Lp[i]), comp=[float(-0.25 * v) for v in R.values[i]])
     v25, e25 = hs_var_es(Lp, 0.025)
     out['b5_tail'] = dict(k=int((Lp >= v25).sum()), var=float(v25))
-    # C1: numarul de pierderi din coada in ferestrele de stres si pe zece ani
+    # C1: number of tail losses in the stress windows and over ten years
     ser = c1_series()
     c1 = {}
     for k in ['bvb', 'spy']:
@@ -1140,7 +1140,7 @@ def extra_numbers(S):
         c1[k] = dict(n_stress=int(len(Ls)), k_stress=int((Ls >= v).sum()), k_full=int((Lk.values >= v1).sum()),
                      n=int(len(Lk)))
     out['c1'] = c1
-    # A1: tabelul pas cu pas (deja in S['A1']); A4: probabilitatile
+    # A1: the step-by-step table (already in S['A1']); A4: the probabilities
     return out
 
 

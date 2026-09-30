@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Daily market data (data/market): Euro Stoxx 50 index, BET index (closing values)'
+Datafile: 'Daily market data (course data): Euro Stoxx 50 index, BET index (closing values)'
 
 Output: 'ch19_nse_multiverse.pdf, ch19_nse_forks.pdf, ch19_nse.json'

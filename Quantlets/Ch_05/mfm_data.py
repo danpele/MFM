@@ -1,19 +1,19 @@
 """
-mfm_data.py -- Incarcarea datelor pentru Capitolul 5 (MFM): volatilitate conditionata, modele GARCH
-===================================================================================================
-  * load_close(name)   -- pretul de inchidere zilnic din data/market/ (sau cursul de referinta BNR)
-  * pct_returns(name)  -- randamente log zilnice in procente, pe calendarul propriu al fiecarei serii
-  * periods_per_year() -- frecventa reala a observatiilor (pentru anualizare)
-  * MARKETS            -- S&P 500, BET, BET-TR, Bitcoin, EUR/RON, aur
+mfm_data.py -- data for Chapter 5 (MFM): conditional volatility, GARCH models
+=============================================================================
+  * load_close(name)   -- daily closing price of the course data (or the BNR reference rate)
+  * pct_returns(name)  -- daily log returns in percent, each series on its own calendar
+  * periods_per_year() -- actual observation frequency (for annualisation)
+  * MARKETS            -- S&P 500, BET, BET-TR, Bitcoin, EUR/RON, gold
 
-Conventii (ca in capitolele 1 si 2):
-  * indicii bursieri: doar zilele lucratoare; zilele cu inchidere identica cu ziua precedenta
-    (sarbatori completate cu ultimul pret) sunt eliminate;
-  * aur (XAU/USD): fara cotatiile de weekend; anualizare cu frecventa reala (aprox. 260 de zile pe an);
-  * cripto: 7 zile din 7;
-  * EUR/RON: cursul oficial de referinta BNR (seria EODHD are cotatii eronate).
+Conventions (as in Chapters 1 and 2):
+  * equity indices: weekdays only; days whose close equals the previous close
+    (holidays filled with the last price) are dropped;
+  * gold (XAU/USD): no weekend quotes; annualised with the actual frequency (about 260 days a year);
+  * crypto: 7 days a week;
+  * EUR/RON: the official BNR reference rate (the EUR/RON series from EODHD has erroneous quotes).
 
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -26,7 +26,7 @@ REPO_RAW = 'https://raw.githubusercontent.com/danpele/MFM/main/data/market/'
 MARKET_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'data', 'market')
 END = '2026-09-18'
 
-# nume -> (simbol, eticheta, grup, data de start)
+# name -> (symbol, label, group, start date)
 MARKETS = {
     'sp500':  ('GSPC.INDX',      'S&P 500',                 'Equity', '2000-01-01'),
     'bet':    ('BET',            'BET',                     'Equity', '2000-01-01'),
@@ -41,7 +41,7 @@ _CACHE = {}
 
 
 def read_market(symbol):
-    """Citeste data/market/<SIMBOL>.csv local sau din repo-ul GitHub."""
+    """Daily price table of one symbol (local copy of the course data, or GitHub)."""
     fname = f'{symbol}.csv'
     path = os.path.join(MARKET_DIR, fname)
     src = path if os.path.exists(path) else REPO_RAW + fname
@@ -49,7 +49,7 @@ def read_market(symbol):
 
 
 def read_reference_rate(currency='EUR', start='2005-07-01', end=END):
-    """Cursul oficial de referinta RON (arhive XML anuale BNR)."""
+    """Official RON reference rate (annual BNR XML archives)."""
     key = (currency, start, end)
     if key in _CACHE:
         return _CACHE[key]
@@ -69,7 +69,7 @@ def read_reference_rate(currency='EUR', start='2005-07-01', end=END):
 
 
 def load_close(name, start=None, end=END):
-    """Pretul de inchidere zilnic, curatat dupa conventiile capitolului."""
+    """Daily closing price, cleaned with the chapter conventions."""
     symbol, _, group, start0 = MARKETS[name]
     start = start or start0
     if symbol.startswith('REF:'):
@@ -77,23 +77,23 @@ def load_close(name, start=None, end=END):
     s = read_market(symbol)['close'].loc[start:end]
     s = s[s > 0].dropna()
     if group != 'Crypto':
-        s = s[s.index.dayofweek < 5]          # fara cotatii de weekend
-        s = s[s.diff() != 0]                  # fara sarbatori completate cu pretul anterior
+        s = s[s.index.dayofweek < 5]          # no weekend quotes
+        s = s[s.diff() != 0]                  # no holidays filled with the previous price
     return s.rename(name)
 
 
 def pct_returns(name, start=None, end=END):
-    """Randamente log zilnice, in procente, pe calendarul propriu al seriei."""
+    """Daily log returns in percent, on the series' own calendar."""
     return (100 * np.log(load_close(name, start, end)).diff().dropna()).rename(name)
 
 
 def periods_per_year(r):
-    """Numarul mediu de observatii pe an calendaristic (frecventa reala a seriei)."""
+    """Average number of observations per calendar year (actual frequency of the series)."""
     years = (r.index[-1] - r.index[0]).days / 365.25
     return len(r) / years
 
 
 def load_vix(start='2000-01-01', end=END):
-    """Indicele VIX (volatilitatea implicita pe 30 de zile a S&P 500, in procente anualizate)."""
+    """The VIX index (30-day implied volatility of the S&P 500, annualised percent)."""
     s = read_market('VIX.INDX')['close'].loc[start:end]
     return s[s.index.dayofweek < 5].rename('vix')

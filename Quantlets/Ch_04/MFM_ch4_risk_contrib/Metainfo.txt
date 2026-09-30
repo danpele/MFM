@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Market data (data/market): SPY, EFA, EEM, TLT, IEF, LQD, HYG, GLD; risk-free rate from the Kenneth French Data Library'
+Datafile: 'Daily market data (course data): SPY, EFA, EEM, TLT, IEF, LQD, HYG, GLD; risk-free rate from the Kenneth French Data Library'
 
 Output: 'ch4_risk_contrib.pdf'

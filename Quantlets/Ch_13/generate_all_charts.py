@@ -31,7 +31,7 @@ from mfm_ml import (load_data, ffd_weights, frac_diff_ffd, get_daily_vol, triple
                     deflated_sharpe_ratio, local_whittle, exact_local_whittle,
                     french_factors, tangency_portfolio)
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'

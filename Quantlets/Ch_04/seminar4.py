@@ -1,9 +1,9 @@
 """
-seminar4.py -- Calculele pentru Seminarul 4 (MFM): optimizarea portofoliului
-===========================================================================
-Partea A (verificari numerice ale derivarilor), Partea B (date reale), Partea C (analiza de referinta).
-Toate rezultatele se scriu in sem4_results.json (folosite in ambele versiuni ale seminarului).
-Modelarea Pietelor Financiare - Daniel Traian PELE
+seminar4.py -- computations for Seminar 4 (MFM): portfolio optimisation
+========================================================================
+Part A (numerical checks of the derivations), Part B (real data), Part C (model solutions).
+All results are written to sem4_results.json (used by both versions of the seminar).
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -28,9 +28,9 @@ SEED = 42
 
 
 def sr_diff_iid(sr1, sr2, rho, T):
-    """Diferenta de Sharpe sub randamente i.i.d. Normale (formula raportata de Ledoit-Wolf 2008).
+    """Sharpe ratio difference under i.i.d. Normal returns (formula reported by Ledoit-Wolf 2008).
 
-    sr1, sr2: Sharpe lunar; rho: corelatia randamentelor; intoarce (z, p).
+    sr1, sr2: monthly Sharpe ratios; rho: correlation of the returns; returns (z, p, se).
     """
     v = (2 - 2 * rho + 0.5 * (sr1 ** 2 + sr2 ** 2 - 2 * sr1 * sr2 * rho ** 2)) / T
     z = (sr1 - sr2) / np.sqrt(v)
@@ -38,8 +38,8 @@ def sr_diff_iid(sr1, sr2, rho, T):
 
 
 def var_ratio_boot(r1, r2, block=6, B=5000, seed=SEED, return_draws=False):
-    """Raportul varianțelor out-of-sample var(r1)/var(r2), cu interval bootstrap circular pe blocuri.
-    Ambele serii folosesc ACEIASI indici (perechi de luni), deci corelatia lor se pastreaza."""
+    """Out-of-sample variance ratio var(r1)/var(r2), with a circular block bootstrap interval.
+    Both series use the SAME indices (paired months), so their correlation is preserved."""
     rng = np.random.default_rng(seed)
     r1, r2 = np.asarray(r1, float), np.asarray(r2, float)
     T = len(r1)
@@ -56,11 +56,11 @@ def var_ratio_boot(r1, r2, block=6, B=5000, seed=SEED, return_draws=False):
 
 
 # =============================================================================
-# PARTEA A
+# PART A
 # =============================================================================
 def part_a():
     R = {}
-    # A1 [Rezolvat] GMV cu doua active: SPY si TLT
+    # A1 [Solved] two-asset GMV: SPY and TLT
     Rm, mu, sd, rho = g.two_asset_stats()
     w = g.gmv_two(sd['SPY'], sd['TLT'], rho)
     v = np.sqrt(w ** 2 * sd['SPY'] ** 2 + (1 - w) ** 2 * sd['TLT'] ** 2 + 2 * w * (1 - w) * rho * sd['SPY'] * sd['TLT'])
@@ -69,7 +69,7 @@ def part_a():
     R['A1'] = dict(s1=sd['SPY'], s2=sd['TLT'], rho=rho, m1=mu['SPY'], m2=mu['TLT'], w=w, vol=v,
                    mean=w * mu['SPY'] + (1 - w) * mu['TLT'], T=len(Rm), A=A_, vol_from_A=float(1 / np.sqrt(A_)),
                    Sigma=Sig2.tolist(), w_matrix=(np.linalg.solve(Sig2, np.ones(2)) / A_).tolist())
-    # A2 [Propus] GMV cu doua active: SPY si GLD (lunar, zile comune)
+    # A2 [Proposed] two-asset GMV: SPY and GLD (monthly, common days)
     r, rex, rf = g.us_monthly(['SPY', 'GLD'])
     s1, s2 = r['SPY'].std() * np.sqrt(12), r['GLD'].std() * np.sqrt(12)
     rh = r.corr().iloc[0, 1]
@@ -77,18 +77,18 @@ def part_a():
     v2 = np.sqrt(w2 ** 2 * s1 ** 2 + (1 - w2) ** 2 * s2 ** 2 + 2 * w2 * (1 - w2) * rh * s1 * s2)
     R['A2'] = dict(s1=s1, s2=s2, rho=rh, w=w2, vol=v2, start=str(r.index[0].date()), T=len(r),
                    vol_if_rho1=abs(w2 * s1 + (1 - w2) * s2))
-    # A3 [Rezolvat] ERC cu doua active = inversul volatilitatii (SPY, IEF)
+    # A3 [Solved] two-asset ERC = inverse volatility (SPY, IEF)
     r, rex, rf = g.us_monthly(['SPY', 'IEF'])
     S = r.cov().values * 12
     s = np.sqrt(np.diag(S))
     w_iv = (1 / s) / (1 / s).sum()
     R['A3'] = dict(s1=s[0], s2=s[1], rho=r.corr().iloc[0, 1], w_spy=w_iv[0], w_erc_numeric=g.w_erc(S)[0],
                    rc=g.risk_contrib(w_iv, S).tolist(), T=len(r), start=str(r.index[0].date()))
-    # A4 [Propus] contributiile la risc ale portofoliului 60/40
+    # A4 [Proposed] risk contributions of the 60/40 portfolio
     w64 = np.array([0.6, 0.4])
     R['A4'] = dict(rc=g.risk_contrib(w64, S).tolist(), vol=float(np.sqrt(w64 @ S @ w64)),
                    vol_erc=float(np.sqrt(w_iv @ S @ w_iv)), cov=S[0, 1])
-    # A5 [Rezolvat] Black-Litterman cu un activ: medie ponderata cu precizia
+    # A5 [Solved] Black-Litterman with one asset: precision-weighted mean
     pi, q, tau, sig = 0.05, 0.08, 0.05, 0.16
     om = 0.02 ** 2
     prec_p, prec_v = 1 / (tau * sig ** 2), 1 / om
@@ -96,7 +96,7 @@ def part_a():
                    weight_view=prec_v / (prec_p + prec_v),
                    mu_bl=(prec_p * pi + prec_v * q) / (prec_p + prec_v),
                    post_sd=np.sqrt(1 / (prec_p + prec_v)))
-    # A6 [Propus] opinia XLK - XLU din curs: Omega = tau P Sigma P' => media simpla
+    # A6 [Proposed] the lecture view XLK - XLU: Omega = tau P Sigma P' => simple average
     r, rex, rf = g.us_monthly(SECTORS, start='2016-08-01')
     Sig = rex.cov().values * 12
     n = len(SECTORS)
@@ -110,7 +110,7 @@ def part_a():
 
 
 def part_a_tests(bts):
-    """A7 [Rezolvat], A8 [Propus]: testul i.i.d. al diferentei de Sharpe pe sectoare."""
+    """A7 [Solved], A8 [Proposed]: i.i.d. test of the Sharpe ratio difference on sectors."""
     ret = bts['Sectors'][0]
     T = len(ret)
     out = {}
@@ -126,7 +126,7 @@ def part_a_tests(bts):
 
 
 # =============================================================================
-# PARTEA B
+# PART B
 # =============================================================================
 def b_backtest_stats(bts, n_jobs=1):
     R = {}
@@ -140,12 +140,12 @@ def b_backtest_stats(bts, n_jobs=1):
                         block=r['block'])
     R['B1'] = dict(table=tab.loc[['1/N', 'MV', 'MV-LO', 'GMV']].round(4).to_dict(orient='index'), tests=tests,
                    T=len(ret), start=f'{ret.index[0]:%Y-%m}', end=f'{ret.index[-1]:%Y-%m}')
-    # B2 [Rezolvat] shrinkage pe sectoare: volatilitatea out-of-sample a GMV
+    # B2 [Solved] shrinkage on sectors: out-of-sample volatility of GMV
     vr, ci, pgt = var_ratio_boot(ret['GMV-LW'], ret['GMV'])
     R['B2'] = dict(vol_gmv=ret['GMV'].std() * np.sqrt(12), vol_lw=ret['GMV-LW'].std() * np.sqrt(12),
                    vol_ew=ret['1/N'].std() * np.sqrt(12), var_ratio=vr, ci=ci.tolist(), share_boot_ge1=pgt,
                    to_gmv=to['GMV'].mean(), to_lw=to['GMV-LW'].mean())
-    # B3 [Rezolvat] ERC si HRP pe sectoare
+    # B3 [Solved] ERC and HRP on sectors
     X = g.us_monthly(SECTORS)[1].values[-g.WINDOW:]
     S = np.cov(X.T)
     w_e, w_h = g.w_erc(S), g.w_hrp(S)
@@ -158,7 +158,7 @@ def b_backtest_stats(bts, n_jobs=1):
                    rc_hrp=dict(zip(SECTORS, g.risk_contrib(w_h, S))), tests=tests,
                    sharpe=dict(ERC=g.sharpe(ret['ERC']), HRP=g.sharpe(ret['HRP']), EW=g.sharpe(ret['1/N'])),
                    turnover=dict(ERC=to['ERC'].mean(), HRP=to['HRP'].mean(), EW=to['1/N'].mean()))
-    # B4 [Propus] shrinkage pe universul combinat (16 ETF-uri)
+    # B4 [Proposed] shrinkage on the combined universe (16 ETFs)
     retc, toc, Wc = bts['Combined']
     vr, ci, pgt = var_ratio_boot(retc['GMV-LW'], retc['GMV'])
     Xc = g.us_monthly(g.COMBINED)[1].values
@@ -169,7 +169,7 @@ def b_backtest_stats(bts, n_jobs=1):
                    sr_gmv=g.sharpe(retc['GMV']), sr_lw=g.sharpe(retc['GMV-LW']),
                    cond_sample=float(np.linalg.cond(np.cov(Xc[-g.WINDOW:].T))),
                    cond_lw=float(np.linalg.cond(g.lw_cc(Xc[-g.WINDOW:])[0])))
-    # B6 [Propus] HRP vs GMV pe universul combinat
+    # B6 [Proposed] HRP vs GMV on the combined universe
     d, se, p = g.sr_diff_hac(retc['HRP'], retc['GMV'])
     rb = g.run_tests({'x': (retc['HRP'], retc['GMV'])})['x'][0]
     ci, pb = rb['ci_boot'], rb['p_boot']
@@ -178,7 +178,7 @@ def b_backtest_stats(bts, n_jobs=1):
                    vol_hrp=retc['HRP'].std() * np.sqrt(12), vol_gmv=retc['GMV'].std() * np.sqrt(12),
                    net50_hrp=g.sharpe(retc['HRP'] - 0.005 * toc['HRP'].fillna(0)),
                    net50_gmv=g.sharpe(retc['GMV'] - 0.005 * toc['GMV'].fillna(0)))
-    # B8 [Propus] costul de echilibru MV-LO vs 1/N pe universul combinat
+    # B8 [Proposed] break-even cost of MV-LO vs 1/N on the combined universe
     c = np.linspace(0, 200, 2001)
     gap = [g.sharpe(retc['MV-LO'] - cc / 1e4 * toc['MV-LO'].fillna(0))
            - g.sharpe(retc['1/N'] - cc / 1e4 * toc['1/N'].fillna(0)) for cc in c]
@@ -190,7 +190,7 @@ def b_backtest_stats(bts, n_jobs=1):
 
 
 def b5_btc():
-    """B5 [Propus] ERC pe multi-active, cu si fara Bitcoin (zile comune, apoi luni)."""
+    """B5 [Proposed] ERC on the multi-asset set, with and without Bitcoin (common days, then months)."""
     syms = [s + '.US' for s in MULTI] + ['BTC-USD.CC']
     p = prices(syms).resample('ME').last()
     r = p.pct_change().dropna().loc[:g.US_END]
@@ -215,7 +215,7 @@ def b5_btc():
 
 
 def b7_bl_multi():
-    """B7 [Propus] Black-Litterman pe multi-active: opinia GLD - TLT = +4% pe an."""
+    """B7 [Proposed] Black-Litterman on the multi-asset set: the view GLD - TLT = +4% a year."""
     r, rex, rf = g.us_monthly(MULTI, start='2016-08-01')
     Sig = rex.cov().values * 12
     n = len(MULTI)
@@ -229,20 +229,20 @@ def b7_bl_multi():
 
 
 def master_level(bts):
-    """A9, B2(d), B4(e), B9: exercitiile de nivel master."""
+    """A9, B2 Extended, B4 task 3, B9: the extension-pack exercises."""
     out = {}
-    # A9 [Propus] deplasarea lui theta_hat^2 (Kan & Zhou 2007), N = 9, T = 60, theta = Sharpe tangent din curs
+    # A9 [Proposed] bias of theta_hat^2 (Kan & Zhou 2007), N = 9, T = 60, theta = tangency Sharpe of the lecture
     R_s, Rex_s, _ = g.us_monthly(SECTORS)
     mu, S = Rex_s.mean().values, Rex_s.cov().values
     wt = g.w_tan(mu, S)
     theta = float((wt @ mu) / np.sqrt(wt @ S @ wt) * np.sqrt(12))
     out['A9'] = dict(theta_ann=theta, **g.kz_bias(theta, 9, 60))
-    # B2(d) [Rezolvat] Marchenko-Pastur pe fereastra de 60 de luni a sectoarelor
+    # B2 Extended [Solved] Marchenko-Pastur on the 60-month sector window
     X = Rex_s.values[-g.WINDOW:]
     ev = np.sort(np.linalg.eigvalsh(np.corrcoef(X.T)))[::-1]
     lo, hi = g.mp_bounds(9 / g.WINDOW)
     out['B2d'] = dict(ev=ev.tolist(), lo=lo, hi=hi, n_above=int((ev > hi).sum()), n_below=int((ev < lo).sum()))
-    # B4(e) [Propus] shrinkage neliniar (Ledoit & Wolf 2020) pe universul combinat
+    # B4 task 3 [Proposed] nonlinear shrinkage (Ledoit & Wolf 2020) on the combined universe
     Rc, Rexc, _ = g.us_monthly(g.COMBINED)
     retn, ton, _ = g.backtest(Rc, Rexc, strategies=['GMV', 'GMV-LW', 'GMV-NL'])
     vr, ci, pgt = var_ratio_boot(retn['GMV-NL'], retn['GMV'])
@@ -250,7 +250,7 @@ def master_level(bts):
     out['B4e'] = dict(vol={s: float(retn[s].std() * np.sqrt(12)) for s in retn},
                       to={s: float(ton[s].mean()) for s in retn}, sr={s: g.sharpe(retn[s]) for s in retn},
                       vr_nl_gmv=vr, ci_nl_gmv=ci.tolist(), vr_nl_lw=vr2, ci_nl_lw=ci2.tolist())
-    # B9 [Propus] testul Britten-Jones al ipotezei 'tangent = 1/N', esantion complet si doua jumatati
+    # B9 [Proposed] Britten-Jones test of 'tangency = 1/N', full sample and two halves
     h = len(Rex_s) // 2
     out['B9'] = {k: {q: v for q, v in g.britten_jones(x).items() if q in ('T', 'F', 'pF', 'wald_hac', 'p_wald_hac', 't', 't_hac', 'w')}
                  | dict(start=f'{x.index[0]:%Y-%m}', end=f'{x.index[-1]:%Y-%m}')
@@ -259,7 +259,7 @@ def master_level(bts):
 
 
 # =============================================================================
-# PARTEA C: blue chips BVB, cu si fara active externe (in RON)
+# PART C: BVB blue chips, with and without foreign assets (in RON)
 # =============================================================================
 FOREIGN = ['SPY', 'EFA', 'IEF', 'GLD']
 
@@ -298,7 +298,7 @@ def part_c():
                       mdd_local=g.max_drawdown(ret_l[s]), mdd_global=g.max_drawdown(ret_g[s]),
                       diff_vs_bettr=d1, p_vs_bettr=p1, diff_vs_local=d2, p_vs_local=p2,
                       w_foreign_mean=float(W_g[s][FOREIGN].sum(1).mean()))
-    # o singura familie de 8 teste (4 reguli x 2 repere), ajustarea Holm
+    # one family of 8 tests (4 rules x 2 benchmarks), Holm adjustment
     adj = g.holm({f'{s}|{k}': out[s][f'p_vs_{k}'] for s in strats for k in ('bettr', 'local')})
     for s in strats:
         out[s]['holm_vs_bettr'], out[s]['holm_vs_local'] = adj[f'{s}|bettr'], adj[f'{s}|local']
@@ -310,10 +310,10 @@ def fig_part_c(ret_l, ret_g, bench):
     fig, ax = plt.subplots(figsize=(7.2, 4.2))
     for s, c in [('1/N', g.EWcol), ('ERC', g.Forest), ('GMV-LW', g.MainBlue)]:
         ax.plot(ret_l.index, np.cumprod(1 + ret_l[s]), color=c, ls='--', lw=1.0,
-                label=f'{s}, BVB only (SR {g.sharpe(ret_l[s]):.2f})')
+                label=f'{s}, BVB only (Sharpe {g.sharpe(ret_l[s]):.2f})')
         ax.plot(ret_g.index, np.cumprod(1 + ret_g[s]), color=c, lw=1.5,
-                label=f'{s}, BVB + foreign (SR {g.sharpe(ret_g[s]):.2f})')
-    ax.plot(bench.index, np.cumprod(1 + bench), color='black', lw=1.5, label=f'BET-TR (SR {g.sharpe(bench):.2f})')
+                label=f'{s}, BVB + foreign (Sharpe {g.sharpe(ret_g[s]):.2f})')
+    ax.plot(bench.index, np.cumprod(1 + bench), color='black', lw=1.5, label=f'BET-TR (Sharpe {g.sharpe(bench):.2f})')
     ax.set_ylabel('Growth of 1 RON')
     ax.set_title(f'Eight BVB blue chips with and without SPY, EFA, IEF, GLD in RON, '
                  f'{ret_g.index[0]:%b %Y} - {ret_g.index[-1]:%b %Y}', fontsize=9, loc='left')
@@ -323,10 +323,10 @@ def fig_part_c(ret_l, ret_g, bench):
 
 
 # =============================================================================
-# GRAFICELE SEMINARULUI: charts/ch4_sem_*.pdf|png (fundal transparent, etichete ENG, legenda jos)
-# Rulare:  python seminar4.py --charts   (foloseste sem4_results.json pentru blocurile deja calibrate)
+# SEMINAR CHARTS: charts/ch4_sem_*.pdf|png (transparent background, English labels, legend at the bottom)
+# Run:  python seminar4.py --charts   (uses sem4_results.json for the calibrated blocks)
 # =============================================================================
-W_IN = 5.6          # latimea figurilor de seminar (inch), afisate pe ~0,5-0,85 din latimea slide-ului
+W_IN = 5.6          # width of the seminar figures (inches), shown at ~0.5-0.85 of the slide width
 
 
 def sem_style():
@@ -339,7 +339,7 @@ def sem_style():
 
 
 def bottom_legend(fig, ncol=3, handles=None, labels=None, fontsize=7.5):
-    """Legenda sub figura (in afara axelor), dupa tight_layout."""
+    """Legend below the figure (outside the axes), after tight_layout."""
     plt.tight_layout()
     if handles is None:
         handles, labels, seen = [], [], set()
@@ -359,7 +359,7 @@ def fmt_pct(ax, axis='y', dec=0):
 
 
 def fig_a1(A1):
-    """A1: volatilitatea portofoliului SPY-TLT in functie de ponderea SPY si curba risc-randament."""
+    """A1: volatility of the SPY-TLT portfolio as a function of the SPY weight, and the risk-return curve."""
     s1, s2, rho, m1, m2 = A1['s1'], A1['s2'], A1['rho'], A1['m1'], A1['m2']
     w = np.linspace(-0.2, 1.2, 281)
     vol = lambda w, r: np.sqrt(w ** 2 * s1 ** 2 + (1 - w) ** 2 * s2 ** 2 + 2 * w * (1 - w) * r * s1 * s2)
@@ -395,7 +395,7 @@ def fig_a1(A1):
 
 
 def fig_a3(A3):
-    """A3: ERC cu doua active; ponderile nu depind de rho, volatilitatea da."""
+    """A3: two-asset ERC; the weights do not depend on rho, the volatility does."""
     s1, s2, rho = A3['s1'], A3['s2'], A3['rho']
     w1 = (1 / s1) / (1 / s1 + 1 / s2)
     fig, axes = plt.subplots(1, 2, figsize=(W_IN, 2.2), gridspec_kw={'width_ratios': [1, 1.2]})
@@ -427,7 +427,7 @@ def fig_a3(A3):
 
 
 def a_5050(A3, A4):
-    """Exemplul lucrat din curs: contributiile la risc ale portofoliului 50/50 SPY-IEF."""
+    """Worked example of the lecture: risk contributions of the 50/50 SPY-IEF portfolio."""
     S = np.array([[A3['s1'] ** 2, A4['cov']], [A4['cov'], A3['s2'] ** 2]])
     w = np.array([0.5, 0.5])
     Sw = S @ w
@@ -436,7 +436,7 @@ def a_5050(A3, A4):
 
 
 def fig_a4(A3, A4):
-    """A4: 60/40 contra ERC, ponderi de capital si cote din varianta."""
+    """A4: 60/40 against ERC, capital weights and variance shares."""
     s1, s2 = A3['s1'], A3['s2']
     w1 = (1 / s1) / (1 / s1 + 1 / s2)
     fig, ax = plt.subplots(figsize=(W_IN * 0.8, 2.2))
@@ -460,7 +460,7 @@ def fig_a4(A3, A4):
 
 
 def fig_a5(A5):
-    """A5: densitatea a priori, verosimilitatea opiniei si densitatea a posteriori (o medie, un activ)."""
+    """A5: prior density, likelihood of the view and posterior density (one mean, one asset)."""
     x = np.linspace(-0.04, 0.16, 600)
     sd_p, sd_v, sd_q = np.sqrt(A5['prior_var']), A5['post_sd'], np.sqrt(A5['omega'])
     fig, ax = plt.subplots(figsize=(W_IN * 0.85, 2.1))
@@ -494,7 +494,7 @@ def bl_confidence_curve(Sig, P, q, ks):
 
 
 def fig_a6():
-    """A6: Black-Litterman pe sectoare, opinia XLK - XLU = 3%: ponderi si sensibilitatea la incredere."""
+    """A6: Black-Litterman on sectors, view XLK - XLU = 3%: weights and sensitivity to confidence."""
     rex, Sig, P, q = bl_setup(SECTORS, '2016-08-01', ('XLK', 'XLU'), 0.03)
     n = len(SECTORS)
     pi, mu_bl, w_bl = g.black_litterman(Sig, g.w_ew(n), P, q)
@@ -515,7 +515,7 @@ def fig_a6():
     ax.plot(ks, W[:, SECTORS.index('XLU')], color=g.Orange, lw=1.4, label='XLU weight')
     ax.axvline(1, color=g.Gray, lw=0.6, ls=':')
     ax.set_xscale('log')
-    ax.set_xlabel('Omega / (tau P Sigma P\'), log scale')
+    ax.set_xlabel(r'$\Omega / (\tau P \Sigma P^\top)$, log scale')
     fmt_pct(ax)
     ax.set_title('Lower confidence, smaller tilt', loc='left')
     bottom_legend(fig, ncol=4, fontsize=7)
@@ -526,7 +526,7 @@ def fig_a6():
 
 
 def fig_a7(A7):
-    """A7: distributia Normala standard, zonele de respingere la 5% si statistica observata."""
+    """A7: standard Normal distribution, 5% rejection regions and the observed statistic."""
     z = A7['z']
     x = np.linspace(-4, 4, 800)
     fig, ax = plt.subplots(figsize=(W_IN * 0.8, 2.0))
@@ -544,7 +544,7 @@ def fig_a7(A7):
 
 
 def fig_a8(A7, A8):
-    """A8: intervalele diferentelor anualizate (i.i.d.) si eroarea standard ca functie de corelatie."""
+    """A8: intervals of the annualised differences (i.i.d.) and the standard error as a function of the correlation."""
     T = A7['T']
     fig, axes = plt.subplots(1, 2, figsize=(W_IN, 2.2), gridspec_kw={'width_ratios': [1, 1.2]})
     ax = axes[0]
@@ -563,20 +563,20 @@ def fig_a8(A7, A8):
     ax.set_title('Two gaps, two precisions', loc='left')
     ax = axes[1]
     r = np.linspace(0, 0.999, 400)
-    for d, c, lab in [(A7, g.Amber, 'SR of GMV and 1/N'), (A8, g.Forest, 'SR of ERC and 1/N')]:
+    for d, c, lab in [(A7, g.Amber, 'Sharpe ratios of GMV and 1/N'), (A8, g.Forest, 'Sharpe ratios of ERC and 1/N')]:
         v = (2 - 2 * r + 0.5 * (d['sr1'] ** 2 + d['sr2'] ** 2 - 2 * d['sr1'] * d['sr2'] * r ** 2)) / T
         ax.plot(r, np.sqrt(v * 12), color=c, lw=1.3, label=lab)
         ax.plot(d['rho'], d['se'] * np.sqrt(12), 'o', color=c, ms=5)
     ax.set_xlabel('Correlation of the two return series')
-    ax.set_ylabel('SE of the annualised difference')
-    ax.set_title('The SE collapses as rho approaches 1', loc='left')
+    ax.set_ylabel('Standard error (annualised)')
+    ax.set_title(r'The standard error collapses as $\rho \to 1$', loc='left')
     bottom_legend(fig, ncol=2, fontsize=7)
     g.save_fig('ch4_sem_a8_intervals')
     return res
 
 
 def fig_a9(nsim=5000, T=60, seed=SEED):
-    """A9: distributia Sharpe-ului maxim estimat (Sigma de verosimilitate maxima), N = 9, T = 60."""
+    """A9: distribution of the estimated maximum Sharpe ratio (maximum-likelihood Sigma), N = 9, T = 60."""
     mu, S = g.sector_truth()
     N = len(mu)
     theta2 = mu @ np.linalg.solve(S, mu)
@@ -607,7 +607,7 @@ def fig_a9(nsim=5000, T=60, seed=SEED):
     ax.set_xscale('log')
     ax.set_ylim(0, 3)
     ax.set_xlabel('Sample length (years, log scale)')
-    ax.set_ylabel('Annualised RMS of the estimate')
+    ax.set_ylabel('Root mean square (annualised)')
     ax.set_title('The bias fades only slowly', loc='left')
     bottom_legend(fig, ncol=2, fontsize=7)
     g.save_fig('ch4_sem_a9_bias')
@@ -618,7 +618,7 @@ def fig_a9(nsim=5000, T=60, seed=SEED):
 
 
 def setup_check():
-    """Setup: panelul de sectoare (randamente lunare) si primele valori."""
+    """Setup: the sector panel (monthly returns) and its first values."""
     r, rex, rf = g.us_monthly(SECTORS)
     p = prices([s + '.US' for s in SECTORS]).resample('ME').last()
     return dict(T=len(r), first=f'{r.index[0]:%Y-%m-%d}', last=f'{r.index[-1]:%Y-%m-%d}',
@@ -630,7 +630,7 @@ def setup_check():
 
 
 def b1_first_month(bts):
-    """B1: prima luna out-of-sample pas cu pas (1/N si MV-LO): fereastra, ponderi, randament, deriva, turnover."""
+    """B1: the first out-of-sample month step by step (1/N and MV-LO): window, weights, return, drift, turnover."""
     R, Rex, rf = g.us_monthly(SECTORS)
     X = Rex.values
     t0 = g.WINDOW
@@ -656,7 +656,7 @@ def b1_first_month(bts):
 
 
 def fig_b1_timeline(info):
-    """B1: ferestrele de estimare si lunile de detinere (primele doua si ultima)."""
+    """B1: estimation windows and holding months (the first two and the last)."""
     fig, ax = plt.subplots(figsize=(W_IN, 1.55))
     ts = lambda s: pd.Timestamp(s + '-01')
     rows = [(ts('1999-01'), ts('2003-12'), ts('2004-01'), 'Window 1: estimate Jan 1999 - Dec 2003, hold Jan 2004'),
@@ -678,7 +678,7 @@ def fig_b1_timeline(info):
 
 
 def fig_b1_wealth(bts):
-    """B1: averea (randamente totale), drawdown, expunerea bruta si turnover-ul celor patru reguli."""
+    """B1: wealth (total returns), drawdown, gross exposure and turnover of the four rules."""
     ret, to, W = bts['Sectors']
     rf = ret.attrs['rf']
     rules = ['1/N', 'MV', 'MV-LO', 'GMV']
@@ -719,7 +719,7 @@ def fig_b1_wealth(bts):
 
 
 def fig_b1_boot(bts, B1):
-    """B1: bootstrap-ul studentizat pentru MV-LO minus 1/N (blocul calibrat) si extrapolarea lungimii esantionului."""
+    """B1: studentized bootstrap for MV-LO minus 1/N (calibrated block) and the extrapolated sample length."""
     ret = bts['Sectors'][0]
     blk = B1['tests']['MV-LO']['block']
     res, tstar = g.sr_diff_boot(ret['MV-LO'], ret['1/N'], block=blk)
@@ -732,20 +732,20 @@ def fig_b1_boot(bts, B1):
     ax.axvline(res['t_obs'], color=g.IDAred, lw=1.5, label=f"Observed {res['t_obs']:+.2f}")
     ax.axvline(-res['z_star'], color='black', ls='--', lw=0.8, label=f"Critical values +/-{res['z_star']:.2f}")
     ax.axvline(res['z_star'], color='black', ls='--', lw=0.8)
-    ax.set_xlabel('(Delta* - Delta) / s(Delta*)')
+    ax.set_xlabel(r'$(\Delta^* - \Delta)/s(\Delta^*)$')
     ax.set_ylabel('Density')
     ax.set_title(f"MV-LO minus 1/N, block {blk}: p = {res['p_boot']:.2f}", loc='left')
     ax = axes[1]
     Y = np.exp(np.linspace(np.log(10), np.log(1000), 200))
-    ax.plot(Y, se * np.sqrt(Y0 / Y), color=g.MainBlue, lw=1.4, label='HAC SE if it falls like 1/sqrt(years)')
-    ax.axhline(d / 1.96, color=g.IDAred, lw=1.0, ls='--', label=f'SE needed for |z| = 1.96: {d / 1.96:.3f}')
+    ax.plot(Y, se * np.sqrt(Y0 / Y), color=g.MainBlue, lw=1.4, label='HAC standard error if it falls like 1/sqrt(years)')
+    ax.axhline(d / 1.96, color=g.IDAred, lw=1.0, ls='--', label=f'Standard error needed for |z| = 1.96: {d / 1.96:.3f}')
     yreq = Y0 * (se / (d / 1.96)) ** 2
     ax.axvline(yreq, color=g.Gray, lw=0.6, ls=':')
     ax.text(yreq, se * 0.9, f' {yreq:.0f} years', fontsize=7, color='black')
     ax.set_xscale('log')
     ax.set_xlabel('Out-of-sample years (log)')
-    ax.set_ylabel('SE of the Sharpe difference')
-    ax.set_title('Fixed-effect extrapolation', loc='left')
+    ax.set_ylabel('Standard error (annualised)')
+    ax.set_title('Extrapolation with the difference held at its estimate', loc='left')
     bottom_legend(fig, ncol=2, fontsize=7)
     g.save_fig('ch4_sem_b1_boot')
     return dict(p_boot=res['p_boot'], ci=res['ci'], t_obs=res['t_obs'], z_star=res['z_star'], years_needed=float(yreq),
@@ -753,7 +753,7 @@ def fig_b1_boot(bts, B1):
 
 
 def b2_pipeline():
-    """B2: de la S la F, delta, Sigma_LW si ponderile GMV pe ultima fereastra a sectoarelor."""
+    """B2: from S to F, delta, Sigma_LW and the GMV weights on the last sector window."""
     R, Rex, rf = g.us_monthly(SECTORS)
     X = Rex.values[-g.WINDOW:]
     T, N = X.shape
@@ -771,7 +771,7 @@ def b2_pipeline():
 
 
 def fig_b2(bts):
-    """B2: distributia bootstrap a raportului variantelor GMV-LW / GMV si turnover-ul."""
+    """B2: bootstrap distribution of the variance ratio GMV-LW / GMV, and turnover."""
     ret, to, W = bts['Sectors']
     vr, ci, pge, draws = var_ratio_boot(ret['GMV-LW'], ret['GMV'], return_draws=True)
     fig, axes = plt.subplots(1, 2, figsize=(W_IN, 2.2), gridspec_kw={'width_ratios': [1.3, 1]})
@@ -795,7 +795,7 @@ def fig_b2(bts):
 
 
 def fig_b2x():
-    """B2 extins: valorile proprii ale corelatiilor sectoarelor pe ultima fereastra, banda Marchenko-Pastur."""
+    """B2 Extended: eigenvalues of the sector correlations on the last window, Marchenko-Pastur band."""
     R, Rex, rf = g.us_monthly(SECTORS)
     X = Rex.values[-g.WINDOW:]
     ev = np.sort(np.linalg.eigvalsh(np.corrcoef(X.T)))[::-1]
@@ -822,7 +822,7 @@ def fig_b2x():
 
 
 def b3_worked():
-    """B3: exemplul lucrat HRP cu patru active (covarianta simulata, transparenta)."""
+    """B3: the four-asset HRP example (simulated covariance, fully transparent)."""
     vol = np.array([0.10, 0.12, 0.20, 0.25])
     C = np.array([[1, 0.8, 0.2, 0.2], [0.8, 1, 0.2, 0.2], [0.2, 0.2, 1, 0.7], [0.2, 0.2, 0.7, 1.0]])
     S = C * np.outer(vol, vol)
@@ -870,7 +870,7 @@ def fig_b3_worked(wk):
 
 
 def fig_b3_sectors(B3):
-    """B3: arborele sectoarelor, corelatiile ordonate si ponderile/cotele de risc."""
+    """B3: the sector tree, the ordered correlations and the weights / risk shares."""
     R, Rex, rf = g.us_monthly(SECTORS)
     X = Rex.values[-g.WINDOW:]
     S = np.cov(X.T)
@@ -908,7 +908,7 @@ def fig_b3_sectors(B3):
 
 
 def fig_b4(bts):
-    """B4: 16 ETF-uri: spectrele esantion / LW / NL pe ultima fereastra si intervalele raporturilor de varianta."""
+    """B4: 16 ETFs: sample / LW / NL spectra on the last window and the variance-ratio intervals."""
     Rc, Rexc, _ = g.us_monthly(g.COMBINED)
     X = Rexc.values[-g.WINDOW:]
     N = X.shape[1]
@@ -951,7 +951,7 @@ def fig_b4(bts):
 
 
 def fig_b5():
-    """B5: ponderea Bitcoin in ERC si HRP si averea cu / fara Bitcoin (aceleasi luni)."""
+    """B5: Bitcoin weight in ERC and HRP, and wealth with / without Bitcoin (same months)."""
     syms = [s + '.US' for s in MULTI] + ['BTC-USD.CC']
     p = prices(syms).resample('ME').last()
     r = p.pct_change().dropna().loc[:g.US_END]
@@ -988,7 +988,7 @@ def fig_b5():
 
 
 def fig_b6(bts, B6):
-    """B6: HRP contra GMV pe 16 ETF-uri: puncte brut/net si distributia bootstrap."""
+    """B6: HRP against GMV on 16 ETFs: gross/net points and the bootstrap distribution."""
     ret, to, W = bts['Combined']
     res, tstar = g.sr_diff_boot(ret['HRP'], ret['GMV'], block=B6['block'])
     fig, axes = plt.subplots(1, 2, figsize=(W_IN, 2.3), gridspec_kw={'width_ratios': [1, 1.2]})
@@ -1000,8 +1000,8 @@ def fig_b6(bts, B6):
         a = (g_.std() * np.sqrt(12), g_.mean() * 12)
         b = (n_.std() * np.sqrt(12), n_.mean() * 12)
         ax.annotate('', xy=b, xytext=a, arrowprops=dict(arrowstyle='->', color=g.SCOL[s], lw=1.2))
-        ax.plot(*a, 'o', mfc='none', color=g.SCOL[s], ms=6, label=f'{s} gross (SR {g.sharpe(g_):.2f})')
-        ax.plot(*b, 'o', color=g.SCOL[s], ms=6, label=f'{s} net of 50 bp (SR {g.sharpe(n_):.2f})')
+        ax.plot(*a, 'o', mfc='none', color=g.SCOL[s], ms=6, label=f'{s} gross (Sharpe {g.sharpe(g_):.2f})')
+        ax.plot(*b, 'o', color=g.SCOL[s], ms=6, label=f'{s} net of 50 bp (Sharpe {g.sharpe(n_):.2f})')
         pts[s] = dict(gross=[float(v) for v in a], net=[float(v) for v in b])
     ax.axhline(0, color=g.Gray, lw=0.5)
     fmt_pct(ax)
@@ -1025,7 +1025,7 @@ def fig_b6(bts, B6):
 
 
 def fig_b7():
-    """B7: Black-Litterman pe cele opt ETF-uri, opinia GLD - TLT = 4%: ponderi, incredere, varianta long-only."""
+    """B7: Black-Litterman on the eight ETFs, view GLD - TLT = 4%: weights, confidence, long-only variant."""
     rex, Sig, P, q = bl_setup(MULTI, '2016-08-01', ('GLD', 'TLT'), 0.04)
     n = len(MULTI)
     pi, mu_bl, w_bl = g.black_litterman(Sig, g.w_ew(n), P, q)
@@ -1053,7 +1053,7 @@ def fig_b7():
     ax.axvline(1, color=g.Gray, lw=0.6, ls=':')
     ax.axhline(0, color=g.Gray, lw=0.5)
     ax.set_xscale('log')
-    ax.set_xlabel('Omega / (tau P Sigma P\'), log scale')
+    ax.set_xlabel(r'$\Omega / (\tau P \Sigma P^\top)$, log scale')
     fmt_pct(ax)
     ax.set_title('Tilt against confidence', loc='left')
     bottom_legend(fig, ncol=3, fontsize=7)
@@ -1065,7 +1065,7 @@ def fig_b7():
 
 
 def fig_b8(bts, B8):
-    """B8: Sharpe net ca functie de cost (0-200 bp), MV-LO si 1/N, punctul de echilibru si aproximarea."""
+    """B8: net Sharpe ratio as a function of cost (0-200 bp), MV-LO and 1/N, the break-even point and its approximation."""
     ret, to, W = bts['Combined']
     c = np.linspace(0, 200, 2001)
     nets = {s: np.array([g.sharpe(ret[s] - cc / 1e4 * to[s].fillna(0)) for cc in c]) for s in ['MV-LO', '1/N']}
@@ -1093,12 +1093,12 @@ def fig_b8(bts, B8):
 
 
 def fig_b9(nsim=2000, seed=SEED):
-    """B9: coeficientii Britten-Jones cu intervale, valorile p ale celor doua teste si marimea lor sub H0."""
+    """B9: Britten-Jones coefficients with intervals, p-values of the two tests and their size under H0."""
     R_s, Rex_s, _ = g.us_monthly(SECTORS)
     h = len(Rex_s) // 2
     samples = {'Full': Rex_s, 'First half': Rex_s.iloc[:h], 'Second half': Rex_s.iloc[h:]}
     bj = {k: g.britten_jones(v) for k, v in samples.items()}
-    # marimea testelor sub H0: mu proportional cu Sigma 1 (tangent = 1/N), Normal i.i.d., T = 166
+    # size of the tests under H0: mu proportional to Sigma 1 (tangency = 1/N), i.i.d. Normal, T = 166
     X2 = Rex_s.iloc[h:].values
     S2 = np.cov(X2.T)
     one = np.ones(9)
@@ -1145,7 +1145,7 @@ def fig_b9(nsim=2000, seed=SEED):
 
 
 def c2_ai_answer():
-    """C2: codul asistentului (ferestre pe tot esantionul, sqrt(252), fara rata fara risc) si corectiile succesive."""
+    """C2: the assistant's code (full-sample window, sqrt(252), no risk-free rate) and the successive corrections."""
     p = prices([s + '.US' for s in SECTORS])
     r = p.resample('ME').last().pct_change().dropna().loc[:g.US_END]
     rf = french_rf().reindex(r.index)
@@ -1154,9 +1154,9 @@ def c2_ai_answer():
     w = w / w.sum()
     port = r.dot(w)
     ai = port.mean() / port.std() * np.sqrt(252)
-    fix2 = port.mean() / port.std() * np.sqrt(12)                      # doar anualizarea
+    fix2 = port.mean() / port.std() * np.sqrt(12)                      # annualisation only
     ex_is = port - rf
-    fix23 = ex_is.mean() / ex_is.std() * np.sqrt(12)                   # anualizare + rata fara risc, in esantion
+    fix23 = ex_is.mean() / ex_is.std() * np.sqrt(12)                   # annualisation + risk-free rate, in sample
     rolled = {}
     for t in range(60, len(r)):
         St = r.iloc[t - 60:t].cov().values
@@ -1202,7 +1202,7 @@ def c2_ai_answer():
 
 
 def fig_c1_tests(C):
-    """C1: valorile p brute si ajustate Holm pentru cele opt teste (4 reguli x 2 repere)."""
+    """C1: raw and Holm-adjusted p-values of the eight tests (4 rules x 2 benchmarks)."""
     strats = ['1/N', 'GMV-LW', 'ERC', 'HRP']
     rows = [(s, k) for s in strats for k in ('bettr', 'local')]
     fig, ax = plt.subplots(figsize=(W_IN * 0.85, 2.3))
@@ -1220,7 +1220,7 @@ def fig_c1_tests(C):
 
 
 def c1_extra():
-    """C1: o conversie USD -> RON si sensibilitatea la o rata fara risc RON de 5% pe an (5%/12 pe luna)."""
+    """C1: one USD -> RON conversion and the sensitivity to a RON risk-free rate of 5% a year (5%/12 a month)."""
     m = part_c_data()
     p = prices(['SPY.US'])
     fx = bnr_rate('USD', 2014, 2026)
@@ -1273,7 +1273,7 @@ def seminar_charts(R):
 
 if __name__ == '__main__':
     if '--charts' in sys.argv:
-        # graficele seminarului: rezultatele de baza (inclusiv blocurile calibrate) din sem4_results.json
+        # seminar charts: base results (including the calibrated blocks) from sem4_results.json
         with open(os.path.join(HERE, 'sem4_results.json')) as f:
             R = json.load(f)
         R['S'] = seminar_charts(R)

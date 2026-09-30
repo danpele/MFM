@@ -20,7 +20,7 @@ MARKET_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'
 SNAP_DIR = os.path.dirname(os.path.abspath(__file__))
 END = '2026-09-18'
 
-# nume -> (simbol, coloana, tip)
+# name -> (symbol, field, type)
 SERIES = {
     'sp500': ('GSPC.INDX', 'close', 'index'),
     'spy':   ('SPY.US', 'adjusted_close', 'etf'),
@@ -35,7 +35,7 @@ SNAP_RAW = 'https://raw.githubusercontent.com/danpele/MFM/main/Quantlets/Ch_12/c
 
 
 def read_market(symbol):
-    """Citeste data/market/<SIMBOL>.csv local sau din repo-ul GitHub."""
+    """Read the daily series of one symbol from the course data (local copy or online)."""
     fname = f'{symbol}.csv'
     path = os.path.join(MARKET_DIR, fname)
     src = path if os.path.exists(path) else REPO_RAW + fname
@@ -43,8 +43,8 @@ def read_market(symbol):
 
 
 def load_close(name, start=None, end=END):
-    """Pretul (sau nivelul indicelui) zilnic; in afara criptoactivelor: doar zilele lucratoare
-    (sedintele cu inchidere neschimbata sunt pastrate: sunt zile reale de tranzactionare)."""
+    """Daily price (or index level); except for crypto assets, weekdays only
+    (days with an unchanged close are kept: they are real trading days)."""
     symbol, col, kind = SERIES[name]
     s = read_market(symbol)[col].loc[start:end]
     s = s[s > 0].dropna()
@@ -54,12 +54,12 @@ def load_close(name, start=None, end=END):
 
 
 def log_returns(name, start=None, end=END):
-    """Randamente log pe calendarul propriu al seriei."""
+    """Log returns on the series' own calendar."""
     return np.log(load_close(name, start, end)).diff().dropna().rename(name)
 
 
 def spy_open_close(start=None, end=END):
-    """Deschiderea si inchiderea zilnica SPY (preturi neajustate: raportul din aceeasi zi nu depinde de ajustari)."""
+    """Daily SPY open and close (unadjusted prices: the same-day ratio does not depend on adjustments)."""
     d = read_market('SPY.US').loc[start:end, ['open', 'close']]
     d = d[(d > 0).all(axis=1)]
     return d[d.index.dayofweek < 5]
@@ -72,7 +72,7 @@ def _get(method, **params):
 
 
 def deribit_chain(path=None, refresh=False):
-    """Lantul de optiuni BTC (preturi de marcaj, volatilitati implicite) la momentul instantaneului."""
+    """BTC option chain (mark prices, implied volatilities) at the snapshot time."""
     path = path or os.path.join(SNAP_DIR, 'ch12_deribit_snapshot.csv')
     if not refresh:
         for src in (path, SNAP_RAW):
@@ -97,7 +97,7 @@ def deribit_chain(path=None, refresh=False):
 
 
 def dvol_history(start='2021-03-24', end=END):
-    """Indicele DVOL (volatilitatea implicita pe 30 de zile a optiunilor BTC, anualizata, in %), valori zilnice."""
+    """DVOL index (30-day implied volatility of BTC options, annualised, in %), daily values."""
     t1 = int(pd.Timestamp(end).tz_localize('UTC').timestamp() * 1000) + 86_400_000
     t0 = int(pd.Timestamp(start).tz_localize('UTC').timestamp() * 1000)
     data = []

@@ -28,7 +28,7 @@ from dep_tools import (ewma_cov, ewma_corr, rolling_corr, fisher_ci, garch_all, 
                        kendall_tau, spearman_rho, theta_from_tau, tail_dep, simulate, fit_copula, gof_test,
                        empirical_tail_dep)
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -47,7 +47,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -59,7 +59,7 @@ Gray     = '#7F7F7F'
 LightGray = '#DADADA'
 FAM_COL = {'gaussian': MainBlue, 't': IDAred, 'clayton': Forest, 'gumbel': Amber, 'frank': Purple}
 
-SIDE = (5.6, 3.5)   # graficele asezate langa text pe slide (coloana de 0.55 din latime)
+SIDE = (5.6, 3.5)   # size of the charts placed next to text
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 TABLE_DIR = HERE
@@ -68,7 +68,7 @@ NUM = {}
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -77,7 +77,7 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
@@ -87,7 +87,7 @@ def shade_crises(ax, alpha=0.12):
 
 
 # =============================================================================
-# 1. De ce conteaza corelatia: diversificarea unui portofoliu 60/40
+# 1. Why correlation matters: diversification of a 60/40 portfolio
 # =============================================================================
 def fig_diversification():
     R = joint_returns(['spy', 'tlt'])
@@ -113,7 +113,7 @@ def fig_diversification():
 
 
 # =============================================================================
-# 2. Corelatia SPY-TLT pe fereastra mobila de un an
+# 2. SPY-TLT correlation on a one-year rolling window
 # =============================================================================
 def fig_spy_tlt_rolling():
     R = joint_returns(['spy', 'tlt'])
@@ -135,7 +135,7 @@ def fig_spy_tlt_rolling():
 
 
 # =============================================================================
-# 3. EWMA vs fereastra mobila; exemplu numeric de actualizare EWMA
+# 3. EWMA vs rolling window; a numerical EWMA update
 # =============================================================================
 def fig_ewma_rolling():
     R = joint_returns(['spy', 'tlt'])
@@ -154,7 +154,7 @@ def fig_ewma_rolling():
     ax.set_ylabel('Correlation SPY-TLT')
     legend_outside_bottom(ax, ncol=2, y=-0.1)
     save_fig('ch6_ewma_rolling')
-    # exemplu pas cu pas: ultima zi a esantionului
+    # step-by-step example: the last day of the sample
     S = ewma_cov(X.values, 0.94)
     t = len(X) - 1
     r = X.values[t - 1]
@@ -168,14 +168,14 @@ def fig_ewma_rolling():
 
 
 # =============================================================================
-# 4. Tranzactionare asincrona: corelatii zilnice, pe 2 zile si saptamanale
+# 4. Asynchronous trading: daily, 2-day and weekly correlations
 # =============================================================================
 def async_table():
     names = ['spy', 'stoxx', 'bet']
     P = joint_prices(names, start='2000-01-01')
     lp = np.log(P)
     d1 = lp.diff().dropna()
-    d2 = (lp - lp.shift(2)).dropna().iloc[::2]                 # randamente pe 2 zile, nesuprapuse
+    d2 = (lp - lp.shift(2)).dropna().iloc[::2]                 # non-overlapping 2-day returns
     wk = np.log(P.resample('W-FRI').last()).diff().dropna()
     rows = []
     for a, b in (('spy', 'stoxx'), ('spy', 'bet'), ('stoxx', 'bet')):
@@ -183,7 +183,7 @@ def async_table():
             r = D[a].corr(D[b])
             lo, hi = fisher_ci(r, len(D))
             rows.append(dict(pair=f'{SHORT[a]} / {SHORT[b]}', freq=lab, rho=r, lo=lo, hi=hi, n=len(D)))
-        lead = d1[a].shift(1).corr(d1[b])                         # a ieri -> b azi
+        lead = d1[a].shift(1).corr(d1[b])                         # a yesterday -> b today
         rows.append(dict(pair=f'{SHORT[a]} / {SHORT[b]}', freq='lead', rho=lead, lo=np.nan, hi=np.nan, n=len(d1)))
     return pd.DataFrame(rows)
 
@@ -214,7 +214,7 @@ def fig_async():
 
 
 # =============================================================================
-# 5-7. DCC: SPY-TLT, portofoliul de varianta minima, Bitcoin-SPY
+# 5-7. DCC: SPY-TLT, the minimum-variance portfolio, Bitcoin-SPY
 # =============================================================================
 def dcc_pair(names, start=None):
     R = joint_returns(names, start=start)
@@ -231,7 +231,7 @@ def fig_dcc_spy_tlt():
     shade_crises(ax)
     ax.plot(rc.index, rc, color=IDAred, lw=0.7, label='DCC(1,1) conditional correlation')
     ax.plot(roll.index, roll, color=MainBlue, lw=1.5, label='252-day rolling correlation')
-    ax.axhline(d['Qbar'][0, 1], color=Gray, ls='--', lw=0.9, label='Unconditional correlation of z (Qbar)')
+    ax.axhline(d['Qbar'][0, 1], color=Gray, ls='--', lw=0.9, label='DCC target $\\bar Q_{12}$ (sample correlation of standardised residuals)')
     ax.axhline(0, color='black', lw=0.6)
     ax.set_ylabel('Correlation SPY-TLT')
     legend_outside_bottom(ax, ncol=2, y=-0.1)
@@ -250,17 +250,17 @@ def fig_dcc_spy_tlt():
 
 
 def fig_dcc_minvar(R, V, rc):
-    """Ponderea SPY in portofoliul de varianta minima SPY-TLT: DCC vs corelatie constanta."""
+    """SPY weight in the SPY-TLT minimum-variance portfolio: DCC vs constant correlation."""
     s1, s2 = V['spy'], V['tlt']
     c = rc * s1 * s2
     w_dcc = ((s2 ** 2 - c) / (s1 ** 2 + s2 ** 2 - 2 * c)).clip(0, 1)
     rho0 = R.corr().iloc[0, 1]
     c0 = rho0 * s1 * s2
     w_ccc = ((s2 ** 2 - c0) / (s1 ** 2 + s2 ** 2 - 2 * c0)).clip(0, 1)
-    # randamente simple ale activelor (R are randamente log): randamentul portofoliului este sum_i w_i (e^{r_i} - 1)
+    # simple asset returns (R holds log returns): the portfolio return is sum_i w_i (e^{r_i} - 1)
     X = 100 * np.expm1(R.loc[w_dcc.index])
-    # filtrele (volatilitatile GARCH, R_t) folosesc doar informatia pana in ziua t-1, dar parametrii GARCH, DCC si
-    # corelatia constanta sunt estimati pe tot esantionul: o ilustrare IN esantion, nu o evaluare in afara esantionului
+    # the filters (GARCH volatilities, R_t) use only information up to day t-1, but the GARCH, DCC and
+    # constant-correlation parameters are estimated on the full sample: an IN-sample illustration, not an out-of-sample evaluation
     p_dcc = w_dcc * X['spy'] + (1 - w_dcc) * X['tlt']
     p_ccc = w_ccc * X['spy'] + (1 - w_ccc) * X['tlt']
     p_6040 = 0.6 * X['spy'] + 0.4 * X['tlt']
@@ -302,14 +302,14 @@ def fig_dcc_btc_spy():
 
 
 # =============================================================================
-# 8-9. Crize: Forbes-Rigobon si distorsiunea corelatiei
+# 8-9. Crises: Forbes-Rigobon and the bias of the correlation
 # =============================================================================
 CALM08, CRISIS08 = ('2007-09-14', '2008-09-12'), ('2008-09-15', '2009-03-31')
 CALM20, CRISIS20 = ('2019-02-19', '2020-02-19'), ('2020-02-20', '2020-04-30')
 
 
 def two_day_returns(names, start='2006-01-01', end='2021-12-31'):
-    """Randamente pe 2 zile (medie mobila, ca in Forbes-Rigobon): log p_t - log p_{t-2}, din preturi comune."""
+    """2-day returns (moving sum, as in Forbes-Rigobon): log p_t - log p_{t-2}, from common prices."""
     lp = np.log(joint_prices(names, start=start, end=end))
     return (lp - lp.shift(2)).dropna()
 
@@ -379,7 +379,7 @@ def fig_exceedance():
 
 
 # =============================================================================
-# 10-14. Copule: pseudo-observatii, familii, estimare, adecvare, dependenta in cozi (JPM-BAC)
+# 10-14. Copulas: pseudo-observations, families, estimation, goodness of fit, tail dependence (JPM-BAC)
 # =============================================================================
 def bank_copula_data():
     R = joint_returns(['jpm', 'bac'])
@@ -468,7 +468,7 @@ def fig_tail_dep(U, t):
     qs = np.linspace(0.01, 0.20, 20)
     emp = np.array([empirical_tail_dep(u, v, q) for q in qs])
     rng = np.random.default_rng(SEED)
-    # banda de referinta: aceeasi estimare pe date simulate din copula t estimata (200 de replicari)
+    # reference band: the same estimate on data simulated from the fitted t copula (200 replications)
     par_t = [t.loc['t', 'par1'], t.loc['t', 'par2']]
     sims = []
     for _ in range(200):
@@ -494,7 +494,7 @@ def fig_tail_dep(U, t):
 
 
 # =============================================================================
-# 15. Integrarea pietelor: SUA, zona euro, Romania (randamente saptamanale)
+# 15. Market integration: US, euro area, Romania (weekly returns)
 # =============================================================================
 def fig_integration():
     W = weekly_returns(['sp500', 'stoxx', 'bet'], start='2000-01-01')
@@ -514,7 +514,7 @@ def fig_integration():
 
 
 # =============================================================================
-# 16-18. Banci: corelatii, corelatia medie in timp, arborele de acoperire minima
+# 16-18. Banks: correlations, the average correlation over time, the minimum spanning tree
 # =============================================================================
 def fig_banks():
     W = weekly_returns(BANKS, start='2010-01-01')
@@ -536,7 +536,7 @@ def fig_banks():
     cb = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     cb.set_label('Correlation of weekly returns')
     save_fig('ch6_banks_heatmap')
-    # corelatia medie pe 52 de saptamani: in aceeasi regiune vs intre regiuni
+    # 52-week average correlation: within the same region vs across regions
     region = {'jpm': 'US', 'bac': 'US', 'dbk': 'EA', 'bnp': 'EA', 'tlv': 'RO', 'brd': 'RO'}
     pairs = [(a, b) for i, a in enumerate(BANKS) for b in BANKS[i + 1:]]
     rc = {p: W[p[0]].rolling(52).corr(W[p[1]]) for p in pairs}
@@ -554,7 +554,7 @@ def fig_banks():
     ax.set_ylabel('Average 52-week correlation')
     legend_outside_bottom(ax, ncol=1, y=-0.1)
     save_fig('ch6_banks_avgcorr')
-    # arborele de acoperire minima pe distanta d = sqrt(2(1 - rho)) (Mantegna, 1999)
+    # minimum spanning tree on the distance d = sqrt(2(1 - rho)) (Mantegna, 1999)
     G = nx.Graph()
     for a, b in pairs:
         G.add_edge(SHORT[a], SHORT[b], weight=np.sqrt(2 * (1 - C.loc[a, b])), rho=C.loc[a, b])
@@ -580,29 +580,29 @@ def fig_banks():
     NUM.update(bk_n=len(W), bk_start=str(W.index[0].date()), bk_jpm_bac=C.loc['jpm', 'bac'], bk_dbk_bnp=C.loc['dbk', 'bnp'],
                bk_tlv_brd=C.loc['tlv', 'brd'], bk_bnp_tlv=C.loc['bnp', 'tlv'], bk_jpm_brd=C.loc['jpm', 'brd'],
                bk_mst_edges='; '.join(f'{a}--{b} ({d["rho"]:.2f})' for a, b, d in T.edges(data=True)))
-    # legatura dintre regiuni in arbore
+    # the link between regions in the tree
     NUM['bk_bridge'] = [f'{a}--{b}' for a, b, d in T.edges(data=True) if {a, b} & {'TLV', 'BRD'} and not {a, b} <= {'TLV', 'BRD'}]
 
 
 # =============================================================================
-# 7. Studiu de caz: COVOL pe clase de active (Engle si Campos-Martins, 2023, Sectiunea 9)
+# 7. Case study: asset-class COVOL (Engle and Campos-Martins, 2023, Section 9)
 # =============================================================================
-# Tabelul 15 din articol: cele mai mari 20 de valori USCOVOL x_t, date pana in martie 2021 (Sectiunea 9)
+# Table 15 of the paper: the 20 largest values of US COVOL x_t, data up to March 2021 (Section 9)
 ECM_TABLE15 = [('2001-09-11', 73.16), ('2016-11-09', 43.04), ('2000-01-10', 41.46), ('2020-03-09', 40.47),
                ('2020-11-09', 34.12), ('2014-11-28', 24.92), ('2001-01-02', 24.89), ('2001-09-04', 24.62),
                ('2001-01-03', 24.51), ('2020-11-04', 22.23), ('2001-09-14', 19.61), ('2008-10-13', 19.12),
                ('2008-10-10', 18.42), ('2014-08-08', 17.51), ('2016-06-24', 17.25), ('2003-09-02', 16.21),
                ('2003-01-02', 15.45), ('2008-09-19', 14.56), ('2016-11-10', 14.19), ('2021-01-06', 13.58)]
-# Tabelul 8 din articol: R^2 al regresiilor lunare ale socului de volatilitate ACWI (248 de luni)
+# Table 8 of the paper: R^2 of the monthly regressions of the ACWI volatility shock (248 months)
 ECM_TABLE8_R2 = [('Global COVOL$^2_m$', 0.404), ('Change in global EPU', 0.110), ('Change in GPR', 0.005),
                  ('All three together', 0.406)]
 ECM_END = '2021-03-01'
 
 
 def covol_panel():
-    """Panel neechilibrat de randamente log zilnice (fiecare ETF pe calendarul propriu, de la prima zi)
-    si factorul PC1 (Sectiunea 9): scorul celor mai mici patrate pe prima componenta principala a
-    matricei de corelatie a randamentelor, calculat in fiecare zi din ETF-urile disponibile."""
+    """Unbalanced panel of daily log returns (each ETF on its own calendar, from its first day)
+    and the PC1 factor (Section 9): the least-squares score on the first principal component of the
+    correlation matrix of the returns, computed each day from the ETFs available."""
     R = pd.concat([np.log(load_price('etf_' + e.lower())).diff().rename(e) for e in COVOL_ETFS], axis=1)
     R = R.loc['2000-01-01':].dropna(how='all')
     Zs = (R - R.mean()) / R.std()
@@ -614,8 +614,8 @@ def covol_panel():
 
 
 def covol_residuals(R, f):
-    """AR(1) cu factorul PC1 in medie si GARCH(1,1) pentru fiecare ETF; AR(1)-GARCH(1,1) pentru PC1.
-    Intoarce reziduurile standardizate (panel neechilibrat)."""
+    """AR(1) with the PC1 factor in the mean and GARCH(1,1) for each ETF; AR(1)-GARCH(1,1) for PC1.
+    Returns the standardised residuals (unbalanced panel)."""
     E = {}
     for c in R.columns:
         r = 100 * R[c].dropna()
@@ -628,7 +628,7 @@ def covol_residuals(R, f):
 
 
 def golden_min(obj, lo, hi, n=80):
-    """Minimizare vectoriala prin sectiunea de aur: obj(u) intoarce un vector, cate o valoare pentru fiecare u."""
+    """Vectorised golden-section minimisation: obj(u) returns a vector, one value per element of u."""
     phi = (np.sqrt(5) - 1) / 2
     a, b = np.array(lo, float), np.array(hi, float)
     c, d = b - phi * (b - a), a + phi * (b - a)
@@ -646,10 +646,10 @@ def golden_min(obj, lo, hi, n=80):
 
 
 def covol_fit(E, tol=1e-6, maxit=500):
-    """COVOL cu incarcari diferite (Sectiunea 5.3): maximizarea alternativa a lui
-    -1/2 sum [ln g + e^2/g], g = s x + 1 - s, pe x_t (sectiuni transversale) si pe s_i (serii de timp),
-    cu 0 <= s_i <= 1, s's = 1 si media x_t = 1 dupa fiecare pas (Observatia 2). Valori initiale: prima
-    componenta principala a matricei corelatiilor de rang ale patratelor."""
+    """COVOL with unequal loadings (paper, Section 5.3): alternating maximisation of
+    -1/2 sum [ln g + e^2/g], g = s x + 1 - s, over x_t (cross-sections) and s_i (time series),
+    with 0 <= s_i <= 1, s's = 1 and mean x_t = 1 after each step (Remark 2). Starting values: the first
+    principal component of the rank-correlation matrix of the squares."""
     Q = E.values ** 2
     M = ~np.isnan(Q)
     Q0 = np.where(M, Q, 0.0)
@@ -687,7 +687,7 @@ def covol_fit(E, tol=1e-6, maxit=500):
 
 
 def fig_covol():
-    """Replicarea USCOVOL pe ETF-urile cursului: x_t zilnic 2000-2026 si cele 20 de zile din tabelul 15."""
+    """Replication of US COVOL on the course ETFs: daily x_t 2000-2026 and the 20 days of Table 15."""
     R, f = covol_panel()
     E = covol_residuals(R, f)
     x, s, it = covol_fit(E)
@@ -697,12 +697,12 @@ def fig_covol():
     post = x.loc[pd.Timestamp(ECM_END) + pd.Timedelta(days=1):].sort_values(ascending=False)
     paper = pd.Series({pd.Timestamp(d): v for d, v in ECM_TABLE15})
     fig, ax = plt.subplots(figsize=(5.6, 3.6))
-    ax.plot(x.index, x.values, color=MainBlue, lw=0.5, label='Squared USCOVOL $\\hat x_t$, course ETF panel')
+    ax.plot(x.index, x.values, color=MainBlue, lw=0.5, label='Squared asset-class COVOL $\\hat x_t$ (20 US-listed ETFs + PC1)')
     ax.scatter(paper.index, paper.values, marker='D', s=16, facecolors='none', edgecolors=Orange, lw=0.9, zorder=4,
                label='Top 20 in Table 15 of Engle and Campos-Martins (2023)')
     ax.axvline(pd.Timestamp(ECM_END), color=Gray, ls='--', lw=0.8, label='End of the paper sample (1 March 2021)')
     for d, v in top.iloc[:6].items():
-        left = d.year == 2020 and d.month == 3              # eticheta la stanga, ca sa nu acopere noiembrie 2020
+        left = d.year == 2020 and d.month == 3              # label on the left, so that it does not cover November 2020
         ax.annotate(f'{d.day} {d:%b %Y}', (d, v), xytext=(-4 if left else 4, 2), textcoords='offset points',
                     fontsize=7, color='black', ha='right' if left else 'left')
     ax.set_ylabel('Squared common volatility $\\hat x_t$')
@@ -734,8 +734,8 @@ def fig_covol():
 
 
 def fig_covol_paper():
-    """Tabelul 8 din Engle si Campos-Martins (2023): R^2 al socului lunar de volatilitate ACWI pe COVOL^2,
-    pe variatia indicelui GEPU (incertitudinea politicii economice) si pe variatia indicelui GPR (risc geopolitic)."""
+    """Table 8 of Engle and Campos-Martins (2023): R^2 of the monthly ACWI volatility shock on COVOL^2,
+    on the change in the GEPU index (economic policy uncertainty) and on the change in the GPR index (geopolitical risk)."""
     lab = [a for a, _ in ECM_TABLE8_R2][::-1]
     val = [b for _, b in ECM_TABLE8_R2][::-1]
     col = [Purple, Amber, Forest, MainBlue]
@@ -749,7 +749,7 @@ def fig_covol_paper():
 
 
 # =============================================================================
-# Exemplu: raportul de acoperire de varianta minima (expunere BET acoperita cu Euro Stoxx 50)
+# Example: the minimum-variance hedge ratio (a BET exposure hedged with the Euro Stoxx 50)
 # =============================================================================
 def hedge_example():
     W = weekly_returns(['bet', 'stoxx'], start='2020-01-01')
@@ -761,10 +761,10 @@ def hedge_example():
 
 
 # =============================================================================
-# Cifre suplimentare pentru interpretari
+# Additional numbers for the interpretations
 # =============================================================================
 def first_persistent_positive(x, n=20):
-    """Prima zi dupa care estimarea ramane pozitiva n zile consecutive."""
+    """First day after which the estimate stays positive for n consecutive days."""
     run = (x > 0).astype(int).rolling(n).sum()
     return run[run == n].index[0]
 

@@ -48,10 +48,10 @@ def hill_by_hand(asset='bettr', k=10):
 # A8: mixtura cu regimuri Markov -> autocorelatia lui r_t^2
 # =============================================================================
 def markov_mixture(p_high=0.9, s2=(1.0, 4.0), pi=(0.8, 0.2), n_sim=400_000):
-    """r_t = sigma_{S_t} eps_t; S_t lant Markov cu 2 stari, distributie stationara pi.
+    """r_t = sigma_{S_t} eps_t; S_t a two-state Markov chain with stationary distribution pi.
 
-    Probabilitatea de a ramane in starea de volatilitate mare este p_high; din echilibrul
-    pi_1 p_12 = pi_2 p_21 rezulta p_12 = (1 - p_high) pi_2 / pi_1.
+    The probability of staying in the high-volatility state is p_high; the balance condition
+    pi_1 p_12 = pi_2 p_21 gives p_12 = (1 - p_high) pi_2 / pi_1.
     corr(r_t^2, r_{t-k}^2) = lambda^k Var(sigma^2) / Var(r^2), lambda = p_11 + p_22 - 1.
     """
     s2 = np.asarray(s2)
@@ -62,7 +62,7 @@ def markov_mixture(p_high=0.9, s2=(1.0, 4.0), pi=(0.8, 0.2), n_sim=400_000):
     e4 = pi[0] * s2[0] ** 2 + pi[1] * s2[1] ** 2
     var_s2, var_r2 = e4 - e2 ** 2, 3 * e4 - e2 ** 2
     rho = lambda k: lam ** k * var_s2 / var_r2
-    # verificare prin simulare
+    # simulation check
     rng = np.random.default_rng(SEED)
     S = np.empty(n_sim, dtype=int); S[0] = 0
     u = rng.random(n_sim)
@@ -86,7 +86,7 @@ def garch_kurtosis(alpha=0.10, beta=0.85):
 
 
 def garch_alpha_for_kurtosis(K_target, persistence):
-    """alpha necesar pentru un kurtosis dat, la persistenta alpha + beta fixa."""
+    """alpha needed for a given kurtosis, at fixed persistence alpha + beta."""
     s2 = persistence ** 2
     return np.sqrt((1 - s2) * (K_target - 3) / (2 * K_target))
 
@@ -142,7 +142,7 @@ def fig_robust_acf(assets=('sp500', 'bettr', 'eurron', 'btc'), m=20):
 
 def dgp_q(r, m=10, lam=2.576):
     """Dalla, Giraitis & Phillips (2022): Q = t' R*^{-1} t, t_k = sum e_t e_{t-k} / sqrt(sum e_t^2 e_{t-k}^2);
-    R* pastreaza doar termenii incrucisati semnificativi (|tau_jk| > 2.576). R* = I da Q-tilde diagonal."""
+    R* keeps only the significant cross terms (|tau_jk| > 2.576). R* = I gives the diagonal Q-tilde."""
     e = (r - r.mean()).values
     P = np.array([np.r_[np.zeros(k), e[k:] * e[:-k]] for k in range(1, m + 1)])
     d = np.sqrt((P ** 2).sum(1))
@@ -181,7 +181,7 @@ def robust_lb_table(assets=('sp500', 'bettr', 'eurron', 'btc'), m_q=10, m_band=2
 # B5: kurtosisul care nu converge (fereastra extinsa)
 # =============================================================================
 def _kurt_path(x, ends):
-    """Excesul de kurtosis pe ferestre extinse [0, e) calculat din sume cumulate (vectorizat pe coloane)."""
+    """Excess kurtosis on expanding windows [0, e) from cumulative sums (vectorised over columns)."""
     c1, c2, c3, c4 = (np.cumsum(x ** p, axis=0) for p in (1, 2, 3, 4))
     n = ends[:, None].astype(float)
     m1, m2, m3, m4 = (c[ends - 1] / n for c in (c1, c2, c3, c4))
@@ -191,7 +191,7 @@ def _kurt_path(x, ends):
 
 
 def fig_kurtosis_expanding(n_paths=500, nus=(3, 6)):
-    """Excesul de kurtosis al S&P 500 pe primii n ani (n = 1..36) vs benzi 5-95% din Student-t simulate."""
+    """S&P 500 excess kurtosis over the first n years (n = 1..36) vs 5-95% bands from simulated Student-t paths."""
     r = rets['sp500']
     first = r.index[0]
     ends = np.array([np.searchsorted(r.index, first + pd.DateOffset(years=y)) for y in range(1, 37)])
@@ -264,7 +264,7 @@ def fig_hill_tails(assets=('bettr', 'btc')):
             ax.fill_between(100 * HILL_FRACS_TAILS, al * (1 - 1.96 / np.sqrt(ks)), al * (1 + 1.96 / np.sqrt(ks)),
                             color=c, alpha=0.15, lw=0)
         z = (rets[a] - rets[a].mean()) / rets[a].std()
-        ax.axhline(stats.t.fit(z)[0], color=Gray, ls='--', lw=0.9, label='Student-t $\\hat\\nu$ (MLE)')
+        ax.axhline(stats.t.fit(z)[0], color=Gray, ls='--', lw=0.9, label='Student-t $\\hat\\nu$ (maximum likelihood)')
         ax.axhline(4, color=LightGray, lw=0.8)
         ax.set_title(LABELS[a], fontsize=9, loc='left')
         ax.set_xlabel('Tail fraction $k/n$ (%)')
@@ -288,7 +288,7 @@ def fig_leverage_ro_crypto(K=20):
         ax.plot(L.index, L.values, marker='o', ms=2.5, lw=1.0, color=COLORS[a], label=LABELS[a])
     ax.axhline(0, color=Gray, lw=0.5)
     ax.axvline(0, color=LightGray, lw=0.5)
-    for a in ('bettr', 'btc'):                      # banda i.i.d. de referinta, cu T-ul fiecarei serii
+    for a in ('bettr', 'btc'):                      # i.i.d. reference band, with each series' own T
         band = 1.96 / np.sqrt(len(rets[a]))
         ax.axhline(band, color=COLORS[a], ls=':', lw=0.9, label=f'{LABELS[a]}: i.i.d. reference band $\\pm${band:.3f}')
         ax.axhline(-band, color=COLORS[a], ls=':', lw=0.9)
@@ -302,9 +302,9 @@ def fig_leverage_ro_crypto(K=20):
 
 
 def leverage_regression(asset, n_controls=5):
-    """|r_{t+1}| = c + b_plus r_t^+ + b_minus r_t^- + sum_{j=1..5} d_j |r_{t-j}| + u, erori Newey-West (HAC).
+    """|r_{t+1}| = c + b_plus r_t^+ + b_minus r_t^- + sum_{j=1..5} d_j |r_{t-j}| + u, Newey-West (HAC) errors.
 
-    |r_t| nu intra printre controale: |r_t| = r_t^+ - r_t^- (coliniaritate perfecta)."""
+    |r_t| is not a control: |r_t| = r_t^+ - r_t^- (perfect collinearity)."""
     r = rets[asset]
     df = pd.DataFrame({'y': r.abs().shift(-1), 'pos': np.maximum(r, 0), 'neg': np.minimum(r, 0)})
     for j in range(1, n_controls + 1):
@@ -321,15 +321,15 @@ def leverage_regression(asset, n_controls=5):
 # B9: BET-TR vs S&P 500 -- test pentru Sharpe si tranzactionare nesincrona
 # =============================================================================
 def bettr_vs_sp500(n_boot=2000, block=21):
-    px = pd.concat([closes['bettr'], closes['sp500']], axis=1, keys=['bet', 'spx']).dropna()   # join pe PRETURI
-    r = np.log(px).diff().dropna()                            # randamente log: corelatii
-    R = px.pct_change().dropna()                              # randamente simple: Sharpe (definitia cursului)
+    px = pd.concat([closes['bettr'], closes['sp500']], axis=1, keys=['bet', 'spx']).dropna()   # align PRICES on common dates
+    r = np.log(px).diff().dropna()                            # log returns: correlations
+    R = px.pct_change().dropna()                              # simple returns: Sharpe (course definition)
     T = len(r)
-    sr = R.mean() / R.std()                                   # Sharpe zilnic, r_f = 0
+    sr = R.mean() / R.std()                                   # daily Sharpe, r_f = 0
     rho = R['bet'].corr(R['spx'])
     theta = 2 - 2 * rho + 0.5 * (sr['bet'] ** 2 + sr['spx'] ** 2 - 2 * sr['bet'] * sr['spx'] * rho ** 2)
     z_jkm = (sr['bet'] - sr['spx']) / np.sqrt(theta / T)
-    # bootstrap pe blocuri (blocuri circulare de 21 de zile) pentru diferenta Sharpe anualizata
+    # block bootstrap (circular 21-day blocks) for the annualised Sharpe difference
     rng = np.random.default_rng(SEED)
     vals = R.values
     nb = int(np.ceil(T / block))
@@ -342,7 +342,7 @@ def bettr_vs_sp500(n_boot=2000, block=21):
         diffs.append(np.sqrt(252) * (m[0] / sd[0] - m[1] / sd[1]))
     diffs = np.array(diffs)
     d_obs = np.sqrt(252) * (sr['bet'] - sr['spx'])
-    # corelatii cu decalaj: BET ziua t vs S&P ziua t-1 (informatia americana ajunge a doua zi la BVB)
+    # lagged correlations: BET day t vs S&P day t-1 (US news reaches the BVB the next day)
     lag1 = r['bet'].corr(r['spx'].shift(1))
     lead1 = r['bet'].corr(r['spx'].shift(-1))
     wk = np.log(px.resample('W-FRI').last()).diff().dropna()
@@ -352,7 +352,7 @@ def bettr_vs_sp500(n_boot=2000, block=21):
                 boot_ci=(np.quantile(diffs, 0.025), np.quantile(diffs, 0.975)),
                 boot_p=2 * min((diffs <= 0).mean(), (diffs >= 0).mean()),
                 corr_lag0=r['bet'].corr(r['spx']), corr_lag1=lag1, corr_lead1=lead1,
-                corr_sum3=r['bet'].corr(r['spx']) + lag1 + lead1,   # ~ corelatia saptamanala; nu este o corelatie
+                corr_sum3=r['bet'].corr(r['spx']) + lag1 + lead1,   # ~ the weekly correlation; not itself a correlation
                 corr_weekly=wk['bet'].corr(wk['spx']), draws=diffs)
 
 
@@ -360,13 +360,13 @@ def bettr_vs_sp500(n_boot=2000, block=21):
 # B11: verificarea unui model -- GARCH(1,1) cu inovatii t, estimat pe S&P 500
 # =============================================================================
 def garch_check(n_paths=200, lags=(1, 20, 100, 250), frac=0.02):
-    """GARCH(1,1)-t pe S&P 500; 200 traiectorii simulate; benzi 5-95% pentru fapte stilizate."""
+    """GARCH(1,1)-t on the S&P 500; 200 simulated paths; 5-95% bands for the stylised facts."""
     from arch import arch_model
     r = 100 * rets['sp500']
     am = arch_model(r, mean='Constant', vol='GARCH', p=1, q=1, dist='t')
     res = am.fit(disp='off')
     from arch.univariate import StudentsT
-    am.distribution = StudentsT(seed=np.random.default_rng(SEED))   # simulari reproductibile
+    am.distribution = StudentsT(seed=np.random.default_rng(SEED))   # reproducible simulations
     n = len(r)
     k = int(frac * n)
 
@@ -382,7 +382,7 @@ def garch_check(n_paths=200, lags=(1, 20, 100, 250), frac=0.02):
     q05, q50, q95 = sims.quantile(0.05), sims.quantile(0.5), sims.quantile(0.95)
     table = pd.DataFrame({'data': pd.Series(data), 'q05': q05, 'median': q50, 'q95': q95})
     table['reproduced'] = (table['data'] >= table['q05']) & (table['data'] <= table['q95'])
-    # grafic: ACF |r| date vs 20 de traiectorii
+    # chart: ACF of |r|, data vs 20 paths
     K = np.arange(1, 251)
     data_curve = [r.abs().autocorr(j) for j in K]
     curves = []
@@ -403,14 +403,14 @@ def garch_check(n_paths=200, lags=(1, 20, 100, 250), frac=0.02):
     plt.tight_layout()
     save_fig('ch1_sem_garch_check')
     a_, b_, nu_ = res.params['alpha[1]'], res.params['beta[1]'], res.params['nu']
-    kappa = 3 * (nu_ - 2) / (nu_ - 4)                     # E z^4 pentru t standardizat
+    kappa = 3 * (nu_ - 2) / (nu_ - 4)                     # E z^4 for a standardised t
     return dict(params=res.params.round(4).to_dict(), persistence=a_ + b_,
                 fourth_moment_cond=(a_ + b_) ** 2 + (kappa - 1) * a_ ** 2,
                 table=table, n_paths=n_paths, k=k)
 
 
 def garch_normal_sp500():
-    """GARCH(1,1) cu inovatii cu distributie Normala pe S&P 500: kurtosisul implicat de parametrii estimati."""
+    """GARCH(1,1) with innovations from the Normal distribution on the S&P 500: kurtosis implied by the estimated parameters."""
     from arch import arch_model
     res = arch_model(100 * rets['sp500'], mean='Constant', vol='GARCH', p=1, q=1, dist='normal').fit(disp='off')
     a, b = res.params['alpha[1]'], res.params['beta[1]']
@@ -421,7 +421,7 @@ def garch_normal_sp500():
 # C1: autocorelatia BET-TR inainte si dupa reclasificarea FTSE (21.09.2020)
 # =============================================================================
 def rho_robust(r):
-    """rho_1 si EE robusta sub H0: rho_1 = 0 (diferenta de martingala); pentru benzi in jurul lui 0."""
+    """rho_1 and its robust SE under H0: rho_1 = 0 (martingale difference); for bands around 0."""
     e = (r - r.mean()).values
     s2 = np.sum(e ** 2)
     rho = np.sum(e[1:] * e[:-1]) / s2
@@ -430,7 +430,7 @@ def rho_robust(r):
 
 
 def rho_hac(r):
-    """rho_1 ca panta regresiei r_t pe r_{t-1}, cu EE Newey-West (HAC): valida si cand rho_1 != 0."""
+    """rho_1 as the slope of r_t on r_{t-1}, with Newey-West (HAC) SE: valid also when rho_1 != 0."""
     df = pd.DataFrame({'y': r, 'x': r.shift(1)}).dropna()
     L = int(4 * (len(df) / 100) ** (2 / 9))
     fit = sm.OLS(df['y'], sm.add_constant(df['x'])).fit(cov_type='HAC', cov_kwds={'maxlags': L})
@@ -441,7 +441,7 @@ BLUE_CHIPS = ['TLV.RO', 'SNP.RO', 'BRD.RO', 'TGN.RO', 'FP.RO', 'SNG.RO', 'H2O.RO
 
 
 def traded_value_proxy():
-    """Valoarea zilnica tranzactionata (lei) a acțiunilor blue-chip BVB din data/market: volum x pret de inchidere."""
+    """Daily traded value (RON) of the BVB blue chips: volume x closing price."""
     v = []
     for sym in BLUE_CHIPS:
         d = read_market(sym)
@@ -475,7 +475,7 @@ def fig_bettr_rolling_acf(window=250, split='2020-09-21'):
     df['post'] = (df.index >= pd.Timestamp(split)).astype(float)
     df['x_post'] = df['x'] * df['post']
     fit = sm.OLS(df['y'], sm.add_constant(df[['x', 'post', 'x_post']])).fit(cov_type='HAC', cov_kwds={'maxlags': 10})
-    # lichiditate: valoarea tranzactionata a blue-chip-urilor, medie mobila pe 250 de zile (log)
+    # liquidity: traded value of the blue chips, 250-day moving average (log)
     tv = traded_value_proxy().reindex(r.index)
     liq = np.log(tv.rolling(window, min_periods=200).mean()).reindex(roll.index)
     ok = liq.notna()
@@ -492,7 +492,7 @@ def fig_bettr_rolling_acf(window=250, split='2020-09-21'):
 # A4: drawdown-ul maxim asteptat al unei miscari browniene fara drift (Magdon-Ismail et al. 2004)
 # =============================================================================
 def mdd_brownian(assets=('gold', 'sp500', 'btc')):
-    """E[MDD] = sqrt(pi/2) sigma sqrt(T) pentru log-pret, mu = 0; comparat cu MDD observat (log)."""
+    """E[MDD] = sqrt(pi/2) sigma sqrt(T) for the log price, mu = 0; compared with the observed (log) MDD."""
     rows = []
     for a in assets:
         c = closes[a]
@@ -501,7 +501,7 @@ def mdd_brownian(assets=('gold', 'sp500', 'btc')):
         e = np.sqrt(np.pi / 2) * sig * np.sqrt(Y)
         mdd = float(np.log(c / c.cummax()).min())
         rows.append({'asset': LABELS[a], 'years': Y, 'sigma': sig, 'mu_log': rets[a].mean() * PERIODS[a],
-                     'E_mdd_log': e, 'pct_fall_at_mean_log_dd': 100 * (1 - np.exp(-e)), 'mdd_log': mdd,   # 1-exp(-E[D]) nu este E[MDD] procentual (Jensen)
+                     'E_mdd_log': e, 'pct_fall_at_mean_log_dd': 100 * (1 - np.exp(-e)), 'mdd_log': mdd,   # 1-exp(-E[D]) is not the expected percentage MDD (Jensen)
                      'mdd_pct': 100 * (np.exp(mdd) - 1)})
     return pd.DataFrame(rows).set_index('asset')
 
@@ -514,7 +514,7 @@ def eurron_regimes(periods=(('2005-07-01', '2011-12-31'), ('2012-01-01', '2019-1
     rows = []
     for a, b in periods:
         x = (r[a:b] - r[a:b].mean()).values
-        rho, se = rho_hac(r[a:b])        # EE HAC: valida si pentru rho_1 != 0 (tau_1 e varianta sub rho_1 = 0)
+        rho, se = rho_hac(r[a:b])        # HAC SE: valid also for rho_1 != 0 (tau_1 is the variance under rho_1 = 0)
         rows.append({'period': f'{a[:4]}-{b[:4]}', 'rho1': rho, 'se_hac': se,
                      'se_iid': 1 / np.sqrt(len(x)), 'vol_pct': 100 * x.std() * np.sqrt(252),
                      'exkurt': stats.kurtosis(x)})
@@ -553,7 +553,7 @@ SEM_ASSETS = ('bettr', 'btc', 'eurron')
 
 
 def _bottom_legend(fig, handles, labels, ncol=3, fontsize=8):
-    """Legenda sub figura, dupa tight_layout (save_fig foloseste bbox_inches='tight')."""
+    """Legend below the figure, after tight_layout (save_fig uses bbox_inches='tight')."""
     plt.tight_layout()
     fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=ncol, frameon=False,
                fontsize=fontsize)

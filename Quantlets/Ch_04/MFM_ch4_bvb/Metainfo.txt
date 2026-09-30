@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Market data (data/market): BVB blue chips, BET-TR and BET'
+Datafile: 'Daily market data (course data): BVB blue chips, BET-TR and BET'
 
 Output: 'ch4_bvb.pdf'

@@ -23,20 +23,20 @@ MU43 = 2 ** (2 / 3) * G(7 / 6) / G(1 / 2)             # E|Z|^{4/3}
 
 
 # =============================================================================
-# ESTIMATORI REALIZATI (o valoare pe zi)
+# REALISED ESTIMATORS (one value per day)
 # =============================================================================
 def rv(R):
-    """Varianta realizata: suma patratelor randamentelor intraday."""
+    """Realised variance: sum of squared intraday returns."""
     return (R ** 2).sum(axis=1, min_count=1)
 
 
 def nret(R):
-    """Numarul de randamente intraday al fiecarei zile."""
+    """Number of intraday returns of each day."""
     return R.notna().sum(axis=1)
 
 
 def bv(R):
-    """Variatia bipower (Barndorff-Nielsen si Shephard): robusta la salturi."""
+    """Bipower variation (Barndorff-Nielsen and Shephard): robust to jumps."""
     a = R.abs().values
     M = nret(R).values
     s = np.nansum(a[:, 1:] * a[:, :-1], axis=1)
@@ -44,7 +44,7 @@ def bv(R):
 
 
 def tq(R):
-    """Tripower quarticity: estimeaza cvarticitatea integrata, robusta la salturi."""
+    """Tripower quarticity: estimates integrated quarticity, robust to jumps."""
     a = R.abs().values ** (4 / 3)
     M = nret(R).values
     s = np.nansum(a[:, 2:] * a[:, 1:-1] * a[:, :-2], axis=1)
@@ -52,12 +52,12 @@ def tq(R):
 
 
 def rq(R):
-    """Cvarticitatea realizata (M/3) * suma r^4."""
+    """Realised quarticity (M/3) * sum r^4."""
     return nret(R) / 3 * (R ** 4).sum(axis=1)
 
 
 def rv_ci(R, level=0.95):
-    """Interval de incredere asimptotic pentru varianta integrata, construit pe scara log."""
+    """Asymptotic confidence interval for integrated variance, built on the log scale."""
     v = rv(R)
     se_log = np.sqrt(2 / 3 * (R ** 4).sum(axis=1)) / v
     z = stats.norm.ppf(0.5 + level / 2)
@@ -65,7 +65,7 @@ def rv_ci(R, level=0.95):
 
 
 def jump_test(R, alpha=0.001):
-    """Testul de salturi cu raportul (RV - BV)/RV (Huang si Tauchen); salt semnificativ daca z > z_{1-alpha}."""
+    """Ratio jump test (RV - BV)/RV (Huang and Tauchen); significant jump if z > z_{1-alpha}."""
     v, b, t = rv(R), bv(R), tq(R)
     M = nret(R)
     theta = MU1 ** -4 + 2 * MU1 ** -2 - 5
@@ -76,10 +76,10 @@ def jump_test(R, alpha=0.001):
 
 
 # =============================================================================
-# ZGOMOT DE MICROSTRUCTURA
+# MICROSTRUCTURE NOISE
 # =============================================================================
 def sparse_points(P, k, offset=0):
-    """Preturile la fiecare al k-lea punct al grilei, pornind de la offset; deschiderea si inchiderea se pastreaza."""
+    """Prices at every k-th grid point, starting at offset; the open and the close are kept."""
     out = {}
     last = P.notna().values.cumsum(axis=1).argmax(axis=1)
     cols = np.arange(P.shape[1])
@@ -92,27 +92,27 @@ def sparse_points(P, k, offset=0):
 
 
 def sparse_rv(P, k, offset=0):
-    """Varianta realizata din randamente de k x 5 minute (o singura grila)."""
+    """Realised variance from k x 5-minute returns (a single grid)."""
     pts = sparse_points(P, k, offset)
     return pd.Series({d: np.sum((100 * np.diff(x)) ** 2) for d, x in pts.items()})
 
 
 def subsampled_rv(P, k):
-    """Media variantelor realizate pe cele k grile decalate (esantionare rara fara pierdere de date)."""
+    """Average of the realised variances on the k shifted grids (sparse sampling without discarding data)."""
     return pd.concat([sparse_rv(P, k, o) for o in range(k)], axis=1).mean(axis=1)
 
 
 def signature(P, ks, scale):
-    """Graficul semnaturii: volatilitatea anualizata medie (%) in functie de intervalul de esantionare."""
+    """Signature plot: mean annualised volatility (%) as a function of the sampling interval."""
     return pd.DataFrame({
         'sparse': [np.sqrt(scale * sparse_rv(P, k).mean()) for k in ks],
         'subsampled': [np.sqrt(scale * subsampled_rv(P, k).mean()) for k in ks]}, index=list(ks))
 
 
 def tsrv(P, K=6, adjust=False):
-    """Two-scale realised variance (Zhang, Mykland si Ait-Sahalia): media pe K grile minus corectia de zgomot.
+    """Two-scale realised variance (Zhang, Mykland and Ait-Sahalia): average over K grids minus the noise correction.
     Grilele pastreaza deschiderea si inchiderea, deci nbar = numarul mediu EFECTIV de randamente pe grila
-    (deplasarea din zgomot a mediei este 2 nbar omega^2); adjust=True imparte la 1 - nbar/n (esantioane mici)."""
+    (the noise bias of the average is 2 nbar omega^2); adjust=True divides by 1 - nbar/n (small samples)."""
     R = 100 * np.log(P).diff(axis=1).iloc[:, 1:]
     n = nret(R)
     nbar = pd.concat([pd.Series({d: len(x) - 1 for d, x in sparse_points(P, K, o).items()}) for o in range(K)],
@@ -122,7 +122,7 @@ def tsrv(P, K=6, adjust=False):
 
 
 def noise_var(R):
-    """Varianta zgomotului: omega^2 = -cov(r_i, r_{i-1}) si limita superioara RV/(2n), medii pe zile."""
+    """Noise variance: omega^2 = -cov(r_i, r_{i-1}) and the upper bound RV/(2n), averaged over days."""
     X = R.values
     cov1 = np.nanmean(X[:, 1:] * X[:, :-1])
     return {'omega2_cov': max(-cov1, 0.0), 'omega2_rv': float((rv(R) / (2 * nret(R))).mean()),
@@ -135,9 +135,9 @@ def parzen(x):
 
 
 def realized_kernel(R, P, c=3.5134):
-    """Nucleu realizat Parzen (Barndorff-Nielsen, Hansen, Lunde si Shephard); latimea H dupa regula lor."""
+    """Parzen realised kernel (Barndorff-Nielsen, Hansen, Lunde and Shephard); bandwidth H from their rule."""
     out, Hs = {}, {}
-    iv20 = sparse_rv(P, 4)                                  # varianta pe grila de 20 de minute, pentru xi
+    iv20 = sparse_rv(P, 4)                                  # variance on the 20-minute grid, for xi
     for i, day in enumerate(R.index):
         r = R.iloc[i].dropna().values
         n = len(r)
@@ -154,8 +154,8 @@ def realized_kernel(R, P, c=3.5134):
 # HAR-RV
 # =============================================================================
 def har_design(v, calendar=False):
-    """Regresori HAR: componenta zilnica, saptamanala, lunara (5 si 22 de zile de tranzactionare;
-    pentru cripto, pe calendar: 7 si 30 de zile, cu cel putin 5, respectiv 20 de observatii)."""
+    """HAR regressors: daily, weekly and monthly components (5 and 22 trading days;
+    for crypto, calendar days: 7 and 30 days, with at least 5 and 20 observations)."""
     if calendar:
         full = v.asfreq('D')
         d = full.shift(1)
@@ -172,7 +172,7 @@ def nw_lags(T):
 
 
 def ols_nw(y, X, lags=None):
-    """MCO cu termen liber si erori standard Newey-West (HAC)."""
+    """OLS with intercept and Newey-West (HAC) standard errors."""
     Xc = np.column_stack([np.ones(len(X)), np.asarray(X, float)])
     y = np.asarray(y, float)
     T, k = Xc.shape
@@ -192,7 +192,7 @@ def ols_nw(y, X, lags=None):
 
 
 def har_fit(v, calendar=False, log=False, jumps=None):
-    """HAR-RV pe esantionul complet; log=True: HAR pe log RV; jumps: componenta de salt ca regresor suplimentar."""
+    """HAR-RV on the full sample; log=True: HAR on log RV; jumps: jump component as an extra regressor."""
     X = har_design(np.log(v) if log else v, calendar)
     if jumps is not None:
         X['J'] = jumps.shift(1).reindex(X.index) if not calendar else jumps.asfreq('D').shift(1).reindex(X.index)
@@ -202,7 +202,7 @@ def har_fit(v, calendar=False, log=False, jumps=None):
 
 
 def har_expanding(v, start, calendar=False, log=False, min_obs=100):
-    """Prognoze HAR pentru ziua t, estimate zilnic pe toate observatiile anterioare lui t (fereastra extinsa)."""
+    """HAR forecasts for day t, re-estimated daily on all observations before t (expanding window)."""
     y = np.log(v) if log else v
     X = har_design(y, calendar)
     ok = X.notna().all(axis=1)
@@ -223,7 +223,7 @@ def har_expanding(v, start, calendar=False, log=False, min_obs=100):
 
 
 def har_weights(b, n=30):
-    """Ponderile implicite ale HAR pe fiecare intarziere 1..n (HAR = AR(22) restrictionat)."""
+    """Implied HAR weights on each lag 1..n (HAR = restricted AR(22))."""
     w = np.zeros(n)
     w[0] += b[1]
     w[:5] += b[2] / 5
@@ -232,11 +232,11 @@ def har_weights(b, n=30):
 
 
 # =============================================================================
-# REPERE: GARCH SI EWMA PE RANDAMENTE ZILNICE
+# BENCHMARKS: GARCH AND EWMA ON DAILY RETURNS
 # =============================================================================
 def garch_forecasts(r, dates, refit=21, dist='t'):
-    """Varianta prognozata pentru fiecare zi din dates cu GARCH(1,1), reestimat la fiecare `refit` zile
-    pe toate datele anterioare; intre reestimari parametrii raman fixi, iar varianta se actualizeaza zilnic."""
+    """Forecast variance for each day in dates with GARCH(1,1), re-estimated every `refit` days
+    on all earlier data; between re-estimations the parameters stay fixed and the variance is updated daily."""
     from arch import arch_model
     dates = pd.DatetimeIndex(dates)
     pos = r.index.get_indexer(dates)
@@ -262,10 +262,10 @@ def ewma_forecasts(r, lam=0.94, burn=250):
 
 
 # =============================================================================
-# EVALUAREA PROGNOZELOR
+# FORECAST EVALUATION
 # =============================================================================
 def qlike(v, f):
-    """QLIKE: v/f - log(v/f) - 1 (robusta la zgomotul proxy-ului, Patton 2011)."""
+    """QLIKE: v/f - log(v/f) - 1 (robust to noise in the proxy, Patton 2011)."""
     return v / f - np.log(v / f) - 1
 
 
@@ -274,7 +274,7 @@ def mse(v, f):
 
 
 def dm_test(l1, l2):
-    """Diebold-Mariano: d = l1 - l2; t = media(d)/se_NW; d < 0 => modelul 1 are pierdere mai mica."""
+    """Diebold-Mariano: d = l1 - l2; t = mean(d)/se_NW; d < 0 => model 1 has the smaller loss."""
     d = (l1 - l2).dropna().values
     res = ols_nw(d, np.empty((len(d), 0)))
     t = res['b'][0] / res['se'][0]
@@ -282,7 +282,7 @@ def dm_test(l1, l2):
 
 
 def mz_test(v, f):
-    """Regresia Mincer-Zarnowitz v = a + b f + e; test Wald comun (a, b) = (0, 1) cu covarianta NW."""
+    """Mincer-Zarnowitz regression v = a + b f + e; joint Wald test of (a, b) = (0, 1) with the NW covariance."""
     res = ols_nw(v.values, f.values[:, None])
     dlt = res['b'] - np.array([0.0, 1.0])
     W = float(dlt @ np.linalg.inv(res['V']) @ dlt)
@@ -291,7 +291,7 @@ def mz_test(v, f):
 
 
 def block_bootstrap(x, stat, block=20, B=2000, seed=42):
-    """Bootstrap pe blocuri mobile (Kunsch): distributia statisticii `stat` pe serii reconstruite din blocuri."""
+    """Moving-block bootstrap (Kunsch): distribution of `stat` on series rebuilt from blocks."""
     rng = np.random.default_rng(seed)
     x = np.asarray(x)
     n = len(x)
@@ -305,8 +305,8 @@ def block_bootstrap(x, stat, block=20, B=2000, seed=42):
 
 
 def block_bootstrap_blocks(x, stat, block=60, B=300, seed=42):
-    """Bootstrap pe blocuri mobile care pastreaza blocurile separate: `stat` primeste o matrice (blocuri x lungime),
-    astfel incat incrementele se calculeaza doar in interiorul fiecarui bloc (fara salturi artificiale la imbinari)."""
+    """Moving-block bootstrap that keeps the blocks separate: `stat` receives a matrix (blocks x length),
+    so increments are computed only within each block (no artificial jumps at the joins)."""
     rng = np.random.default_rng(seed)
     x = np.asarray(x, dtype=float)
     n = len(x)
@@ -319,11 +319,11 @@ def block_bootstrap_blocks(x, stat, block=60, B=300, seed=42):
 
 
 # =============================================================================
-# VOLATILITATE ASPRA
+# ROUGH VOLATILITY
 # =============================================================================
 def roughness(logsig, qs=(0.5, 1.0, 1.5, 2.0, 3.0), lags=range(1, 31)):
-    """m(q, D) = media |log sigma_{t+D} - log sigma_t|^q ~ D^{q H}: panta zeta_q = q H pe scara log-log."""
-    x = np.asarray(logsig, dtype=float)             # 1D: o serie (NaN = zi lipsa); 2D: blocuri, incremente doar in bloc
+    """m(q, D) = mean |log sigma_{t+D} - log sigma_t|^q ~ D^{q H}: slope zeta_q = q H on the log-log scale."""
+    x = np.asarray(logsig, dtype=float)             # 1D: one series (NaN = missing day); 2D: blocks, increments only within a block
     lags = np.array(list(lags))
     M = {q: np.array([np.nanmean(np.abs(x[..., l:] - x[..., :-l]) ** q) for l in lags]) for q in qs}
     zeta = {q: np.polyfit(np.log(lags), np.log(M[q]), 1)[0] for q in qs}

@@ -1,12 +1,12 @@
 """
-mfm_data.py -- Incarcarea datelor pentru Capitolul 3 (MFM): modele factoriale
-============================================================================
-  * read_market(symbol)   -- data/market/<SIMBOL>.csv (local sau din repo-ul GitHub)
-  * prices(symbols)       -- preturi ajustate (ETF/actiuni) sau de inchidere (indici), join pe zilele comune
-  * french(name, freq)    -- factori si portofolii din Kenneth French Data Library
-  * ols_hac(y, X, lags)   -- OLS cu erori standard Newey-West
+mfm_data.py -- Data for Chapter 3 (MFM): factor models
+======================================================
+  * read_market(symbol)   -- daily prices of one asset from the course data
+  * prices(symbols)       -- adjusted (ETFs/stocks) or closing (indices) prices, aligned on common days
+  * french(name, freq)    -- factors and portfolios from the Kenneth French Data Library
+  * ols_hac(y, X, lags)   -- OLS with Newey-West standard errors
 
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import io
@@ -21,7 +21,7 @@ REPO_RAW = 'https://raw.githubusercontent.com/danpele/MFM/main/data/market/'
 MARKET_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'data', 'market')
 FRENCH = 'https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/'
 
-SECTORS = ['XLB', 'XLE', 'XLF', 'XLI', 'XLK', 'XLP', 'XLU', 'XLV', 'XLY']        # din dec. 1998
+SECTORS = ['XLB', 'XLE', 'XLF', 'XLI', 'XLK', 'XLP', 'XLU', 'XLV', 'XLY']        # from Dec 1998
 SECTORS_ALL = SECTORS + ['XLRE', 'XLC']                                           # XLRE 2015, XLC 2018
 SECTOR_NAMES = {'XLB': 'Materials', 'XLE': 'Energy', 'XLF': 'Financials', 'XLI': 'Industrials',
                 'XLK': 'Technology', 'XLP': 'Cons. staples', 'XLU': 'Utilities', 'XLV': 'Health care',
@@ -36,7 +36,7 @@ _CACHE = {}
 
 
 def read_market(symbol):
-    """Citeste data/market/<SIMBOL>.csv local sau din repo-ul GitHub."""
+    """Daily prices of one asset from the course data."""
     fname = f'{symbol}.csv'
     path = os.path.join(MARKET_DIR, fname)
     src = path if os.path.exists(path) else REPO_RAW + fname
@@ -44,7 +44,7 @@ def read_market(symbol):
 
 
 def price(symbol):
-    """Pretul folosit: adjusted_close pentru ETF/actiuni (.US, .RO), close pentru indici."""
+    """Price used: adjusted close for ETFs and stocks, close for indices."""
     d = read_market(symbol)
     col = 'close' if symbol.endswith('.INDX') or symbol == 'BET' else 'adjusted_close'
     s = d[col].astype(float)
@@ -52,18 +52,18 @@ def price(symbol):
 
 
 def prices(symbols, start=None, end=None):
-    """Preturi aliniate: join pe zilele comune (analiza comuna -> intai join pe preturi)."""
+    """Prices aligned on the common days (multi-asset analyses align prices before taking returns)."""
     p = pd.concat([price(s) for s in symbols], axis=1).dropna()
     return p.loc[start:end]
 
 
 def log_returns(p):
-    """Randamente log pe un tabel deja aliniat (zile comune)."""
+    """Log returns of an already aligned table (common days)."""
     return np.log(p).diff().dropna()
 
 
 # =============================================================================
-# KENNETH FRENCH DATA LIBRARY)
+# KENNETH FRENCH DATA LIBRARY
 # =============================================================================
 FILES = {
     ('ff3', 'M'): 'F-F_Research_Data_Factors_CSV.zip',
@@ -76,7 +76,7 @@ FILES = {
     ('ind10', 'M'): '10_Industry_Portfolios_CSV.zip',
     ('ind30', 'M'): '30_Industry_Portfolios_CSV.zip',
     ('p100', 'M'): '100_Portfolios_10x10_CSV.zip',
-    # portofolii univariate (primul tabel: ponderate cu valoarea de piata), studiul de caz Jensen-Kelly-Pedersen
+    # univariate sorts (first table: value-weighted), Jensen-Kelly-Pedersen case study
     ('ME', 'M'): 'Portfolios_Formed_on_ME_CSV.zip',
     ('BE-ME', 'M'): 'Portfolios_Formed_on_BE-ME_CSV.zip',
     ('OP', 'M'): 'Portfolios_Formed_on_OP_CSV.zip',
@@ -96,7 +96,7 @@ FILES = {
 
 
 def _parse_first_table(text, date_len):
-    """Primul tabel din fisierul French: antet ',col1,col2...', apoi randuri YYYYMM(DD),valori."""
+    """First table of a French data set: header ',col1,col2...', then rows YYYYMM(DD),values."""
     lines = text.splitlines()
     i = next(k for k, l in enumerate(lines) if l.startswith(',') and len(l.split(',')) > 1)
     cols = [c.strip() for c in lines[i].split(',')[1:]]
@@ -112,11 +112,11 @@ def _parse_first_table(text, date_len):
     if date_len == 6:
         df['date'] = df['date'] + pd.offsets.MonthEnd(0)
     df = df.set_index('date')
-    return df.replace([-99.99, -999.0], np.nan) / 100.0          # procente -> zecimal
+    return df.replace([-99.99, -999.0], np.nan) / 100.0          # percent -> decimal
 
 
 def french(name='ff5', freq='M'):
-    """Factori Fama-French / momentum / portofolii, in zecimal (0.01 = 1%)."""
+    """Fama-French factors / momentum / portfolios, in decimals (0.01 = 1%)."""
     key = (name, freq)
     if key in _CACHE:
         return _CACHE[key]
@@ -132,21 +132,21 @@ def french(name='ff5', freq='M'):
 
 
 def factors(freq='M'):
-    """Mkt-RF, SMB, HML, RMW, CMA, RF, MOM si SMB_FF3 pe perioada comuna.
+    """Mkt-RF, SMB, HML, RMW, CMA, RF, MOM and SMB_FF3 over the common period.
 
-    SMB din fisierul cu cinci factori (sortari dupa B/M, profitabilitate si investitii) intra in FF5;
-    SMB_FF3 este SMB-ul publicat al modelului cu trei factori (sortari 2x3 dupa marime si B/M),
-    folosit in FF3 si Carhart. HML, Mkt-RF si RF sunt aceleasi in cele doua fisiere.
+    The five-factor SMB (sorts on B/M, profitability and investment) enters FF5;
+    SMB_FF3 is the published three-factor SMB (2x3 sorts on size and B/M),
+    used in FF3 and Carhart. HML, Mkt-RF and RF are the same in the two data sets.
     """
     f3 = french('ff3', freq)[['SMB']].rename(columns={'SMB': 'SMB_FF3'})
     return pd.concat([french('ff5', freq), french('mom', freq), f3], axis=1).dropna()
 
 
 # =============================================================================
-# REGRESII
+# REGRESSIONS
 # =============================================================================
 def ols_hac(y, X, lags=None, const=True):
-    """OLS cu erori standard Newey-West (Bartlett). Intoarce (coef, se, t, resid, r2)."""
+    """OLS with Newey-West (Bartlett) standard errors. Returns (coef, se, t, resid, r2)."""
     y = np.asarray(y, float)
     X = np.asarray(X, float)
     if X.ndim == 1:
@@ -172,10 +172,10 @@ def ols_hac(y, X, lags=None, const=True):
 
 
 def grs_test(excess, market_excess):
-    """Testul Gibbons-Ross-Shanken (1989) pentru alfa = 0 pe N active, un factor.
+    """Gibbons-Ross-Shanken (1989) test of alpha = 0 on N assets, one factor.
 
-    Sigma si varianta factorului sunt estimatorii de verosimilitate maxima (impartire la T),
-    ca in lucrare; sub reziduuri normale i.i.d., W ~ F(N, T - N - 1) exact.
+    Sigma and the factor variance are maximum-likelihood estimators (division by T);
+    under i.i.d. Normal residuals, W ~ F(N, T - N - 1) exactly.
     """
     from scipy import stats
     R = np.asarray(excess, float)

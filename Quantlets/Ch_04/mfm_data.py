@@ -1,12 +1,12 @@
 """
-mfm_data.py -- Incarcarea datelor pentru Capitolul 4 (MFM): optimizarea portofoliului
-====================================================================================
-  * read_market(symbol)     -- data/market/<SIMBOL>.csv
-  * prices(symbols)         -- preturi ajustate (ETF/actiuni) sau de inchidere (indici), join pe zilele comune
-  * french_rf()             -- rata fara risc lunara (Kenneth French Data Library)
-  * bnr_rate(currency)      -- cursul oficial de referinta BNR (RON pentru o unitate de valuta)
+mfm_data.py -- data for Chapter 4 (MFM): portfolio optimisation
+================================================================
+  * read_market(symbol)     -- daily price table of one symbol
+  * prices(symbols)         -- adjusted (ETFs, stocks) or closing (indices) prices, aligned on common days
+  * french_rf()             -- monthly risk-free rate (Kenneth French Data Library)
+  * bnr_rate(currency)      -- official BNR reference rate (RON per unit of currency)
 
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import io
@@ -23,15 +23,15 @@ MARKET_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'
 FRENCH = 'https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/'
 BNR_XML = 'https://curs.bnr.ro/files/xml/years/nbrfxrates{}.xml'
 
-SECTORS = ['XLB', 'XLE', 'XLF', 'XLI', 'XLK', 'XLP', 'XLU', 'XLV', 'XLY']        # din dec. 1998
+SECTORS = ['XLB', 'XLE', 'XLF', 'XLI', 'XLK', 'XLP', 'XLU', 'XLV', 'XLY']        # from Dec 1998
 SECTOR_NAMES = {'XLB': 'Materials', 'XLE': 'Energy', 'XLF': 'Financials', 'XLI': 'Industrials',
                 'XLK': 'Technology', 'XLP': 'Cons. staples', 'XLU': 'Utilities', 'XLV': 'Health care',
                 'XLY': 'Cons. discretionary'}
-MULTI = ['SPY', 'EFA', 'EEM', 'TLT', 'IEF', 'LQD', 'HYG', 'GLD']                  # HYG din apr. 2007
+MULTI = ['SPY', 'EFA', 'EEM', 'TLT', 'IEF', 'LQD', 'HYG', 'GLD']                  # HYG from Apr 2007
 MULTI_NAMES = {'SPY': 'US equities', 'EFA': 'Developed ex-US', 'EEM': 'Emerging markets',
                'TLT': 'US Treasuries 20y+', 'IEF': 'US Treasuries 7-10y', 'LQD': 'Investment-grade credit',
                'HYG': 'High-yield credit', 'GLD': 'Gold'}
-BVB = ['TLV', 'SNP', 'BRD', 'TGN', 'SNG', 'SNN', 'EL', 'TEL']                      # listate inainte de 2014-09
+BVB = ['TLV', 'SNP', 'BRD', 'TGN', 'SNG', 'SNN', 'EL', 'TEL']                      # listed before 2014-09
 BVB_NAMES = {'TLV': 'Banca Transilvania', 'SNP': 'OMV Petrom', 'BRD': 'BRD-GSG', 'TGN': 'Transgaz',
              'SNG': 'Romgaz', 'SNN': 'Nuclearelectrica', 'EL': 'Electrica', 'TEL': 'Transelectrica'}
 
@@ -39,7 +39,7 @@ _CACHE = {}
 
 
 def read_market(symbol):
-    """Seria data/market/<SIMBOL>.csv."""
+    """Daily price table of one symbol (course data)."""
     fname = f'{symbol}.csv'
     path = os.path.join(MARKET_DIR, fname)
     src = path if os.path.exists(path) else REPO_RAW + fname
@@ -47,7 +47,7 @@ def read_market(symbol):
 
 
 def price(symbol):
-    """Pretul folosit: adjusted_close pentru ETF/actiuni (.US, .RO), close pentru indici si cripto."""
+    """Price used: adjusted close for ETFs and stocks, close for indices and crypto."""
     d = read_market(symbol)
     col = 'close' if symbol.endswith('.INDX') or symbol.endswith('.CC') or symbol == 'BET' else 'adjusted_close'
     s = d[col].astype(float)
@@ -55,18 +55,18 @@ def price(symbol):
 
 
 def prices(symbols, start=None, end=None):
-    """Preturi aliniate: join pe zilele comune (analiza comuna -> intai join pe preturi)."""
+    """Prices aligned on common days (multi-asset analyses align prices first, then take returns)."""
     p = pd.concat([price(s) for s in symbols], axis=1).dropna()
     return p.loc[start:end]
 
 
 def log_returns(p):
-    """Randamente log pe un tabel deja aliniat (zile comune)."""
+    """Log returns of a table already aligned on common days."""
     return np.log(p).diff().dropna()
 
 
 def french_rf():
-    """Rata fara risc lunara (T-bill la o luna) din fisierul Fama-French cu 3 factori, in zecimal."""
+    """Monthly risk-free rate (one-month T-bill) from the Fama-French three-factor file, in decimals."""
     if 'rf' in _CACHE:
         return _CACHE['rf']
     url = FRENCH + 'F-F_Research_Data_Factors_CSV.zip'
@@ -88,13 +88,13 @@ def french_rf():
 
 
 def monthly_returns(symbols, start=None):
-    """Randamente lunare simple din preturile de sfarsit de luna (zile comune)."""
+    """Monthly simple returns from month-end prices (common days)."""
     p = prices(symbols).resample('ME').last()
     return p.pct_change().dropna().loc[start:]
 
 
 def bnr_rate(currency='USD', start=2014, end=2026):
-    """Cursul de referinta BNR: lei pentru o unitate de valuta (arhivele XML anuale)."""
+    """BNR reference rate: RON per unit of currency (annual XML archives)."""
     key = ('bnr', currency, start, end)
     if key in _CACHE:
         return _CACHE[key]

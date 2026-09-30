@@ -48,7 +48,7 @@ def label_num(d, tag):
 
 
 # =============================================================================
-# 1. ATENUAREA: SCORUL ESTE O MASURARE CU EROARE A SENTIMENTULUI ADEVARAT
+# 1. ATTENUATION: THE SCORE MEASURES TRUE SENTIMENT WITH ERROR
 # =============================================================================
 def attenuation():
     tw = g.load_csv('ch15_twitter_scores.csv')
@@ -61,11 +61,11 @@ def attenuation():
         out['rho'][c] = float(np.corrcoef(s, sc[c])[0, 1])
         L = lab[c].astype(float)
         out['lam_label'][c] = float(np.cov(s, L)[0, 1] / np.var(L, ddof=1))
-        # Aigner (1973): variabila binara "stire negativa", clasificare gresita
+        # Aigner (1973): binary "negative news" variable, misclassification
         t, h = (s == -1), (L == -1)
         pi, p = t.mean(), h.mean()
-        a1 = np.mean(~h[t])          # P(prezis ne-negativ | adevarat negativ)
-        a0 = np.mean(h[~t])          # P(prezis negativ | adevarat ne-negativ)
+        a1 = np.mean(~h[t])          # P(predicted non-negative | truly negative)
+        a0 = np.mean(h[~t])          # P(predicted negative | truly non-negative)
         lam = pi * (1 - pi) * (1 - a0 - a1) / (p * (1 - p))
         out['aigner_neg'][c] = {'pi': float(pi), 'p': float(p), 'a0': float(a0), 'a1': float(a1), 'lam': float(lam),
                                 'lam_direct': float(np.cov(t, h)[0, 1] / np.var(h, ddof=1))}
@@ -79,7 +79,7 @@ def news_setup():
 
 
 def factor_iv(P):
-    """Modelul cu un factor pentru cele trei scoruri zilnice si IV cu un scor ca instrument pentru altul."""
+    """One-factor model for the three daily scores and IV with one score as the instrument for another."""
     Z = {c: P[f'z_{c}'].values for c in ('lm', 'finbert', 'qwen')}
     C = np.corrcoef(np.vstack([Z['lm'], Z['finbert'], Z['qwen']]))
     r = {('lm', 'finbert'): C[0, 1], ('lm', 'qwen'): C[0, 2], ('finbert', 'qwen'): C[1, 2]}
@@ -95,7 +95,7 @@ def factor_iv(P):
     out = {'lam_factor': lam, 'corr': {f'{a}|{b}': float(v) for (a, b), v in r.items()}, 'iv': {}}
     B = 999
     Gs = len(uniq)
-    # sume pe zile pentru bootstrap pe grupuri (zile)
+    # sums by day for the cluster (day) bootstrap
     def sums(v):
         return np.bincount(codes, weights=v, minlength=Gs)
     raw = {'n': np.ones_like(y), 'y': y}
@@ -132,13 +132,13 @@ def factor_iv(P):
 
 
 # =============================================================================
-# 2. PREDICTION-POWERED INFERENCE PE TWITTER
+# 2. PREDICTION-POWERED INFERENCE ON TWITTER
 # =============================================================================
 def ppi_sim(ns=(100, 200, 400, 800), R=2000, seed=15):
-    """PPI (Angelopoulos et al., 2023): esantion etichetat (n) si esantion neetichetat (N - n) INDEPENDENTE, predictorul
-    f fix (antrenat pe alte date). Simularea trateaza cele N titluri de validare ca populatie: in fiecare replicare,
-    ambele esantioane se extrag independent, cu intoarcere, deci varianta Var(f)/(N - n) + Var(f - Y)/n este exacta,
-    iar theta (media celor N etichete) este media populatiei."""
+    """PPI (Angelopoulos et al., 2023): labelled sample (n) and unlabelled sample (N - n) INDEPENDENT, predictor
+    f fixed (trained on other data). The simulation treats the N validation headlines as the population: in each replication
+    both samples are drawn independently, with replacement, so the variance Var(f)/(N - n) + Var(f - Y)/n is exact,
+    and theta (the mean of the N labels) is the population mean."""
     tw = g.load_csv('ch15_twitter_scores.csv')
     y = tw['label'].map(SIGN).values.astype(float)
     theta = y.mean()
@@ -165,7 +165,7 @@ def ppi_sim(ns=(100, 200, 400, 800), R=2000, seed=15):
             r[k] = {'cover': float(np.mean(np.abs(v[:, 0] - theta) <= z * v[:, 1])), 'width': float(np.mean(2 * z * v[:, 1])),
                     'bias': float(v[:, 0].mean() - theta)}
         out['by_n'][str(n)] = r
-    # un exemplu concret cu n = 200 (o impartire aleatoare a titlurilor: n etichetate, restul neetichetate)
+    # a concrete example with n = 200 (a random split of the headlines: n labelled, the rest unlabelled)
     idx = np.random.default_rng(1).permutation(N)
     L, U = idx[:200], idx[200:]
     ex = {'classical': (y[L].mean(), y[L].std(ddof=1) / np.sqrt(200))}
@@ -174,7 +174,7 @@ def ppi_sim(ns=(100, 200, 400, 800), R=2000, seed=15):
         ex[c] = (F[c][U].mean() - rect.mean(), np.sqrt(F[c][U].var(ddof=1) / len(U) + rect.var(ddof=1) / 200),
                  rect.mean())
     out['example'] = {k: [float(x) for x in v] for k, v in ex.items()}
-    # varianta rectificatorului vs varianta etichetelor: castigul de eficienta
+    # variance of the rectifier vs variance of the labels: the efficiency gain
     out['var_ratio'] = {c: float((F[c] - y).var() / y.var()) for c in F}
     VI['ppi'] = out
     return out
@@ -210,7 +210,7 @@ def fig_ppi():
 
 
 # =============================================================================
-# 3. CALIBRAREA PROBABILITATILOR
+# 3. CALIBRATION OF THE PROBABILITIES
 # =============================================================================
 def calib_stats(P, y, bins=10):
     conf = P.max(1)
@@ -274,10 +274,10 @@ def fig_calibration():
 
 
 # =============================================================================
-# 4. PANELUL CU 16 ACTIUNI: GRUPARE, WILD CLUSTER BOOTSTRAP, HOLM
+# 4. THE 16-STOCK PANEL: CLUSTERING, WILD CLUSTER BOOTSTRAP, HOLM
 # =============================================================================
 def wcr_boot(y, x, cl, B=9999, seed=15):
-    """Wild cluster bootstrap restrictionat (b = 0), ponderi Rademacher, t cu SE grupata CR1."""
+    """Restricted wild cluster bootstrap (b = 0), Rademacher weights, t with CR1 clustered SE."""
     y, x = np.asarray(y, float), np.asarray(x, float)
     codes, uniq = pd.factorize(np.asarray(cl))
     G, n = len(uniq), len(y)
@@ -291,7 +291,7 @@ def wcr_boot(y, x, cl, B=9999, seed=15):
         s = np.bincount(codes, weights=xd * e, minlength=G)
         return b / np.sqrt(cr1 * (s @ s) / Sxx ** 2)
     t0 = tstat(y)
-    et = y - y.mean()                      # reziduurile modelului restrictionat
+    et = y - y.mean()                      # residuals of the restricted model
     Ag = np.bincount(codes, weights=xd * et, minlength=G)
     Bg = np.bincount(codes, weights=xd * xd, minlength=G)
     Cg = np.bincount(codes, weights=et, minlength=G)
@@ -299,14 +299,14 @@ def wcr_boot(y, x, cl, B=9999, seed=15):
     rng = np.random.default_rng(seed)
     W = rng.choice([-1.0, 1.0], size=(B, G))
     b = W @ Ag / Sxx
-    dm = W @ Cg / n                        # abaterea mediei lui y*
+    dm = W @ Cg / n                        # deviation of the mean of y*
     S = W * Ag[None, :] - dm[:, None] * Dg[None, :] - b[:, None] * Bg[None, :]
     t = b / np.sqrt(cr1 * np.sum(S ** 2, 1) / Sxx ** 2)
     return float(t0), float(np.mean(np.abs(t) >= abs(t0)))
 
 
 def twoway_se(y, x, c1, c2):
-    """SE grupata pe doua dimensiuni (Cameron, Gelbach & Miller, 2011): V1 + V2 - V12."""
+    """Two-way clustered SE (Cameron, Gelbach & Miller, 2011): V1 + V2 - V12."""
     y, x = np.asarray(y, float), np.asarray(x, float)
     xd = x - x.mean()
     Sxx = xd @ xd
@@ -351,7 +351,7 @@ def panel_inference(P, strat=None):
     adj = holm([rows[k]['p_wcr'] for k in keys])
     for k, a in zip(keys, adj):
         rows[k]['p_wcr_holm'] = float(a)
-    # strategiile d+2: Newey-West t, p normal, Holm pe 3 scoruri
+    # the d+2 strategies: Newey-West t, Normal p-value, Holm over 3 scores
     if strat is None:
         with open(os.path.join(HERE, 'ch15_results.json')) as f:
             strat = json.load(f)['news']['strat']
@@ -363,7 +363,7 @@ def panel_inference(P, strat=None):
 
 
 # =============================================================================
-# 5. STUDIUL DE EVENIMENT: DIFERENTA POZITIV - NEGATIV SI TESTUL BMP
+# 5. EVENT STUDY: POSITIVE - NEGATIVE DIFFERENCE AND THE BMP TEST
 # =============================================================================
 def event_inference(P, rets, col='finbert'):
     neg, pos = g.event_groups(P[col])
@@ -377,7 +377,7 @@ def event_inference(P, rets, col='finbert'):
         r = M.cluster_ols(s[w].values, s['pos'].values, s.index.get_level_values('day'))
         out[w] = {'d': float(r['b']), 'lo': float(r['b'] - 1.96 * r['se_cl']), 'hi': float(r['b'] + 1.96 * r['se_cl']),
                   't': float(r['t_cl'])}
-    # BMP: CAR standardizat cu abaterea standard a randamentului in exces din cele 250 de zile care se termina in -6
+    # BMP: CAR standardised by the standard deviation of the excess return over the 250 days ending at -6
     ex = rets.drop(columns='SPY').sub(rets['SPY'], axis=0)
     sd = ex.rolling(250, min_periods=120).std().shift(6)
     sds = sd.stack()
@@ -393,7 +393,7 @@ def event_inference(P, rets, col='finbert'):
 
 
 # =============================================================================
-# 6. CURBA SPECIFICATIILOR CU NUL PRIN SCHIMBAREA SEMNULUI PE ZILE
+# 6. SPECIFICATION CURVE WITH A SIGN-FLIP NULL BY DAYS
 # =============================================================================
 def nw_t_mat(X, L):
     n = X.shape[1]
@@ -406,10 +406,10 @@ def nw_t_mat(X, L):
 
 
 def spec_curve(P, rets, B=2000, seed=15, block=10):
-    """Nulul comun: ponderi Rademacher constante pe blocuri de `block` zile de semnal consecutive (bootstrap salbatic
-    dependent, Shao, 2010), aceleasi pentru toate specificatiile. Ipoteze: sub nul, randamentele cu semn ale fiecarui
-    bloc sunt simetrice in jurul lui 0, iar blocurile sunt aproximativ independente; se pastreaza dependenta dintre
-    specificatii si dependenta seriala pe distante mai mici decat blocul."""
+    """Joint null: Rademacher weights constant over blocks of `block` consecutive signal days (dependent wild
+    bootstrap, Shao, 2010), the same for all specifications. Assumptions: under the null, the signed returns of each
+    block are symmetric around 0 and the blocks are roughly independent; the dependence between
+    specifications and the serial dependence within a block are preserved."""
     days = rets.index[rets.index >= P.index.get_level_values('day').min()]
     series = []
     meta = []
@@ -417,7 +417,7 @@ def spec_curve(P, rets, B=2000, seed=15, block=10):
         for b in A.BANDS:
             for ret, lag in A.HOLD.items():
                 x = A.portfolio(P.dropna(subset=[ret]), c, days, b, ret, lag)
-                # indexata dupa ziua semnalului (ziua castigului minus lag): aceeasi schimbare de semn pentru toate
+                # indexed by the signal day (return day minus lag): the same sign flip for all
                 s = pd.Series(x.values, index=pd.DatetimeIndex(days)).shift(-lag).reindex(days).fillna(0.0)
                 series.append(s.values)
                 meta.append({'score': c, 'band': b, 'day': lag})
@@ -463,7 +463,7 @@ def fig_spec_curve():
 
 
 # =============================================================================
-# 7. AUC INAINTE vs DUPA PUBLICARE: TEST DELONG SI PUTERE
+# 7. AUC BEFORE vs AFTER RELEASE: DELONG TEST AND POWER
 # =============================================================================
 def delong_var(p, up):
     p, up = np.asarray(p, float), np.asarray(up, bool)
@@ -484,12 +484,12 @@ def auc_test():
         a1, v1 = delong_var(pre[f'qwen{s}'], pre['ret'] > 0)
         a2, v2 = delong_var(post[f'qwen{s}'], post['ret'] > 0)
         m, n = int((post['ret'] > 0).sum()), int((post['ret'] <= 0).sum())
-        v0 = (m + n + 1) / (12 * m * n)       # varianta AUC sub AUC = 0.5 (Hanley & McNeil)
+        v0 = (m + n + 1) / (12 * m * n)       # variance of the AUC when AUC = 0.5 (Hanley & McNeil)
         z = (a1 - a2) / np.sqrt(v1 + v2)
         out[s] = {'auc_pre': a1, 'auc_post': a2, 'se_pre': np.sqrt(v1), 'se_post': np.sqrt(v2), 'z': float(z),
                   'p': float(2 * stats.norm.sf(abs(z))), 'mde': float(z80 * np.sqrt(v1 + v0)),
                   'se0_post': float(np.sqrt(v0)), 'n_up': m, 'n_down': n}
-        # luni necesare dupa publicare pentru a detecta caderea la 0.5 cu puterea 80% (aceeasi proportie de luni in crestere)
+        # months needed after release to detect the fall to 0.5 with 80% power (same share of up months)
         share = m / (m + n)
         need = None
         for T in range(20, 2000):
@@ -503,7 +503,7 @@ def auc_test():
 
 
 # =============================================================================
-# 8. SCURGEREA DATELOR DE ANTRENARE: DIFERENTA DIFERENTELOR CU CI
+# 8. TRAINING-DATA LEAKAGE: DIFFERENCE IN DIFFERENCES WITH CI
 # =============================================================================
 def leakage_did(B=2000, seed=15):
     pb = g.load_csv('ch15_phrasebank_scores.csv')
@@ -527,7 +527,7 @@ def leakage_did(B=2000, seed=15):
 
 
 def timing():
-    """Timpul pe titlu: o singura trecere pentru fiecare prompt; mediana celor trei prompturi."""
+    """Time per headline: one pass for each prompt; median of the three prompts."""
     t = g.load_csv('ch15_llm_time.csv', index_col=0)['sec_per_text']
     out = {}
     for s in ('0.5B', '1.5B', '3B', '7B', '14B'):

@@ -1,11 +1,11 @@
 """
-Generator pentru toate graficele si cifrele din Capitolul 7: Value-at-Risk si Expected Shortfall
-===============================================================================================
-Toate graficele: fundal transparent, etichete ENG, legenda in afara, jos.
-Date zilnice de piata (data/market): S&P 500, BET (2000-2026), Bitcoin (2014-2026), aur XAU/USD (2000-2026),
-ETF-uri SPY, TLT, GLD; EUR/RON: cursul oficial de referinta BNR (iulie 2005-2026).
-Conventie: nivelul = probabilitatea cozii alpha (VaR 1%, ES 2.5%); pierderea L = -r, in % din pozitie; VaR si ES pozitive.
-Cifrele sunt salvate in ch7_results.json (folosite de generatoarele de slide-uri).
+All charts and numbers of Chapter 7: Value-at-Risk and Expected Shortfall
+==========================================================================
+All charts: transparent background, English labels, legend below the plot.
+Daily market data of the course: S&P 500, BET (2000-2026), Bitcoin (2014-2026), gold XAU/USD (2000-2026),
+ETFs SPY, TLT, GLD; EUR/RON: official BNR reference rate (July 2005-2026).
+Convention: level = tail probability alpha (VaR 1%, ES 2.5%); loss L = -r, in % of the position; VaR and ES positive.
+The numbers are written to ch7_results.json (read by the slide generators).
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """
 
@@ -25,7 +25,7 @@ from risk_measures import (hs_var_es, normal_var_es, t_fit, t_var_es, cf_var_es,
                            gpd_var_es, gpd_se, mean_excess, garch_filter, garch_next, fhs_mc,
                            rolling_conditional)
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -44,7 +44,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Brand colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -52,7 +52,7 @@ Amber    = '#B5853F'
 Orange   = '#E67E22'
 Purple   = '#8E44AD'
 Crimson  = '#DC3545'
-Gray     = '#7F7F7F'   # doar linii de referinta, benzi, grila
+Gray     = '#7F7F7F'   # reference lines, bands and grid only
 LightGray = '#DADADA'
 Teal     = '#17A2B8'
 METHOD_COL = {'HS': MainBlue, 'Normal': Orange, 'Student-t': Forest, 'Cornish-Fisher': Purple, 'EVT (GPD)': IDAred}
@@ -65,7 +65,7 @@ METHODS = ['HS', 'Normal', 'Student-t', 'Cornish-Fisher', 'EVT (GPD)']
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as a transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -74,26 +74,26 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
 # =============================================================================
-# DATE: randamente log zilnice in %, fiecare serie pe calendarul ei; pierderea L = -r
+# DATA: daily log returns in %, each series on its own calendar; loss L = -r
 # =============================================================================
 rets = {k: 100 * log_returns(k) for k in MARKETS}
 loss = {k: -v for k, v in rets.items()}
 
 
 def all_methods(L, alpha):
-    """VaR si ES la nivelul a pentru toate metodele necondiționate."""
+    """VaR and ES at level alpha for all unconditional methods."""
     f = gpd_fit(L, 0.05)
     return {'HS': hs_var_es(L, alpha), 'Normal': normal_var_es(L, alpha), 'Student-t': t_var_es(L, alpha),
             'Cornish-Fisher': cf_var_es(L, alpha), 'EVT (GPD)': gpd_var_es(f, alpha)}
 
 
 def summary_table():
-    """Statistici descriptive si VaR/ES (1%, 2.5%) pe metode pentru cele cinci serii."""
+    """Descriptive statistics and VaR/ES (1%, 2.5%) by method for the five series."""
     rows = {}
     for k in ORDER:
         L = loss[k]
@@ -114,7 +114,7 @@ def summary_table():
 
 
 # =============================================================================
-# 1. DEFINITII: distributia pierderilor S&P 500, VaR si ES
+# 1. DEFINITIONS: S&P 500 loss distribution, VaR and ES
 # =============================================================================
 def fig_loss_distribution():
     L = loss['sp500']
@@ -149,10 +149,10 @@ def fig_loss_distribution():
 
 
 # =============================================================================
-# 2. SUBADITIVITATE: contraexemplul cu doua obligatiuni
+# 2. SUBADDITIVITY: the two-bond counterexample
 # =============================================================================
 def discrete_var_es(values, probs, alpha):
-    """VaR si ES cu probabilitatea cozii alpha pentru o pierdere discreta L = -X (formula Acerbi-Tasche).
+    """VaR and ES at tail probability alpha for a discrete loss L = -X (Acerbi-Tasche formula).
     VaR_alpha = -inf{x : P(X <= x) > alpha}; ES_alpha = (E[L 1{L > VaR}] + VaR (alpha - P(L > VaR))) / alpha."""
     order = np.argsort(values)
     x, p = np.asarray(values)[order], np.asarray(probs)[order]
@@ -164,7 +164,7 @@ def discrete_var_es(values, probs, alpha):
 
 
 def bonds_example(p=0.009, lgd=100.0, alpha=0.01):
-    """Doua obligatiuni independente; fiecare pierde lgd cu probabilitatea p."""
+    """Two independent bonds; each loses lgd with probability p."""
     single = discrete_var_es([0, lgd], [1 - p, p], alpha)
     port = discrete_var_es([0, lgd, 2 * lgd], [(1 - p) ** 2, 2 * p * (1 - p), p ** 2], alpha)
     return dict(p=p, lgd=lgd, alpha=alpha, var1=single[0], es1=single[1], varP=port[0], esP=port[1],
@@ -192,11 +192,11 @@ def fig_subadditivity(ex):
 
 
 # =============================================================================
-# 3. VaR si ES in functie de nivelul de incredere (S&P 500)
+# 3. VaR and ES as functions of the tail probability (S&P 500)
 # =============================================================================
 def fig_var_levels():
     L = loss['sp500']
-    levels = np.geomspace(0.05, 0.001, 50)     # probabilitatea cozii alpha, de la 5% la 0.1%
+    levels = np.geomspace(0.05, 0.001, 50)     # tail probability alpha, from 5% down to 0.1%
     f = gpd_fit(L, 0.05)
     tp = t_fit(L)
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
@@ -235,7 +235,7 @@ def fig_var_levels():
 
 
 # =============================================================================
-# 4. METODE x ACTIVE
+# 4. METHODS x ASSETS
 # =============================================================================
 def fig_methods_assets(t):
     fig, axes = plt.subplots(1, 5, figsize=(12, 3.3))
@@ -246,7 +246,7 @@ def fig_methods_assets(t):
         ax.bar(xx - 0.2, vals, 0.38, color=[METHOD_COL[m] for m in METHODS])
         ax.bar(xx + 0.2, es, 0.38, color=[METHOD_COL[m] for m in METHODS], alpha=0.45, hatch='///', edgecolor='white')
         ax.set_xticks(xx)
-        ax.set_xticklabels(['HS', 'N', 't', 'CF', 'EVT'], fontsize=8)
+        ax.set_xticklabels(['HS', 'Normal', 't', 'CF', 'EVT'], fontsize=8)
         ax.set_title(LABELS[k].replace(' (reference rate)', ''), fontsize=9)
         if k == ORDER[0]:
             ax.set_ylabel('Daily loss (%)')
@@ -260,7 +260,7 @@ def fig_methods_assets(t):
 
 
 # =============================================================================
-# 5. HS pe ferestre mobile vs FHS (S&P 500 si Bitcoin)
+# 5. Rolling-window HS vs FHS (S&P 500 and Bitcoin)
 # =============================================================================
 def fig_rolling(name, d, fname, title, start):
     d = d.loc[start:]
@@ -286,7 +286,7 @@ def fig_rolling(name, d, fname, title, start):
 
 
 # =============================================================================
-# 6. VaR/ES conditionat pentru ziua urmatoare (21 septembrie 2026)
+# 6. Conditional VaR/ES for the next day (21 September 2026)
 # =============================================================================
 def conditional_now():
     out = {}
@@ -315,10 +315,10 @@ def conditional_now():
 
 
 # =============================================================================
-# 7. ORIZONTUL: regula radacinii patrate si Monte Carlo FHS
+# 7. THE HORIZON: square-root-of-time rule and FHS Monte Carlo
 # =============================================================================
 def horizon_ratios(hs=(1, 2, 5, 10, 20)):
-    """VaR 1% empiric pe h zile (sume suprapuse) raportat la sqrt(h) * VaR 1% pe o zi."""
+    """Empirical h-day VaR 1% (overlapping sums) divided by sqrt(h) times the one-day VaR 1%."""
     out = {}
     for k in ORDER:
         r = rets[k]
@@ -351,7 +351,7 @@ def fig_horizon(ratios, mc):
     ax.hist(mc['sim'], bins=200, density=True, color=MainBlue, alpha=0.5, label='FHS Monte Carlo, 10-day loss')
     ax.axvline(mc['mc_var'], color=IDAred, lw=1.3, label=f"MC VaR 1% = {mc['mc_var']:.2f}%")
     ax.axvline(mc['sqrt_var'], color=Amber, lw=1.3, ls='--', label=f"sqrt(10) x 1-day FHS VaR = {mc['sqrt_var']:.2f}%")
-    ax.axvline(mc['uncond_var'], color=Gray, lw=1.3, ls=':', label=f"sqrt(10) x 1-day HS VaR = {mc['uncond_var']:.2f}%")
+    ax.axvline(mc['uncond_var'], color=Purple, lw=1.3, ls=':', label=f"sqrt(10) x 1-day HS VaR = {mc['uncond_var']:.2f}%")
     ax.set_xlim(-12, 16)
     ax.set_xlabel('10-day loss (%)')
     ax.set_ylabel('Density')
@@ -375,7 +375,7 @@ def mc_horizon(k='sp500', h=10):
 
 
 # =============================================================================
-# 8. PORTOFOLIU: VaR marginal si pe componente (alocare Euler)
+# 8. PORTFOLIO: marginal and component VaR (Euler allocation)
 # =============================================================================
 PORT = ['SPY', 'TLT', 'GLD', 'BTC']
 W = np.array([0.40, 0.30, 0.20, 0.10])
@@ -383,17 +383,17 @@ W = np.array([0.40, 0.30, 0.20, 0.10])
 
 def portfolio_components():
     lr = joint_returns(PORT, start='2014-09-18')
-    R = 100 * (np.exp(lr) - 1)           # randamente simple (%), agregabile in portofoliu
+    R = 100 * (np.exp(lr) - 1)           # simple returns (%), which aggregate across the portfolio
     rp = R.values @ W
     Lp = -rp
     z1 = stats.norm.ppf(1 - 0.01)         # z_{1-alpha}, alpha = 1%
     S = np.cov(R.values.T)
     sp = np.sqrt(W @ S @ W)
-    mvar = z1 * (S @ W) / sp            # VaR marginal (Normal, media ignorata)
-    cvar = W * mvar                      # VaR pe componente; suma = VaR portofoliului
+    mvar = z1 * (S @ W) / sp            # marginal VaR (Normal, mean ignored)
+    cvar = W * mvar                      # component VaR; the sum equals the portfolio VaR
     var_p = z1 * sp
     var_ind = z1 * np.sqrt(np.diag(S)) * W
-    # ES istoric pe componente: E[-w_i R_i | L_p >= VaR_p]
+    # historical component ES: E[-w_i R_i | L_p >= VaR_p]
     v_hs, es_hs = hs_var_es(Lp, 0.025)
     tail = Lp >= v_hs
     ces = -(R.values[tail] * W).mean(axis=0)
@@ -423,7 +423,7 @@ def fig_components(pc):
 
 
 # =============================================================================
-# 9. EVT: exces mediu, coada GPD, maxime lunare GEV
+# 9. EVT: mean excess, GPD tail, monthly maxima (GEV)
 # =============================================================================
 def fig_mean_excess():
     L = loss['sp500'].values
@@ -435,7 +435,7 @@ def fig_mean_excess():
     uu = np.linspace(f['u'], us[-1], 50)
     ax.plot(uu, (f['beta'] + f['xi'] * (uu - f['u'])) / (1 - f['xi']), color=IDAred,
             label='GPD implied: (beta + xi (u - u0)) / (1 - xi)')
-    ax.axvline(f['u'], color=Gray, ls=':', label=f"Threshold u0 = {f['u']:.2f}% (top 5% of losses above it)")
+    ax.axvline(f['u'], color='black', ls=':', label=f"Threshold u0 = {f['u']:.2f}% (top 5% of losses above it)")
     ax.set_xlabel('Threshold u (daily loss, %)')
     ax.set_ylabel('Mean excess e(u) (%)')
     ax.set_title('S&P 500 losses: mean excess plot')
@@ -493,14 +493,14 @@ def fig_gev():
 
 
 # =============================================================================
-# 10. EVT conditionat (McNeil & Frey) vs HS pe S&P 500
+# 10. Conditional EVT (McNeil & Frey) vs HS on the S&P 500
 # =============================================================================
 def fig_cond_evt(d):
     d = d.loc['2018-01-01':]
     fig, ax = plt.subplots(figsize=(10, 3.4))
     ax.bar(d.index, d['loss'].clip(lower=0), width=1.5, color=Teal, alpha=0.45, label='Daily loss (gains set to 0)')
     ax.plot(d.index, d['hs_var'], color=MainBlue, lw=1.1, label='HS VaR 1% (500 days)')
-    ax.plot(d.index, d['ngarch_var'], color=Orange, lw=0.8, ls='--', label='GARCH with Normal errors, VaR 1%')
+    ax.plot(d.index, d['ngarch_var'], color=Orange, lw=0.8, ls='--', label='GARCH with Normal shocks, VaR 1%')
     ax.plot(d.index, d['cevt_var'], color=IDAred, lw=0.8, label='Conditional EVT VaR 1% (McNeil-Frey)')
     ax.set_ylabel('Daily loss (%)')
     ax.set_ylim(0, 12)
@@ -531,14 +531,14 @@ def fig_basel(t):
 
 
 # =============================================================================
-# 12. LICHIDITATE: VaR ajustat la lichiditate (Bangia et al.), exemplu ilustrativ
+# 12. LIQUIDITY: liquidity-adjusted VaR (Bangia et al.), an illustration
 # =============================================================================
-SPREAD_MEAN, SPREAD_SD, SPREAD_A = 0.5, 0.3, 3.0     # ipoteze ilustrative pentru spread-ul relativ (%)
+SPREAD_MEAN, SPREAD_SD, SPREAD_A = 0.5, 0.3, 3.0     # illustrative assumptions for the relative spread (%)
 
 
 def liquidity(sym='TLV', position=1_000_000):
-    """VaR 1% istoric pe ultimii doi ani pentru o actiune BVB + costul iesirii din pozitie la jumatate de spread."""
-    r = 100 * (np.exp(joint_returns([sym]).loc['2024-09-18':][sym]) - 1)   # randamente simple: pierderea in bani exacta
+    """Historical VaR 1% over the last two years for a BVB stock + the cost of exiting the position at half the spread."""
+    r = 100 * (np.exp(joint_returns([sym]).loc['2024-09-18':][sym]) - 1)   # simple returns: the exact money loss
     v = hs_var_es(-r, 0.01)[0]
     col = 0.5 * (SPREAD_MEAN + SPREAD_A * SPREAD_SD)
     return dict(sym=sym, N=len(r), var1=v, col=col, lvar=v + col, ratio=(v + col) / v,
@@ -546,8 +546,8 @@ def liquidity(sym='TLV', position=1_000_000):
 
 
 # =============================================================================
-# 13. STUDIU DE CAZ: Chronopoulos, Raftapostolos & Kapetanios (2024), JFEc 22(3), Tabelul 6 (alpha = 1%)
-# RMSFE relativ la regresia cuantila liniara; cifrele sunt cele publicate in Tabelul 6 al articolului
+# 13. CASE STUDY: Chronopoulos, Raftapostolos & Kapetanios (2024), JFEc 22(3), Table 6 (alpha = 1%)
+# RMSFE relative to linear quantile regression; values from Table 6 of the paper
 # =============================================================================
 CRK_METHODS = ['Polynomial', 'B-splines', 'Linear MIDAS', 'Deep', 'Deep LASSO', 'Deep ridge', 'Deep elastic net',
                'Deep MIDAS']
@@ -560,7 +560,7 @@ CRK_TABLE6_1PCT = {
 
 
 def fig_crk_table6():
-    """Tabelul 6 din Chronopoulos et al. (2024), alpha = 1%: RMSFE relativ, pe metode si seturi de predictori."""
+    """Table 6 of Chronopoulos et al. (2024), alpha = 1%: relative RMSFE by method and predictor set."""
     cols = [MainBlue, IDAred, Forest, Orange]
     fig, ax = plt.subplots(figsize=(8, 3.4))
     xx = np.arange(len(CRK_METHODS))
@@ -576,7 +576,7 @@ def fig_crk_table6():
     ax.text(0.9, 11.0, 'Flexible, not deep', ha='center', fontsize=8.5, color=Orange, fontweight='bold')
     ax.text(5.0, 11.0, 'Deep neural network quantile regression', ha='center', fontsize=8.5, color=MainBlue,
             fontweight='bold')
-    for i, v in enumerate(CRK_TABLE6_1PCT.values()):       # valorile extreme din Tabelul 6
+    for i, v in enumerate(CRK_TABLE6_1PCT.values()):       # extreme values of Table 6
         for j, y in enumerate(v):
             if y > 2 or y < 0.03:
                 ax.text(xx[j] + (i - 1.5) * w, y * 1.12, f'{y:.3f}', ha='center',
@@ -586,7 +586,7 @@ def fig_crk_table6():
                         for m in CRK_METHODS], fontsize=8)
     ax.set_yticks([0.01, 0.1, 1])
     ax.set_yticklabels(['0.01', '0.1', '1'])
-    ax.set_ylabel('RMSFE relative to linear QR (log scale)')
+    ax.set_ylabel('RMSFE relative to linear quantile regression (log scale)')
     ax.set_title('S&P 500, VaR 1%: relative RMSFE by method and predictor set (Chronopoulos et al., 2024, Table 6)')
     legend_outside_bottom(ax, 4, -0.2)
     save_fig('ch7_crk_table6')

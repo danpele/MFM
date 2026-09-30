@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Monday, 21 September 2026'
 
-Datafile: 'Daily market data (data/market in the MFM repository)'
+Datafile: 'Daily market data from the MFM course repository'
 
 Output: 'ch0_bvb_history.pdf'

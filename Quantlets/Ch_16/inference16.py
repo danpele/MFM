@@ -1,26 +1,26 @@
 """
-inference16.py -- Inferenta pentru Capitolul 16 (MFM): active digitale si DeFi
-==============================================================================
-  * indicele de coada Hill: eroare standard asimptotica k^(-1/2) alpha, CI 95%, bootstrap pe blocuri,
-    sensibilitatea la k (Drees, de Haan & Resnick, 2000);
-  * regula CRIX/ECRIX a lui Trimborn & Hardle (2018), Sectiunile 3-5: indice de baza cu k1 = 1 constituent,
-    s constituenti suplimentari cu ponderi beta estimate prin (11), verosimilitate din densitatea nucleu
-    Epanechnikov a reziduurilor indicelui de baza (latime de banda plug-in Sheather-Jones), AIC = -2 log L + 2 s,
-    revizuire trimestriala pe ultimele trei luni, oprire la prima crestere a AIC (ECRIX, regula 26) si minimul global
-    (EFCRIX, regula 27);
-  * ruptura corelatiei Bitcoin -- S&P 500: sup-Wald (Andrews, 1993) cu erori HAC pentru o ruptura in termenul liber si
-    in panta, valori critice asimptotice simulate, data rupturii si CI Bai (1997); corelatia ajustata
+inference16.py -- Inference for Chapter 16 (MFM): digital assets and DeFi
+=========================================================================
+  * Hill tail index: asymptotic standard error k^(-1/2) alpha, 95% CI, block bootstrap,
+    sensitivity to k (Drees, de Haan & Resnick, 2000);
+  * the CRIX/ECRIX rule of Trimborn & Hardle (2018), Sections 3-5: base index with k1 = 1 constituent,
+    s additional constituents with weights beta estimated by (11), likelihood from the Epanechnikov kernel density
+    of the base-index residuals (Sheather-Jones plug-in bandwidth), AIC = -2 log L + 2 s,
+    quarterly review on the last three months, stop at the first rise of the AIC (ECRIX, rule 26) and global minimum
+    (EFCRIX, rule 27);
+  * break in the Bitcoin -- S&P 500 correlation: sup-Wald (Andrews, 1993) with HAC errors for a break in the intercept
+    and the slope, simulated asymptotic critical values, break date and Bai (1997) CI; the adjusted correlation of
     Forbes & Rigobon (2002);
-  * paritatea stablecoin-urilor: AR cu prag si banda (EQ-TAR, Balke & Fomby, 1997), testul sup-Wald robust la
-    heteroscedasticitate cu bootstrap cu regresori ficsi (Hansen, 1996);
-  * LVR: interval bootstrap pe blocuri pentru rata realizata si identitatea cu varianta realizata / 8;
-  * harta claselor de active: bootstrap pe blocuri pentru modificarea distantelor dintre centrele claselor;
-  * evaluarea activelor cripto: testul GRS (Gibbons, Ross & Shanken, 1989) cu p-valoare bootstrap salbatic si
-    Fama-MacBeth cu erori Shanken (1992), pe opt monede si factorul de piata cripto al indicelui total;
-  * beta Dimson (1979) pentru IBIT si ETHA.
-Datele: data/market; oferta in circulatie: Coin Metrics Community Data; rata fara risc: FRED (DTB4WK).
-Iesire: ch16_inference.json si graficul ch16_crix_rule.
-Modelarea Pietelor Financiare - Daniel Traian PELE
+  * stablecoin pegs: equilibrium threshold AR with a band (EQ-TAR, Balke & Fomby, 1997), heteroskedasticity-robust
+    sup-Wald test with a fixed-regressor bootstrap (Hansen, 1996);
+  * LVR: block-bootstrap interval for the realised rate and the identity with realised variance / 8;
+  * asset-class map: block bootstrap for the change in the distances between class centroids;
+  * crypto asset pricing: the GRS test (Gibbons, Ross & Shanken, 1989) with a wild-bootstrap p-value and
+    Fama-MacBeth with Shanken (1992) errors, on eight coins and the crypto market factor of the total index;
+  * Dimson (1979) beta for IBIT and ETHA.
+Data: course market data; circulating supply: Coin Metrics Community Data; risk-free rate: FRED (DTB4WK).
+Output: ch16_inference.json and the chart ch16_crix_rule.
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -42,21 +42,21 @@ from generate_all_charts import (plt, MainBlue, IDAred, Forest, Amber, Orange, P
                                  save_fig, fig_legend_bottom, jsonable, hill, crix_index, asset_features,
                                  STYL, WINDOWS, FEATURES, ETF_START, SEED)
 
-TRIM = 0.15                       # fractiunea taiata la fiecare capat (Andrews, 1993; Hansen, 1996)
+TRIM = 0.15                       # fraction trimmed at each end (Andrews, 1993; Hansen, 1996)
 
 
 # =============================================================================
-# 1. INDICELE DE COADA HILL: INFERENTA
+# 1. HILL TAIL INDEX: INFERENCE
 # =============================================================================
 def hill_k(x, k):
-    """Estimatorul Hill din cele mai mari k valori pozitive ale lui x."""
+    """Hill estimator from the k largest positive values of x."""
     x = np.sort(x[x > 0])[::-1]
     return 1 / np.mean(np.log(x[:k] / x[k]))
 
 
 def hill_inference(start='2018-01-01', B=1000, block=20):
-    """alpha_H din cele mai mari 5% pierderi, eroarea standard asimptotica alpha/sqrt(k) (date i.i.d.),
-    CI 95%, CI bootstrap pe blocuri mobile (dependenta), si alpha pentru k = 2.5% si 10%."""
+    """alpha_H from the largest 5% of losses, asymptotic standard error alpha/sqrt(k) (i.i.d. data),
+    95% CI, moving-block bootstrap CI (dependence), and alpha for k = 2.5% and 10%."""
     rng = np.random.default_rng(SEED)
     out = {}
     for key in STYL:
@@ -86,11 +86,11 @@ def hill_inference(start='2018-01-01', B=1000, block=20):
 
 
 # =============================================================================
-# 2. REGULA CRIX (Trimborn & Hardle, 2018): ECRIX si EFCRIX, revizuire trimestriala
+# 2. THE CRIX RULE (Trimborn & Hardle, 2018): ECRIX and EFCRIX, quarterly review
 # =============================================================================
 def sj_bandwidth(x):
-    """Latimea de banda plug-in Sheather-Jones ('solve-the-equation') pentru nucleul gaussian (ca bw.SJ din R),
-    convertita la nucleul Epanechnikov cu varianta 1 (factor (R(K_E)/R(K_G))^(1/5))."""
+    """Sheather-Jones plug-in bandwidth ('solve-the-equation') for the Gaussian kernel (as bw.SJ in R),
+    converted to the Epanechnikov kernel with variance 1 (factor (R(K_E)/R(K_G))^(1/5))."""
     x = np.asarray(x, float)
     n = len(x)
     d = (x[:, None] - x[None, :]).ravel()
@@ -113,7 +113,7 @@ def sj_bandwidth(x):
 
 
 def epa_loglik(base, x):
-    """Log-verosimilitatea valorilor x sub densitatea nucleu Epanechnikov (suport +-sqrt(5)) a reziduurilor de baza."""
+    """Log-likelihood of the values x under the Epanechnikov kernel density (support +-sqrt(5)) of the base residuals."""
     h = sj_bandwidth(base)
     u = (x[:, None] - base[None, :]) / h
     k = 3 / (4 * np.sqrt(5)) * (1 - u ** 2 / 5) * (np.abs(u) <= np.sqrt(5))
@@ -122,9 +122,9 @@ def epa_loglik(base, x):
 
 
 def crix_window(mv, px, days):
-    """Pentru zilele unei ferestre trimestriale: randamentele log ale indicelui total (toate monedele, pondere 1)
-    si, pentru fiecare zi, cantitatile Q = valoare de piata / pret la sfarsitul lunii anterioare, ordonate dupa
-    valoarea de piata (abordarea top-down, ec. 23)."""
+    """For the days of a quarterly window: log returns of the total index (all coins, weight 1)
+    and, for each day, the quantities Q = market value / price at the end of the previous month, ordered by
+    market value (the top-down approach, eq. 23)."""
     rows = []
     for t in days:
         prevm = mv.loc[:t.to_period('M').start_time - pd.Timedelta(days=1)]
@@ -139,8 +139,8 @@ def crix_window(mv, px, days):
 
 
 def crix_residuals(rows, k, beta):
-    """eps_hat(k, beta) = randamentul indicelui total - randamentul CRIX(k, beta), ec. (11) si (22): primul
-    constituent cu pondere 1, urmatorii k - 1 cu ponderile beta."""
+    """eps_hat(k, beta) = total-index return - CRIX(k, beta) return, eqs. (11) and (22): the first
+    constituent with weight 1, the next k - 1 with weights beta."""
     e = []
     for order, q, p1, p0 in rows:
         tot = np.log((p1 * q).sum() / (p0 * q).sum())
@@ -151,14 +151,14 @@ def crix_residuals(rows, k, beta):
 
 
 def crix_rule(kmax=4):
-    """Numarul de constituenti ales trimestrial (fereastra: ultimele trei luni) de ECRIX (oprire la prima crestere
-    a AIC) si EFCRIX (minimul global), cu k1 = 1 si pasul s = 1 (Trimborn & Hardle, 2018, Sectiunile 3-5)."""
+    """Number of constituents chosen each quarter (window: last three months) by ECRIX (stop at the first rise
+    of the AIC) and EFCRIX (global minimum), with k1 = 1 and step s = 1 (Trimborn & Hardle, 2018, Sections 3-5)."""
     mv = market_values()
     px = pd.concat([price(a) for a in CRIX_UNIVERSE], axis=1).reindex(mv.index)
     qends = pd.date_range('2018-06-30', END, freq='QE')
     res = []
     for qe in qends:
-        days = mv.loc[qe.to_period('Q').start_time:qe].index      # trimestrul calendaristic incheiat la qe
+        days = mv.loc[qe.to_period('Q').start_time:qe].index      # the calendar quarter ending at qe
         rows = crix_window(mv, px, days)
         if rows is None or len(rows) < 60:
             continue
@@ -185,8 +185,8 @@ def crix_rule(kmax=4):
 
 
 def fig_crix_rule(cr, te):
-    """Stanga: eroarea de urmarire a indicelui cu primii k constituenti; dreapta: numarul de trimestre in care
-    regulile ECRIX si EFCRIX aleg k constituenti."""
+    """Left: tracking error of the index with the first k constituents; right: number of quarters in which
+    the ECRIX and EFCRIX rules choose k constituents."""
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.8))
     ks = [1, 2, 3, 4]
     axes[0].plot(ks, [te[str(k)] for k in ks], 'o-', color=MainBlue, label='Tracking error vs the 5-asset index (% p.a.)')
@@ -208,15 +208,15 @@ def fig_crix_rule(cr, te):
 
 
 # =============================================================================
-# 3. RUPTURI STRUCTURALE: sup-Wald (Andrews, 1993), CI pentru data rupturii (Bai, 1997)
+# 3. STRUCTURAL BREAKS: sup-Wald (Andrews, 1993), CI for the break date (Bai, 1997)
 # =============================================================================
 def nw_lags(T):
-    """Numarul de decalaje Newey-West: floor(4 (T/100)^(2/9))."""
+    """Number of Newey-West lags: floor(4 (T/100)^(2/9))."""
     return int(np.floor(4 * (T / 100) ** (2 / 9)))
 
 
 def hac_meat(Z, u, L):
-    """Matricea de varianta pe termen lung a lui z_t u_t, nucleu Bartlett cu L decalaje."""
+    """Long-run variance matrix of z_t u_t, Bartlett kernel with L lags."""
     g = Z * u[:, None]
     S = g.T @ g
     for l in range(1, L + 1):
@@ -226,8 +226,8 @@ def hac_meat(Z, u, L):
 
 
 def sup_wald_crit(p, trim=TRIM, reps=20000, grid=1000, seed=SEED):
-    """Distributia asimptotica sub H0 a sup-Wald (Andrews, 1993): sup ||B(r) - r B(1)||^2 / (r (1 - r)),
-    B miscare browniana p-dimensionala, r in [trim, 1 - trim]; simulare."""
+    """Asymptotic null distribution of sup-Wald (Andrews, 1993): sup ||B(r) - r B(1)||^2 / (r (1 - r)),
+    B a p-dimensional Brownian motion, r in [trim, 1 - trim]; simulation."""
     rng = np.random.default_rng(seed)
     r = np.arange(1, grid + 1) / grid
     sel = (r >= trim) & (r <= 1 - trim)
@@ -240,8 +240,8 @@ def sup_wald_crit(p, trim=TRIM, reps=20000, grid=1000, seed=SEED):
 
 
 def sup_wald(y, X, index, trim=TRIM, lags=None):
-    """Test sup-Wald pentru o ruptura in toti coeficientii lui y = X b + u la o data necunoscuta, cu matrice de
-    covarianta HAC (Bartlett) calculata separat in fiecare regim; data estimata = minimul SSR (Bai, 1997)."""
+    """sup-Wald test for a break in all coefficients of y = X b + u at an unknown date, with a HAC (Bartlett)
+    covariance matrix computed separately in each regime; estimated date = minimum SSR (Bai, 1997)."""
     y, X = np.asarray(y, float), np.asarray(X, float)
     T, p = X.shape
     L = nw_lags(T) if lags is None else lags
@@ -265,7 +265,7 @@ def sup_wald(y, X, index, trim=TRIM, lags=None):
         SSR[tb] = ssr
     tb_w = int(np.nanargmax(W))
     tb_hat = int(np.nanargmin(SSR))
-    # CI Bai (1997): (d'Q d)^2 / (d'Omega d) (T_hat - T0) -> argmax(W(s) - |s|/2); 97.5% cuantila = 11
+    # Bai (1997) CI: (d'Q d)^2 / (d'Omega d) (T_hat - T0) -> argmax(W(s) - |s|/2); 97.5% quantile = 11
     b0 = np.linalg.lstsq(X[:tb_hat], y[:tb_hat], rcond=None)[0]
     b1 = np.linalg.lstsq(X[tb_hat:], y[tb_hat:], rcond=None)[0]
     d = b1 - b0
@@ -281,8 +281,8 @@ def sup_wald(y, X, index, trim=TRIM, lags=None):
 
 
 def break_btc_spx(start='2016-01-01'):
-    """Ruptura in regresia r_BTC = a + b r_SPX + u (zile comune, randamente log zilnice); corelatiile inainte /
-    dupa data estimata; corelatia ajustata Forbes-Rigobon relativ la 2017-2019."""
+    """Break in the regression r_BTC = a + b r_SPX + u (common days, daily log returns); correlations before /
+    after the estimated date; Forbes-Rigobon adjusted correlation relative to 2017-2019."""
     r = 100 * joint_returns(['BTC', 'SPX'], start)
     X = np.column_stack([np.ones(len(r)), r['SPX'].values])
     sw = sup_wald(r['BTC'].values, X, r.index)
@@ -296,7 +296,7 @@ def break_btc_spx(start='2016-01-01'):
     sw['start'] = str(r.index[0].date())
     pre, post = r.loc[:sw['date']].iloc[:-1], r.loc[sw['date']:]
     sw['rho_pre'], sw['rho_post'] = pre['BTC'].corr(pre['SPX']), post['BTC'].corr(post['SPX'])
-    # Forbes-Rigobon: rho* = rho / sqrt(1 + delta (1 - rho^2)), delta = var_high / var_low - 1 (piata sursa: S&P 500)
+    # Forbes-Rigobon: rho* = rho / sqrt(1 + delta (1 - rho^2)), delta = var_high / var_low - 1 (source market: S&P 500)
     per = {'p1': ('2017-01-01', '2019-12-31'), 'p2': ('2020-01-01', '2023-12-31'), 'p3': (ETF_START, END)}
     x = {k: r.loc[a:b] for k, (a, b) in per.items()}
     fr = {}
@@ -305,7 +305,7 @@ def break_btc_spx(start='2016-01-01'):
         delta = x[k]['SPX'].var() / x['p1']['SPX'].var() - 1
         fr[k] = dict(rho=rho, delta=delta, rho_star=rho / np.sqrt(1 + delta * (1 - rho ** 2)), n=len(x[k]),
                      vol_spx=x[k]['SPX'].std() * np.sqrt(252))
-    # bootstrap pe blocuri pentru rho*_p2 - rho_p1 (fiecare perioada reesantionata separat)
+    # block bootstrap for rho*_p2 - rho_p1 (each period resampled separately)
     rng = np.random.default_rng(SEED)
     def cbb(z):
         n = len(z)
@@ -327,15 +327,16 @@ def break_btc_spx(start='2016-01-01'):
 
 
 # =============================================================================
-# 4. PARITATEA: AR CU PRAG SI BANDA (EQ-TAR) si testul de liniaritate Hansen (1996)
+# 4. THE PEG: EQUILIBRIUM THRESHOLD AR (EQ-TAR) and the Hansen (1996) linearity test
 # =============================================================================
 def tar_fit(d, trim=TRIM, B=999, seed=SEED):
-    """EQ-TAR: d_t = phi_in d_{t-1} + e_t daca |d_{t-1}| <= c, d_t = phi_out d_{t-1} + e_t altfel.
-    Pragul c: cautare pe grila (valorile lui |d_{t-1}| intre cuantilele trim si 1 - trim), minimul SSR.
-    Test H0: phi_in = phi_out (AR(1) liniar), sup-Wald robust la heteroscedasticitate; p-valoare prin bootstrap cu
-    regresori ficsi y*_t = e_t eta_t, eta_t ~ N(0, 1), e_t reziduurile modelului liniar (H0) (Hansen, 1996).
-    Doar perechile (d_(t-1), d_t) din zile calendaristice consecutive: daca se elimina o perioada din serie, nicio
-    pereche nu trece peste golul creat."""
+    """Equilibrium threshold AR (EQ-TAR, Balke & Fomby 1997): d_t = phi_in d_{t-1} + e_t if |d_{t-1}| <= c,
+    d_t = phi_out d_{t-1} + e_t otherwise.
+    Threshold c: grid search (values of |d_{t-1}| between the trim and 1 - trim quantiles), minimum SSR.
+    Test H0: phi_in = phi_out (linear AR(1)), heteroskedasticity-robust sup-Wald; p-value by the fixed-regressor
+    bootstrap y*_t = e_t eta_t, eta_t ~ N(0, 1), e_t the residuals of the linear model (H0) (Hansen, 1996).
+    Only pairs (d_(t-1), d_t) on consecutive calendar days: if a period is removed from the series, no
+    pair crosses the gap."""
     ok = np.diff(d.index.values).astype('timedelta64[D]') == np.timedelta64(1, 'D')
     y, x = d.values[1:][ok], d.values[:-1][ok]
     a = np.abs(x)
@@ -344,8 +345,8 @@ def tar_fit(d, trim=TRIM, B=999, seed=SEED):
     n = len(y)
     x2 = xs ** 2
     lo, hi = int(np.floor(trim * n)), int(np.ceil((1 - trim) * n))
-    # pozitiile unde se poate taia (valori distincte ale lui |x|)
-    cuts = np.array([i for i in range(lo, hi) if as_[i] < as_[i + 1]]) + 1   # regimul interior = primele i observatii
+    # positions where the sample can be split (distinct values of |x|)
+    cuts = np.array([i for i in range(lo, hi) if as_[i] < as_[i + 1]]) + 1   # the inner regime = the first i observations
 
     def wald(yy):
         c1 = np.cumsum(xs * yy)
@@ -362,7 +363,7 @@ def tar_fit(d, trim=TRIM, B=999, seed=SEED):
         return (pin - pout) ** 2 / (vin + vout), pin, pout, vin, vout
 
     Wc, pin, pout, vin, vout = wald(ys)
-    # estimarea pragului: minimul SSR
+    # threshold estimate: minimum SSR
     c1 = np.cumsum(xs * ys)
     c2 = np.cumsum(x2)
     i = cuts - 1
@@ -384,7 +385,7 @@ def tar_fit(d, trim=TRIM, B=999, seed=SEED):
 
 
 def peg_tar(start='2021-01-01'):
-    """EQ-TAR pentru USDT, USDC, DAI: abaterea inchiderii zilnice in puncte de baza, 2021-2026."""
+    """EQ-TAR for USDT, USDC, DAI: deviation of the daily close in basis points, 2021-2026."""
     out = {}
     for k in STABLE:
         d = 1e4 * (read_market(ASSETS[k][0]).loc[start:END, 'close'] - 1)
@@ -393,13 +394,13 @@ def peg_tar(start='2021-01-01'):
 
 
 # =============================================================================
-# 5. LVR: CI bootstrap pentru rata realizata
+# 5. LVR: bootstrap CI for the realised rate
 # =============================================================================
 def lvr_ci(start='2024-01-01', B=2000, block=20, seed=SEED):
-    """Rata anuala LVR realizata (Milionis et al., 2022): portofoliul de reechilibrare detine zilnic cantitatea de ETH
-    a fondului x = V/(2P); pierderea zilnica normalizata (dR_t - dV_t)/V_(t-1) = R_t/2 - (sqrt(1 + R_t) - 1),
-    R_t randamentul simplu; rata = suma / ani. sigma^2/8 din varianta randamentelor log; rv8 = suma R_t^2 / 8 / ani;
-    interval bootstrap pe blocuri mobile pentru rata realizata, pentru sigma^2/8 si pentru diferenta."""
+    """Realised annual LVR rate (Milionis et al., 2022): the rebalancing portfolio holds every day the pool's
+    ETH x = V/(2P); normalised daily loss (dR_t - dV_t)/V_(t-1) = R_t/2 - (sqrt(1 + R_t) - 1),
+    R_t the simple return; rate = sum / years. sigma^2/8 from the variance of log returns; rv8 = sum R_t^2 / 8 / years;
+    moving-block bootstrap interval for the realised rate, for sigma^2/8 and for the difference."""
     p = price('ETH', start)
     r = np.log(p).diff().dropna().values
     yrs = (p.index[-1] - p.index[0]).days / 365.25
@@ -426,10 +427,10 @@ def lvr_ci(start='2024-01-01', B=2000, block=20, seed=SEED):
 
 
 # =============================================================================
-# 6. HARTA CLASELOR DE ACTIVE: bootstrap pentru modificarea distantelor
+# 6. ASSET-CLASS MAP: bootstrap for the change in distances
 # =============================================================================
 def class_distances(f):
-    """Distantele centrelor (cripto vs clase) si dispersia cripto, pe ferestre, in spatiul standardizat comun."""
+    """Centroid distances (crypto vs classes) and crypto dispersion, by window, in the common standardised space."""
     X = f[FEATURES].values
     Z = (X - X.mean(0)) / X.std(0)
     zc = pd.DataFrame(Z, columns=FEATURES)
@@ -448,10 +449,10 @@ def class_distances(f):
 
 
 def alt_bootstrap(B=500, block=28, seed=SEED):
-    """Bootstrap pe blocuri mobile comune tuturor activelor: in fiecare fereastra se extrag blocuri de 28 de zile
-    calendaristice (4 saptamani = 20 de zile lucratoare) si fiecare activ ia randamentele sale (pe calendarul propriu)
-    din aceleasi zile, deci dependenta dintre active se pastreaza; caracteristicile recalculate, standardizare
-    comuna, modificarea W2 - W1 a distantelor; CI 95% percentile."""
+    """Moving-block bootstrap common to all assets: in each window, blocks of 28 calendar days
+    (4 weeks = 20 weekdays) are drawn and each asset takes its own returns (on its own calendar)
+    from the same days, so the dependence between assets is kept; features recomputed, common
+    standardisation, the change W2 - W1 in the distances; 95% percentile CI."""
     rng = np.random.default_rng(seed)
     base = []
     series = {}
@@ -471,7 +472,7 @@ def alt_bootstrap(B=500, block=28, seed=SEED):
         for w, days in cal.items():
             n = len(days)
             st = rng.integers(0, n - block + 1, int(np.ceil(n / block)))
-            sel = days[(st[:, None] + np.arange(block)[None, :]).ravel()[:n]]      # aceleasi zile pentru toate activele
+            sel = days[(st[:, None] + np.arange(block)[None, :]).ravel()[:n]]      # the same days for all assets
             for (s, ww), r in series.items():
                 if ww != w:
                     continue
@@ -493,21 +494,21 @@ def alt_bootstrap(B=500, block=28, seed=SEED):
 
 
 # =============================================================================
-# 7. EVALUAREA ACTIVELOR CRIPTO: GRS si Fama-MacBeth cu corectia Shanken
+# 7. CRYPTO ASSET PRICING: GRS and Fama-MacBeth with the Shanken correction
 # =============================================================================
 COINS = ['BTC', 'ETH', 'XRP', 'BNB', 'ADA', 'DOGE', 'LTC', 'LINK']
 
 
 def weekly_rf():
-    """Rata fara risc saptamanala din randamentul titlurilor de stat la 4 saptamani (FRED DTB4WK, % pe an)."""
+    """Weekly risk-free rate from the 4-week Treasury bill yield (FRED DTB4WK, % a year)."""
     s = pd.read_csv('https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTB4WK', index_col=0, parse_dates=True).iloc[:, 0]
     s = pd.to_numeric(s, errors='coerce').dropna()
     return (s / 100 / 52).resample('W-FRI').last().ffill()
 
 
 def grs_test(R, f):
-    """GRS = (T - N - K)/N * a' S^-1 a / (1 + m' O^-1 m) ~ F(N, T - N - K) sub erori i.i.d. Normale;
-    S, O estimatori de verosimilitate maxima (impartire la T)."""
+    """GRS = (T - N - K)/N * a' S^-1 a / (1 + m' O^-1 m) ~ F(N, T - N - K) under i.i.d. errors with the Normal
+    distribution; S, O maximum-likelihood estimators (division by T)."""
     T, N = R.shape
     K = f.shape[1]
     X = np.column_stack([np.ones(T), f])
@@ -522,10 +523,10 @@ def grs_test(R, f):
 
 
 def asset_pricing(start='2018-01-05', Bb=2000, seed=SEED):
-    """Opt monede, randamente simple saptamanale in exces (vineri); factorul de piata = indicele total ponderat cu
-    valoarea de piata (5 monede cu oferta publica in circulatie), in exces fata de rata fara risc.
-    GRS cu p-valoare F si p-valoare bootstrap salbatic (Rademacher pe linii, sub H0: alfa = 0);
-    Fama-MacBeth: beta din prima etapa pe tot esantionul, regresii transversale saptamanale; erori FM si Shanken."""
+    """Eight coins, weekly simple excess returns (Friday); market factor = the market-value weighted total index
+    (5 coins with a public circulating supply), in excess of the risk-free rate.
+    GRS with the F p-value and a wild-bootstrap p-value (Rademacher by row, under H0: alpha = 0);
+    Fama-MacBeth: first-stage betas on the full sample, weekly cross-sectional regressions; FM and Shanken errors."""
     tot, _ = crix_index(None, 'cap')
     p = pd.concat([price(c) for c in COINS] + [tot.rename('MKT')], axis=1).dropna()
     w = p.resample('W-FRI').last().pct_change().dropna().loc[start:END]
@@ -569,11 +570,11 @@ def asset_pricing(start='2018-01-05', Bb=2000, seed=SEED):
 
 
 # =============================================================================
-# 8. BETA DIMSON (1979) pentru ETF-urile spot
+# 8. DIMSON (1979) BETA for the spot ETFs
 # =============================================================================
 def dimson(etf='IBIT', coin='BTC'):
-    """r_ETF,t = a + b_-1 r_coin,t-1 + b_0 r_coin,t + b_+1 r_coin,t+1 + u_t, pe zilele comune; beta Dimson = suma,
-    eroare standard Newey-West."""
+    """r_ETF,t = a + b_-1 r_coin,t-1 + b_0 r_coin,t + b_+1 r_coin,t+1 + u_t, on common days; Dimson beta = the sum,
+    Newey-West standard error."""
     r = 100 * joint_returns([etf, coin])
     X = pd.concat([r[coin].shift(1).rename('lag'), r[coin].rename('now'), r[coin].shift(-1).rename('lead')], axis=1)
     d = pd.concat([r[etf], X], axis=1).dropna()

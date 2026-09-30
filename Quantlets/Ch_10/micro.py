@@ -1,21 +1,21 @@
 """
-micro.py -- Estimatori de lichiditate si modele de microstructura (Capitolul 10, MFM)
-====================================================================================
+micro.py -- Liquidity estimators and microstructure models (Chapter 10, MFM)
+=========================================================================
   * roll_spread            -- Roll (1984): s = 2 sqrt(-Cov(dp_t, dp_{t-1}))
-  * cs_spread              -- Corwin si Schultz (2012): din maximele si minimele a doua perioade consecutive
-  * ar_spread              -- Abdi si Ranaldo (2017): din inchidere si mijlocul intervalului maxim-minim
-  * edge_spread            -- Ardia, Guidotti si Kroencke (2024): estimatorul EDGE din deschidere, maxim, minim, inchidere
-  * amihud                 -- Amihud (2002): |r| / valoarea tranzactionata
-  * roll_mc                -- Harris (1990): distributia de selectie a covariantei Roll sub modelul adevarat
-  * price_discovery        -- Hasbrouck (1995), Gonzalo si Granger (1995): ponderile informationale dintr-un VECM
-  * pin_loglik             -- Easley, Kiefer, O'Hara si Paperman (1996): verosimilitatea PIN, factorizata (Lin si Ke, 2011)
-  * walk_book              -- executia unui ordin la piata pe un registru de ordine dat
-  * gm_quotes, gm_simulate -- Glosten si Milgrom (1985): cotatiile unui formator de piata care invata
-  * kyle                   -- Kyle (1985): echilibrul cu un singur interval de tranzactionare
-  * ac_trajectory, ac_frontier -- Almgren si Chriss (2001): executia optima a unui ordin mare
-  * zi_simulate            -- registru de ordine simulat cu fluxuri aleatoare (model cu inteligenta zero)
+  * cs_spread              -- Corwin and Schultz (2012): from the highs and lows of two consecutive periods
+  * ar_spread              -- Abdi and Ranaldo (2017): from the close and the mid-range of high and low
+  * edge_spread            -- Ardia, Guidotti and Kroencke (2024): the EDGE estimator from open, high, low, close
+  * amihud                 -- Amihud (2002): |r| / traded value
+  * roll_mc                -- Harris (1990): sampling distribution of the Roll covariance under the true model
+  * price_discovery        -- Hasbrouck (1995), Gonzalo and Granger (1995): information shares from a VECM
+  * pin_loglik             -- Easley, Kiefer, O'Hara and Paperman (1996): the PIN likelihood, factorised (Lin and Ke, 2011)
+  * walk_book              -- executing a market order against a given order book
+  * gm_quotes, gm_simulate -- Glosten and Milgrom (1985): quotes of a learning market maker
+  * kyle                   -- Kyle (1985): the single-auction equilibrium
+  * ac_trajectory, ac_frontier -- Almgren and Chriss (2001): optimal execution of a large order
+  * zi_simulate            -- simulated order book with random order flow (zero-intelligence model)
 
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import numpy as np
@@ -23,10 +23,10 @@ import pandas as pd
 
 
 # =============================================================================
-# ESTIMATORI DE SPREAD SI DE LICHIDITATE
+# SPREAD AND LIQUIDITY ESTIMATORS
 # =============================================================================
 def roll_spread(close):
-    """Spread-ul relativ Roll din covarianta de ordinul 1 a randamentelor log; NaN daca covarianta este pozitiva."""
+    """Roll relative spread from the first-order autocovariance of log returns; NaN if the covariance is positive."""
     r = np.log(np.asarray(close, float))
     dp = np.diff(r)
     c = np.mean((dp[1:] - dp.mean()) * (dp[:-1] - dp.mean()))
@@ -34,10 +34,10 @@ def roll_spread(close):
 
 
 def cs_spread(high, low, close=None):
-    """Estimatorul Corwin-Schultz pentru fiecare pereche de perioade consecutive (valorile negative devin 0).
-    Cu close (date zilnice): ajustarea pentru miscarea de peste noapte din Corwin si Schultz (2012): daca minimul zilei t+1
-    este peste inchiderea zilei t, maximul si minimul lui t+1 scad cu diferenta; daca maximul lui t+1 este sub
-    inchiderea lui t, ambele cresc cu diferenta. Barele intraday ale aceleiasi sesiuni nu se ajusteaza."""
+    """Corwin-Schultz estimator for each pair of consecutive periods (negative values set to 0).
+    With close (daily data): the overnight adjustment of Corwin and Schultz (2012): if the low of day t+1 is above
+    the close of day t, the high and low of t+1 are lowered by the difference; if the high of t+1 is below the close
+    of t, both are raised by the difference. Intraday bars of the same session are not adjusted."""
     H, L = np.asarray(high, float), np.asarray(low, float)
     h0, l0, h1, l1 = H[:-1], L[:-1], H[1:].copy(), L[1:].copy()
     if close is not None:
@@ -56,22 +56,22 @@ def cs_spread(high, low, close=None):
 
 
 def ar_terms(close, high, low):
-    """Termenii Abdi-Ranaldo: 4 (c_t - eta_t)(c_t - eta_{t+1}); media lor estimeaza s^2."""
+    """Abdi-Ranaldo terms: 4 (c_t - eta_t)(c_t - eta_{t+1}); their mean estimates s^2."""
     c = np.log(np.asarray(close, float))
     eta = (np.log(np.asarray(high, float)) + np.log(np.asarray(low, float))) / 2
     return 4 * (c[:-1] - eta[:-1]) * (c[:-1] - eta[1:])
 
 
 def ar_spread(close, high, low):
-    """Spread-ul relativ Abdi-Ranaldo: sqrt(max(media termenilor, 0))."""
+    """Abdi-Ranaldo relative spread: sqrt(max(mean of the terms, 0))."""
     m = np.mean(ar_terms(close, high, low))
     return np.sqrt(max(m, 0.0)), m
 
 
 def edge_spread(open_, high, low, close, sign=True):
-    """EDGE (Ardia, Guidotti si Kroencke, 2024, JFE 161, 103916): spread-ul relativ din preturile OHLC.
-    Transcrierea implementarii de referinta a autorilor (pachetul bidask, licenta MIT). sign=True intoarce estimarea
-    cu semn; pentru medii pe mai multe ferestre, autorii recomanda estimarile cu semn cu valorile negative puse la zero."""
+    """EDGE (Ardia, Guidotti and Kroencke, 2024, JFE 161, 103916): relative spread from OHLC prices.
+    Follows the authors' reference implementation (bidask package, MIT licence). sign=True returns the signed
+    estimate; for averages over several windows, each negative window estimate is set to zero before averaging."""
     o, h, l, c = (np.log(np.asarray(x, float)) for x in (open_, high, low, close))
     if len(o) < 3:
         return np.nan
@@ -103,8 +103,8 @@ def edge_spread(open_, high, low, close, sign=True):
 
 
 def roll_mc(c, sigma, T=78, R=20000, seed=42):
-    """Harris (1990): simulam modelul Roll (m_t mers aleator cu pasi N(0, sigma^2), q_t = +-1 cu prob. 1/2)
-    pe T preturi si calculam covarianta de ordinul 1 a variatiilor (demediate), ca pe date reale."""
+    """Harris (1990): simulate the Roll model (m_t a random walk with N(0, sigma^2) steps, q_t = +-1 with prob. 1/2)
+    over T prices and compute the first-order autocovariance of the (demeaned) changes, as on real data."""
     rng = np.random.default_rng(seed)
     p = np.cumsum(rng.normal(0, sigma, (R, T)), axis=1) + c * np.where(rng.random((R, T)) < 0.5, 1, -1)
     dp = np.diff(p, axis=1)
@@ -113,9 +113,9 @@ def roll_mc(c, sigma, T=78, R=20000, seed=42):
 
 
 def price_discovery(y, p=1):
-    """VECM bivariat cu vectorul de cointegrare (1, -1) impus: dy_t = a0 + alpha (y1 - y2)_{t-1} + sum Gamma_i dy_{t-i} + e_t.
-    Intoarce alpha, statisticile t, ponderea componentei Gonzalo-Granger (alpha_perp normalizat) si limitele
-    ponderii informationale Hasbrouck (cele doua ordonari Cholesky)."""
+    """Bivariate VECM with the cointegrating vector (1, -1) imposed: dy_t = a0 + alpha (y1 - y2)_{t-1} + sum Gamma_i dy_{t-i} + e_t.
+    Returns alpha, the t statistics, the Gonzalo-Granger component share (normalised alpha_perp) and the bounds
+    of the Hasbrouck information share (the two Cholesky orderings)."""
     y = np.asarray(y, float)
     dy = np.diff(y, axis=0)
     z = (y[:, 0] - y[:, 1])[:-1]
@@ -128,7 +128,7 @@ def price_discovery(y, p=1):
     se = np.sqrt(np.linalg.inv(X.T @ X)[1, 1] * np.diag(Om))
     ap = np.array([-alpha[1], alpha[0]])                       # alpha_perp: alpha' alpha_perp = 0
     cs = ap / ap.sum()
-    psi = ap                                                    # randul comun al impactului pe termen lung (pana la o scala)
+    psi = ap                                                    # common row of the long-run impact matrix (up to scale)
     IS = []
     for order in ([0, 1], [1, 0]):
         F = np.linalg.cholesky(Om[np.ix_(order, order)])
@@ -140,8 +140,8 @@ def price_discovery(y, p=1):
 
 
 def pin_loglik(B, S, alpha, delta, mu, eb, es):
-    """Log-verosimilitatea EKOP pentru o zi cu B cumparari si S vanzari, in forma factorizata care evita
-    depasirea numerica (Lin si Ke, 2011): ln L = -eb - es + B ln(mu + eb) + S ln(mu + es) - ln B! - ln S!
+    """EKOP log-likelihood of a day with B buys and S sells, in the factorised form that avoids
+    numerical overflow (Lin and Ke, 2011): ln L = -eb - es + B ln(mu + eb) + S ln(mu + es) - ln B! - ln S!
     + ln[(1 - alpha) xb^B xs^S + alpha delta e^-mu xb^B + alpha (1 - delta) e^-mu xs^S], xb = eb / (mu + eb)."""
     from scipy.special import gammaln, logsumexp
     lxb, lxs = np.log(eb / (mu + eb)), np.log(es / (mu + es))
@@ -152,15 +152,15 @@ def pin_loglik(B, S, alpha, delta, mu, eb, es):
 
 
 def amihud(r, dv, scale=1e6):
-    """Ilichiditatea Amihud: media |r| (puncte de baza) la 1 milion USD tranzactionat."""
+    """Amihud illiquidity: mean |r| (basis points) per USD 1 million traded."""
     x = pd.concat([r.rename('r'), dv.rename('dv')], axis=1, join='inner').dropna()
     x = x[x['dv'] > 0]
     return float((1e4 * x['r'].abs() / (x['dv'] / scale)).mean())
 
 
 def daily_estimates(d, overnight=True):
-    """Estimatorii de spread pe o fereastra de bare: overnight=True pentru date zilnice (ajustarea Corwin-Schultz
-    pentru miscarea de peste noapte), overnight=False pentru barele intraday ale unei sesiuni."""
+    """Spread estimators over a window of bars: overnight=True for daily data (Corwin-Schultz overnight
+    adjustment), overnight=False for the intraday bars of one session."""
     rs, cov = roll_spread(d['close'])
     cs = cs_spread(d['high'], d['low'], d['close'] if overnight else None)
     ar2 = ar_terms(d['close'], d['high'], d['low'])
@@ -168,11 +168,11 @@ def daily_estimates(d, overnight=True):
 
 
 # =============================================================================
-# REGISTRUL DE ORDINE
+# ORDER BOOK
 # =============================================================================
 def walk_book(asks, qty):
-    """Ordin de cumparare la piata de marime qty pe ofertele de vanzare asks = [(pret, cantitate), ...] crescator.
-    Intoarce executiile, pretul mediu ponderat si ofertele ramase."""
+    """Market buy order of size qty against the sell offers asks = [(price, quantity), ...] in ascending order.
+    Returns the fills, the volume-weighted average price and the remaining offers."""
     fills, left, rest = [], qty, []
     for p, q in asks:
         if left <= 0:
@@ -191,16 +191,16 @@ def walk_book(asks, qty):
 # GLOSTEN-MILGROM (1985)
 # =============================================================================
 def gm_quotes(theta, mu, vl, vh):
-    """Cotatiile ask si bid: asteptarea valorii conditionat de o cumparare, respectiv de o vanzare.
-    theta = P(V = vh), mu = ponderea investitorilor informati; cei neinformati cumpara sau vand cu prob. 1/2."""
-    pb_h, pb_l = mu + (1 - mu) / 2, (1 - mu) / 2               # P(cumparare | V = vh), P(cumparare | V = vl)
-    th_b = pb_h * theta / (pb_h * theta + pb_l * (1 - theta))   # P(V = vh | cumparare)
-    th_s = pb_l * theta / (pb_l * theta + pb_h * (1 - theta))   # P(V = vh | vanzare)
+    """Ask and bid quotes: expected value conditional on a buy and on a sell, respectively.
+    theta = P(V = vh), mu = share of informed traders; uninformed traders buy or sell with prob. 1/2."""
+    pb_h, pb_l = mu + (1 - mu) / 2, (1 - mu) / 2               # P(buy | V = vh), P(buy | V = vl)
+    th_b = pb_h * theta / (pb_h * theta + pb_l * (1 - theta))   # P(V = vh | buy)
+    th_s = pb_l * theta / (pb_l * theta + pb_h * (1 - theta))   # P(V = vh | sell)
     return vl + th_b * (vh - vl), vl + th_s * (vh - vl), th_b, th_s
 
 
 def gm_simulate(mu, vl=90.0, vh=110.0, v=110.0, n=60, seed=1):
-    """Un sir de tranzactii cand valoarea adevarata este v; formatorul de piata invata din fluxul de ordine."""
+    """A sequence of trades when the true value is v; the market maker learns from the order flow."""
     rng = np.random.default_rng(seed)
     theta, rows = 0.5, []
     for t in range(n):
@@ -213,11 +213,11 @@ def gm_simulate(mu, vl=90.0, vh=110.0, v=110.0, n=60, seed=1):
 
 
 # =============================================================================
-# KYLE (1985), o singura perioada
+# KYLE (1985), one period
 # =============================================================================
 def kyle(sigma_v, sigma_u):
-    """Echilibrul Kyle: v ~ N(p0, sigma_v^2), cererea zgomotoasa u ~ N(0, sigma_u^2).
-    Strategia informatului x = beta (v - p0), pretul p = p0 + lambda (x + u)."""
+    """Kyle equilibrium: v ~ N(p0, sigma_v^2), noise-trader demand u ~ N(0, sigma_u^2).
+    Informed strategy x = beta (v - p0), price p = p0 + lambda (x + u)."""
     beta = sigma_u / sigma_v
     lam = sigma_v / (2 * sigma_u)
     profit = sigma_v * sigma_u / 2
@@ -228,9 +228,9 @@ def kyle(sigma_v, sigma_u):
 # ALMGREN-CHRISS (2001)
 # =============================================================================
 def ac_trajectory(X, T, N, sigma, eta, gamma, lam, eps=0.0):
-    """Traiectoria optima de lichidare (formulele exacte in timp discret).
-    X actiuni de vandut in T zile, N intervale; sigma = volatilitatea pretului (USD / zi^0.5);
-    impact temporar h(v) = eps sgn + eta v; impact permanent g(v) = gamma v; lam = aversiunea la risc."""
+    """Optimal liquidation trajectory (exact discrete-time formulas).
+    X shares to sell in T days, N intervals; sigma = price volatility (USD / day^0.5);
+    temporary impact h(v) = eps sgn + eta v; permanent impact g(v) = gamma v; lam = risk aversion."""
     tau = T / N
     eta_t = eta - gamma * tau / 2
     t = np.arange(N + 1) * tau
@@ -247,7 +247,7 @@ def ac_trajectory(X, T, N, sigma, eta, gamma, lam, eps=0.0):
 
 
 def ac_frontier(X, T, N, sigma, eta, gamma, lams):
-    """Frontiera eficienta (abaterea standard, costul asteptat) pentru mai multe aversiuni la risc."""
+    """Efficient frontier (standard deviation, expected cost) for several risk aversions."""
     out = []
     for lam in lams:
         _, _, E, V = ac_trajectory(X, T, N, sigma, eta, gamma, lam)
@@ -256,11 +256,11 @@ def ac_frontier(X, T, N, sigma, eta, gamma, lams):
 
 
 # =============================================================================
-# REGISTRU DE ORDINE SIMULAT (model cu inteligenta zero, Farmer, Patelli si Zovko 2005)
+# SIMULATED ORDER BOOK (zero-intelligence model, Farmer, Patelli and Zovko 2005)
 # =============================================================================
 def zi_simulate(n_events=300_000, L=40, rate_limit=1.0, rate_market=0.25, rate_cancel=0.025, n_ticks=4000, seed=7):
-    """Ordine limita (uniform pe L tick-uri de la cotatia opusa), ordine la piata si anulari, toate de o unitate.
-    Intoarce seria (mijloc, spread) si instantanee ale registrului."""
+    """Limit orders (uniform over L ticks from the opposite quote), market orders and cancellations, all of one unit.
+    Returns the (mid, spread) series and snapshots of the book."""
     rng = np.random.default_rng(seed)
     bid_q = np.zeros(n_ticks, int)
     ask_q = np.zeros(n_ticks, int)
@@ -275,7 +275,7 @@ def zi_simulate(n_events=300_000, L=40, rate_limit=1.0, rate_market=0.25, rate_c
         w = np.array([2 * L * rate_limit, 2 * rate_market, rate_cancel * n_orders])
         u = rng.random() * w.sum()
         side = rng.random() < 0.5
-        if u < w[0]:                                   # ordin limita
+        if u < w[0]:                                   # limit order
             k = rng.integers(1, L + 1)
             if side:
                 p = ba - k
@@ -283,13 +283,13 @@ def zi_simulate(n_events=300_000, L=40, rate_limit=1.0, rate_market=0.25, rate_c
             else:
                 p = bb + k
                 ask_q[p] += 1
-        elif u < w[0] + w[1]:                          # ordin la piata
+        elif u < w[0] + w[1]:                          # market order
             if side:
                 ask_q[ba] -= 1 if ask_q[ba] > 0 else 0
             else:
                 bid_q[bb] -= 1 if bid_q[bb] > 0 else 0
-        else:                                          # anulare a unui ordin existent, ales uniform dintre toate ordinele
-            side = rng.random() < bid_q.sum() / n_orders   # partea aleasa proportional cu numarul de ordine in asteptare
+        else:                                          # cancel an existing order, chosen uniformly among all orders
+            side = rng.random() < bid_q.sum() / n_orders   # side chosen in proportion to the number of resting orders
             if side and bid_q.sum() > 1:
                 idx = rng.choice(np.flatnonzero(bid_q), p=bid_q[bid_q > 0] / bid_q.sum())
                 bid_q[idx] -= 1
@@ -302,7 +302,7 @@ def zi_simulate(n_events=300_000, L=40, rate_limit=1.0, rate_market=0.25, rate_c
             ask_q[ba] = 1
         bb = np.flatnonzero(bid_q)[-1]
         ba = np.flatnonzero(ask_q)[0]
-        if bb < 5 * L or ba > n_ticks - 5 * L:         # recentrare: registrul ramane in mijlocul grilei
+        if bb < 5 * L or ba > n_ticks - 5 * L:         # recentre: the book stays in the middle of the grid
             sh = int((bb + ba) / 2 - n_ticks // 2)
             bid_q, ask_q = np.roll(bid_q, -sh), np.roll(ask_q, -sh)
             if sh > 0:

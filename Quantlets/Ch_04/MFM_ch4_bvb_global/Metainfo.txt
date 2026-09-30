@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Market data (data/market): BVB blue chips, BET-TR, SPY, EFA, IEF, GLD; USD/RON reference rate (BNR)'
+Datafile: 'Daily market data (course data): BVB blue chips, BET-TR, SPY, EFA, IEF, GLD; USD/RON reference rate (BNR)'
 
 Output: 'ch4_sem_bvb_global.pdf'

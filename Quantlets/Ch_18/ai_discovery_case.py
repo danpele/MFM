@@ -37,7 +37,7 @@ def main():
     ret = joint_returns(ALL).mean(axis=1) / 100
     rows = []
     for d, v in tci.items():
-        i = vol.index.searchsorted(d, side='right')          # prima zi dupa t
+        i = vol.index.searchsorted(d, side='right')          # first day after t
         if i + H > len(vol):
             break
         fut = vol.iloc[i:i + H]

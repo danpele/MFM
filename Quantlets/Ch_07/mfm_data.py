@@ -1,19 +1,19 @@
 """
-mfm_data.py -- Incarcarea datelor pentru Capitolul 7 (MFM): VaR si Expected Shortfall
-====================================================================================
-  * load_close(name)    -- pretul zilnic din data/market/ (sau cursul de referinta BNR)
-  * log_returns(name)   -- randamente log pe calendarul propriu al fiecarei serii
-  * joint_returns(...)  -- randamente pentru un portofoliu: intai join pe PRETURI in zilele comune
-  * MARKETS             -- S&P 500, BET, Bitcoin, EUR/RON, aur; ETF-uri si actiuni BVB pentru portofolii
+mfm_data.py -- Data loading for Chapter 7 (MFM): VaR and Expected Shortfall
+============================================================================
+  * load_close(name)    -- daily price of a series of the course data (or the BNR reference rate)
+  * log_returns(name)   -- log returns on each series' own calendar
+  * joint_returns(...)  -- returns for a portfolio: prices aligned on common days first
+  * MARKETS             -- S&P 500, BET, Bitcoin, EUR/RON, gold; ETFs and BVB stocks for portfolios
 
-Conventii (ca in capitolele 0-2):
-  * indicii bursieri: doar zilele lucratoare; se elimina doar inregistrarile de sarbatoare completate cu
-    pretul anterior (inchidere neschimbata SI volum zero sau lipsa); inchiderile neschimbate din zilele
-    reale de tranzactionare (volum pozitiv) raman in selectie ca randamente zero;
-  * aurul (XAU/USD): fara cotatiile de weekend; anualizare cu frecventa reala;
-  * cripto: 7 zile din 7;
-  * ETF-uri si actiuni: pretul ajustat (dividende, split-uri); indici, FX, cripto: pretul de inchidere;
-  * EUR/RON: cursul oficial de referinta BNR.
+Conventions (as in Chapters 0-2):
+  * equity indices: weekdays only; only holiday records filled with the previous price are removed
+    (unchanged close AND zero or missing volume); unchanged closes on genuine trading days
+    (positive volume) stay in the sample as zero returns;
+  * gold (XAU/USD): no weekend quotes; annualisation with the actual frequency;
+  * crypto: 7 days a week;
+  * ETFs and stocks: adjusted price (dividends, splits); indices, FX, crypto: closing price;
+  * EUR/RON: official BNR reference rate.
 
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """
@@ -28,7 +28,7 @@ REPO_RAW = 'https://raw.githubusercontent.com/danpele/MFM/main/data/market/'
 MARKET_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'data', 'market')
 END = '2026-09-18'
 
-# nume -> (simbol, eticheta, tip, data de start)
+# name -> (symbol, label, type, start date)
 MARKETS = {
     'sp500':  ('GSPC.INDX',    'S&P 500',                  'index',  '2000-01-01'),
     'bet':    ('BET',          'BET',                      'index',  '2000-01-01'),
@@ -36,7 +36,7 @@ MARKETS = {
     'eurron': ('REF:EUR',      'EUR/RON (reference rate)', 'fx',     '2005-07-01'),
     'gold':   ('XAUUSD.FOREX', 'Gold (XAU/USD)',           'fx',     '2000-01-01'),
 }
-# active pentru portofolii (join pe preturi in zilele comune)
+# portfolio assets (prices aligned on common days)
 ASSETS = {
     'SPY': ('SPY.US', 'adjusted_close'), 'TLT': ('TLT.US', 'adjusted_close'), 'GLD': ('GLD.US', 'adjusted_close'),
     'BTC': ('BTC-USD.CC', 'close'),
@@ -50,7 +50,7 @@ _CACHE = {}
 
 
 def read_market(symbol):
-    """Citeste data/market/<SIMBOL>.csv local sau din repo-ul GitHub."""
+    """Read the daily price series of one symbol (local copy of the course data, else from GitHub)."""
     fname = f'{symbol}.csv'
     path = os.path.join(MARKET_DIR, fname)
     src = path if os.path.exists(path) else REPO_RAW + fname
@@ -58,7 +58,7 @@ def read_market(symbol):
 
 
 def read_reference_rate(currency='EUR', start='2005-07-01', end=END):
-    """Cursul oficial de referinta RON (arhive XML anuale BNR)."""
+    """Official RON reference rate (annual BNR XML archives)."""
     key = (currency, start, end)
     if key in _CACHE:
         return _CACHE[key]
@@ -78,7 +78,7 @@ def read_reference_rate(currency='EUR', start='2005-07-01', end=END):
 
 
 def load_close(name, start=None, end=END):
-    """Pretul zilnic, curatat dupa conventiile capitolului."""
+    """Daily price, cleaned according to the chapter conventions."""
     symbol, _, kind, start0 = MARKETS[name]
     start = start or start0
     if symbol.startswith('REF:'):
@@ -86,21 +86,21 @@ def load_close(name, start=None, end=END):
     d = read_market(symbol).loc[start:end]
     d = d[d['close'] > 0].dropna(subset=['close'])
     if kind != 'crypto':
-        d = d[d.index.dayofweek < 5]          # fara cotatii de weekend
+        d = d[d.index.dayofweek < 5]          # no weekend quotes
     s = d['close']
     if kind == 'index' and 'volume' in d:
-        # fara sarbatori completate cu pretul anterior: inchidere neschimbata si volum zero/lipsa
+        # drop holidays filled with the previous price: unchanged close and zero/missing volume
         s = s[~((s.diff() == 0) & (d['volume'].fillna(0) <= 0))]
     return s.rename(name)
 
 
 def log_returns(name, start=None, end=END):
-    """Randamente log pe calendarul propriu al seriei."""
+    """Log returns on the series' own calendar."""
     return np.log(load_close(name, start, end)).diff().dropna().rename(name)
 
 
 def periods_per_year(r):
-    """Frecventa reala: numarul mediu de observatii pe an calendaristic."""
+    """Actual frequency: average number of observations per calendar year."""
     return len(r) / ((r.index[-1] - r.index[0]).days / 365.25)
 
 
@@ -114,7 +114,7 @@ def asset_price(key, end=END):
 
 
 def joint_returns(keys, start=None, end=END):
-    """Randamente log simple pentru mai multe active: join pe PRETURI in zilele comune, apoi randamente."""
+    """Log returns for several assets: align the PRICES on common days first, then compute returns."""
     p = pd.concat([asset_price(k, end) for k in keys], axis=1, join='inner').dropna()
     if start:
         p = p.loc[start:]

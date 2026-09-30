@@ -45,7 +45,7 @@ def a1_parity():
 
 
 def a2_parity_div():
-    """Paritate cu randament de dividend q: S = 80, K = 75, T = 3 luni, r = 5%, q = 2%, call 7.10, put 1.20."""
+    """Parity with dividend yield q: S = 80, K = 75, T = 3 months, r = 5%, q = 2%, call 7.10, put 1.20."""
     S, K, T, r, q, C, P = 80.0, 75.0, 0.25, 0.05, 0.02, 7.10, 1.20
     se, pvk = S * np.exp(-q * T), K * np.exp(-r * T)
     return dict(se=se, pvk=pvk, lhs=C - P, rhs=se - pvk, gap=C - P - (se - pvk))
@@ -77,7 +77,7 @@ def a4_american():
 
 
 def a5_bs():
-    """Black-Scholes pas cu pas: S = K = 100, T = 6 luni, r = 3%, sigma = 25%."""
+    """Black-Scholes step by step: S = K = 100, T = 6 months, r = 3%, sigma = 25%."""
     S, K, T, r, s = 100.0, 100.0, 0.5, 0.03, 0.25
     g = bs_greeks(S, K, T, r, s)
     return dict(d1=float(g['d1']), d2=float(g['d2']), Nd1=float(stats.norm.cdf(g['d1'])), Nd2=float(stats.norm.cdf(g['d2'])),
@@ -87,7 +87,7 @@ def a5_bs():
 
 
 def a6_delta_gamma():
-    """Hedging delta-gamma: vandut 1000 de call-uri A5; instrumente: call K = 110 (aceeasi scadenta) si actiunea."""
+    """Delta-gamma hedge: 1,000 short A5 calls; instruments: call K = 110 (same expiry) and the stock."""
     S, T, r, s = 100.0, 0.5, 0.03, 0.25
     g1 = bs_greeks(S, 100, T, r, s); g2 = bs_greeks(S, 110, T, r, s)
     pos_delta, pos_gamma = -1000 * float(g1['delta']), -1000 * float(g1['gamma'])
@@ -99,7 +99,7 @@ def a6_delta_gamma():
 
 
 def a7_newton():
-    """Volatilitatea implicita prin Newton: call S = K = 100, T = 3 luni, r = 2%, pret de piata 4.50, sigma_0 = 20%."""
+    """Implied volatility by Newton: call S = K = 100, T = 3 months, r = 2%, market price 4.50, sigma_0 = 20%."""
     steps = newton_iv(4.50, 100.0, 100.0, 0.25, 0.02, sigma0=0.20, steps=3)
     return dict(steps=steps, exact=implied_vol(4.50, 100.0, 100.0, 0.25, 0.02))
 
@@ -108,7 +108,7 @@ A8_K = [80, 85, 90, 95, 100, 105, 110, 115, 120]
 
 
 def a8_strip():
-    """Varianta implicita pe 90 de zile dintr-o banda de 9 optiuni OTM (F = 100, r = 0), preturi rotunjite la 0.01."""
+    """90-day implied variance from a strip of 9 OTM options (F = 100, r = 0), prices rounded to 0.01."""
     F, T = 100.0, 90 / 365
     iv = lambda K: 0.18 - 0.35 * np.log(K / F) + 0.9 * np.log(K / F) ** 2
     Q = []
@@ -131,9 +131,9 @@ BFLY_EXPIRY = '2026-10-30 08:00:00'
 
 
 def a1_butterfly(h=1000.0, K0=85000.0):
-    """Convexitatea in K pe lantul Bitcoin: fluture C(K-h) - 2C(K) + C(K+h) din preturile de marcare in USD (prima in BTC
-    x indicele S, conventia Deribit) si costul executabil (aripile la ask, corpul la bid); densitatea
-    q(K) ~ e^{r tau} fluture / h^2, cu e^{r tau} = F/S (rata implicita in forward-ul Deribit)."""
+    """Convexity in K on the Bitcoin chain: butterfly C(K-h) - 2C(K) + C(K+h) from mark prices in USD (premium in BTC
+    x index S, Deribit convention) and the executable cost (wings at the ask, body at the bid); density
+    q(K) ~ e^{r tau} butterfly / h^2, with e^{r tau} = F/S (rate implied by the Deribit forward)."""
     c = deribit_chain()
     g = c[(c['expiry'] == pd.Timestamp(BFLY_EXPIRY)) & (c['type'] == 'call')].set_index('strike').sort_index()
     F, S = float(g['forward'].iloc[0]), float(g['index'].iloc[0])
@@ -144,9 +144,9 @@ def a1_butterfly(h=1000.0, K0=85000.0):
     out['bf_mark'] = out['Cm'] - 2 * out['C0'] + out['Cp']
     out['bf_exec'] = out['askm'] - 2 * out['bid0'] + out['askp']
     out['q'] = F / S * out['bf_mark'] / h ** 2
-    out['mass'] = F / S * out['bf_mark'] / h                 # E^Q[(h - |S_T - K|)^+]/h: masa ponderata triunghiular ~ h q(K)
-    out['p_int'] = 2 * h * out['q']                           # ~ P(K - h < S_T < K + h), fara ponderare
-    # toate tripletele echidistante din lantul acestei scadente
+    out['mass'] = F / S * out['bf_mark'] / h                 # E^Q[(h - |S_T - K|)^+]/h: triangle-weighted mass ~ h q(K)
+    out['p_int'] = 2 * h * out['q']                           # ~ P(K - h < S_T < K + h), unweighted
+    # all equally spaced strike triplets in the chain of this expiry
     Ks = list(g.index)
     n_tr = n_neg_mark = n_neg_exec = 0
     neg, spr = [], []
@@ -167,8 +167,8 @@ def a1_butterfly(h=1000.0, K0=85000.0):
 
 
 def a2_implied_forward():
-    """Paritatea ca regresie: C - P = D F - D K pe toate preturile de exercitare cu call si put cotate
-    (mid in USD = prima in BTC x indicele S, conventia Deribit)."""
+    """Parity as a regression: C - P = D F - D K over all strikes with both call and put quoted
+    (mid in USD = premium in BTC x index S, Deribit convention)."""
     c = deribit_chain()
     g = c[(c['expiry'] == pd.Timestamp(BFLY_EXPIRY)) & (c['bid'] > 0) & (c['ask'] > 0)].copy()
     F0, S0 = float(g['forward'].iloc[0]), float(g['index'].iloc[0])
@@ -180,7 +180,7 @@ def a2_implied_forward():
     m = sm.OLS(y, X).fit(cov_type='HC1')
     D = -m.params['K']
     Fh = m.params['const'] / D
-    # metoda delta: F = -a / b
+    # delta method: F = -a / b
     a_, b_ = m.params['const'], m.params['K']
     grad = np.array([-1 / b_, a_ / b_ ** 2])
     seF = float(np.sqrt(grad @ m.cov_params().values @ grad))
@@ -190,7 +190,7 @@ def a2_implied_forward():
 
 
 def a4_crr_error():
-    """Eroarea CRR fata de Black-Scholes, inmultita cu N: oscilatie par/impar, ordinul 1/N."""
+    """CRR error against Black-Scholes, times N: even/odd oscillation, order 1/N."""
     S, K, T, r, s = 100.0, 100.0, 1.0, 0.05, 0.20
     bs = float(bs_price(S, K, T, r, s))
     return {str(N): dict(price=float(crr_price(S, K, T, r, s, N)), nerr=float(N * (crr_price(S, K, T, r, s, N) - bs)))
@@ -198,8 +198,8 @@ def a4_crr_error():
 
 
 def a8_lognormal_strip():
-    """Banda de optiuni pentru o distributie log-normala (sigma = 20%, 90 de zile, F = 100, r = 0): valoarea exacta
-    sigma^2 = 0.04; formula Cboe cu Delta K = 5 pe [80, 120]; grila densa pe [80, 120]; grila densa pe (0, infinit)."""
+    """Option strip for a log-normal distribution (sigma = 20%, 90 days, F = 100, r = 0): exact value
+    sigma^2 = 0.04; Cboe formula with Delta K = 5 on [80, 120]; dense grid on [80, 120]; dense grid on (0, infinity)."""
     F, T, s = 100.0, 90 / 365, 0.20
     q = lambda K: np.where(K < F, bs_price(F, K, T, 0.0, s, 'put'), bs_price(F, K, T, 0.0, s, 'call'))
     K5 = np.arange(80.0, 120.1, 5.0)
@@ -215,8 +215,8 @@ def a8_lognormal_strip():
 
 
 def b8_rnd_band(days=90, B=300):
-    """Densitatea neutra la risc pentru scadenta BTC cea mai apropiata de 90 de zile: banda bootstrap pe perechi,
-    probabilitatile P(S_T < 0.8F) si P(S_T > 1.2F) cu intervale, fata de densitatea log-normala ATM."""
+    """Risk-neutral density for the BTC expiry closest to 90 days: pairs-bootstrap band,
+    probabilities P(S_T < 0.8F) and P(S_T > 1.2F) with intervals, against the ATM log-normal density."""
     c, tab, t0 = btc_surface()
     e = pick(tab, days); f = tab.loc[e]
     F, T = float(f['F']), float(f['T'])
@@ -234,7 +234,7 @@ def b8_rnd_band(days=90, B=300):
     atm = np.sqrt(svi_w(0.0, *p0) / T)
     ln = lambda x: float(stats.lognorm.cdf(x * F, s=atm * np.sqrt(T), scale=F * np.exp(-0.5 * atm ** 2 * T)))
     rng = np.random.default_rng(SEED)
-    P80, P120, D80, D120, QB = [], [], [], [], []   # D: SVI minus log-normal, cu volatilitatea ATM a fiecarei reestimari
+    P80, P120, D80, D120, QB = [], [], [], [], []   # D: SVI minus log-normal, with the ATM volatility of each refit
     while len(P80) < B:
         i = rng.integers(0, len(kq), len(kq))
         if len(np.unique(kq[i])) < 6:
@@ -249,7 +249,7 @@ def b8_rnd_band(days=90, B=300):
         D80.append(a_ - lnb(0.8)); D120.append(b_ - (1 - lnb(1.2)))
     kmin, kmax = float(np.exp(kq.min())), float(np.exp(kq.max()))
     A0 = integrate.trapezoid(q0, K)
-    # grafic: densitatea cu banda bootstrap, densitatea log-normala, pragurile 0.8F si 1.2F si intervalul cotat
+    # chart: density with bootstrap band, log-normal density, thresholds 0.8F and 1.2F and the quoted range
     QB = np.array(QB); x = K / F
     lnd = stats.lognorm.pdf(K, s=atm * np.sqrt(T), scale=F * np.exp(-0.5 * atm ** 2 * T)) * F
     fig, ax = plt.subplots(figsize=(6.6, 3.3))
@@ -268,8 +268,8 @@ def b8_rnd_band(days=90, B=300):
     ax.set_title(f"Bitcoin, expiry {pd.Timestamp(e).strftime('%d %b %Y')} ({f['days']:.0f} days)", fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=2, y=-0.2)
     save_fig('ch12_sem_b8_density')
-    ext_lo = float(integrate.trapezoid(q0[K <= kmin * F], K[K <= kmin * F]) / A0)       # masa sub ultima cotatie
-    ext_hi = float(1 - integrate.trapezoid(q0[K <= kmax * F], K[K <= kmax * F]) / A0)   # masa peste ultima cotatie
+    ext_lo = float(integrate.trapezoid(q0[K <= kmin * F], K[K <= kmin * F]) / A0)       # mass below the last quote
+    ext_hi = float(1 - integrate.trapezoid(q0[K <= kmax * F], K[K <= kmax * F]) / A0)   # mass above the last quote
     return dict(expiry=str(pd.Timestamp(e).date()), days=float(f['days']), n=int(len(kq)), atm=float(100 * atm),
                 ext_lo=ext_lo, ext_hi=ext_hi, ext_lo_share=ext_lo / float(p80), ext_hi_share=ext_hi / float(p120),
                 p80=float(p80), p80_lo=float(np.quantile(P80, 0.025)), p80_hi=float(np.quantile(P80, 0.975)),
@@ -283,7 +283,7 @@ def b8_rnd_band(days=90, B=300):
 # PARTEA B
 # =============================================================================
 def b1_hedge_boot():
-    """Eroarea de acoperire (abaterea standard) pentru N reechilibrari, cu interval bootstrap de 95%; panta log-log."""
+    """Hedging error (standard deviation) for N rebalancings, with a 95% bootstrap interval; log-log slope."""
     rng = np.random.default_rng(SEED)
     S0, K, T, r, s, mu = 100.0, 100.0, 0.25, 0.04, 0.20, 0.08
     paths = gbm_paths(S0, mu, s, T, 252, 10000, seed=SEED)
@@ -311,7 +311,7 @@ def b1_hedge_boot():
 
 
 def b2_delta_hedged():
-    """Vanzatorul unei optiuni call pe o luna pe S&P 500, cu hedging zilnic la VIX: media P&L, Newey-West, bootstrap pe blocuri."""
+    """Seller of a one-month S&P 500 call, hedged daily at the VIX: mean P&L, Newey-West, block bootstrap."""
     d = delta_hedged_history()
     x = d['pnl'].values
     m, se = nw_mean(x, 3)
@@ -319,7 +319,7 @@ def b2_delta_hedged():
     n, L = len(x), 6
     means = []
     for _ in range(2000):
-        st = rng.integers(0, n - L + 1, size=int(np.ceil(n / L)))   # toate blocurile, inclusiv ultimul
+        st = rng.integers(0, n - L + 1, size=int(np.ceil(n / L)))   # all blocks, including the last one
         means.append(np.concatenate([x[s:s + L] for s in st])[:n].mean())
     worst5 = np.sort(x)[:5]
     return dict(n=n, mean=m, se=se, t=m / se, lo=float(np.quantile(means, 0.025)), hi=float(np.quantile(means, 0.975)),
@@ -328,7 +328,7 @@ def b2_delta_hedged():
 
 
 def b3_svi():
-    """SVI pe scadenta BTC cea mai apropiata de 30 de zile; bootstrap pe perechi pentru volatilitatea ATM si asimetrie."""
+    """SVI on the BTC expiry closest to 30 days; pairs bootstrap for the ATM volatility and the skew."""
     c, tab, t0 = btc_surface()
     e = pick(tab, 30)
     g = c[c['expiry'] == e]
@@ -346,7 +346,7 @@ def b3_svi():
         iv = lambda x: 100 * np.sqrt(np.clip(svi_w(x, p['a'], p['b'], p['rho'], p['m'], p['s']), 1e-8, None) / T)
         atm.append(float(iv(0.0))); rr.append(float(iv(0.15) - iv(-0.15))); curves.append(iv(kk))
     curves = np.array(curves)
-    # conditia de absenta a arbitrajului de tip fluture (Gatheral-Jacquier): g(k) >= 0
+    # no-butterfly-arbitrage condition (Gatheral-Jacquier): g(k) >= 0
     a, b, rho, m, s = (float(f[x]) for x in ['a', 'b', 'rho', 'm', 's'])
     kg = np.linspace(-1.5, 1.5, 3001)
     W = svi_w(kg, a, b, rho, m, s)
@@ -370,7 +370,7 @@ def b3_svi():
 
 
 def b5_vrp():
-    """Prima de risc a variantei S&P 500: media, eroarea Newey-West (21 de lag-uri), subperioade."""
+    """S&P 500 variance risk premium: mean, Newey-West error (21 lags), subperiods."""
     d = vrp_sp500()
     out = {}
     for tag, x in [('all', d), ('p1', d.loc[:'2007-12-31']), ('p2', d.loc['2008-01-01':])]:
@@ -378,7 +378,7 @@ def b5_vrp():
         mv, sev = nw_mean(x['vrp_vol'], 21)
         out[tag] = dict(n=int(len(x)), mean=m, se=se, t=m / se, lo=m - 1.96 * se, hi=m + 1.96 * se, mean_vol=mv, se_vol=sev,
                         share=float((x['vrp'] > 0).mean()), iv=float(x['vix'].mean()), rv=float(np.sqrt(x['rv']).mean()))
-    # stabilitatea intre subperioade: VRP pe constanta si un indicator 2008-2026, erori Newey-West (21 de lag-uri)
+    # stability across subperiods: VRP on a constant and a 2008-2026 dummy, Newey-West errors (21 lags)
     X = sm.add_constant(pd.Series((d.index >= '2008-01-01').astype(float), index=d.index, name='post'))
     for col, tag in [('vrp', 'diff'), ('vrp_vol', 'diff_vol')]:
         m = sm.OLS(d[col], X).fit(cov_type='HAC', cov_kwds={'maxlags': 21})
@@ -391,7 +391,7 @@ def b5_vrp():
 
 
 def b6_mz():
-    """Mincer-Zarnowitz: varianta realizata pe urmatoarele 21 de zile pe VIX^2; test comun a = 0, b = 1 (HAC)."""
+    """Mincer-Zarnowitz: realised variance over the next 21 days on VIX^2; joint test a = 0, b = 1 (HAC)."""
     d = vrp_sp500()
     m = sm.OLS(d['rv'], sm.add_constant(d[['iv2']])).fit(cov_type='HAC', cov_kwds={'maxlags': 21})
     w = m.wald_test('const = 0, iv2 = 1', scalar=True)
@@ -413,10 +413,10 @@ def b7_vrp_btc():
 
 
 # =============================================================================
-# PARTEA C: swap de varianta sintetic, vandut lunar
+# PART C: synthetic variance swap, sold monthly
 # =============================================================================
 def monthly_swap(iv, r, H, ppy):
-    """P&L lunar al vanzatorului unui swap de varianta cu notional vega 1: (IV^2 - RV) / (2 IV), in puncte de volatilitate."""
+    """Monthly P&L of the seller of a variance swap with vega notional 1: (IV^2 - RV) / (2 IV), in volatility points."""
     rows = []
     iv, r = iv.align(r, join='inner')
     for i0 in range(0, len(iv) - H, H):
@@ -435,7 +435,7 @@ def perf(p, per_year=12):
     srs = []
     xv = x.values
     for _ in range(2000):
-        st = rng.integers(0, n - L + 1, size=int(np.ceil(n / L)))   # toate blocurile, inclusiv ultimul
+        st = rng.integers(0, n - L + 1, size=int(np.ceil(n / L)))   # all blocks, including the last one
         y = np.concatenate([xv[s:s + L] for s in st])[:n]
         srs.append(y.mean() / y.std() * np.sqrt(per_year))
     return dict(n=int(n), mean=float(x.mean()), sd=float(x.std()), sharpe=float(sr), sr_lo=float(np.quantile(srs, 0.025)),
@@ -452,12 +452,12 @@ def c1_vrp_signal():
     ratio = (px['vix'] / px['vix3m']).dropna()
     p_sp3 = p_sp.loc[ratio.index[0]:]
     active = ratio.reindex(p_sp3.index) <= 1
-    cond = p_sp3.assign(pnl=p_sp3['pnl'].where(active, 0.0))   # lunile sarite: P&L 0 (numerar), acelasi calendar lunar
+    cond = p_sp3.assign(pnl=p_sp3['pnl'].where(active, 0.0))   # skipped months: P&L 0 (cash), same monthly calendar
     dv = dvol_history()
     b = load_close('btc')
     r_b = np.log(b).diff().dropna()
     p_b = monthly_swap(dv, r_b, 30, 365)
-    # sensibilitatea la calendarul lunar: aceeasi strategie, cu grila de 21 de zile pornita in fiecare dintre primele 21 de zile
+    # sensitivity to the monthly calendar: same strategy, 21-day grid started on each of the first 21 days
     grid = []
     for o in range(21):
         x = monthly_swap(sp['vix'].loc[r_sp.index].iloc[o:], r_sp.iloc[o:], 21, 252)['pnl']
@@ -488,7 +488,7 @@ def c1_vrp_signal():
 # GRAFICE SUPLIMENTARE PENTRU SEMINAR (aceleasi cifre ca in functiile de mai sus)
 # =============================================================================
 def setup_check():
-    """Verificarea datelor: S&P 500 si VIX imbinate pe zilele comune; lantul Deribit al cursului."""
+    """Data check: S&P 500 and VIX joined on common days; the Deribit chain of the course."""
     px = pd.concat([load_close('sp500'), load_close('vix')], axis=1, join='inner').dropna()
     c = deribit_chain()
     return dict(n=int(len(px)), first=str(px.index[0].date()), last=str(px.index[-1].date()),
@@ -498,7 +498,7 @@ def setup_check():
 
 
 def a1_chart():
-    """Densitatea implicita din tripletele de call-uri vecine (preturi de referinta in USD) pentru scadenta din A1."""
+    """Implied density from neighbouring call triplets (mark prices in USD) for the A1 expiry."""
     c = deribit_chain()
     g = c[(c['expiry'] == pd.Timestamp(BFLY_EXPIRY)) & (c['type'] == 'call')].set_index('strike').sort_index()
     F, S = float(g['forward'].iloc[0]), float(g['index'].iloc[0])
@@ -543,7 +543,7 @@ def a4_chart():
 
 
 def a5_chart():
-    """Delta, gamma si vega ale call-ului din A5 in functie de S, cu punctul S = 100 marcat."""
+    """Delta, gamma and vega of the A5 call as functions of S, with the point S = 100 marked."""
     K, T, r, sg = 100.0, 0.5, 0.03, 0.25
     Sg = np.linspace(60, 140, 401)
     gk = bs_greeks(Sg, K, T, r, sg)
@@ -569,7 +569,7 @@ def a5_chart():
 
 
 def a7_chart():
-    """Pretul Black-Scholes ca functie de sigma, pretul de piata 4.50, valorile de pornire si pasul Newton."""
+    """Black-Scholes price as a function of sigma, market price 4.50, starting values and the Newton step."""
     S, K, T, r, P = 100.0, 100.0, 0.25, 0.02, 4.50
     sg = np.linspace(0.02, 0.40, 300)
     price = bs_price(S, K, T, r, sg)
@@ -600,7 +600,7 @@ def a7_chart():
 
 
 def a8_chart():
-    """Integrandul benzii de varianta (log-normal, 90 de zile): dreptunghiurile Cboe pe [80, 120] si cozile trunchiate."""
+    """Integrand of the variance strip (log-normal, 90 days): Cboe rectangles on [80, 120] and the truncated tails."""
     F, T, s = 100.0, 90 / 365, 0.20
     q = lambda K: np.where(K < F, bs_price(F, K, T, 0.0, s, 'put'), bs_price(F, K, T, 0.0, s, 'call'))
     Kd = np.linspace(50, 160, 2201)
@@ -620,7 +620,7 @@ def a8_chart():
 
 
 def b2_chart():
-    """P&L cumulat al vanzatorului de optiuni acoperite delta (S&P 500), cu cele mai rele cinci luni marcate."""
+    """Cumulative P&L of the delta-hedged option seller (S&P 500), with the five worst months marked."""
     d = delta_hedged_history()
     cum = d['pnl'].cumsum()
     w5 = d['pnl'].nsmallest(5)
@@ -637,7 +637,7 @@ def b2_chart():
 
 
 def b4_chart():
-    """Contributia fiecarui pret de exercitare la varianta implicita (formula Cboe), cele doua scadente din jurul a 30 de zile."""
+    """Contribution of each strike to the implied variance (Cboe formula), the two expiries around 30 days."""
     c = deribit_chain()
     t0 = c['snapshot_utc'].iloc[0]
     c = c.assign(T=(c['expiry'] - t0).dt.total_seconds() / (365 * 86400))
@@ -665,7 +665,7 @@ def b4_chart():
 
 
 def b5_chart():
-    """VRP zilnica S&P 500 in puncte de volatilitate, cu mediile pe subperioade si intervalele Newey-West de 95%."""
+    """Daily S&P 500 VRP in volatility points, with subperiod means and 95% Newey-West intervals."""
     d = vrp_sp500()
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.6), gridspec_kw={'width_ratios': [2.2, 1]})
     ax = axes[0]
@@ -692,7 +692,7 @@ def b5_chart():
 
 
 def b6_chart():
-    """Elipsa de incredere comuna de 95% pentru (alpha, beta) in regresia Mincer-Zarnowitz, cu punctul (0, 1)."""
+    """Joint 95% confidence ellipse for (alpha, beta) in the Mincer-Zarnowitz regression, with the point (0, 1)."""
     d = vrp_sp500()
     m = sm.OLS(d['rv'], sm.add_constant(d[['iv2']])).fit(cov_type='HAC', cov_kwds={'maxlags': 21})
     b = m.params.values; V = m.cov_params().values
@@ -714,7 +714,7 @@ def b6_chart():
 
 
 def b7_chart():
-    """Prima Bitcoin zilnica (DVOL minus volatilitatea realizata pe 30 de zile), cu media si intervalul Newey-West."""
+    """Daily Bitcoin premium (DVOL minus 30-day realised volatility), with the mean and the Newey-West interval."""
     d = vrp_btc()
     m, se = nw_mean(d['vrp_vol'], 30)
     s = vrp_sp500()

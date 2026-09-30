@@ -26,7 +26,7 @@ from systemic import (mes, mes_threshold, lrmes, srisk_ratio, breakeven_leverage
                       block_bootstrap_idx, covar_boot, covar_dynamic, var_fit, var_bic, gfevd, spillover_table,
                       rolling_total, lasso_qr_gacv)
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -45,7 +45,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Course colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -54,7 +54,7 @@ Orange   = '#E67E22'
 Purple   = '#8E44AD'
 Crimson  = '#DC3545'
 Teal     = '#17A2B8'
-Gray     = '#7F7F7F'   # doar linii de referinta, benzi, grila
+Gray     = '#7F7F7F'   # reference lines, bands and grid only
 REGION_COL = {'US': MainBlue, 'EU': IDAred, 'RO': Forest}
 REGION_LAB = {'US': 'US banks', 'EU': 'European banks', 'RO': 'Romanian banks (BVB)'}
 EVENTS = [('2011-08-08', 'Euro crisis'), ('2016-06-24', 'Brexit vote'), ('2018-12-19', 'RO bank tax'),
@@ -68,7 +68,7 @@ RESULTS = {}
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -77,7 +77,7 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
@@ -96,7 +96,7 @@ def jsonable(x):
 
 
 def mark_events(ax, ymax=None):
-    """Linii verticale de referinta pentru evenimente, cu eticheta neagra."""
+    """Vertical reference lines for events, with black labels."""
     for d, lab in EVENTS:
         t = pd.Timestamp(d)
         if ax.get_xlim()[0] <= mdates.date2num(t) <= ax.get_xlim()[1]:
@@ -106,14 +106,14 @@ def mark_events(ax, ymax=None):
 
 
 # =============================================================================
-# DATE: randamente log zilnice in % pentru banci si indici, zile comune (join pe preturi)
+# DATA: daily log returns in % for banks and indices, common days (prices aligned first)
 # =============================================================================
 R = joint_returns(ALL + ['SPX', 'SX5E', 'BET', 'VIX'])
 RB = R[ALL]
 
 
 def system_ex(k, members):
-    """Randamentul sistemului regional fara banca k (portofoliu cu ponderi egale)."""
+    """Return of the regional system without bank k (equal-weighted portfolio)."""
     return R[[j for j in members if j != k]].mean(axis=1)
 
 
@@ -122,14 +122,14 @@ def region_of(k):
 
 
 # =============================================================================
-# 1. Indicii bancari regionali
+# 1. Regional bank indices
 # =============================================================================
 def fig_bank_indices():
-    """Portofoliile bancare cu ponderi egale (SUA, Europa, Romania), baza 100 la inceputul lui 2010."""
+    """Equal-weighted bank portfolios (US, Europe, Romania), base 100 at the start of 2010."""
     fig, ax = plt.subplots(figsize=(7.2, 3.1))
     out = {}
     for reg, mem in [('US', US), ('EU', EU), ('RO', RO)]:
-        s = 100 * (1 + (np.exp(R[mem] / 100) - 1).mean(axis=1)).cumprod()     # rebalansare zilnica
+        s = 100 * (1 + (np.exp(R[mem] / 100) - 1).mean(axis=1)).cumprod()     # daily rebalancing
         ax.plot(s.index, s.values, color=REGION_COL[reg], lw=0.9, label=f'{REGION_LAB[reg]} (equal weights)')
         dd = s / s.cummax() - 1
         out[reg] = {'last': s.iloc[-1], 'maxdd': dd.min(), 'maxdd_date': dd.idxmin(),
@@ -144,10 +144,10 @@ def fig_bank_indices():
 
 
 # =============================================================================
-# 2. MES si SRISK
+# 2. MES and SRISK
 # =============================================================================
 def mes_table():
-    """MES 5% (fata de indicele regional), MES la pragul de -2% si LRMES, cu interval bootstrap pe blocuri."""
+    """MES 5% (against the regional index), MES at the -2% threshold and LRMES, with a block-bootstrap interval."""
     rows = {}
     rng = np.random.default_rng(SEED)
     for k in ALL:
@@ -185,7 +185,7 @@ def fig_mes(t):
 
 
 def fig_srisk(t):
-    """SRISK / capitalul de piata in functie de levier, pentru bancile cu LRMES maxim, median si minim."""
+    """SRISK / market equity as a function of leverage, for the banks with the largest, median and smallest LRMES."""
     order = t['lrmes'].sort_values()
     pick = [order.index[-1], order.index[len(order) // 2], order.index[0]]
     L = np.linspace(2, 20, 200)
@@ -207,20 +207,20 @@ def fig_srisk(t):
 # 3. CoVaR
 # =============================================================================
 def covar_table(alpha):
-    """CoVaR si Delta-CoVaR pentru bancile americane si europene (sistemul = restul bancilor din regiune)."""
+    """CoVaR and Delta-CoVaR for the US and European banks (system = the other banks of the region)."""
     rows = {}
     for i, k in enumerate(US + EU):
         mem = US if k in US else EU
         xs = system_ex(k, mem)
         c = covar_static(xs, R[k], alpha)
         lo, hi = covar_boot(xs, R[k], alpha, B=B_BOOT, block=20, seed=SEED + i)
-        e = covar_static(R[k], xs, alpha)                      # expunerea: banca in conditiile unei crize a sistemului
+        e = covar_static(R[k], xs, alpha)                      # exposure: the bank given a crisis of the system
         rows[k] = {**c, 'lo': lo, 'hi': hi, 'exp_covar': e['covar'], 'exp_dcovar': e['dcovar'], 'exp_b': e['b']}
     return pd.DataFrame(rows).T
 
 
 def fig_covar_qr():
-    """Regresia cuantila a sistemului pe JPMorgan: dreptele de 1% si 50%."""
+    """Quantile regression of the system on JPMorgan: the 1% and 50% lines."""
     xs, xi = system_ex('JPM', US), R['JPM']
     fig, ax = plt.subplots(figsize=(6.0, 3.4))
     ax.scatter(xi, xs, s=3, color=Teal, alpha=0.45, label='Daily returns, 2010-2026')
@@ -275,7 +275,7 @@ def fig_var_vs_dcovar(t):
 
 
 def dynamic_covar():
-    """Delta-CoVaR 1% variabil in timp; stare: log VIX, randamentul indicelui regional si al sistemului (t-1)."""
+    """Time-varying Delta-CoVaR 1%; state: log VIX, regional index return and system return (t-1)."""
     out, betas = {}, {}
     for k in ['JPM', 'C', 'GS', 'DBK', 'SAN', 'HSBA']:
         mem = US if k in US else EU
@@ -353,8 +353,8 @@ def fig_spill_table(st):
 
 
 def fig_spill_network(st):
-    """Reteaua conectivitatii nete pe perechi: sageata de la emitator la receptor, grosime ~ efectul net."""
-    pn = st['pairwise_net']                     # pn[i, j] > 0: i transmite net catre j
+    """Network of net pairwise connectedness: arrow from transmitter to receiver, width ~ net effect."""
+    pn = st['pairwise_net']                     # pn[i, j] > 0: i is a net transmitter to j
     n = len(ALL)
     ang = np.linspace(np.pi / 2, np.pi / 2 - 2 * np.pi, n, endpoint=False)
     pos = {k: (np.cos(a), np.sin(a)) for k, a in zip(ALL, ang)}
@@ -416,7 +416,7 @@ LAMBDAS = np.logspace(-6, -1.5, 20)
 
 
 def frm_design():
-    """Randamente zilnice (fractii) ale bancilor si variabilele macro intarziate cu o zi."""
+    """Daily returns (fractions) of the banks and the macro variables lagged by one day."""
     Rf = R / 100
     Mac = Rf[MACRO].shift(1).add_suffix('_lag')
     return Rf[ALL].join(Mac).dropna()
@@ -428,8 +428,8 @@ def frm_window(D, k, tau=0.05):
 
 
 def frm_series(window=63, step=10, lam_fixed=2e-4):
-    """FRM = media lambda (GACV) pe banci, pe ferestre mobile de 63 de zile; si ponderea predictorilor activi
-    (12 banci + 3 variabile macro intarziate) la lambda fix."""
+    """FRM = average lambda (GACV) across banks, on rolling 63-day windows; and the share of active predictors
+    (12 banks + 3 lagged macro variables) at a fixed lambda."""
     D = frm_design()
     rows = {}
     cache = os.path.join(HERE, 'ch18_frm.csv')
@@ -450,7 +450,7 @@ def frm_series(window=63, step=10, lam_fixed=2e-4):
 
 
 def fig_frm_gacv():
-    """Curba GACV pentru JPMorgan intr-o fereastra calma si intr-una de criza."""
+    """GACV curve for JPMorgan in a calm and in a crisis window."""
     D = frm_design()
     out = {}
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.8))
@@ -500,7 +500,7 @@ def fig_frm_rolling(f, lam_fix):
 
 
 # =============================================================================
-# 6. Teste de stres
+# 6. Stress tests
 # =============================================================================
 EPISODES = [('GFC: Lehman', '2008-09-01', '2008-11-30'), ('Euro crisis', '2011-07-01', '2011-10-31'),
             ('Brexit vote', '2016-06-20', '2016-07-15'), ('RO bank tax', '2018-12-10', '2019-01-31'),
@@ -510,13 +510,13 @@ INTL = US + EU
 
 
 def stress_historical():
-    """Pentru fiecare episod: cea mai proasta fereastra de 10 zile a portofoliului bancar cu ponderi egale."""
+    """For each episode: the worst 10-day window of the equal-weighted bank portfolio."""
     Rl = joint_returns(INTL, start='2007-01-01')
     rows, port = {}, {}
     for name, a, b in EPISODES:
         keys = INTL + (RO if pd.Timestamp(a) >= pd.Timestamp('2010-01-01') else [])
         X = (Rl.loc[a:b] if keys == INTL else R.loc[a:b, keys])
-        # randamentul log exact al portofoliului rebalansat zilnic: 100 ln(media randamentelor simple brute)
+        # exact log return of the daily-rebalanced portfolio: 100 ln(mean of gross simple returns)
         p = (100 * np.log(np.exp(X / 100).mean(axis=1))).rolling(10).sum()
         end = p.idxmin()
         i = X.index.get_loc(end)
@@ -552,12 +552,12 @@ def weekly_returns(keys):
 
 
 def reverse_stress(target=25.0, weeks=4):
-    """Testul de stres invers: cel mai plauzibil scenariu al factorilor care produce o pierdere data.
+    """Reverse stress test: the most plausible factor scenario that produces a given loss.
 
-    Model: randamentele log saptamanale ale bancilor (%) = beta' f + eroare, f = (S&P 500, Euro Stoxx 50, BET);
-    pe orizontul de h saptamani f ~ N(0, h Sigma) (fara autocovariante). Pierderea portofoliului (randament log,
-    aproximare pe factori: erorile idiosincratice puse la zero) L = -b'f, b = media beta.
-    Scenariul cel mai probabil cu L = target: f* = -target Sigma b / (b' Sigma b); distanta Mahalanobis target / sqrt(b' Sigma b)."""
+    Model: weekly bank log returns (%) = beta' f + error, f = (S&P 500, Euro Stoxx 50, BET);
+    over h weeks f ~ N(0, h Sigma) (no autocovariances). Portfolio loss (log return,
+    factor-only approximation: idiosyncratic errors set to zero) L = -b'f, b = mean beta.
+    Most likely scenario with L = target: f* = -target Sigma b / (b' Sigma b); Mahalanobis distance target / sqrt(b' Sigma b)."""
     W = weekly_returns(ALL + ['SPX', 'SX5E', 'BET'])
     F = W[['SPX', 'SX5E', 'BET']]
     Xf = np.column_stack([np.ones(len(F)), F.values])
@@ -568,7 +568,7 @@ def reverse_stress(target=25.0, weeks=4):
     fstar = -target * S @ b / sb ** 2
     d = target / sb
     from scipy.stats import norm
-    # miscarile realizate ale factorilor in cele mai proaste 4 saptamani ale portofoliului (2020)
+    # realised factor moves in the worst 4 weeks of the portfolio (2020)
     port = W[ALL].mean(axis=1).rolling(weeks).sum()
     end = port.loc['2020'].idxmin()
     real = F.loc[:end].iloc[-weeks:].sum()
@@ -592,8 +592,8 @@ def fig_reverse(rv):
 
 
 # =============================================================================
-# STUDIU DE CAZ: ANDO, GREENWOOD-NIMMO & SHIN (2022), cifrele publicate:
-# Figura 4, Tabelul 3, Figura 13, Sectiunea 4.3
+# CASE STUDY: ANDO, GREENWOOD-NIMMO & SHIN (2022), figures reported in the paper:
+# Figure 4, Table 3, Figure 13, Section 4.3
 # =============================================================================
 AGS_FIG4 = {0.01: 88.18, 0.05: 77.17, 0.10: 72.20, 0.90: 73.34, 0.95: 79.36, 0.99: 91.77}
 AGS_MEAN = 56.57
@@ -603,7 +603,7 @@ AGS_FIG13 = {'S(0.95)': 0.51, 'S(0.05)': 0.15, 'RTD': 0.42}
 
 
 def fig_case_quantile_index():
-    """Indicele de transmitere pe intregul esantion, pe cuantile (Figura 4 din lucrare)."""
+    """Full-sample spillover index by quantile (Figure 4 of the paper)."""
     fig, ax = plt.subplots(figsize=(6.4, 3.0))
     left = [t for t in AGS_FIG4 if t < 0.5]
     right = [t for t in AGS_FIG4 if t > 0.5]
@@ -630,7 +630,7 @@ def fig_case_quantile_index():
 
 
 def fig_case_tail_corr():
-    """Corelatii publicate: indicii pe ferestre mobile (Tabelul 3) si cu CATFIN (Figura 13)."""
+    """Correlations reported in the paper: rolling indices (Table 3) and with CATFIN (Figure 13)."""
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.8))
     cols = {'S(0.95)': IDAred, 'S(0.05)': Forest, 'tails': Amber, 'RTD': Purple}
     k3 = list(AGS_TAB3)
@@ -661,7 +661,7 @@ def fig_case_tail_corr():
 
 
 # =============================================================================
-# RULARE
+# RUN
 # =============================================================================
 if __name__ == '__main__' and sys.argv[1:] == ['case']:
     fig_case_quantile_index()

@@ -1,11 +1,11 @@
 """
-Generator pentru toate graficele din Capitolul 5: Volatilitate conditionata, modele GARCH
-========================================================================================
-Toate graficele: fundal transparent, etichete ENG, legenda in afara, jos.
-Date zilnice: S&P 500, BET (2000-2026), BET-TR (2014-2026), Bitcoin (2014-2026), aur XAU/USD (2000-2026),
-EUR/RON: cursul oficial de referinta BNR (iulie 2005-2026); VIX pentru comparatie.
-Estimare: pachetul arch (verosimilitate maxima, erori standard robuste Bollerslev-Wooldridge).
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Charts of Chapter 5: Conditional Volatility, GARCH Models
+=========================================================
+All charts: transparent background, English labels, legend outside, at the bottom.
+Daily data: S&P 500, BET (2000-2026), BET-TR (2014-2026), Bitcoin (2014-2026), gold XAU/USD (2000-2026),
+EUR/RON: the official BNR reference rate (July 2005-2026); the VIX for comparison.
+Estimation: package arch (maximum likelihood, robust Bollerslev-Wooldridge standard errors).
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -25,7 +25,7 @@ from mfm_data import MARKETS, LABELS, pct_returns, periods_per_year, load_vix   
 from garch_tools import (fit_garch, half_life, news_impact, sign_bias_test, ljung_box, arch_lm,  # noqa: E402
                          ewma_variance, qlike, mz_regression, dm_test, DISTS, VOL_SPEC)
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -33,7 +33,7 @@ plt.rcParams['savefig.transparent'] = True
 plt.rcParams['axes.grid'] = False
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = ['Helvetica', 'Arial', 'DejaVu Sans']
-# fonturi dimensionate pentru slide-uri (graficele au 9--11 inch latime si se afiseaza pe 8--14 cm)
+# font sizes for slides (charts are 9-11 inches wide and shown at 8-14 cm)
 plt.rcParams['font.size'] = 12
 plt.rcParams['axes.labelsize'] = 13
 plt.rcParams['axes.titlesize'] = 13
@@ -47,7 +47,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 11
 
-# Culori brand
+# Chart colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -67,7 +67,7 @@ NUM = {}
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -76,7 +76,7 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
@@ -87,7 +87,7 @@ def acf(x, nlags):
 
 
 # =============================================================================
-# DATE
+# DATA
 # =============================================================================
 rets = {k: pct_returns(k) for k in MARKETS}
 PPY = {k: periods_per_year(rets[k]) for k in MARKETS}
@@ -96,7 +96,7 @@ MAIN = ['sp500', 'bet', 'btc', 'eurron', 'gold']
 
 
 # =============================================================================
-# 1. EFECTE ARCH IN RANDAMENTE (inainte de modelare)
+# 1. ARCH EFFECTS IN RETURNS (before modelling)
 # =============================================================================
 def arch_effects_table():
     rows = []
@@ -147,7 +147,7 @@ def fig_acf_r_r2():
 
 
 # =============================================================================
-# 2. ESTIMAREA PE TOATE SERIILE
+# 2. ESTIMATION ON ALL SERIES
 # =============================================================================
 def model_grid():
     rows, fits = [], {}
@@ -168,7 +168,7 @@ def model_grid():
 
 
 def garch_table(fits):
-    """GARCH(1,1)-t pe fiecare serie: parametri, erori robuste si clasice, persistenta, timp de injumatatire."""
+    """GARCH(1,1)-t on each series: parameters, robust and classical errors, persistence, half-life."""
     rows = []
     for k in ORDER:
         f = fits[(k, 'GARCH', 't')]
@@ -203,7 +203,7 @@ def asym_table(fits):
 
 
 # =============================================================================
-# 3. SIMULARE: DE CE PRODUCE GARCH GRUPAREA VOLATILITATII
+# 3. SIMULATION: WHY GARCH PRODUCES VOLATILITY CLUSTERING
 # =============================================================================
 def fig_simulation():
     n = 2000
@@ -230,7 +230,7 @@ def fig_simulation():
     h = [l for ax in axes for l in ax.get_lines() if not l.get_label().startswith('_')]
     fig.legend(h, [l.get_label() for l in h], loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=3, frameon=False)
     save_fig('ch5_simulation')
-    # statistici pe o traiectorie lunga (1 milion de zile), nu pe cele 2000 de zile din grafic
+    # statistics on a long path (one million days), not on the 2000 days of the chart
     N = 1_000_000
     zl = rng.standard_normal(N)
     xl = np.empty(N)
@@ -244,7 +244,7 @@ def fig_simulation():
 
 
 # =============================================================================
-# 4. S&P 500: VOLATILITATE CONDITIONATA SI VIX
+# 4. S&P 500: CONDITIONAL VOLATILITY AND THE VIX
 # =============================================================================
 def fig_sp500_vol(fits):
     f = fits[('sp500', 'GARCH', 't')]
@@ -273,7 +273,7 @@ def fig_covid(fits):
     vix = load_vix().loc[a:b]
     r = rets['sp500'].loc[a:b]
     fig, ax = plt.subplots(figsize=(9, 3.8))
-    ax.bar(r.index, np.abs(r.values) * ppy, color=Teal, alpha=0.45, width=1.0, label=r'$|r_t|\sqrt{252}$ (% p.a.)')
+    ax.bar(r.index, np.abs(r.values) * ppy, color=Teal, alpha=0.45, width=1.0, label=r'$|r_t|\sqrt{q}$ (% p.a.), $q$ = ' + f'{PPY["sp500"]:.1f}')
     ax.plot(g.sigma.loc[a:b] * ppy, color=MainBlue, label='GARCH(1,1)-t')
     ax.plot(j.sigma.loc[a:b] * ppy, color=IDAred, label='GJR-GARCH(1,1)-t')
     ax.plot(vix, color=Amber, label='VIX')
@@ -290,7 +290,7 @@ def fig_covid(fits):
 
 
 # =============================================================================
-# 5. PERSISTENTA SI TIMP DE INJUMATATIRE
+# 5. PERSISTENCE AND HALF-LIFE
 # =============================================================================
 def fig_persistence(gt):
     H = 250
@@ -310,7 +310,7 @@ def fig_persistence(gt):
 
 
 # =============================================================================
-# 6. ASIMETRIE: CURBA DE IMPACT A STIRILOR
+# 6. ASYMMETRY: THE NEWS IMPACT CURVE
 # =============================================================================
 def fig_nic(fits):
     eps = np.linspace(-6, 6, 241)
@@ -334,7 +334,7 @@ def fig_nic(fits):
 
 
 # =============================================================================
-# 7. INOVATII: CEL NORMAL NU AJUNGE
+# 7. INNOVATIONS: THE NORMAL DISTRIBUTION IS NOT ENOUGH
 # =============================================================================
 def fig_resid_density(fits):
     fn = fits[('sp500', 'GARCH', 'normal')]
@@ -377,7 +377,7 @@ def fig_resid_density(fits):
 
 
 # =============================================================================
-# 8. DIAGNOSTIC
+# 8. DIAGNOSTICS
 # =============================================================================
 def diagnostics(fits):
     rows = []
@@ -415,7 +415,7 @@ def fig_diag_acf(fits):
 
 
 # =============================================================================
-# 9. ALTE PIETE
+# 9. OTHER MARKETS
 # =============================================================================
 def fig_markets_vol(fits):
     fig, axes = plt.subplots(2, 2, figsize=(10, 5.2))
@@ -458,7 +458,7 @@ def fig_term_structure(fits, gt):
 
 
 # =============================================================================
-# 10. EVALUAREA PROGNOZELOR (S&P 500, IN AFARA ESANTIONULUI, 2016-2026)
+# 10. FORECAST EVALUATION (S&P 500, OUT OF SAMPLE, 2016-2026)
 # =============================================================================
 MODELS_OOS = [('GARCH', 'normal', 'GARCH-N'), ('GARCH', 't', 'GARCH-t'), ('GJR', 't', 'GJR-t'), ('EGARCH', 't', 'EGARCH-t')]
 
@@ -481,12 +481,12 @@ def oos_forecasts(k='sp500', first_year=2016, H=22):
             pos = idx.get_indexer(fc.index)
             out1[lab].iloc[pos + 1] = fc.iloc[:, 0].values
             if hh == H and lab in outH:
-                outH[lab].loc[fc.index] = fc.sum(axis=1).values      # varianta cumulata pe t+1..t+H, la originea t
+                outH[lab].loc[fc.index] = fc.sum(axis=1).values      # cumulative variance over t+1..t+H, at origin t
     ew = ewma_variance(r)
     hist = (r ** 2).rolling(20).mean().shift(1)
     out1['EWMA'] = ew.reindex(idx)
     out1['Hist-20'] = hist
-    outH['EWMA'] = (ew.shift(-1) * H).reindex(idx)       # prognoza EWMA este constanta in orizont
+    outH['EWMA'] = (ew.shift(-1) * H).reindex(idx)       # the EWMA forecast is flat across horizons
     f1 = pd.DataFrame(out1).loc[f'{first_year}-01-01':].dropna()
     fH = pd.DataFrame(outH).dropna()
     return f1, fH
@@ -506,7 +506,7 @@ def forecast_eval(k='sp500', first_year=2016, H=22):
                          dm_t=dm['t'], dm_p=dm['p'], mz_a=mz['a'], mz_b=mz['b'], mz_b_se=mz['b_se'], mz_r2=mz['r2'],
                          mz_wald_p=mz['wald_p']))
     t = pd.DataFrame(rows).set_index('model')
-    # orizont H: variante cumulate, origini nesuprapuse (din H in H zile)
+    # horizon H: cumulative variances, non-overlapping origins (every H days)
     rH = (r ** 2).rolling(H).sum().shift(-H)
     origins = fH.index[::H]
     rows = []
@@ -523,17 +523,17 @@ def forecast_eval(k='sp500', first_year=2016, H=22):
     tH.to_csv(os.path.join(TABLE_DIR, 'ch5_forecast_eval_22d.csv'))
     NUM['oos'] = {'start': str(f1.index[0].date()), 'end': str(f1.index[-1].date()), 'n': len(f1),
                   'n22': int(tH['n'].iloc[0])}
-    # grafic 1: prognoza vs |r|
+    # chart 1: forecast vs |r|
     ppy = np.sqrt(PPY[k])
     fig, ax = plt.subplots(figsize=(10, 3.6))
-    ax.scatter(f1.index, np.sqrt(proxy) * ppy, s=2, color=Teal, alpha=0.5, label=r'Realised proxy $|r_t|\sqrt{252}$')
+    ax.scatter(f1.index, np.sqrt(proxy) * ppy, s=2, color=Teal, alpha=0.5, label=r'Realised proxy $|r_t|\sqrt{q}$, $q$ = ' + f'{PPY[k]:.1f}')
     ax.plot(f1.index, np.sqrt(f1['GJR-t']) * ppy, color=IDAred, lw=0.7, label='GJR-GARCH-t one-day-ahead forecast')
     ax.plot(f1.index, np.sqrt(f1['EWMA']) * ppy, color=MainBlue, lw=0.6, alpha=0.8, label='EWMA ($\\lambda$ = 0.94)')
     ax.set_ylim(0, 110)
     ax.set_ylabel('Annualised volatility (%)')
     legend_outside_bottom(ax, ncol=3, y=-0.12)
     save_fig('ch5_forecast_oos')
-    # grafic 2: QLIKE relativ
+    # chart 2: relative QLIKE
     fig, ax = plt.subplots(figsize=(8.5, 3.6))
     order = t['qlike'].sort_values().index
     vals = t.loc[order, 'dm_diff']
@@ -547,7 +547,7 @@ def forecast_eval(k='sp500', first_year=2016, H=22):
     ax.axhline(0, color=Gray, lw=0.6)
     ax.set_ylabel('QLIKE minus GARCH-t\n(lower = better)')
     save_fig('ch5_qlike')
-    # grafic 3: Mincer-Zarnowitz pe 22 de zile, in logaritmi
+    # chart 3: 22-day Mincer-Zarnowitz, in logs
     fig, ax = plt.subplots(figsize=(7, 4))
     y, x = rH.reindex(origins), fH['GJR-t'].reindex(origins)
     okk = y.notna() & x.notna()
@@ -566,7 +566,7 @@ def forecast_eval(k='sp500', first_year=2016, H=22):
 
 
 # =============================================================================
-# 11. GARCH-IN-MEAN SI MEMORIE LUNGA
+# 11. GARCH-IN-MEAN AND LONG MEMORY
 # =============================================================================
 def garch_in_mean():
     r = rets['sp500']
@@ -611,7 +611,7 @@ def fig_long_memory(fits):
 
 
 # =============================================================================
-# 12. EXEMPLU LUCRAT: RECURSIA SI PROGNOZA PAS CU PAS (S&P 500, ultima zi)
+# 12. WORKED EXAMPLE: THE RECURSION AND THE FORECAST STEP BY STEP (S&P 500, last day)
 # =============================================================================
 def worked_example(fits):
     f = fits[('sp500', 'GARCH', 't')]

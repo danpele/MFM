@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), BET, Bitcoin (BTC-USD.CC); EUR/RON: BNR reference rate'
+Datafile: 'Daily closes from the course data: S&P 500, BET, Bitcoin; EUR/RON: BNR reference rate'
 
 Output: 'ch8_four_assets.pdf'

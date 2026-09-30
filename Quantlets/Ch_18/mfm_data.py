@@ -23,7 +23,7 @@ MARKET_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'
 START = '2010-01-01'
 END = '2026-09-18'
 
-# banca -> (simbol, nume, regiune)
+# bank -> (symbol, name, region)
 BANKS = {
     'JPM':  ('JPM.US',    'JPMorgan Chase',       'US'),
     'BAC':  ('BAC.US',    'Bank of America',      'US'),
@@ -50,7 +50,7 @@ REGION_INDEX = {'US': 'SPX', 'EU': 'SX5E', 'RO': 'BET'}
 
 
 def read_market(symbol):
-    """Citeste data/market/<SIMBOL>.csv local sau din repo-ul GitHub."""
+    """Read the daily price series of one symbol from the course data."""
     fname = f'{symbol}.csv'
     path = os.path.join(MARKET_DIR, fname)
     src = path if os.path.exists(path) else REPO_RAW + fname
@@ -58,14 +58,14 @@ def read_market(symbol):
 
 
 def bank_frame(key, start=START, end=END):
-    """OHLCV al unei banci, cu pretul ajustat si corectiile de mai sus."""
+    """Daily prices and volume of one bank, with the adjusted price and the corrections above."""
     symbol, _, region = BANKS[key]
     d = read_market(symbol).loc[start:end].copy()
     d = d[(d.index.dayofweek < 5) & (d['adjusted_close'] > 0)]
     if region == 'RO':
-        d = d[d['volume'] > 0]                                   # zile fara tranzactii
+        d = d[d['volume'] > 0]                                   # days without trades
     if key == 'TLV' and pd.Timestamp('2016-05-30') in d.index:
-        # ajustarea pentru actiunile gratuite: factorul de dupa data ex se aplica si pe 30 mai 2016
+        # bonus-share adjustment: the post-ex-date factor also applies on 30 May 2016
         f = d.loc['2016-05-31', 'adjusted_close'] / d.loc['2016-05-31', 'close']
         d.loc['2016-05-30', 'adjusted_close'] = d.loc['2016-05-30', 'close'] * f
     return d
@@ -79,34 +79,34 @@ def index_close(key, start=START, end=END):
     s = read_market(INDICES[key][0])['close'].loc[start:end]
     s = s[(s.index.dayofweek < 5) & (s > 0)].dropna()
     if key != 'VIX':
-        s = s[s.diff() != 0]                                     # sarbatori completate cu pretul anterior
+        s = s[s.diff() != 0]                                     # holidays filled with the previous price
     return s.rename(key)
 
 
 def prices(keys, start=START, end=END):
-    """Preturi zilnice pentru banci si/sau indici, doar in zilele comune."""
+    """Daily prices of banks and/or indices, on common trading days only."""
     cols = [bank_price(k, start, end) if k in BANKS else index_close(k, start, end) for k in keys]
     return pd.concat(cols, axis=1, join='inner').dropna()
 
 
 def joint_returns(keys, start=START, end=END):
-    """Randamente log zilnice in %: intai join pe PRETURI in zilele comune, apoi randamente."""
+    """Daily log returns in %: prices are aligned on common trading days first, then returns are computed."""
     return 100 * np.log(prices(keys, start, end)).diff().dropna()
 
 
 def bank_range_vol(keys, start=START, end=END):
-    """Volatilitatea zilnica Parkinson (in %, anualizata), in zilele comune tuturor bancilor."""
+    """Daily Parkinson volatility (in %, annualised), on the days common to all banks."""
     out = []
     for k in keys:
         d = bank_frame(k, start, end)
         rng = np.log(d['high'] / d['low']).where(d['high'] > d['low'])
         s2 = rng ** 2 / (4 * np.log(2))
-        floor = s2.where(s2 > 0).cummin().ffill()                  # cea mai mica valoare pozitiva observata PANA la ziua t
-        s2 = s2.fillna(floor)                                     # zile cu maxim = minim: fara look-ahead bias
+        floor = s2.where(s2 > 0).cummin().ffill()                  # smallest positive value observed UP TO day t
+        s2 = s2.fillna(floor)                                     # days with high = low: no look-ahead bias
         out.append((100 * np.sqrt(252 * s2)).rename(k))
     return pd.concat(out, axis=1, join='inner').dropna()
 
 
 def system_return(R, members):
-    """Randamentul sistemului: portofoliul cu ponderi egale al bancilor (randamente log in %, aproximare zilnica)."""
+    """System return: equal-weighted portfolio of the banks (log returns in %, daily approximation)."""
     return R[members].mean(axis=1)

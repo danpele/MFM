@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Monday, 21 September 2026'
 
-Datafile: 'Daily market data (data/market in the MFM repository); DefiLlama stablecoin supply'
+Datafile: 'Daily market data from the MFM course repository; DefiLlama stablecoin supply'
 
 Output: 'ch0_stablecoins.pdf, ch0_usdt_peg.pdf, ch0_ibit.pdf'

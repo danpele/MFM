@@ -30,16 +30,16 @@ R = joint_returns(['spy', 'tlt'])
 rep = {'rho_pre': float(R.loc[:'2021-12-31'].corr().iloc[0, 1]),
        'rho_post': float(R.loc['2022-01-01':].corr().iloc[0, 1])}
 
-# corelatia realizata lunara (cel putin 15 zile in luna)
+# monthly realised correlation (at least 15 days in the month)
 g = R.groupby(R.index.to_period('M'))
 rho_m = g.apply(lambda x: x['spy'].corr(x['tlt']) if len(x) >= 15 else np.nan).dropna()
-rho_m = rho_m.iloc[1:-1] if rho_m.index[-1] >= pd.Period('2026-09', 'M') else rho_m.iloc[1:]  # fara lunile incomplete
+rho_m = rho_m.iloc[1:-1] if rho_m.index[-1] >= pd.Period('2026-09', 'M') else rho_m.iloc[1:]  # without incomplete months
 z_m = np.arctanh(rho_m)
 
 cpi = pd.read_csv('https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL', index_col=0, parse_dates=True).iloc[:, 0]
 cpi.index = cpi.index.to_period('M')
 infl = 100 * (cpi / cpi.shift(12) - 1)
-x = infl.shift(2).reindex(z_m.index)        # inflatia publicata inainte de inceputul lunii t
+x = infl.shift(2).reindex(z_m.index)        # inflation published before the start of month t
 df = pd.DataFrame({'z': z_m, 'rho': rho_m, 'infl': x}).dropna()
 
 
@@ -59,8 +59,8 @@ res = {'replicate': rep,
 
 
 def fig_ai_inflation(df, res):
-    """Corelatia lunara SPY-TLT fata de inflatia cunoscuta la inceputul lunii, inainte si dupa 2022, cu dreptele
-    estimate (pe scara Fisher, transformate inapoi) si intervalele HAC de 95% ale pantei."""
+    """Monthly SPY-TLT correlation against the inflation known at the start of the month, before and after 2022, with the
+    fitted lines (on the Fisher scale, transformed back) and the 95% HAC intervals of the slope."""
     fig, axes = plt.subplots(2, 1, figsize=(5.6, 4.2), gridspec_kw=dict(height_ratios=[2.2, 1]))
     ax = axes[0]
     pre = df.index <= pd.Period('2021-12', 'M')

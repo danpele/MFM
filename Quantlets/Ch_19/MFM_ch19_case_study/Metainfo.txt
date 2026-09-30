@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Daily market data (data/market): BET index (official closing values), Bitcoin, SPY'
+Datafile: 'Daily market data (course data): BET index (official closing values), Bitcoin, SPY'
 
 Output: 'ch19_bet_facts.pdf, ch19_bet_garch.pdf, ch19_bet_var.pdf, ch19_breach_rates.pdf, ch19_rolling_breaches.pdf, ch19_lookahead.pdf, ch19_kupiec_power.pdf, ch19_results.json'

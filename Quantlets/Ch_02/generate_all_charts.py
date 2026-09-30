@@ -21,7 +21,7 @@ from mfm_data import MARKETS, LABELS, GROUPS, load_close, log_returns, complete_
 from eff_tests import (variance_ratio, chow_denning, runs_test, robust_ljung_box, rs_hurst,  # noqa: E402
                        lo_modified_rs, dfa_hurst, rolling_stat)
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -40,7 +40,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Chart colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -59,7 +59,7 @@ SEED = 42
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -68,7 +68,7 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
@@ -111,7 +111,7 @@ def efficiency_table():
 # FIG 1: Care serie este reala? (Roberts, 1959)
 # =============================================================================
 def fig_random_walk_game(seed=7):
-    """S&P 500 2010-2026 printre trei mersuri aleatoare cu acelasi drift si aceeasi volatilitate."""
+    """S&P 500 2010-2026 among three random walks with the same drift and volatility."""
     p = load_close('sp500', start='2010-01-01')
     r = np.log(p).diff().dropna()
     rng = np.random.default_rng(seed)
@@ -246,7 +246,7 @@ def fig_hurst_rs():
 # FIG 6: Exponentul DFA pe piete, cu banda de amestecare (ipoteza i.i.d.)
 # =============================================================================
 def shuffle_band(r, func, n_sim=200, seed=SEED):
-    """Banda 95% din permutari: distruge ORICE dependenta (inclusiv gruparea volatilitatii)."""
+    """95% band from permutations: destroys ALL dependence (including volatility clustering)."""
     rng = np.random.default_rng(seed)
     x = np.asarray(r, dtype=float)
     sims = [func(rng.permutation(x)) for _ in range(n_sim)]
@@ -254,8 +254,8 @@ def shuffle_band(r, func, n_sim=200, seed=SEED):
 
 
 def wild_band(r, func, n_sim=199, seed=SEED):
-    """Banda 95% wild bootstrap: semne Rademacher pe randamentele centrate.
-    Pastreaza traiectoria volatilitatii |e_t| (permisa sub RW3), distruge autocorelatia randamentelor."""
+    """95% wild-bootstrap band: Rademacher signs on the demeaned returns.
+    Keeps the volatility path |e_t| (allowed under RW3), destroys the autocorrelation of returns."""
     rng = np.random.default_rng(seed)
     e = np.asarray(r, dtype=float)
     e = e - e.mean()
@@ -314,8 +314,8 @@ def fig_rolling_vr():
 
 
 def fig_rolling_hurst(n_sim=199):
-    """DFA pe ferestre mobile; banda nula wild bootstrap calculata separat pentru FIECARE fereastra
-    (pastreaza volatilitatea ferestrei, permisa sub RW3). Pentru comparatie: banda i.i.d. Student-t4."""
+    """Rolling DFA; wild-bootstrap null band computed separately for EACH window
+    (keeps the window's volatility, allowed under RW3). For comparison: the i.i.d. Student-t4 band."""
     rng = np.random.default_rng(SEED)
     null = [dfa_hurst(rng.standard_t(4, WINDOW))[0] for _ in range(300)]
     lo_t, hi_t = np.percentile(null, [2.5, 97.5])
@@ -392,13 +392,13 @@ DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
 
 
 def dow_regression(r):
-    """Randament zilnic pe variabile dummy pentru zilele saptamanii (fara constanta), erori Newey-West."""
+    """Daily return on weekday dummies (no constant), Newey-West errors."""
     r = complete_months(r)
     X = pd.get_dummies(r.index.dayofweek).astype(float)
     X.columns = DAYS
     X.index = r.index
     res = sm.OLS(r * 1e4, X).fit(cov_type='HAC', cov_kwds={'maxlags': 5})
-    # testul egalitatii mediilor (Wald), cu aceleasi erori HAC
+    # Wald test of equal means, with the same HAC errors
     R = np.zeros((4, 5))
     for i in range(4):
         R[i, 0], R[i, i + 1] = 1, -1
@@ -414,7 +414,7 @@ def january_regression(r):
 
 
 def turn_of_month(r):
-    """Dummy pentru ultima zi de tranzactionare a lunii si primele trei zile ale lunii urmatoare (Ariel, 1987)."""
+    """Dummy for the last trading day of the month and the first three days of the next month (Ariel, 1987)."""
     d = pd.DataFrame({'r': complete_months(r) * 1e4})
     ym = d.index.to_period('M')
     rank = d.groupby(ym).cumcount()
@@ -462,7 +462,7 @@ def fig_calendar():
 # FIG 11: Testarea multipla -- anomalii false pe date reale
 # =============================================================================
 def fig_multiple_testing(n_rules=2000, seed=SEED):
-    """Reguli de calendar aleatoare pe S&P 500: fiecare alege la intamplare 20% din zile ca 'zile bune'."""
+    """Random calendar rules on the S&P 500: each picks 20% of the days at random as 'good days'."""
     rng = np.random.default_rng(seed)
     r = rets['sp500'] * 1e4
     x = r.values
@@ -498,10 +498,10 @@ def tsmom_table():
     for k in [m for m in ORDER if m != 'eurron']:
         p = complete_months(load_close(k))
         pm = p.resample('ME').last()
-        m = np.log(pm).diff().dropna()                          # randamente log lunare: doar pentru semnal
-        R = pm.pct_change().dropna()                            # randamente simple: castigul pozitiei
-        sig = np.sign(m.rolling(12).sum().shift(1))            # semnul randamentului pe ultimele 12 luni
-        s = (sig * R).dropna()                                  # long +1 / short -1, inainte de finantare si costuri
+        m = np.log(pm).diff().dropna()                          # monthly log returns: for the signal only
+        R = pm.pct_change().dropna()                            # simple returns: the position's payoff
+        sig = np.sign(m.rolling(12).sum().shift(1))            # sign of the past 12-month return
+        s = (sig * R).dropna()                                  # long +1 / short -1, before funding and costs
         res = sm.OLS(s * 100, np.ones(len(s))).fit(cov_type='HAC', cov_kwds={'maxlags': 6})
         bh = R.loc[s.index]
         rows.append(dict(market=LABELS[k], group=GROUPS[k], months=len(s),

@@ -25,7 +25,7 @@ REPO_RAW = 'https://raw.githubusercontent.com/danpele/MFM/main/data/market/'
 MARKET_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'data', 'market')
 END = '2026-09-18'
 
-# nume -> (simbol, eticheta, grup, data de start, zile pe an)
+# name -> (symbol, label, group, start date, days per year)
 MARKETS = {
     'sp500':  ('GSPC.INDX',     'S&P 500 (US)',          'Developed', '2000-01-01', 252),
     'stoxx':  ('STOXX50E.INDX', 'Euro Stoxx 50',         'Developed', '2000-01-01', 252),
@@ -53,7 +53,7 @@ _CACHE = {}
 
 
 def read_market(symbol):
-    """Citeste data/market/<SIMBOL>.csv local sau din repo-ul GitHub."""
+    """Daily price table of one series (local copy of the course data, otherwise the GitHub repository)."""
     fname = f'{symbol}.csv'
     path = os.path.join(MARKET_DIR, fname)
     src = path if os.path.exists(path) else REPO_RAW + fname
@@ -61,7 +61,7 @@ def read_market(symbol):
 
 
 def read_reference_rate(currency='EUR', start='2005-07-01', end=END):
-    """Cursul oficial de referinta RON (arhive XML anuale BNR)."""
+    """Official RON reference rate (BNR annual XML archives)."""
     key = (currency, start, end)
     if key in _CACHE:
         return _CACHE[key]
@@ -81,7 +81,7 @@ def read_reference_rate(currency='EUR', start='2005-07-01', end=END):
 
 
 def load_close(name, start=None, end=END):
-    """Pretul de inchidere zilnic, curatat dupa conventiile capitolului."""
+    """Daily closing price, cleaned with the chapter conventions."""
     symbol, _, group, start0, _ = MARKETS[name]
     start = start or start0
     if symbol.startswith('REF:'):
@@ -89,14 +89,14 @@ def load_close(name, start=None, end=END):
     s = read_market(symbol)['close'].loc[start:end]
     s = s[s > 0].dropna()
     if group != 'Crypto':
-        s = s[s.index.dayofweek < 5]          # fara cotatii de weekend
-        s = s[s.diff() != 0]                  # fara sarbatori completate cu pretul anterior
+        s = s[s.index.dayofweek < 5]          # no weekend quotes
+        s = s[s.diff() != 0]                  # no holidays filled with the previous price
     return s.rename(name)
 
 
 def complete_months(x):
-    """Elimina luna finala incompleta (ultima observatie inainte de ultima zi lucratoare a lunii):
-    analizele lunare si efectul schimbarii lunii folosesc doar luni complete."""
+    """Drop the incomplete final month (last observation before the last business day of the month):
+    the monthly analyses and the turn-of-the-month effect use complete months only."""
     last = x.index[-1]
     if last + pd.offsets.BMonthEnd(0) != last:
         x = x[x.index < last.to_period('M').start_time]
@@ -104,7 +104,7 @@ def complete_months(x):
 
 
 def log_returns(name, start=None, end=END):
-    """Randamente log pe calendarul propriu al seriei."""
+    """Log returns on the series' own calendar."""
     return np.log(load_close(name, start, end)).diff().dropna().rename(name)
 
 
@@ -121,8 +121,8 @@ def _get(url, timeout=120, agent='Mozilla/5.0'):
 
 
 def shiller():
-    """S&P Composite lunar (datele publice ale lui Robert J. Shiller): P = media lunara a preturilor,
-    D = dividendele pe 12 luni (nominale)."""
+    """Monthly S&P Composite (Robert J. Shiller's public data): P = monthly average price,
+    D = trailing 12-month dividends (nominal)."""
     if 'shiller' in _CACHE:
         return _CACHE['shiller']
     urls = []
@@ -151,7 +151,7 @@ def shiller():
 
 
 def fred(series):
-    """Serie FRED (fara cheie), ca pd.Series cu indice la sfarsit de luna."""
+    """FRED series (no API key), as a pd.Series indexed at month ends."""
     d = pd.read_csv(io.BytesIO(_get(FRED + series, agent='Python-urllib')), index_col=0, parse_dates=True)
     s = pd.to_numeric(d.iloc[:, 0], errors='coerce').dropna()
     s.index = s.index + pd.offsets.MonthEnd(0)
@@ -159,16 +159,16 @@ def fred(series):
 
 
 def sp500_monthly(end='2026-08-31'):
-    """S&P 500 lunar, P (media lunara) si D (dividende pe 12 luni), prelungit pana la `end`.
-    Prelungire (splicing): P = media lunara a inchiderilor zilnice GSPC.INDX; D = dividendele pe 12 luni
-    ale SPY.US (din adjusted_close si close), scalate cu raportul mediu D_Shiller / D_SPY pe ultimele 12 luni comune."""
+    """Monthly S&P 500, P (monthly average) and D (trailing 12-month dividends), extended to `end`.
+    Splicing: P = monthly average of the daily S&P 500 closes; D = trailing 12-month dividends of the SPY fund
+    (from the adjusted and unadjusted closes), scaled by the mean ratio D_Shiller / D_SPY over the last 12 common months."""
     sh = shiller()
     spx = read_market('GSPC.INDX')['close']
     P_ext = spx.resample('ME').mean()
     spy = read_market('SPY.US')
     tr = spy['adjusted_close'] / spy['adjusted_close'].shift(1)
     div = (tr * spy['close'].shift(1) - spy['close']).clip(lower=0)
-    div[div < 1e-3 * spy['close']] = 0.0                       # doar zilele ex-dividend
+    div[div < 1e-3 * spy['close']] = 0.0                       # ex-dividend days only
     D_spy = div.resample('ME').sum().rolling(12).sum()
     common = sh.index.intersection(D_spy.dropna().index)[-12:]
     kP = float((sh.loc[common, 'P'] / P_ext.loc[common]).mean())

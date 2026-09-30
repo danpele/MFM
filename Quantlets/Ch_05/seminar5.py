@@ -1,18 +1,18 @@
 """
-seminar5.py -- Cifrele Seminarului 5 (MFM): modele GARCH
-=======================================================
-  A1  recursia GARCH(1,1) si prognoza pas cu pas (exemplu numeric)
-  B2  GJR vs GARCH pe S&P 500 si pe BET: testul raportului de verosimilitate, AIC/BIC
-  B4  Bitcoin: Student-t vs t asimetric (Hansen, 1994) vs GED
-  B6  BET: comparatia prognozelor (QLIKE, Diebold-Mariano, Mincer-Zarnowitz), 2016-2026
-  B7/B8 bootstrap parametric: incertitudinea persistentei si a timpului de injumatatire (S&P 500, BET),
-        testul IGARCH prin bootstrap sub H0
-  C   Volatilitatea BET si socurile S&P 500 din ziua precedenta: GARCH-t cu regresor in varianta
-  seminar_charts()  graficele ch5_sem_* pentru fiecare rezolvare (A1-A6, B1-B8, C1-C3) si cifrele lor
-                    (ch5_seminar_charts.json); extragerile bootstrap se pastreaza in ch5_sem_draws.npz
-Rulare: python seminar5.py (tot) sau python seminar5.py charts [quick] (doar graficele, din cifrele salvate)
+seminar5.py -- numbers of Seminar 5 (MFM): GARCH models
+========================================================
+  A1  the GARCH(1,1) recursion and the step-by-step forecast (numerical example)
+  B2  GJR vs GARCH on the S&P 500 and the BET: likelihood ratio test, AIC/BIC
+  B4  Bitcoin: Student-t vs skewed-t (Hansen, 1994) vs GED
+  B6  BET: forecast comparison (QLIKE, Diebold-Mariano, Mincer-Zarnowitz), 2016-2026
+  B7/B8 parametric bootstrap: uncertainty of the persistence and the half-life (S&P 500, BET),
+        and the IGARCH test by bootstrap under H0
+  C1  BET volatility and the previous-day S&P 500 shocks: GARCH-t with a regressor in the variance
+  seminar_charts()  the ch5_sem_* charts for every solution (A1-A6, B1-B8, C1-C3) and their numbers
+                    (ch5_seminar_charts.json); the bootstrap draws are kept in ch5_sem_draws.npz
+Run: python seminar5.py (everything) or python seminar5.py charts [quick] (charts only, from the saved numbers)
 
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -44,7 +44,7 @@ DRAWS = {}                     # bootstrap draws kept for the seminar charts (B7
 
 
 # -----------------------------------------------------------------------------
-# A1. Recursia si prognoza pas cu pas
+# A1. The recursion and the step-by-step forecast
 # -----------------------------------------------------------------------------
 def a1_recursion():
     om, al, be = 0.05, 0.10, 0.85
@@ -77,7 +77,7 @@ def lr_tests():
 
 
 # -----------------------------------------------------------------------------
-# B4. Bitcoin: distributia inovatiilor
+# B4. Bitcoin: the innovation distribution
 # -----------------------------------------------------------------------------
 def btc_innovations():
     r = rets['btc']
@@ -100,7 +100,7 @@ def btc_innovations():
 
 
 # -----------------------------------------------------------------------------
-# B5/B6. Comparatia prognozelor
+# B5/B6. Forecast comparison
 # -----------------------------------------------------------------------------
 def forecast_comparison(k):
     r = rets[k]
@@ -118,12 +118,12 @@ def forecast_comparison(k):
 
 
 # -----------------------------------------------------------------------------
-# B7/B8. Bootstrap parametric si testul IGARCH simulat sub H0
+# B7/B8. Parametric bootstrap and the IGARCH test simulated under H0
 # -----------------------------------------------------------------------------
 def tgarch_negll(theta, r, igarch=False):
-    """Minus log-verosimilitatea GARCH(1,1)-t cu medie constanta mu.
-    Parametrizare: p = alpha + beta in [0, 1], s = alpha / p in [0, 1]; IGARCH: p = 1.
-    Pornirea ca in arch: sigma^2_0 = eps^2_0 = media ponderata EWMA (0.94) a primelor 75 de patrate."""
+    """Minus the log-likelihood of GARCH(1,1)-t with constant mean mu.
+    Parametrisation: p = alpha + beta in [0, 1], s = alpha / p in [0, 1]; IGARCH: p = 1.
+    Start as in arch: sigma^2_0 = eps^2_0 = EWMA-weighted mean (0.94) of the first 75 squares."""
     if igarch:
         mu, om, s, nu = theta
         p = 1.0
@@ -142,8 +142,8 @@ def tgarch_negll(theta, r, igarch=False):
 
 
 def fit_tgarch(r, igarch=False, start=None):
-    """GARCH(1,1)-t (sau IGARCH(1,1)-t, alpha + beta = 1) prin verosimilitate proprie, cu restrictia alpha + beta <= 1.
-    Modelul nerestrictionat se porneste si din solutia IGARCH: l_GARCH >= l_IGARCH, deci LR >= 0."""
+    """GARCH(1,1)-t (or IGARCH(1,1)-t, alpha + beta = 1) by our own likelihood, with the restriction alpha + beta <= 1.
+    The unrestricted model is also started from the IGARCH solution: l_GARCH >= l_IGARCH, so LR >= 0."""
     r = np.asarray(r, dtype=float)
     m, v = np.mean(r), np.var(r)
     opts = {'ftol': 1e-12, 'gtol': 1e-7, 'maxiter': 3000}
@@ -166,7 +166,7 @@ def fit_tgarch(r, igarch=False, start=None):
 
 
 def sim_tgarch(par, n, B, rng, s2_start, burn=500):
-    """B traiectorii GARCH(1,1)-t simultan (vectorizat pe coloane); functioneaza si pentru alpha + beta = 1."""
+    """B GARCH(1,1)-t paths at once (vectorised over columns); also works for alpha + beta = 1."""
     nu = par['nu']
     z = rng.standard_t(nu, size=(n + burn, B)) * np.sqrt((nu - 2) / nu)
     s2 = np.full(B, s2_start)
@@ -179,7 +179,7 @@ def sim_tgarch(par, n, B, rng, s2_start, burn=500):
 
 
 def param_bootstrap(k, B=999):
-    """Bootstrap parametric: B traiectorii din GARCH(1,1)-t estimat, reestimate; intervale percentile."""
+    """Parametric bootstrap: B paths from the fitted GARCH(1,1)-t, re-estimated; percentile intervals."""
     from joblib import Parallel, delayed
     r = rets[k]
     f = fit_garch(r, 'GARCH', 't')
@@ -191,14 +191,14 @@ def param_bootstrap(k, B=999):
     fits = Parallel(n_jobs=-1)(delayed(fit_tgarch)(sims[:, b], False, st) for b in range(B))
     pers = np.array([x['pers'] for x in fits])
     hls = np.array([half_life(x) for x in pers])
-    hq = np.sort(hls)                                          # np.inf pastrat: persistenta la limita 1
+    hq = np.sort(hls)                                          # np.inf kept: persistence at the bound 1
     DRAWS[f'boot_pers_{k}'] = pers
     est = p['alpha[1]'] + p['beta[1]']
     OUT[f'boot_{k}'] = {'B': B, 'est': float(est), 'hl': float(half_life(est)),
                         'pers_lo': float(np.quantile(pers, 0.025)), 'pers_hi': float(np.quantile(pers, 0.975)),
                         'pers_sd': float(pers.std()), 'pers_mean': float(pers.mean()),
                         'hl_lo': float(np.quantile(hq, 0.025)), 'hl_med': float(np.median(hq)),
-                        # h(p) este crescatoare: capatul superior este h(cuantila 97,5% a lui p), infinit daca p = 1
+                        # h(p) is increasing: the upper end is h(97.5% quantile of p), infinite if p = 1
                         'hl_hi': float(half_life(np.quantile(pers, 0.975))), 'share_inf': float((pers >= 1 - 1e-6).mean()),
                         'share_ge_0999': float((pers >= 0.999).mean()),
                         'se_robust_sum': float(np.sqrt(f.res.param_cov.loc[['alpha[1]', 'beta[1]'], ['alpha[1]', 'beta[1]']].values.sum()))}
@@ -211,8 +211,8 @@ def _null_rep(y):
 
 
 def igarch_test(k, B=999):
-    """Testul H0: alpha + beta = 1 (IGARCH) prin bootstrap parametric SUB H0 (Andrews, 2000: un interval percentile
-    trunchiat la 1 nu este un test valid). Statistici: persistenta estimata si LR = 2(l_GARCH - l_IGARCH)."""
+    """Test of H0: alpha + beta = 1 (IGARCH) by parametric bootstrap UNDER H0 (Andrews, 2000: a percentile interval
+    truncated at 1 is not a valid test). Statistics: the estimated persistence and LR = 2(l_GARCH - l_IGARCH)."""
     from joblib import Parallel, delayed
     r = rets[k]
     u = fit_tgarch(r)
@@ -233,7 +233,7 @@ def igarch_test(k, B=999):
 
 
 def fig_bootstrap(boots, nulls):
-    """Distributia bootstrap a persistentei: din modelul estimat si sub H0 (IGARCH)."""
+    """Bootstrap distribution of the persistence: from the fitted model and under H0 (IGARCH)."""
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.6))
     for ax, (k, lab, col) in zip(axes, [('sp500', 'S&P 500', MainBlue), ('bet', 'BET', IDAred)]):
         bins = np.linspace(min(boots[k].min(), nulls[k].min()), 1.0, 40)
@@ -247,11 +247,11 @@ def fig_bootstrap(boots, nulls):
 
 
 # -----------------------------------------------------------------------------
-# C. BET si socurile S&P 500: GARCH-t cu regresor in varianta (verosimilitate proprie)
+# C1. BET and the S&P 500 shocks: GARCH-t with a regressor in the variance (own likelihood)
 # -----------------------------------------------------------------------------
 def join_bet_sp():
-    """Join pe PRETURI in zilele comune, apoi randamente; socul american relevant pentru BET in ziua t
-    este randamentul S&P 500 din ziua comuna precedenta (bursa americana inchide dupa BVB)."""
+    """Align PRICES on common days, then take returns; the US shock relevant for the BET on day t
+    is the S&P 500 return of the previous common day (the US market closes after the BVB)."""
     px = pd.concat([load_close('bet'), load_close('sp500')], axis=1, join='inner').dropna()
     ret = 100 * np.log(px).diff().dropna()
     df = pd.DataFrame({'bet': ret['bet'], 'us_lag': ret['sp500'].shift(1)}).dropna()
@@ -267,8 +267,8 @@ def spill_negll(theta, y, x, delta_free=True):
         return 1e10
     e = y - mu - phi * x
     n = len(y)
-    # s2_t = beta s2_{t-1} + (omega + alpha e_{t-1}^2 + delta u_{t-1}^2): filtru liniar recursiv;
-    # x_t = u_{t-1} (randamentul S&P 500 din ziua comuna precedenta), deci regresorul din dispersie este x_t^2
+    # s2_t = beta s2_{t-1} + (omega + alpha e_{t-1}^2 + delta u_{t-1}^2): a linear recursive filter;
+    # x_t = u_{t-1} (the S&P 500 return of the previous common day), so the variance regressor is x_t^2
     drive = np.empty(n)
     drive[0] = np.var(y) * (1 - be)
     drive[1:] = om + al * e[:-1] ** 2 + de * x[1:] ** 2
@@ -297,7 +297,7 @@ def fit_spill(df, delta_free=True):
 
 
 def spill_path(df, par):
-    """Dispersia conditionata a BET si partea datorata socului american din ziua precedenta."""
+    """Conditional variance of the BET and the part due to the previous-day US shock."""
     y, x = df['bet'].values, df['us_lag'].values
     e = y - par['mu'] - par['phi'] * x
     n = len(y)
@@ -307,7 +307,7 @@ def spill_path(df, par):
     s2 = lfilter([1.0], [1.0, -par['beta']], drive)
     us = np.zeros(n)
     us[1:] = par['delta'] * x[1:] ** 2
-    # contributia cumulata a termenului american prin recursia beta: sum_j beta^j delta u_{t-1-j}^2
+    # cumulative contribution of the US term through the beta recursion: sum_j beta^j delta u_{t-1-j}^2
     us_total = lfilter([1.0], [1.0, -par['beta']], us)
     return pd.DataFrame({'s2': s2, 'us': us_total}, index=df.index)
 
@@ -320,7 +320,7 @@ def part_c():
         u = fit_spill(sub, True)
         rr = fit_spill(sub, False)
         lr = 2 * (u['loglik'] - rr['loglik'])
-        # delta >= 0: sub ipoteza nula parametrul este pe frontiera -> 0.5 chi2(0) + 0.5 chi2(1)
+        # delta >= 0: under the null the parameter is on the boundary -> 0.5 chi2(0) + 0.5 chi2(1)
         p = 0.5 * (1 - stats.chi2.cdf(max(lr, 0), 1))
         x2 = (sub['us_lag'] ** 2).mean()
         share = u['delta'] * x2 / (u['omega'] + u['delta'] * x2)
@@ -343,8 +343,8 @@ def part_c():
 
 
 # =============================================================================
-# GRAFICELE SEMINARULUI: cel putin unul pentru fiecare rezolvare (derivari A, calcule B, proiecte C)
-# Cifrele folosite pe slide-uri se salveaza in ch5_seminar_charts.json (CH).
+# SEMINAR CHARTS: at least one per solution (A derivations, B computations, C projects)
+# The numbers used on the slides are saved in ch5_seminar_charts.json (CH).
 # =============================================================================
 CH = {}
 DRAW_FILE = os.path.join(HERE, 'ch5_sem_draws.npz')
@@ -352,7 +352,7 @@ INF_FILE = os.path.join(HERE, 'ch5_inference.json')
 
 
 def _fig_legend(fig, axes, ncol=3, y=0.0):
-    """Legenda comuna, in afara graficului, jos (fara duplicate)."""
+    """Common legend, outside the plot, at the bottom (no duplicates)."""
     h, l = [], []
     for ax in np.atleast_1d(axes):
         for hh, ll in zip(*ax.get_legend_handles_labels()):
@@ -362,7 +362,7 @@ def _fig_legend(fig, axes, ncol=3, y=0.0):
 
 
 def _inf():
-    """Rezultatele din inference5.py (local sau din repository-ul cursului)."""
+    """Results of inference5.py (local or from the course repository)."""
     if os.path.exists(INF_FILE):
         with open(INF_FILE) as fh:
             return json.load(fh)
@@ -372,7 +372,7 @@ def _inf():
 
 
 def setup_check():
-    """Fisierele, filtrele si primele randamente (slide-ul de pregatire)."""
+    """Series, filters and first returns (the setup slide)."""
     out = {}
     for k in ['sp500', 'bet', 'btc']:
         sym, _, group, start = MARKETS[k]
@@ -469,7 +469,7 @@ def fig_a2():
     f = pdf(z)
     fig, axes = plt.subplots(1, 3, figsize=(11, 3.2))
     ax = axes[0]
-    ax.plot(z, f, color=MainBlue, label=r'Skewed-t density $f(z)$, $\hat\eta$ = %.2f, $\hat\lambda$ = %.3f' % (g['eta'], g['lam']))
+    ax.plot(z, f, color=MainBlue, label=r'Skewed-t density $f(z)$, $\hat\nu$ = %.2f, $\hat\lambda$ = %.3f' % (g['eta'], g['lam']))
     ax.fill_between(z[z <= 0], f[z <= 0], color=IDAred, alpha=0.3, label=f'$P(z<0)$ = {p_neg:.3f}')
     ax.set_xlabel('$z$')
     ax.set_title(r'Probability of a negative shock', color='black')
@@ -523,7 +523,7 @@ def fig_a3():
     ax.axhline(0, color=Gray, lw=0.5)
     ax.set_xlabel(r'Persistence $p = \alpha + \beta$')
     ax.set_ylabel('Days')
-    ax.set_title('Half-life: the tangent goes negative', color='black')
+    ax.set_title('Half-life: the delta-method line falls below zero', color='black')
     ax = axes[1]
     v = np.sqrt(PPY['sp500'] * om / (1 - p))
     ax.plot(p, v, color=Purple, label=r'Long-run volatility $\sqrt{q\,\hat\omega/(1-p)}$, $\hat\omega$ fixed')
@@ -608,7 +608,7 @@ def fig_a5():
 
 # ---------------------------------------------------------------- A6
 def _acf_cols(X, L):
-    """Autocorelatiile (corelatie Pearson, ca pandas autocorr) pentru fiecare coloana a lui X, decalaje 1..L."""
+    """Autocorrelations (Pearson correlation, as pandas autocorr) for each column of X, lags 1..L."""
     out = np.empty((L, X.shape[1]))
     for k in range(1, L + 1):
         a, b = X[k:], X[:-k]
@@ -836,14 +836,14 @@ def fig_b5_timeline():
         x0 = (pd.Timestamp(f'{y}-01-01') - pd.Timestamp('2000-01-01')).days
         ax.barh(i, 365, left=x0, color=Amber, height=0.5,
                 label='Forecast year: parameters fixed, variance updated daily' if i == 0 else '_nolegend_')
-        ax.text(x0 + 380, i, f'refit on 1 Jan {y}', va='center', color='black', fontsize=10.5)
+        ax.text(x0 + 380, i, f'refit with data to 31 Dec {y - 1}', va='center', color='black', fontsize=10.5)
     ax.set_yticks([])
     ticks = [2000, 2005, 2010, 2015, 2019]
     ax.set_xticks([(pd.Timestamp(f'{t}-01-01') - pd.Timestamp('2000-01-01')).days for t in ticks])
     ax.set_xticklabels([str(t) for t in ticks])
     ax.set_xlim(0, (pd.Timestamp('2020-06-01') - pd.Timestamp('2000-01-01')).days)
     ax.invert_yaxis()
-    ax.set_title(r'Forecast made at the close of day $t$ with data up to $t$; evaluated against $r_{t+1}^2$', color='black')
+    ax.set_title(r'Forecast $h_t$ made at the close of day $t-1$; evaluated against $r_t^2$', color='black')
     ax = axes[1]
     w = f1.loc['2020-02-03':'2020-04-30']
     rr = r.reindex(w.index)
@@ -855,7 +855,7 @@ def fig_b5_timeline():
     fig.tight_layout()
     _fig_legend(fig, axes, ncol=2, y=0.0)
     save_fig('ch5_sem_b5_timeline')
-    # QLIKE pas cu pas pe trei zile
+    # QLIKE step by step over three days
     days = ['2020-03-13', '2020-03-16', '2020-03-17']
     rows = []
     for d in days:
@@ -980,7 +980,7 @@ def fig_b56_gwmcs():
 
 # ---------------------------------------------------------------- B7 / B8
 def _draws():
-    """Extragerile bootstrap: din rularea curenta (DRAWS) sau din fisierul salvat."""
+    """Bootstrap draws: from the current run (DRAWS) or from the saved file."""
     return dict(DRAWS) if DRAWS else dict(np.load(DRAW_FILE))
 
 
@@ -1073,7 +1073,7 @@ def fig_c1():
                       'us_lag': {str(d.date()): float(df.loc[d, 'us_lag']) for d in df.index},
                       'bet': {str(d.date()): float(df.loc[d, 'bet']) for d in df.index}}
 
-    # descompunerea volatilitatii BET cu parametrii estimati (OUT['partc']['full']['u'])
+    # decomposition of BET volatility with the estimated parameters (OUT['partc']['full']['u'])
     par = OUT['partc']['full']['u']
     dfa = join_bet_sp()
     path = spill_path(dfa, par)
@@ -1100,7 +1100,7 @@ def fig_c1():
 
 # ---------------------------------------------------------------- C2
 def c2_ai_answer():
-    """Ruleaza exact codul asistentului (randamente in zecimale) si varianta corectata."""
+    """Runs the assistant's code as given (returns in decimals) and the corrected version."""
     import warnings as _w
     from arch import arch_model
     px = load_close('sp500')
@@ -1176,8 +1176,8 @@ def fig_c3(ticker='JPM'):
 
 
 def seminar_charts(quick=False):
-    """Toate graficele noi ale seminarului; cifrele intra in ch5_seminar_charts.json.
-    quick=True pastreaza rezultatele C3 deja salvate (estimarea QSD dureaza cateva minute)."""
+    """All seminar charts; their numbers go to ch5_seminar_charts.json.
+    quick=True keeps the saved C3 results (the QSD estimation takes a few minutes)."""
     setup_check()
     fig_a1(); fig_a2(); a3_covariance(); fig_a3(); fig_a4(); fig_a5(); fig_a6()
     fig_b1(); fig_b2(); fig_b3(); fig_b4()
@@ -1199,7 +1199,7 @@ def seminar_charts(quick=False):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == 'charts':
-        # doar graficele seminarului, din cifrele si extragerile bootstrap salvate
+        # seminar charts only, from the saved numbers and bootstrap draws
         with open(os.path.join(HERE, 'ch5_seminar_numbers.json')) as fh:
             OUT.update(json.load(fh))
         seminar_charts(quick='quick' in sys.argv)

@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Monday, 21 September 2026'
 
-Datafile: 'Daily market data (data/market in the MFM repository); FRED EUR/USD and USD/JPY exchange rates and BNR official EUR/RON reference rate'
+Datafile: 'Daily market data from the MFM course repository; FRED EUR/USD and USD/JPY exchange rates and BNR official EUR/RON reference rate'
 
 Output: 'ch0_cross_asset_growth.pdf, ch0_risk_return.pdf'

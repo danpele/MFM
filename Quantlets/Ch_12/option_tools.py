@@ -19,7 +19,7 @@ N, n = stats.norm.cdf, stats.norm.pdf
 
 
 def bs_price(S, K, T, r, sigma, kind='call', q=0.0):
-    """Pretul Black-Scholes al unei optiuni europene."""
+    """Black-Scholes price of a European option."""
     S, K, T, sigma = map(np.asarray, (S, K, T, sigma))
     d1 = (np.log(S / K) + (r - q + 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
     d2 = d1 - sigma * np.sqrt(T)
@@ -29,7 +29,7 @@ def bs_price(S, K, T, r, sigma, kind='call', q=0.0):
 
 
 def bs_greeks(S, K, T, r, sigma, kind='call', q=0.0):
-    """Delta, gamma, vega (la 1 punct de volatilitate), theta (pe zi calendaristica), rho; plus d1, d2."""
+    """Delta, gamma, vega (per volatility point), theta (per calendar day), rho; plus d1, d2."""
     S, K, T, sigma = map(np.asarray, (S, K, T, sigma))
     d1 = (np.log(S / K) + (r - q + 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
     d2 = d1 - sigma * np.sqrt(T)
@@ -48,7 +48,7 @@ def bs_greeks(S, K, T, r, sigma, kind='call', q=0.0):
 
 
 def implied_vol(price, S, K, T, r, kind='call', q=0.0, lo=1e-4, hi=5.0):
-    """Volatilitatea implicita: solutia unica a ecuatiei BS(sigma) = pret (vega > 0)."""
+    """Implied volatility: the unique solution of BS(sigma) = price (vega > 0)."""
     f = lambda s: bs_price(S, K, T, r, s, kind, q) - price
     if f(lo) > 0 or f(hi) < 0:
         return np.nan
@@ -56,7 +56,7 @@ def implied_vol(price, S, K, T, r, kind='call', q=0.0, lo=1e-4, hi=5.0):
 
 
 def newton_iv(price, S, K, T, r, sigma0=0.2, kind='call', steps=4):
-    """Pasii metodei Newton: sigma_{k+1} = sigma_k - (BS(sigma_k) - pret) / vega(sigma_k)."""
+    """Newton steps: sigma_{k+1} = sigma_k - (BS(sigma_k) - price) / vega(sigma_k)."""
     out, s = [], sigma0
     for _ in range(steps):
         p = float(bs_price(S, K, T, r, s, kind))
@@ -68,7 +68,7 @@ def newton_iv(price, S, K, T, r, sigma0=0.2, kind='call', steps=4):
 
 
 def crr_price(S, K, T, r, sigma, steps, kind='call', american=False):
-    """Arborele binomial Cox-Ross-Rubinstein: u = exp(sigma sqrt(dt)), d = 1/u, p = (e^{r dt} - d)/(u - d)."""
+    """Cox-Ross-Rubinstein binomial tree: u = exp(sigma sqrt(dt)), d = 1/u, p = (e^{r dt} - d)/(u - d)."""
     dt = T / steps
     u = np.exp(sigma * np.sqrt(dt)); d = 1 / u
     p = (np.exp(r * dt) - d) / (u - d)
@@ -85,7 +85,7 @@ def crr_price(S, K, T, r, sigma, steps, kind='call', american=False):
 
 
 def merton_price(S, K, T, r, sigma, lam, mu_j, sig_j, kind='call', nmax=60):
-    """Merton (1976): salturi log-normale ln(1+J) ~ N(mu_j, sig_j^2), intensitate lam; serie Poisson de preturi BS."""
+    """Merton (1976): log-normal jumps ln(1+J) ~ N(mu_j, sig_j^2), intensity lam; Poisson series of BS prices."""
     kappa = np.exp(mu_j + 0.5 * sig_j ** 2) - 1
     lam2 = lam * (1 + kappa)
     tot = 0.0
@@ -98,7 +98,7 @@ def merton_price(S, K, T, r, sigma, lam, mu_j, sig_j, kind='call', nmax=60):
 
 
 def heston_price(S, K, T, r, v0, kappa, theta, xi, rho, kind='call'):
-    """Heston (1993): pretul call prin formula Lewis (2001), cu functia caracteristica a lui ln(S_T/F) (forma stabila)."""
+    """Heston (1993): call price by the Lewis (2001) formula, with the characteristic function of ln(S_T/F) (stable form)."""
     def phi(u):
         d = np.sqrt((rho * xi * 1j * u - kappa) ** 2 + xi ** 2 * (1j * u + u ** 2))
         g = (kappa - rho * xi * 1j * u - d) / (kappa - rho * xi * 1j * u + d)
@@ -113,12 +113,12 @@ def heston_price(S, K, T, r, v0, kappa, theta, xi, rho, kind='call'):
 
 
 def svi_w(k, a, b, rho, m, s):
-    """SVI (Gatheral): varianta totala implicita w(k) = a + b (rho (k - m) + sqrt((k - m)^2 + s^2)), k = ln(K/F)."""
+    """SVI (Gatheral): total implied variance w(k) = a + b (rho (k - m) + sqrt((k - m)^2 + s^2)), k = ln(K/F)."""
     return a + b * (rho * (k - m) + np.sqrt((k - m) ** 2 + s ** 2))
 
 
 def svi_fit(k, w, weights=None):
-    """Estimarea SVI prin cele mai mici patrate (ponderate), cu restrictii b >= 0, |rho| < 1, s > 0."""
+    """SVI fit by (weighted) least squares, with constraints b >= 0, |rho| < 1, s > 0."""
     k, w = np.asarray(k), np.asarray(w)
     wt = np.ones_like(w) if weights is None else np.asarray(weights)
     def loss(p):
@@ -137,7 +137,7 @@ def svi_fit(k, w, weights=None):
 
 
 def variance_from_strip(K, Q, F, T, r=0.0):
-    """Varianta implicita (formula VIX): 2/T sum dK/K^2 e^{rT} Q(K) - 1/T (F/K0 - 1)^2, Q = pretul OTM (mid)."""
+    """Implied variance (VIX formula): 2/T sum dK/K^2 e^{rT} Q(K) - 1/T (F/K0 - 1)^2, Q = OTM price (mid)."""
     K, Q = np.asarray(K, float), np.asarray(Q, float)
     o = np.argsort(K); K, Q = K[o], Q[o]
     dK = np.empty_like(K)
@@ -148,9 +148,9 @@ def variance_from_strip(K, Q, F, T, r=0.0):
 
 
 def delta_hedge(paths, K, T, r, sigma_imp, n_rebal, kind='call'):
-    """Vinde o optiune la pretul BS(sigma_imp) si acopera delta de n_rebal ori pana la scadenta.
-    paths: matrice (n_traiectorii, n_pasi+1) de preturi pe o grila uniforma; n_pasi divizibil cu n_rebal.
-    Intoarce eroarea de hedging la scadenta (valoarea portofoliului de hedging minus plata optiunii)."""
+    """Sell an option at BS(sigma_imp) and delta-hedge it n_rebal times until expiry.
+    paths: price matrix (n_paths, n_steps+1) on a uniform grid; n_steps divisible by n_rebal.
+    Returns the hedging error at expiry (hedge portfolio value minus the option pay-off)."""
     npath, nstep = paths.shape[0], paths.shape[1] - 1
     every = nstep // n_rebal
     dt = T / nstep

@@ -1,15 +1,15 @@
 """
-garch_tools.py -- Functii pentru Capitolul 5 (MFM): estimarea, diagnosticul si prognoza modelelor GARCH
-=====================================================================================================
-  * fit_garch(r, vol, dist)   -- GARCH / GJR-GARCH / EGARCH cu inovatii Normale, t, t asimetric sau GED
-                                 (pachetul arch); seria este rescalata intern daca este prea putin volatila
-  * half_life(persistence)    -- timpul de injumatatire al unui soc de volatilitate
-  * news_impact(res, eps)     -- curba de impact a stirilor (Engle-Ng, 1993)
-  * sign_bias_test(z, eps)    -- testele de asimetrie Engle-Ng (1993, ec. 18): z_t^2 pe S-, S- eps, S+ eps
-  * ewma_variance(r, lam)     -- varianta EWMA (RiskMetrics, lambda = 0.94)
-  * qlike, mz_regression, dm_test -- evaluarea prognozelor de volatilitate (Patton, 2011; Mincer-Zarnowitz; Diebold-Mariano)
+garch_tools.py -- functions for Chapter 5 (MFM): estimation, diagnostics and forecasts of GARCH models
+=======================================================================================================
+  * fit_garch(r, vol, dist)   -- GARCH / GJR-GARCH / EGARCH with Normal, t, skewed-t or GED innovations
+                                 (package arch); the series is rescaled internally if its volatility is too low
+  * half_life(persistence)    -- half-life of a volatility shock
+  * news_impact(res, eps)     -- news impact curve (Engle-Ng, 1993)
+  * sign_bias_test(z, eps)    -- Engle-Ng sign-bias tests (1993, eq. 18): z_t^2 on S-, S- eps, S+ eps
+  * ewma_variance(r, lam)     -- EWMA variance (RiskMetrics, lambda = 0.94)
+  * qlike, mz_regression, dm_test -- volatility forecast evaluation (Patton, 2011; Mincer-Zarnowitz; Diebold-Mariano)
 
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import numpy as np
@@ -25,7 +25,7 @@ DISTS = {'normal': 'Normal', 't': 'Student-t', 'skewt': 'Skewed-t', 'ged': 'GED'
 
 
 class Fit:
-    """Rezultatul unei estimari, exprimat in unitatile seriei originale (randamente in %)."""
+    """Result of one fit, in the units of the original series (returns in %)."""
 
     def __init__(self, res, c, r, vol):
         self.res, self.c, self.r, self.vol = res, c, r, vol
@@ -36,8 +36,8 @@ class Fit:
         else:
             p['omega'] = p['omega'] / c ** 2
         self.params = p
-        # covarianta robusta (Bollerslev-Wooldridge) transformata in unitatile originale cu jacobianul
-        # transformarii: mu/c, omega/c^2 (GARCH, GJR) sau omega - (1 - beta) ln c^2 (EGARCH)
+        # robust (Bollerslev-Wooldridge) covariance mapped to the original units with the Jacobian
+        # of the transformation: mu/c, omega/c^2 (GARCH, GJR) or omega - (1 - beta) ln c^2 (EGARCH)
         names = list(res.params.index)
         J = np.eye(len(names))
         J[names.index('mu'), names.index('mu')] = 1 / c
@@ -57,7 +57,7 @@ class Fit:
         self.bic = -2 * self.loglik + k * np.log(n)
         self.sigma = res.conditional_volatility / c
         self.z = res.std_resid
-        self.eps = res.resid / c                   # reziduuri nestandardizate, in unitatile seriei originale
+        self.eps = res.resid / c                   # unstandardised residuals, in the units of the original series
         self.converged = res.convergence_flag == 0
 
     @property
@@ -69,7 +69,7 @@ class Fit:
         return p['alpha[1]'] + p['beta[1]'] + g * self.neg_share()
 
     def neg_share(self):
-        """E[z^2 1(z < 0)] pentru distributia inovatiilor (0.5 daca este simetrica); intra in persistenta GJR."""
+        """E[z^2 1(z < 0)] for the innovation distribution (0.5 if symmetric); enters the GJR persistence."""
         d = self.res.model.distribution
         if d.name.startswith('Standardized Skew'):
             from scipy import integrate
@@ -85,14 +85,14 @@ class Fit:
         return p['omega'] / (1 - self.persistence)
 
     def forecast_var(self, horizon):
-        """Prognoza variantei zilnice pentru t+1, ..., t+h, in %^2."""
+        """Daily variance forecasts for t+1, ..., t+h, in %^2."""
         f = self.res.forecast(horizon=horizon, reindex=False, method='analytic' if self.vol != 'EGARCH' else 'simulation',
                               simulations=2000)
         return f.variance.iloc[-1].values / self.c ** 2
 
 
 def scale_for(r):
-    """Factor de rescalare (putere a lui 10) astfel incat abaterea standard sa fie de ordinul 1."""
+    """Rescaling factor (a power of 10) that makes the standard deviation of order 1."""
     s = r.std()
     return 10.0 if s < 0.5 else 1.0
 
@@ -105,12 +105,12 @@ def fit_garch(r, vol='GARCH', dist='t', mean='Constant', last_obs=None, c=None):
 
 
 def half_life(persistence):
-    """Numarul de zile dupa care jumatate din socul asupra variantei s-a disipat."""
+    """Number of days after which half of a variance shock has gone."""
     return np.log(0.5) / np.log(persistence) if 0 < persistence < 1 else np.inf
 
 
 def news_impact(fit, eps, sigma2_bar=None):
-    """sigma^2_t ca functie de socul eps_{t-1}, cu sigma^2_{t-1} fixat la varianta de selectie."""
+    """sigma^2_t as a function of the shock eps_{t-1}, with sigma^2_{t-1} fixed at the sample variance."""
     p = fit.params
     s2 = fit.r.var() if sigma2_bar is None else sigma2_bar
     if fit.vol == 'EGARCH':
@@ -122,8 +122,8 @@ def news_impact(fit, eps, sigma2_bar=None):
 
 
 def sign_bias_test(z, eps):
-    """Engle-Ng (1993, ec. 18): z_t^2 pe S-_{t-1}, S-_{t-1} eps_{t-1}, S+_{t-1} eps_{t-1}, cu eps_{t-1} reziduul
-    NESTANDARDIZAT si z_t reziduul standardizat; t-uri si testul comun T R^2 ~ chi2(3)."""
+    """Engle-Ng (1993, eq. 18): z_t^2 on S-_{t-1}, S-_{t-1} eps_{t-1}, S+_{t-1} eps_{t-1}, with eps_{t-1} the
+    UNSTANDARDISED residual and z_t the standardised residual; t statistics and the joint test T R^2 ~ chi2(3)."""
     d = pd.concat([pd.Series(z), pd.Series(eps)], axis=1, keys=['z', 'e']).dropna()
     z, e = d['z'].values, d['e'].values
     y = z[1:] ** 2
@@ -149,7 +149,7 @@ def arch_lm(x, lags=5):
 
 
 def ewma_variance(r, lam=0.94, init=250):
-    """Prognoza EWMA pentru ziua t+1 (aliniata la t+1): s2_{t+1} = lam s2_t + (1 - lam) r_t^2."""
+    """EWMA forecast for day t+1 (aligned at t+1): s2_{t+1} = lam s2_t + (1 - lam) r_t^2."""
     x = r.values
     s2 = np.empty(len(x) + 1)
     s2[0] = np.mean(x[:init] ** 2)
@@ -159,12 +159,12 @@ def ewma_variance(r, lam=0.94, init=250):
 
 
 def qlike(proxy, h):
-    """Pierderea QLIKE (Patton, 2011), forma folosita la comparatii: proxy/h + ln h."""
+    """QLIKE loss (Patton, 2011), the form used for comparisons: proxy/h + ln h."""
     return proxy / h + np.log(h)
 
 
 def mz_regression(proxy, h, lags=5):
-    """Mincer-Zarnowitz: proxy = a + b h + u, erori HAC; testul Wald a = 0, b = 1."""
+    """Mincer-Zarnowitz: proxy = a + b h + u, HAC errors; Wald test of a = 0, b = 1."""
     X = sm.add_constant(np.asarray(h))
     ols = sm.OLS(np.asarray(proxy), X).fit(cov_type='HAC', cov_kwds={'maxlags': lags})
     w = ols.wald_test((np.eye(2), np.array([0.0, 1.0])), scalar=True)
@@ -173,7 +173,7 @@ def mz_regression(proxy, h, lags=5):
 
 
 def dm_test(loss_a, loss_b, lags=5):
-    """Diebold-Mariano: d = L_a - L_b; t-statistic HAC pentru media lui d (negativ: A mai bun)."""
+    """Diebold-Mariano: d = L_a - L_b; HAC t statistic for the mean of d (negative: A better)."""
     d = np.asarray(loss_a) - np.asarray(loss_b)
     ols = sm.OLS(d, np.ones_like(d)).fit(cov_type='HAC', cov_kwds={'maxlags': lags})
     t = float(ols.tvalues[0])

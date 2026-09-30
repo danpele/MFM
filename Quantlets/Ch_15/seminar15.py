@@ -22,7 +22,7 @@ S = {}
 
 
 # =============================================================================
-# PARTEA A
+# PART A
 # =============================================================================
 def dict_example(text, D):
     w = M.tokens(text)
@@ -37,11 +37,11 @@ def dict_example(text, D):
 
 
 def part_a():
-    """A1-A2: tonul dupa doua dictionare; A3-A4: metrici din matricea de confuzie; A5-A6: probabilitati si
-    clasa majoritara; A7-A8: costul la care strategia nu mai castiga nimic."""
+    """A1-A2: tone under two dictionaries; A3-A4: metrics from the confusion matrix; A5-A6: probabilities and
+    the majority class; A7-A8: the cost at which the strategy stops earning."""
     pb = M.load_phrasebank()
     D = M.load_dictionaries()
-    # propozitii reale din PhraseBank (acord 100%) in care cele doua dictionare dau semne diferite
+    # real PhraseBank sentences (100% agreement) on which the two dictionaries give different signs
     allag = pb[pb['agree'] == 'AllAgree'].copy()
     allag['len'] = allag['text'].str.len()
     lm = M.dict_tone(allag['text'], D['LM_pos'], D['LM_neg'])
@@ -60,7 +60,7 @@ def part_a():
         cmx = M.class_metrics(tw['label'], pr[m])
         S[key] = {'cm': cm.values.tolist(), 'acc': M.acc(tw['label'], pr[m]), 'f1': M.macro_f1(tw['label'], pr[m]),
                   'metrics': cmx.to_dict('index')}
-    # A5: probabilitatile Qwen2.5-7B pentru un titlu; temperatura
+    # A5: Qwen2.5-7B probabilities for one headline; temperature
     i = int(np.argmin(np.abs(tw['qwen7B_negative'] - 0.62)))
     p = tw.loc[i, ['qwen7B_negative', 'qwen7B_neutral', 'qwen7B_positive']].values.astype(float)
     logit = np.log(np.maximum(p, 1e-12))
@@ -76,7 +76,7 @@ def part_a():
 
 
 def part_a_costs(R):
-    """A7-A8: pragul de cost (puncte de baza pe tranzactie) sub care strategia ramane profitabila."""
+    """A7-A8: the cost threshold (basis points per trade) below which the strategy stays profitable."""
     st = R['news']['strat']['finbert']
     S['A7'] = {'mean_active_bp': st['mean_active_bp'], 'breakeven_bp': st['mean_active_bp'] / 4,
                'active': st['active']}
@@ -84,12 +84,12 @@ def part_a_costs(R):
 
 
 def part_a_inference(R):
-    """A1-A8 (derivari): atenuarea prin clasificare gresita (Aigner, 1973), varianta si puterea testului McNemar,
-    kappa Fleiss si un pas E Dawid-Skene pe un tabel mic, conditia de ordinul intai pentru temperatura,
-    eroarea standard a costului de echilibru (metoda delta)."""
+    """A1-A8 (derivations): attenuation from misclassification (Aigner, 1973), variance and power of the McNemar test,
+    Fleiss' kappa and one Dawid-Skene E step on a small table, the first-order condition for the temperature,
+    the standard error of the break-even cost (delta method)."""
     from scipy import stats as st
     out = {}
-    # A1-A2: variabila "stire negativa" (rand/coloana 0 din matricea de confuzie Twitter)
+    # A1-A2: the "negative news" dummy (row/column 0 of the Twitter confusion matrix)
     for key in ('A3', 'A4'):
         cm = np.array(S[key]['cm'], float)
         n = cm.sum()
@@ -101,10 +101,10 @@ def part_a_inference(R):
         out['att_' + key] = {'n': n, 'pi': pi, 'p': p, 'a0': a0, 'a1': a1, 'lam': lam, 'inv': 1 / lam,
                              'n_tp': cm[0, 0], 'n_neg': cm[0].sum(), 'n_predneg': cm[:, 0].sum(),
                              'n_fp': cm[1, 0] + cm[2, 0], 'n_nonneg': cm[1].sum() + cm[2].sum()}
-    # A3-A4: diferenta de acuratete pe perechi, varianta multinomiala, McNemar exact, puterea
+    # A3-A4: paired accuracy difference, multinomial variance, exact McNemar, power
     for key in ('B1', 'B2'):
         b = S[key]
-        n = int(np.array(S['A3']['cm']).sum())       # titlurile din setul de validare Twitter
+        n = int(np.array(S['A3']['cm']).sum())       # headlines of the Twitter validation set
         n01, n10 = b['n01'], b['n10']
         d = (n01 - n10) / n
         q = (n01 + n10) / n
@@ -116,7 +116,7 @@ def part_a_inference(R):
         n80 = (zc + st.norm.ppf(0.8)) ** 2 * (q - d ** 2) / d ** 2
         out['mc_' + key] = {'n': n, 'n01': n01, 'n10': n10, 'd': d, 'q': q, 'se': se, 'lo': d - zc * se, 'hi': d + zc * se,
                             'p_z': pz, 'p_exact': min(1.0, pex), 'power': power, 'n80': n80}
-    # A6: kappa Fleiss si un pas E Dawid-Skene pe un tabel ilustrativ (6 propozitii x 5 evaluatori)
+    # A6: Fleiss' kappa and one Dawid-Skene E step on an illustrative table (6 sentences x 5 raters)
     V = np.array([[5, 0, 0], [0, 5, 0], [0, 1, 4], [1, 3, 1], [2, 3, 0], [0, 2, 3]], float)
     m = V.sum(1)[0]
     Pi = (V * (V - 1)).sum(1) / (m * (m - 1))
@@ -130,7 +130,7 @@ def part_a_inference(R):
     maj = V / V.sum(1, keepdims=True)
     out['fleiss'] = {'votes': V.tolist(), 'Pi': Pi.tolist(), 'pj': pj.tolist(), 'Pbar': Pbar, 'Pe': Pe, 'kappa': kappa,
                      'acc_r': acc_r, 'post': post.tolist(), 'share': maj.tolist()}
-    # A5(d): temperatura optima pentru Qwen2.5-7B (conditia de ordinul intai), pe jumatatea de validare
+    # A5(d): optimal temperature for Qwen2.5-7B (first-order condition), on the validation half
     tw = g.load_csv('ch15_twitter_scores.csv')
     y = tw['label'].map({'negative': 0, 'neutral': 1, 'positive': 2}).values
     P = tw[['qwen7B_negative', 'qwen7B_neutral', 'qwen7B_positive']].values.astype(float)
@@ -147,7 +147,7 @@ def part_a_inference(R):
     from scipy.optimize import brentq
     T_star = brentq(foc, 0.5, 50)
     out['temp'] = {'T': T_star, 'foc_1': foc(1.0), 'foc_T': foc(T_star)}
-    # A7-A8: costul de echilibru si eroarea lui standard (metoda delta, varianta Newey-West a mediei)
+    # A7-A8: the break-even cost and its standard error (delta method, Newey-West variance of the mean)
     for c in ('finbert', 'qwen'):
         x = R['news']['strat'][c]
         mu, t, a = x['mean_bp'], x['t'], x['active']
@@ -163,7 +163,7 @@ def part_a_inference(R):
 
 
 # =============================================================================
-# PARTEA B
+# PART B
 # =============================================================================
 def b_pairs(a, b, data='tw'):
     d = g.load_csv('ch15_twitter_scores.csv' if data == 'tw' else 'ch15_phrasebank_scores.csv')
@@ -177,7 +177,7 @@ def b_pairs(a, b, data='tw'):
 
 
 def b_leakage():
-    """B3: acuratetea pe datele de antrenare ale FinBERT (PhraseBank) si pe date noi (Twitter)."""
+    """B3: accuracy on the FinBERT training data (PhraseBank) and on new data (Twitter)."""
     pb = g.load_csv('ch15_phrasebank_scores.csv')
     tw = g.load_csv('ch15_twitter_scores.csv')
     out = {}
@@ -205,7 +205,7 @@ def b_learning():
 
 
 def b_cluster(P):
-    """B5: aceeasi regresie, erori standard OLS vs grupate pe zile vs grupate pe actiuni."""
+    """B5: the same regression, OLS standard errors vs clustered by day vs clustered by stock."""
     out = {}
     for c in ('finbert', 'lm', 'qwen'):
         for y in ('r0', 'r1', 'r2'):
@@ -235,7 +235,7 @@ def b_event(P, col):
 
 
 def b_memory():
-    """B7: AUC pentru directia lunara a S&P 500, inainte si dupa publicarea ponderilor Qwen2.5."""
+    """B7: AUC for the monthly direction of the S&P 500, before and after the release of the Qwen2.5 weights."""
     mm = g.load_csv('ch15_memory_monthly.csv', index_col=0, parse_dates=True)
     out = {}
     for s in ('1.5B', '7B', '14B'):
@@ -246,7 +246,7 @@ def b_memory():
             r[per] = {'auc': g.auc(p, u), 'lo': lo, 'hi': hi, 'n': int(sel.sum()), 'n_up': int(u.sum()),
                       'mean_up': float(p[u].mean()), 'mean_down': float(p[~u].mean())}
         out[s] = r
-    # permutare: AUC sub ipoteza nula, perioada de dinainte (14B)
+    # permutation: AUC under the null hypothesis, pre-release period (14B)
     rng = np.random.default_rng(1)
     pre = mm.loc[:'2024-08-31']
     p, u = pre['qwen14B'].values, (pre['ret'] > 0).values
@@ -272,10 +272,10 @@ def b_prompts():
 
 
 # =============================================================================
-# PARTEA C
+# PART C
 # =============================================================================
 def part_c(P, rets):
-    """Prezice sentimentul FinBERT al titlurilor randamentul din d+2 (pozitie de la inchiderea din d+1 la inchiderea din d+2), dupa costuri?"""
+    """Does FinBERT headline sentiment predict the d+2 return (position from the close of d+1 to the close of d+2), after costs?"""
     days = rets.index[rets.index >= P.index.get_level_values('day').min()]
     out = {}
     for c in ('finbert', 'qwen', 'lm'):
@@ -291,12 +291,12 @@ def part_c(P, rets):
                             'be_bp': 100 * St.loc[act, 'gross'].mean() / 4 if act.any() else np.nan,
                             'n_active': int(act.sum())}
         out[c] = r
-    # doar dupa titlurile publicate in afara sesiunii? nu: sensibilitate la costuri
+    # sensitivity to costs
     St = M.signal_portfolio(P, 'finbert', days, ret='r2')
     act = St['k'] > 0
     out['cost_grid'] = {int(c): float(M.sharpe(St['gross'] - np.where(act, 4 * c / 100, 0))) for c in (0, 1, 2, 5, 10)}
     out['cum'] = St
-    # graficul: randamentul cumulat net pentru trei niveluri de cost
+    # chart: cumulative net return for three cost levels
     fig, ax = plt.subplots(figsize=(6.6, 3.0))
     for cbp, col in ((0, g.MainBlue), (2, g.Teal), (5, g.IDAred)):
         net = St['gross'] - np.where(act, 4 * cbp / 100, 0)
@@ -326,11 +326,11 @@ def fig_cluster(B5):
 
 
 # =============================================================================
-# GRAFICELE SEMINARULUI (cate unul pentru fiecare rezolvare din Partea B si pentru A1, A3, A7)
+# SEMINAR CHARTS (one for each solution of Part B and for A1, A3, A7)
 # =============================================================================
 def fig_a1_attenuation(key='A3', name='ch15_sem_a1_attenuation', label='FinBERT', col=None, reps=2000, seed=15):
-    """A1/A2: distributia pantei OLS pe variabila adevarata s* si pe variabila prezisa s_hat, simulata cu ratele de
-    clasificare gresita din matricea de confuzie Twitter; beta = 1, zgomot N(0, 1), n = numarul de titluri."""
+    """A1/A2: distribution of the OLS slope on the true variable s* and on the predicted variable s_hat, simulated with the
+    misclassification rates of the Twitter confusion matrix; beta = 1, noise N(0, 1), n = number of headlines."""
     x = S['AI']['att_' + key]
     n, pi, a0, a1, lam = int(x['n']), x['pi'], x['a0'], x['a1'], x['lam']
     rng = np.random.default_rng(seed)
@@ -356,7 +356,7 @@ def fig_a1_attenuation(key='A3', name='ch15_sem_a1_attenuation', label='FinBERT'
 
 
 def fig_power(keys=('mc_B1',), labels=('LM vs FinBERT',), name='ch15_sem_a3_power'):
-    """A3/A4: puterea testului pe perechi in functie de numarul de titluri, cu d si q estimate pe Twitter."""
+    """A3/A4: power of the paired test as a function of the number of headlines, with d and q estimated on Twitter."""
     from scipy import stats as st
     zc = st.norm.ppf(0.975)
     nn = np.logspace(2, 4.6, 200)
@@ -379,7 +379,7 @@ def fig_power(keys=('mc_B1',), labels=('LM vs FinBERT',), name='ch15_sem_a3_powe
 
 
 def fig_cost(key='cost_finbert', label='FinBERT', name='ch15_sem_a7_cost'):
-    """A7/A8: randamentul net zilnic mediu in functie de costul pe tranzactie, cu banda +-1.96 SE (a fix)."""
+    """A7/A8: mean daily net return as a function of the cost per trade, with a +-1.96 SE band (a fixed)."""
     x = S['AI'][key]
     c = np.linspace(0, 6, 121)
     net = x['mu'] - 4 * x['a'] * c
@@ -398,7 +398,7 @@ def fig_cost(key='cost_finbert', label='FinBERT', name='ch15_sem_a7_cost'):
 
 
 def fig_pairs(key='B1', names=('LM', 'FinBERT'), name='ch15_sem_b1_pairs'):
-    """B1/B2: acuratetea celor doi clasificatori cu CI bootstrap, diferenta pe perechi cu CI si cazurile discordante."""
+    """B1/B2: accuracy of the two classifiers with bootstrap CIs, the paired difference with its CI and the discordant cases."""
     b = S[key]
     fig, (ax, cx, bx) = plt.subplots(1, 3, figsize=(7.0, 2.4), gridspec_kw={'width_ratios': [1.3, 1.1, 1.0]})
     for yy, v, ci, col in ((1, b['acc_a'], b['ci_a'], g.Orange), (0, b['acc_b'], b['ci_b'], g.MainBlue)):
@@ -427,7 +427,7 @@ def fig_pairs(key='B1', names=('LM', 'FinBERT'), name='ch15_sem_b1_pairs'):
 
 
 def fig_leakage():
-    """B3: acuratetea pe tot Financial PhraseBank si pe Twitter, pentru patru clasificatori."""
+    """B3: accuracy on the whole Financial PhraseBank and on Twitter, for four classifiers."""
     B3 = S['B3']
     ms = ['FinBERT', 'Qwen 7B', 'LM', 'MiniLM + LR']
     labs = ['FinBERT', 'Qwen2.5-7B', 'LM', 'MiniLM + LR']
@@ -447,7 +447,7 @@ def fig_leakage():
 
 
 def fig_event_paths(P):
-    """B6: randamentul in exces cumulat mediu, zilele -5..+5, grupurile LM (semn) si FinBERT (tercile)."""
+    """B6: mean cumulative excess return, days -5..+5, LM groups (sign) and FinBERT groups (terciles)."""
     cols = g.EVENT_COLS
     days = np.arange(-5, 6)
     fig, ax = plt.subplots(figsize=(6.4, 2.8))
@@ -471,7 +471,7 @@ def fig_event_paths(P):
 
 
 def fig_perm():
-    """B7: distributia AUC sub ipoteza nula (etichete amestecate), Qwen2.5-14B, lunile dinainte de publicare."""
+    """B7: distribution of the AUC under the null hypothesis (shuffled labels), Qwen2.5-14B, pre-release months."""
     mm = g.load_csv('ch15_memory_monthly.csv', index_col=0, parse_dates=True)
     rng = np.random.default_rng(1)
     pre = mm.loc[:'2024-08-31']
@@ -490,7 +490,7 @@ def fig_perm():
 
 
 def fig_prompts_ci():
-    """B8: acuratetea cu CI bootstrap si ponderea raspunsurilor 'neutral' pentru trei prompturi."""
+    """B8: accuracy with bootstrap CIs and the share of 'neutral' answers for three prompts."""
     B8 = S['B8']
     fig, (ax, bx) = plt.subplots(1, 2, figsize=(6.8, 2.6))
     for k, (s, col) in enumerate((('7B', g.MainBlue), ('14B', g.Purple))):
@@ -514,8 +514,8 @@ def fig_prompts_ci():
 
 
 def fig_pvalues(PN):
-    """B10: valorile p ale celor noua pante, trei metode (t15, wild cluster bootstrap, Holm), scala logaritmica;
-    PN = ch15_inference.json['panel']['reg'] (valid_inference.py)."""
+    """B10: p-values of the nine slopes, three methods (t15, wild cluster bootstrap, Holm), log scale;
+    PN: the panel regressions of the valid-inference analysis."""
     rows = [(c, h) for c in ('finbert', 'qwen', 'lm') for h in ('r0', 'r1', 'r2')]
     names = {'finbert': 'FinBERT', 'qwen': 'Qwen2.5-7B', 'lm': 'LM'}
     fig, ax = plt.subplots(figsize=(6.6, 2.8))
@@ -584,7 +584,7 @@ if __name__ == '__main__':
     part_a_inference(R)
     seminar_charts(P)
     old = os.path.join(HERE, 'sem15_results.json')
-    if os.path.exists(old):                     # C3 (c3_reference.py) se pastreaza
+    if os.path.exists(old):                     # C3 is kept
         with open(old) as f:
             c3 = json.load(f).get('c3')
         if c3 is not None:

@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Daily market data (data/market): AAPL, AMZN, BAC, C, CSCO, GS, JPM, MSFT, MS, NVDA, WFC (adjusted close) and the VIX'
+Datafile: 'Daily market data (course data): AAPL, AMZN, BAC, C, CSCO, GS, JPM, MSFT, MS, NVDA, WFC (adjusted close) and the VIX'
 
 Output: 'ch5_qsd_gap.pdf, ch5_qsd_nic.pdf, ch5_case_qsd.csv'

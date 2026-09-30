@@ -37,11 +37,11 @@ PROCS = max(1, min(14, (os.cpu_count() or 2) - 2))
 
 
 # =============================================================================
-# 1. NIVELUL GSADF SUB VOLATILITATE VARIABILA
+# 1. SIZE OF GSADF UNDER CHANGING VOLATILITY
 # =============================================================================
-SIZE_T = 400           # lungimea seriei (T observatii de regresie)
-SIZE_N = 1000          # traiectorii Monte Carlo pe scenariu
-SIZE_B = 199           # replici wild bootstrap pentru fiecare traiectorie
+SIZE_T = 400           # series length (T regression observations)
+SIZE_N = 1000          # Monte Carlo paths per scenario
+SIZE_B = 199           # wild bootstrap replications per path
 SCENARIOS = {'iid': 'Constant volatility',
              'up': 'Volatility triples at T/2',
              'down': 'Volatility falls to one third at T/2',
@@ -49,7 +49,7 @@ SCENARIOS = {'iid': 'Constant volatility',
 
 
 def null_shocks(kind, T, rng):
-    """Socuri cu dispersia neconditionata 1 (iid) sau cu volatilitate variabila."""
+    """Shocks with unconditional variance 1 (i.i.d.) or with changing volatility."""
     z = rng.standard_normal(T)
     if kind == 'iid':
         return z
@@ -57,7 +57,7 @@ def null_shocks(kind, T, rng):
         return z * np.where(np.arange(T) < T // 2, 1.0, 3.0)
     if kind == 'down':
         return z * np.where(np.arange(T) < T // 2, 3.0, 1.0)
-    if kind == 'garch':                               # sigma2_t = w + a e_{t-1}^2 + b sigma2_{t-1}, varianta necond. 1
+    if kind == 'garch':                               # sigma2_t = w + a e_{t-1}^2 + b sigma2_{t-1}, unconditional variance 1
         a, b = 0.10, 0.88
         w = 1 - a - b
         zz = rng.standard_normal(T + 500)
@@ -71,11 +71,11 @@ def null_shocks(kind, T, rng):
 
 
 def _size_worker(args):
-    """O traiectorie sub H0: GSADF, decizia cu valoarea critica MC si cu wild bootstrap, episoade false (BSADF)."""
+    """One path under H0: GSADF, the decision with the MC and the wild-bootstrap critical value, false episodes (BSADF)."""
     kind, i, cv_mc, bs95_mc, L = args
     rng = np.random.default_rng([SEED, i, list(SCENARIOS).index(kind)])
     e = null_shocks(kind, SIZE_T, rng)
-    y = np.concatenate([[0.0], np.cumsum(1.0 / SIZE_T + e)])        # mers aleator cu drift asimptotic neglijabil
+    y = np.concatenate([[0.0], np.cumsum(1.0 / SIZE_T + e)])        # random walk with an asymptotically negligible drift
     res = psy(y)
     wc = wild_cv(y, res['w0'], SIZE_B, seed=int(rng.integers(1 << 31)))
     ep_mc = episodes(res['bsadf'], bs95_mc, np.arange(len(res['bsadf'])), L)
@@ -104,16 +104,16 @@ def size_study():
 
 
 # =============================================================================
-# 2. MULTIPLICITATEA IN DATARE: BITCOIN SAPTAMANAL
+# 2. MULTIPLICITY IN DATE-STAMPING: WEEKLY BITCOIN
 # =============================================================================
-TAU_B = 104            # fereastra de control a erorii de tip I pe familie: 2 ani de date saptamanale
-PS_B = 999             # replici bootstrap
+TAU_B = 104            # window of family-wise type I error control: 2 years of weekly data
+PS_B = 999             # bootstrap replications
 
 
 def ps_fwer_cv(y, w0, tau_b=TAU_B, B=PS_B, seed=SEED):
-    """Phillips & Shi (2020): reziduurile regresiei sub H0 (Delta y_t = a + e_t), extrase cu revenire si inmultite cu
-    ponderi N(0,1), construiesc traiectorii de w0 + tau_b - 1 variatii; valoarea critica este cuantila de 95% a
-    maximului BSADF pe cele tau_b date finale ale fiecarei traiectorii."""
+    """Phillips & Shi (2020): residuals of the regression under H0 (Delta y_t = a + e_t), drawn with replacement and
+    multiplied by N(0,1) weights, build paths of w0 + tau_b - 1 changes; the critical value is the 95% quantile of the
+    maximum of BSADF over the last tau_b dates of each path."""
     rng = np.random.default_rng(seed)
     dy = np.diff(np.asarray(y, float))
     eps = dy - dy.mean()
@@ -131,7 +131,7 @@ def fwer_bitcoin(R=2000):
     n, w0 = res['n'], res['w0']
     L = int(np.ceil(np.log(n)))
     idx = y.index[1:]
-    # probabilitatea unei alarme false oriunde in esantion, cu valori critice punctuale de 95% (sub H0 Monte Carlo)
+    # probability of a false alarm anywhere in the sample, with pointwise 95% critical values (Monte Carlo H0)
     rng = np.random.default_rng(SEED)
     e = rng.standard_normal((R, n))
     Y = np.concatenate([np.zeros((R, 1)), np.cumsum(1.0 / n + e, axis=1)], axis=1)
@@ -139,7 +139,7 @@ def fwer_bitcoin(R=2000):
     q95 = np.nanquantile(bs, 0.95, axis=0)
     any_exc = np.nanmax(bs - q95, axis=1) > 0
     ep_any = np.array([len(episodes(b, q95, np.arange(n), L)) > 0 for b in bs])
-    # pe o fereastra de TAU_B date consecutive (ultimele TAU_B)
+    # over a window of TAU_B consecutive dates (the last TAU_B)
     last = slice(n - TAU_B, n)
     any_last = np.nanmax(bs[:, last] - q95[last], axis=1) > 0
     ps = ps_fwer_cv(y.values, w0)
@@ -149,7 +149,7 @@ def fwer_bitcoin(R=2000):
     ep_mc = episodes(res['bsadf'], cvmc['bsadf95'], idx, L)
     ep_w = episodes(res['bsadf'], wc['bsadf95'], idx, L)
     fmt = lambda eps: [dict(start=d2s(s), end=d2s(e_), n=int(k), change=_chg(y, s, e_)) for s, e_, k in eps]
-    # grafic: BSADF cu trei praguri
+    # chart: BSADF with three thresholds
     fig, ax = plt.subplots(figsize=(7.4, 3.0))
     ax.plot(idx, res['bsadf'], color=IDAred, lw=0.9, label='BSADF statistic, Bitcoin weekly')
     ax.plot(idx, cvmc['bsadf95'], color=Forest, lw=1.0, ls='--', label='95% pointwise critical value, Monte Carlo')
@@ -169,10 +169,10 @@ def fwer_bitcoin(R=2000):
 
 
 # =============================================================================
-# 3. INDICATORUL DE INCREDERE LPPLS: SEMNAL VS FARA SEMNAL
+# 3. LPPLS CONFIDENCE INDICATOR: SIGNAL VS NO SIGNAL
 # =============================================================================
 def lppls_hits(ci, p, horizon=90, fall=0.20):
-    """Doar datele cu fereastra completa de `horizon` zile calendaristice in date (fara rezultate cenzurate la final)."""
+    """Only dates whose `horizon` calendar days are fully observed (no censored outcomes at the end)."""
     rows = []
     for d, v in ci.items():
         if d + pd.Timedelta(days=horizon) > p.index[-1]:
@@ -183,7 +183,7 @@ def lppls_hits(ci, p, horizon=90, fall=0.20):
 
 
 def circular_block_ci(s, h, block, B=9999, seed=SEED):
-    """Bootstrap pe blocuri circulare al perechilor (semnal, rezultat): distributia diferentei p_on - p_off."""
+    """Circular block bootstrap of the (signal, outcome) pairs: distribution of the difference p_on - p_off."""
     rng = np.random.default_rng(seed)
     n = len(s)
     k = int(np.ceil(n / block))
@@ -197,7 +197,7 @@ def circular_block_ci(s, h, block, B=9999, seed=SEED):
 
 
 def hac_lpm(s, h, lags):
-    """Regresie liniara de probabilitate h = a + b s + u, eroare standard Newey-West cu `lags` intarzieri."""
+    """Linear probability regression h = a + b s + u, Newey-West standard error with `lags` lags."""
     import statsmodels.api as sm
     X = sm.add_constant(s)
     r = sm.OLS(h, X).fit(cov_type='HAC', cov_kwds=dict(maxlags=lags))
@@ -211,13 +211,13 @@ def lppls_test():
         p = price(key, 'D', start)
         d = lppls_hits(ci, p)
         gap = float(np.median(np.diff(d.index.values).astype('timedelta64[D]').astype(float)))
-        block = int(np.ceil(90 / gap))                      # un bloc = orizontul de 90 de zile
+        block = int(np.ceil(90 / gap))                      # one block = the 90-day horizon
         s, h = d['sig'].values, d['hit'].values
         diff = h[s == 1].mean() - h[s == 0].mean()
         bd = circular_block_ci(s, h, block)
         hac = hac_lpm(s, h, block)
         n_on = int(s.sum())
-        # marimea efectiva: numarul de blocuri independente de 90 de zile care contin semnale
+        # effective size: the number of independent 90-day blocks containing signals
         out[key] = dict(n=int(len(d)), n_on=n_on, p_on=float(h[s == 1].mean()), p_off=float(h[s == 0].mean()),
                         diff=float(diff), block=block, gap_days=gap, ci_lo=float(np.quantile(bd, 0.025)),
                         ci_hi=float(np.quantile(bd, 0.975)), boot_se=float(bd.std()),
@@ -229,14 +229,14 @@ def lppls_test():
 
 
 # =============================================================================
-# 4. NUMARUL DE REGIMURI MARKOV: LR CU BOOTSTRAP PARAMETRIC
+# 4. NUMBER OF MARKOV REGIMES: PARAMETRIC-BOOTSTRAP LR
 # =============================================================================
 MS_B = 199
 MS_REPS = 20
 
 
 def ms_llf(r, k, reps=MS_REPS, seed=None):
-    """Log-verosimilitatea maxima: k = 1 (Normala iid, forma inchisa) sau Markov-switching cu k regimuri."""
+    """Maximised log-likelihood: k = 1 (i.i.d. Normal distribution, closed form) or Markov switching with k regimes."""
     r = np.asarray(r, float)
     if k == 1:
         s2 = r.var()
@@ -255,7 +255,7 @@ def ms_llf(r, k, reps=MS_REPS, seed=None):
 
 
 def ms_simulate(params, n, rng):
-    """Simuleaza randamente dintr-un model Markov-switching: mu, sd (liste) si P[i, j] = P(s_t = j | s_{t-1} = i)."""
+    """Simulate returns from a Markov-switching model: mu, sd (lists) and P[i, j] = P(s_t = j | s_{t-1} = i)."""
     mu, sd, P = np.asarray(params['mu']), np.asarray(params['sd']), np.asarray(params['P'])
     k = len(mu)
     w, v = np.linalg.eig(P.T)
@@ -271,7 +271,7 @@ def ms_simulate(params, n, rng):
 
 
 def ms_params(res, k):
-    P = np.asarray(res.regime_transition)[:, :, 0].T          # statsmodels: [i, j] = P(s_t = i | s_{t-1} = j)
+    P = np.asarray(res.regime_transition)[:, :, 0].T          # statsmodels stores [i, j] = P(s_t = i | s_{t-1} = j); transposed to P[i, j] = P(s_t = j | s_{t-1} = i)
     par = dict(zip(res.model.param_names, np.asarray(res.params)))
     return dict(mu=[float(par[f'const[{j}]']) for j in range(k)],
                 sd=[float(np.sqrt(par[f'sigma2[{j}]'])) for j in range(k)], P=P.tolist())
@@ -298,7 +298,7 @@ def lr_boot(r, k0, B=MS_B):
         lrs = np.array(pool.map(_lr_worker, [(k0, params, len(r), i) for i in range(B)], chunksize=2))
     lrs = lrs[np.isfinite(lrs)]
     from scipy import stats
-    df = 4 if k0 == 1 else 6          # parametri in plus: 1 vs 2: mu, sigma, p11, p22; 2 vs 3: mu, sigma + 4 probabilitati de tranzitie
+    df = 4 if k0 == 1 else 6          # extra parameters: 1 vs 2: mu, sigma, p11, p22; 2 vs 3: mu, sigma + 4 transition probabilities
     return dict(k0=k0, llf0=l0, llf1=l1, lr=float(lr), B=int(len(lrs)), p_boot=float((1 + (lrs >= lr).sum()) / (len(lrs) + 1)),
                 q95=float(np.quantile(lrs, 0.95)), q99=float(np.quantile(lrs, 0.99)), lr_max=float(lrs.max()),
                 chi2_df=df, chi2_95=float(stats.chi2.ppf(0.95, df)), lrs=lrs.tolist())
@@ -316,7 +316,7 @@ def regimes_test(out=None):
     if 'btc_2v3' not in out:
         out['btc_2v3'] = lr_boot(r, 2)
     print('regimes btc 2v3', {k: v for k, v in out['btc_2v3'].items() if k != 'lrs'})
-    # grafic: distributiile bootstrap ale LR si cuantila chi-patrat
+    # chart: bootstrap distributions of LR and the chi-square quantile
     fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.9))
     for ax, (tag, title) in zip(axes, [('btc_1v2', 'Bitcoin: one vs two regimes'), ('btc_2v3', 'Bitcoin: two vs three regimes')]):
         o = out[tag]
@@ -336,7 +336,7 @@ def regimes_test(out=None):
 
 
 # =============================================================================
-# 5. BUBBLES FOR FAMA: MARIMEA EFECTIVA A ESANTIONULUI
+# 5. BUBBLES FOR FAMA: EFFECTIVE SAMPLE SIZE
 # =============================================================================
 def gsy_ess(thr=1.0, B=2000):
     d = gsy_events(thr)
@@ -349,8 +349,8 @@ def gsy_ess(thr=1.0, B=2000):
         st.append(np.concatenate([g[keys[j]] for j in pick]).mean())
     p = float(d['crash'].mean())
     se = float(np.std(st))
-    # sensibilitate: bootstrap pe blocuri mobile de k ani calendaristici consecutivi (pastreaza dependenta dintre
-    # ferestrele de 2 ani ale evenimentelor din ani vecini), k = 2, 3, 5
+    # sensitivity: moving-block bootstrap of k consecutive calendar years (keeps the dependence between
+    # the 2-year windows of events in neighbouring years), k = 2, 3, 5
     years = np.arange(d['date'].dt.year.min(), d['date'].dt.year.max() + 1)
     se_blocks = {}
     for k in (2, 3, 5):

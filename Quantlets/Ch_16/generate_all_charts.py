@@ -1,12 +1,12 @@
 """
-Generator pentru toate graficele si cifrele din Capitolul 16: active digitale si DeFi
-====================================================================================
-Toate graficele: fundal transparent, etichete ENG, legenda in afara, jos; fara serii gri.
-Date zilnice de piata (data/market): Bitcoin, Ethereum, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB,
-stablecoin-urile USDT, USDC, DAI; ETF-urile IBIT, ETHA, QQQ, GLD, TLT; actiunile COIN, MSTR; S&P 500; aurul XAU/USD.
-Surse publice: oferta curenta a cripto-activelor (Coin Metrics Community Data); TVL si stablecoin-uri (DefiLlama).
-Cifrele sunt salvate in ch16_results.json (folosite de generatoarele de slide-uri).
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Generator of all charts and numbers of Chapter 16: digital assets and DeFi
+==========================================================================
+All charts: transparent background, English labels, legend outside at the bottom; no grey series.
+Daily market data: Bitcoin, Ethereum, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB,
+the stablecoins USDT, USDC, DAI; the ETFs IBIT, ETHA, QQQ, GLD, TLT; the shares COIN, MSTR; S&P 500; gold XAU/USD.
+Public sources: current supply of crypto-assets (Coin Metrics Community Data); TVL and stablecoins (DefiLlama).
+The numbers are saved in ch16_results.json (used by the slide generators).
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -26,7 +26,7 @@ from mfm_data import (ASSETS, LABELS, CRIX_UNIVERSE, STABLE, CLASS_ASSETS, END, 
                       joint_prices, joint_returns, periods_per_year, market_values, defi_tvl,
                       stablecoin_chart, stablecoin_list, chain_tvl, chain_tvl_at, symbol_returns, read_market)
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -45,7 +45,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand (gri doar pentru linii de referinta si grila)
+# Course colours (grey only for reference lines and the grid)
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -65,12 +65,12 @@ CLASS_COL = {'Crypto': Orange, 'Equity': MainBlue, 'FX': Forest, 'Commodity': Am
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 SEED = 42
-ETF_START = '2024-01-11'          # prima zi de tranzactionare a ETF-urilor spot pe Bitcoin din date (IBIT)
+ETF_START = '2024-01-11'          # first trading day of the spot Bitcoin ETFs in the data (IBIT)
 B_BOOT = 2000
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as a transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -79,12 +79,12 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
 def fig_legend_bottom(fig, handles=None, labels=None, ncol=4, y=0.0):
-    """O singura legenda sub o figura cu mai multe panouri."""
+    """A single legend below a multi-panel figure."""
     if handles is None:
         handles, labels = [], []
         for ax in fig.axes:
@@ -96,7 +96,7 @@ def fig_legend_bottom(fig, handles=None, labels=None, ncol=4, y=0.0):
 
 
 def jsonable(x):
-    """Converteste recursiv numerele numpy si datele in tipuri JSON."""
+    """Recursively convert numpy numbers and dates to JSON types."""
     if isinstance(x, dict):
         return {str(k): jsonable(v) for k, v in x.items()}
     if isinstance(x, (list, tuple)):
@@ -111,28 +111,28 @@ def jsonable(x):
 
 
 def max_drawdown(p):
-    """Cea mai mare scadere de la un maxim anterior (in %) si data minimului."""
+    """Largest fall from a previous peak (in %) and the date of the trough."""
     dd = p / p.cummax() - 1
     return 100 * dd.min(), dd.idxmin()
 
 
 def hill(x, frac=0.05):
-    """Estimatorul Hill al indicelui de coada pentru cele mai mari frac din valorile pozitive ale lui x."""
+    """Hill estimator of the tail index from the largest frac of the positive values of x."""
     x = np.sort(x[x > 0])[::-1]
     k = max(int(frac * len(x)), 10)
     return 1 / np.mean(np.log(x[:k] / x[k]))
 
 
 def hac_ols(y, X, lags=4):
-    """Regresie OLS cu erori standard Newey-West (HAC)."""
+    """OLS regression with Newey-West (HAC) standard errors."""
     return sm.OLS(y, sm.add_constant(X)).fit(cov_type='HAC', cov_kwds={'maxlags': lags})
 
 
 # =============================================================================
-# 1. PIATA CRIPTO: valoare de piata si dominanta Bitcoin
+# 1. THE CRYPTO MARKET: market value and Bitcoin dominance
 # =============================================================================
 def fig_market_value():
-    """Valoarea de piata (pret x oferta curenta) a activelor din universul indicelui, 2018-2026."""
+    """Market value (price x current supply) of the assets in the index universe, 2018-2026."""
     mv = market_values()
     m = mv.resample('ME').last()
     tot = mv.sum(axis=1)
@@ -159,13 +159,13 @@ def fig_market_value():
 
 
 # =============================================================================
-# 2. FAPTE STILIZATE: cripto vs actiuni si aur
+# 2. STYLISED FACTS: crypto vs shares and gold
 # =============================================================================
 STYL = ['BTC', 'ETH', 'SOL', 'DOGE', 'SPX', 'GOLD']
 
 
 def stylised_table(start='2018-01-01'):
-    """Momente, cozi, autocorelatii, scaderi maxime si VaR 1% / ES 2.5% istorice, fiecare serie pe calendarul ei."""
+    """Moments, tails, autocorrelations, maximum drawdowns and historical VaR 1% / ES 2.5%, each series on its own calendar."""
     rows = {}
     for k in STYL:
         p = price(k, start)
@@ -179,7 +179,7 @@ def stylised_table(start='2018-01-01'):
                        acf1=r.autocorr(1), acf1_abs=r.abs().autocorr(1), var1=-q, es2_5=-r[r <= q25].mean(),
                        min=r.min(), min_date=str(r.idxmin().date()), mdd=mdd, mdd_date=str(mdd_date.date()),
                        hill_left=hill(-r.values), share5sd=100 * (np.abs(r - r.mean()) > 5 * r.std()).mean(),
-                       # aceleasi masuri ca pierderi simple, in % din pozitie: 1 - exp(r/100)
+                       # the same measures as simple losses, in % of the position: 1 - exp(r/100)
                        var1_simple=100 * (1 - np.exp(q / 100)),
                        es2_5_simple=100 * (1 - np.exp(r[r <= q25] / 100)).mean(),
                        min_simple=100 * (np.exp(r.min() / 100) - 1))
@@ -189,8 +189,8 @@ def stylised_table(start='2018-01-01'):
 
 
 def fig_rolling_vol(start='2018-01-01'):
-    """Volatilitatea anualizata pe ferestre mobile de un an calendaristic."""
-    # culori distincte: aurul (Forest, linie intrerupta) nu se confunda cu Bitcoin (Orange)
+    """Annualised volatility over rolling one-calendar-year windows."""
+    # distinct colours: gold (Forest, dashed line) is not confused with Bitcoin (Orange)
     VOL_COL = {'BTC': Orange, 'ETH': Purple, 'SPX': MainBlue, 'GOLD': Forest}
     VOL_LS = {'BTC': '-', 'ETH': '-', 'SPX': '-', 'GOLD': '--'}
     fig, ax = plt.subplots(figsize=(7.2, 3.0))
@@ -211,7 +211,7 @@ def fig_rolling_vol(start='2018-01-01'):
 
 
 def fig_drawdowns(start='2018-01-01'):
-    """Scaderea de la maximul anterior pentru Bitcoin, Ethereum si S&P 500."""
+    """Drawdown from the previous peak for Bitcoin, Ethereum and the S&P 500."""
     fig, ax = plt.subplots(figsize=(7.2, 2.9))
     out = {}
     for k in ['BTC', 'ETH', 'SPX']:
@@ -228,7 +228,7 @@ def fig_drawdowns(start='2018-01-01'):
 
 
 def fig_weekday(start='2018-01-01'):
-    """Dispersia randamentelor Bitcoin pe zile ale saptamanii, inainte si dupa lansarea ETF-urilor spot."""
+    """Variance of Bitcoin returns by day of the week, before and after the launch of the spot ETFs."""
     r = 100 * log_returns('BTC', start)
     pre, post = r.loc[:'2024-01-10'], r.loc[ETF_START:]
     days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -245,7 +245,7 @@ def fig_weekday(start='2018-01-01'):
     save_fig('ch16_weekday')
 
     def ratio(x):
-        """Raportul dispersiilor (centrate): weekend / zile lucratoare."""
+        """Ratio of (centred) variances: weekend / weekdays."""
         we = x[x.index.dayofweek >= 5]
         wd = x[x.index.dayofweek < 5]
         return we.var(ddof=1) / wd.var(ddof=1)
@@ -257,8 +257,8 @@ def fig_weekday(start='2018-01-01'):
 
 
 def fig_rolling_corr():
-    """Corelatia pe 250 de zile comune: Bitcoin cu S&P 500, Nasdaq 100 si aurul (join pe preturi).
-    Panoul din stanga: indicii de actiuni (aproape suprapusi: linie continua vs intrerupta cu markeri); dreapta: aurul."""
+    """Correlation over 250 common days: Bitcoin with the S&P 500, the Nasdaq 100 and gold (prices aligned first).
+    Left panel: the equity indices (almost overlapping: solid line vs dashed line with markers); right: gold."""
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 3.0), sharex=True, sharey=True,
                              gridspec_kw=dict(wspace=0.08))
     out = {}
@@ -293,11 +293,11 @@ def fig_rolling_corr():
 
 
 # =============================================================================
-# 3. INDICI CRIPTO: indice ponderat cu valoarea de piata, numarul de constituenti ales prin AIC
+# 3. CRYPTO INDICES: market-value weighted index, number of constituents chosen by the AIC
 # =============================================================================
 def crix_index(k=None, weighting='cap', mv=None, px=None):
-    """Indice Laspeyres cu reponderare lunara: primii k constituenti dupa valoarea de piata la sfarsitul lunii
-    anterioare; cantitatile sunt fixe in cursul lunii, iar divizorul pastreaza continuitatea la reponderare."""
+    """Laspeyres index with monthly reweighting: the first k constituents by market value at the end of the previous
+    month; quantities are fixed within the month and the divisor keeps the index continuous at reweighting."""
     if mv is None:
         mv = market_values()
     if px is None:
@@ -327,8 +327,8 @@ def crix_index(k=None, weighting='cap', mv=None, px=None):
 
 
 def crix_aic(mv=None, px=None):
-    """AIC(k) = n ln(s2_k) + 2k, cu s2_k media patratelor diferentelor dintre randamentele log ale indicelui total
-    (toti cei 7 constituenti) si ale indicelui cu k constituenti; pe intreaga perioada si pe fiecare an."""
+    """AIC(k) = n ln(s2_k) + 2k, with s2_k the mean squared difference between the log returns of the total index
+    (all 7 constituents) and of the index with k constituents; over the full period and for each year."""
     if mv is None:
         mv = market_values()
     if px is None:
@@ -354,7 +354,7 @@ def crix_aic(mv=None, px=None):
 
 
 def fig_crix():
-    """Indicele total (7 active), Bitcoin singur (k = 1), indicele cu ponderi egale; AIC(k) si ponderile in timp."""
+    """Total index (7 assets), Bitcoin alone (k = 1), the equal-weight index; AIC(k) and the weights over time."""
     mv = market_values()
     px = pd.concat([price(a) for a in CRIX_UNIVERSE], axis=1).reindex(mv.index)
     tot, w = crix_index(None, 'cap', mv, px)
@@ -362,7 +362,7 @@ def fig_crix():
     k2, _ = crix_index(2, 'cap', mv, px)
     ew, _ = crix_index(None, 'equal', mv, px)
     a = crix_aic(mv, px)
-    # indicele
+    # the index
     fig, ax = plt.subplots(figsize=(7.2, 3.0))
     for s, lab, c, lw in [(tot, f'Cap-weighted, all {len(CRIX_UNIVERSE)} assets (total market)', Orange, 1.3), (k2, 'Cap-weighted, top 2', Purple, 0.9),
                           (k1, 'Top 1 (Bitcoin)', MainBlue, 0.9), (ew, f'Equally weighted, {len(CRIX_UNIVERSE)} assets', Forest, 0.9)]:
@@ -371,24 +371,24 @@ def fig_crix():
     ax.set_ylabel('Index level (1000 at start, log scale)')
     legend_outside_bottom(ax, ncol=2, y=-0.14)
     save_fig('ch16_crix_index')
-    # eroarea de urmarire si castigul AIC la adaugarea fiecarui constituent
+    # tracking error and AIC gain when each constituent is added
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.8))
     ks = list(a['te'])
     axes[0].plot(ks, [a['te'][k] for k in ks], 'o-', color=MainBlue, label=f'Tracking error vs the {len(CRIX_UNIVERSE)}-asset index (% p.a.)')
     axes[0].set_xlabel('Number of constituents k')
     axes[0].set_ylabel('% per year')
     axes[0].set_xticks(ks)
-    # imbunatatirea ajustarii n ln(s2_k / s2_(k+1)) = AIC(k) - AIC(k+1) + 2, comparata cu penalizarea 2
+    # fit improvement n ln(s2_k / s2_(k+1)) = AIC(k) - AIC(k+1) + 2, compared with the penalty 2
     fit = [a['aic'][k] - a['aic'][k + 1] + 2 for k in ks[:-1]]
     axes[1].bar([f'{k} to {k + 1}' for k in ks[:-1]], fit, color=Orange,
-                label='Fit improvement n ln(s2(k) / s2(k+1)) when one constituent is added')
+                label='Fit improvement $n\\ln(\\hat\\sigma^2_k/\\hat\\sigma^2_{k+1})$ from adding one constituent')
     axes[1].axhline(2, color=IDAred, lw=1.0, ls='--', label='AIC penalty per constituent (2)')
     axes[1].set_yscale('log')
     axes[1].set_xlabel('k')
     fig.tight_layout()
     fig_legend_bottom(fig, ncol=2, y=0.0)
     save_fig('ch16_crix_aic')
-    # ponderile
+    # the weights
     fig, ax = plt.subplots(figsize=(7.2, 2.9))
     wi = w.copy()
     wi.index = pd.PeriodIndex(wi.index, freq='M').to_timestamp()
@@ -415,10 +415,10 @@ def fig_crix():
 
 
 # =============================================================================
-# 4. STABLECOIN-URI: oferta, abateri de la paritate, USDC in martie 2023, prabusirea UST
+# 4. STABLECOINS: supply, peg deviations, USDC in March 2023, the collapse of UST
 # =============================================================================
 def fig_stablecoin_supply():
-    """Oferta stablecoin-urilor ancorate la USD: total, USDT, USDC, DAI (miliarde USD)."""
+    """Supply of USD stablecoins: total, USDT, USDC, DAI (billion USD)."""
     tot = stablecoin_chart()['value'].loc['2019-01-01':]
     parts = {'USDT': stablecoin_chart(1)['value'], 'USDC': stablecoin_chart(2)['value'], 'DAI': stablecoin_chart(5)['value']}
     fig, ax = plt.subplots(figsize=(7.2, 2.9))
@@ -429,8 +429,8 @@ def fig_stablecoin_supply():
     ax.set_ylabel('Supply (USD bn)')
     legend_outside_bottom(ax, ncol=4, y=-0.14)
     save_fig('ch16_stablecoin_supply')
-    # clasificarea pe mecanisme la aceeasi data ca totalul (END): valoarea fiecarei monede de peste 100 mil. USD,
-    # restul monedelor = totalul minus suma lor
+    # classification by mechanism on the same date as the total (END): the value of each coin above 100 million USD,
+    # the other coins = the total minus their sum
     lst = stablecoin_list()
     lst = lst.assign(mechanism=lst['mechanism'].replace({'crytpo-backed': 'crypto-backed'}))
     big = lst[lst['supply'] >= 0.1].copy()
@@ -459,7 +459,7 @@ def fig_stablecoin_supply():
 
 
 def peg_stats(key, start='2021-01-01'):
-    """Abaterea de la paritate (puncte de baza) pe preturile de inchidere si pe minimele zilnice."""
+    """Peg deviation (basis points) on closing prices and on daily lows."""
     d = read_market(ASSETS[key][0]).loc[start:END]
     dev = 1e4 * (d['close'] - 1)
     low = 1e4 * (d['low'] - 1)
@@ -473,7 +473,8 @@ def peg_stats(key, start='2021-01-01'):
 
 
 def fig_peg_deviation(start='2021-01-01'):
-    """Abaterea zilnica de la 1 USD pentru USDT, USDC si DAI (inchidere si minimul zilei)."""
+    """Daily deviation from 1 USD for USDT, USDC and DAI (close and daily low)."""
+    PEG_NAME = {'USDT': 'Tether (USDT)', 'USDC': 'USD Coin (USDC)', 'DAI': 'Dai (DAI)'}
     fig, axes = plt.subplots(3, 1, figsize=(7.2, 4.6), sharex=True)
     out = {}
     for ax, k in zip(axes, STABLE):
@@ -484,18 +485,18 @@ def fig_peg_deviation(start='2021-01-01'):
         ax.plot(dev.index, dev.values, color=COL[k], lw=0.8, label=f'Daily close')
         ax.axhline(0, color=Gray, lw=0.5)
         ax.set_ylim(-400, 100)
-        ax.set_ylabel(f'{k} (bp)')
+        ax.set_ylabel(PEG_NAME[k] + ', bp')
         out[k] = peg_stats(k, start)
     h = [plt.Line2D([], [], color=COL[k], lw=1.2) for k in STABLE] + [plt.Line2D([], [], color=IDAred, lw=0.8)]
     fig.tight_layout()
-    fig_legend_bottom(fig, h, ['USDT daily close', 'USDC daily close', 'DAI daily close',
+    fig_legend_bottom(fig, h, ['Tether daily close', 'USD Coin daily close', 'Dai daily close',
                                'Daily low (clipped at -400 bp in the panels)'], ncol=4, y=0.0)
     save_fig('ch16_peg_deviation')
     return out
 
 
 def fig_depeg_2023():
-    """Martie 2023: USDC si DAI sub paritate dupa inchiderea Silicon Valley Bank; USDT peste paritate."""
+    """March 2023: USDC and DAI below the peg after the closure of Silicon Valley Bank; USDT above the peg."""
     a, b = '2023-03-05', '2023-03-20'
     fig, ax = plt.subplots(figsize=(7.2, 3.0))
     out = {}
@@ -514,7 +515,7 @@ def fig_depeg_2023():
 
 
 def fig_ust():
-    """TerraUSD (UST), aprilie-mai 2022: oferta si pretul implicit (valoare / oferta), DefiLlama."""
+    """TerraUSD (UST), April-May 2022: supply and implied price (value / supply), DefiLlama."""
     u = stablecoin_chart(3).loc['2022-03-01':'2022-05-31'].copy()
     u = u[u['supply'] > 0]
     u['px'] = u['value'] / u['supply']
@@ -538,22 +539,22 @@ def fig_ust():
 
 
 # =============================================================================
-# 5. FORMATORI AUTOMATI DE PIATA (AMM): alunecare, pierdere impermanenta, simulare pe ETH
+# 5. AUTOMATED MARKET MAKERS (AMM): slippage, impermanent loss, simulation on ETH
 # =============================================================================
 def amm_swap(x, y, dx, fee=0.003):
-    """Schimb dx din activul X intr-un fond x*y = k cu comision fee: cantitatea primita si pretul efectiv."""
+    """Swap dx of asset X in a pool x*y = k with a fee: amount received and effective price."""
     g = 1 - fee
     dy = y * g * dx / (x + g * dx)
     return dy, dy / dx
 
 
 def impermanent_loss(r):
-    """Pierderea impermanenta a unui furnizor de lichiditate 50/50 x*y = k, pentru raportul de pret r = P1/P0."""
+    """Impermanent loss of a 50/50 liquidity provider in x*y = k, for the price ratio r = P1/P0."""
     return 2 * np.sqrt(r) / (1 + r) - 1
 
 
 def fig_amm_theory():
-    """Alunecarea pretului in functie de marimea ordinului si pierderea impermanenta."""
+    """Price slippage by order size, and impermanent loss."""
     delta = np.logspace(-4, np.log10(0.3), 200)
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.9))
     out = {}
@@ -578,16 +579,16 @@ def fig_amm_theory():
 
 
 def fig_lp_vs_hodl(start='2024-01-01'):
-    """Fond ETH/USD x*y = k fara comisioane: furnizorul de lichiditate vs pastrarea activelor, vs portofoliul de
-    reechilibrare din Milionis et al. (2022) (detine in fiecare zi cantitatea de ETH a fondului, x = V/(2P), si
-    tranzactioneaza la pretul pietei) si vs un portofoliu 50/50 reechilibrat zilnic (pondere constanta)."""
+    """ETH/USD pool x*y = k without fees: the liquidity provider vs holding the assets, vs the rebalancing
+    portfolio of Milionis et al. (2022) (holds the pool's ETH every day, x = V/(2P), and trades at the market price)
+    and vs a 50/50 portfolio rebalanced daily (constant weight)."""
     p = price('ETH', start)
     rel = p / p.iloc[0]
     hodl = 100 * (1 + rel) / 2
     lp = 100 * np.sqrt(rel)
     R = p.pct_change().fillna(0)
     reb = 100 * (1 + 0.5 * R).cumprod()
-    x_pool = lp / (2 * p)                                         # ETH detinut de fond (V'(P) = V / 2P)
+    x_pool = lp / (2 * p)                                         # ETH held by the pool (V'(P) = V / 2P)
     dR = (x_pool.shift(1) * p.diff()).fillna(0)
     mmrz = 100 + dR.cumsum()                                      # R_t = R_(t-1) + x(P_(t-1)) (P_t - P_(t-1))
     fig, ax = plt.subplots(figsize=(7.2, 3.0))
@@ -601,7 +602,7 @@ def fig_lp_vs_hodl(start='2024-01-01'):
     r = np.log(p).diff().dropna()
     sig2 = r.var() * 365
     yrs = (p.index[-1] - p.index[0]).days / 365.25
-    # LVR realizata (Milionis et al., 2022): suma pierderilor zilnice (dR_t - dV_t) / V_(t-1), anualizata
+    # realised LVR (Milionis et al., 2022): sum of the daily losses (dR_t - dV_t) / V_(t-1), annualised
     lvr_real = ((dR - lp.diff()) / lp.shift(1)).dropna().sum() / yrs
     return dict(start=str(p.index[0].date()), p0=p.iloc[0], p1=p.iloc[-1], ratio=rel.iloc[-1], hodl=hodl.iloc[-1],
                 lp=lp.iloc[-1], reb=reb.iloc[-1], mmrz=mmrz.iloc[-1], lvr_level=mmrz.iloc[-1] - lp.iloc[-1],
@@ -611,11 +612,11 @@ def fig_lp_vs_hodl(start='2024-01-01'):
 
 
 # =============================================================================
-# 6. ETF-URI SPOT: IBIT si ETHA fata de activul suport
+# 6. SPOT ETFs: IBIT and ETHA against the underlying
 # =============================================================================
 def etf_tracking(etf='IBIT', coin='BTC'):
-    """Randamente ETF vs activ suport in zilele de tranzactionare ale ETF-ului: zilnic (aceeasi data si data urmatoare)
-    si saptamanal (vineri); abaterea de urmarire; drift-ul raportului ETF / activ (comisionul anual)."""
+    """ETF vs underlying returns on the ETF's trading days: daily (same date and next date) and weekly (Friday);
+    tracking error; drift of the ETF / underlying ratio (the annual fee)."""
     p = joint_prices([etf, coin])
     r = np.log(p).diff().dropna()
     c_next = np.log(price(coin)).diff().shift(-1).reindex(r.index)
@@ -639,7 +640,7 @@ def etf_tracking(etf='IBIT', coin='BTC'):
 
 
 def fig_etf():
-    """IBIT si Bitcoin: nivelurile normalizate si randamentele zilnice vs saptamanale."""
+    """IBIT and Bitcoin: normalised levels and daily vs weekly returns."""
     p = joint_prices(['IBIT', 'BTC'])
     n = 100 * p / p.iloc[0]
     fig, ax = plt.subplots(figsize=(7.2, 2.8))
@@ -668,10 +669,10 @@ def fig_etf():
 
 
 # =============================================================================
-# 7. ACTIUNI "CRIPTO": COIN si MSTR, beta fata de Bitcoin si S&P 500 (saptamanal)
+# 7. "CRYPTO" EQUITIES: COIN and MSTR, beta to Bitcoin and the S&P 500 (weekly)
 # =============================================================================
 def fig_crypto_equities(start='2021-04-16'):
-    """Regresii saptamanale cu doi factori (Bitcoin, S&P 500) si beta mobil pe 52 de saptamani fata de Bitcoin."""
+    """Weekly two-factor regressions (Bitcoin, S&P 500) and the rolling 52-week beta to Bitcoin."""
     out = {}
     fig, ax = plt.subplots(figsize=(7.2, 2.9))
     for k in ['COIN', 'MSTR']:
@@ -695,10 +696,10 @@ def fig_crypto_equities(start='2021-04-16'):
 
 
 # =============================================================================
-# 8. DEFI: valoarea totala blocata (TVL) si Ethereum; TVL pe blockchain-uri
+# 8. DEFI: total value locked (TVL) and Ethereum; TVL by blockchain
 # =============================================================================
 def fig_defi_tvl():
-    """TVL total (DefiLlama) si pretul Ethereum, lunar, 2020-2026; TVL pe blockchain-uri azi."""
+    """Total TVL (DefiLlama) and the Ethereum price, monthly, 2020-2026; TVL by blockchain today."""
     tvl = defi_tvl().loc['2020-01-01':]
     eth = price('ETH', '2020-01-01')
     m = pd.concat([tvl.resample('ME').last(), eth.resample('ME').last()], axis=1).dropna()
@@ -712,7 +713,7 @@ def fig_defi_tvl():
     save_fig('ch16_defi_tvl')
     d = np.log(m).diff().dropna()
     reg = hac_ols(d['TVL'], d['ETH'], lags=3)
-    # TVL pe blockchain-uri la aceeasi data ca seria totala (END): cele mai mari 10 dintre primele 15 de azi
+    # TVL by blockchain on the same date as the total series (END): the 10 largest of today's top 15
     ch = pd.Series({c: chain_tvl_at(c, END) for c in chain_tvl().head(15).index}).sort_values(ascending=False).head(10)
     fig, ax = plt.subplots(figsize=(6.6, 2.9))
     ax.barh(ch.index[::-1], ch.values[::-1], color=Teal, label='Total value locked (USD bn)')
@@ -727,15 +728,15 @@ def fig_defi_tvl():
 
 
 # =============================================================================
-# 9. SUNT CRIPTO-ACTIVELE O CLASA ALTERNATIVA? (replicare restransa a abordarii Pele et al., 2023)
+# 9. ARE CRYPTO-ASSETS AN ALTERNATIVE CLASS? (a reduced replication of Pele et al., 2023)
 # =============================================================================
 WINDOWS = {'W1': ('2019-01-01', '2021-06-30'), 'W2': (ETF_START, END)}
 FEATURES = ['ann_vol', 'skew', 'kurt', 'acf1', 'acf1_sq', 'hill_left', 'hill_right', 'mdd']
 
 
 def asset_features(r, ppy=None):
-    """Caracteristicile statistice ale unei serii de randamente log zilnice (ppy: observatii pe an, implicit
-    frecventa reala a seriei)."""
+    """Statistical features of a series of daily log returns (ppy: observations per year, by default the
+    actual frequency of the series)."""
     ppy = periods_per_year(r) if ppy is None else ppy
     p = np.exp(r.cumsum())
     return dict(ann_vol=np.log(r.std() * np.sqrt(ppy)), skew=stats.skew(r), kurt=np.log1p(max(stats.kurtosis(r), 0)),
@@ -744,7 +745,7 @@ def asset_features(r, ppy=None):
 
 
 def feature_table():
-    """Tabelul caracteristicilor pe active si ferestre (W1: 2019 - iunie 2021; W2: era ETF-urilor spot)."""
+    """Table of features by asset and window (W1: 2019 - June 2021; W2: the spot-ETF era)."""
     rows = []
     for s, (lab, cls, _) in CLASS_ASSETS.items():
         for w, (a, b) in WINDOWS.items():
@@ -754,7 +755,7 @@ def feature_table():
 
 
 def fig_alt_assets():
-    """Componente principale ale caracteristicilor standardizate; distanta cripto - clasele traditionale."""
+    """Principal components of the standardised features; distance between crypto and the traditional classes."""
     f = feature_table()
     X = f[FEATURES].values
     Z = (X - X.mean(0)) / X.std(0)
@@ -762,7 +763,7 @@ def fig_alt_assets():
     pc = Z @ Vt[:2].T
     if np.corrcoef(pc[:, 0], f['ann_vol'])[0, 1] < 0:
         pc[:, 0] *= -1
-        Vt[0] *= -1          # incarcarile PC1 cu acelasi semn ca axa din grafic
+        Vt[0] *= -1          # PC1 loadings with the same sign as the axis in the chart
     f['pc1'], f['pc2'] = pc[:, 0], pc[:, 1]
     ev = S ** 2 / (S ** 2).sum()
     fig, ax = plt.subplots(figsize=(7.2, 4.0))
@@ -787,7 +788,7 @@ def fig_alt_assets():
     ax.set_ylabel(f'PC2 ({100 * ev[1]:.0f}% of variance)')
     legend_outside_bottom(ax, ncol=4, y=-0.16)
     save_fig('ch16_alt_assets')
-    # distante in spatiul complet standardizat
+    # distances in the full standardised space
     f[[f'z_{c}' for c in FEATURES]] = Z
     zc = [f'z_{c}' for c in FEATURES]
     out = dict(ev1=100 * ev[0], ev2=100 * ev[1], loadings={c: float(v) for c, v in zip(FEATURES, Vt[0])})
@@ -807,22 +808,22 @@ def fig_alt_assets():
 
 
 # =============================================================================
-# 8. STUDIU DE CAZ: LIU, TSYVINSKI & WU (2022), TABELUL 1, PANELUL B
+# 10. CASE STUDY: LIU, TSYVINSKI & WU (2022), TABLE 1, PANEL B
 # =============================================================================
-LTW_T1 = {'BTC': (1.3, 11.1), 'XRP': (2.6, 23.7), 'ETH': (3.6, 21.0)}   # medie, abatere standard (%), Tabelul 1, Panelul B
-LTW_START = {'BTC': '2014-01-01', 'XRP': '2014-01-01', 'ETH': '2015-08-06'}   # Ether: din saptamana 32 din 2015
+LTW_T1 = {'BTC': (1.3, 11.1), 'XRP': (2.6, 23.7), 'ETH': (3.6, 21.0)}   # mean, standard deviation (%), Table 1, Panel B
+LTW_START = {'BTC': '2014-01-01', 'XRP': '2014-01-01', 'ETH': '2015-08-06'}   # Ether: from week 32 of 2015
 LTW_END = '2020-07-31'
 LTW_NAME = {'BTC': 'Bitcoin', 'XRP': 'XRP', 'ETH': 'Ether'}
 
 
 def ltw_weekly(key, end=END):
-    """Randamente saptamanale simple cu calendarul lucrarii: 52 de saptamani pe an, primele 51 de 7 zile,
-    ultima pana la 31 decembrie; doar saptamanile complete (ultima inchidere = ultima zi a saptamanii)."""
+    """Weekly simple returns on the paper's calendar: 52 weeks a year, the first 51 of 7 days,
+    the last one up to 31 December; complete weeks only (last close = last day of the week)."""
     return ltw_weekly_series(price(key, None, end)).rename(key)
 
 
 def ltw_weekly_series(p):
-    """Acelasi calendar pentru orice serie zilnica de preturi 7/7 (de ex. un indice cripto)."""
+    """The same calendar for any 7/7 daily price series (e.g. a crypto index)."""
     doy = p.index.dayofyear
     wk = np.minimum((doy - 1) // 7 + 1, 52)
     grp = pd.DataFrame({'p': p.values, 'd': p.index, 'y': p.index.year, 'w': wk}).groupby(['y', 'w'])
@@ -842,8 +843,8 @@ def ltw_moments(r):
 
 
 def fig_ltw_table1():
-    """Tabelul 1, Panelul B din Liu, Tsyvinski & Wu (2022) refacut pe datele cursului (2014 - iulie 2020)
-    si aceleasi statistici in afara esantionului (august 2020 - 2026); volatilitatea pe 52 de saptamani."""
+    """Table 1, Panel B of Liu, Tsyvinski & Wu (2022) rebuilt on our sample (2014 - July 2020)
+    and the same statistics out of sample (August 2020 - 2026); 52-week volatility."""
     out, W = {}, {}
     for k in LTW_T1:
         r = ltw_weekly(k)
@@ -853,8 +854,8 @@ def fig_ltw_table1():
     keys = list(LTW_T1)
     x = np.arange(len(keys))
     bw = 0.26
-    ins_lab = f"Course data, same weeks ({out['BTC']['ins']['first'][:4]} - Jul 2020)"
-    oos_lab = f"Course data, out of sample (Aug 2020 - {pd.Timestamp(out['BTC']['oos']['last']).strftime('%b %Y')})"
+    ins_lab = f"Our sample (daily closes), same weeks ({out['BTC']['ins']['first'][:4]} - Jul 2020)"
+    oos_lab = f"Our sample (daily closes), out of sample (Aug 2020 - {pd.Timestamp(out['BTC']['oos']['last']).strftime('%b %Y')})"
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.9))
     for ax, (stat, ttl) in zip(axes, [('mean', 'Mean weekly return (%)'), ('sd', 'Standard deviation of weekly returns (%)')]):
         bars = [([LTW_T1[k][0 if stat == 'mean' else 1] for k in keys], MainBlue, 'Liu, Tsyvinski & Wu (2022), Table 1, Panel B'),

@@ -22,16 +22,16 @@ from scipy.special import gammaln
 # RAPORTUL DISPERSIILOR (VARIANCE RATIO)
 # =============================================================================
 def variance_ratio(r, q):
-    """VR(q) cu suprapunere si corectiile de deplasare Lo-MacKinlay (1988).
+    """Overlapping VR(q) with the Lo-MacKinlay (1988) bias corrections.
 
-    Returneaza (VR, z omoscedastic, z* robust la heteroscedasticitate).
+    Returns (VR, homoskedastic z, heteroskedasticity-robust z*).
     """
     x = np.asarray(r, dtype=float)
     T = len(x)
     mu = x.mean()
     e = x - mu
     var_a = (e ** 2).sum() / (T - 1)
-    agg = np.convolve(x, np.ones(q), mode='valid') - q * mu        # sume pe q perioade, suprapuse
+    agg = np.convolve(x, np.ones(q), mode='valid') - q * mu        # overlapping q-period sums
     m = q * (T - q + 1) * (1 - q / T)
     var_c = (agg ** 2).sum() / m
     vr = var_c / var_a
@@ -46,7 +46,7 @@ def variance_ratio(r, q):
 
 
 def chow_denning(r, qs=(2, 5, 10, 20)):
-    """Testul multiplu Chow-Denning: max |z*(q)|; valoarea p din modulul maxim studentizat (df infinit)."""
+    """Chow-Denning multiple test: max |z*(q)|; p-value from the studentized maximum modulus (infinite df)."""
     zs = [variance_ratio(r, q)[2] for q in qs]
     zmax = np.max(np.abs(zs))
     p = 1 - (2 * stats.norm.cdf(zmax) - 1) ** len(qs)
@@ -57,7 +57,7 @@ def chow_denning(r, qs=(2, 5, 10, 20)):
 # TESTUL SECVENTELOR (RUNS TEST)
 # =============================================================================
 def runs_test(r):
-    """Numarul de secvente de semne (fara zerouri), media si varianta sub ipoteza de independenta."""
+    """Number of sign runs (zeros dropped), with its mean and variance under independence."""
     s = np.sign(np.asarray(r, dtype=float))
     s = s[s != 0]
     n1, n2 = (s > 0).sum(), (s < 0).sum()
@@ -73,7 +73,7 @@ def runs_test(r):
 # LJUNG-BOX CLASIC SI ROBUST
 # =============================================================================
 def robust_ljung_box(r, m=10):
-    """Q(m) Ljung-Box si Q~(m) cu varianta robusta tau_k = sum e_t^2 e_{t-k}^2 / (sum e_t^2)^2."""
+    """Ljung-Box Q(m) and Q~(m) with the robust variance tau_k = sum e_t^2 e_{t-k}^2 / (sum e_t^2)^2."""
     e = np.asarray(r, dtype=float) - np.mean(r)
     T = len(e)
     s2 = (e ** 2).sum()
@@ -96,7 +96,7 @@ def _rs(x):
 
 
 def expected_rs(n):
-    """E[R/S] pentru zgomot i.i.d. (Anis & Lloyd, 1976)."""
+    """E[R/S] for i.i.d. noise (Anis & Lloyd, 1976)."""
     if n <= 340:
         f = np.exp(gammaln((n - 1) / 2) - gammaln(n / 2)) / np.sqrt(np.pi)
     else:
@@ -106,7 +106,7 @@ def expected_rs(n):
 
 
 def rs_hurst(r, min_n=10, n_sizes=20):
-    """H din panta log(R/S) ~ log(n) (Hurst, 1951) si H corectat Anis-Lloyd (panta lui R/S - E[R/S] + 0,5)."""
+    """H from the slope of log(R/S) on log(n) (Hurst, 1951) and the Anis-Lloyd corrected H (slope of R/S - E[R/S], plus 0.5)."""
     x = np.asarray(r, dtype=float)
     T = len(x)
     sizes = np.unique(np.logspace(np.log10(min_n), np.log10(T // 4), n_sizes).astype(int))
@@ -123,11 +123,11 @@ def rs_hurst(r, min_n=10, n_sizes=20):
 
 
 def lo_modified_rs(r, q=None):
-    """Statistica V = Q_T / sqrt(T) a lui Lo (1991); sub H0 (fara memorie lunga) V in [0,809; 1,862] la 95%."""
+    """Lo's (1991) statistic V = Q_T / sqrt(T); under H0 (no long memory) V lies in [0.809, 1.862] with 95% probability."""
     x = np.asarray(r, dtype=float)
     T = len(x)
     e = x - x.mean()
-    if q is None:                                   # latimea de banda Andrews (1991) pentru AR(1)
+    if q is None:                                   # Andrews (1991) bandwidth for an AR(1)
         rho = np.corrcoef(e[1:], e[:-1])[0, 1]
         q = int(np.floor((3 * T / 2) ** (1 / 3) * abs(2 * rho / (1 - rho ** 2)) ** (2 / 3)))
     s2 = (e ** 2).mean()
@@ -140,7 +140,7 @@ def lo_modified_rs(r, q=None):
 
 
 def dfa_hurst(r, min_box=10, n_sizes=18, max_frac=0.25):
-    """Exponentul DFA-1: panta log F(n) ~ log n pe profilul cumulat al randamentelor centrate."""
+    """DFA-1 exponent: slope of log F(n) on log n for the cumulative profile of demeaned returns."""
     x = np.asarray(r, dtype=float)
     y = np.cumsum(x - x.mean())
     T = len(y)
@@ -161,7 +161,7 @@ def dfa_hurst(r, min_box=10, n_sizes=18, max_frac=0.25):
 # ROLLING
 # =============================================================================
 def rolling_stat(r, func, window=500, step=21):
-    """Aplica func pe ferestre mobile de `window` observatii, la fiecare `step` observatii."""
+    """Apply func on rolling windows of `window` observations, every `step` observations."""
     x = r.values
     idx, out = [], []
     for end in range(window, len(x) + 1, step):

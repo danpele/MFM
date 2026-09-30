@@ -26,10 +26,10 @@ S = {}
 
 
 # =============================================================================
-# PARTEA A
+# PART A
 # =============================================================================
 def part_a():
-    # A1/A2: parametrii LSTM
+    # A1/A2: LSTM parameters
     S['A1'] = dict(d=1, h=16, lstm=M.lstm_param_count(1, 16), lstm_text=M.lstm_param_count(1, 16, False),
                    head=17, total=M.lstm_param_count(1, 16) + 17)
     S['A2'] = dict(d=5, h=32, l1=M.lstm_param_count(5, 32), l2=M.lstm_param_count(32, 32), head=33,
@@ -110,7 +110,7 @@ def part_a():
 
 
 # =============================================================================
-# PARTEA B
+# PART B
 # =============================================================================
 def b_returns(asset):
     """Out-of-sample R^2 against the zero forecast (block-bootstrap interval, blocks of 20 days), DM test on
@@ -257,7 +257,7 @@ def part_b():
 
 
 # =============================================================================
-# PARTEA C: BET
+# PART C: BET
 # =============================================================================
 def part_c():
     S['C'] = b_risk('bet').to_dict('index')

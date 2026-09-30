@@ -44,10 +44,10 @@ OUT = {}
 
 
 # =============================================================================
-# 1. Teste pentru Delta-CoVaR (bootstrap comun pe blocuri de 20 de zile)
+# 1. Tests for Delta-CoVaR (joint bootstrap, blocks of 20 days)
 # =============================================================================
 def holm(p):
-    """Corectia Holm (valori p ajustate) pentru o familie de teste."""
+    """Holm correction (adjusted p-values) for a family of tests."""
     p = np.asarray(p, float)
     o = np.argsort(p)
     m = len(p)
@@ -58,7 +58,7 @@ def holm(p):
 
 
 def bh(p, q=0.05):
-    """Benjamini-Hochberg: masca respingerilor la rata de descoperiri false q."""
+    """Benjamini-Hochberg: rejection mask at false discovery rate q."""
     p = np.asarray(p, float)
     m = len(p)
     o = np.argsort(p)
@@ -70,7 +70,7 @@ def bh(p, q=0.05):
 
 
 def covar_tests(alpha=0.01, B=B, block=20, seed=SEED):
-    """Aceleasi extrageri bootstrap pentru toate bancile -> distributia comuna a Delta-CoVaR si a pantelor."""
+    """The same bootstrap draws for all banks -> joint distribution of Delta-CoVaR and of the slopes."""
     banks = US + EU
     sysr = {k: system_ex(k, US if k in US else EU).values for k in banks}
     x = {k: R[k].values for k in banks}
@@ -88,14 +88,14 @@ def covar_tests(alpha=0.01, B=B, block=20, seed=SEED):
             DB[r, j] = c['b'] - qreg(sysr[k][idx], x[k][idx], 0.5)[1]
     res = {'alpha': alpha, 'n': n, 'n_tail': n * alpha, 'banks': {}}
     for j, k in enumerate(banks):
-        fit = QuantReg(sysr[k], sm.add_constant(x[k])).fit(q=alpha, max_iter=5000)     # s.e. kernel (sandwich)
+        fit = QuantReg(sysr[k], sm.add_constant(x[k])).fit(q=alpha, max_iter=5000)     # kernel standard error (sandwich)
         dpt = point[k]['b'] - b50[k]
         se_db = DB[:, j].std(ddof=1)
         res['banks'][k] = {'dcovar': point[k]['dcovar'], 'b': point[k]['b'], 'b50': b50[k], 'se_b_kernel': fit.bse[1],
                            'se_b_boot': None, 'lo': np.percentile(D[:, j], 2.5), 'hi': np.percentile(D[:, j], 97.5),
                            'se_dcovar_boot': D[:, j].std(ddof=1), 'db': dpt, 'se_db': se_db,
                            'p_db': 2 * stats.norm.sf(abs(dpt) / se_db)}
-    # egalitatea contributiilor pe perechi, in fiecare regiune: t = diferenta / abaterea bootstrap a diferentei
+    # equal contributions by pair, within each region: t = difference / bootstrap standard deviation of the difference
     pairs = []
     for mem in (US, EU):
         for a in range(len(mem)):
@@ -104,7 +104,7 @@ def covar_tests(alpha=0.01, B=B, block=20, seed=SEED):
                 d = point[mem[a]]['dcovar'] - point[mem[b_]]['dcovar']
                 se = (D[:, i] - D[:, j]).std(ddof=1)
                 pairs.append((mem[a], mem[b_], d, se, 2 * stats.norm.sf(abs(d) / se),
-                              # suprapunerea intervalelor marginale
+                              # overlap of the marginal intervals
                               not (res['banks'][mem[a]]['hi'] < res['banks'][mem[b_]]['lo'] or
                                    res['banks'][mem[b_]]['hi'] < res['banks'][mem[a]]['lo'])))
     p = np.array([q[4] for q in pairs])
@@ -117,7 +117,7 @@ def covar_tests(alpha=0.01, B=B, block=20, seed=SEED):
     res['n_sig_overlap'] = int(sum(1 for i, q in enumerate(pairs) if q[5] and p[i] < 0.05))
     res['n_db_sig'] = int(sum(v['p_db'] < 0.05 for v in res['banks'].values()))
     res['n_db_sig_holm'] = int((holm([v['p_db'] for v in res['banks'].values()]) < 0.05).sum())
-    # test Wald comun: toate Delta-CoVaR egale intr-o regiune (covarianta bootstrap a contrastelor)
+    # joint Wald test: all Delta-CoVaR equal within a region (bootstrap covariance of the contrasts)
     for reg, mem in (('US', US), ('EU', EU)):
         ids = [banks.index(k) for k in mem]
         C = np.zeros((len(ids) - 1, len(banks)))
@@ -131,7 +131,7 @@ def covar_tests(alpha=0.01, B=B, block=20, seed=SEED):
 
 
 # =============================================================================
-# 2. Euler: ES al portofoliului = suma ponderata a MES (conditionare pe portofoliu)
+# 2. Euler: ES of the portfolio = weighted sum of the MES (conditioning on the portfolio)
 # =============================================================================
 def euler_check(alpha=0.05):
     X = R[US]
@@ -146,7 +146,7 @@ def euler_check(alpha=0.05):
 
 
 # =============================================================================
-# 3. CoVaR Girardi-Ergun: conditionare pe X_i <= -VaR_i (istoric)
+# 3. Girardi-Ergun CoVaR: conditioning on X_i <= -VaR_i (historical)
 # =============================================================================
 def ge_covar(alpha=0.05):
     out = {}
@@ -155,7 +155,7 @@ def ge_covar(alpha=0.05):
         xi = R[k].values
         qa, qm = np.quantile(xi, alpha), np.quantile(xi, 0.5)
         dist = xs[xi <= qa]
-        med = xs[np.abs(xi - xi.mean()) <= xi.std()]                       # starea de referinta: eveniment de o abatere standard
+        med = xs[np.abs(xi - xi.mean()) <= xi.std()]                       # benchmark state: a one-standard-deviation event
         out[k] = {'ge_covar': -np.quantile(dist, alpha), 'ge_covar_med': -np.quantile(med, alpha),
                   'ab_covar': covar_static(xs, xi, alpha)['covar'], 'n_cond': int(len(dist))}
         out[k]['ge_dcovar'] = out[k]['ge_covar'] - out[k]['ge_covar_med']
@@ -163,7 +163,7 @@ def ge_covar(alpha=0.05):
 
 
 def kupiec(x, n, p):
-    """Testul Kupiec (acoperire neconditionata): LR ~ chi2(1) sub H0: rata de depasire = p."""
+    """Kupiec test (unconditional coverage): likelihood-ratio statistic LR ~ chi2(1) under H0: hit rate = p."""
     ph = x / n
     ll0 = x * np.log(p) + (n - x) * np.log(1 - p)
     ll1 = (x * np.log(ph) if x > 0 else 0) + ((n - x) * np.log(1 - ph) if x < n else 0)
@@ -172,8 +172,8 @@ def kupiec(x, n, p):
 
 
 def backtest_ge(alpha=0.05, start=1000):
-    """Backtest in afara esantionului al CoVaR Girardi-Ergun (istoric, fereastra extinsa):
-    lovitura comuna 1{X_sys <= -CoVaR_t, X_i <= -VaR_i,t}, cu probabilitatea alpha^2 sub H0."""
+    """Out-of-sample backtest of the Girardi-Ergun CoVaR (historical, expanding window):
+    joint hit 1{X_sys <= -CoVaR_t, X_i <= -VaR_i,t}, with probability alpha^2 under H0."""
     out = {}
     for k in US + EU:
         xs = system_ex(k, US if k in US else EU).values
@@ -194,10 +194,10 @@ def backtest_ge(alpha=0.05, start=1000):
 
 
 # =============================================================================
-# 4. SRISK ca in Brownlees & Engle (2017): GJR-GARCH + DCC, simulare cu inovatii reesantionate
+# 4. SRISK following Brownlees & Engle (2017): GJR-GARCH + DCC, simulation with resampled innovations
 # =============================================================================
 def gjr_fit(r):
-    """GJR-GARCH(1,1) cu medie zero (randamente log in %), QML."""
+    """GJR-GARCH(1,1) with zero mean (log returns in %), quasi-maximum likelihood (QML)."""
     m = arch_model(r, mean='Zero', vol='GARCH', p=1, o=1, q=1, dist='normal', rescale=False).fit(disp='off')
     om, a, g, b = m.params[['omega', 'alpha[1]', 'gamma[1]', 'beta[1]']]
     s2 = m.conditional_volatility ** 2
@@ -206,7 +206,7 @@ def gjr_fit(r):
 
 
 def dcc_fit(e):
-    """DCC(1,1) bivariat, al doilea pas al QML (Engle, 2002); e = reziduuri standardizate T x 2."""
+    """Bivariate DCC(1,1), second QML step (Engle, 2002); e = standardised residuals T x 2."""
     S = np.corrcoef(e.T)
     T = len(e)
 
@@ -235,7 +235,7 @@ def dcc_fit(e):
 
 
 def simulate_market(gm, eps_m, idx):
-    """Traiectorii ale pietei (GJR) din inovatiile reesantionate eps_m[idx], idx: S x h."""
+    """Market paths (GJR) from the resampled innovations eps_m[idx], idx: S x h."""
     Sn, h = idx.shape
     s2 = np.full(Sn, gm['s2_next'])
     cum = np.zeros(Sn)
@@ -247,7 +247,7 @@ def simulate_market(gm, eps_m, idx):
 
 
 def simulate_firm(gf, gm, dcc, eps_m, xi, idx):
-    """Traiectoriile bancii conditionate pe aceleasi date extrase (Anexa A din Brownlees & Engle, 2017)."""
+    """Bank paths conditional on the same drawn dates (Appendix A of Brownlees & Engle, 2017)."""
     Sn, h = idx.shape
     s2i = np.full(Sn, gf['s2_next'])
     q11 = np.full(Sn, dcc['Q_next'][0, 0])
@@ -269,7 +269,7 @@ def simulate_firm(gf, gm, dcc, eps_m, xi, idx):
 
 
 def lrmes_sim(end, h, C, Sn, seed=SEED, gaussian=False):
-    """LRMES (fractie) pentru cele 13 banci la data `end`, orizont h zile, prag C (randament aritmetic al pietei)."""
+    """LRMES (fraction) for the 13 banks at date `end`, horizon h days, threshold C (arithmetic market return)."""
     rng = np.random.default_rng(seed)
     Rs = R.loc[:end]
     out, info = {}, {}
@@ -278,14 +278,14 @@ def lrmes_sim(end, h, C, Sn, seed=SEED, gaussian=False):
         gm = gjr_fit(rm)
         eps_m = rm / gm['sig']
         T = len(rm)
-        # 1) traiectoriile pietei; se pastreaza doar scenariile de criza (algoritmul din Anexa A)
+        # 1) market paths; only the crisis scenarios are kept (algorithm of Appendix A of Brownlees & Engle, 2017)
         keep_idx, n_all = [], 0
         for _ in range(Sn // 20000):
             idx = rng.integers(0, T, size=(20000, h))
             n_all += 20000
             if gaussian:
                 eps_draw = rng.standard_normal((20000, h))
-                # traiectorii gaussiene: indici catre o matrice proprie de inovatii
+                # Gaussian paths: indices into their own matrix of innovations
                 cm = _sim_gauss_market(gm, eps_draw)
                 keep_idx.append(eps_draw[np.exp(cm / 100) - 1 < C])
             else:
@@ -323,7 +323,7 @@ def _sim_gauss_market(gm, eps):
 
 
 def _sim_gauss_firm(gf, gm, dcc, eps_m_paths, rng):
-    """Varianta cu inovatii Normale (aceleasi traiectorii de criza ale pietei, xi ~ N(0,1))."""
+    """Variant with Normal innovations (the same crisis paths of the market, xi ~ N(0,1))."""
     Sn, h = eps_m_paths.shape
     xi = rng.standard_normal((Sn, h))
     s2i = np.full(Sn, gf['s2_next'])
@@ -346,9 +346,9 @@ def _sim_gauss_firm(gf, gm, dcc, eps_m_paths, rng):
 def srisk_simulation():
     end = R.index[-1]
     be, be_info = lrmes_sim(end, 22, -0.10, 200000, SEED)                 # Brownlees & Engle (2017): h = 22, C = -10%
-    v6, v6_info = lrmes_sim(end, 126, -0.40, 400000, SEED + 1)            # scenariul de 6 luni / -40%
-    g6, _ = lrmes_sim(end, 126, -0.40, 400000, SEED + 2, gaussian=True)   # aceleasi, cu inovatii Normale
-    cv, cv_info = lrmes_sim(pd.Timestamp('2020-03-31'), 22, -0.10, 200000, SEED + 3)   # conditionat la 31.03.2020
+    v6, v6_info = lrmes_sim(end, 126, -0.40, 400000, SEED + 1)            # the 6-month / -40% scenario
+    g6, _ = lrmes_sim(end, 126, -0.40, 400000, SEED + 2, gaussian=True)   # the same, with Normal innovations
+    cv, cv_info = lrmes_sim(pd.Timestamp('2020-03-31'), 22, -0.10, 200000, SEED + 3)   # conditional on 31.03.2020
     short = {k: lrmes(mes_threshold(R[k].values, R[REGION_INDEX[region_of(k)]].values, -2.0)) for k in ALL}
     res = {'end': end, 'be': be, 'v6': v6, 'g6': g6, 'covid': cv, 'short': short,
            'p_crisis_be': {r: be_info[r]['p_crisis'] for r in be_info},
@@ -380,7 +380,7 @@ def fig_lrmes_models(s):
 
 
 # =============================================================================
-# 5. Incertitudinea conectivitatii: bootstrap pe reziduurile VAR (blocuri de 20 de zile)
+# 5. Uncertainty of connectedness: bootstrap of the VAR residuals (blocks of 20 days)
 # =============================================================================
 def var_simulate(A, c, E, Y0, idx):
     p = len(A)
@@ -403,7 +403,7 @@ def var_fit_c(Y, p):
 
 
 def spill_bootstrap(Y, p, H=10, B=B, block=20, seed=SEED):
-    """Interval percentil pentru conectivitatea totala si neta (bootstrap pe blocuri de reziduuri, VAR reestimat)."""
+    """Percentile interval for total and net connectedness (residual block bootstrap, VAR re-estimated)."""
     Y = np.asarray(Y, float)
     A, c, E = var_fit_c(Y, p)
     rng = np.random.default_rng(seed)
@@ -437,10 +437,10 @@ def fig_spill_ci(point_net, net_draws):
 
 
 # =============================================================================
-# 6. VAR regularizat (Demirer et al., 2018): elastic net adaptiv (esantion complet), elastic net pe 150 de zile
+# 6. Regularised VAR (Demirer et al., 2018): adaptive elastic net (full sample), elastic net on 150 days
 # =============================================================================
 def aenet_eq(X, y, w, lambdas, folds=10, seed=SEED):
-    """min sum (y - Xb)^2 + lam sum w_i (|b_i|/2 + b_i^2/2)  (ecuatia (9)); lambda prin validare incrucisata pe 10 grupe."""
+    """min sum (y - Xb)^2 + lam sum w_i (|b_i|/2 + b_i^2/2)  (equation (9)); lambda by 10-fold cross-validation."""
     def fit(X, y, lam):
         Xc, yc = X - X.mean(0), y - y.mean()
         z = (Xc ** 2).sum(0)
@@ -471,7 +471,7 @@ def aenet_eq(X, y, w, lambdas, folds=10, seed=SEED):
 
 
 def var_aenet(Y, p, lambdas=None):
-    """VAR(p) cu elastic net adaptiv ecuatie cu ecuatie; ponderi w = 1/|b_OLS|."""
+    """VAR(p) with adaptive elastic net, equation by equation; weights w = 1/|b_OLS|."""
     Y = np.asarray(Y, float)
     T, k = Y.shape
     X = np.hstack([Y[p - l - 1:T - l - 1] for l in range(p)])
@@ -492,7 +492,7 @@ def var_aenet(Y, p, lambdas=None):
 
 
 def var_enet_window(Y, p):
-    """Elastic net (w_i = 1) pentru ferestrele mobile; penalizarea L1:L2 = 1:1 din ecuatia (9) <=> l1_ratio = 1/3."""
+    """Elastic net (w_i = 1) for the rolling windows; the L1:L2 = 1:1 penalty of equation (9) <=> l1_ratio = 1/3."""
     T, k = Y.shape
     X = np.hstack([Y[p - l - 1:T - l - 1] for l in range(p)])
     Yt = Y[p:]
@@ -507,7 +507,7 @@ def var_enet_window(Y, p):
 
 
 def rolling_compare(Y, step=10, H=10):
-    """Conectivitatea totala: OLS VAR(2) pe 250 de zile (indicele capitolului) fata de elastic net si OLS pe 150 de zile."""
+    """Total connectedness: OLS VAR(2) on 250 days (baseline index) against elastic net and OLS on 150 days."""
     Y = pd.DataFrame(Y)
     rows = {}
     for end in range(250, len(Y) + 1, step):
@@ -529,7 +529,7 @@ def rolling_compare(Y, step=10, H=10):
 
 def fig_spill_enet(rc):
     fig, ax = plt.subplots(figsize=(7.2, 3.0))
-    ax.plot(rc.index, rc['ols250_p2'], color=Purple, lw=1.0, label='OLS VAR(2), 250-day windows (chapter index)')
+    ax.plot(rc.index, rc['ols250_p2'], color=Purple, lw=1.0, label='OLS VAR(2), 250-day windows (baseline index)')
     ax.plot(rc.index, rc['ols150'], color=Orange, lw=0.8, label='OLS VAR(1), 150-day windows')
     ax.plot(rc.index, rc['enet150'], color=Forest, lw=1.0, label='Elastic-net VAR(1), 150-day windows, 10-fold CV')
     ax.set_ylabel('Total connectedness (%)')
@@ -539,11 +539,11 @@ def fig_spill_enet(rc):
 
 
 # =============================================================================
-# 7. Retele de cauzalitate Granger: 156 de teste pe perechi, controlul erorilor multiple
+# 7. Granger-causality networks: 156 pairwise tests, multiple-testing control
 # =============================================================================
 def granger_pairs(Y, p=1, extra=0):
-    """Test Wald robust (HC0) pentru j -> i: regresia lui y_i pe p (+extra) intarzieri ale lui y_i si y_j;
-    extra = 1 da testul cu intarzieri suplimentare (Toda-Yamamoto), valid si pentru serii foarte persistente."""
+    """Robust (HC0) Wald test for j -> i: regression of y_i on p (+extra) lags of y_i and y_j;
+    extra = 1 gives the lag-augmented test (Toda-Yamamoto), valid also for highly persistent series."""
     Y = pd.DataFrame(Y)
     L = p + extra
     out = []
@@ -574,10 +574,10 @@ def granger_fdr():
 
 
 # =============================================================================
-# RULARE
+# RUN
 # =============================================================================
 def run_stage(stage):
-    """Etapele sunt independente (pot rula in paralel); fiecare scrie ch18_inf_<etapa>.json."""
+    """The stages are independent (they can run in parallel); each writes ch18_inf_<stage>.json."""
     out = {}
     if stage == 'covar1':
         out['covar_tests'] = covar_tests(0.01)
@@ -633,7 +633,7 @@ STAGES = ['covar1', 'covar5', 'misc', 'srisk', 'spill', 'window', 'enet']
 
 
 if __name__ == '__main__':
-    # python3 inference18.py <etapa>   -> o etapa;   python3 inference18.py merge -> ch18_inference.json
+    # python3 inference18.py <stage>   -> one stage;   python3 inference18.py merge -> ch18_inference.json
     arg = sys.argv[1] if len(sys.argv) > 1 else 'all'
     if arg == 'merge':
         for st in STAGES:

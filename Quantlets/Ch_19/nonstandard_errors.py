@@ -1,18 +1,18 @@
 """
-nonstandard_errors.py -- Studiul de caz al Capitolului 19: erorile nestandard (Menkveld et al., 2024)
-===================================================================================================
-Un mini-multivers pentru ipoteza „eficienta pietei nu s-a schimbat in timp” (Sec. I.A din articol), pe
-indicele Euro Stoxx 50 si pe BET (inchideri zilnice, data/market), 2002-2018, perioada din articol.
-Bifurcatiile din Tabelul V permise de datele zilnice (Seminarul 19, C3):
-  * valori extreme: nimic; winsorizare; eliminare (percentilele 2.5 si 97.5 ale masurii anuale m_t, Tabelul V)
-  * masura anuala m_t: |VR(5) - 1|, |VR(21) - 1| (raportul variantelor, randamente suprapuse pe q zile),
-    R^2 al unui AR(1) pentru randamentele zilnice
-  * modelul variatiei anuale medii (in %): tendinta liniara 100 b / mean(m); media lui 100 dln m_t;
-    media lui 100 (m_t / m_{t-1} - 1)
-3 x 3 x 3 = 27 de drumuri pe indice. Eroarea nestandard = IQR-ul celor 27 de estimari (ec. 3 din articol);
-ordinea bifurcatiilor: statistica Anderson-Darling cu k esantioane (Sec. II.C, Fig. 6).
-Iesire: charts/ch19_nse_multiverse, charts/ch19_nse_forks, ch19_nse.json
-Modelarea Pietelor Financiare - Daniel Traian PELE
+nonstandard_errors.py -- Case study of Chapter 19: nonstandard errors (Menkveld et al., 2024)
+===========================================================================================
+A mini-multiverse for the hypothesis "market efficiency has not changed over time" (Sec. I.A of the paper), on
+the Euro Stoxx 50 index and the BET (daily closes from the course data), 2002-2018, the period of the paper.
+Forks of Table V that daily data allow (Seminar 19, C3):
+  * outliers: none; winsorised; trimmed (2.5 and 97.5 percentiles of the annual measure m_t, Table V)
+  * annual measure m_t: |VR(5) - 1|, |VR(21) - 1| (variance ratio, overlapping q-day returns),
+    R^2 of an AR(1) for daily returns
+  * model of the average yearly change (in %): linear trend 100 b / mean(m); mean of 100 dln m_t;
+    mean of 100 (m_t / m_{t-1} - 1)
+3 x 3 x 3 = 27 paths per index. Nonstandard error = IQR of the 27 estimates (eq. 3 of the paper);
+ranking of the forks: k-sample Anderson-Darling statistic (Sec. II.C, Fig. 6).
+Output: charts/ch19_nse_multiverse, charts/ch19_nse_forks, ch19_nse.json
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -28,7 +28,7 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import read_market, drop_duplicate_records  # noqa: E402
 
-# Stil standard MFM: transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -57,7 +57,7 @@ Teal = '#17A2B8'
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 
-NSE_START, NSE_END = '2002', '2018'          # perioada din articol (Sec. I.A)
+NSE_START, NSE_END = '2002', '2018'          # period of the paper (Sec. I.A)
 NSE_INDICES = {'STOXX50E.INDX': 'Euro Stoxx 50', 'BET': 'BET'}
 OUTLIERS = ['None', 'Winsorised', 'Trimmed']
 MEASURES = ['|VR(5) - 1|', '|VR(21) - 1|', 'AR(1) R$^2$']
@@ -74,7 +74,7 @@ def save_nse_fig(name):
 
 
 def index_returns(symbol):
-    """Randamente log zilnice (inchideri, zile lucratoare, fara inregistrari duplicate), 2002-2018."""
+    """Daily log returns (closes, weekdays, no duplicate records), 2002-2018."""
     df = read_market(symbol).loc['2001-12-01':f'{NSE_END}-12-31']
     df = drop_duplicate_records(df[df.index.dayofweek < 5])
     s = df['close']
@@ -83,16 +83,16 @@ def index_returns(symbol):
 
 
 def variance_ratio(x, q):
-    """VR(q) = Var(randament pe q zile, suprapus) / (q Var(randament zilnic))."""
+    """VR(q) = Var(overlapping q-day return) / (q Var(daily return))."""
     xq = pd.Series(x).rolling(q).sum().dropna().values
     return np.var(xq, ddof=1) / (q * np.var(x, ddof=1))
 
 
 def annual_measure(r, outlier, measure):
-    """Masura anuala a (in)eficientei m_t, calculata pe randamentele zilnice din fiecare an; tratamentul valorilor
-    extreme se aplica masurii, la frecventa analizei (anuala), ca in Tabelul V (fork 3, nota a): winsorizare sau
-    eliminare la percentilele 2.5 si 97.5 ale celor m_t; anii eliminati raman lipsa (NaN), spatierea calendaristica
-    se pastreaza."""
+    """Annual (in)efficiency measure m_t, computed on the daily returns of each year; the outlier treatment is
+    applied to the measure at the frequency of the analysis (annual), as in Table V (fork 3, note a): winsorised or
+    trimmed at the 2.5 and 97.5 percentiles of the m_t; trimmed years stay missing (NaN), so calendar spacing
+    is kept."""
     m = []
     for _, g in r.groupby(r.index.year):
         x = g.values
@@ -112,10 +112,10 @@ def annual_measure(r, outlier, measure):
 
 
 def yearly_change(m, model):
-    """Variatia anuala medie (%) si SE-ul ei, dupa bifurcatia modelului. Anii lipsa (NaN) raman pe calendar:
-    tendinta se estimeaza pe anii observati, variatiile doar intre ani consecutivi observati.
-    SE: OLS pentru tendinta; sd / sqrt(n) pentru media variatiilor (aproximare care ignora dependenta MA(1)
-    dintre variatiile succesive)."""
+    """Average yearly change (%) and its SE, by the model fork. Missing years (NaN) stay on the calendar:
+    the trend is estimated on the observed years, changes only between consecutive observed years.
+    SE: OLS for the trend; sd / sqrt(n) for the mean of the changes (an approximation that ignores the MA(1)
+    dependence between successive changes)."""
     t = np.arange(len(m))
     ok = ~np.isnan(m)
     if model == 'Linear trend':
@@ -149,7 +149,7 @@ def part_nse():
         for fork in ('outlier', 'measure', 'model'):
             res = stats.anderson_ksamp([g['est'].values for _, g in df.groupby(fork)])
             ad[fork] = float(res.statistic)
-            NSE['ad_crit5'] = float(res.critical_values[2])      # k = 3 grupuri la fiecare bifurcatie
+            NSE['ad_crit5'] = float(res.critical_values[2])      # k = 3 groups at each fork
         byl = {mo: float(np.median(df.loc[df.model == mo, 'est'])) for mo in FORK_MODELS}
         NSE[lab] = dict(N=len(r), years=int(r.index.year.nunique()), start=str(r.index[0].date()),
                         end=str(r.index[-1].date()), median=q50, iqr=q75 - q25, p10_90=q90 - q10,
@@ -158,7 +158,7 @@ def part_nse():
                         max_rel=float(df.loc[df.model == 'Relative difference', 'est'].max()),
                         table=df.round(4).to_dict('records'))
 
-    # --- grafic 1: multiversul, estimarile grupate dupa bifurcatia modelului ---
+    # --- chart 1: the multiverse, estimates grouped by the model fork ---
     fig, axes = plt.subplots(1, 2, figsize=(7.6, 4.3), sharey=True)
     mcol = dict(zip(MEASURES, [MainBlue, Forest, IDAred]))
     mmark = dict(zip(OUTLIERS, ['o', 's', '^']))
@@ -178,7 +178,7 @@ def part_nse():
         ax.set_xticklabels(FORK_MODELS)
         ax.set_xlim(-0.5, 2.5)
         ax.set_title(f'{lab}: IQR = {q75 - q25:.1f} pp, median = {q50:.1f}%', fontsize=10)
-    axes[0].set_ylabel('Average yearly change (%), symlog scale')
+    axes[0].set_ylabel('Average yearly change (%), log scale beyond ±10%')
     h = ([plt.Line2D([], [], ls='', marker='o', color=c, markeredgecolor='black', markeredgewidth=0.3, label=f'Measure: {m}')
           for m, c in mcol.items()]
          + [plt.Line2D([], [], ls='', marker=mk, color='white', markeredgecolor='black', label=f'Outliers: {o}')
@@ -189,7 +189,7 @@ def part_nse():
     plt.tight_layout()
     save_nse_fig('ch19_nse_multiverse')
 
-    # --- grafic 2: ordinea bifurcatiilor (Anderson-Darling cu k esantioane) ---
+    # --- chart 2: ranking of the forks (k-sample Anderson-Darling) ---
     fig, ax = plt.subplots(figsize=(6.4, 3.9))
     forks = ['model', 'measure', 'outlier']
     names = ['Model (trend, log, relative)', 'Measure (VR(5), VR(21), AR(1) R$^2$)', 'Outliers (none, winsorised, trimmed)']

@@ -1,14 +1,14 @@
 """
-seminar19.py -- Cifrele si graficele Seminarului 19 (atelier de proiect, MFM)
+seminar19.py -- Numbers and charts of Seminar 19 (project workshop, MFM)
 =============================================================================
-  B1-B2  fapte stilizate cu inferenta robusta: BET (rezolvat) si Bitcoin (propus)
-  B3-B4  GARCH(1,1)-t si GJR-GARCH(1,1)-t pe BET, cu CI pentru timpul de injumatatire
-  B5-B6  VaR 1% pentru ziua urmatoare si backtesting: BET (rezolvat) si Bitcoin (propus)
-  B7     capcana informatiei din viitor (parametri din toata selectia)
-  B8     capcana calendarului: corelatia Bitcoin-SPY cu join pe randamente vs join pe preturi
-  C1     analiza de referinta: s-a schimbat riscul de coada al BET dupa reclasificarea FTSE (septembrie 2020)?
-Cifrele sunt salvate in sem19_results.json.
-Modelarea Pietelor Financiare - Daniel Traian PELE
+  B1-B2  stylised facts with robust inference: BET (solved) and Bitcoin (proposed)
+  B3-B4  GARCH(1,1)-t and GJR-GARCH(1,1)-t on the BET, with a CI for the half-life
+  B5-B6  next-day VaR 1% and backtesting: BET (solved) and Bitcoin (proposed)
+  B7     the look-ahead trap (full-sample parameters)
+  B8     the calendar trap: Bitcoin-SPY correlation with returns aligned vs prices aligned
+  C1     reference analysis: did the tail risk of the BET change after the FTSE reclassification (September 2020)?
+The numbers are saved in sem19_results.json.
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -31,16 +31,16 @@ from generate_all_charts import (plt, MainBlue, IDAred, Orange, Teal, Gray, Fore
 from case_study import t_std_q  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-FTSE = '2020-09-21'      # BVB inclusa in indicii FTSE Russell pentru piete emergente secundare
+FTSE = '2020-09-21'      # BVB included in the FTSE Russell indices as a Secondary Emerging market
 RES = {}
-CH = {}          # intrari pentru graficele solutiilor (nu se salveaza in JSON)
+CH = {}          # inputs for the solution charts (not saved in JSON)
 
 bet = 100 * log_returns('bet')
 btc = 100 * log_returns('btc')
 
 
 def half_life_ci(res):
-    """Timpul de injumatatire ln(0.5)/ln(alpha+beta) cu CI 95% prin metoda delta (covarianta robusta)."""
+    """Half-life ln(0.5)/ln(alpha+beta) with a 95% delta-method CI (robust covariance)."""
     p = res.params
     cov = res.param_cov.loc[['alpha[1]', 'beta[1]'], ['alpha[1]', 'beta[1]']].values
     pers = p['alpha[1]'] + p['beta[1]']
@@ -54,8 +54,8 @@ def half_life_ci(res):
 
 
 def robust_q(x, m=10):
-    """Portmanteau robust la heteroscedasticitate conditionata (Lobato, Nankervis & Savin, 2001):
-    Q* = T sum_k rho_k^2 / tau_k, tau_k = mean(x_t^2 x_{t-k}^2) / gamma_0^2, ~ chi2(m) sub H0 (necorelare)."""
+    """Portmanteau test robust to conditional heteroskedasticity (Lobato, Nankervis & Savin, 2001):
+    Q* = T sum_k rho_k^2 / tau_k, tau_k = mean(x_t^2 x_{t-k}^2) / gamma_0^2, ~ chi2(m) under H0 (no autocorrelation)."""
     x = np.asarray(x) - np.mean(x)
     T = len(x)
     g0 = np.mean(x ** 2)
@@ -116,7 +116,7 @@ def part_var_btc():
 
 
 def part_join():
-    """Corelatia Bitcoin-SPY: (gresit) randamente pe calendare proprii, apoi join; (corect) join pe preturi."""
+    """Bitcoin-SPY correlation: (wrong) returns on own calendars, then common dates; (right) prices aligned on common dates first."""
     spy = asset_price('SPY')
     b = asset_price('BTC')
     r_spy = np.log(spy).diff().dropna()
@@ -140,8 +140,8 @@ def part_join():
     cw = rw.iloc[:, 0].rolling(250).corr(rw.iloc[:, 1]).dropna()
     cr = rr.iloc[:, 0].rolling(250).corr(rr.iloc[:, 1]).dropna()
     fig, ax = plt.subplots(figsize=(7.6, 4.2))
-    ax.plot(cr.index, cr.values, color=MainBlue, lw=1.0, label='Join on prices, then returns (correct)')
-    ax.plot(cw.index, cw.values, color=Orange, lw=1.0, label='Returns on own calendars, then join (wrong)')
+    ax.plot(cr.index, cr.values, color=MainBlue, lw=1.0, label='Common price dates first, then returns (correct)')
+    ax.plot(cw.index, cw.values, color=Orange, lw=1.0, label='Returns on each calendar, then common dates (wrong)')
     ax.axhline(0, color=Gray, lw=0.5)
     ax.set_ylabel('250-day correlation, Bitcoin vs SPY')
     legend_outside_bottom(ax, ncol=2, y=-0.1)
@@ -149,8 +149,8 @@ def part_join():
 
 
 def joint_hill_boot(R, share=0.05, B=999, block=20, rng=None):
-    """Hill pe pierderile fiecarei coloane din R (T x m, zile comune) si bootstrap pe blocuri mobile COMUN:
-    aceleasi blocuri de zile pentru toate coloanele, deci dependenta dintre piete este pastrata."""
+    """Hill on the losses of each column of R (T x m, common days) and a JOINT moving-block bootstrap:
+    the same blocks of days for all columns, so the dependence between markets is kept."""
     R = np.asarray(R)
     T, m = R.shape
     ks = [hill_k(R[:, j], share) for j in range(m)]
@@ -164,8 +164,8 @@ def joint_hill_boot(R, share=0.05, B=999, block=20, rng=None):
 
 
 def part_c():
-    """Analiza de referinta pentru C1: BET inainte si dupa reclasificarea FTSE (21.09.2020), control WIG20."""
-    rngs = iter(np.random.SeedSequence(2020).spawn(64))   # fluxuri aleatoare independente pentru fiecare extragere
+    """Reference analysis for C1: BET before and after the FTSE reclassification (21 Sep 2020), WIG20 control."""
+    rngs = iter(np.random.SeedSequence(2020).spawn(64))   # independent random streams for each draw
     pre, post = bet.loc['2014-09-22':FTSE].iloc[:-1], bet.loc[FTSE:]
     out = {}
     hd = {}
@@ -177,22 +177,22 @@ def part_c():
         out[lab] = dict(N=len(r), start=str(r.index[0].date()), end=str(r.index[-1].date()),
                         vol=r.std() * np.sqrt(252), kurt=stats.kurtosis(r), hill=h['alpha'], hill_lo=h['lo'],
                         hill_hi=h['hi'], k=h['k'], pers=g['pers'], nu=g['nu'], hs_var=float(np.quantile(-r, 0.99)))
-    # diferenta indicilor Hill: extrageri independente (fluxuri aleatoare distincte) in cele doua perioade disjuncte
+    # difference of Hill indices: independent draws (distinct random streams) in the two disjoint periods
     dd = hd['post'] - hd['pre']
     CH['c1_dd'] = dd
     out['dhill'] = out['post']['hill'] - out['pre']['hill']
     out['dhill_ci'] = list(np.percentile(dd, [2.5, 97.5]))
     out['dhill_se'] = float(dd.std(ddof=1))
-    # sensibilitatea kurtosis-ului (necontrolat cand alpha < 4) la cele mai mari zile
+    # sensitivity of the kurtosis (uncontrolled when alpha < 4) to the largest days
     top = pre.abs().nlargest(2).index
     out['pre']['top_days'] = [str(d.date()) for d in top]
     out['pre']['top_returns'] = [float(pre.loc[d]) for d in top]
     out['pre']['kurt_ex1'] = stats.kurtosis(pre.drop(top[:1]))
     out['pre']['kurt_ex2'] = stats.kurtosis(pre.drop(top))
     out['dkurt'] = stats.kurtosis(post) - stats.kurtosis(pre)
-    # control: WIG20 (neafectat de reclasificarea BVB); diferenta-in-diferente pe indicele Hill:
-    # join pe PRETURI in zilele comune BET-WIG20, apoi randamente; in fiecare perioada aceleasi blocuri pentru
-    # ambele piete (pastreaza dependenta dintre ele), extrageri independente intre cele doua perioade
+    # control: WIG20 (unaffected by the BVB reclassification); difference-in-differences of the Hill index:
+    # PRICES aligned on common BET-WIG20 days, then returns; in each period the same blocks for
+    # both markets (keeps their dependence), independent draws between the two periods
     P = pd.concat([load_close('bet', '2014-09-01', '2026-09-18'), asset_price('WIG20', '2026-09-18')],
                   axis=1, join='inner').dropna()
     J = (100 * np.log(P).diff().dropna()).loc['2014-09-22':'2026-09-18']
@@ -217,19 +217,19 @@ def part_c():
     CH['c1_did_draws'] = base['draws']
     out['did_ci'] = [base['lo'], base['hi']]
     out['did_se'] = base['se']
-    out['did_mde'] = (stats.norm.ppf(0.975) + stats.norm.ppf(0.80)) * base['se']   # efectul minim detectabil, putere 80%
-    # grila de specificatii: k = 2.5%, 5%, 10% din zilele cu pierdere x blocuri de 10, 20, 40 de zile; corectia Holm
+    out['did_mde'] = (stats.norm.ppf(0.975) + stats.norm.ppf(0.80)) * base['se']   # minimum detectable effect, 80% power
+    # specification grid: k = 2.5%, 5%, 10% of loss days x blocks of 10, 20, 40 days; Holm correction
     grid = [base if (sh, bl) == (0.05, 20) else did_spec(sh, bl) for sh in (0.025, 0.05, 0.10) for bl in (10, 20, 40)]
     pg = np.array([g['p'] for g in grid])
     out['grid'] = dict(specs=[{k: g[k] for k in ('share', 'block', 'did', 'se', 'p')} for g in grid],
                        n=len(grid), rej_raw=int((pg < 0.05).sum()), rej_holm=int((holm(pg) < 0.05).sum()),
                        did_min=float(min(g['did'] for g in grid)), did_max=float(max(g['did'] for g in grid)),
                        p_min=float(pg.min()))
-    # ruptura cu data necunoscuta in log|r| (toate momentele finite), 2014-2026
+    # break at an unknown date in log|r| (all moments finite), 2014-2026
     y = np.log(np.abs(bet.loc['2014-09-22':'2026-09-18']))
     sw = sup_wald_break(y.values)
     out['supwald'] = dict(stat=sw['stat'], p=sw['p'], cv5=sw['cv5'], date=str(y.index[sw['k']].date()))
-    # date placebo: aceeasi analiza Hill la +/- un an
+    # placebo dates: the same Hill analysis at +/- one year
     out['placebo'] = {}
     for lab, d0 in [('m1', '2019-09-23'), ('p1', '2021-09-20')]:
         a1, a2 = bet.loc['2014-09-22':d0].iloc[:-1], bet.loc[d0:'2026-09-18']
@@ -247,13 +247,13 @@ def part_c():
 
 
 # =============================================================================
-# GRAFICE PENTRU SOLUTIILE SEMINARULUI (A3, A7, A9, A11, B1-B5, B7, C1)
+# CHARTS FOR THE SEMINAR SOLUTIONS (A3, A7, A9, A11, B1-B5, B7, C1)
 # =============================================================================
 QL_RAW = 'https://raw.githubusercontent.com/danpele/MFM/main/Quantlets/Ch_19/'
 
 
 def ql_file(name):
-    """Fisier produs de generate_all_charts.py (studiul de caz): copia locala sau cea din repository."""
+    """Output of the lecture case study (generate_all_charts.py), read from the course repository."""
     local = os.path.join(HERE, name)
     return local if os.path.exists(local) else QL_RAW + name
 
@@ -269,7 +269,7 @@ def case_results():
 
 
 def chart_a3():
-    """A3: prognoza variantei GARCH(1,1) pentru BET, cu parametrii rotunjiti afisati in enunt."""
+    """A3: GARCH(1,1) variance forecast for the BET, with the rounded parameters shown in the task."""
     G = case_results()['garch']
     om, al, be = round(G['omega'], 4), round(G['alpha'], 4), round(G['beta'], 4)
     p = al + be
@@ -296,7 +296,7 @@ def chart_a3():
 
 
 def chart_a7():
-    """A7: distributia binomiala a numarului de depasiri la T = 250 si regiunea de respingere Kupiec."""
+    """A7: binomial distribution of the number of breaches at T = 250 and the Kupiec rejection region."""
     T = 250
     rej = set(kupiec_region(T).tolist())
     x = np.arange(0, 16)
@@ -316,7 +316,7 @@ def chart_a7():
 
 
 def chart_a9():
-    """A9: valorile p ordonate fata de pragurile Holm si Benjamini-Hochberg."""
+    """A9: sorted p-values against the Holm and Benjamini-Hochberg thresholds."""
     P = np.array([0.001, 0.004, 0.012, 0.019, 0.028, 0.041, 0.09, 0.20, 0.46, 0.73])
     m = len(P)
     i = np.arange(1, m + 1)
@@ -338,7 +338,7 @@ def chart_a9():
 
 
 def chart_a11():
-    """A11: kurtosis-ul de selectie pentru Student-t cu 3 grade de libertate (aceeasi simulare ca in enunt)."""
+    """A11: sample kurtosis of a Student-t with 3 degrees of freedom (the same simulation as in the task)."""
     rng = np.random.default_rng(11)
     Ts = (1000, 10000, 100000)
     sims = {T: np.array([stats.kurtosis(rng.standard_t(3, T)) for _ in range(200)]) for T in Ts}
@@ -366,7 +366,7 @@ def hill_path(r, kmax):
 
 
 def chart_b1():
-    """B1: graficul Hill pentru BET si distributia bootstrap pe blocuri a estimatorului."""
+    """B1: Hill plot for the BET and the block-bootstrap distribution of the estimator."""
     H = RES['facts_bet']['hill']
     ks, a = hill_path(bet.values, 800)
     fig, axes = plt.subplots(1, 2, figsize=(7.6, 4.3))
@@ -393,7 +393,7 @@ def chart_b1():
 
 
 def chart_b2():
-    """B2: grafice Hill pentru BET si Bitcoin, k ca pondere din zilele cu pierdere."""
+    """B2: Hill plots for the BET and Bitcoin, k as a share of the loss days."""
     fig, axes = plt.subplots(1, 2, figsize=(7.6, 4.3))
     ax = axes[0]
     for key, lab, c in [('bet', 'BET', MainBlue), ('btc', 'Bitcoin', Orange)]:
@@ -416,7 +416,7 @@ def chart_b2():
 
 
 def chart_b3():
-    """B3: statistica profil pentru persistenta, intervalul Wald si intervalul profil."""
+    """B3: profile statistic for the persistence, the Wald interval and the profile interval."""
     G = RES['garch_bet']
     P = G['profile']
     g, lr = np.array(P['grid']), np.array(P['lr'])
@@ -442,7 +442,7 @@ def chart_b3():
 
 
 def chart_b4():
-    """B4: curbele de impact al stirilor pentru GARCH(1,1)-t si GJR-GARCH(1,1)-t (BET)."""
+    """B4: news-impact curves for GARCH(1,1)-t and GJR-GARCH(1,1)-t (BET)."""
     g, j = CH['garch_res'].params, CH['gjr_res'].params
     s2g = g['omega'] / (1 - g['alpha[1]'] - g['beta[1]'])
     s2j = j['omega'] / (1 - j['alpha[1]'] - 0.5 * j['gamma[1]'] - j['beta[1]'])
@@ -464,7 +464,7 @@ def load_bet_forecasts():
 
 
 def chart_b5():
-    """B5: depasiri cumulate minus depasirile asteptate (0,01 t), patru modele, BET 2005-2026."""
+    """B5: cumulative breaches minus expected breaches (0.01 t), four models, BET 2005-2026."""
     fc = load_bet_forecasts()
     t = np.arange(1, len(fc) + 1)
     band = 1.96 * np.sqrt(ALPHA * (1 - ALPHA) * t)
@@ -480,7 +480,7 @@ def chart_b5():
 
 
 def chart_b7():
-    """B7: depasiri cumulate, estimare pe fereastra mobila vs parametri din tot esantionul (informatie din viitor)."""
+    """B7: cumulative breaches, rolling estimation vs full-sample parameters (look-ahead information)."""
     fc = load_bet_forecasts()
     res = CH['garch_res']
     p = res.params
@@ -503,7 +503,7 @@ def chart_b7():
 
 
 def chart_c1():
-    """C1: distributiile bootstrap ale schimbarii indicelui Hill BET si ale diferentei in diferente (BET - WIG20)."""
+    """C1: bootstrap distributions of the change in the BET Hill index and of the difference-in-differences (BET - WIG20)."""
     c = RES['c1']
     fig, axes = plt.subplots(1, 2, figsize=(7.6, 4.3))
     ax = axes[0]

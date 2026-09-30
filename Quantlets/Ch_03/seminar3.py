@@ -1,9 +1,9 @@
 """
-seminar3.py -- Calculele pentru Seminarul 3 (MFM): modele factoriale
-===================================================================
-Partea A (verificari numerice ale derivarilor), Partea B (date reale), Partea C (analiza de referinta).
-Toate rezultatele se scriu in sem3_results.json (folosite in versiunea profesorului).
-Modelarea Pietelor Financiare - Daniel Traian PELE
+seminar3.py -- Computations for Seminar 3 (MFM): factor models
+==============================================================
+Part A (numerical checks of the derivations), Part B (real data), Part C (reference analysis).
+All results are written to sem3_results.json (used in the instructor version).
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -26,9 +26,9 @@ SEED = 42
 
 
 def block_bootstrap_alpha(y, X, B=2000, block=20, periods=252, seed=SEED, draws=False):
-    """Bootstrap pe blocuri mobile (Kunsch) pentru alfa anualizat dintr-o regresie OLS.
+    """Moving-block bootstrap (Kunsch) for the annualised alpha of an OLS regression.
 
-    Perechile (y, X) se reesantioneaza impreuna (blocuri de randuri intregi). draws=True intoarce si extragerile.
+    The pairs (y, X) are resampled together (blocks of whole rows). draws=True also returns the draws.
     """
     rng = np.random.default_rng(seed)
     y, X = np.asarray(y), np.asarray(X)
@@ -37,7 +37,7 @@ def block_bootstrap_alpha(y, X, B=2000, block=20, periods=252, seed=SEED, draws=
     out = np.empty(B)
     Z = np.column_stack([np.ones(n), X])
     for b in range(B):
-        starts = rng.integers(0, n - block + 1, nb)          # ultimul bloc valid incepe la n - block
+        starts = rng.integers(0, n - block + 1, nb)          # the last valid block starts at n - block
         idx = (starts[:, None] + np.arange(block)).ravel()[:n]
         coef = np.linalg.lstsq(Z[idx], y[idx], rcond=None)[0]
         out[b] = coef[0] * periods
@@ -47,25 +47,25 @@ def block_bootstrap_alpha(y, X, B=2000, block=20, periods=252, seed=SEED, draws=
 
 
 # =============================================================================
-# PARTEA A
+# PART A
 # =============================================================================
 def part_a():
     R = {}
-    # A3 [Rezolvat] Vasicek ca medie a posteriori; dispersia a priori estimata empiric (Bayes empiric)
+    # A3 [Solved] Vasicek as a posterior mean; prior variance estimated from the data (empirical Bayes)
     b1, b2, se1, halves = g.beta_split()
     pm, pv = g.vasicek_prior(b1, se1)
     w = pv / (pv + se1['XLK'] ** 2)
     R['A3'] = dict(beta=b1['XLK'], se=se1['XLK'], prior_mean=pm, var_cs=b1.var(ddof=1), mean_se2=(se1 ** 2).mean(),
                    prior_var=pv, w=w, vasicek=w * b1['XLK'] + (1 - w) * pm, beta_later=b2['XLK'],
                    blume=0.33 + 0.67 * b1['XLK'])
-    # A4 [Propus] panta Blume ca pondere de contractie: plim = Var(beta) / (Var(beta) + se^2) daca beta e constant
+    # A4 [Proposed] Blume slope as a shrinkage weight: plim = Var(beta) / (Var(beta) + se^2) if beta is constant
     fit = stats.linregress(b1, b2)
     c, a = fit.slope, fit.intercept
     w_imp = pv / (pv + (se1 ** 2).mean())
-    t_gap = (c - w_imp) / fit.stderr                       # abaterea pantei estimate de la valoarea implicata
+    t_gap = (c - w_imp) / fit.stderr                       # gap between the fitted slope and the implied value
     R['A4'] = dict(a=a, c=c, se_c=fit.stderr, w_implied=w_imp, a_implied=(1 - w_imp) * pm,
                    t_gap=t_gap, p_gap=2 * stats.t.sf(abs(t_gap), len(b1) - 2))
-    # A5 [Rezolvat] 10 valori p ipotetice
+    # A5 [Solved] 10 hypothetical p-values
     p = np.array([0.001, 0.004, 0.009, 0.012, 0.021, 0.035, 0.048, 0.060, 0.20, 0.55])
     m = len(p)
     bonf = p < 0.05 / m
@@ -79,24 +79,24 @@ def part_a():
     kmax = max([k + 1 for k in range(m) if ps[k] <= bh_crit[k]], default=0)
     R['A5'] = dict(p=p.tolist(), naive=int((p < 0.05).sum()), bonferroni=int(bonf.sum()), holm=int(sum(holm)),
                    bh=kmax, bh_crit=bh_crit.round(4).tolist())
-    # A2 [Propus] GRS = castigul de raport Sharpe patrat (valori din date: 25 de portofolii, CAPM)
+    # A2 [Proposed] GRS = gain in squared Sharpe ratio (values from the data: 25 portfolios, CAPM)
     res, ex, mk = g.sml_data()
     R['A2'] = g.grs_sharpe(ex.values, mk.values)
-    # A6 [Propus] factor inutil (Kan & Zhang, 1999) si A7 [Rezolvat] erori in variabile
+    # A6 [Proposed] useless factor (Kan & Zhang, 1999) and A7 [Solved] errors in variables
     R['A6'] = g.useless_factor_sim()
     R['A7'] = g.eiv_attenuation()
-    # A8 [Propus] active echicorelate
+    # A8 [Proposed] assets with equal correlations
     R['A8'] = dict(rho=0.5, l1=1 + 2 * 0.5, l2=1 - 0.5, share1=(1 + 2 * 0.5) / 3)
     return R
 
 
 # =============================================================================
-# PARTEA B
+# PART B
 # =============================================================================
 def b1_xlk():
     ex, F = g.monthly_excess(['XLK.US', 'SPY.US'])
     y, x = ex['XLK.US'].values, F['Mkt-RF'].values
-    lags = int(np.floor(4 * (len(y) / 100) ** (2 / 9)))           # regula Newey-West: T = 331 -> 5
+    lags = int(np.floor(4 * (len(y) / 100) ** (2 / 9)))           # Newey-West lag rule: T = 331 -> 5
     b, se, t, e, r2 = ols_hac(y, x, lags=lags)
     Z = np.column_stack([np.ones(len(y)), x])
     s2 = e @ e / (len(y) - 2)
@@ -124,10 +124,10 @@ def b3_pca():
 
 
 def dimson_beta(y, m, keep, k=1):
-    """Beta Dimson (1979): suma pantelor pe BET_{t+k}, ..., BET_t, ..., BET_{t-k} (tranzactionare rara).
+    """Dimson (1979) beta: sum of the slopes on BET_{t+k}, ..., BET_t, ..., BET_{t-k} (thin trading).
 
-    Lead-urile si lag-urile lui BET se formeaza pe calendarul complet al perechii (actiune, BET),
-    INAINTE de eliminarea zilelor cu erori de date (keep = False), deci nu se sare peste zilele eliminate.
+    The leads and lags of BET are built on the full calendar of the (stock, BET) pair,
+    BEFORE the days with data errors are dropped (keep = False), so no dropped day is skipped over.
     """
     X = pd.concat({j: m.shift(j) for j in range(-k, k + 1)}, axis=1)
     d = pd.concat([y.rename('y'), X], axis=1)[keep].dropna()
@@ -139,9 +139,9 @@ def b4_bvb(start='2015-01-01'):
     res = g.bvb_betas()
     dims = {}
     for s in BVB:
-        p = prices([s + '.RO', 'BET']).loc[start:]          # fiecare actiune aliniata separat cu BET
+        p = prices([s + '.RO', 'BET']).loc[start:]          # each stock aligned separately with BET
         r = log_returns(p)
-        keep = ~(r.abs() > g.MAX_ABS_RET).any(axis=1)      # pragul se aplica perechii (actiune, BET)
+        keep = ~(r.abs() > g.MAX_ABS_RET).any(axis=1)      # the threshold applies to the (stock, BET) pair
         dims[s] = dimson_beta(r[s + '.RO'], r['BET'], keep)
     res['dimson'] = pd.Series(dims)
     return res.round(3).reset_index().to_dict(orient='records')
@@ -187,7 +187,7 @@ def b7_multiple_testing():
         else:
             break
     bh = max([k + 1 for k in range(m) if ps[k] <= 0.05 * (k + 1) / m], default=0)
-    # Benjamini-Yekutieli (2001): valid sub orice dependenta, praguri BH impartite la sum_j 1/j
+    # Benjamini-Yekutieli (2001): valid under any dependence, BH thresholds divided by sum_j 1/j
     cm = (1 / np.arange(1, m + 1)).sum()
     by = max([k + 1 for k in range(m) if ps[k] <= 0.05 * (k + 1) / (m * cm)], default=0)
     return dict(T=len(ex), naive=int((d['p'] < 0.05).sum()), bonferroni=int((d['p'] < 0.05 / m).sum()), holm=holm, bh=bh, by=by,
@@ -208,7 +208,7 @@ def b8_pca_bvb():
     if vecs[:, 0].sum() < 0:
         vecs[:, 0] *= -1
     pc1 = Z.values @ vecs[:, 0]
-    # corelatia medie efectiva (in afara diagonalei), comparata cu sectoarele SUA pe aceeasi perioada
+    # actual mean off-diagonal correlation, compared with the US sectors over the same period
     def avg_corr(Y):
         C = np.corrcoef(np.asarray(Y, float).T)
         n = C.shape[0]
@@ -225,7 +225,7 @@ def b8_pca_bvb():
 
 
 def b9_lns(B=500, seed=SEED):
-    """Lewellen-Nagel-Shanken: R^2 OLS si GLS, 25 portofolii vs 25 + 30 industrii; IC bootstrap i.i.d. pe luni."""
+    """Lewellen-Nagel-Shanken: OLS and GLS R^2, 25 portfolios vs 25 + 30 industries; i.i.d. bootstrap CIs over months."""
     rng = np.random.default_rng(seed)
     F = factors('M')
     P25 = french('p25', 'M').loc['1963-07-31':g.END]
@@ -266,12 +266,12 @@ def b9_lns(B=500, seed=SEED):
 
 
 def b10_model_comparison():
-    """Barillas-Shanken: SR^2 maxim al factorilor, 1963-2026 si 2000-2026 (bootstrap stationar)."""
+    """Barillas-Shanken: maximum squared Sharpe ratio of the factors, 1963-2026 and 2000-2026 (stationary bootstrap)."""
     return g.model_comparison()
 
 
 def b11_grs_robust(B=2000, lags=6, seed=SEED, draws=False):
-    """GRS pe 25 de portofolii fara normalitate: bootstrap pe reziduuri (H0 impus) si Wald GMM cu HAC."""
+    """GRS on 25 portfolios without normality: residual bootstrap (H0 imposed) and GMM Wald with HAC."""
     rng = np.random.default_rng(seed)
     res, ex, mk = g.sml_data()
     R, f = ex.values, mk.values
@@ -283,10 +283,10 @@ def b11_grs_robust(B=2000, lags=6, seed=SEED, draws=False):
     boot = np.empty(B)
     for b in range(B):
         i = rng.integers(0, T, T)
-        Rb = np.outer(f, AB[1]) + E[i]                   # alfa = 0 impus; randuri intregi (corelatie transversala pastrata)
+        Rb = np.outer(f, AB[1]) + E[i]                   # alpha = 0 imposed; whole rows (cross-sectional correlation preserved)
         boot[b] = grs_test(Rb, f)[0]
-    # Wald GMM: momente e_t x (1, f_t); varianta HAC (Bartlett) a lui (alfa, beta)
-    u = (Z[:, :, None] * E[:, None, :]).reshape(T, -1)     # T x 2N, ordine (1: alfa_1..N, f: beta_1..N)
+    # GMM Wald: moments e_t x (1, f_t); HAC (Bartlett) variance of (alpha, beta)
+    u = (Z[:, :, None] * E[:, None, :]).reshape(T, -1)     # T x 2N, order (1: alpha_1..N, f: beta_1..N)
     S = u.T @ u / T
     for l in range(1, lags + 1):
         C = u[l:].T @ u[:-l] / T
@@ -299,7 +299,7 @@ def b11_grs_robust(B=2000, lags=6, seed=SEED, draws=False):
     S0 = u.T @ u / T
     V0 = (Di @ S0 @ Di / T)[:N, :N]
     W0 = alpha @ np.linalg.solve(V0, alpha)
-    # reziduuri: asimetrie si aplatizare (motivul bootstrap-ului)
+    # residuals: skewness and kurtosis (the reason for the bootstrap)
     kurt = float(np.mean(stats.kurtosis(E, axis=0, fisher=False)))
     if draws:
         return boot, stat, E
@@ -310,30 +310,30 @@ def b11_grs_robust(B=2000, lags=6, seed=SEED, draws=False):
 
 
 # =============================================================================
-# PARTEA C: prime factoriale pe BVB (momentum si beta scazut), analiza de referinta
+# PART C: factor premia on the BVB (momentum and low beta), reference analysis
 # =============================================================================
 def part_c(return_series=False):
-    """Momentum 12-1 si beta scazut pe blue chips BVB, doar cu informatie disponibila la formarea portofoliului.
+    """Momentum 12-1 and low beta on BVB blue chips, using only information available at portfolio formation.
 
-    * lunile incomplete (ultima luna, daca datele se opresc inainte de sfarsitul ei) se elimina;
-    * |r| > 50% intr-o luna = eveniment de capital neajustat (FP, septembrie 2023): randamentul este indisponibil;
-      actiunea nu intra in clasamentele al caror semnal contine luna respectiva, iar in luna de detinere
-      iese din media portofoliului (regula fixata dinainte);
-    * eligibilitatea in luna t foloseste doar informatie de la sfarsitul lunii t-1 (semnal si pret disponibile).
+    * incomplete months (the last month, if the data stop before its end) are dropped;
+    * |r| > 50% in a month = unadjusted capital event (FP, September 2023): the return is unavailable;
+      the stock is left out of rankings whose signal contains that month, and out of the portfolio
+      mean in the holding month (rule fixed in advance);
+    * eligibility in month t uses only information from the end of month t-1 (signal and price available).
     """
     names = [s for s in BVB if s not in ('H2O',)]
     px = pd.concat([g.price(s + '.RO') for s in names] + [g.price('BET')], axis=1)
     m = px.resample('ME').last().loc['2015-12-31':]
     last = px.index[-1]
-    if (last + pd.offsets.BDay(1)).month == last.month:          # ultima luna nu e completa
+    if (last + pd.offsets.BDay(1)).month == last.month:          # the last month is incomplete
         m = m.iloc[:-1]
     stocks = [s + '.RO' for s in names]
     raw = m.pct_change()
     flag = raw.abs() > 0.5
-    rets = raw.mask(flag)                                         # randamente valide (NaN = eroare sau lipsa)
-    gross = 1 + rets[stocks]                                      # randament indisponibil -> semnal indisponibil
-    mom = gross.rolling(11, min_periods=11).apply(np.prod, raw=True).shift(2) - 1   # lunile t-12 ... t-2
-    hold = rets[stocks].fillna(0.0).where(m[stocks].shift(1).notna()).mask(flag[stocks])   # randamentul lunii t
+    rets = raw.mask(flag)                                         # valid returns (NaN = error or missing)
+    gross = 1 + rets[stocks]                                      # unavailable return -> unavailable signal
+    mom = gross.rolling(11, min_periods=11).apply(np.prod, raw=True).shift(2) - 1   # months t-12 ... t-2
+    hold = rets[stocks].fillna(0.0).where(m[stocks].shift(1).notna()).mask(flag[stocks])   # return of month t
     rows = []
     for t in range(13, len(m)):
         date = m.index[t]
@@ -343,7 +343,7 @@ def part_c(return_series=False):
         ms = mom.iloc[t][avail].sort_values()
         k = 3
         mom_ls = hold.iloc[t][ms.index[-k:]].mean() - hold.iloc[t][ms.index[:k]].mean()
-        win = rets.iloc[max(0, t - 36):t]                         # doar lunile t-36 ... t-1
+        win = rets.iloc[max(0, t - 36):t]                         # only months t-36 ... t-1
         betas = {}
         for s in avail:
             d = win[[s, 'BET']].dropna()
@@ -365,7 +365,7 @@ def part_c(return_series=False):
     out['end'] = str(d.index[-1].date())
     out['n_median'] = float(d['n'].median())
     out['n_flagged'] = int(flag[stocks].sum().sum())
-    # C2: raspunsul AI pe acelasi esantion (semnal cu luna t inclusa, randamente log) si fiecare eroare separat
+    # instructor diagnostics on the same sample (variants of the signal timing and of the return aggregation)
     look = (1 + rets[stocks]).rolling(12, min_periods=12).apply(np.prod, raw=True) - 1
     logh = np.log1p(hold)
     var, ser = {}, {'corrected': d['mom']}
@@ -380,7 +380,7 @@ def part_c(return_series=False):
         var[lab] = dict(mean_ann=v.mean() * 12, sd_ann=v.std() * np.sqrt(12),
                         t_nw=ols_hac(v.values, np.zeros((len(v), 0)), lags=3)[2][0])
     out['c2_variants'] = var
-    # C1: exemplu de clasament pentru ultima luna de detinere (semnal 12-1, eligibilitate la t-1)
+    # C1: example ranking for the last holding month (12-1 signal, eligibility at t-1)
     t = len(m) - 1
     avail = [s for s in stocks if pd.notna(mom[s].iloc[t]) and pd.notna(m[s].iloc[t - 1])]
     ms = mom.iloc[t][avail].sort_values(ascending=False)
@@ -394,7 +394,7 @@ def part_c(return_series=False):
 
 
 def fig_part_c(d):
-    """Evolutia a 1 leu in cele doua strategii long-short pe blue chips BVB."""
+    """Growth of 1 leu in the two long-short strategies on BVB blue chips."""
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots(figsize=(7.0, 3.0))
     for c, col, lab in [('mom', g.MainBlue, 'Momentum 12-1: top 3 minus bottom 3'),
@@ -1081,8 +1081,8 @@ def a4_chart():
     _label_points(ax, list(b1.index), b1.values, b2.values)
     xs = np.linspace(0.3, 1.6, 10)
     ax.plot(xs, xs, color=g.Gray, ls=':', lw=0.8, label='Identity')
-    ax.plot(xs, fit.intercept + fit.slope * xs, color=IDAred, label=f'Fitted: {fit.intercept:.3f} + {fit.slope:.3f} b1')
-    ax.plot(xs, (1 - w) * pm + w * xs, color=Forest, ls='--', label=f'Implied by A3: {(1 - w) * pm:.3f} + {w:.3f} b1')
+    ax.plot(xs, fit.intercept + fit.slope * xs, color=IDAred, label=f'Fitted: later beta = {fit.intercept:.3f} + {fit.slope:.3f} x earlier beta')
+    ax.plot(xs, (1 - w) * pm + w * xs, color=Forest, ls='--', label=f'Implied by A3: later beta = {(1 - w) * pm:.3f} + {w:.3f} x earlier beta')
     ax.set_xlabel('Beta, 1999-2012')
     ax.set_ylabel('Beta, 2013-2026')
     _ax_title(ax, 'Regression to the mean exceeds sampling noise')

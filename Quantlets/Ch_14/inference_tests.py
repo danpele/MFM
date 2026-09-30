@@ -162,7 +162,7 @@ def returns_inference():
 
 
 # =============================================================================
-# 2. BET: TRANZACTIONARE NESINCRONA
+# 2. BET: NON-SYNCHRONOUS TRADING
 # =============================================================================
 def nonsync():
     d = load_csv('ch14_returns_bet.csv')
@@ -202,7 +202,7 @@ def nonsync():
 
 
 # =============================================================================
-# 3. PUTEREA TESTULUI KUPIEC
+# 3. POWER OF THE KUPIEC TEST
 # =============================================================================
 def kupiec_power():
     crit = stats.chi2.ppf(0.95, 1)
@@ -385,7 +385,7 @@ def backtests():
 
 
 # =============================================================================
-# 6. INFERENTA CONFORMALA ADAPTIVA (GIBBS & CANDES, 2021)
+# 6. ADAPTIVE CONFORMAL INFERENCE (GIBBS & CANDES, 2021)
 # =============================================================================
 def aci(y, q, alpha, gamma=0.001, n_cal=250):
     """Adaptive conformal inference (Gibbs & Candes, 2021) for a lower quantile q_t of level alpha.
@@ -481,7 +481,7 @@ def conformal():
     axs[1].set_ylabel('VaR 1% (%)')
     axs[1].yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f'{v:g}'))
     axs[1].xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-    fig_legend_bottom(fig, [h1, h2, h3, h4], ['Adaptive level $\\alpha_t$ (target 1%)', 'Chronos-2 raw quantile',
+    fig_legend_bottom(fig, [h1, h2, h3, h4], ['Adaptive level $\\alpha_t$ (target 1%)', 'Chronos-2 direct quantile',
                                               'Chronos-2 + adaptive conformal', 'FHS'], ncol=2, y=0.06)
     fig.tight_layout(rect=(0, 0.1, 1, 1))
     save_fig('ch14_conformal')
@@ -506,7 +506,7 @@ def gw():
 
 
 # =============================================================================
-# 8. MEMORIE: ACF |r| VS DESCRESTERE GEOMETRICA
+# 8. MEMORY: ACF OF |r| VS GEOMETRIC DECAY
 # =============================================================================
 def memory():
     x = M.load_returns('sp500').loc['2000':].values

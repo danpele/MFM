@@ -1,16 +1,16 @@
 """
-case_study_race.py -- Capitolul 10, studiul de caz: cat valoreaza cursa vitezei (Aquilina, Budish & O'Neill, 2022)
-=================================================================================================================
-Extrapolarea din sectiunea VI a articolului (tabelul XV), aplicata la SPY:
+case_study_race.py -- Chapter 10 case study: what the speed race is worth (Aquilina, Budish & O'Neill, 2022)
+===========================================================================================================
+The extrapolation of the paper's Section VI (Table XV), applied to SPY:
   * col. 2:  Pi_t = 0.4213 bp x V_t
-  * col. 6:  Pi_t = 0.3354 bp x V_t + 0.0066 bp x sigma_t x Vbar   (sigma_t = volatilitatea realizata anualizata, %)
-  * scenariile extreme ale tabelului XIV: taxa intre 0.20 si 0.74 bp din valoarea tranzactionata
-Date: bare de 5 minute SPY, sesiunea regulata (09:30-16:00, ora New York), zilele cu toate cele 78 de bare, 2021-2025.
-  V_t     = suma (inchidere x volum) pe cele 78 de bare
-  sigma_t = 100 sqrt(252 sum r^2), din randamentele log pe 5 minute (prima bara: de la deschidere)
-Grafice: ch10_race_tax (taxa zilnica implicata, col. 6, la valoarea tranzactionata medie V_t = Vbar), ch10_race_prize (premiul anual implicat, col. 2 si col. 6)
-Iesire: case_study_race.json
-Modelarea Pietelor Financiare - Daniel Traian PELE
+  * col. 6:  Pi_t = 0.3354 bp x V_t + 0.0066 bp x sigma_t x Vbar   (sigma_t = annualised realised volatility, %)
+  * the extreme scenarios of Table XIV: a tax between 0.20 and 0.74 bp of traded value
+Data: SPY 5-minute bars, regular session (09:30-16:00, New York time), days with all 78 bars, 2021-2025.
+  V_t     = sum (close x volume) over the 78 bars
+  sigma_t = 100 sqrt(252 sum r^2), from 5-minute log returns (first bar: from the open)
+Charts: ch10_race_tax (implied daily tax, col. 6, at mean traded value V_t = Vbar), ch10_race_prize (implied annual prize, col. 2 and col. 6)
+Output: case_study_race.json
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -26,13 +26,13 @@ from mfm_data import intraday_spy   # noqa: E402
 from generate_all_charts import (MainBlue, IDAred, Forest,  # noqa: E402
                                  save_fig, legend_outside_bottom, jsonable)
 
-# coeficientii publicati (Aquilina, Budish & O'Neill, 2022, tabelul XV col. 2 si 6; tabelul XIV), in pb
+# coefficients of Aquilina, Budish & O'Neill (2022), Table XV col. 2 and 6; Table XIV; in bp
 ABO = dict(col2=0.4213, col6_v=0.3354, col6_s=0.0066, lo=0.20, hi=0.74, tax_lse=0.419)
 YEARS = (2021, 2025)
 
 
 def race_daily(s):
-    """V_t (USD) si sigma_t (%, anualizata) pentru fiecare zi completa; taxa zilnica implicata dupa col. 6 la V_t = Vbar (pb)."""
+    """V_t (USD) and sigma_t (%, annualised) for each complete day; implied daily tax by col. 6 at V_t = Vbar (bp)."""
     s = s.loc[s['date'].dt.year.between(*YEARS)]
     d = pd.DataFrame({'V': s.groupby('date')['dv'].sum(),
                       'sigma': 100 * np.sqrt(252 * s.groupby('date')['r'].apply(lambda v: (v ** 2).sum()))})
@@ -42,7 +42,7 @@ def race_daily(s):
 
 
 def race_prize(d):
-    """Premiul anual implicat (USD milioane) dupa col. 2, col. 6 si scenariile extreme ale tabelului XIV."""
+    """Implied annual prize (USD million) by col. 2, col. 6 and the extreme scenarios of Table XIV."""
     out = {}
     for y, g in d.groupby('year'):
         V, Vbar = g['V'].sum(), g['V'].mean()
@@ -55,7 +55,7 @@ def race_prize(d):
 
 def fig_race_tax(d):
     fig, ax = plt.subplots(figsize=(9, 3.4))
-    ax.plot(d.index, d['tax6'], color=MainBlue, lw=0.8, label='Implied daily tax at mean traded value, Table XV col. 6: 0.3354 + 0.0066 x daily realised volatility (bp)')
+    ax.plot(d.index, d['tax6'], color=MainBlue, lw=0.8, label='Implied daily tax at mean traded value, Table XV col. 6: 0.3354 + 0.0066 x annualised realised volatility of the day (%), in bp')
     ax.axhline(ABO['col2'], color=IDAred, lw=1.0, ls='--', label='Table XV col. 2: 0.4213 bp')
     ax.axhline(ABO['lo'], color=Forest, lw=1.0, ls=':', label='Table XIV lowest and highest scenarios: 0.20 and 0.74 bp')
     ax.axhline(ABO['hi'], color=Forest, lw=1.0, ls=':')
@@ -81,7 +81,7 @@ def fig_race_prize(P):
     fig, ax = plt.subplots(figsize=(9, 3.4))
     b2 = ax.bar(x - w / 2, [P[y]['col2'] for y in ys], w, color=MainBlue, label='Table XV col. 2 (traded value)')
     b6 = ax.bar(x + w / 2, [P[y]['col6'] for y in ys], w, color=IDAred, label='Table XV col. 6 (traded value and volatility)')
-    xr = x + w + 0.08                                             # intervalul limitelor, la dreapta perechii de bare
+    xr = x + w + 0.08                                             # range of the scenarios, to the right of each pair of bars
     ax.vlines(xr, [P[y]['lo'] for y in ys], [P[y]['hi'] for y in ys], color=Forest, lw=1.6,
               label='Range between the Table XIV lowest and highest scenarios (0.20 to 0.74 bp)')
     ax.scatter(np.r_[xr, xr], [P[y]['lo'] for y in ys] + [P[y]['hi'] for y in ys], color=Forest, marker='_', s=120, zorder=3)

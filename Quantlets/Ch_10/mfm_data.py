@@ -1,20 +1,20 @@
 """
-mfm_data.py -- Incarcarea datelor pentru Capitolul 10 (MFM): microstructura pietei
-==================================================================================
-  * read_market(symbol)     -- fisierul zilnic data/market/<SIMBOL>.csv (local sau din repo)
-  * ohlc(key, start, end)   -- deschidere, maxim, minim, inchidere AJUSTATE (dividende, split-uri)
-  * dollar_volume(key, ...) -- valoarea tranzactionata zilnic in USD (pret ajustat doar pentru split-uri x volum)
-  * returns(key, ...)       -- randamente log zilnice din pretul ajustat
-  * intraday_spy()          -- bare de 5 minute SPY, sesiunea regulata 09:30-16:00 (ora New York)
-  * intraday_btc()          -- bare de 5 minute Bitcoin, 24/7 (UTC)
-  * read_reference_rate()   -- cursul de referinta BNR (USD/RON), pentru conversia valorilor BVB
+mfm_data.py -- Data loading for Chapter 10 (MFM): market microstructure
+=======================================================================
+  * read_market(symbol)     -- daily price file of one symbol (local copy or repository)
+  * ohlc(key, start, end)   -- ADJUSTED open, high, low, close (dividends, splits)
+  * dollar_volume(key, ...) -- daily traded value in USD (split-adjusted price x volume)
+  * returns(key, ...)       -- daily log returns from the adjusted price
+  * intraday_spy()          -- SPY 5-minute bars, regular session 09:30-16:00 (New York time)
+  * intraday_btc()          -- Bitcoin 5-minute bars, 24/7 (UTC)
+  * read_reference_rate()   -- BNR (National Bank of Romania) reference rate (USD/RON), to convert BVB values
 
-Conventii:
-  * actiuni si ETF-uri: doar zilele lucratoare; se elimina zilele fara tranzactii (maxim = minim sau volum zero);
-  * cripto: 7 zile din 7; volumul zilnic al cripto-activelor este deja exprimat in USD;
-  * volumul actiunilor este in numar de actiuni, pe aceeasi baza ca pretul ajustat pentru split-uri.
+Conventions:
+  * stocks and ETFs: weekdays only; days without trading are dropped (high = low or zero volume);
+  * crypto: 7 days a week; the daily volume of crypto-assets is already in USD;
+  * stock volume is in number of shares, on the same basis as the split-adjusted price.
 
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -27,7 +27,7 @@ REPO_RAW = 'https://raw.githubusercontent.com/danpele/MFM/main/data/market/'
 MARKET_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'data', 'market')
 END = '2026-09-18'
 
-# cheie -> (simbol, eticheta, grup)
+# key -> (symbol, label, group)
 ASSETS = {
     'SPY': ('SPY.US', 'SPY', 'US'), 'AAPL': ('AAPL.US', 'Apple', 'US'), 'MSFT': ('MSFT.US', 'Microsoft', 'US'),
     'NVDA': ('NVDA.US', 'NVIDIA', 'US'), 'JPM': ('JPM.US', 'JPMorgan', 'US'), 'GME': ('GME.US', 'GameStop', 'US'),
@@ -44,8 +44,8 @@ ASSETS = {
 }
 GROUPS = {g: [k for k, v in ASSETS.items() if v[2] == g] for g in ('US', 'BVB', 'Crypto')}
 LABELS = {k: v[1] for k, v in ASSETS.items()}
-# evenimente de ajustare mari care sunt dividende in numerar, nu split-uri (verificate la emitent):
-#   SNN.RO 2018-12-21: dividend brut de 1,61 lei pe actiune, data ex 21.12.2018
+# large adjustment events that are cash dividends, not splits (issuer announcement):
+#   SNN.RO 2018-12-21: gross dividend of 1.61 lei per share, ex-date 21 December 2018
 #   (https://www.nuclearelectrica.ro/wp-content/uploads/2018/12/SNN_Comunicat-plata-dividende-suplimentare_EN.pdf)
 CASH_DIVIDENDS = {'SNN.RO': ['2018-12-21']}
 
@@ -53,7 +53,7 @@ _CACHE = {}
 
 
 def read_market(symbol):
-    """Citeste data/market/<SIMBOL>.csv local sau din repo-ul GitHub."""
+    """Read the daily price file of one symbol, from a local copy or from the GitHub repository."""
     if symbol in _CACHE:
         return _CACHE[symbol]
     fname = f'{symbol}.csv'
@@ -64,7 +64,7 @@ def read_market(symbol):
 
 
 def read_reference_rate(currency='USD', start='2014-01-01', end=END):
-    """Cursul oficial de referinta RON (arhive XML anuale BNR)."""
+    """Official RON reference rate (BNR yearly XML archives)."""
     key = ('REF', currency, start, end)
     if key in _CACHE:
         return _CACHE[key]
@@ -87,14 +87,14 @@ def _clean(key, d):
     d = d[(d['high'] > d['low']) & (d['volume'].fillna(0) > 0)]
     if ASSETS[key][2] != 'Crypto':
         d = d[d.index.dayofweek < 5]
-        # cotatii eronate izolate: pretul ajustat de peste doua ori mai mare / mai mic decat mediana locala (21 de zile)
+        # isolated bad ticks: adjusted price more than twice / less than half the local median (21 days)
         med = d['adjusted_close'].rolling(21, center=True, min_periods=5).median()
         d = d[np.abs(np.log(d['adjusted_close'] / med)) < np.log(2)]
     return d
 
 
 def ohlc(key, start='2016-09-19', end=END):
-    """Deschidere, maxim, minim, inchidere ajustate cu factorul pretului ajustat (dividende si split-uri)."""
+    """Open, high, low, close scaled by the adjustment factor of the adjusted price (dividends and splits)."""
     d = read_market(ASSETS[key][0]).loc[start:end].copy()
     f = d['adjusted_close'] / d['close']
     for c in ['open', 'high', 'low', 'close']:
@@ -103,32 +103,32 @@ def ohlc(key, start='2016-09-19', end=END):
 
 
 def split_adjusted_close(d, symbol=None):
-    """Pretul de inchidere ajustat DOAR pentru split-uri si actiuni gratuite (aceeasi baza ca volumul in numar de
-    actiuni); dividendele in numerar mari din CASH_DIVIDENDS nu sunt tratate ca split-uri."""
+    """Close price adjusted ONLY for splits and bonus shares (same basis as the volume in number of shares);
+    the large cash dividends in CASH_DIVIDENDS are not treated as splits."""
     k = (d['close'].shift(1) / d['close']) / (d['adjusted_close'].shift(1) / d['adjusted_close'])
-    k = k.where(np.abs(np.log(k)) > 0.15, 1.0).fillna(1.0)      # zilele de split: raportul de divizare
+    k = k.where(np.abs(np.log(k)) > 0.15, 1.0).fillna(1.0)      # split days: the split ratio
     for day in CASH_DIVIDENDS.get(symbol, []):
         k.loc[k.index == pd.Timestamp(day)] = 1.0
-    back = k[::-1].cumprod()[::-1].shift(-1).fillna(1.0)          # produsul split-urilor ulterioare fiecarei zile
+    back = k[::-1].cumprod()[::-1].shift(-1).fillna(1.0)          # product of the splits after each day
     return d['close'] / back
 
 
 def returns(key, start='2016-09-19', end=END):
-    """Randamente log zilnice din pretul ajustat (zilele fara tranzactii eliminate)."""
+    """Daily log returns from the adjusted price (days without trading dropped)."""
     d = read_market(ASSETS[key][0]).loc[start:end]
     d = _clean(key, d)
     return np.log(d['adjusted_close']).diff().dropna().rename(key)
 
 
 def dollar_volume(key, start='2016-09-19', end=END):
-    """Valoarea tranzactionata zilnic, in USD."""
+    """Daily traded value, in USD."""
     d = read_market(ASSETS[key][0]).loc[:end]
     grp = ASSETS[key][2]
     if grp == 'Crypto':
-        dv = d['volume']                                          # deja in USD
+        dv = d['volume']                                          # already in USD
     else:
         dv = split_adjusted_close(d, ASSETS[key][0]) * d['volume']
-        if grp == 'BVB':                                          # RON -> USD la cursul de referinta BNR
+        if grp == 'BVB':                                          # RON -> USD at the BNR reference rate
             fx = read_reference_rate('USD', start='2014-01-01', end=end)
             dv = dv / fx.reindex(dv.index).ffill()
     d = _clean(key, d.assign(dv=dv))
@@ -136,7 +136,7 @@ def dollar_volume(key, start='2016-09-19', end=END):
 
 
 def intraday_spy():
-    """Bare de 5 minute SPY, sesiunea regulata (09:30-15:55 = inceputul barei), doar zilele complete (78 de bare)."""
+    """SPY 5-minute bars, regular session (09:30-15:55 = bar start), complete days only (78 bars)."""
     fname = 'intraday/SPY.US_5m.csv'
     path = os.path.join(MARKET_DIR, fname)
     d = pd.read_csv(path if os.path.exists(path) else REPO_RAW + fname, parse_dates=['datetime_utc'])
@@ -147,13 +147,13 @@ def intraday_spy():
     d = d[d['date'].isin(n[n == 78].index)].set_index('t').sort_index()
     d['r'] = np.log(d['close']).groupby(d['date']).diff()
     first = d['tod'] == '09:30'
-    d.loc[first, 'r'] = np.log(d.loc[first, 'close'] / d.loc[first, 'open'])   # prima bara: de la deschidere
+    d.loc[first, 'r'] = np.log(d.loc[first, 'close'] / d.loc[first, 'open'])   # first bar: from the open
     d['dv'] = d['close'] * d['volume']
     return d
 
 
 def intraday_btc():
-    """Bare de 5 minute Bitcoin (UTC), 24 de ore din 24; volumul nu este folosit (lipseste pe multe bare)."""
+    """Bitcoin 5-minute bars (UTC), 24 hours a day; volume is not used (missing on many bars)."""
     fname = 'intraday/BTC-USD.CC_5m.csv'
     path = os.path.join(MARKET_DIR, fname)
     d = pd.read_csv(path if os.path.exists(path) else REPO_RAW + fname, parse_dates=['datetime_utc'])
@@ -162,5 +162,5 @@ def intraday_btc():
     d['date'] = d.index.normalize()
     d['r'] = np.log(d['close']).diff()
     gap = d.index.to_series().diff() != pd.Timedelta('5min')
-    d.loc[gap, 'r'] = np.nan                                       # fara randamente peste goluri
+    d.loc[gap, 'r'] = np.nan                                       # no returns across missing bars
     return d

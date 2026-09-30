@@ -32,15 +32,15 @@ sys.path.insert(0, HERE)
 from generate_all_charts import plt, MainBlue, IDAred, Forest, Amber, Gray, save_fig   # noqa: E402  (stilul MFM)
 
 FF49_URL = 'https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/49_Industry_Portfolios_CSV.zip'
-MN_LAGS = 120            # decalaje t-2 ... t-120
-MN_WINDOW = 240          # fereastra de estimare: 20 de ani
-MN_MA = 120              # media mobila a lui r_OOS: 10 ani
+MN_LAGS = 120            # lags t-2 ... t-120
+MN_WINDOW = 240          # estimation window: 20 years
+MN_MA = 120              # moving average of r_OOS: 10 years
 MN_RIDGE_START = '1971-01-01'
 
 
 def french_industries49():
-    """49 Industry Portfolios (Kenneth French Data Library): randamente lunare medii ponderate cu capitalizarea,
-    in unitati zecimale; valorile lipsa (-99.99, -999) devin NaN."""
+    """49 Industry Portfolios (Kenneth French Data Library): value-weighted average monthly returns,
+    as fractions; missing values (-99.99, -999) become NaN."""
     raw = urllib.request.urlopen(urllib.request.Request(FF49_URL, headers={'User-Agent': 'Mozilla/5.0'}),
                                  timeout=120).read()
     z = zipfile.ZipFile(io.BytesIO(raw))
@@ -55,12 +55,12 @@ def french_industries49():
 
 
 def mn_panel(R, lags=MN_LAGS):
-    """Pentru fiecare luna t: X_t (N_t x 238), randamentele t-2..t-120 si patratele lor, centrate si standardizate
-    transversal; y_t = r_t centrat transversal. Returneaza lunile, X-urile, y-urile si portofoliile folosite."""
+    """For each month t: X_t (N_t x 238), the returns t-2..t-120 and their squares, demeaned and standardised
+    across portfolios; y_t = r_t demeaned across portfolios. Returns the months, the X, the y and the portfolios used."""
     A = R.values
     months, XS, YS, NS = [], [], [], []
     for t in range(lags, len(A)):
-        ok = ~np.isnan(A[t - lags:t + 1]).any(axis=0)            # istoric complet t-120 ... t
+        ok = ~np.isnan(A[t - lags:t + 1]).any(axis=0)            # complete history t-120 ... t
         if ok.sum() < 10:
             continue
         past = np.column_stack([A[t - k, ok] for k in range(2, lags + 1)])
@@ -75,7 +75,7 @@ def mn_panel(R, lags=MN_LAGS):
 
 
 def mn_moments(XS, YS):
-    """Momentele ponderate lunare (ponderea 1/N_t): G_t = X'X/N, b_t = X'y/N, v_t = y'y/N."""
+    """Monthly weighted moments (weight 1/N_t): G_t = X'X/N, b_t = X'y/N, v_t = y'y/N."""
     G = np.array([X.T @ X / len(y) for X, y in zip(XS, YS)])
     b = np.array([X.T @ y / len(y) for X, y in zip(XS, YS)])
     v = np.array([y @ y / len(y) for y in YS])
@@ -83,14 +83,14 @@ def mn_moments(XS, YS):
 
 
 def mn_rolling(months, XS, YS, G, b, v, window=MN_WINDOW, ma=MN_MA):
-    """OLS pe ferestre mobile de 20 de ani: r_IS (in selectie) si r_OOS,t+1 (Martin & Nagel, ec. 19; Fig. 8)."""
+    """OLS on rolling 20-year windows: r_IS (in sample) and r_OOS,t+1 (Martin & Nagel, eq. 19; Fig. 8)."""
     rows = []
     for e in range(window - 1, len(months) - 1):
         Gs, bs = G[e - window + 1:e + 1].sum(axis=0), b[e - window + 1:e + 1].sum(axis=0)
         h = np.linalg.solve(Gs, bs)
-        r_is = h @ bs / window                                   # media (1/N) h'X_s'y_s in fereastra
+        r_is = h @ bs / window                                   # mean of (1/N) h'X_s'y_s in the window
         X1, y1 = XS[e + 1], YS[e + 1]
-        r2_is = r_is / v[e - window + 1:e + 1].mean()           # R^2 in selectie al ferestrei
+        r2_is = r_is / v[e - window + 1:e + 1].mean()           # in-sample R^2 of the window
         rows.append((months[e + 1], r_is, r2_is, (X1 @ h) @ y1 / len(y1)))
     o = pd.DataFrame(rows, columns=['date', 'r_is', 'r2_is', 'r_oos']).set_index('date')
     o['oos_ma'] = o['r_oos'].rolling(ma).mean()
@@ -99,7 +99,7 @@ def mn_rolling(months, XS, YS, G, b, v, window=MN_WINDOW, ma=MN_MA):
 
 
 def mn_ridge(months, G, b, v, start=MN_RIDGE_START, grid=np.logspace(0, 7, 57)):
-    """Ridge pe tot esantionul din `start`; penalizarea: max. media R^2 din anii exclusi (leave-one-year-out)."""
+    """Full-sample ridge from `start`; penalty: maximises the mean R^2 of the left-out years (leave-one-year-out)."""
     sel = months >= start
     yrs = months.year[sel]
     Gs, bs, vs = G[sel], b[sel], v[sel]
@@ -127,7 +127,7 @@ def mn_ridge(months, G, b, v, start=MN_RIDGE_START, grid=np.logspace(0, 7, 57)):
 
 
 def fig_mn_rolling(o):
-    """Fig. 8 pe 49 de portofolii: r_OOS in medie mobila pe 10 ani, cu benzi de 2 erori standard, si r_IS."""
+    """Martin & Nagel Fig. 8 on 49 portfolios: 10-year moving average of r_OOS with 2-standard-error bands, and r_IS."""
     x = o.dropna()
     s = 1e5
     fig, ax = plt.subplots(figsize=(7.2, 3.3))
@@ -146,7 +146,7 @@ def fig_mn_rolling(o):
 
 
 def fig_mn_ridge(coef):
-    """Fig. 7 pe 49 de portofolii: coeficientii ridge pe randamentele trecute si pe patratele lor."""
+    """Martin & Nagel Fig. 7 on 49 portfolios: ridge coefficients on past returns and on their squares."""
     lag = coef['lag'].values
     m12 = lag % 12 == 0
     short = (lag <= 12) & ~m12
@@ -169,7 +169,7 @@ def fig_mn_ridge(coef):
 
 
 def mn_summary(o, coef, ridge, months, NS, R):
-    """Cifrele de pe slide-uri."""
+    """The numbers shown on the slides."""
     x = o.dropna()
     t = x['oos_ma'] / x['oos_se']
     above = t[t > 2]

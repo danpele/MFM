@@ -1,19 +1,19 @@
 """
-inference19.py -- Inferenta de nivel master pentru studiul de caz si seminarul Capitolului 19 (MFM)
+inference19.py -- Master-level inference for the case study and the seminar of Chapter 19 (MFM)
 ==================================================================================================
-  * hill / hill_ci              -- indicele de coada Hill pe pierderi, CI asimptotic si CI bootstrap pe blocuri
-                                   (kurtosis-ul de selectie nu este consistent cand alpha < 4: Athreya, 1987)
-  * garch_t_nll / profile_pers  -- CI prin verosimilitatea profil pentru persistenta alpha + beta a GARCH(1,1)-t,
-                                   restrans la regiunea stationara (Andrews, 1999)
-  * dq_test                     -- testul Dynamic Quantile (Engle & Manganelli, 2004)
-  * fz0 / dm_test / mcs         -- scorul FZ0 pentru (VaR, ES) (Patton, Ziegel & Chen, 2019), teste Diebold-Mariano
-                                   cu erori HAC, setul de modele de incredere (Hansen, Lunde & Nason, 2011)
-  * comparative_backtest        -- backtest comparativ pentru ES cu trei zone (Nolde & Ziegel, 2017)
-  * kupiec_power / kupiec_mde   -- puterea exacta (binomiala) a testului Kupiec si efectul minim detectabil
-  * sup_wald_break              -- ruptura cu data necunoscuta (Andrews, 1993), valori p prin simularea limitei
+  * hill / hill_ci              -- Hill tail index of losses, asymptotic CI and block-bootstrap CI
+                                   (the sample kurtosis is not consistent when alpha < 4: Athreya, 1987)
+  * garch_t_nll / profile_pers  -- profile-likelihood CI for the persistence alpha + beta of GARCH(1,1)-t,
+                                   restricted to the stationary region (Andrews, 1999)
+  * dq_test                     -- Dynamic Quantile test (Engle & Manganelli, 2004)
+  * fz0 / dm_test / mcs         -- FZ0 score for (VaR, ES) (Patton, Ziegel & Chen, 2019), Diebold-Mariano tests
+                                   with HAC errors, model confidence set (Hansen, Lunde & Nason, 2011)
+  * comparative_backtest        -- comparative ES backtest with three zones (Nolde & Ziegel, 2017)
+  * kupiec_power / kupiec_mde   -- exact (binomial) power of the Kupiec test and the minimum detectable effect
+  * sup_wald_break              -- break at an unknown date (Andrews, 1993), p-values by simulating the limit
 
-Conventie: pierderea L = -r (in %); VaR si ES pozitive; alpha = probabilitatea cozii.
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Convention: loss L = -r (in %); VaR and ES positive; alpha = tail probability.
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import numpy as np
@@ -23,21 +23,21 @@ import statsmodels.api as sm
 
 
 # =============================================================================
-# 1. INDICELE DE COADA HILL
+# 1. HILL TAIL INDEX
 # =============================================================================
 def hill(losses, k):
-    """Estimatorul Hill al indicelui de coada din cele mai mari k pierderi (pozitive)."""
+    """Hill estimator of the tail index from the k largest (positive) losses."""
     x = np.sort(np.asarray(losses)[np.asarray(losses) > 0])[::-1]
     return 1.0 / np.mean(np.log(x[:k]) - np.log(x[k]))
 
 
 def hill_k(r, share=0.05):
-    """k = 5% din zilele cu pierdere (aceeasi regula ca in Capitolul 16)."""
+    """k = 5% of the loss days (the same rule as in Chapter 16)."""
     return int(round(share * np.sum(-np.asarray(r) > 0)))
 
 
 def hill_ci(r, share=0.05, B=999, block=20, seed=0):
-    """Hill pe pierderi, CI asimptotic i.i.d. alpha(1 +/- 1.96/sqrt(k)) si CI bootstrap pe blocuri mobile."""
+    """Hill on losses, asymptotic i.i.d. CI alpha(1 +/- 1.96/sqrt(k)) and moving-block bootstrap CI."""
     L = -np.asarray(r)
     k = hill_k(r, share)
     a = hill(L, k)
@@ -51,12 +51,12 @@ def hill_ci(r, share=0.05, B=999, block=20, seed=0):
 
 
 # =============================================================================
-# 2. GARCH(1,1)-t: CI PRIN VEROSIMILITATEA PROFIL PENTRU PERSISTENTA
+# 2. GARCH(1,1)-t: PROFILE-LIKELIHOOD CI FOR PERSISTENCE
 # =============================================================================
 def garch_t_nll(theta, r):
-    """-log L pentru GARCH(1,1) cu inovatii Student-t standardizate; theta = (mu, omega, alpha, beta, nu)."""
+    """-log L for GARCH(1,1) with standardised Student-t innovations; theta = (mu, omega, alpha, beta, nu)."""
     mu, om, a, b, nu = theta
-    if om <= 0 or a < 0 or b < 0 or a + b > 1 or nu <= 2.05:        # a + b = 1 (IGARCH) este admis
+    if om <= 0 or a < 0 or b < 0 or a + b > 1 or nu <= 2.05:        # a + b = 1 (IGARCH) is allowed
         return 1e10
     e = r - mu
     T = len(e)
@@ -69,7 +69,7 @@ def garch_t_nll(theta, r):
 
 
 def profile_pers(r, grid, x0):
-    """Maximul verosimilitatii cu persistenta fixata p = alpha + beta (reparametrizare alpha = p*s, beta = p*(1-s))."""
+    """Maximum likelihood with the persistence fixed at p = alpha + beta (reparametrised alpha = p*s, beta = p*(1-s))."""
     r = np.asarray(r)
     out = []
     for p in grid:
@@ -85,9 +85,9 @@ def profile_pers(r, grid, x0):
 
 
 def profile_ci(r, res):
-    """CI 95% din verosimilitatea profil pentru p = alpha + beta, pe grila 0.960-0.9999 si in p = 1 (IGARCH).
-    Punctele interioare p < 1: 2(l_max - l(p)) <= 3.84 (chi2(1)); p = 1 este pe frontiera spatiului p <= 1, unde
-    statistica LR are distributia 0.5 chi2(0) + 0.5 chi2(1) (Andrews, 1999): p = 1 este inclus daca LR <= 2.71."""
+    """95% profile-likelihood CI for p = alpha + beta, on the grid 0.960-0.9999 and at p = 1 (IGARCH).
+    Interior points p < 1: 2(l_max - l(p)) <= 3.84 (chi2(1)); p = 1 is on the boundary of the space p <= 1, where
+    the LR statistic has the distribution 0.5 chi2(0) + 0.5 chi2(1) (Andrews, 1999): p = 1 is included if LR <= 2.71."""
     p = res.params
     pers = p['alpha[1]'] + p['beta[1]']
     lmax = -garch_t_nll((p['mu'], p['omega'], p['alpha[1]'], p['beta[1]'], p['nu']), np.asarray(r))
@@ -105,10 +105,10 @@ def profile_ci(r, res):
 
 
 # =============================================================================
-# 3. TESTE PENTRU PROGNOZELE DE RISC
+# 3. TESTS FOR RISK FORECASTS
 # =============================================================================
 def dq_test(L, var, a=0.01, lags=4):
-    """Dynamic Quantile (Engle & Manganelli, 2004): Hit_t - a pe constanta, lags depasiri si VaR_t; DQ ~ chi2(lags+2)."""
+    """Dynamic Quantile (Engle & Manganelli, 2004): Hit_t - a on a constant, lagged breaches and VaR_t; DQ ~ chi2(lags+2)."""
     hit = (np.asarray(L) > np.asarray(var)).astype(float) - a
     X = [np.ones(len(hit))] + [np.roll(hit, l) for l in range(1, lags + 1)] + [np.asarray(var)]
     X = np.column_stack(X)[lags:]
@@ -119,7 +119,7 @@ def dq_test(L, var, a=0.01, lags=4):
 
 
 def fz0(r, var, es, a):
-    """Scorul FZ0 (Patton, Ziegel & Chen, 2019) pentru v = -VaR, e = -ES (cuantile negative), randamentul r."""
+    """FZ0 score (Patton, Ziegel & Chen, 2019) for v = -VaR, e = -ES (negative quantiles), return r."""
     v, e, y = -np.asarray(var), -np.asarray(es), np.asarray(r)
     return -((y <= v) * (v - y)) / (a * e) + v / e + np.log(-e) - 1
 
@@ -135,7 +135,7 @@ def nw_var(d, lags=None):
 
 
 def dm_test(l1, l2):
-    """Diebold-Mariano: d = l1 - l2; t = mean(d)/sqrt(HAC var/T); d < 0 => modelul 1 mai bun."""
+    """Diebold-Mariano: d = l1 - l2; t = mean(d)/sqrt(HAC var/T); d < 0 => model 1 is better."""
     d = np.asarray(l1) - np.asarray(l2)
     v, lags = nw_var(d)
     t = d.mean() / np.sqrt(v / len(d))
@@ -143,8 +143,8 @@ def dm_test(l1, l2):
 
 
 def mcs(losses, B=999, block=20, alpha=0.10, seed=0):
-    """Setul de modele de incredere (Hansen, Lunde & Nason, 2011), statistica T_max, bootstrap pe blocuri mobile.
-    losses: DataFrame T x m. Intoarce valorile p MCS pentru fiecare model."""
+    """Model confidence set (Hansen, Lunde & Nason, 2011), T_max statistic, moving-block bootstrap.
+    losses: DataFrame T x m. Returns the MCS p-value of each model."""
     rng = np.random.default_rng(seed)
     L = losses.values
     T, m = L.shape
@@ -155,7 +155,7 @@ def mcs(losses, B=999, block=20, alpha=0.10, seed=0):
     pmax = 0.0
     while len(alive) > 1:
         Lm = L[:, alive]
-        dbar = Lm.mean(0) - Lm.mean()                       # d_i. = L_i - media modelelor ramase
+        dbar = Lm.mean(0) - Lm.mean()                       # d_i. = L_i - mean of the remaining models
         boot = np.array([Lm[ix].mean(0) - Lm[ix].mean() for ix in idx])
         se = np.sqrt(((boot - dbar) ** 2).mean(0))
         t = dbar / se
@@ -171,9 +171,9 @@ def mcs(losses, B=999, block=20, alpha=0.10, seed=0):
 
 
 def comparative_backtest(s_int, s_std, level=0.05):
-    """Backtest comparativ (Nolde & Ziegel, 2017) cu scoruri FZ0: d = S(intern) - S(standard).
-    Rosu: se respinge H0-, 'intern cel putin la fel de bun' (d > 0 semnificativ);
-    verde: se respinge H0+, 'intern cel mult la fel de bun' (d < 0 semnificativ); altfel galben."""
+    """Comparative backtest (Nolde & Ziegel, 2017) with FZ0 scores: d = S(internal) - S(standard).
+    Red: H0- rejected, 'internal at least as good' (d > 0 significant);
+    green: H0+ rejected, 'internal at most as good' (d < 0 significant); otherwise yellow."""
     t = dm_test(s_int, s_std)['t']
     z = stats.norm.ppf(1 - level)
     zone = 'red' if t > z else ('green' if t < -z else 'yellow')
@@ -181,7 +181,7 @@ def comparative_backtest(s_int, s_std, level=0.05):
 
 
 def holm(p):
-    """Valori p ajustate Holm (FWER)."""
+    """Holm-adjusted p-values (FWER)."""
     p = np.asarray(p, float)
     o = np.argsort(p)
     m = len(p)
@@ -192,7 +192,7 @@ def holm(p):
 
 
 def bh(p, q=0.05):
-    """Benjamini-Hochberg: masca respingerilor la FDR q."""
+    """Benjamini-Hochberg: mask of rejections at FDR q."""
     p = np.asarray(p, float)
     m = len(p)
     o = np.argsort(p)
@@ -204,10 +204,10 @@ def bh(p, q=0.05):
 
 
 # =============================================================================
-# 4. PUTEREA TESTULUI KUPIEC
+# 4. POWER OF THE KUPIEC TEST
 # =============================================================================
 def kupiec_region(T, p0=0.01, level=0.05):
-    """Numerele de depasiri x pentru care LR_uc respinge la nivelul dat."""
+    """Breach counts x for which LR_uc rejects at the given level."""
     xs = np.arange(0, T + 1)
     ph = xs / T
     with np.errstate(divide='ignore', invalid='ignore'):
@@ -224,7 +224,7 @@ def kupiec_power(T, p1, p0=0.01, level=0.05):
 
 
 def kupiec_mde(T, p0=0.01, power=0.80, level=0.05):
-    """Cea mai mica rata adevarata > p0 detectata cu puterea ceruta."""
+    """Smallest true rate > p0 detected with the required power."""
     for p1 in np.arange(p0 + 0.0005, 0.2, 0.0005):
         if kupiec_power(T, p1, p0, level)[0] >= power:
             return float(p1)
@@ -232,11 +232,11 @@ def kupiec_mde(T, p0=0.01, power=0.80, level=0.05):
 
 
 # =============================================================================
-# 5. RUPTURA CU DATA NECUNOSCUTA
+# 5. BREAK AT AN UNKNOWN DATE
 # =============================================================================
 def sup_wald_break(y, trim=0.15, nsim=2000, seed=0, hac=True):
-    """Test sup-Wald (Andrews, 1993) pentru o ruptura in media lui y la o data necunoscuta, erori HAC;
-    valoarea p prin simularea limitei sup_pi B(pi)^2/(pi(1-pi)) (punte browniana)."""
+    """sup-Wald test (Andrews, 1993) for a break in the mean of y at an unknown date, HAC errors;
+    p-value by simulating the limit sup_pi B(pi)^2/(pi(1-pi)) (Brownian bridge)."""
     y = np.asarray(y, float)
     T = len(y)
     lo, hi = int(np.floor(trim * T)), int(np.ceil((1 - trim) * T))
@@ -263,10 +263,10 @@ def sup_wald_break(y, trim=0.15, nsim=2000, seed=0, hac=True):
 
 
 # =============================================================================
-# 6. EVALUAREA FORMALA A CELOR PATRU MODELE (studiul de caz)
+# 6. FORMAL EVALUATION OF THE FOUR MODELS (case study)
 # =============================================================================
 def formal_eval(fc, models=('HS', 'Normal', 'GARCH-t', 'FHS'), a=0.01, a_es=0.025, standard='HS'):
-    """DQ la VaR 1%; FZ0 la nivelul 2.5% pentru perechea (VaR 2.5%, ES 2.5%); DM pe perechi; MCS; backtest comparativ."""
+    """DQ at VaR 1%; FZ0 at level 2.5% for the pair (VaR 2.5%, ES 2.5%); pairwise DM; MCS; comparative backtest."""
     out = {'dq': {}, 'fz0': {}, 'dm': {}, 'cb': {}}
     S = {}
     for m in models:

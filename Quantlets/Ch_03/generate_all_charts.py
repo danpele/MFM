@@ -1,11 +1,11 @@
 """
-Generator pentru graficele din Capitolul 3: Modele factoriale si evaluarea activelor
-===================================================================================
-Toate graficele: fundal transparent, etichete ENG, legenda in afara, jos.
-Date: ETF-uri sectoriale si factoriale SUA, S&P 500 (SPY), actiuni BVB si indicele BET
-(data/market); factorii Fama-French, momentum si cele 25 de portofolii marime x B/M
-(Kenneth French Data Library.
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Charts of Chapter 3: Factor Models and Asset Pricing
+====================================================
+All charts: transparent background, English labels, legend below the plot.
+Data: US sector and factor ETFs, S&P 500 (SPY), BVB stocks and the BET index
+(daily prices of the course data); Fama-French factors, momentum and the 25 size x B/M portfolios
+(Kenneth French Data Library).
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import (prices, price, log_returns, french, factors, ols_hac, grs_test,
                       SECTORS, SECTORS_ALL, SECTOR_NAMES, FACTOR_ETFS, BVB, BVB_NAMES)
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -41,7 +41,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Chart colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -53,7 +53,7 @@ Gray     = '#7F7F7F'
 LightGray = '#DADADA'
 PALETTE = [MainBlue, IDAred, Forest, Amber, Orange, Purple, Crimson, '#795548', '#17A2B8', '#6F42C1', '#20C997']
 
-# modelele: FF3 si Carhart folosesc SMB-ul publicat al modelului cu trei factori; FF5 pe cel din fisierul cu cinci
+# models: FF3 and Carhart use the published three-factor SMB; FF5 uses the five-factor SMB
 FF3 = ['Mkt-RF', 'SMB_FF3', 'HML']
 CARHART = FF3 + ['MOM']
 FF5 = ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA']
@@ -62,12 +62,12 @@ FF6 = FF5 + ['MOM']
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 SEED = 42
-MAX_ABS_RET = 0.5        # prag pentru erori de date in seriile BVB (log-randament zilnic)
-END = '2026-07-31'       # ultima luna a esantionului lunar folosit in capitol (T = 757 luni din iulie 1963)
+MAX_ABS_RET = 0.5        # data-error threshold for the BVB series (daily log return)
+END = '2026-07-31'       # last month of the monthly sample used in the chapter (T = 757 months from July 1963)
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -76,15 +76,15 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
 # =============================================================================
-# DATE COMUNE
+# COMMON DATA
 # =============================================================================
 def monthly_excess(symbols, start='1999-01-01'):
-    """Randamente lunare simple in exces fata de RF (T-bill la o luna), pe lunile comune."""
+    """Monthly simple excess returns over RF (one-month T-bill), on the common months."""
     p = prices(symbols).resample('ME').last()
     r = p.pct_change().dropna()
     F = factors('M')
@@ -95,13 +95,13 @@ def monthly_excess(symbols, start='1999-01-01'):
 
 
 def daily_excess_one(symbol, start=None):
-    """Randamentul zilnic in exces al unui singur activ, pe calendarul factorilor.
+    """Daily excess return of a single asset, on the factor calendar.
 
-    Se pastreaza doar zilele in care exista si pretul din ziua de tranzactionare precedenta
-    (altfel randamentul ar acoperi mai multe zile, iar factorii doar una).
+    Only days with a price on the previous trading day are kept
+    (otherwise the return would span several days and the factors only one).
     """
     s = price(symbol)
-    F = factors('D').loc[:END]                         # acelasi sfarsit de esantion ca datele lunare
+    F = factors('D').loc[:END]                         # same sample end as the monthly data
     s = s.loc[s.index.isin(F.index)]
     cal = pd.Series(np.arange(len(F)), index=F.index)
     pos = cal.loc[s.index].values
@@ -115,12 +115,12 @@ def daily_excess_one(symbol, start=None):
 
 
 def daily_excess(symbols, start=None):
-    """Compatibilitate: dictionar {simbol: (exces, factori)} pe calendarul fiecarui activ."""
+    """Compatibility: dictionary {symbol: (excess, factors)} on each asset's calendar."""
     return {s: daily_excess_one(s, start) for s in symbols}
 
 
 # =============================================================================
-# FIG 1: Frontiera eficienta, CML si portofoliul tangent (ETF-uri sectoriale)
+# FIG 1: Efficient frontier, CML and tangency portfolio (sector ETFs)
 # =============================================================================
 def fig_frontier():
     S = [s + '.US' for s in SECTORS]
@@ -131,12 +131,12 @@ def fig_frontier():
     inv = np.linalg.inv(cov)
     w_tan = inv @ mu / (ones @ inv @ mu)
     mu_t, sd_t = w_tan @ mu, np.sqrt(w_tan @ cov @ w_tan)
-    # frontiera (fara restrictii) in spatiul excesului de randament
+    # unconstrained frontier in excess-return space
     A, B, C = ones @ inv @ ones, ones @ inv @ mu, mu @ inv @ mu
     targets = np.linspace(-0.02, 0.20, 200)
     sd_f = np.sqrt((A * targets ** 2 - 2 * B * targets + C) / (A * C - B ** 2))
     fig, ax = plt.subplots(figsize=(6.6, 3.4))
-    eff = targets >= B / A                               # ramura eficienta: media >= media portofoliului de varianta minima
+    eff = targets >= B / A                               # efficient branch: mean >= mean of the minimum-variance portfolio
     ax.plot(sd_f[eff], targets[eff], color=MainBlue, lw=1.2, label='Efficient frontier (risky sectors)')
     ax.plot(sd_f[~eff], targets[~eff], color=MainBlue, lw=1.0, ls=':', label='Inefficient branch (minimum-variance boundary)')
     xs = np.linspace(0, 0.30, 50)
@@ -165,7 +165,7 @@ def fig_frontier():
 
 
 # =============================================================================
-# FIG 2: Dreapta pietei de capital (SML) pe cele 25 de portofolii Fama-French
+# FIG 2: Security market line (SML) on the 25 Fama-French portfolios
 # =============================================================================
 def sml_data(start='1963-07-31'):
     F = factors('M')
@@ -217,7 +217,7 @@ def fig_sml():
 
 
 # =============================================================================
-# FIG 3: Beta rulant (fereastra de un an) pentru patru sectoare
+# FIG 3: Rolling beta (one-year window) for four sectors
 # =============================================================================
 def fig_rolling_beta(window=252):
     S = ['XLK.US', 'XLU.US', 'XLF.US', 'XLE.US']
@@ -239,7 +239,7 @@ def fig_rolling_beta(window=252):
 
 
 # =============================================================================
-# FIG 4: Revenirea beta spre 1 (Blume) si ajustarea Vasicek
+# FIG 4: Regression of betas towards 1 (Blume) and the Vasicek adjustment
 # =============================================================================
 def beta_split():
     S = [s + '.US' for s in SECTORS]
@@ -253,10 +253,10 @@ def beta_split():
 
 
 def vasicek_prior(b, se):
-    """Informatia a priori Vasicek estimata empiric (Bayes empiric).
+    """Vasicek prior estimated from the data (empirical Bayes).
 
-    Var_cs(beta_hat) = Var_cs(beta) + media se^2: dispersia beta estimate include zgomotul de estimare,
-    deci dispersia a priori a beta adevarate este Var_cs(beta_hat) - media se(beta_hat)^2.
+    Var_cs(beta_hat) = Var_cs(beta) + mean se^2: the dispersion of estimated betas includes estimation noise,
+    so the prior variance of the true betas is Var_cs(beta_hat) - mean se(beta_hat)^2.
     """
     m = float(b.mean())
     v = float(b.var(ddof=1) - (se ** 2).mean())
@@ -266,8 +266,8 @@ def vasicek_prior(b, se):
 def fig_beta_shrink():
     b1, b2, se1, halves = beta_split()
     slope, icpt = np.polyfit(b1, b2, 1)
-    # Vasicek (Bayes empiric): media a priori = media transversala a beta estimate;
-    # dispersia a priori = dispersia transversala a beta estimate MINUS zgomotul mediu de estimare
+    # Vasicek (empirical Bayes): prior mean = cross-sectional mean of the estimated betas;
+    # prior variance = cross-sectional variance of the estimated betas MINUS the mean estimation noise
     prior_m, prior_v = vasicek_prior(b1, se1)
     w = prior_v / (prior_v + se1 ** 2)
     b_vas = w * b1 + (1 - w) * prior_m
@@ -279,7 +279,7 @@ def fig_beta_shrink():
         ax.annotate(s, (b1[s], b2[s]), xytext=(3, 2), textcoords='offset points', fontsize=6.5, color='black')
     xs = np.linspace(0.4, 1.6, 10)
     ax.plot(xs, xs, color=Gray, ls=':', label='No change (45 degree)')
-    ax.plot(xs, icpt + slope * xs, color=IDAred, label=f'Fitted: b2 = {icpt:.2f} + {slope:.2f} b1')
+    ax.plot(xs, icpt + slope * xs, color=IDAred, label=f'Fitted: later beta = {icpt:.2f} + {slope:.2f} x earlier beta')
     ax.set_xlabel('Beta, Jan 1999 - Dec 2012')
     ax.set_ylabel('Beta, Jan 2013 - Jul 2026')
     ax.set_title('Betas regress towards 1 (Blume, 1971)', fontsize=9, loc='left')
@@ -293,7 +293,7 @@ def fig_beta_shrink():
 
 
 # =============================================================================
-# FIG 5: Randamentul cumulat al factorilor Fama-French si momentum
+# FIG 5: Cumulative returns of the Fama-French factors and momentum
 # =============================================================================
 def fig_factor_cum():
     F = factors('M').loc[:END]
@@ -306,7 +306,7 @@ def fig_factor_cum():
         out[c] = float(wealth.iloc[-1])
     ax.set_yscale('log')
     ax.set_ylabel('Compounded return index, start = 1')
-    ax.set_title(f'Long-short factor returns, {F.index[0]:%b %Y} - {F.index[-1]:%b %Y} (Kenneth French data)',
+    ax.set_title(f'Excess and long-short factor returns, {F.index[0]:%b %Y} - {F.index[-1]:%b %Y} (Kenneth French data)',
                  fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=6, y=-0.13)
     plt.tight_layout()
@@ -315,7 +315,7 @@ def fig_factor_cum():
 
 
 # =============================================================================
-# FIG 6: Statistici t ale primelor factoriale, inainte si dupa 2000
+# FIG 6: t-statistics of factor premia, before and after 2000
 # =============================================================================
 def factor_tstats(split='1999-12-31'):
     F = factors('M').loc[:END]
@@ -349,12 +349,12 @@ def fig_factor_tstats():
 
 
 # =============================================================================
-# FIG 7: Gradina zoologica a factorilor: descoperiri false sub ipoteza nula
+# FIG 7: The factor zoo: false discoveries under the null
 # =============================================================================
 def fig_false_discoveries(M=300, T=600, reps=2000):
     rng = np.random.default_rng(SEED)
-    # M factori fara prima (media 0), fiecare testat pe T luni
-    t = rng.standard_normal((reps, M))                 # statistica t ~ N(0,1) sub H0, teste independente
+    # M factors with no premium (mean 0), each tested on T months
+    t = rng.standard_normal((reps, M))                 # t-statistic ~ N(0,1) under H0, independent tests
     n196 = (np.abs(t) > 1.96).sum(1)
     n3 = (np.abs(t) > 3.0).sum(1)
     tmax = np.abs(t).max(1)
@@ -377,7 +377,7 @@ def fig_false_discoveries(M=300, T=600, reps=2000):
 
 
 # =============================================================================
-# FIG 8-9: PCA pe randamentele sectoarelor (11 ETF-uri, din iunie 2018)
+# FIG 8-9: PCA of sector returns (11 ETFs, from June 2018)
 # =============================================================================
 def pca_sectors():
     S = [s + '.US' for s in SECTORS_ALL]
@@ -388,7 +388,7 @@ def pca_sectors():
     vals, vecs = np.linalg.eigh(C)
     order = np.argsort(vals)[::-1]
     vals, vecs = vals[order], vecs[:, order]
-    for k in range(vecs.shape[1]):                      # semn: incarcare medie pozitiva
+    for k in range(vecs.shape[1]):                      # sign: positive mean loading
         if vecs[:, k].sum() < 0:
             vecs[:, k] *= -1
     pcs = Z.values @ vecs
@@ -425,7 +425,7 @@ def fig_pca():
 
 
 # =============================================================================
-# FIG 10: ETF-uri factoriale, cresterea a 1 USD
+# FIG 10: Factor ETFs, growth of 1 USD
 # =============================================================================
 def fig_factor_etfs():
     E = [e + '.US' for e in FACTOR_ETFS] + ['SPY.US']
@@ -450,7 +450,7 @@ def fig_factor_etfs():
 
 
 # =============================================================================
-# FIG 11: Alfa si expuneri FF5 + momentum ale ETF-urilor factoriale
+# FIG 11: FF5 + momentum alphas and loadings of the factor ETFs
 # =============================================================================
 def etf_regressions():
     E = [e + '.US' for e in FACTOR_ETFS]
@@ -491,14 +491,14 @@ def fig_etf_alphas():
 
 
 # =============================================================================
-# FIG 12: Beta CAPM ale actiunilor BVB fata de indicele BET
+# FIG 12: CAPM betas of BVB stocks against the BET index
 # =============================================================================
 def bvb_betas(start='2015-01-01'):
     rows = []
     for s in BVB:
         p = prices([s + '.RO', 'BET']).loc[start:]
         r = log_returns(p)
-        # erori de date (evenimente de capital neajustate): |r| > 50% intr-o zi se elimina
+        # data errors (unadjusted capital events): days with |r| > 50% are removed
         bad = (r.abs() > MAX_ABS_RET).any(axis=1)
         r = r[~bad]
         b, se, t, e, r2 = ols_hac(r[s + '.RO'].values, r['BET'].values)
@@ -528,10 +528,10 @@ def fig_bvb_betas():
 
 
 # =============================================================================
-# FIG 13: Fama-MacBeth pe 25 de portofolii: CAPM vs FF3 vs FF5
+# FIG 13: Fama-MacBeth on 25 portfolios: CAPM vs FF3 vs FF5
 # =============================================================================
 def fama_macbeth(ex, F, fac, nw_lags=6):
-    """Prima etapa: beta pe toata perioada; a doua: regresii transversale lunare."""
+    """Pass 1: full-sample betas; pass 2: monthly cross-sectional regressions."""
     X = F[fac].values
     B = np.linalg.lstsq(np.column_stack([np.ones(len(X)), X]), ex.values, rcond=None)[0][1:].T   # N x K
     lam = []
@@ -542,9 +542,9 @@ def fama_macbeth(ex, F, fac, nw_lags=6):
     mean = lam.mean(0)
     se_fm = lam.std(0, ddof=1) / np.sqrt(len(lam))
     se_nw = np.array([ols_hac(lam[:, j], np.zeros((len(lam), 0)), lags=nw_lags)[1][0] for j in range(lam.shape[1])])
-    # corectia Shanken (1992): varianta FM contine deja Sigma_f / T (variatia factorilor);
-    # doar restul (partea idiosincratica) se inmulteste cu (1 + c), c = lambda' Sigma_f^-1 lambda:
-    # Var_Sh = (1 + c) (Var_FM - Sigma_f* / T) + Sigma_f* / T, Sigma_f* = Sigma_f bordat cu zero pentru termenul liber
+    # Shanken (1992) correction: the FM variance already contains Sigma_f / T (factor variation);
+    # only the remainder (the idiosyncratic part) is multiplied by (1 + c), c = lambda' Sigma_f^-1 lambda:
+    # Var_Sh = (1 + c) (Var_FM - Sigma_f* / T) + Sigma_f* / T, Sigma_f* = Sigma_f bordered with zeros for the intercept
     Sf = np.atleast_2d(np.cov(X.T))
     c = mean[1:] @ np.linalg.solve(Sf, mean[1:])
     sf_diag = np.r_[0.0, np.diag(Sf)] / len(lam)
@@ -585,10 +585,10 @@ def fig_fama_macbeth():
 
 
 # =============================================================================
-# FIG 14: Studiul de caz Jensen, Kelly & Pedersen (2023): alfa CAPM OLS vs empirical Bayes
+# FIG 14: Case study Jensen, Kelly & Pedersen (2023): OLS vs empirical-Bayes CAPM alphas
 # =============================================================================
-# 15 factori long-short din portofoliile univariate ponderate cu valoarea (Kenneth French Data Library):
-# (fisier, portofoliul long, portofoliul short); long = extrema cu randament mai mare in lucrarea originala
+# 15 long-short factors from the value-weighted univariate sorts (Kenneth French Data Library):
+# (data set, long portfolio, short portfolio); long = the extreme with the higher return in the original paper
 JKP_SIGNALS = {
     'Size': ('ME', 'Lo 30', 'Hi 30'),
     'Book/market': ('BE-ME', 'Hi 30', 'Lo 30'),
@@ -606,8 +606,8 @@ JKP_SIGNALS = {
     'Reversal 1-0': ('PRIOR_1_0', 'Lo PRIOR', 'Hi PRIOR'),
     'Reversal 60-13': ('PRIOR_60_13', 'Lo PRIOR', 'Hi PRIOR'),
 }
-# temele lucrarii (Sec. II.B; fisierul "Cluster Labels.csv" din codul autorilor, github.com/bkelly-lab/ReplicationCrisis):
-# tema caracteristicii JKP corespunzatoare fiecarui semnal
+# themes of the paper (Sec. II.B; "Cluster Labels.csv" in the authors' code, github.com/bkelly-lab/ReplicationCrisis):
+# JKP theme of the characteristic behind each signal
 JKP_THEMES = {
     'Size': 'Size',                          # market_equity
     'Book/market': 'Value',                  # be_me
@@ -630,10 +630,10 @@ JKP_THEME_ORDER = ['Value', 'Investment', 'Low risk', 'Profitability', 'Accruals
 
 
 def jkp_replication(start='1963-07-31'):
-    """Jensen, Kelly & Pedersen (2023) pe 15 factori SUA: alfa CAPM cu factorii scalati la 10% volatilitate
-    idiosincratica anuala (Sec. II.A), rata de replicare OLS (t >= 1.96), Benjamini-Yekutieli la 5%,
-    temele lucrarii (JKP_THEMES, Sec. II.B) si modelul ierarhic empirical Bayes cu media a priori 0
-    (ec. 21-23, Prop. 4; o singura regiune, deci tau_s = 0); in plus, varianta cu o singura tema."""
+    """Jensen, Kelly & Pedersen (2023) on 15 US factors: CAPM alphas with factors scaled to 10% annual
+    idiosyncratic volatility (Sec. II.A), OLS replication rate (t >= 1.96), Benjamini-Yekutieli at 5%,
+    the paper's themes (JKP_THEMES, Sec. II.B) and the hierarchical empirical-Bayes model with prior mean 0
+    (eqs. 21-23, Prop. 4; one region, so tau_s = 0); also the variant with a single theme."""
     from scipy.optimize import minimize
     X = pd.DataFrame({k: french(f, 'M')[lo] - french(f, 'M')[sh] for k, (f, lo, sh) in JKP_SIGNALS.items()})
     X = X.loc[start:END].dropna()
@@ -641,14 +641,14 @@ def jkp_replication(start='1963-07-31'):
     T, N = X.shape
     Z = np.column_stack([np.ones(T), m])
     E0 = X.values - Z @ np.linalg.lstsq(Z, X.values, rcond=None)[0]
-    Xs = X * (0.10 / np.sqrt(12)) / E0.std(0, ddof=2)               # volatilitate reziduala lunara 10%/sqrt(12)
+    Xs = X * (0.10 / np.sqrt(12)) / E0.std(0, ddof=2)               # monthly residual volatility 10%/sqrt(12)
     B = np.linalg.lstsq(Z, Xs.values, rcond=None)[0]
     E = Xs.values - Z @ B
     a = B[0]
     se = np.sqrt((E ** 2).sum(0) / (T - 2) * np.linalg.inv(Z.T @ Z)[0, 0])
     t = a / se
     p = 2 * stats.norm.sf(np.abs(t))
-    # Benjamini-Yekutieli la 5%
+    # Benjamini-Yekutieli at 5%
     o = np.argsort(p)
     ok = p[o] <= np.arange(1, N + 1) / (N * np.sum(1 / np.arange(1, N + 1))) * 0.05
     by = np.zeros(N, bool)
@@ -666,14 +666,14 @@ def jkp_replication(start='1963-07-31'):
         best = min(fits, key=lambda z: z.fun)
         tc, tw = np.exp(best.x)
         O = Mm @ Mm.T * tc ** 2 + np.eye(N) * tw ** 2
-        P = np.linalg.inv(np.linalg.inv(O) + np.linalg.inv(S))       # Prop. 4, cu Sigma / T
+        P = np.linalg.inv(np.linalg.inv(O) + np.linalg.inv(S))       # Prop. 4, with Sigma / T
         pm = P @ np.linalg.solve(S, a)
         ps = np.sqrt(np.diag(P))
         return dict(tau_c=tc, tau_w=tw, post_mean=pm, post_sd=ps, z=pm / ps, loglik=-best.fun)
     theme = [JKP_THEMES[c] for c in X.columns]
     g = np.array([JKP_THEME_ORDER.index(x) for x in theme])
     r = eb(g)
-    r1 = eb(np.zeros(N, int))                                        # varianta: o singura tema
+    r1 = eb(np.zeros(N, int))                                        # variant: a single theme
     k = len(np.unique(g))
     tab = pd.DataFrame({'theme': theme, 'alpha': a, 'se': se, 't': t, 'by': by, 'post_mean': r['post_mean'],
                         'post_sd': r['post_sd'], 'z': r['z']}, index=X.columns)
@@ -709,7 +709,7 @@ def fig_jkp_replication():
     ax2.set_xlabel('OLS t-statistic / posterior z')
     ax1.set_yticks(y, d.index)
     ax1.tick_params(axis='y', labelsize=8)
-    # separatoare si nume de teme
+    # theme separators and names
     th = d['theme'].values
     for i in range(1, len(d)):
         if th[i] != th[i - 1]:
@@ -732,17 +732,17 @@ def fig_jkp_replication():
 
 
 # =============================================================================
-# INFERENTA AVANSATA (fara grafice): GRS ca test Sharpe, erori robuste la specificare gresita,
-# factori inutili, R^2 transversal (Lewellen-Nagel-Shanken), numarul de factori, compararea modelelor
+# ADVANCED INFERENCE (no charts): GRS as a Sharpe test, misspecification-robust errors,
+# useless factors, cross-sectional R^2 (Lewellen-Nagel-Shanken), number of factors, model comparison
 # =============================================================================
 def two_pass_gmm(ex, F, fac, lags=0):
-    """Doua etape ca GMM exact identificat: momente (R - a - B f) x (1, f) si X'(R - X gamma), X = [1, B].
+    """Two passes as an exactly identified GMM: moments (R - a - B f) x (1, f) and X'(R - X gamma), X = [1, B].
 
-    Intoarce gamma (anualizat) si erorile standard:
-      * 'krs'    : robuste la specificare gresita (Kan, Robotti & Shanken, 2013) -- derivata completa,
-                   inclusiv termenul cu erorile de evaluare e = mu - X gamma;
-      * 'correct': aceeasi formula cu e = 0 (modelul presupus corect; Jagannathan & Wang, 1998).
-    lags > 0: matricea S Newey-West (Bartlett); lags = 0: momente necorelate serial.
+    Returns gamma (annualised) and the standard errors:
+      * 'krs'    : misspecification-robust (Kan, Robotti & Shanken, 2013) -- full derivative,
+                   including the term with the pricing errors e = mu - X gamma;
+      * 'correct': the same formula with e = 0 (model assumed correct; Jagannathan & Wang, 1998).
+    lags > 0: Newey-West (Bartlett) S matrix; lags = 0: serially uncorrelated moments.
     """
     R = np.asarray(ex, float)
     Fm = np.asarray(F[fac], float)
@@ -779,7 +779,7 @@ def two_pass_gmm(ex, F, fac, lags=0):
             J[:, j] = (gbar(th0 + d, target) - gbar(th0 - d, target)) / (2 * h)
         return J
 
-    # contributiile individuale ale momentelor (media lor este zero in esantion)
+    # individual moment contributions (their sample mean is zero)
     E = R - Z @ AB
     g1t = (Z[:, :, None] * E[:, None, :]).reshape(T, -1)
     g2t = (R - X @ gam) @ X
@@ -800,7 +800,7 @@ def two_pass_gmm(ex, F, fac, lags=0):
 
 
 def grs_sharpe(ex, mk):
-    """Identitatea GRS: alpha' Sigma^-1 alpha = SR^2(f, R) - SR^2(f) (estimatori MV, impartire la T)."""
+    """GRS identity: alpha' Sigma^-1 alpha = SR^2(f, R) - SR^2(f) (ML estimators, division by T)."""
     R = np.asarray(ex, float)
     f = np.asarray(mk, float)
     T, N = R.shape
@@ -816,7 +816,7 @@ def grs_sharpe(ex, mk):
 
 
 def fm_krs_table(ex, F, fac):
-    """Fama-MacBeth (FM, NW 6, Shanken) plus erorile Kan-Robotti-Shanken, pe aceleasi active."""
+    """Fama-MacBeth (FM, NW 6, Shanken) plus Kan-Robotti-Shanken errors, on the same assets."""
     d = fama_macbeth(ex, F, fac)
     k = two_pass_gmm(ex.values, F, fac)
     d['se_krs'] = k['se_krs']
@@ -825,10 +825,10 @@ def fm_krs_table(ex, F, fac):
 
 
 def useless_factor_sim(reps=2000, seed=SEED):
-    """Kan & Zhang (1999): CAPM + un factor g independent de randamente, pe cele 25 de portofolii reale.
+    """Kan & Zhang (1999): CAPM + a factor g independent of returns, on the 25 actual portfolios.
 
-    Pentru fiecare replicare: g ~ N(0, s^2) i.i.d., doua etape Fama-MacBeth; se numara respingerile
-    |t| > 1.96 ale lui lambda_g (erori FM si Shanken) si respingerile testului Wald din prima etapa beta_g = 0.
+    In each replication: g ~ N(0, s^2) i.i.d., two Fama-MacBeth passes; count the rejections
+    |t| > 1.96 of lambda_g (FM and Shanken errors) and the rejections of the first-pass Wald test beta_g = 0.
     """
     rng = np.random.default_rng(seed)
     res, ex, mk = sml_data()
@@ -853,7 +853,7 @@ def useless_factor_sim(reps=2000, seed=SEED):
         tvals.append(t_sh)
         rej_fm += abs(t_fm) > 1.96
         rej_sh += abs(t_sh) > 1.96
-        # Wald pentru beta_g = 0 pe toate activele (reziduuri i.i.d.)
+        # Wald test of beta_g = 0 on all assets (i.i.d. residuals)
         E = R - Z @ AB
         Sig = E.T @ E / T
         vg = np.linalg.inv(Z.T @ Z)[2, 2]
@@ -865,7 +865,7 @@ def useless_factor_sim(reps=2000, seed=SEED):
 
 
 def lns_r2(start='1963-07-31'):
-    """Lewellen, Nagel & Shanken (2010): R^2 transversal OLS si GLS, 25 portofolii vs 25 + 30 industrii."""
+    """Lewellen, Nagel & Shanken (2010): OLS and GLS cross-sectional R^2, 25 portfolios vs 25 + 30 industries."""
     F = factors('M')
     P25 = french('p25', 'M').loc[start:END]
     I30 = french('ind30', 'M').loc[start:END]
@@ -893,7 +893,7 @@ def lns_r2(start='1963-07-31'):
             mbar = (one @ Vi @ mu) / (one @ Vi @ one)
             d = mu - mbar
             r2_gls = 1 - (eg @ Vi @ eg) / (d @ Vi @ d)
-            # restrictia LNS pentru factori tranzactionati: lambda = media factorului, fara termen liber
+            # LNS restriction for traded factors: lambda = factor mean, no intercept
             ec = mu - B @ f.mean(0)
             r2_c = 1 - ec @ ec / ((mu - mu.mean()) @ (mu - mu.mean()))
             out[f'{mname} | {sname}'] = dict(N=N, r2_ols=r2_ols, r2_gls=r2_gls, r2_constrained=r2_c,
@@ -902,12 +902,12 @@ def lns_r2(start='1963-07-31'):
 
 
 def n_factors(X, kmax):
-    """Numarul de factori: Kaiser (valori proprii > 1), Bai & Ng (2002) IC_p2, Ahn & Horenstein (2013) ER."""
+    """Number of factors: Kaiser (eigenvalues > 1), Bai & Ng (2002) IC_p2, Ahn & Horenstein (2013) ER."""
     X = np.asarray(X, float)
     X = (X - X.mean(0)) / X.std(0)
     T, N = X.shape
-    ev = np.sort(np.linalg.eigvalsh(X.T @ X / T))[::-1]         # valorile proprii ale matricei de corelatie
-    V = [ev[k:].sum() / N for k in range(kmax + 1)]              # V(k) = (1/NT) suma patratelor reziduale
+    ev = np.sort(np.linalg.eigvalsh(X.T @ X / T))[::-1]         # eigenvalues of the correlation matrix
+    V = [ev[k:].sum() / N for k in range(kmax + 1)]              # V(k) = (1/NT) sum of squared residuals
     pen = (N + T) / (N * T) * np.log(min(N, T))
     ic = [np.log(V[k]) + k * pen for k in range(kmax + 1)]
     er = [ev[k - 1] / ev[k] for k in range(1, kmax + 1)]
@@ -917,7 +917,7 @@ def n_factors(X, kmax):
 
 
 def number_of_factors():
-    """Estimatorii numarului de factori pe ETF-urile sectoriale (zilnic) si pe 100 de portofolii (lunar)."""
+    """Number-of-factors estimators on the sector ETFs (daily) and on 100 portfolios (monthly)."""
     vals, vecs, r, c1 = pca_sectors()
     S = [s + '.US' for s in SECTORS_ALL]
     out = {'sectors': n_factors(r[S].values, 5)}
@@ -934,7 +934,7 @@ def max_sr2(F, fac):
 
 
 def stationary_bootstrap_idx(T, mean_block, rng):
-    """Indici pentru bootstrap-ul stationar (Politis & Romano, 1994), lungime medie a blocului mean_block."""
+    """Indices for the stationary bootstrap (Politis & Romano, 1994), mean block length mean_block."""
     idx = np.empty(T, dtype=int)
     idx[0] = rng.integers(T)
     for t in range(1, T):
@@ -943,12 +943,12 @@ def stationary_bootstrap_idx(T, mean_block, rng):
 
 
 def model_comparison(B=2000, mean_block=6, seed=SEED):
-    """Barillas & Shanken (2018): SR^2 maxim al factorilor fiecarui model; intervale bootstrap stationar."""
+    """Barillas & Shanken (2018): maximum squared Sharpe ratio of each model's factors; stationary-bootstrap intervals."""
     rng = np.random.default_rng(seed)
     F = factors('M')
     models = {'CAPM': ['Mkt-RF'], 'FF3': FF3, 'Carhart': CARHART, 'FF5': FF5, 'FF5+MOM': FF6}
-    # perechi imbricate (FF3 - CAPM, FF5+MOM - FF5: diferenta >= 0 in esantion) si neimbricate
-    # (FF5 - FF3: SMB diferit in cele doua modele; FF5 - Carhart)
+    # nested pairs (FF3 - CAPM, FF5+MOM - FF5: in-sample difference >= 0) and non-nested pairs
+    # (FF5 - FF3: different SMB in the two models; FF5 - Carhart)
     pairs = [('FF3', 'CAPM'), ('FF5', 'FF3'), ('FF5+MOM', 'FF5'), ('FF5', 'Carhart')]
     out = {}
     for lab, a, b in [('1963-2026', '1963-07-31', END), ('2000-2026', '2000-01-31', END)]:
@@ -961,7 +961,7 @@ def model_comparison(B=2000, mean_block=6, seed=SEED):
             s = {k: max_sr2(Fb, v) for k, v in models.items()}
             for p in pairs:
                 boots[p].append(12 * (s[p[0]] - s[p[1]]))
-        # alfa de spanning: fiecare factor regresat pe ceilalti cinci (NW)
+        # spanning alphas: each factor regressed on the other five (NW)
         full = models['FF5+MOM']
         span = {}
         for c in full:
@@ -978,8 +978,8 @@ def model_comparison(B=2000, mean_block=6, seed=SEED):
 
 
 def eiv_attenuation():
-    """Erori in variabile in etapa a doua, conditionat pe traiectoria realizata a factorului:
-    plim_N lambda_OLS / lambda_realizat = Var(beta) / (Var(beta) + s2_eps / sum_t (f_t - f_bar)^2)."""
+    """Errors in variables in pass 2, conditional on the realised factor path:
+    plim_N lambda_OLS / lambda_realised = Var(beta) / (Var(beta) + s2_eps / sum_t (f_t - f_bar)^2)."""
     out = {}
     res, ex, mk = sml_data()
     cases = {'25 size x B/M': (ex, mk)}

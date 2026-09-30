@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mfm_data as M      # noqa: E402
 import rv_tools as T      # noqa: E402
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -42,7 +42,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand (gri doar pentru linii de referinta si benzi)
+# Brand colours (reference lines in black; light bands only for intervals)
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -51,9 +51,10 @@ Orange   = '#E67E22'
 Purple   = '#8E44AD'
 Crimson  = '#DC3545'
 Teal     = '#17A2B8'
-Gray     = '#7F7F7F'
+Black    = '#000000'
 LightGray = '#DADADA'
 MODEL_COL = {'logHAR': IDAred, 'HAR': Orange, 'GARCH-t': MainBlue, 'EWMA': Purple, 'RW': Forest}
+MODEL_LABEL = {'logHAR': 'log-HAR', 'HAR': 'HAR', 'GARCH-t': 'GARCH(1,1)-t', 'EWMA': 'EWMA', 'RW': "Yesterday's RV"}
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
@@ -63,7 +64,7 @@ OOS_BTC = '2025-03-01'
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as a transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -72,12 +73,12 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
 def fig_legend_bottom(fig, handles=None, labels=None, ncol=3, y=0.0):
-    """O singura legenda pentru o figura cu mai multe panouri, sub figura."""
+    """A single legend for a multi-panel figure, below the figure."""
     if handles is None:
         handles, labels = [], []
         for ax in fig.axes:
@@ -104,13 +105,13 @@ def jsonable(x):
 
 
 # =============================================================================
-# DATE
+# DATA
 # =============================================================================
 P_SPY = M.spy_intraday()
 R_SPY = M.intraday_returns(P_SPY)
 ON, OC, CC = M.spy_overnight(P_SPY)
-RV_SPY = T.rv(R_SPY)                       # varianta realizata intraday (%^2)
-RVT_SPY = RV_SPY + ON ** 2                 # varianta zilnica totala: intraday + randamentul peste noapte la patrat
+RV_SPY = T.rv(R_SPY)                       # intraday realised variance (%^2)
+RVT_SPY = RV_SPY + ON ** 2                 # total daily variance: intraday + squared overnight return
 P_BTC = M.btc_intraday()
 R_BTC = M.intraday_returns(P_BTC)
 RV_BTC = T.rv(R_BTC)
@@ -119,15 +120,15 @@ D_BTC = M.daily_returns('btc', start='2014-09-17')
 
 
 def ann(v, ppy):
-    """Volatilitatea anualizata (%) dintr-o varianta zilnica (%^2)."""
+    """Annualised volatility (%) from a daily variance (%^2)."""
     return np.sqrt(ppy * v)
 
 
 # =============================================================================
-# 1. O ZI DE TRANZACTIONARE: PRET SI VARIANTA REALIZATA CUMULATA
+# 1. ONE TRADING DAY: PRICE AND CUMULATIVE REALISED VARIANCE
 # =============================================================================
 def fig_intraday_day(day='2025-04-07'):
-    """Pretul SPY pe bare de 5 minute intr-o zi agitata si suma cumulata a patratelor randamentelor."""
+    """SPY price on 5-minute bars on a turbulent day and the cumulative sum of squared returns."""
     d = pd.Timestamp(day)
     p = P_SPY.loc[d].dropna()
     r = R_SPY.loc[d].dropna()
@@ -155,10 +156,10 @@ def fig_intraday_day(day='2025-04-07'):
 
 
 # =============================================================================
-# 2. SERIILE DE VARIANTA REALIZATA
+# 2. REALISED VARIANCE SERIES
 # =============================================================================
 def fig_rv_series():
-    """Volatilitatea realizata zilnica anualizata: SPY (intraday) si Bitcoin (24 de ore)."""
+    """Annualised daily realised volatility: SPY (intraday) and Bitcoin (24 hours)."""
     fig, axes = plt.subplots(2, 1, figsize=(9.6, 4.6), sharex=False)
     axes[0].plot(RV_SPY.index, ann(RV_SPY, 252), color=MainBlue, lw=0.6, label='SPY, daily realised volatility (09:30-16:00, % p.a.)')
     axes[1].plot(RV_BTC.asfreq('D').index, ann(RV_BTC.asfreq('D'), 365), color=Amber, lw=0.6, label='Bitcoin, daily realised volatility (24 hours UTC, % p.a.)')
@@ -177,7 +178,7 @@ def fig_rv_series():
 
 
 def fig_overnight():
-    """Descompunerea variantei zilnice SPY pe ani: partea intraday si randamentul peste noapte."""
+    """SPY daily variance by year: the intraday part and the overnight return."""
     df = pd.DataFrame({'intraday': RV_SPY, 'overnight': ON ** 2})
     y = df.groupby(df.index.year).mean()
     fig, ax = plt.subplots(figsize=(8.4, 3.2))
@@ -198,10 +199,10 @@ def fig_overnight():
 
 
 # =============================================================================
-# 3. INCERTITUDINEA RV: INTERVAL DE INCREDERE ASIMPTOTIC
+# 3. UNCERTAINTY OF RV: ASYMPTOTIC CONFIDENCE INTERVAL
 # =============================================================================
 def fig_rv_ci(a='2025-03-01', b='2025-05-30'):
-    """RV zilnica SPY cu intervalul de incredere de 95% (Barndorff-Nielsen si Shephard), martie-mai 2025."""
+    """SPY daily RV with the 95% confidence interval (Barndorff-Nielsen and Shephard), March-May 2025."""
     lo, hi = T.rv_ci(R_SPY)
     s = slice(a, b)
     fig, ax = plt.subplots(figsize=(9.0, 3.2))
@@ -220,10 +221,10 @@ def fig_rv_ci(a='2025-03-01', b='2025-05-30'):
 
 
 # =============================================================================
-# 4. SEZONALITATEA INTRADAY
+# 4. INTRADAY SEASONALITY
 # =============================================================================
 def fig_seasonality():
-    """Media |r| pe intervale de 5 minute: SPY (forma de U) si Bitcoin pe ore UTC."""
+    """Mean |r| per 5-minute interval: SPY (U-shape) and Bitcoin by UTC hour."""
     full = R_SPY[R_SPY.notna().sum(axis=1) == 78]
     s = full.abs().mean()
     tb = R_BTC.abs().mean().values.reshape(24, 12).mean(axis=1)
@@ -248,32 +249,32 @@ def fig_seasonality():
 
 
 # =============================================================================
-# 5. ZGOMOTUL DE MICROSTRUCTURA: SIMULARE SI GRAFICUL SEMNATURII
+# 5. MICROSTRUCTURE NOISE: SIMULATION AND SIGNATURE PLOT
 # =============================================================================
 def simulate_noise(days=100, n=23400, sigma=1.0, omega=0.01, seed=SEED):
-    """Pret eficient (miscare browniana, volatilitate zilnica variabila) + zgomot i.i.d. N(0, omega^2), 1 secunda."""
+    """Efficient price (Brownian motion, time-varying daily volatility) + i.i.d. N(0, omega^2) noise, 1 second."""
     rng = np.random.default_rng(seed)
     sig_d = sigma * np.exp(0.3 * rng.standard_normal(days) - 0.045)
     X = np.cumsum(rng.standard_normal((days, n)) * (sig_d[:, None] / np.sqrt(n)), axis=1)
     X = np.c_[np.zeros(days), X]
-    Y = X + omega * rng.standard_normal(X.shape)        # pretul observat (log x 100)
+    Y = X + omega * rng.standard_normal(X.shape)        # observed price (log x 100)
     return X, Y, sig_d ** 2
 
 
 def fig_noise_simulation():
-    """Graficul semnaturii pentru date simulate: RV explodeaza la frecvente mari; TSRV si nucleul realizat corecteaza."""
+    """Signature plot on simulated data: RV explodes at high frequencies; TSRV and the realised kernel correct it."""
     X, Y, iv = simulate_noise()
     secs = [1, 2, 5, 10, 30, 60, 120, 300, 600, 900, 1800]
     sig = [np.mean(np.sum(np.diff(Y[:, ::k], axis=1) ** 2, axis=1)) for k in secs]
     sig_eff = [np.mean(np.sum(np.diff(X[:, ::k], axis=1) ** 2, axis=1)) for k in secs]
     n = Y.shape[1] - 1
-    # TSRV: scara rapida 1 secunda, scara lenta 300 de secunde (K = 300)
+    # TSRV: fast scale 1 second, slow scale 300 seconds (K = 300)
     K = 300
     rv_all = np.sum(np.diff(Y, axis=1) ** 2, axis=1)
     rv_avg = np.mean([np.sum(np.diff(Y[:, o::K], axis=1) ** 2, axis=1) for o in range(K)], axis=0)
     nbar = (n - K + 1) / K
     tsrv = (rv_avg - nbar / n * rv_all) / (1 - nbar / n)
-    # nucleu realizat Parzen pe randamente de 1 secunda
+    # Parzen realised kernel on 1-second returns
     rk = []
     for i in range(Y.shape[0]):
         r = np.diff(Y[i])
@@ -286,7 +287,7 @@ def fig_noise_simulation():
     fig, ax = plt.subplots(figsize=(7.4, 3.2))
     ax.plot(secs, sig, 'o-', color=IDAred, ms=4, label='RV of observed prices (efficient price + noise)')
     ax.plot(secs, sig_eff, 's--', color=MainBlue, ms=3.5, label='RV of the efficient price (no noise)')
-    ax.axhline(iv.mean(), color=Gray, lw=0.8, ls=':', label='True integrated variance (mean)')
+    ax.axhline(iv.mean(), color=Black, lw=0.8, ls=':', label='True integrated variance (mean)')
     ax.axhline(tsrv.mean(), color=Forest, lw=1.1, label='Two-scale RV, 1 s and 5 min')
     ax.axhline(np.mean(rk), color=Purple, lw=1.1, ls='-.', label='Realised kernel (Parzen), 1 s')
     ax.set_xscale('log')
@@ -308,7 +309,7 @@ KS_BTC = [1, 2, 3, 4, 6, 12, 24, 36, 48, 72]
 
 
 def fig_signature():
-    """Graficul semnaturii empiric: SPY (5-130 de minute) si Bitcoin (5-360 de minute)."""
+    """Empirical signature plot: SPY (5-130 minutes) and Bitcoin (5-360 minutes)."""
     ss = T.signature(P_SPY, KS_SPY, 252)
     sb = T.signature(P_BTC, KS_BTC, 365)
     fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.1))
@@ -337,10 +338,10 @@ def fig_signature():
 
 
 # =============================================================================
-# 6. SALTURI: VARIATIA BIPOWER SI TESTUL DE SALTURI
+# 6. JUMPS: BIPOWER VARIATION AND THE JUMP TEST
 # =============================================================================
 def fig_jumps():
-    """Zilele cu salt semnificativ (nivel 0,1%): SPY si Bitcoin; marimea punctului = componenta de salt."""
+    """Days with a significant jump (0.1% level): SPY and Bitcoin; marker size = jump component."""
     js, jb = T.jump_test(R_SPY), T.jump_test(R_BTC)
     fig, axes = plt.subplots(2, 1, figsize=(9.6, 4.6))
     for ax, j, col, ppy, name in [(axes[0], js, MainBlue, 252, 'SPY'), (axes[1], jb, Amber, 365, 'Bitcoin')]:
@@ -365,10 +366,10 @@ def fig_jumps():
 
 
 # =============================================================================
-# 7. FAPTE STILIZATE ALE RV: LOG RV APROAPE NORMALA, RANDAMENTE STANDARDIZATE
+# 7. STYLISED FACTS OF RV: LOG RV CLOSE TO NORMAL, STANDARDISED RETURNS
 # =============================================================================
 def fig_distributions():
-    """Stanga: log RV (SPY) si distributia Normala; dreapta: r/sd(r) vs r/sqrt(RV) (Andersen et al.)."""
+    """Left: log RV (SPY) and the Normal distribution; right: r/sd(r) vs r/sqrt(RV) (Andersen et al.)."""
     lv = np.log(RV_SPY)
     z = OC / np.sqrt(RV_SPY)
     u = OC / OC.std()
@@ -398,7 +399,7 @@ def fig_distributions():
 
 
 def CC_BTC_UTC():
-    """Randamentul zilnic Bitcoin (UTC) din barele de 5 minute: deschiderea de 00:00 -> ultima inchidere."""
+    """Bitcoin daily return (UTC) from the 5-minute bars: 00:00 open -> last close."""
     return 100 * np.log(P_BTC.iloc[:, -1] / P_BTC[0])
 
 
@@ -408,7 +409,7 @@ def acf(x, lags):
 
 
 def fig_acf():
-    """Autocorelatiile log RV (SPY, Bitcoin) si ale randamentelor zilnice la patrat (SPY): memorie lunga."""
+    """Autocorrelations of log RV (SPY, Bitcoin) and of squared daily returns (SPY): long memory."""
     L = 100
     a1 = acf(np.log(RVT_SPY), L)
     b = np.log(RV_BTC.asfreq('D')).interpolate()
@@ -434,12 +435,12 @@ def fig_acf():
 
 
 # =============================================================================
-# 8. VIX SI VOLATILITATEA REALIZATA ULTERIOARA: PRIMA DE RISC A VARIANTEI
+# 8. VIX AND SUBSEQUENT REALISED VOLATILITY: THE VARIANCE RISK PREMIUM
 # =============================================================================
 def fig_vix():
-    """VIX (volatilitatea implicita pe 30 de zile) vs volatilitatea realizata in urmatoarele 21 de zile (SPY, cu noaptea)."""
+    """VIX (30-day implied volatility) vs realised volatility over the next 21 days (SPY, including overnight)."""
     vix = M.daily_close('vix').reindex(RVT_SPY.index).ffill()
-    fut = RVT_SPY[::-1].rolling(21).sum()[::-1].shift(-1)          # suma RV pe zilele t+1..t+21
+    fut = RVT_SPY[::-1].rolling(21).sum()[::-1].shift(-1)          # sum of RV over days t+1..t+21
     fvol = np.sqrt(252 / 21 * fut)
     df = pd.DataFrame({'vix': vix, 'fvol': fvol}).dropna()
     fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.2), gridspec_kw={'width_ratios': [1.8, 1]})
@@ -450,7 +451,7 @@ def fig_vix():
     gap = df['vix'] - df['fvol']
     axes[1].hist(gap, bins=np.arange(-30, 31, 1.5), color=Teal, alpha=0.85,
                  label='VIX minus future realised volatility (percentage points)')
-    axes[1].axvline(0, color=Gray, lw=0.8)
+    axes[1].axvline(0, color=Black, lw=0.8)
     axes[1].set_xlabel('Percentage points')
     fig_legend_bottom(fig, ncol=3, y=0.02)
     plt.tight_layout(rect=(0, 0.1, 1, 1))
@@ -464,10 +465,10 @@ def fig_vix():
 
 
 # =============================================================================
-# 9. MODELUL HAR-RV
+# 9. THE HAR-RV MODEL
 # =============================================================================
 def har_tables():
-    """HAR si log-HAR pe esantionul complet: SPY (varianta totala) si Bitcoin (24 de ore)."""
+    """HAR and log-HAR on the full sample: SPY (total variance) and Bitcoin (24 hours)."""
     out = {}
     for k, v, cal in [('spy', RVT_SPY, False), ('btc', RV_BTC, True)]:
         for tag, log in [('lev', False), ('log', True)]:
@@ -478,10 +479,10 @@ def har_tables():
 
 
 def fig_har(tab):
-    """Stanga: ponderile implicite ale log-HAR pe intarzieri (SPY, Bitcoin); dreapta: log-HAR SPY in esantion, ultimele 250 de zile."""
+    """Left: implied log-HAR lag weights (SPY, Bitcoin); right: SPY log-HAR in sample, last 250 days."""
     ws = T.har_weights(tab['spy_log']['b'], 30)
     wb = T.har_weights(tab['btc_log']['b'], 30)
-    # Bitcoin: saptamana = 7 zile, luna = 30 de zile calendaristice
+    # Bitcoin: week = 7 days, month = 30 calendar days
     b = tab['btc_log']['b']
     wb = np.zeros(30)
     wb[0] += b[1]
@@ -493,7 +494,7 @@ def fig_har(tab):
     lg = np.arange(1, 31)
     axes[0].bar(lg - 0.2, ws, 0.4, color=MainBlue, label='SPY: implied weight on lag')
     axes[0].bar(lg + 0.2, wb, 0.4, color=Amber, label='Bitcoin: implied weight on lag (complete 7- and 30-day windows)')
-    axes[0].axhline(0, color=Gray, lw=0.6)
+    axes[0].axhline(0, color=Black, lw=0.6)
     axes[0].set_xlabel('Lag (days)')
     last = fit.index[-250:]
     axes[1].plot(last, ann(RVT_SPY.loc[last], 252), color=Teal, lw=0.9, label='SPY realised volatility incl. overnight (% p.a.)')
@@ -510,10 +511,10 @@ def fig_har(tab):
 
 
 # =============================================================================
-# 10. PROGNOZE OUT-OF-SAMPLE: HAR vs GARCH vs EWMA
+# 10. OUT-OF-SAMPLE FORECASTS: HAR vs GARCH vs EWMA
 # =============================================================================
 def oos_forecasts(v, r, start, calendar):
-    """Prognoze pentru ziua urmatoare: HAR, log-HAR (fereastra extinsa), GARCH(1,1)-t si EWMA pe randamente zilnice, RV de ieri."""
+    """Next-day forecasts: HAR, log-HAR (expanding window), GARCH(1,1)-t and EWMA on daily returns, yesterday's RV."""
     idx = v.loc[start:].index
     F = pd.DataFrame({
         'logHAR': T.har_expanding(v, start, calendar=calendar, log=True),
@@ -525,7 +526,7 @@ def oos_forecasts(v, r, start, calendar):
 
 
 def evaluate(F, y):
-    """Pierderi medii QLIKE si MSE, R^2 Mincer-Zarnowitz, teste DM fata de log-HAR."""
+    """Mean QLIKE and MSE losses, Mincer-Zarnowitz R^2, DM tests against log-HAR."""
     out = {}
     for c in F:
         mz = T.mz_test(y, F[c])
@@ -542,7 +543,7 @@ def evaluate(F, y):
 
 
 def fig_oos(F, y, Fb, yb):
-    """SPY 2022-2026: volatilitatea realizata (inclusiv noaptea) si prognozele log-HAR si GARCH-t; pierderea QLIKE cumulata."""
+    """SPY 2022-2026: realised volatility (including overnight) and the log-HAR and GARCH-t forecasts; cumulative QLIKE loss."""
     fig, axes = plt.subplots(2, 1, figsize=(9.6, 5.0), gridspec_kw={'height_ratios': [1.5, 1]})
     axes[0].plot(y.index, ann(y, 252), color=Teal, lw=0.6, label='SPY realised volatility incl. overnight (% p.a.)')
     axes[0].plot(F.index, ann(F['GARCH-t'], 252), color=MainBlue, lw=1.0, label='GARCH(1,1)-t forecast')
@@ -551,11 +552,11 @@ def fig_oos(F, y, Fb, yb):
     axes[0].set_ylim(0, 80)
     for c in ['GARCH-t', 'EWMA', 'HAR']:
         d = (T.qlike(y, F[c]) - T.qlike(y, F['logHAR'])).cumsum()
-        axes[1].plot(d.index, d.values, color=MODEL_COL[c], lw=1.1, label=f'Cumulative QLIKE: {c} minus log-HAR (SPY)')
+        axes[1].plot(d.index, d.values, color=MODEL_COL[c], lw=1.1, label=f'Cumulative QLIKE: {MODEL_LABEL[c]} minus log-HAR (SPY)')
     for c in ['GARCH-t']:
         d = (T.qlike(yb, Fb[c]) - T.qlike(yb, Fb['logHAR'])).cumsum()
-        axes[1].plot(d.index, d.values, color=Amber, lw=1.1, ls='--', label='Cumulative QLIKE: GARCH-t minus log-HAR (Bitcoin)')
-    axes[1].axhline(0, color=Gray, lw=0.6)
+        axes[1].plot(d.index, d.values, color=Amber, lw=1.1, ls='--', label='Cumulative QLIKE: GARCH(1,1)-t minus log-HAR (Bitcoin)')
+    axes[1].axhline(0, color=Black, lw=0.6)
     axes[1].set_ylabel('Cumulative loss difference')
     fig_legend_bottom(fig, ncol=2, y=0.02)
     plt.tight_layout(rect=(0, 0.1, 1, 1))
@@ -563,19 +564,19 @@ def fig_oos(F, y, Fb, yb):
 
 
 def fig_mz(F, y):
-    """Regresiile Mincer-Zarnowitz pe scara log: log-HAR si GARCH-t (SPY, 2022-2026)."""
+    """Mincer-Zarnowitz regressions on the log scale: log-HAR and GARCH-t (SPY, 2022-2026)."""
     fig, axes = plt.subplots(1, 2, figsize=(9.0, 3.3), sharey=True)
     for ax, c in zip(axes, ['logHAR', 'GARCH-t']):
-        ax.scatter(F[c], y, s=4, color=MODEL_COL[c], alpha=0.5, label=f'{c}: forecast vs realised variance')
+        ax.scatter(F[c], y, s=4, color=MODEL_COL[c], alpha=0.5, label=f'{MODEL_LABEL[c]}: forecast vs realised variance')
         lim = [min(F[c].min(), y.min()), max(F[c].max(), y.max())]
-        ax.plot(lim, lim, color=Gray, lw=0.8, ls='--', label='45-degree line (unbiased forecast)')
+        ax.plot(lim, lim, color=Black, lw=0.8, ls='--', label='45-degree line (unbiased forecast)')
         mz = T.mz_test(y, F[c])
         xx = np.linspace(F[c].min(), F[c].max(), 50)
         ax.plot(xx, mz['a'] + mz['b'] * xx, color='black', lw=1.0, label='Mincer-Zarnowitz fitted line')
         ax.set_xscale('log')
         ax.set_yscale('log')
         ax.set_xlabel('Forecast (%$^2$)')
-        ax.set_title(c, fontsize=9, loc='left')
+        ax.set_title(MODEL_LABEL[c], fontsize=9, loc='left')
     axes[0].set_ylabel('Realised variance (%$^2$)')
     fig_legend_bottom(fig, ncol=2, y=0.02)
     plt.tight_layout(rect=(0, 0.12, 1, 1))
@@ -583,10 +584,10 @@ def fig_mz(F, y):
 
 
 # =============================================================================
-# 11. VOLATILITATE ASPRA
+# 11. ROUGH VOLATILITY
 # =============================================================================
 def rough_H(logsig, qs=(0.5, 1.0, 1.5, 2.0, 3.0), lags=range(1, 31)):
-    """H = panta dreptei zeta_q = q H, prin origine."""
+    """H = slope of the line zeta_q = q H through the origin."""
     ro = T.roughness(logsig, qs, lags)
     q = np.array(qs)
     z = np.array([ro['zeta'][x] for x in qs])
@@ -595,9 +596,9 @@ def rough_H(logsig, qs=(0.5, 1.0, 1.5, 2.0, 3.0), lags=range(1, 31)):
 
 
 def fig_rough():
-    """log m(q, Delta) vs log Delta pentru log-volatilitatea SPY; pantele zeta_q = q H."""
+    """log m(q, Delta) vs log Delta for SPY log-volatility; slopes zeta_q = q H."""
     ro = rough_H(0.5 * np.log(RVT_SPY.values))
-    rb = rough_H(0.5 * np.log(RV_BTC.asfreq('D').values))   # zile lipsa = NaN: doar perechi observate la fiecare decalaj
+    rb = rough_H(0.5 * np.log(RV_BTC.asfreq('D').values))   # missing days = NaN: only observed pairs at each lag
     fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.2), gridspec_kw={'width_ratios': [1.4, 1]})
     cols = [MainBlue, Forest, Amber, Purple, IDAred]
     for q, c in zip(ro['m'], cols):
@@ -609,7 +610,7 @@ def fig_rough():
     qs = np.array(list(ro['zeta']))
     axes[1].plot(qs, [ro['zeta'][q] for q in qs], 'o-', color=MainBlue, label=f'SPY: slopes, H = {ro["H"]:.2f}')
     axes[1].plot(qs, [rb['zeta'][q] for q in qs], 's--', color=Amber, label=f'Bitcoin: slopes, H = {rb["H"]:.2f}')
-    axes[1].plot(qs, 0.5 * qs, color=Gray, ls=':', lw=0.9, label='Brownian motion: H = 0.5')
+    axes[1].plot(qs, 0.5 * qs, color=Black, ls=':', lw=0.9, label='Brownian motion: H = 0.5')
     axes[1].set_xlabel('q')
     axes[1].set_ylabel(r'Slope $\zeta_q$')
     fig_legend_bottom(fig, ncol=4, y=0.02)
@@ -619,13 +620,13 @@ def fig_rough():
 
 
 # =============================================================================
-# 12. STUDIU DE CAZ: Christensen, Siggaard & Veliyev (2023), JFEc 21(5)
-# Cifre publicate: randul "HAR" din Tabelele 2-7 (MSE in afara esantionului relativ la HAR, medie pe 29 de actiuni DJIA,
-# setul de test = ultimele 20% din 2001-2017), articolul publicat: JFEc 21(5), 1680-1727, doi:10.1093/jjfinec/nbac020.
+# 12. CASE STUDY: Christensen, Siggaard & Veliyev (2023), JFEc 21(5)
+# Row "HAR" of Tables 2-7 (out-of-sample MSE relative to HAR, mean over 29 DJIA stocks,
+# test set = last 20% of 2001-2017): JFEc 21(5), 1680-1727, doi:10.1093/jjfinec/nbac020.
 # =============================================================================
 CSV_MODELS = ['HAR-X', 'LogHAR', 'LevHAR', 'SHAR', 'HARQ', 'RR', 'LA', 'EN', 'A-LA', 'P-LA', 'BG', 'RF', 'GB',
               'NN1_1', 'NN10_1', 'NN1_2', 'NN10_2', 'NN1_3', 'NN10_3', 'NN1_4', 'NN10_4']
-CSV_REL_MSE = {   # (orizont, set de informatii): (tabel, randul HAR pe coloanele CSV_MODELS)
+CSV_REL_MSE = {   # (horizon, information set): (table, HAR row over the CSV_MODELS columns)
     ('day', 'HAR'):   (2, [1.000, 0.995, 1.073, 1.009, 1.059, 1.000, 1.003, 0.999, 1.007, 1.005, 1.147, 1.020, 1.054,
                            0.980, 0.969, 0.966, 0.958, 0.955, 0.954, 0.984, 0.990]),
     ('day', 'ALL'):   (3, [0.966, 0.901, 1.003, 1.080, 1.289, 0.919, 0.936, 0.916, 0.957, 0.987, 0.961, 0.901, 0.962,
@@ -649,7 +650,7 @@ CSV_FAMILY = [('HAR family (OLS)', Orange, ['HAR-X', 'LogHAR', 'LevHAR', 'SHAR',
 
 
 def csv_label(m):
-    """Eticheta unui model; NNe_k -> NN_k^e, ca in lucrare."""
+    """Label of a model; NNe_k -> NN_k^e (notation of the paper)."""
     if m.startswith('NN'):
         e, k = m[2:].split('_')
         return rf'NN$_{k}^{{{e}}}$'
@@ -657,20 +658,20 @@ def csv_label(m):
 
 
 def csv_table():
-    """Cifrele publicate: rand = (orizont, set de informatii), coloane = modele."""
+    """Numbers from the paper: row = (horizon, information set), columns = models."""
     return pd.DataFrame({k: v[1] for k, v in CSV_REL_MSE.items()}, index=CSV_MODELS).T
 
 
 def fig_csv_horizons():
-    """MSE relativ la HAR pe orizonturi (zi, saptamana, luna), pentru M_HAR si M_ALL (Tabelele 2-7)."""
+    """MSE relative to HAR by horizon (day, week, month), for M_HAR and M_ALL (Tables 2-7)."""
     tab = csv_table()
     hz = ['day', 'week', 'month']
     show = [('HAR-X', Amber, 'D'), ('LogHAR', IDAred, 'o'), ('HARQ', Orange, 'v'), ('EN', Purple, 's'),
             ('RF', Forest, '^'), ('NN10_2', MainBlue, 'P')]
     fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.4), sharey=True)
     for ax, info, ttl in [(axes[0], 'HAR', r'$\mathcal{M}_{HAR}$: daily, weekly, monthly RV (Tables 2, 4, 6)'),
-                          (axes[1], 'ALL', r'$\mathcal{M}_{ALL}$: RV lags + 9 predictors (Tables 3, 5, 7)')]:
-        ax.axhline(1.0, color=Gray, lw=0.8, ls='--', label='HAR = 1')
+                          (axes[1], 'ALL', r'$\mathcal{M}_{ALL}$: RV lags + 9 predictors (12 in total; Tables 3, 5, 7)')]:
+        ax.axhline(1.0, color=Black, lw=0.8, ls='--', label='HAR = 1')
         for m, c, mk in show:
             ax.plot(range(3), [tab.loc[(h, info), m] for h in hz], marker=mk, ms=5, color=c, lw=1.3, label=csv_label(m))
         ax.set_xticks(range(3))
@@ -690,7 +691,7 @@ def fig_csv_horizons():
 
 
 def fig_csv_ranking():
-    """Clasamentul celor 21 de modele, o luna inainte, M_ALL (Tabelul 7), colorat pe familii."""
+    """Ranking of the 21 models, one month ahead, M_ALL (Table 7), coloured by family."""
     s = csv_table().loc[('month', 'ALL')].sort_values(ascending=False)
     col = {m: c for _, c, ms in CSV_FAMILY for m in ms}
     fig, ax = plt.subplots(figsize=(6.6, 4.8))
@@ -699,7 +700,7 @@ def fig_csv_ranking():
     for yi, (m, v) in zip(y, s.items()):
         ax.text(v + (0.012 if v >= 1 else -0.012), yi, f'{v:.3f}', va='center', ha='left' if v >= 1 else 'right',
                 fontsize=10, color='black')
-    ax.axvline(1.0, color=Gray, lw=0.8, ls='--')
+    ax.axvline(1.0, color=Black, lw=0.8, ls='--')
     ax.set_yticks(y)
     ax.set_yticklabels([csv_label(m) for m in s.index], fontsize=10.5)
     ax.set_xlim(0.45, 1.78)

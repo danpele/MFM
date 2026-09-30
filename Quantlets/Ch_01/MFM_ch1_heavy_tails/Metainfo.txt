@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Monday, 21 September 2026'
 
-Datafile: 'Daily market data (data/market): S&P 500, BET-TR, Bitcoin, gold; EUR/RON official reference rate'
+Datafile: 'Daily market data of the course: S&P 500, BET-TR, Bitcoin, gold; EUR/RON official reference rate'
 
 Output: 'ch1_hist_qq.pdf, ch1_gain_loss.pdf, ch1_aggregation_kurtosis.pdf, ch1_hill_plot.pdf'

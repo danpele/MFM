@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Monday, 21 September 2026'
 
-Datafile: 'Daily market data (data/market in the MFM repository); BNR official EUR/RON reference rate'
+Datafile: 'Daily market data from the MFM course repository; BNR official EUR/RON reference rate'
 
 Output: 'ch0_romania.pdf, ch0_bad_ticks.pdf'

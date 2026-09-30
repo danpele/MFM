@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Monday, 21 September 2026'
 
-Datafile: 'Daily market data (data/market): S&P 500 index and SPY ETF open, high, low, close'
+Datafile: 'Daily market data of the course: S&P 500 index and SPY ETF open, high, low, close'
 
 Output: 'ch1_vol_estimators.pdf'

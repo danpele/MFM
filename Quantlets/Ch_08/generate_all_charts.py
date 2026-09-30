@@ -2,7 +2,7 @@
 Chart generator for Chapter 8: Backtesting and Evaluating Risk Forecasts
 ========================================================================
 All charts: transparent background, English labels, legend outside at the bottom.
-Data: S&P 500, BET and Bitcoin (data/market), EUR/RON (BNR reference rate).
+Data: S&P 500, BET and Bitcoin daily closes (course data), EUR/RON (BNR reference rate).
 One-day-ahead VaR/ES forecasts on a rolling window (1000 observations): HS, Normal, Student-t,
 GARCH-t, FHS, GARCH-EVT; evaluation from 2007 (EUR/RON from 2009, Bitcoin from 2017).
 Modelling Financial Markets - Daniel Traian PELE
@@ -24,7 +24,7 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mfm_data as M   # noqa: E402
 
-# MFM standard style (as in SFM): transparent + English labels + legend at the bottom
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -220,7 +220,7 @@ def fig_kupiec_curve():
         ax.bar(xs[acc], lr[acc], color=Forest, width=0.8, label='Not rejected at 5%')
         ax.bar(xs[~acc], lr[~acc], color=IDAred, width=0.8, label='Rejected at 5%')
         ax.axhline(stats.chi2.ppf(0.95, 1), color='black', ls='--', lw=0.8, label=r'$\chi^2_1$ 5% critical value 3.84')
-        ax.set_title(f'T = {T} days, p = 1%', fontsize=9)
+        ax.set_title(f'T = {T} days, α = 1%', fontsize=9)
         ax.set_xlabel('Number of breaches x')
         ax.set_ylim(0, 25)
         out[T] = dict(lo=int(xs[acc].min()), hi=int(xs[acc].max()))
@@ -276,7 +276,7 @@ def fig_durations(tab):
         ax.step(Ds, surv, where='post', color=MCOL[m], label=f'{m} (b = {tab[("sp500", m)]["b"]:.2f})')
         out[m] = dict(n=len(D), median=float(np.median(D)), share_le5=float(np.mean(D <= 5)))
     d = np.linspace(1, 800, 200)
-    ax.plot(d, (1 - 0.01) ** d, color='black', ls='--', lw=0.9, label='No memory, p = 1% (geometric)')
+    ax.plot(d, (1 - 0.01) ** d, color='black', ls='--', lw=0.9, label='No memory, α = 1% (geometric)')
     ax.set_yscale('log')
     ax.set_xlabel('Days between consecutive breaches of VaR 1% (S&P 500)')
     ax.set_ylabel('Share of durations > d')
@@ -304,7 +304,7 @@ def fig_traffic_light():
         out[m] = dict(max=int(x.max()), max_day=str(x.idxmax().date()), share_red=float(np.mean(x >= 10)),
                       share_yellow=float(np.mean((x >= 5) & (x <= 9))), last=int(x.iloc[-1]))
     ax.text(1.01, 2 / 36.5, 'green', color=Forest, fontsize=8, transform=ax.transAxes)
-    ax.text(1.01, 7.5 / 36.5, 'yellow /\namber', color=Amber, fontsize=8, transform=ax.transAxes)
+    ax.text(1.01, 7.5 / 36.5, 'yellow', color=Amber, fontsize=8, transform=ax.transAxes)
     ax.text(1.01, 20 / 36.5, 'red', color=IDAred, fontsize=8, transform=ax.transAxes)
     ax.set_ylim(-0.5, 36)
     ax.set_ylabel('Exceptions of VaR 1%\nin the last 250 days')
@@ -383,7 +383,7 @@ def fig_mf_residuals():
         ax.plot(i + 1, out[m], 'D', color='black', ms=4, label='Mean' if i == 0 else None)
     ax.axhline(0, color='black', lw=0.8, ls='--', label='Expected under a correct ES (mean 0)')
     ax.set_xticks(range(1, 7), M.MODELS)
-    ax.set_ylabel('Exceedance residual (L - ES) / scale')
+    ax.set_ylabel('Exceedance residual (L - ES) / σ (forecast volatility)')
     legend_outside_bottom(ax, ncol=2, y=-0.13)
     save_fig('ch8_mf_residuals')
     return out
@@ -886,7 +886,7 @@ BD_TABLE3 = {
     'GJR-GARCH-t': [[0.00, 0.00, 0.01, 0.02, 0.04], [0.00, 0.00, 0.01, 0.01, 0.01], [0.00, 0.00, 0.00, 0.00, 0.01],
                     [0.00, 0.01, 0.00, 0.00, 0.01], [0.00, 0.01, 0.00, 0.01, 0.01]],
 }
-# large S&P 500 stocks in data/market with daily prices from 2002 (2000-day window before January 2010)
+# large S&P 500 stocks in the course data with daily prices from 2002 (2000-day window before January 2010)
 BD_STOCKS = ['AAPL.US', 'MSFT.US', 'AMZN.US', 'NVDA.US', 'CSCO.US', 'JPM.US', 'BAC.US', 'C.US', 'WFC.US', 'GS.US',
              'MS.US']
 BD_OOS = ('2010-01-01', '2019-08-31')

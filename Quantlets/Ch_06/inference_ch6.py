@@ -43,10 +43,10 @@ N = {}
 
 
 # =============================================================================
-# 1. Varianta HAC a unei corelatii (metoda delta pe momente)
+# 1. HAC variance of a correlation (delta method on moments)
 # =============================================================================
 def bartlett_lrv(M, L):
-    """Varianta pe termen lung (Newey-West, nucleu Bartlett cu L decalaje) a coloanelor lui M (centrate)."""
+    """Long-run variance (Newey-West, Bartlett kernel with L lags) of the (centred) columns of M."""
     M = np.asarray(M, dtype=float)
     M = M - M.mean(0)
     T = len(M)
@@ -58,7 +58,7 @@ def bartlett_lrv(M, L):
 
 
 def corr_grad(m):
-    """Gradientul lui rho = (m5 - m1 m2) / sqrt((m3 - m1^2)(m4 - m2^2)), m = (Ex, Ey, Ex^2, Ey^2, Exy)."""
+    """Gradient of rho = (m5 - m1 m2) / sqrt((m3 - m1^2)(m4 - m2^2)), m = (Ex, Ey, Ex^2, Ey^2, Exy)."""
     m1, m2, m3, m4, m5 = m
     vx, vy, c = m3 - m1 ** 2, m4 - m2 ** 2, m5 - m1 * m2
     r = c / np.sqrt(vx * vy)
@@ -67,8 +67,8 @@ def corr_grad(m):
 
 
 def corr_delta_se(x, y, L=None):
-    """Corelatia si trei erori standard: Fisher (i.i.d. Normal), metoda delta fara decalaje (momente de ordin 4)
-    si metoda delta HAC (Bartlett, L = floor(4 (T/100)^(2/9)) implicit)."""
+    """The correlation and three standard errors: Fisher (i.i.d. Normal), the delta method without lags (fourth moments)
+    and the HAC delta method (Bartlett, L = floor(4 (T/100)^(2/9)) by default)."""
     x, y = np.asarray(x, float), np.asarray(y, float)
     T = len(x)
     L = int(np.floor(4 * (T / 100) ** (2 / 9))) if L is None else L
@@ -80,7 +80,7 @@ def corr_delta_se(x, y, L=None):
 
 
 def hac_ci(r, se, level=0.95):
-    """Interval pe scara Fisher z cu eroarea standard data (metoda delta: se_z = se / (1 - r^2))."""
+    """Interval on the Fisher z scale with the given standard error (delta method: se_z = se / (1 - r^2))."""
     q = stats.norm.ppf(0.5 + level / 2)
     z, sz = np.arctanh(r), se / (1 - r ** 2)
     return np.tanh(z - q * sz), np.tanh(z + q * sz)
@@ -126,11 +126,11 @@ def fig_corr_hac():
 
 
 # =============================================================================
-# 2. Testul Wied-Kramer-Dehling (2012)
+# 2. The Wied-Kramer-Dehling (2012) test
 # =============================================================================
 def wkd_test(x, y):
-    """Q_T = max_j (j / sqrt(T)) |rho_j - rho_T| / D, D^2 = varianta pe termen lung a corelatiei prin metoda delta,
-    nucleu Bartlett cu latimea floor(T^(1/4)) (Wied, Kramer & Dehling, 2012). Sub H0: sup |punte Brownian|."""
+    """Q_T = max_j (j / sqrt(T)) |rho_j - rho_T| / D, D^2 = long-run variance of the correlation by the delta method,
+    Bartlett kernel with bandwidth floor(T^(1/4)) (Wied, Kramer & Dehling, 2012). Under H0: sup |Brownian bridge|."""
     x, y = np.asarray(x, float), np.asarray(y, float)
     T = len(x)
     M = np.column_stack([x, y, x * x, y * y, x * y])
@@ -154,7 +154,7 @@ def fig_wkd():
     brk = Z.index[w['j']]
     z0, z1 = Z.loc[:brk], Z.loc[brk:].iloc[1:]
     fig, ax = plt.subplots(figsize=(5.6, 3.5))
-    ax.plot(Z.index, w['path'], color=MainBlue, lw=1.0, label='WKD process (j / sqrt(T)) |rho_j - rho_T| / D')
+    ax.plot(Z.index, w['path'], color=MainBlue, lw=1.0, label='Wied–Krämer–Dehling cumulative-sum (CUSUM) statistic (j / sqrt(T)) |rho_j - rho_T| / D')
     ax.axhline(stats.kstwobign.ppf(0.95), color='black', ls='--', lw=0.8, label='5% critical value (1.358)')
     ax.axvline(brk, color=IDAred, ls=':', lw=1.0, label=f'Estimated break: {brk.date()}')
     ax.set_ylabel('Scaled CUSUM of correlation')
@@ -169,10 +169,10 @@ def fig_wkd():
 
 
 # =============================================================================
-# 3. DCC: erori standard pentru estimarea in doi pasi
+# 3. DCC: standard errors of the two-step estimation
 # =============================================================================
 def simulate_garch(mu, omega, alpha, beta, eps):
-    """Randamente (in %) dintr-un GARCH(1,1) cu medie constanta si inovatiile standardizate eps."""
+    """Returns (in %) from a GARCH(1,1) with constant mean and the standardised innovations eps."""
     T = len(eps)
     r = np.empty(T)
     s2 = omega / (1 - alpha - beta)
@@ -183,8 +183,8 @@ def simulate_garch(mu, omega, alpha, beta, eps):
 
 
 def two_step_bootstrap(B=199):
-    """Bootstrap parametric cu reziduuri pentru (a, b): (i) doar pasul 2 (DCC reestimat pe reziduurile simulate),
-    (ii) ambii pasi (randamente GARCH simulate, GARCH reestimat, apoi DCC). Aceleasi inovatii in (i) si (ii)."""
+    """Parametric residual bootstrap for (a, b): (i) step 2 only (DCC re-estimated on the simulated residuals),
+    (ii) both steps (simulated GARCH returns, GARCH re-estimated, then DCC). The same innovations in (i) and (ii)."""
     R = joint_returns(['spy', 'tlt'])
     P, V, Z, _ = garch_all(R)
     d = dcc_fit(Z)
@@ -214,16 +214,16 @@ def two_step_bootstrap(B=199):
 
 
 # =============================================================================
-# 4. Raportul de acoperire dinamic in afara esantionului: BET acoperit cu Euro Stoxx 50
+# 4. The dynamic hedge ratio out of sample: BET hedged with the Euro Stoxx 50
 # =============================================================================
 def garch_fixed(r_full, params):
-    """Volatilitatea conditionala si reziduurile standardizate pe toata perioada, cu parametrii fixati."""
+    """Conditional volatility and standardised residuals over the whole period, with the parameters fixed."""
     res = arch_model(100 * r_full, mean='Constant', vol='GARCH', p=1, q=1).fix(params)
     return res.conditional_volatility, res.resid / res.conditional_volatility
 
 
 def nw_tstat(d):
-    """Statistica t a mediei cu eroare standard Newey-West (L = floor(4 (T/100)^(2/9)))."""
+    """t statistic of the mean with a Newey-West standard error (L = floor(4 (T/100)^(2/9)))."""
     d = np.asarray(d, float)
     T = len(d)
     L = int(np.floor(4 * (T / 100) ** (2 / 9)))
@@ -231,8 +231,8 @@ def nw_tstat(d):
 
 
 def fig_hedge_oos(h_all, h_static, h_expost, e_un, e_st, e_dc, split):
-    """Raportul de hedge DCC (parametri estimati pana in 2019, apoi fixati) fata de hedge-ul static si
-    suma cumulata a patratelor randamentelor cu hedge in perioada de evaluare."""
+    """DCC hedge ratio (parameters estimated up to 2019, then fixed) against the static hedge, and
+    the cumulative sum of squared hedged returns over the evaluation period."""
     fig, axes = plt.subplots(2, 1, figsize=(5.6, 4.0))
     ax = axes[0]
     h = h_all.loc['2017-01-01':]
@@ -284,13 +284,13 @@ def hedge_oos(split='2019-12-31'):
 
 
 # =============================================================================
-# 5. Forbes-Rigobon cu delta aleator
+# 5. Forbes-Rigobon with a random delta
 # =============================================================================
 def fr_delta_method(rc, delta, n_c, n_0):
-    """Eroarea standard a lui rho* = rho_c / sqrt(1 + delta (1 - rho_c^2)): cu delta fixat si cu delta aleator.
-    Aproximari i.i.d. Normale, ferestre independente: Var(rho_c) ~ (1 - rho_c^2)^2 / n_c,
-    Var(delta) ~ 2 (1 + delta)^2 (1/(n_c-1) + 1/(n_0-1)) si covarianta Cov(rho_c, delta) ~ (1 + delta) rho_c (1 - rho_c^2) / n_c
-    (corelatia si varianta sursei sunt estimate din aceeasi fereastra de criza)."""
+    """Standard error of rho* = rho_c / sqrt(1 + delta (1 - rho_c^2)): with delta fixed and with delta random.
+    i.i.d. Normal approximations, independent windows: Var(rho_c) ~ (1 - rho_c^2)^2 / n_c,
+    Var(delta) ~ 2 (1 + delta)^2 (1/(n_c-1) + 1/(n_0-1)) and the covariance Cov(rho_c, delta) ~ (1 + delta) rho_c (1 - rho_c^2) / n_c
+    (the correlation and the source variance are estimated from the same crisis window)."""
     k = 1 + delta * (1 - rc ** 2)
     g_r, g_d = (1 + delta) / k ** 1.5, -rc * (1 - rc ** 2) / (2 * k ** 1.5)
     v_r, v_d = (1 - rc ** 2) ** 2 / n_c, 2 * (1 + delta) ** 2 * (1 / (n_c - 1) + 1 / (n_0 - 1))
@@ -319,8 +319,8 @@ def fr_bootstrap(calm, crisis, tag, B=1999, block=10):
         dif = np.array(dif)
         se_fix, se_rand, g_r, g_d, se_d, c_rd = fr_delta_method(rc, delta, len(c1) // 2, len(c0) // 2)
         z_fix = (np.arctanh(adj) - np.arctanh(r0)) / np.sqrt(1 / (len(c1) // 2 - 3) + 1 / (len(c0) // 2 - 3))
-        # test pe scara rho cu eroarea standard a diferentei (delta aleator), calm tratat ca i.i.d. Normal;
-        # rho_calm si delta folosesc aceeasi fereastra calma: Cov(rho*, rho_calm) = g_d Cov(delta, rho_calm),
+        # test on the rho scale with the standard error of the difference (random delta), calm window treated as i.i.d. Normal;
+        # rho_calm and delta use the same calm window: Cov(rho*, rho_calm) = g_d Cov(delta, rho_calm),
         # Cov(delta, rho_calm) ~ -(1 + delta) rho_calm (1 - rho_calm^2) / n_0
         se0 = (1 - r0 ** 2) / np.sqrt(len(c0) // 2)
         c_s0 = -g_d * (1 + delta) * r0 * (1 - r0 ** 2) / (len(c0) // 2)
@@ -342,7 +342,7 @@ def fr_bootstrap(calm, crisis, tag, B=1999, block=10):
 
 
 # =============================================================================
-# 6. Estimatori de rang si erorile standard CML
+# 6. Rank estimators and CML standard errors
 # =============================================================================
 def emp_copula_at_points(u, v, chunk=2000):
     n = len(u)
@@ -353,14 +353,14 @@ def emp_copula_at_points(u, v, chunk=2000):
 
 
 def tau_se(u, v):
-    """Eroarea standard a lui tau Kendall din proiectia Hoeffding: 4 sd(2 C_n(U, V) - U - V) / sqrt(n)."""
+    """Standard error of Kendall's tau from the Hoeffding projection: 4 sd(2 C_n(U, V) - U - V) / sqrt(n)."""
     W = 2 * emp_copula_at_points(u, v) - u - v
     return kendall_tau(u, v), 4 * W.std() / np.sqrt(len(u))
 
 
 def cml_se(fam, par, u, v, hp=1e-5, hu=1e-6):
-    """Erori standard CML: inversa hessienei (margini cunoscute) si sandwich-ul Genest-Ghoudi-Rivest (1995),
-    in care scorul primeste termenii W1(U_i) + W2(V_i) datorati rangurilor."""
+    """CML standard errors: the inverse Hessian (known margins) and the Genest-Ghoudi-Rivest (1995) sandwich,
+    in which the score gets the terms W1(U_i) + W2(V_i) due to the ranks."""
     par = np.asarray(par, float)
     k, n = len(par), len(u)
 
@@ -403,7 +403,7 @@ def rank_inference():
     N.update(ri_tau=tau, ri_se_tau=se_tau, ri_rho_tau=rho_tau, ri_se_rho_tau=se_rho_tau, ri_rho_cml=ft['par'][0],
              ri_nu_cml=ft['par'][1], ri_se_rho_naive=naive[0], ri_se_rho_ggr=ggr[0], ri_se_nu_naive=naive[1],
              ri_se_nu_ggr=ggr[1], ri_n=len(u))
-    # asimetria in cozi: lambda_L(q) - lambda_U(q), bootstrap i.i.d. pe perechi de reziduuri (reranguite)
+    # tail asymmetry: lambda_L(q) - lambda_U(q), i.i.d. bootstrap of residual pairs (re-ranked)
     rng = np.random.default_rng(SEED)
     X = Zb.values
     for q, tag in ((0.05, '05'), (0.01, '01')):
@@ -416,7 +416,7 @@ def rank_inference():
         db = np.array(db)
         N.update({f'ts_diff{tag}': L0 - U0, f'ts_se{tag}': db.std(ddof=1), f'ts_lo{tag}': np.percentile(db, 2.5),
                   f'ts_hi{tag}': np.percentile(db, 97.5), f'ts_k{tag}': int(round(q * len(u)))})
-    # S&P 500 / Euro Stoxx 50 saptamanal (seminarul, A2 si B2)
+    # S&P 500 / Euro Stoxx 50 weekly (seminar, A2 and B2)
     W = weekly_returns(['sp500', 'stoxx'], start='2000-01-01')
     U2 = pseudo_obs(W.values)
     u2, v2 = U2[:, 0], U2[:, 1]
@@ -440,7 +440,7 @@ def rank_inference():
 
 
 # =============================================================================
-# 7. Chen & Fan (2006) in cifre: CML pe rangurile reziduurilor GARCH
+# 7. Chen & Fan (2006) in numbers: CML on the ranks of GARCH residuals
 # =============================================================================
 def chen_fan_mc(R_=500, T=2000, rho=0.8, df=5):
     Rb, Zb, U = bank_copula_data()
@@ -468,10 +468,10 @@ def chen_fan_mc(R_=500, T=2000, rho=0.8, df=5):
 
 
 # =============================================================================
-# 8. Copula t dinamica: GAS (Creal, Koopman & Lucas, 2013), scalare unitara
+# 8. Dynamic t copula: GAS (Creal, Koopman & Lucas, 2013), unit scaling
 # =============================================================================
 def t_score_rho(rho, nu, x, y):
-    """d log c_t / d rho pentru copula t (x, y = cuantilele t_nu ale pseudo-observatiilor)."""
+    """d log c_t / d rho for the t copula (x, y = the t_nu quantiles of the pseudo-observations)."""
     Q = x * x + y * y - 2 * rho * x * y
     D = nu * (1 - rho ** 2)
     dQD = (-2 * x * y * (1 - rho ** 2) + 2 * rho * Q) / (nu * (1 - rho ** 2) ** 2)
@@ -480,7 +480,7 @@ def t_score_rho(rho, nu, x, y):
 
 @njit(cache=True)
 def gas_t_nll(om, A, Bp, nu, x, y, cst):
-    """Minus log-verosimilitatea copulei t GAS (aceeasi recursie ca gas_filter); x, y = cuantilele t_nu."""
+    """Minus the log-likelihood of the GAS t copula (same recursion as gas_filter); x, y = the t_nu quantiles."""
     f = om / (1.0 - Bp)
     ll = 0.0
     for t in range(len(x)):
@@ -558,7 +558,7 @@ def fig_gas_copula():
              gas_rho_max_date=str(rho.idxmax().date()), gas_rho_last=rho.iloc[-1], gas_rho_static=g['rho_static'],
              gas_nu_static=g['nu_static'], gas_lam_min=lam.min(), gas_lam_max=lam.max(), gas_lam_static=lam_s,
              gas_rho_2020=rho.loc['2020-03-01':'2020-06-30'].mean(), gas_rho_2019=rho.loc['2019'].mean())
-    # seminarul, B6: S&P 500 / Euro Stoxx 50 saptamanal
+    # seminar, B6: S&P 500 / Euro Stoxx 50 weekly
     W = weekly_returns(['sp500', 'stoxx'], start='2000-01-01')
     U2 = pseudo_obs(W.values)
     g2 = gas_t_copula(U2[:, 0], U2[:, 1])
@@ -570,12 +570,12 @@ def fig_gas_copula():
 
 
 # =============================================================================
-# 9. Calibrarea testelor sub ipoteza nula (bootstrap parametric): CCC contra DCC, simetria cozilor, GAS contra static
+# 9. Calibrating the tests under the null (parametric bootstrap): CCC against DCC, tail symmetry, GAS against static
 # =============================================================================
 def ccc_null_bootstrap(names, tag, B=199):
-    """p-valoarea statisticii DCC contra CCC sub H0: CCC. Inovatii cu corelatie constanta din reziduurile decorelate
-    reesantionate, randamente GARCH(1,1) simulate cu parametrii estimati, apoi AMBII pasi reestimati pe fiecare traiectorie
-    (GARCH univariat, tinta Qbar, (a, b)); statistica observata se calculeaza cu aceeasi procedura."""
+    """p-value of the DCC-against-CCC statistic under H0: CCC. Constant-correlation innovations from the resampled
+    decorrelated residuals, GARCH(1,1) returns simulated with the estimated parameters, then BOTH steps re-estimated on each path
+    (univariate GARCH, target Qbar, (a, b)); the observed statistic is computed with the same procedure."""
     R = joint_returns(names)
     P, V, Z, _ = garch_all(R)
     d = dcc_fit(Z)
@@ -600,8 +600,8 @@ def ccc_null_bootstrap(names, tag, B=199):
 
 
 def tail_symmetry_block(q_list=((0.05, '05'), (0.01, '01')), B=999):
-    """lambda_L(q) - lambda_U(q) la prag fixat q, cu bootstrap stationar pe blocuri (Politis & Romano, 1994); lungimea
-    medie a blocului: regula automata a lui Politis & White (2004), aplicata indicatorului 1{colt inferior} - 1{colt superior}."""
+    """lambda_L(q) - lambda_U(q) at a fixed threshold q, with a stationary block bootstrap (Politis & Romano, 1994); mean
+    block length: the automatic rule of Politis & White (2004), applied to the indicator 1{lower corner} - 1{upper corner}."""
     from arch.bootstrap import optimal_block_length
     Rb, Zb, U = bank_copula_data()
     u, v = U[:, 0], U[:, 1]
@@ -624,8 +624,8 @@ def tail_symmetry_block(q_list=((0.05, '05'), (0.01, '01')), B=999):
 
 
 def gas_null_bootstrap(B=199):
-    """Seminarul, B6: p-valoarea raportului de verosimilitate GAS contra t static, prin bootstrap parametric sub copula t
-    statica estimata (n perechi simulate, transformate in pseudo-observatii, ambele modele reestimate)."""
+    """Seminar, B6: p-value of the likelihood ratio GAS against static t, by a parametric bootstrap under the fitted
+    static t copula (n simulated pairs, turned into pseudo-observations, both models refitted)."""
     W = weekly_returns(['sp500', 'stoxx'], start='2000-01-01')
     U2 = pseudo_obs(W.values)
     g = gas_t_copula(U2[:, 0], U2[:, 1])
@@ -641,7 +641,7 @@ def gas_null_bootstrap(B=199):
 
 
 def save(path='ch6_inference_numbers.json'):
-    """Adauga cifrele calculate la fisierul existent (etapele pot fi rulate separat)."""
+    """Add the computed numbers to the existing file (the stages can be run separately)."""
     fn = os.path.join(HERE, path)
     out = json.load(open(fn)) if os.path.exists(fn) else {}
     for k, v in N.items():

@@ -247,7 +247,7 @@ def b3_es_sp500():
                       Z2_last=zl['Z2'], p2_last=zl['p'], crit5_last=zl['crit5'], n_last=zl['n_hit'])
         if m == 'GARCH-t':
             fig, ax = plt.subplots(figsize=(6.4, 2.9))
-            ax.hist(zl['sims'], bins=60, color=g.MainBlue, alpha=0.45, edgecolor='white', label='Simulated $Z_2$ under H0 (5000 paths)')
+            ax.hist(zl['sims'], bins=60, color=g.MainBlue, alpha=0.45, edgecolor='white', label='Simulated $Z_2$ under H0 (5000 simulations)')
             ax.axvline(zl['Z2'], color=g.IDAred, lw=1.4, label=f'Observed $Z_2$ = {zl["Z2"]:.2f}')
             ax.axvline(zl['crit5'], color=g.Amber, ls='--', lw=1.0, label=f'Simulated 5% critical value = {zl["crit5"]:.2f}')
             ax.axvline(-0.70, color='black', ls=':', lw=1.0, label='Acerbi-Szekely fixed threshold -0.70')
@@ -576,8 +576,8 @@ def ch_a5():
     ax.axvspan(-0.5, 4.5, color=g.Forest, alpha=0.10, lw=0)
     ax.axvspan(4.5, 9.5, color='#F1C40F', alpha=0.15, lw=0)
     ax.axvspan(9.5, 15.5, color=g.IDAred, alpha=0.10, lw=0)
-    ax.step(xs, stats.binom.cdf(xs, T, 0.01), where='mid', color=g.MainBlue, lw=1.4, label='P(X ≤ x), correct model, p = 1%')
-    ax.step(xs, stats.binom.cdf(xs, T, 0.03), where='mid', color=g.IDAred, lw=1.4, label='P(X ≤ x), true p = 3%')
+    ax.step(xs, stats.binom.cdf(xs, T, 0.01), where='mid', color=g.MainBlue, lw=1.4, label='P(X ≤ x), correct model, α = 1%')
+    ax.step(xs, stats.binom.cdf(xs, T, 0.03), where='mid', color=g.IDAred, lw=1.4, label='P(X ≤ x), true π = 3%')
     ax.axhline(0.95, color='black', ls='--', lw=0.8, label='95% (yellow from here)')
     ax.axhline(0.9999, color='black', ls=':', lw=0.9, label='99.99% (red from here)')
     ax.set_xticks(xs)
@@ -801,7 +801,7 @@ def ch_b1(b1=None, dq=None, MC=None):
     ax.axhline(5, color='black', ls='--', lw=0.8, label='Nominal 5%')
     ax.set_xticks(range(4), ['Kupiec', 'CC', 'duration', 'DQ'])
     ax.set_ylabel('Rejection rate of a correct model (%)')
-    ax.set_title('Size of the battery (bars: ±1.96 MC s.e.)', fontsize=9)
+    ax.set_title('Size of the set of tests (bars: ±1.96 Monte Carlo standard errors)', fontsize=9)
     plt.tight_layout()
     _bars_legend(fig, axs[1:], ncol=3)
     g.save_fig('ch8_sem_b1_results')
@@ -907,8 +907,8 @@ def ch_b5(maxlag=20):
         ax.errorbar([i + 0.12], [dd.mean()], yerr=[1.96 * s_h], fmt='s', color=col, ms=4, capsize=3, lw=1.0,
                     mfc='white')
         ci[m] = dict(mean=float(dd.mean()), naive=float(1.96 * s_n), hac=float(1.96 * s_h))
-    ax.plot([], [], 'o', color='black', ms=4, label='95% interval, naive s.e.')
-    ax.plot([], [], 's', color='black', mfc='white', ms=4, label='95% interval, HAC s.e.')
+    ax.plot([], [], 'o', color='black', ms=4, label='95% interval, naive standard error')
+    ax.plot([], [], 's', color='black', mfc='white', ms=4, label='95% interval, HAC standard error')
     ax.axhline(0, color=g.Gray, lw=0.6)
     ax.set_xticks(range(3), ['GARCH-t', 'HS', 'GARCH-EVT'], fontsize=7.5)
     ax.set_ylabel('Mean FZ0 difference vs FHS')
@@ -1006,7 +1006,7 @@ def ch_b7():
             errs.append(196 * np.sqrt(p * (1 - p) / nn))
             ns.append((k, nn))
         ax.bar(np.arange(3) + (j - 0.5) * 0.36, vals, 0.36, yerr=errs, capsize=2, color=col,
-               error_kw=dict(lw=0.7), label=f'{lab} (±1.96 binomial s.e.)')
+               error_kw=dict(lw=0.7), label=f'{lab} (±1.96 binomial standard errors)')
         out[lab] = ns
     ax.axhline(5, color='black', ls='--', lw=0.8, label='Nominal 5%')
     ax.set_xticks(range(3), ['All', 'Calm', 'Crisis'])
@@ -1041,7 +1041,7 @@ def ch_b9(b9=None):
 
 
 def c2_fixture(n=400, day=320, shock=-0.08, seed=8):
-    """C2 price fixture: 400 prices from 100, daily log returns 1% x standardised Student-t4, seed 8,
+    """C2 test price series: 400 prices from 100, daily log returns 1% x standardised Student-t4, seed 8,
     with a return of -8% on day 320."""
     rng = np.random.default_rng(seed)
     r = 0.01 * rng.standard_t(4, n) / np.sqrt(2)
@@ -1062,12 +1062,12 @@ def ch_c2(W=250, p=0.01):
     fig, ax = plt.subplots(figsize=(6.8, 2.8))
     sel = slice(300 - W, 345 - W)
     days = idx[sel]
-    ax.bar(days, 100 * L[sel], color=g.Orange, alpha=0.6, width=0.8, label='Daily loss (fixture)')
+    ax.bar(days, 100 * L[sel], color=g.Orange, alpha=0.6, width=0.8, label='Daily loss (test series)')
     ax.step(days, 100 * v_bad[sel], where='mid', color=g.IDAred, lw=1.2, label='VaR from r[t−W : t+1] (includes day t)')
     ax.step(days, 100 * v_ok[sel], where='mid', color=g.MainBlue, lw=1.2, ls='--', label='VaR from r[t−W : t] (lagged)')
     ax.annotate('−8% on day 320: the wrong VaR already\nuses it (3.84%); the lagged VaR (2.28%)\nmoves only on day 321', (320.4, 3.84), xytext=(326, 5.6),
                 fontsize=7.5, color='black', arrowprops=dict(arrowstyle='->', lw=0.7, color='black'))
-    ax.set_xlabel('Day of the fixture')
+    ax.set_xlabel('Day of the test series')
     ax.set_ylabel('Loss / VaR (%)')
     g.legend_outside_bottom(ax, ncol=2, y=-0.2)
     g.save_fig('ch8_sem_c2_lookahead')

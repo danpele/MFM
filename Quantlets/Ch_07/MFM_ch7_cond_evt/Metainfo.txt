@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
+Datafile: 'Daily market data of the course: S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
 
 Output: 'ch7_cond_evt.pdf'

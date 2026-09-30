@@ -33,10 +33,10 @@ from generate_all_charts import (plt, MainBlue, IDAred, Forest, Amber, Orange, P
 
 
 # =============================================================================
-# PARTEA A
+# PART A
 # =============================================================================
 def a1_present_value(D1=2.0, r=0.06, g=0.02, P=65.0):
-    """Gordon: F = D1 / (r - g); bula B = P - F creste cu r, fundamentalul cu g."""
+    """Gordon: F = D1 / (r - g); the bubble B = P - F grows at r, the fundamental at g."""
     F = D1 / (r - g)
     B = P - F
     out = dict(F=F, B=B, share0=B / P)
@@ -47,15 +47,15 @@ def a1_present_value(D1=2.0, r=0.06, g=0.02, P=65.0):
 
 
 def a2_blanchard_watson(B0=15.0, r=0.06, pi=0.9, h=5):
-    """Bula Blanchard-Watson: supravietuieste cu pi pe an; conditionat de supravietuire creste cu (1+r)/pi."""
+    """Blanchard-Watson bubble: survives with probability pi per year; conditional on survival it grows at (1+r)/pi."""
     return dict(growth=(1 + r) / pi - 1, surv=pi ** h, life=1 / (1 - pi), EB=B0 * (1 + r) ** h,
                 B_surv=B0 * ((1 + r) / pi) ** h, pi=pi, h=h,
-                csd=B0 * (1 + r) * np.sqrt((1 - pi) / pi),          # abaterea standard conditionata (fara zgomot)
-                log_slope=-(1 - pi))                                # panta E[Delta y | y] in logaritmi
+                csd=B0 * (1 + r) * np.sqrt((1 - pi) / pi),          # conditional standard deviation (no noise)
+                log_slope=-(1 - pi))                                # slope of E[Delta y | y] in logs
 
 
 def _df_t(Y):
-    """Statistica t a lui b din Delta y_t = a + b y_{t-1} + e_t, pe fiecare rand al lui Y."""
+    """t-statistic of b in Delta y_t = a + b y_{t-1} + e_t, for each row of Y."""
     X, Z = Y[:, :-1], np.diff(Y, axis=1)
     n = Z.shape[1]
     sx, sxx, sz, sxz, szz = X.sum(1), (X * X).sum(1), Z.sum(1), (X * Z).sum(1), (Z * Z).sum(1)
@@ -66,10 +66,10 @@ def _df_t(Y):
 
 
 def a3_df_limit(T=1000, R=20_000):
-    """Distributia Dickey-Fuller cu termen liber: simulare pentru T mare; media numaratorului limita = -1/2."""
+    """Dickey-Fuller distribution with a constant: simulation for large T; mean of the limit numerator = -1/2."""
     rng = np.random.default_rng(SEED)
     tt = np.concatenate([_df_t(np.cumsum(rng.standard_normal((2000, T + 1)), axis=1)) for _ in range(R // 2000)])
-    # functionala limita aproximata pe grila de T puncte: numarator 1/2 (W(1)^2 - 1) - W(1) int W
+    # limit functional approximated on a grid of T points: numerator 1/2 (W(1)^2 - 1) - W(1) int W
     W = np.cumsum(rng.standard_normal((5000, T)), axis=1) / np.sqrt(T)
     num = 0.5 * (W[:, -1] ** 2 - 1) - W[:, -1] * W.mean(1)
     return dict(T=T, R=R, q05=float(np.quantile(tt, 0.05)), q50=float(np.quantile(tt, 0.50)),
@@ -78,7 +78,7 @@ def a3_df_limit(T=1000, R=20_000):
 
 
 def a4_mild(Ts=(100, 400, 1600), alpha=0.8, c=1.0, R=4000):
-    """Radacina usor exploziva rho_T = 1 + c / T^alpha: mediana statisticii ADF creste cu T (divergenta la +inf)."""
+    """Mildly explosive root rho_T = 1 + c / T^alpha: the median ADF statistic grows with T (diverges to +inf)."""
     rng = np.random.default_rng(SEED)
     out = []
     for T in Ts:
@@ -93,7 +93,7 @@ def a4_mild(Ts=(100, 400, 1600), alpha=0.8, c=1.0, R=4000):
 
 
 def a4_windows(T=440):
-    """(pastrat pentru notebook) ferestrele PSY pentru T = 440."""
+    """PSY windows for T = 440."""
     w0, r0 = min_window(T)
     n_sadf = T - w0 + 1
     return dict(T=T, r0=r0, w0=w0, n_sadf=n_sadf, n_gsadf=n_sadf * (n_sadf + 1) // 2, logT=float(np.log(T)),
@@ -101,9 +101,9 @@ def a4_windows(T=440):
 
 
 def _ms_step(P, mu, sd, prev_turb, r):
-    """Un pas al filtrului Hamilton cu doua regimuri (0 = calm, 1 = turbulent)."""
+    """One step of the two-regime Hamilton filter (0 = calm, 1 = turbulent)."""
     prev = np.array([1 - prev_turb, prev_turb])
-    pred = P.T @ prev                          # P[i, j] = P(s_t = j | s_{t-1} = i)
+    pred = P.T @ prev                          # here P[i, j] = P(s_t = j | s_{t-1} = i): rows are the previous regime (the transpose of the statsmodels layout)
     lik = stats.norm.pdf(r, mu, sd)
     post = pred * lik / (pred * lik).sum()
     return pred, lik, post
@@ -130,13 +130,13 @@ def a6_markov(P=((0.95, 0.05), (0.20, 0.80)), mu=(0.4, -1.0), sd=(2.0, 6.0), pre
 
 
 def _lppls_diag(t1, t2, tc, m, w, B, C1, C2):
-    """Conditiile din Shu & Zhu (2020), ec. (11)-(12), care se pot verifica din parametri (fara date)."""
+    """The conditions of Shu & Zhu (2020), eqs. (11)-(12), that can be checked from the parameters (no data)."""
     C = np.hypot(C1, C2)
     D = t2 - t1
-    O = w / np.pi * np.log((tc - t1) / (tc - t2))          # numarul de semiperioade (Shu & Zhu 2020, ec. 12)
+    O = w / np.pi * np.log((tc - t1) / (tc - t2))          # number of half-periods (Shu & Zhu 2020, eq. 12)
     damp = m * abs(B) / (w * C)
-    exact = m * abs(B) / (C * np.hypot(m, w))              # rata de hazard >= 0 pentru orice faza: m|B| >= |C| sqrt(m^2 + w^2)
-    slope = -B * m * (tc - t2) ** (m - 1)          # d/dt [B (tc - t)^m] la t2, fara oscilatii
+    exact = m * abs(B) / (C * np.hypot(m, w))              # hazard rate >= 0 for every phase: m|B| >= |C| sqrt(m^2 + w^2)
+    slope = -B * m * (tc - t2) ** (m - 1)          # d/dt [B (tc - t)^m] at t2, without oscillations
     return dict(C=C, D=D, O=O, damping=damp, exact=exact, dtc=tc - t2, dtc_days=(tc - t2) * 365.25, tc_lim=D / 5,
                 slope=slope, m=m, w=w, B=B, ok_B=B < 0, ok_m=0.01 <= m <= 0.99, ok_w=2 <= w <= 25,
                 ok_tc=0 <= tc - t2 <= D / 5, ok_O=O >= 2.5, ok_D=damp >= 1, ok_exact=exact >= 1)
@@ -151,10 +151,10 @@ def a8_lppls():
 
 
 # =============================================================================
-# PARTEA B
+# PART B
 # =============================================================================
 def b1_pd_windows(r0s=(0.03, None, 0.08)):
-    """GSADF pe raportul P/D Shiller pentru trei ferestre minime (regula PSY in mijloc)."""
+    """GSADF on the Shiller P/D ratio for three minimum windows (the PSY rule in the middle)."""
     sh = shiller()
     y = np.log(sh['PD'])
     out = []
@@ -169,7 +169,7 @@ def b1_pd_windows(r0s=(0.03, None, 0.08)):
 
 
 def b2_sadf_vs_gsadf():
-    """Nasdaq 100 si S&P 500 lunar: datarea PWY (inceput fix) vs PSY (inceput mobil)."""
+    """Nasdaq 100 and S&P 500 monthly: PWY date-stamping (fixed start) vs PSY (moving start)."""
     out = {}
     for k in ['ndx', 'sp500']:
         y = np.log(price(k, 'M'))
@@ -179,7 +179,7 @@ def b2_sadf_vs_gsadf():
 
 
 def b3_btc_wild():
-    """Bitcoin saptamanal: valori critice Monte Carlo (mers aleator gaussian) vs wild bootstrap."""
+    """Bitcoin weekly: Monte Carlo critical values (Gaussian random walk) vs wild bootstrap."""
     y = np.log(price('btc', 'W'))
     o = run_psy(y, wild=True)
     idx = o['idx']
@@ -205,7 +205,7 @@ def b3_btc_wild():
 
 
 def b4_bvb():
-    """BET lunar 1997-2026 si BET-FI saptamanal 2012-2026: GSADF, episoade (Monte Carlo si wild bootstrap)."""
+    """BET monthly 1997-2026 and BET-FI weekly 2012-2026: GSADF, episodes (Monte Carlo and wild bootstrap)."""
     out = {}
     fig, axes = plt.subplots(2, 1, figsize=(7.4, 4.2))
     for ax, (k, f, title) in zip(axes, [('bet', 'M', 'BET, monthly 1997-2026'), ('betfi', 'W', 'BET-FI, weekly 2012-2026')]):
@@ -225,7 +225,7 @@ def b4_bvb():
 
 
 def b5_tc_windows(t2='2017-11-15', starts=('2016-06-01', '2017-08-01')):
-    """LPPLS pe Bitcoin cu t2 fix si inceputul ferestrei t1 mobil (saptamanal): distributia lui tc."""
+    """LPPLS on Bitcoin with a fixed t2 and a moving window start t1 (weekly): the distribution of tc."""
     p = price('btc', 'D')
     rows = []
     for t1 in pd.date_range(starts[0], starts[1], freq='7D'):
@@ -255,7 +255,7 @@ def b5_tc_windows(t2='2017-11-15', starts=('2016-06-01', '2017-08-01')):
 
 
 def b6_ci_ndx():
-    """Indicatorul de incredere LPPLS pentru Nasdaq 100, 1997-2002 (din fisierul publicat de capitol) si evaluarea."""
+    """LPPLS confidence indicator for the Nasdaq 100, 1997-2002 (precomputed in the lecture), and its evaluation."""
     path = os.path.join(HERE, 'ch17_lppls_ci_ndx.csv')
     ci = pd.read_csv(path if os.path.exists(path) else QL_RAW + 'ch17_lppls_ci_ndx.csv', index_col=0, parse_dates=True)['ci']
     p = price('ndx', 'D', '1994-01-01')
@@ -281,7 +281,7 @@ def b6_ci_ndx():
 
 
 def b7_ms_sp():
-    """Markov-switching cu doua regimuri pe S&P 500 saptamanal 1990-2026."""
+    """Two-regime Markov switching on the weekly S&P 500, 1990-2026."""
     p, r, res, hi = ms_fit('sp500', '1990-01-01')
     out = ms_summary(res, hi, r)
     fp = res.filtered_marginal_probabilities[hi]
@@ -302,7 +302,7 @@ def b7_ms_sp():
     ssp = sp > 0.5
     out['share_turb_smoothed'] = float(ssp.mean())
     out['agree'] = float(((fp > 0.5) == ssp).mean())
-    # un regim: aceeasi medie si dispersie
+    # one regime: the same mean and variance
     ll1 = float(stats.norm.logpdf(r, r.mean(), r.std(ddof=0)).sum())
     out['llf1'] = ll1
     out['lr'] = 2 * (out['llf'] - ll1)
@@ -310,13 +310,13 @@ def b7_ms_sp():
 
 
 def b8_ms_btc():
-    """Bitcoin saptamanal: doua vs trei regimuri (AIC, BIC), media si volatilitatea fiecarui regim."""
+    """Bitcoin weekly: two vs three regimes (AIC, BIC), mean and volatility of each regime."""
     import statsmodels.api as sm
     p = price('btc', 'W')
     r = 100 * np.log(p).diff().dropna()
     out = {}
     for k in (2, 3):
-        np.random.seed(SEED + k)                      # cautarea aleatoare a punctelor de start: reproductibila
+        np.random.seed(SEED + k)                      # random search over starting values: reproducible
         res = sm.tsa.MarkovRegression(r, k_regimes=k, trend='c', switching_variance=True).fit(search_reps=30, maxiter=1000, disp=False)
         order = np.argsort([res.params[f'sigma2[{j}]'] for j in range(k)])
         out[f'k{k}'] = dict(llf=float(res.llf), aic=float(res.aic), bic=float(res.bic),
@@ -341,10 +341,10 @@ def b8_ms_btc():
 
 
 # =============================================================================
-# PARTEA C: EXISTA O BULA AI?
+# PART C: IS THERE AN AI BUBBLE?
 # =============================================================================
 def c1_ai():
-    """NVIDIA si Nasdaq 100 (lunar si saptamanal) vs Cisco in episodul dot-com: BSADF, cresteri, LPPLS azi."""
+    """NVIDIA and the Nasdaq 100 (monthly and weekly) vs Cisco in the dot-com episode: BSADF, run-ups, LPPLS today."""
     out = {}
     fig, axes = plt.subplots(3, 1, figsize=(7.4, 5.0))
     for ax, (k, a, b) in zip(axes, [('csco', '1990-01-01', '2003-12-31'), ('nvda', '1999-01-01', '2026-09-18'),
@@ -362,10 +362,10 @@ def c1_ai():
     fig.tight_layout()
     fig_legend(fig, axes, ncol=3, y=0.0)
     save_fig('ch17_sem_ai')
-    # cresteri pe 2 ani (Greenwood-Shleifer-You), brut si peste Nasdaq 100
+    # 2-year run-ups (Greenwood-Shleifer-You), raw and net of the Nasdaq 100
     pn = price('nvda', 'M')
     pnd, pcd, pqd = price('nvda', 'D'), price('csco', 'D'), price('ndx', 'D')
-    # din preturi zilnice: ultima inchidere pana la data d vs ultima inchidere pana la aceeasi data cu doi ani inainte
+    # from daily prices: last close up to date d vs last close up to the same date two years earlier
     run = lambda p, d: float(p.loc[:d].iloc[-1] / p.loc[:pd.Timestamp(d) - pd.DateOffset(years=2)].iloc[-1] - 1)
     out['run_nvda_now'] = run(pnd, pnd.index[-1])
     out['run_ndx_now'] = run(pqd, pqd.index[-1])
@@ -378,13 +378,13 @@ def c1_ai():
     out['csco_peak'] = d2s(pk)
     out['csco_dd'] = float(pdd.loc[pk:].min() / pdd.loc[pk] - 1)
     out['csco_trough'] = d2s(pdd.loc[pk:].idxmin())
-    after = pdd.loc[pdd.loc[pk:].idxmin():]                  # dupa minim: prima zi inapoi la nivelul varfului
+    after = pdd.loc[pdd.loc[pk:].idxmin():]                  # after the trough: first day back at the peak level
     out['csco_recover'] = d2s(after[after >= pdd.loc[pk]].index[0]) if (after >= pdd.loc[pk]).any() else None
     nd = price('nvda', 'D')
     out['nvda_ath'] = d2s(nd.idxmax())
     out['nvda_dd_now'] = float(nd.iloc[-1] / nd.max() - 1)
     out['nvda_maxdd_2y'] = float(drawdown(nd.loc['2024-09-18':]).min())
-    # LPPLS azi: indicatorul de incredere pe ultimele 26 de saptamani (NVIDIA si Nasdaq 100)
+    # LPPLS today: the confidence indicator over the last 26 weeks (NVIDIA and Nasdaq 100)
     for k in ['nvda', 'ndx']:
         p = price(k, 'D', '2022-01-01')
         t, yy = yrs(p.index), np.log(p.values)
@@ -398,10 +398,10 @@ def c1_ai():
 
 
 # =============================================================================
-# GRAFICE PENTRU ENUNTURI SI SOLUTII (seminarul restructurat)
+# CHARTS FOR THE TASKS AND SOLUTIONS
 # =============================================================================
 def fig_sem_data():
-    """Datele seminarului: raportul P/D Shiller, Nasdaq 100 lunar, S&P 500 saptamanal, Bitcoin saptamanal."""
+    """Seminar data: Shiller P/D ratio, Nasdaq 100 monthly, S&P 500 weekly, Bitcoin weekly."""
     sh = shiller()
     series = [(sh['PD'], 'S&P Composite real price-dividend ratio, monthly', MainBlue),
               (price('ndx', 'M'), 'Nasdaq 100, month-end close', IDAred),
@@ -422,7 +422,7 @@ def fig_sem_data():
 
 
 def fig_sem_a1(D1=2.0, r=0.06, g=0.02, P=65.0):
-    """A1: valoarea fundamentala F_h, bula asteptata E[B_h] si ponderea bulei in pretul asteptat."""
+    """A1: fundamental value F_h, expected bubble E[B_h] and the bubble share of the expected price."""
     a = a1_present_value(D1, r, g, P)
     h = np.arange(0, 101)
     F, B = a['F'] * (1 + g) ** h, a['B'] * (1 + r) ** h
@@ -447,7 +447,7 @@ def fig_sem_a1(D1=2.0, r=0.06, g=0.02, P=65.0):
 
 
 def fig_sem_a2(B0=15.0, r=0.06, pi=0.9, delta=1.0, T=300, seed=SEED):
-    """A2(d): bula Evans (reluare pozitiva delta), fara zgomot; in logaritmi prabusirile arata ca revenire la medie."""
+    """A2(d): Evans bubble (positive restart delta), no noise; in logs the collapses look like mean reversion."""
     rng = np.random.default_rng(seed)
     B = np.empty(T + 1)
     B[0] = B0
@@ -477,7 +477,7 @@ def fig_sem_a2(B0=15.0, r=0.06, pi=0.9, delta=1.0, T=300, seed=SEED):
 
 
 def fig_sem_a3(T=1000, R=20_000):
-    """A3: distributia simulata a statisticii t (Dickey-Fuller cu termen liber) si cuantilele ei."""
+    """A3: simulated distribution of the t-statistic (Dickey-Fuller with a constant) and its quantiles."""
     rng = np.random.default_rng(SEED)
     tt = np.concatenate([_df_t(np.cumsum(rng.standard_normal((2000, T + 1)), axis=1)) for _ in range(R // 2000)])
     q05, q95 = np.quantile(tt, [0.05, 0.95])
@@ -494,7 +494,7 @@ def fig_sem_a3(T=1000, R=20_000):
 
 
 def fig_sem_a4(Ts=(100, 400, 1600), alpha=0.8, c=1.0, R=4000):
-    """A4: distributia statisticii t sub o radacina usor exploziva: se muta spre dreapta cand T creste."""
+    """A4: distribution of the t-statistic under a mildly explosive root: it shifts right as T grows."""
     rng = np.random.default_rng(SEED)
     fig, ax = plt.subplots(figsize=(7.0, 2.8))
     out = []
@@ -551,7 +551,7 @@ def _lppls_trend(t, tc, m, w, B, C1, C2, osc=True):
 
 
 def fig_sem_a7(t1=2025.0, t2=2026.0, tc=2026.08, m=0.5, w=8.0, B=-1.2, C1=0.06, C2=-0.02):
-    """A7: tendinta LPPLS implicata de parametri (A = 0): legea putere si oscilatiile log-periodice."""
+    """A7: LPPLS trend implied by the parameters (A = 0): the power law and the log-periodic oscillations."""
     t = np.linspace(t1, tc - 1e-4, 2000)
     fig, ax = plt.subplots(figsize=(7.0, 2.8))
     ax.plot(t, _lppls_trend(t, tc, m, w, B, C1, C2, False), color=MainBlue, lw=1.1, label='Power law $B(t_c - t)^m$')
@@ -567,7 +567,7 @@ def fig_sem_a7(t1=2025.0, t2=2026.0, tc=2026.08, m=0.5, w=8.0, B=-1.2, C1=0.06, 
 
 
 def fig_sem_a8():
-    """A8: la ce faze este deriva (rata de hazard) negativa? Parametrii A7 vs A8, deriva normalizata cu tau^(1-m)."""
+    """A8: at which phases is the drift (hazard rate) negative? A7 vs A8 parameters, drift normalised by tau^(1-m)."""
     fig, ax = plt.subplots(figsize=(7.0, 2.8))
     out = {}
     for tag, (t1, t2, tc, m, w, B, C1, C2), col in [('A7', (2025.0, 2026.0, 2026.08, 0.5, 8.0, -1.2, 0.06, -0.02), MainBlue),
@@ -588,7 +588,7 @@ def fig_sem_a8():
 
 
 def fig_sem_b1(r0s=(0.03, None, 0.08)):
-    """B1: BSADF pe raportul P/D pentru trei ferestre minime, cu valorile critice si episoadele datate."""
+    """B1: BSADF on the P/D ratio for three minimum windows, with the critical values and the date-stamped episodes."""
     sh = shiller()
     y = np.log(sh['PD'])
     fig, axes = plt.subplots(3, 1, figsize=(7.4, 5.0), sharex=True)
@@ -616,7 +616,7 @@ def fig_sem_b1(r0s=(0.03, None, 0.08)):
 
 
 def fig_sem_b2():
-    """B2: S&P 500 lunar, ADF recursiv (PWY, inceput fix) vs BSADF (PSY), cu valorile critice."""
+    """B2: S&P 500 monthly, recursive ADF (PWY, fixed start) vs BSADF (PSY), with the critical values."""
     y = np.log(price('sp500', 'M'))
     o = run_psy(y)
     idx = o['idx']
@@ -639,7 +639,7 @@ def fig_sem_b2():
 
 
 def fig_sem_size(keys, labs, name):
-    """B9 / B10: marimea GSADF si rata episoadelor false (studiul de nivel din inference17.json)."""
+    """B9 / B10: size of GSADF and the false-episode rate (from the lecture size study)."""
     with open(os.path.join(HERE, 'inference17.json')) as f:
         sz = json.load(f)['size']
     x = np.arange(len(keys))
@@ -667,7 +667,7 @@ def fig_sem_size(keys, labs, name):
 
 
 def charts():
-    """Graficele noi ale seminarului (fara a rescrie sem17_results.json); cifrele verificate fata de JSON."""
+    """Seminar charts for the tasks and solutions."""
     with open(os.path.join(HERE, 'sem17_results.json')) as f:
         S = json.load(f)
     out = dict(data=fig_sem_data(), A1=fig_sem_a1(), A2=fig_sem_a2(), A3=fig_sem_a3(), A4=fig_sem_a4(),

@@ -33,14 +33,14 @@ LABELS = ['negative', 'neutral', 'positive']
 TW_MAP = {0: 'negative', 1: 'positive', 2: 'neutral'}          # Bearish, Bullish, Neutral
 AGREE = ['50Agree', '66Agree', '75Agree', 'AllAgree']
 
-# actiuni americane cu stiri in FNSPID si preturi in data/market (Meta apare in FNSPID ca FB pana in 2022)
+# US stocks with FNSPID news and daily prices in the course data (Meta appears in FNSPID as FB until 2022)
 TICKERS = {'AAPL': 'AAPL.US', 'MSFT': 'MSFT.US', 'AMZN': 'AMZN.US', 'NVDA': 'NVDA.US', 'TSLA': 'TSLA.US',
            'GOOGL': 'GOOGL.US', 'GOOG': 'GOOGL.US', 'META': 'META.US', 'FB': 'META.US', 'JPM': 'JPM.US',
            'BAC': 'BAC.US', 'C': 'C.US', 'GS': 'GS.US', 'MS': 'MS.US', 'WFC': 'WFC.US', 'CSCO': 'CSCO.US',
            'GME': 'GME.US', 'MSTR': 'MSTR.US', 'COIN': 'COIN.US'}
 LLM_SIZES = {'0.5B': 'Qwen/Qwen2.5-0.5B-Instruct', '1.5B': 'Qwen/Qwen2.5-1.5B-Instruct',
              '3B': 'Qwen/Qwen2.5-3B-Instruct', '7B': 'Qwen/Qwen2.5-7B-Instruct', '14B': 'Qwen/Qwen2.5-14B-Instruct'}
-QWEN_RELEASE = '2024-09-19'          # publicarea ponderilor Qwen2.5
+QWEN_RELEASE = '2024-09-19'          # release of the Qwen2.5 weights
 PROMPTS = {
     'P1': ('You classify the sentiment of financial news for investors. '
            'Answer with one word: positive, negative or neutral.', 'Headline: {x}\nSentiment:'),
@@ -53,10 +53,10 @@ PROMPTS = {
 
 
 # =============================================================================
-# DATE DE PIATA
+# MARKET DATA
 # =============================================================================
 def read_market(symbol):
-    """Citeste data/market/<SIMBOL>.csv local sau din repo-ul GitHub."""
+    """Daily prices of one asset from the course data (local copy or the GitHub repository)."""
     fname = f'{symbol}.csv'
     path = os.path.join(MARKET_DIR, fname)
     src = path if os.path.exists(path) else REPO_RAW + fname
@@ -64,18 +64,18 @@ def read_market(symbol):
 
 
 def stock_returns(symbols, start='2009-01-01'):
-    """Randamente simple zilnice (%) close-to-close pe pretul ajustat, pentru actiuni si SPY.
-    Join pe preturi in zilele comune, apoi randamente."""
+    """Simple daily close-to-close returns (%) on the adjusted price, for the stocks and SPY.
+    Prices are joined on common days, then returns are computed."""
     px = pd.concat({s: read_market(s)['adjusted_close'] for s in symbols}, axis=1).loc[start:]
     return 100 * px.pct_change(fill_method=None)
 
 
 # =============================================================================
-# TEXTE ETICHETATE
+# LABELLED TEXTS
 # =============================================================================
 def load_phrasebank():
-    """Financial PhraseBank v1.0: 4,846 de propozitii din stiri financiare, etichetate de 16 adnotatori.
-    Coloana 'agree': cel mai inalt prag de acord atins (50%, 66%, 75%, 100%)."""
+    """Financial PhraseBank v1.0: 4,846 sentences from financial news, labelled by 16 annotators.
+    'agree': the highest agreement threshold reached (50%, 66%, 75%, 100%)."""
     z = zipfile.ZipFile(io.BytesIO(urllib.request.urlopen(PHRASEBANK_URL).read()))
     sets = {}
     for lvl in AGREE:
@@ -91,18 +91,18 @@ def load_phrasebank():
 
 
 def load_twitter(split='valid'):
-    """Twitter Financial News Sentiment: titluri de stiri financiare publicate pe Twitter, 2022; train / valid."""
+    """Twitter Financial News Sentiment: financial news headlines posted on Twitter, 2022; train / valid."""
     d = pd.read_csv(TWITTER_URL + f'sent_{split}.csv')
     d['label'] = d['label'].map(TW_MAP)
     return d
 
 
 # =============================================================================
-# DICTIONARE
+# DICTIONARIES
 # =============================================================================
 def load_dictionaries():
-    """Liste de cuvinte: Loughran-McDonald (negative, pozitive, incertitudine) si Harvard IV-4 (Negativ, Positiv).
-    Sursa: fisierele distribuite cu pachetul pysentiment2."""
+    """Word lists: Loughran-McDonald (negative, positive, uncertainty) and Harvard IV-4 (Negativ, Positiv).
+    Source: the lists distributed with the pysentiment2 package."""
     try:
         import pysentiment2
     except ImportError:
@@ -125,19 +125,19 @@ TOKEN = re.compile(r"[A-Za-z][A-Za-z'\-]*")
 
 
 def tokens(text):
-    """Cuvinte in majuscule, fara cifre si semne de punctuatie."""
+    """Upper-case words, without digits and punctuation."""
     return [w.upper().strip("'-") for w in TOKEN.findall(str(text))]
 
 
 def dict_counts(texts, pos, neg):
-    """Numarul de cuvinte pozitive si negative din fiecare text."""
+    """Number of positive and negative words in each text."""
     P = np.array([sum(w in pos for w in tokens(t)) for t in texts])
     N = np.array([sum(w in neg for w in tokens(t)) for t in texts])
     return P, N
 
 
 def dict_tone(texts, pos, neg):
-    """Tonul: (P - N) / (P + N); 0 daca nu exista cuvinte din dictionar."""
+    """Tone: (P - N) / (P + N); 0 if the text has no dictionary words."""
     P, N = dict_counts(texts, pos, neg)
     return np.where(P + N > 0, (P - N) / np.maximum(P + N, 1), 0.0)
 
@@ -147,7 +147,7 @@ def tone_label(tone, band=0.0):
 
 
 def vader_compound(texts):
-    """Scorul compus VADER (Hutto & Gilbert, 2014), in [-1, 1]."""
+    """VADER compound score (Hutto & Gilbert, 2014), in [-1, 1]."""
     import nltk
     try:
         from nltk.sentiment.vader import SentimentIntensityAnalyzer
@@ -160,7 +160,7 @@ def vader_compound(texts):
 
 
 # =============================================================================
-# MODELE DE LIMBAJ
+# LANGUAGE MODELS
 # =============================================================================
 def device():
     import torch
@@ -172,7 +172,7 @@ def device():
 
 
 def finbert_probs(texts, batch=64, name='ProsusAI/finbert'):
-    """Probabilitatile FinBERT (negative, neutral, positive) pentru fiecare text."""
+    """FinBERT probabilities (negative, neutral, positive) for each text."""
     import torch
     from transformers import AutoTokenizer, AutoModelForSequenceClassification
     tok = AutoTokenizer.from_pretrained(name)
@@ -200,8 +200,8 @@ def llm_load(size):
 
 
 def llm_choice_probs(tok, m, system, user_texts, choices, batch=16):
-    """Zero-shot: probabilitatile relative ale cuvintelor-raspuns (primul token al fiecaruia) la primul pas
-    de generare, dupa sablonul de conversatie al modelului."""
+    """Zero-shot: relative probabilities of the answer words (first token of each) at the first generation
+    step, after the model's chat template."""
     import torch
     ids = [tok.encode(w, add_special_tokens=False)[0] for w in choices]
     prompts = [tok.apply_chat_template([{'role': 'system', 'content': system}, {'role': 'user', 'content': u}],
@@ -216,13 +216,13 @@ def llm_choice_probs(tok, m, system, user_texts, choices, batch=16):
 
 
 def llm_sentiment(tok, m, texts, prompt='P1', batch=16):
-    """Probabilitatile (negative, neutral, positive) date de un LLM zero-shot."""
+    """Probabilities (negative, neutral, positive) from a zero-shot LLM."""
     system, user = PROMPTS[prompt]
     return llm_choice_probs(tok, m, system, [user.format(x=str(t)) for t in texts], LABELS, batch)
 
 
 def embed(texts, name='sentence-transformers/all-MiniLM-L6-v2', batch=128):
-    """Embeddings de propozitie: media starilor ascunse (mean pooling), normalizate la lungimea 1."""
+    """Sentence embeddings: mean of the hidden states (mean pooling), normalised to unit length."""
     import torch
     from transformers import AutoTokenizer, AutoModel
     tok = AutoTokenizer.from_pretrained(name)
@@ -240,18 +240,18 @@ def embed(texts, name='sentence-transformers/all-MiniLM-L6-v2', batch=128):
 
 
 def probs_label(P):
-    """Eticheta cu probabilitatea maxima; coloanele sunt in ordinea LABELS."""
+    """Label with the highest probability; columns are in the order of LABELS."""
     return np.array(LABELS)[np.asarray(P).argmax(1)]
 
 
 def net_score(P):
-    """Scorul net de sentiment: P(pozitiv) - P(negativ), in [-1, 1]."""
+    """Net sentiment score: P(positive) - P(negative), in [-1, 1]."""
     P = np.asarray(P)
     return P[:, 2] - P[:, 0]
 
 
 # =============================================================================
-# EVALUAREA CLASIFICARII
+# CLASSIFICATION METRICS
 # =============================================================================
 def confusion(y, yhat, labels=LABELS):
     return pd.crosstab(pd.Categorical(y, labels), pd.Categorical(yhat, labels), dropna=False,
@@ -270,7 +270,7 @@ def macro_f1(y, yhat, labels=LABELS):
 
 
 def class_metrics(y, yhat, labels=LABELS):
-    """Precizie, recall si F1 pe clase."""
+    """Precision, recall and F1 by class."""
     y, yhat = np.asarray(y), np.asarray(yhat)
     rows = {}
     for l in labels:
@@ -283,7 +283,7 @@ def class_metrics(y, yhat, labels=LABELS):
 
 
 def boot_ci(y, yhat, stat, B=2000, seed=0, level=0.95):
-    """Interval bootstrap (reesantionare i.i.d. a textelor) pentru o statistica a clasificarii."""
+    """Bootstrap interval (i.i.d. resampling of texts) for a classification statistic."""
     rng = np.random.default_rng(seed)
     y, yhat = np.asarray(y), np.asarray(yhat)
     n = len(y)
@@ -296,8 +296,8 @@ def acc(y, yhat):
 
 
 def mcnemar(y, a, b):
-    """Testul McNemar exact: compara doua clasificari pe aceleasi texte.
-    n01: A greseste si B are dreptate; n10: invers."""
+    """Exact McNemar test: compares two classifiers on the same texts.
+    n01: A wrong and B right; n10: the reverse."""
     y, a, b = map(np.asarray, (y, a, b))
     ca, cb = a == y, b == y
     n01, n10 = int(np.sum(~ca & cb)), int(np.sum(ca & ~cb))
@@ -306,7 +306,7 @@ def mcnemar(y, a, b):
 
 
 def diff_ci(y, a, b, B=2000, seed=0):
-    """Interval bootstrap pentru diferenta de acuratete acc(B) - acc(A), pe aceleasi texte."""
+    """Bootstrap interval for the accuracy difference acc(B) - acc(A), on the same texts."""
     rng = np.random.default_rng(seed)
     y, a, b = map(np.asarray, (y, a, b))
     n = len(y)
@@ -315,11 +315,11 @@ def diff_ci(y, a, b, B=2000, seed=0):
 
 
 # =============================================================================
-# STIRI DATATE SI SEMNALE
+# DATED NEWS AND SIGNALS
 # =============================================================================
 def load_fnspid(paths=None, tickers=TICKERS):
-    """Titlurile FNSPID (ambele fisiere: surse externe si Nasdaq) pentru actiunile din TICKERS:
-    data (UTC), titlu, simbol. Titlurile repetate (acelasi titlu, aceeasi actiune, aceeasi zi) apar o singura data."""
+    """FNSPID headlines (both parts: external sources and Nasdaq) for the stocks in TICKERS:
+    date (UTC), headline, ticker. Repeated headlines (same headline, stock and day) are kept once."""
     out = []
     for src in (paths or FNSPID_URLS):
         for ch in pd.read_csv(src, usecols=['Date', 'Article_title', 'Stock_symbol'], chunksize=500_000, dtype=str,
@@ -335,9 +335,9 @@ def load_fnspid(paths=None, tickers=TICKERS):
 
 
 def assign_trading_day(ts, days):
-    """FNSPID da doar data publicarii (ora este 00:00 UTC pentru aproape toate titlurile): titlul datat d
-    este atribuit primei zile de tranzactionare >= d. Ora din zi nu se cunoaste, deci stirea poate aparea
-    si dupa inchiderea zilei d."""
+    """FNSPID gives only the publication date (the time is 00:00 UTC for almost all headlines): a headline dated d
+    is assigned to the first trading day >= d. The time of day is unknown, so the news may appear
+    after the close of day d."""
     d0 = ts.dt.tz_convert('UTC').dt.tz_localize(None).dt.normalize()
     days = pd.DatetimeIndex(days).sort_values()
     pos = days.searchsorted(d0.values)
@@ -348,10 +348,10 @@ def assign_trading_day(ts, days):
 
 
 def daily_panel(S, rets):
-    """S: scoruri medii pe (zi, actiune), indexate (day, ticker). Adauga randamentul in exces fata de SPY
-    in ziua stirii (r0), in urmatoarele doua zile (r1, r2) si in zilele -5..+5 (studiul de eveniment:
-    rm5..rm1, r0, r1, r2, rp3..rp5). Cu date fara ora, r1 poate contine inca reactia la stire; primul randament
-    sigur de tranzactionat este r2 (de la inchiderea zilei urmatoare)."""
+    """S: mean scores by (day, stock), indexed (day, ticker). Adds the excess return over SPY
+    on the news day (r0), on the next two days (r1, r2) and on days -5..+5 (event study:
+    rm5..rm1, r0, r1, r2, rp3..rp5). Without a time stamp, r1 may still contain the reaction to the news; the first
+    safely tradable return is r2 (from the close of the next day)."""
     ex = rets.drop(columns='SPY').sub(rets['SPY'], axis=0)
     P = S.copy()
     for k in range(-5, 6):
@@ -363,7 +363,7 @@ def daily_panel(S, rets):
 
 
 def cluster_ols(y, x, groups):
-    """OLS y = a + b x cu erori standard obisnuite si grupate pe zile (Petersen, 2009)."""
+    """OLS y = a + b x with ordinary and day-clustered standard errors (Petersen, 2009)."""
     X = np.column_stack([np.ones(len(x)), x])
     y = np.asarray(y, float)
     XtX = np.linalg.inv(X.T @ X)
@@ -381,7 +381,7 @@ def cluster_ols(y, x, groups):
 
 
 def nw_t(x, lags=None):
-    """Media si statistica t cu varianta Newey-West (HAC)."""
+    """Mean and t statistic with the Newey-West (HAC) variance."""
     x = np.asarray(x, float)
     x = x[~np.isnan(x)]
     n = len(x)
@@ -394,7 +394,7 @@ def nw_t(x, lags=None):
 
 
 def block_boot_mean(x, B=2000, block=10, seed=0):
-    """Interval bootstrap pe blocuri mobile pentru media unei serii zilnice."""
+    """Moving-block bootstrap interval for the mean of a daily series."""
     rng = np.random.default_rng(seed)
     x = np.asarray(x, float)
     n = len(x)
@@ -407,10 +407,10 @@ def block_boot_mean(x, B=2000, block=10, seed=0):
 
 
 def signal_portfolio(P, col, days, cost_bp=0.0, band=0.0, ret='r2'):
-    """Strategia zilnica: pentru fiecare actiune cu stiri (|scor| > band) luam pozitia sign(scor), cu hedge pe SPY,
-    ponderi egale; castigul este randamentul in exces din coloana ret (implicit r2: pozitia se deschide la
-    inchiderea zilei de dupa stire, cand stirea este sigur publica). Zilele fara pozitii au randament 0.
-    Costul: cost_bp puncte de baza pe fiecare tranzactie (actiune si SPY, la intrare si la iesire: 4 x cost)."""
+    """Daily strategy: for each stock with news (|score| > band) take the position sign(score), hedged with SPY,
+    equal weights; the gain is the excess return in column ret (default r2: the position opens at the
+    close of the day after the news, when the news is surely public). Days without positions return 0.
+    Cost: cost_bp basis points per trade (stock and SPY, at entry and at exit: 4 x cost)."""
     q = P[P[col].abs() > band]
     lag = {'r0': 0, 'r1': 1, 'r2': 2}[ret]
     pos_day = pd.DatetimeIndex(days)

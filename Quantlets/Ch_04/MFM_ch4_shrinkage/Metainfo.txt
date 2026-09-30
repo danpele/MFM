@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Market data (data/market): nine sector ETFs; risk-free rate from the Kenneth French Data Library'
+Datafile: 'Daily market data (course data): nine sector ETFs; risk-free rate from the Kenneth French Data Library'
 
 Output: 'ch4_shrinkage.pdf'

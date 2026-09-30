@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Daily market data (data/market): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
+Datafile: 'Daily market data (course data): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
 
 Output: 'ch5_sem_bootstrap.pdf, ch5_sem_spillover.pdf, ch5_sem_a1_recursion.pdf, ch5_sem_a1_forecast.pdf, ch5_sem_a2_skewt.pdf, ch5_sem_a3_halflife.pdf, ch5_sem_a4_kurtosis.pdf, ch5_sem_a5_ratio.pdf, ch5_sem_a6_acf.pdf, ch5_sem_b1_fit.pdf, ch5_sem_b1_diag.pdf, ch5_sem_b2_nic.pdf, ch5_sem_b3_thresholds.pdf, ch5_sem_b4_btc.pdf, ch5_sem_b5_timeline.pdf, ch5_sem_b5_losses.pdf, ch5_sem_b5_mz.pdf, ch5_sem_b6_losses.pdf, ch5_sem_b6_mz.pdf, ch5_sem_b56_gwmcs.pdf, ch5_sem_b7_persistence.pdf, ch5_sem_b7_lr.pdf, ch5_sem_b8_bet.pdf, ch5_sem_c1_alignment.pdf, ch5_sem_c1_decomp.pdf, ch5_sem_c3_pit.pdf, ch5_inference.json'

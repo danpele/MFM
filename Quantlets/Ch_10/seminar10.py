@@ -1,14 +1,14 @@
 """
-seminar10.py -- Calculele Seminarului 10 (MFM): microstructura pietei
-=====================================================================
-Partea A: derivari -- momentele si eroarea standard a estimatorului Roll, Glosten-Milgrom pentru theta general,
-          echilibrul Kyle, Almgren-Chriss prin ecuatia Euler-Lagrange, verosimilitatea PIN (pas cu pas).
-Partea B: tiparul intrazilnic SPY, estimatori de spread la doua frecvente (si o simulare Monte Carlo a modelului Roll),
-          ilichiditatea si VIX (cu test de ruptura), ilichiditatea Amihud pe trei piete, relatia volum - miscare de pret
-          (cu variabila instrumentala), tiparul orar Bitcoin, descoperirea pretului intre ETF-ul pe BET si indice.
-Partea C: prima de ilichiditate (Amihud, 2002) pe BVB, in SUA si pe piata cripto.
-Cifrele sunt salvate in sem10_results.json.
-Modelarea Pietelor Financiare - Daniel Traian PELE
+seminar10.py -- Computations of Seminar 10 (MFM): market microstructure
+======================================================================
+Part A: derivations -- moments and standard error of the Roll estimator, Glosten-Milgrom for general theta,
+        the Kyle equilibrium, Almgren-Chriss via the Euler-Lagrange equation, the PIN likelihood (step by step).
+Part B: the SPY intraday pattern, spread estimators at two frequencies (and a Monte Carlo of the Roll model),
+        illiquidity and the VIX (with a break test), Amihud illiquidity in three markets, volume and price moves
+        (with an instrumental variable), the Bitcoin hourly pattern, price discovery between the BET ETF and the index.
+Part C: the illiquidity premium (Amihud, 2002) on the BVB, in the US and in crypto.
+Results are written to sem10_results.json.
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -39,8 +39,8 @@ B = 1000
 
 
 def boot_days(values_by_day, stat, B=B, seed=SEED, draws=False):
-    """Bootstrap pe zile (blocuri = zile intregi): interval percentil de 95% pentru stat(esantion de zile).
-    draws=True intoarce si valorile celor B reesantionari."""
+    """Day bootstrap (blocks = whole days): 95% percentile interval for stat(sample of days).
+    draws=True also returns the values of the B resamples."""
     rng = np.random.default_rng(seed)
     days = np.array(list(values_by_day.keys()))
     out = []
@@ -52,11 +52,11 @@ def boot_days(values_by_day, stat, B=B, seed=SEED, draws=False):
 
 
 # =============================================================================
-# PARTEA A
+# PART A
 # =============================================================================
 def a1_roll(var=0.0520, cov=-0.0081, price=20.0, rho_q=0.3):
-    """Modelul Roll: momentele, estimatorul si deplasarea cand semnele tranzactiilor sunt autocorelate.
-    Cu Corr(q_t, q_{t-1}) = rho_q (lant Markov, m independent de q): Cov(dp_t, dp_{t-1}) = -c^2 (1 - rho_q)^2."""
+    """The Roll model: moments, the estimator and its bias when trade signs are autocorrelated.
+    With Corr(q_t, q_{t-1}) = rho_q (Markov chain, m independent of q): Cov(dp_t, dp_{t-1}) = -c^2 (1 - rho_q)^2."""
     c = np.sqrt(-cov)
     cov_rho = -c ** 2 * (1 - rho_q) ** 2
     return dict(c=c, s=2 * c, s_pct=100 * 2 * c / price, sig2=var - 2 * c ** 2, share=2 * c ** 2 / var,
@@ -65,8 +65,8 @@ def a1_roll(var=0.0520, cov=-0.0081, price=20.0, rho_q=0.3):
 
 
 def a2_roll_se(var=0.0520, cov=-0.0081, Ts=(78, 250)):
-    """Eroarea standard a lui s_hat = 2 sqrt(-cov_hat) prin metoda delta; Var(cov_hat) din formula lui Bartlett
-    pentru un MA(1) (aproximare gaussiana): T Var(cov_hat) -> g0^2 + 3 g1^2."""
+    """Standard error of s_hat = 2 sqrt(-cov_hat) by the delta method; Var(cov_hat) from Bartlett's formula
+    for an MA(1) (Gaussian approximation): T Var(cov_hat) -> g0^2 + 3 g1^2."""
     from scipy.stats import norm
     c = np.sqrt(-cov)
     out = dict(var=var, cov=cov, s=2 * c, avar=var ** 2 + 3 * cov ** 2)
@@ -78,13 +78,13 @@ def a2_roll_se(var=0.0520, cov=-0.0081, Ts=(78, 250)):
 
 
 def gm_spread_formula(theta, mu, dv=20.0):
-    """Spread-ul Glosten-Milgrom pentru theta general: a - b = 4 mu theta (1 - theta) dV / (1 - mu^2 (2 theta - 1)^2)."""
+    """Glosten-Milgrom spread for general theta: a - b = 4 mu theta (1 - theta) dV / (1 - mu^2 (2 theta - 1)^2)."""
     return 4 * mu * theta * (1 - theta) * dv / (1 - mu ** 2 * (2 * theta - 1) ** 2)
 
 
 def a3_gm(mu=0.3, theta=0.5, vl=90.0, vh=110.0):
     ask, bid, tb, ts = gm_quotes(theta, mu, vl, vh)
-    ask2, bid2, tb2, ts2 = gm_quotes(tb, mu, vl, vh)          # dupa o cumparare
+    ask2, bid2, tb2, ts2 = gm_quotes(tb, mu, vl, vh)          # after one buy
     a7, b7, _, _ = gm_quotes(0.7, mu, vl, vh)
     return dict(ask=ask, bid=bid, spread=ask - bid, pb_h=mu + (1 - mu) / 2, pb_l=(1 - mu) / 2, th_b=tb, th_s=ts,
                 ask2=ask2, bid2=bid2, spread2=ask2 - bid2, th_b2=tb2, spread_07=a7 - b7,
@@ -92,20 +92,20 @@ def a3_gm(mu=0.3, theta=0.5, vl=90.0, vh=110.0):
 
 
 def a4_gm_learning(mus=(0.1, 0.3, 0.5), level=108.0, vl=90.0, vh=110.0):
-    """Dupa k cumparari consecutive, cota P(V_H) se inmulteste cu (1 + mu) / (1 - mu) la fiecare cumparare;
-    bid-ul dupa k cumparari este V_L + dV theta_{k-1}, deci bid > level cere (k - 1) ln((1 + mu)/(1 - mu)) > ln(o*)."""
+    """After k consecutive buys, the odds of V_H are multiplied by (1 + mu) / (1 - mu) at each buy;
+    the bid after k buys is V_L + dV theta_{k-1}, so bid > level requires (k - 1) ln((1 + mu)/(1 - mu)) > ln(o*)."""
     q = (level - vl) / (vh - vl)
     out = {}
     for mu in mus:
         k = 1 + int(np.floor(np.log(q / (1 - q)) / np.log((1 + mu) / (1 - mu)))) + 1
         theta, kk = 0.5, 0
-        while True:                                         # verificare directa cu cotatiile
+        while True:                                         # direct check with the quotes
             kk += 1
             ask, bid, tb, ts = gm_quotes(theta, mu, vl, vh)
             if bid > level:
                 break
             theta = tb
-        out[mu] = dict(k=kk - 1, k_formula=k, speed=np.log((1 + mu) / (1 - mu)))   # kk - 1 cumparari observate
+        out[mu] = dict(k=kk - 1, k_formula=k, speed=np.log((1 + mu) / (1 - mu)))   # kk - 1 observed buys
     return out
 
 
@@ -118,8 +118,8 @@ def a5_kyle(sigma_v=2.0, sigma_u=10_000.0, y=15_000.0, sigma_u2=20_000.0):
 
 
 def a6_kyle_ols(sigma_v=2.0, sigma_u=10_000.0, p0=50.0, n=200_000, seed=SEED):
-    """Economia Kyle simulata: panta OLS a lui (p - p0) pe y este lambda; un raport de tip Amihud |r| / (p0 |y|)
-    estimeaza lambda / p0^2, iar cu volumul total |x| + |u| in loc de |y| il subestimeaza."""
+    """Simulated Kyle economy: the OLS slope of (p - p0) on y is lambda; an Amihud-type ratio |r| / (p0 |y|)
+    estimates lambda / p0^2, and with total volume |x| + |u| instead of |y| it underestimates it."""
     rng = np.random.default_rng(seed)
     k = kyle(sigma_v, sigma_u)
     v = p0 + sigma_v * rng.standard_normal(n)
@@ -137,12 +137,12 @@ def a6_kyle_ols(sigma_v=2.0, sigma_u=10_000.0, p0=50.0, n=200_000, seed=SEED):
 
 
 def a7_ac(lam=2e-6):
-    """Almgren-Chriss: solutia in timp continuu (Euler-Lagrange: x'' = kappa^2 x) si programul discret exact."""
+    """Almgren-Chriss: the continuous-time solution (Euler-Lagrange: x'' = kappa^2 x) and the exact discrete schedule."""
     tau = AC['T'] / AC['N']
     eta_t = AC['eta'] - AC['gamma'] * tau / 2
     kt2 = lam * AC['sigma'] ** 2 / eta_t
     kappa = np.arccosh(kt2 * tau ** 2 / 2 + 1) / tau
-    kc = np.sqrt(lam * AC['sigma'] ** 2 / AC['eta'])          # timp continuu: eta_tilde -> eta cand tau -> 0
+    kc = np.sqrt(lam * AC['sigma'] ** 2 / AC['eta'])          # continuous time: eta_tilde -> eta as tau -> 0
     t, x, E, V = ac_trajectory(lam=lam, **AC)
     t0, x0, E0, V0 = ac_trajectory(lam=0, **AC)
     xc = AC['X'] * np.sinh(kc * (AC['T'] - t)) / np.sinh(kc * AC['T'])
@@ -158,21 +158,21 @@ PIN_PAR = dict(alpha=0.3, delta=0.5, mu=400.0, eb=1000.0, es=1000.0)
 
 
 def pin_posterior(B, S, alpha, delta, mu, eb, es):
-    """Probabilitatile a posteriori ale celor trei stari (fara stire, stire proasta, stire buna) dupa (B, S)."""
+    """Posterior probabilities of the three states (no news, bad news, good news) given (B, S)."""
     from scipy.special import softmax
     _, terms = pin_loglik(B, S, alpha, delta, mu, eb, es)
     return softmax(terms)
 
 
 def a9_pin(B=1450, S=1000, **par):
-    """Verosimilitatea EKOP pentru o zi: evaluarea directa esueaza numeric, forma factorizata nu."""
+    """EKOP likelihood of one day: direct evaluation fails numerically, the factorised form does not."""
     import warnings as _w
     par = par or PIN_PAR
     a, d, mu, eb, es = (par[k] for k in ('alpha', 'delta', 'mu', 'eb', 'es'))
     pin = a * mu / (a * mu + eb + es)
     with _w.catch_warnings():
         _w.simplefilter('ignore')
-        naive = np.exp(-eb) * np.float64(eb) ** B                 # e^-1000 = 0 si 1000^1450 = inf: 0 * inf = nan
+        naive = np.exp(-eb) * np.float64(eb) ** B                 # e^-1000 = 0 and 1000^1450 = inf: 0 * inf = nan
     ll, _ = pin_loglik(B, S, a, d, mu, eb, es)
     post = pin_posterior(B, S, a, d, mu, eb, es)
     return dict(pin=pin, naive=str(naive), exp_small=float(np.exp(-eb)), loglik=ll, p_none=post[0], p_bad=post[1],
@@ -180,8 +180,8 @@ def a9_pin(B=1450, S=1000, **par):
 
 
 def a10_pin():
-    """Aceiasi parametri: o zi cu stire proasta probabila (B = 1000, S = 1420), o zi linistita (B = S = 1000)
-    si PIN cand mu se dubleaza."""
+    """Same parameters: a likely bad-news day (B = 1000, S = 1420), a quiet day (B = S = 1000)
+    and PIN when mu doubles."""
     x = a9_pin(B=1000, S=1420)
     q = a9_pin(B=1000, S=1000)
     par = dict(PIN_PAR, mu=800.0)
@@ -191,7 +191,7 @@ def a10_pin():
 
 
 # =============================================================================
-# PARTEA B
+# PART B
 # =============================================================================
 def b1_ushape():
     s = intraday_spy()
@@ -207,7 +207,7 @@ def b1_ushape():
     vs = np.nanmean(arr[:, 2])
     vlo, vhi = boot_days(by_day, lambda v: np.nanmean([a[2] for a in v]))
     tod = spy_tod(s)
-    # un pas al bootstrap-ului, explicit: prima reesantionare (acelasi generator ca boot_days)
+    # one bootstrap step, explicitly: the first resample (same generator as boot_days)
     rng1 = np.random.default_rng(SEED)
     days = np.array(list(by_day.keys()))
     pick = rng1.choice(days, len(days), replace=True)
@@ -215,7 +215,7 @@ def b1_ushape():
     first = dict(ratio=float(np.nanmean(a1[:, 0]) / np.nanmean(a1[:, 1])), n_unique=int(len(np.unique(pick))),
                  open=float(1e4 * np.nanmean(a1[:, 0])), mid=float(1e4 * np.nanmean(a1[:, 1])),
                  vshare=float(100 * np.nanmean(a1[:, 2])))
-    # grafic: media |r| si ponderea in volumul zilei pe intervale, cu benzi bootstrap pe zile (benzi punctuale)
+    # chart: mean |r| and share of the day's volume by interval, with pointwise day-bootstrap bands
     piv = x.pivot_table(index='date', columns='tod', values='r', aggfunc=lambda v: abs(v).mean())
     vsh = (s['volume'] / s.groupby('date')['volume'].transform('sum')).groupby([s['date'], s['tod']]).sum().unstack()
     rng = np.random.default_rng(SEED)
@@ -269,18 +269,18 @@ def b2_spreads():
     ar5 = 1e4 * np.sqrt(max(E['ar2'].mean(), 0))
     alo, ahi = boot_days(by_day, lambda v: 1e4 * np.sqrt(max(np.mean([r['ar2'] for r in v]), 0)))
     tick = 1e4 * (0.01 / E['price']).mean()
-    # date zilnice: bootstrap pe blocuri mobile de 20 de zile
+    # daily data: moving-block bootstrap with blocks of 20 days
     d = ohlc('SPY', START2)
     cs = cs_spread(d['high'], d['low'], d['close'])
     ar2 = ar_terms(d['close'], d['high'], d['low'])
     dp = np.diff(np.log(d['close'].values))
-    pairs = np.column_stack([dp[1:], dp[:-1]])                # perechile (dp_t, dp_{t-1}) pentru covarianta Roll
+    pairs = np.column_stack([dp[1:], dp[:-1]])                # pairs (dp_t, dp_{t-1}) for the Roll covariance
     roll_cov = lambda x: np.mean(x[:, 0] * x[:, 1]) - x[:, 0].mean() * x[:, 1].mean()
     rng = np.random.default_rng(SEED)
     n, L = len(cs), 20
     csb, arb, rlb = [], [], []
     for _ in range(B):
-        st = rng.integers(0, n - L + 1, n // L + 1)             # inceputurile posibile ale blocurilor: 0, ..., n - L
+        st = rng.integers(0, n - L + 1, n // L + 1)             # possible block starts: 0, ..., n - L
         idx = np.concatenate([np.arange(a, a + L) for a in st])[:n]
         csb.append(1e4 * cs[idx].mean())
         arb.append(1e4 * np.sqrt(max(ar2[idx].mean(), 0)))
@@ -296,13 +296,13 @@ def b2_spreads():
                ar_dhi=float(np.percentile(arb, 97.5)), sd_daily=sd_daily, share_negcov=float((E['cov'] < 0).mean()),
                roll_d=float(roll_d), roll_dlo=float(np.percentile(rlb_s, 2.5)), roll_dhi=float(np.percentile(rlb_s, 97.5)),
                roll_d_pos=float((rlb >= 0).mean()))
-    # cat de des este trunchiat la 0 fiecare estimator in reesantionari (momentul mediat are semnul gresit)
+    # how often each estimator is truncated at 0 across resamples (the averaged moment has the wrong sign)
     _, _, mc = boot_days(by_day, lambda v: np.mean([r['cov'] for r in v]), draws=True)
     _, _, ma = boot_days(by_day, lambda v: np.mean([r['ar2'] for r in v]), draws=True)
     res.update(trunc_roll5=float((mc >= 0).mean()), trunc_ar5=float((ma <= 0).mean()),
                trunc_ar_d=float((np.array(arb) == 0).mean()), trunc_roll_d=float((rlb >= 0).mean()),
                n_days5=int(len(E)), n_daily=int(len(d)), n_ret5=int(s.dropna(subset=['r']).groupby('date').size().iloc[0] - 1))
-    # aceeasi fereastra de doi ani pentru barele de 5 minute (sensibilitate: frecventa fara efectul perioadei)
+    # the same two-year window for the 5-minute bars (sensitivity: frequency without the period effect)
     Em = E.loc[START2:]
     bm = {dd: row for dd, row in Em.iterrows()}
     res.update(n_days5m=int(len(Em)),
@@ -316,7 +316,7 @@ def b2_spreads():
 
 
 def fig_b2_estimates(r):
-    """Estimari si intervale pe scala logaritmica; intervalele care ating 0 sunt taiate la marginea stanga."""
+    """Estimates and intervals on a log scale; intervals that reach 0 are cut at the left edge."""
     rows = [('Roll', 'roll5', 'rlo', 'rhi', 'roll5m', 'roll5mlo', 'roll5mhi', 'roll_d', 'roll_dlo', 'roll_dhi'),
             ('Corwin-Schultz', 'cs5', 'clo', 'chi', 'cs5m', 'cs5mlo', 'cs5mhi', 'cs_d', 'cs_dlo', 'cs_dhi'),
             ('Abdi-Ranaldo', 'ar5', 'alo', 'ahi', 'ar5m', 'ar5mlo', 'ar5mhi', 'ar_d', 'ar_dlo', 'ar_dhi')]
@@ -348,8 +348,8 @@ def fig_b2_estimates(r):
 
 
 def b2_mc(E):
-    """Monte Carlo sub modelul Roll, calibrat pe SPY (aceleasi setari ca roll_small_sample): distributiile ponderii
-    zilelor cu covarianta pozitiva si ale estimarii Roll agregate, pentru un spread de un pas si fara spread."""
+    """Monte Carlo under the Roll model, calibrated to SPY (same settings as roll_small_sample): distributions of the
+    share of days with a positive covariance and of the pooled Roll estimate, for a one-tick spread and no spread."""
     n = 77
     v = E['var'].mean()
     c_tick = (0.01 / E['price']).mean() / 2
@@ -450,13 +450,13 @@ def b4_illiq_vix():
     y, X = np.log(j['illiq']), sm.add_constant(np.log(j['vix']))
     ols = sm.OLS(y, X).fit()
     hac = sm.OLS(y, X).fit(cov_type='HAC', cov_kwds={'maxlags': 20})
-    # control pentru nivelul valorii tranzactionate (tendinta)
+    # control for the level of traded value (trend)
     dvd = s.groupby('date')['dv'].sum().rename('dv')
     j2 = pd.concat([j, dvd], axis=1, join='inner').dropna()
     X2 = sm.add_constant(pd.DataFrame({'lvix': np.log(j2['vix']), 't': np.arange(len(j2)) / 252}))
     hac2 = sm.OLS(np.log(j2['illiq']), X2).fit(cov_type='HAC', cov_kwds={'maxlags': 20})
     rho1 = float(np.corrcoef(ols.resid[1:], ols.resid[:-1])[0, 1])
-    # (d) stabilitatea elasticitatii: ruptura la mijlocul esantionului (data fixata inainte de estimare), test Wald HAC
+    # sub-task 4, elasticity stability: break at the middle of the sample (date fixed before estimation), HAC Wald test
     mid = j.index[len(j) // 2]
     post = (j.index >= mid).astype(float)
     X3 = sm.add_constant(pd.DataFrame({'lvix': np.log(j['vix']), 'post': post, 'lvix_post': post * np.log(j['vix'])},
@@ -478,7 +478,7 @@ def b4_illiq_vix():
 
 
 def fig_b4(j, ols, hac, hac2, hac3, se_post, mid):
-    """Relatia log-log cu dreapta OLS, autocorelatia reziduurilor si intervalele HAC ale elasticitatii."""
+    """The log-log relation with the OLS line, the residual autocorrelation and the HAC intervals of the elasticity."""
     x, y = np.log(j['vix']), np.log(j['illiq'])
     fig, axes = plt.subplots(1, 3, figsize=(12, 3.4), gridspec_kw=dict(width_ratios=[1.1, 1, 1.1]))
     ax = axes[0]
@@ -548,7 +548,7 @@ def b5_amihud_groups():
 
 
 def fig_b5(il, grp, ratios, p1, p2, ratio):
-    """Amihud pe active (scala log), distributia bootstrap a raportului medianelor, clasamentele pe doi ani."""
+    """Amihud by asset (log scale), bootstrap distribution of the ratio of medians, rankings in the two years."""
     fig, axes = plt.subplots(1, 3, figsize=(12, 3.5), gridspec_kw=dict(width_ratios=[1.3, 1, 1]))
     ax = axes[0]
     xpos = 0
@@ -602,29 +602,29 @@ def b6_sqrt():
         gg = xx.groupby(pd.cut(xx['part'], bins, include_lowest=True)).agg(v=('part', 'mean'), z=('z', 'mean')).dropna()
         sl.append(np.polyfit(np.log(gg['v']), np.log(gg['z']), 1)[0])
     lo, hi = np.percentile(sl, [2.5, 97.5])
-    # pe barele individuale (nu pe grupe)
+    # on individual bars (not groups)
     y = np.log(x['r'].abs() + 1e-6) - np.log(x.groupby('date')['r'].transform('std'))
     raw = sm.OLS(y, sm.add_constant(np.log(x['part']))).fit(cov_type='cluster', cov_kwds={'groups': pd.factorize(x['date'])[0]})
-    # randamentele nule: ln|r| nu este definit; constanta 1e-6 (0,01 pb) si, ca sensibilitate, excluderea barelor cu r = 0
+    # zero returns: ln|r| is undefined; constant 1e-6 (0.01 bp) and, as a sensitivity check, dropping bars with r = 0
     nz = (x['r'] != 0).values
     raw_nz = sm.OLS(y[nz], sm.add_constant(np.log(x['part'][nz]))).fit(cov_type='cluster',
                                                                        cov_kwds={'groups': pd.factorize(x['date'][nz])[0]})
-    # (c) variabila instrumentala: volumul relativ al aceleiasi bare (aceeasi ora) din ziua precedenta
+    # sub-task 3, instrumental variable: relative volume of the same bar (same time of day) on the previous day
     x = x.assign(ly=y, lv=np.log(x['part']))
-    x['lv_lag'] = x.groupby('tod')['lv'].shift(1)             # barele sunt ordonate in timp; shift pe ora = ziua anterioara
+    x['lv_lag'] = x.groupby('tod')['lv'].shift(1)             # bars are in time order; a shift within the time of day = the previous day
     x['ly_lag'] = x.groupby('tod')['ly'].shift(1)
     z = x.dropna(subset=['lv_lag', 'ly_lag'])
     gid = pd.factorize(z['date'])[0]
     fs = sm.OLS(z['lv'], sm.add_constant(z['lv_lag'])).fit(cov_type='cluster', cov_kwds={'groups': gid})
     Z = sm.add_constant(z['lv_lag']).values
     Xe = sm.add_constant(z['lv']).values
-    Pz = Z @ np.linalg.solve(Z.T @ Z, Z.T @ Xe)               # proiectia regresorilor pe instrumente
+    Pz = Z @ np.linalg.solve(Z.T @ Z, Z.T @ Xe)               # projection of the regressors on the instruments
     b_iv = np.linalg.solve(Pz.T @ Xe, Pz.T @ z['ly'].values)
     e = z['ly'].values - Xe @ b_iv
     A = np.linalg.inv(Pz.T @ Pz)
     meat = sum(np.outer(Pz[gid == gg].T @ e[gid == gg], Pz[gid == gg].T @ e[gid == gg]) for gg in np.unique(gid))
     se_iv = np.sqrt(np.diag(A @ meat @ A))
-    red = np.corrcoef(z['ly'], z['ly_lag'])[0, 1]            # |r| de ieri la aceeasi ora: canalul care incalca excluderea
+    red = np.corrcoef(z['ly'], z['ly_lag'])[0, 1]            # yesterday's |r| at the same time: the channel that violates exclusion
     fig_b6(g, slope, (lo, hi), raw, raw_nz, b_iv[1], se_iv[1])
     return dict(slope=float(slope), lo=float(lo), hi=float(hi), n=int(len(x)), n_days=int(len(days)),
                 raw=float(raw.params.iloc[1]), raw_se=float(raw.bse.iloc[1]), zero_share=float(1 - nz.mean()),
@@ -634,7 +634,7 @@ def b6_sqrt():
 
 
 def fig_b6(g, slope, ci, raw, raw_nz, iv, iv_se):
-    """Relatia pe grupe (log-log) cu panta 0,5 de referinta si intervalele celor patru estimari ale pantei."""
+    """The grouped relation (log-log) with the reference slope 0.5 and the intervals of the four slope estimates."""
     fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.4))
     ax = axes[0]
     lx, lz = np.log(g['v'].values), np.log(g['z'].values)
@@ -684,7 +684,7 @@ def b7_btc():
     lo, hi = boot_days(wd, lambda v: np.nanmean([a[0] for a in v]) / np.nanmean([a[1] for a in v]))
     wkr = np.nanmean([v[2] for v in by_day.values() if not v[3]]) / np.nanmean([v[2] for v in by_day.values() if v[3]])
     lo2, hi2 = boot_days(by_day, lambda v: np.nanmean([a[2] for a in v if not a[3]]) / np.nanmean([a[2] for a in v if a[3]]))
-    nb = b.groupby('date').size()                                     # barele cu randament valid pe zi (din 288)
+    nb = b.groupby('date').size()                                     # bars with a valid return per day (out of 288)
     cover = dict(full=int((nb == 288).sum()), min=int(nb.min()), med=float(nb.median()),
                  n_wd=int(sum(1 for v in by_day.values() if not v[3])), n_we=int(sum(1 for v in by_day.values() if v[3])))
     fig_b7(b, (ratio, lo, hi), (wkr, lo2, hi2))
@@ -697,8 +697,8 @@ def b7_btc():
 
 
 def fig_b7(b, r1, r2):
-    """Profilul orar al mediei |r| (media zilnica pe ora, apoi media pe zile), zile lucratoare si weekend, cu benzi
-    bootstrap pe zile; cele doua rapoarte cu intervalele lor."""
+    """Hourly profile of mean |r| (daily mean by hour, then mean over days), weekdays and weekends, with
+    day-bootstrap bands; the two ratios with their intervals."""
     piv = b.assign(hour=b.index.hour).pivot_table(index='date', columns='hour', values='r', aggfunc=lambda v: v.abs().mean())
     we = piv.index.dayofweek >= 5
     fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.3), gridspec_kw=dict(width_ratios=[1.6, 1]))
@@ -736,13 +736,13 @@ def fig_b7(b, r1, r2):
 
 
 def b8_price_discovery(B=B, L=20, seed=SEED):
-    """ETF-ul Patria-TVBETETF si indicele BET-TR: VECM cu vectorul (1, -1), limitele ponderii Hasbrouck, ponderea
-    Gonzalo-Granger; intervale bootstrap pe blocuri mobile (blocuri de L zile) ale perechilor (X_t, Y_t) din VECM;
-    apoi cele doua jumatati ale esantionului."""
+    """The Patria-TVBETETF and the BET-TR index: VECM with the vector (1, -1), Hasbrouck share bounds, the
+    Gonzalo-Granger share; moving-block bootstrap intervals (blocks of L days) over the VECM pairs (X_t, Y_t);
+    then the two halves of the sample."""
     from statsmodels.tsa.vector_ar.vecm import coint_johansen, select_order
     y = bet_etf_pair().values
-    p = max(int(select_order(y, maxlags=10, deterministic='co').bic), 1)   # BIC pe 1..10 decalaje ale lui dy
-    jo = coint_johansen(y, 0, p)                                           # constanta nerestrictionata
+    p = max(int(select_order(y, maxlags=10, deterministic='co').bic), 1)   # BIC over 1..10 lags of dy
+    jo = coint_johansen(y, 0, p)                                           # unrestricted constant
     base = price_discovery(y, p)
     dy = np.diff(y, axis=0)
     z = (y[:, 0] - y[:, 1])[:-1]
@@ -782,7 +782,7 @@ def b8_price_discovery(B=B, L=20, seed=SEED):
 
 
 def fig_b8(yl, base, d, h1, h2):
-    """Preturile rebazate si baza ETF - indice; coeficientii de ajustare si ponderile, cu intervale bootstrap."""
+    """Rebased prices and the ETF - index basis; adjustment coefficients and shares, with bootstrap intervals."""
     fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.2))
     ax = axes[0]
     ax.plot(yl.index, 100 * np.exp(yl['etf'] - yl['etf'].iloc[0]), color=IDAred, lw=1.1, label='Patria-TVBETETF (close)')
@@ -846,7 +846,7 @@ def fig_b8(yl, base, d, h1, h2):
 
 
 # =============================================================================
-# PARTEA C: prima de ilichiditate (Amihud 2002, efectul in serie de timp)
+# PART C: the illiquidity premium (Amihud 2002, time-series effect)
 # =============================================================================
 C_MARKETS = {
     'BVB': dict(ret=('BETTR.INDX', 'close'), keys=[k for k in GROUPS['BVB'] if k != 'TVBETETF']),
@@ -856,7 +856,7 @@ C_MARKETS = {
 
 
 def market_illiq(keys, start='2016-09-19'):
-    """Ilichiditatea agregata lunara: media transversala a logaritmului Amihud lunar al fiecarui activ."""
+    """Monthly market illiquidity: cross-sectional mean of the log monthly Amihud ratio of each asset."""
     cols = {}
     for k in keys:
         x = pd.concat([returns(k, start).rename('r'), dollar_volume(k, start).rename('dv')], axis=1, join='inner').dropna()
@@ -873,16 +873,16 @@ def c1_premium():
         p = read_market(sym)[col].loc['2016-08-01':'2026-08-31']
         r = 100 * np.log(p.resample('ME').last()).diff().rename('r')
         li = market_illiq(spec['keys']).dropna()
-        # socul de ilichiditate: rezidul unui AR(1) pe logaritmul ilichiditatii
+        # illiquidity shock: the residual of an AR(1) on log illiquidity
         ar = sm.OLS(li.iloc[1:].values, sm.add_constant(li.shift(1).iloc[1:].values)).fit()
         shock = pd.Series(ar.resid, index=li.index[1:], name='shock')
         d = pd.concat([r, li.shift(1).rename('lag'), shock], axis=1, join='inner').dropna().loc['2016-11':'2026-08']
         fit = sm.OLS(d['r'], sm.add_constant(d[['lag', 'shock']])).fit(cov_type='HAC', cov_kwds={'maxlags': 6})
-        # Amihud si Hurvich (2004): regresia augmentata cu reziduul AR(1) calculat cu phi corectat de deplasare,
-        # phi_c = phi + (1 + 3 phi) / T + 3 (1 + 3 phi) / T^2; eroarea standard include incertitudinea lui phi_c
+        # Amihud and Hurvich (2004): regression augmented with the AR(1) residual computed with the bias-corrected phi,
+        # phi_c = phi + (1 + 3 phi) / T + 3 (1 + 3 phi) / T^2; the standard error includes the uncertainty of phi_c
         T_ar = len(li) - 1
         phi = ar.params[1]
-        phi_c = min(phi + (1 + 3 * phi) / T_ar + 3 * (1 + 3 * phi) / T_ar ** 2, 0.9999)   # trunchiat la 0.9999
+        phi_c = min(phi + (1 + 3 * phi) / T_ar + 3 * (1 + 3 * phi) / T_ar ** 2, 0.9999)   # capped at 0.9999
         psi_c = np.mean(li.values[1:] - phi_c * li.values[:-1])
         vc = pd.Series(li.values[1:] - psi_c - phi_c * li.values[:-1], index=li.index[1:], name='vc')
         dc = pd.concat([r, li.shift(1).rename('lag'), vc], axis=1, join='inner').dropna().loc['2016-11':'2026-08']
@@ -911,10 +911,10 @@ def c1_premium():
     fig_legend_bottom(fig, h, [a.get_legend_handles_labels()[1][0] for a in axes] , ncol=3, y=0.02)
     plt.tight_layout(rect=(0, 0.08, 1, 1))
     save_fig('ch10_sem_premium')
-    # sectiunea transversala BVB: portofoliul celor mai putin lichide vs cele mai lichide (reechilibrare anuala)
+    # BVB cross-section: least liquid minus most liquid portfolio (annual rebalancing)
     keys = C_MARKETS['BVB']['keys']
     px = pd.concat({k: read_market(ASSETS[k][0])['adjusted_close'] for k in keys}, axis=1).loc['2017-01-01':'2026-08-31']
-    mret = px.resample('ME').last().pct_change(fill_method=None)       # randamente simple totale (portofoliu exact)
+    mret = px.resample('ME').last().pct_change(fill_method=None)       # simple total returns (exact portfolio)
     spreads = []
     for y in range(2018, 2027):
         il = {}
@@ -938,7 +938,7 @@ def c1_premium():
 
 
 def fig_c1(out, ls):
-    """Coeficientul ilichiditatii decalate (HAC si cu deplasare redusa) si seria lunara nelichid minus lichid (BVB)."""
+    """Coefficient of lagged illiquidity (HAC and reduced-bias) and the monthly illiquid-minus-liquid series (BVB)."""
     fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.3), gridspec_kw=dict(width_ratios=[1, 1.4]))
     ax = axes[0]
     for i, name in enumerate(('BVB', 'US', 'Crypto')):
@@ -972,10 +972,10 @@ def fig_c1(out, ls):
 
 
 # =============================================================================
-# GRAFICE PENTRU PARTEA A (modele pe hartie) si pentru C2
+# CHARTS FOR PART A (models on paper) AND FOR C2
 # =============================================================================
 def fig_a1_bounce(c=0.09, sig2=0.0358, n_path=40, n_long=20000, seed=SEED):
-    """A1 simulat: pretul eficient, pretul tranzactiilor si autocorelatia variatiilor, cu parametrii din A1(b)."""
+    """A1 simulated: efficient price, trade price and autocorrelation of changes, with the parameters of A1 sub-task 2."""
     rng = np.random.default_rng(seed)
     m = 20 + np.cumsum(rng.normal(0, np.sqrt(sig2), n_long))
     q = np.where(rng.random(n_long) < 0.5, 1, -1)
@@ -1009,15 +1009,15 @@ def fig_a1_bounce(c=0.09, sig2=0.0358, n_path=40, n_long=20000, seed=SEED):
 
 
 def fig_a2_sampling(var=0.0520, cov=-0.0081, Ts=(78, 250), R=20000):
-    """A2: distributia de selectie a autocovariantei (simulata sub modelul Roll, semne binare, demediere) si
-    aproximarea Normala a lui Bartlett; coada pozitiva hasurata."""
+    """A2: sampling distribution of the autocovariance (simulated under the Roll model, binary signs, demeaned) and
+    Bartlett's Normal approximation; positive tail hatched."""
     from scipy.stats import norm
     c = np.sqrt(-cov)
     sig = np.sqrt(var - 2 * c ** 2)
     fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.2), sharey=False)
     out = {}
     for ax, T, col in zip(axes, Ts, (IDAred, MainBlue)):
-        g = roll_mc(c, sig, T=T + 1, R=R, seed=SEED)        # T variatii de pret
+        g = roll_mc(c, sig, T=T + 1, R=R, seed=SEED)        # T price changes
         se = np.sqrt((var ** 2 + 3 * cov ** 2) / T)
         ax.hist(g, bins=60, density=True, color=col, alpha=0.45, label='Simulated under Roll (binary signs, demeaned)')
         xs = np.linspace(cov - 4.5 * se, cov + 4.5 * se, 300)
@@ -1039,7 +1039,7 @@ def fig_a2_sampling(var=0.0520, cov=-0.0081, Ts=(78, 250), R=20000):
 
 
 def fig_a3_spread(dv=20.0):
-    """A3: spread-ul Glosten-Milgrom in functie de probabilitatea initiala theta, pentru trei ponderi mu."""
+    """A3: the Glosten-Milgrom spread as a function of the prior probability theta, for three shares mu."""
     th = np.linspace(0.005, 0.995, 200)
     fig, ax = plt.subplots(figsize=(7.2, 3.2))
     for mu, c in [(0.1, Amber), (0.3, IDAred), (0.5, MainBlue)]:
@@ -1057,7 +1057,7 @@ def fig_a3_spread(dv=20.0):
 
 
 def fig_a4_learning(mus=(0.1, 0.3, 0.5), level=108.0, vl=90.0, vh=110.0, kmax=14):
-    """A4: bid-ul dupa k cumparari consecutive (scenariu conditionat) si traiectoriile simulate din curs."""
+    """A4: the bid after k consecutive buys (conditional scenario) and the simulated paths of the lecture."""
     fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.3))
     ax = axes[0]
     for mu, c in zip(mus, (Amber, IDAred, MainBlue)):
@@ -1089,7 +1089,7 @@ def fig_a4_learning(mus=(0.1, 0.3, 0.5), level=108.0, vl=90.0, vh=110.0, kmax=14
 
 
 def fig_a6_kyle(sigma_v=2.0, sigma_u=10_000.0, p0=50.0, n=200_000, seed=SEED, n_show=3000):
-    """A6: lambda ca panta de regresie (simularea din A6) si raportul de tip Amihud cu doua numitoare."""
+    """A6: lambda as a regression slope (the A6 simulation) and the Amihud-type ratio with two denominators."""
     rng = np.random.default_rng(seed)
     k = kyle(sigma_v, sigma_u)
     v = p0 + sigma_v * rng.standard_normal(n)
@@ -1131,7 +1131,7 @@ def fig_a6_kyle(sigma_v=2.0, sigma_u=10_000.0, p0=50.0, n=200_000, seed=SEED, n_
 
 
 def fig_ac_seminar():
-    """A7-A8: detinerile x_k dupa fiecare zi (discret, N = 5) si solutia continua; frontiera cost - risc."""
+    """A7-A8: holdings x_k after each day (discrete, N = 5) and the continuous solution; the cost - risk frontier."""
     fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.3))
     ax = axes[0]
     tt = np.linspace(0, AC['T'], 200)
@@ -1168,11 +1168,11 @@ def fig_ac_seminar():
 
 
 PIN_DAYS = [('A9: B = 1450, S = 1000', 1450, 1000), ('A10(a): B = 1000, S = 1420', 1000, 1420),
-            ('A10(b): B = S = 1000', 1000, 1000), ('A10(d): B = 1195, S = 1000', 1195, 1000)]
+            ('A10(b): B = S = 1000', 1000, 1000), ('A10(c): B = 1195, S = 1000', 1195, 1000)]
 
 
 def fig_pin(**par):
-    """A9-A10: cele trei stari ale modelului EKOP (centrele Poisson) si probabilitatile a posteriori pentru patru zile."""
+    """A9-A10: the three states of the EKOP model (Poisson centres) and the posterior probabilities for four days."""
     par = par or PIN_PAR
     a, d_, mu, eb, es = (par[k] for k in ('alpha', 'delta', 'mu', 'eb', 'es'))
     fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.4), gridspec_kw=dict(width_ratios=[1, 1.5]))
@@ -1213,7 +1213,7 @@ def fig_pin(**par):
 
 
 def fig_c2_roundtrip(mid=20.0, s=0.05):
-    """C2: bid, pret de mijloc si ask; o jumatate de spread pe fiecare sens, un spread pentru dus-intors."""
+    """C2: bid, mid-price and ask; half a spread each way, one spread for a round trip."""
     a, b = mid + s / 2, mid - s / 2
     fig, ax = plt.subplots(figsize=(7.5, 3.0))
     for y, lab, c in [(a, f'Ask a = {a:.3f} lei: you buy here', IDAred), (mid, f'Mid m = {mid:.3f} lei', Gray),
@@ -1237,11 +1237,11 @@ def fig_c2_roundtrip(mid=20.0, s=0.05):
 
 
 # =============================================================================
-# C3: pretul cursei vitezei pentru SPY (Aquilina, Budish si O'Neill, 2022), tabelele complete
+# C3: the price of the speed race for SPY (Aquilina, Budish and O'Neill, 2022), full tables
 # =============================================================================
 def c3_race(B=B, L=20, seed=SEED):
-    """V_t, sigma_t pe zile; mediile si corelatia anuala cu intervale bootstrap (zile independente si blocuri mobile
-    de L zile); premiul anual; taxa zilnica la valoarea medie si raportul efectiv Pi_t / V_t."""
+    """Daily V_t, sigma_t; yearly means and correlation with bootstrap intervals (independent days and moving blocks
+    of L days); the annual prize; the daily tax at mean traded value and the effective ratio Pi_t / V_t."""
     d = race_daily(intraday_spy())
     P = race_prize(d)
     d['ratio6'] = ABO['col6_v'] + ABO['col6_s'] * d['sigma'] * d.groupby('year')['V'].transform('mean') / d['V']

@@ -1,11 +1,11 @@
 """
-Generator pentru graficele din Capitolul 4: Optimizarea portofoliului
-=====================================================================
-Toate graficele: fundal transparent, etichete ENG, legenda in afara, jos.
-Date: ETF-uri sectoriale SUA, ETF-uri multi-active (actiuni, obligatiuni, credit, aur),
-actiuni BVB, indicii BET si BET-TR (data/market); rata fara risc lunara
-(Kenneth French Data Library); cursul USD/RON (BNR).
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Charts of Chapter 4: Portfolio Optimisation
+===========================================
+All charts: transparent background, English labels, legend outside, at the bottom.
+Data: US sector ETFs, multi-asset ETFs (equities, bonds, credit, gold), BVB stocks,
+the BET and BET-TR indices (course data); monthly risk-free rate
+(Kenneth French Data Library); USD/RON rate (BNR).
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import (read_market, prices, price, log_returns, french_rf, monthly_returns, bnr_rate,
                       SECTORS, SECTOR_NAMES, MULTI, MULTI_NAMES, BVB, BVB_NAMES)
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -44,7 +44,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Chart colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -55,22 +55,22 @@ Crimson  = '#DC3545'
 Gray     = '#7F7F7F'
 LightGray = '#DADADA'
 PALETTE = [MainBlue, IDAred, Forest, Amber, Orange, Purple, Crimson, '#795548', '#17A2B8', '#6F42C1', '#20C997']
-EWcol    = '#D63384'   # culoarea portofoliului 1/N (niciodata gri pentru serii)
+EWcol    = '#D63384'   # colour of the 1/N portfolio (series are never grey)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 SEED = 42
-MAX_ABS_RET = 0.5        # prag pentru erori de date in seriile BVB (log-randament zilnic)
-US_END = '2026-07-31'    # ultima luna cu rata fara risc publicata
-BVB_END = '2026-08-31'   # ultima luna completa
-WINDOW = 60              # fereastra de estimare (luni)
+MAX_ABS_RET = 0.5        # threshold for data errors in the BVB series (daily log return)
+US_END = '2026-07-31'    # last month with a published risk-free rate
+BVB_END = '2026-08-31'   # last complete month
+WINDOW = 60              # estimation window (months)
 STRATS = ['1/N', 'MV', 'MV-LO', 'GMV', 'GMV-LO', 'GMV-LW', 'ERC', 'HRP']
 SCOL = {'1/N': EWcol, 'MV': IDAred, 'MV-LO': Orange, 'GMV': Amber, 'GMV-LO': Purple,
         'GMV-LW': MainBlue, 'ERC': Forest, 'HRP': '#17A2B8'}
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -79,15 +79,15 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
 # =============================================================================
-# DATE COMUNE
+# SHARED DATA
 # =============================================================================
 def us_monthly(symbols, start=None, end=US_END):
-    """Randamente lunare simple (totale) si in exces fata de RF, pe lunile comune."""
+    """Monthly simple (total) returns and excess returns over RF, on common months."""
     r = monthly_returns([s + '.US' for s in symbols]).loc[start:end]
     r.columns = symbols
     rf = french_rf().reindex(r.index)
@@ -97,24 +97,24 @@ def us_monthly(symbols, start=None, end=US_END):
 
 
 def bvb_monthly(symbols=BVB, bench=('BETTR.INDX', 'BET'), end=BVB_END):
-    """Randamente lunare BVB (RON) din randamente zilnice filtrate (|r| > 0.5 = eveniment neajustat)."""
+    """Monthly BVB returns (RON) from filtered daily returns (|r| > 0.5 = unadjusted corporate event)."""
     cols = [s + '.RO' for s in symbols] + list(bench)
     p = prices(cols)
     lr = log_returns(p)
     bad = lr.abs() > MAX_ABS_RET
     lr = lr.mask(bad, 0.0)
     m = np.exp(lr.resample('ME').sum()) - 1
-    m = m.loc[:end].iloc[1:]                     # prima luna este incompleta
+    m = m.loc[:end].iloc[1:]                     # the first month is incomplete
     m.columns = list(symbols) + ['BET-TR' if b.startswith('BETTR') else b for b in bench]
     removed = {c.replace('.RO', ''): [str(d.date()) for d in lr.index[bad[c]]] for c in cols if bad[c].any()}
     return m, removed
 
 
 # =============================================================================
-# ESTIMATORI SI PONDERI
+# ESTIMATORS AND WEIGHTS
 # =============================================================================
 def lw_cc(X):
-    """Ledoit-Wolf (2004): shrinkage spre tinta cu corelatie constanta. Intoarce (Sigma, delta)."""
+    """Ledoit-Wolf (2004): shrinkage towards the constant-correlation target. Returns (Sigma, delta)."""
     X = np.asarray(X, float)
     T, N = X.shape
     Y = X - X.mean(0)
@@ -137,24 +137,24 @@ def lw_cc(X):
 
 
 def w_ew(n):
-    """Portofoliul 1/N."""
+    """The 1/N portfolio."""
     return np.ones(n) / n
 
 
 def w_gmv(S):
-    """Portofoliul de varianta minima globala: S^-1 1 / 1' S^-1 1."""
+    """Global minimum-variance portfolio: S^-1 1 / 1' S^-1 1."""
     x = np.linalg.solve(S, np.ones(len(S)))
     return x / x.sum()
 
 
 def w_tan(mu, S):
-    """Portofoliul tangent (Sharpe maxim) cu vanzari in lipsa: S^-1 mu / 1' S^-1 mu."""
+    """Tangency (maximum-Sharpe) portfolio with short sales: S^-1 mu / 1' S^-1 mu."""
     x = np.linalg.solve(S, mu)
     return x / x.sum()
 
 
 def w_long_only(S, mu=None):
-    """Varianta minima (mu=None) sau Sharpe maxim cu ponderi 0 <= w <= 1, suma 1 (SLSQP)."""
+    """Minimum variance (mu=None) or maximum Sharpe with weights 0 <= w <= 1 summing to 1 (SLSQP)."""
     n = len(S)
     if mu is None:
         f = lambda w: w @ S @ w
@@ -168,7 +168,7 @@ def w_long_only(S, mu=None):
 
 
 def w_erc(S):
-    """Contributii egale la risc (Maillard, Roncalli, Teiletche 2010): min 0.5 y'Sy - sum(log y)/n."""
+    """Equal risk contributions (Maillard, Roncalli, Teiletche 2010): min 0.5 y'Sy - sum(log y)/n."""
     n = len(S)
     b = np.ones(n) / n
     f = lambda y: 0.5 * y @ S @ y - b @ np.log(y)
@@ -180,8 +180,8 @@ def w_erc(S):
 
 
 def hrp_tree(S):
-    """Arborele HRP (Lopez de Prado 2016, Stage 1): d_ij = sqrt((1 - rho_ij)/2); apoi distanta euclidiana
-    intre coloanele matricei D, d~_ij = sqrt(sum_n (d_ni - d_nj)^2); legatura simpla (single linkage) pe d~."""
+    """HRP tree (Lopez de Prado 2016, Stage 1): d_ij = sqrt((1 - rho_ij)/2); then the Euclidean distance
+    between the columns of D, d~_ij = sqrt(sum_n (d_ni - d_nj)^2); single linkage on d~."""
     sd = np.sqrt(np.diag(S))
     C = S / np.outer(sd, sd)
     D = np.sqrt(np.clip((1 - C) / 2, 0, None))
@@ -190,7 +190,7 @@ def hrp_tree(S):
 
 
 def w_hrp(S):
-    """Hierarchical Risk Parity (Lopez de Prado 2016): ordonare dupa arbore + bisectie recursiva."""
+    """Hierarchical Risk Parity (Lopez de Prado 2016): tree ordering + recursive bisection."""
     S = np.asarray(S)
     order = list(leaves_list(hrp_tree(S)))
     w = np.ones(len(S))
@@ -219,13 +219,13 @@ def w_hrp(S):
 
 
 def risk_contrib(w, S):
-    """Contributiile procentuale la varianta: w_i (S w)_i / w'Sw."""
+    """Percentage contributions to variance: w_i (S w)_i / w'Sw."""
     w = np.asarray(w)
     return w * (S @ w) / (w @ S @ w)
 
 
 def weights(name, Rw):
-    """Ponderile strategiei `name` estimate pe fereastra Rw (randamente in exces, T x N)."""
+    """Weights of strategy `name` estimated on the window Rw (excess returns, T x N)."""
     X = np.asarray(Rw, float)
     n = X.shape[1]
     mu = X.mean(0)
@@ -252,13 +252,13 @@ def weights(name, Rw):
 
 
 # =============================================================================
-# BACKTEST OUT-OF-SAMPLE CU FEREASTRA RULANTA
+# OUT-OF-SAMPLE BACKTEST WITH A ROLLING WINDOW
 # =============================================================================
 def backtest(R, Rex, window=WINDOW, strategies=STRATS):
-    """Reechilibrare lunara: ponderi din ultimele `window` luni, aplicate in luna urmatoare.
+    """Monthly rebalancing: weights from the last `window` months, applied in the next month.
 
-    R: randamente totale, Rex: randamente in exces (acelasi index). Intoarce randamentele in exces
-    ale portofoliilor, turnover-ul (suma |w_nou - w_derivat|) si istoricul ponderilor.
+    R: total returns, Rex: excess returns (same index). Returns the portfolios' excess returns,
+    the turnover (sum |w_new - w_drifted|) and the weight history.
     """
     R, Rex = R.values, Rex
     idx = Rex.index[window:]
@@ -280,7 +280,7 @@ def backtest(R, Rex, window=WINDOW, strategies=STRATS):
             prev[s] = w * gross / (w @ gross)
             W[s].append(w)
     ret = pd.DataFrame(out, index=idx)
-    ret.attrs['rf'] = pd.Series(R[window:, 0] - X[window:, 0], index=idx)   # rata fara risc (0 daca R = Rex)
+    ret.attrs['rf'] = pd.Series(R[window:, 0] - X[window:, 0], index=idx)   # risk-free rate (0 if R = Rex)
     to = pd.DataFrame(turn, index=idx)
     Wd = {s: pd.DataFrame(np.array(W[s]), index=idx, columns=Rex.columns) for s in strategies}
     return ret, to, Wd
@@ -292,8 +292,8 @@ def sharpe(r, periods=12):
 
 
 def summary(ret, to, costs=(0, 10, 50)):
-    """Medie, volatilitate, Sharpe (anualizate, randamente in exces), turnover mediu lunar, scaderea maxima
-    a averii din randamente totale (exces + rata fara risc), Sharpe net de costuri (bp)."""
+    """Mean, volatility, Sharpe (annualised, excess returns), mean monthly turnover, maximum drawdown
+    of wealth from total returns (excess + risk-free rate), Sharpe net of costs (bp)."""
     rows = {}
     rf = ret.attrs.get('rf', 0.0)
     for s in ret.columns:
@@ -307,20 +307,20 @@ def summary(ret, to, costs=(0, 10, 50)):
 
 
 def max_drawdown(r):
-    """Scaderea maxima a averii; o pierdere lunara >= 100% anuleaza averea (drawdown -100%)."""
+    """Maximum drawdown of wealth; a monthly loss >= 100% wipes out wealth (drawdown -100%)."""
     r = np.asarray(r, float)
     if (r <= -1).any():
         return -1.0
-    w = np.r_[1.0, np.cumprod(1 + r)]                          # averea initiala 1 intra in maximul curent
+    w = np.r_[1.0, np.cumprod(1 + r)]                          # the initial wealth of 1 enters the running maximum
     return float((w / np.maximum.accumulate(w) - 1).min())
 
 
 # =============================================================================
-# INFERENTA PENTRU DIFERENTE DE SHARPE
+# INFERENCE FOR SHARPE RATIO DIFFERENCES
 # =============================================================================
 def sr_diff_hac(r1, r2, lags=None):
-    """Ledoit-Wolf (2008), Sectiunea 3.1: Delta = SR1 - SR2 (lunar), eroare standard prin metoda delta,
-    covarianta HAC cu nucleul Bartlett (Newey-West) si lag floor(4 (T/100)^(2/9))."""
+    """Ledoit-Wolf (2008), Section 3.1: Delta = SR1 - SR2 (monthly), delta-method standard error,
+    HAC covariance with the Bartlett (Newey-West) kernel and lag floor(4 (T/100)^(2/9))."""
     r1, r2 = np.asarray(r1, float), np.asarray(r2, float)
     T = len(r1)
     m1, m2 = r1.mean(), r2.mean()
@@ -340,16 +340,16 @@ def sr_diff_hac(r1, r2, lags=None):
     return d * np.sqrt(12), se * np.sqrt(12), p
 
 
-# Ledoit-Wolf (2008), Sectiunea 3.2.2: bootstrap studentizat, circular pe blocuri
-LW_BLOCKS = (1, 2, 4, 6, 8, 10)     # grila de blocuri din LW (2008), Sectiunea 3.2.2 si Sectiunea 5
-LW_K = 5000                         # secvente pseudo pentru calibrare (LW 2008, Sectiunea 5)
-LW_M = 4999                         # replicari bootstrap pentru valoarea p (LW 2008, Sectiunea 5)
-LW_M_CAL = 499                      # replicari bootstrap in calibrare (LW 2008, Sectiunea 4)
-LW_SB_MEAN = 5                      # bootstrap stationar al reziduurilor VAR(1), bloc mediu 5
+# Ledoit-Wolf (2008), Section 3.2.2: studentized circular block bootstrap
+LW_BLOCKS = (1, 2, 4, 6, 8, 10)     # block grid of LW (2008), Sections 3.2.2 and 5
+LW_K = 5000                         # pseudo sequences for the calibration (LW 2008, Section 5)
+LW_M = 4999                         # bootstrap draws for the p-value (LW 2008, Section 5)
+LW_M_CAL = 499                      # bootstrap draws inside the calibration (LW 2008, Section 4)
+LW_SB_MEAN = 5                      # stationary bootstrap of the VAR(1) residuals, mean block 5
 
 
 def _lw_parts(r1, r2):
-    """Delta = SR1 - SR2 (lunar), gradientul lui f si seriile y_t (LW 2008, ec. 1-5)."""
+    """Delta = SR1 - SR2 (monthly), the gradient of f and the series y_t (LW 2008, eqs. 1-5)."""
     m1, m2 = r1.mean(-1), r2.mean(-1)
     g1, g2 = (r1 ** 2).mean(-1), (r2 ** 2).mean(-1)
     v1, v2 = g1 - m1 ** 2, g2 - m2 ** 2
@@ -360,7 +360,7 @@ def _lw_parts(r1, r2):
 
 
 def qs_kernel(x):
-    """Nucleul Quadratic Spectral (Andrews 1991)."""
+    """Quadratic Spectral kernel (Andrews 1991)."""
     x = np.asarray(x, float)
     out = np.ones_like(x)
     nz = x != 0
@@ -370,12 +370,12 @@ def qs_kernel(x):
 
 
 def hac_qs_pw(Y):
-    """Covarianta HAC cu nucleul QS prealbit (Andrews & Monahan 1992), latime de banda automata
-    (Andrews 1991, AR(1)), factorul T/(T-4) din LW (2008, ec. 5). Y: T x 4, centrat."""
+    """HAC covariance with the prewhitened QS kernel (Andrews & Monahan 1992), automatic bandwidth
+    (Andrews 1991, AR(1)), factor T/(T-4) of LW (2008, eq. 5). Y: T x 4, centred."""
     T, k = Y.shape
     X0, X1 = Y[:-1], Y[1:]
-    A = np.linalg.lstsq(X0, X1, rcond=None)[0].T                # VAR(1) fara termen liber
-    U, s, Vt = np.linalg.svd(A)                                  # Andrews-Monahan: valori singulare <= 0.97
+    A = np.linalg.lstsq(X0, X1, rcond=None)[0].T                # VAR(1) without intercept
+    U, s, Vt = np.linalg.svd(A)                                  # Andrews-Monahan: singular values <= 0.97
     A = U @ np.diag(np.minimum(s, 0.97)) @ Vt
     E = X1 - X0 @ A.T
     n = len(E)
@@ -394,15 +394,15 @@ def hac_qs_pw(Y):
 
 
 def lw_se(r1, r2):
-    """Delta (lunar) si eroarea standard s(Delta) din datele originale (LW 2008, ec. 5)."""
+    """Delta (monthly) and its standard error s(Delta) from the original data (LW 2008, eq. 5)."""
     d, grad, Y = _lw_parts(np.asarray(r1, float), np.asarray(r2, float))
     Psi = hac_qs_pw(Y)
     return float(d), float(np.sqrt(grad @ Psi @ grad / len(r1)))
 
 
 def cbb_stat(r1, r2, b, M, rng):
-    """M replicari bootstrap circular pe blocuri de lungime b: Delta* si s(Delta*) 'natural'
-    (Goetze & Kuensch 1996; LW 2008, Sectiunea 3.2.2)."""
+    """M circular block bootstrap draws with block length b: Delta* and the 'natural' s(Delta*)
+    (Goetze & Kuensch 1996; LW 2008, Section 3.2.2)."""
     T = len(r1)
     nb = -(-T // b)
     st = rng.integers(0, T, (M, nb))
@@ -417,7 +417,7 @@ def cbb_stat(r1, r2, b, M, rng):
 
 
 def _sb_indices(T, n, mean_block, rng):
-    """Indicii unui bootstrap stationar (Politis & Romano 1994), bloc mediu `mean_block`."""
+    """Indices of a stationary bootstrap (Politis & Romano 1994), mean block `mean_block`."""
     idx = np.empty(n, int)
     idx[0] = rng.integers(T)
     new = rng.random(n) < 1 / mean_block
@@ -428,8 +428,8 @@ def _sb_indices(T, n, mean_block, rng):
 
 
 def lw_block_calibration(r1, r2, blocks=LW_BLOCKS, K=LW_K, M=LW_M_CAL, alpha=0.05, seed=SEED):
-    """Algoritmul 3.1 din LW (2008): VAR(1) + bootstrap stationar al reziduurilor, K secvente pseudo,
-    acoperirea intervalului studentizat simetric pentru fiecare b; alege b cu acoperirea cea mai apropiata de 1-alpha."""
+    """Algorithm 3.1 of LW (2008): VAR(1) + stationary bootstrap of the residuals, K pseudo sequences,
+    coverage of the symmetric studentized interval for each b; picks the b whose coverage is closest to 1-alpha."""
     rng = np.random.default_rng(seed)
     r1, r2 = np.asarray(r1, float), np.asarray(r2, float)
     X = np.column_stack([r1, r2])
@@ -456,10 +456,10 @@ def lw_block_calibration(r1, r2, blocks=LW_BLOCKS, K=LW_K, M=LW_M_CAL, alpha=0.0
 
 
 def sr_diff_boot(r1, r2, block=None, M=LW_M, K=LW_K, alpha=0.05, seed=SEED):
-    """Testul Ledoit-Wolf (2008, Sectiunea 3.2.2 si Remarca 3.2) pentru H0: SR1 = SR2:
-    bootstrap studentizat circular pe blocuri; blocul din Algoritmul 3.1 (daca block=None).
-    Intoarce Delta (anualizat), intervalul 95% simetric (anualizat), valoarea p (ec. 9), statisticile
-    studentizate bootstrap, blocul ales si functia de calibrare."""
+    """Ledoit-Wolf (2008, Section 3.2.2 and Remark 3.2) test of H0: SR1 = SR2:
+    studentized circular block bootstrap; block from Algorithm 3.1 (if block=None).
+    Returns Delta (annualised), the symmetric 95% interval (annualised), the p-value (eq. 9), the
+    bootstrap studentized statistics, the chosen block and the calibration output."""
     r1, r2 = np.asarray(r1, float), np.asarray(r2, float)
     cal = None
     if block is None:
@@ -475,7 +475,7 @@ def sr_diff_boot(r1, r2, block=None, M=LW_M, K=LW_K, alpha=0.05, seed=SEED):
 
 
 # =============================================================================
-# FIG 1: Frontiera cu doua active (SPY, TLT) pentru mai multe corelatii
+# FIG 1: Two-asset frontier (SPY, TLT) for several correlations
 # =============================================================================
 def two_asset_stats():
     R, Rex, rf = us_monthly(['SPY', 'TLT'], start='2002-08-01')
@@ -486,7 +486,7 @@ def two_asset_stats():
 
 
 def gmv_two(s1, s2, rho):
-    """Ponderea primului activ in GMV cu doua active."""
+    """Weight of the first asset in the two-asset GMV portfolio."""
     return (s2 ** 2 - rho * s1 * s2) / (s1 ** 2 + s2 ** 2 - 2 * rho * s1 * s2)
 
 
@@ -519,10 +519,10 @@ def fig_two_asset():
 
 
 # =============================================================================
-# FIG 2: Frontiera sectoarelor: cu si fara vanzari in lipsa, 1/N, GMV, tangent
+# FIG 2: Sector frontier with and without short sales, 1/N, GMV, tangency
 # =============================================================================
 def frontier_curve(mu, S, targets):
-    """Frontiera analitica (vanzari in lipsa permise): sigma(m) pentru fiecare medie tinta m."""
+    """Analytical frontier (short sales allowed): sigma(m) for each target mean m."""
     Si = np.linalg.inv(S)
     one = np.ones(len(mu))
     A, B, C = one @ Si @ one, one @ Si @ mu, mu @ Si @ mu
@@ -531,7 +531,7 @@ def frontier_curve(mu, S, targets):
 
 
 def frontier_lo(mu, S, targets):
-    """Frontiera cu ponderi nenegative (SLSQP), pentru mediile tinta realizabile."""
+    """Frontier with non-negative weights (SLSQP), for the attainable target means."""
     n = len(mu)
     out = []
     for m in targets:
@@ -581,10 +581,10 @@ def fig_frontier():
 
 
 # =============================================================================
-# FIG 3: Eroarea de estimare: frontiere estimate vs realizate (simulare)
+# FIG 3: Estimation error: estimated vs realised frontiers (simulation)
 # =============================================================================
 def sector_truth():
-    """Parametrii 'adevarati' ai simularilor: media si covarianta lunara din tot esantionul."""
+    """'True' parameters of the simulations: monthly mean and covariance of the full sample."""
     R, Rex, rf = us_monthly(SECTORS)
     return Rex.mean().values, Rex.cov().values
 
@@ -592,7 +592,7 @@ def sector_truth():
 def fig_estimation_error(T=60, nsim=25, seed=SEED):
     mu, S = sector_truth()
     rng = np.random.default_rng(seed)
-    t = np.linspace(-0.01, 0.06, 150) / 1          # medii lunare tinta
+    t = np.linspace(-0.01, 0.06, 150) / 1          # monthly target means
     fig, ax = plt.subplots(figsize=(7, 4.4))
     s_true = frontier_curve(mu, S, t)
     ax.plot(s_true * np.sqrt(12), t * 12, color=MainBlue, lw=2, label='True frontier (known parameters)')
@@ -603,7 +603,7 @@ def fig_estimation_error(T=60, nsim=25, seed=SEED):
         Si = np.linalg.inv(S_hat)
         one = np.ones(len(mu))
         s_hat = frontier_curve(m_hat, S_hat, t)
-        # portofoliile frontierei estimate, evaluate cu parametrii adevarati
+        # portfolios of the estimated frontier, evaluated with the true parameters
         A, B, C = one @ Si @ one, one @ Si @ m_hat, m_hat @ Si @ m_hat
         D = A * C - B ** 2
         real_m, real_s = [], []
@@ -636,7 +636,7 @@ def fig_estimation_error(T=60, nsim=25, seed=SEED):
     legend_outside_bottom(ax, ncol=2, y=-0.15)
     plt.tight_layout()
     save_fig('ch4_estimation_error')
-    # theta_hat = |Sharpe in esantion| = radacina lui mu' S^-1 mu (Sharpe-ul maxim estimat, Kan & Zhou 2007)
+    # theta_hat = |in-sample Sharpe| = square root of mu' S^-1 mu (estimated maximum Sharpe, Kan & Zhou 2007)
     est_sr, true_sr = np.abs(np.array(est_sr)), np.array(true_sr)
     return dict(T=T, nsim=2000, sr_opt=sr_opt, sr_ew=sr_ew, share_B_negative=float(np.mean(neg_b)),
                 est_sr_median=float(np.median(est_sr)), true_sr_median=float(np.median(true_sr)),
@@ -644,7 +644,7 @@ def fig_estimation_error(T=60, nsim=25, seed=SEED):
 
 
 # =============================================================================
-# FIG 4: Cat de lunga trebuie sa fie fereastra? (simulare, DeMiguel-Garlappi-Uppal)
+# FIG 4: How long must the window be? (simulation, DeMiguel-Garlappi-Uppal)
 # =============================================================================
 def fig_window_length(nsim=300, seed=SEED):
     mu, S = sector_truth()
@@ -683,7 +683,7 @@ def fig_window_length(nsim=300, seed=SEED):
 
 
 # =============================================================================
-# FIG 5: Ponderi rulante: MV vs GMV-LW (sectoare)
+# FIG 5: Rolling weights: MV vs GMV-LW (sectors)
 # =============================================================================
 def fig_rolling_weights(bt):
     ret, to, W = bt
@@ -701,7 +701,7 @@ def fig_rolling_weights(bt):
     mv, lw = W['MV'], W['GMV-LW']
     X = us_monthly(list(W['MV'].columns))[1].values
     B = np.array([np.linalg.solve(np.cov(X[t - WINDOW:t].T), X[t - WINDOW:t].mean(0)).sum()
-                  for t in range(WINDOW, len(X))])                      # 1' S^-1 mu pe fiecare fereastra
+                  for t in range(WINDOW, len(X))])                      # 1' S^-1 mu in each window
     return dict(n_windows=len(B), n_B_negative=int((B < 0).sum()),
                 mv_max_abs=float(mv.abs().max().max()), mv_median_gross=float(mv.abs().sum(1).median()),
                 lw_max_abs=float(lw.abs().max().max()), lw_median_gross=float(lw.abs().sum(1).median()),
@@ -709,7 +709,7 @@ def fig_rolling_weights(bt):
 
 
 # =============================================================================
-# FIG 6: Shrinkage: valori proprii si intensitatea delta in timp
+# FIG 6: Shrinkage: eigenvalues and the intensity delta over time
 # =============================================================================
 def fig_shrinkage():
     R, Rex, rf = us_monthly(SECTORS)
@@ -745,10 +745,10 @@ def fig_shrinkage():
 
 
 # =============================================================================
-# FIG 7: Black-Litterman: randamente implicite, o opinie relativa, ponderi
+# FIG 7: Black-Litterman: implied returns, one relative view, weights
 # =============================================================================
 def black_litterman(Sigma, w_b, P, q, delta=2.5, tau=0.05, conf=None):
-    """Black-Litterman (1992), forma He-Litterman: Omega = diag(P tau Sigma P') daca nu e data."""
+    """Black-Litterman (1992), He-Litterman form: Omega = diag(P tau Sigma P') if not given."""
     pi = delta * Sigma @ w_b
     Om = np.diag(np.diag(P @ (tau * Sigma) @ P.T)) if conf is None else conf
     A = np.linalg.inv(tau * Sigma) + P.T @ np.linalg.inv(Om) @ P
@@ -796,7 +796,7 @@ def fig_black_litterman():
 
 
 # =============================================================================
-# FIG 8: Contributii la risc: 1/N, GMV-LO, ERC, HRP (multi-active)
+# FIG 8: Risk contributions: 1/N, GMV-LO, ERC, HRP (multi-asset)
 # =============================================================================
 def fig_risk_contrib():
     R, Rex, rf = us_monthly(MULTI)
@@ -828,7 +828,7 @@ def fig_risk_contrib():
 
 
 # =============================================================================
-# FIG 9: HRP: dendrograma si ponderi (universul combinat, 16 ETF-uri)
+# FIG 9: HRP: dendrogram and weights (combined universe, 16 ETFs)
 # =============================================================================
 COMBINED = SECTORS + [a for a in MULTI if a != 'SPY']
 
@@ -866,7 +866,7 @@ def fig_hrp():
 
 
 # =============================================================================
-# FIG 10-13: Backtest out-of-sample pe trei universuri
+# FIG 10-13: Out-of-sample backtest on three universes
 # =============================================================================
 UNIVERSES = {'Sectors': SECTORS, 'Multi-asset': MULTI, 'Combined': COMBINED}
 
@@ -885,11 +885,11 @@ def fig_oos_cum(bts, universe='Multi-asset'):
     fig, ax = plt.subplots(figsize=(7.2, 4.2))
     for s in STRATS:
         rf = ret.attrs['rf']
-        total = ret[s] + rf                                       # randamentul total al portofoliului
-        wealth = np.cumprod(1 + total) / np.cumprod(1 + rf)       # averea relativa la contul de titluri de stat
-        ruin = np.flatnonzero(total.values <= -1)                 # o pierdere >= 100% anuleaza averea
+        total = ret[s] + rf                                       # total return of the portfolio
+        wealth = np.cumprod(1 + total) / np.cumprod(1 + rf)       # wealth relative to the T-bill account
+        ruin = np.flatnonzero(total.values <= -1)                 # a loss >= 100% wipes out wealth
         if len(ruin):
-            wealth.iloc[ruin[0]:] = np.nan                        # traiectoria se opreste la ruina
+            wealth.iloc[ruin[0]:] = np.nan                        # the path stops at ruin
         ax.plot(ret.index, wealth, color=SCOL[s], lw=1.6 if s in ('1/N', 'GMV-LW', 'ERC', 'HRP') else 0.8,
                 label=f'{s} (Sharpe {sharpe(ret[s]):.2f})')
     ax.set_yscale('log')
@@ -939,7 +939,7 @@ def fig_costs(bts, universe='Combined'):
 
 
 def _test_pair(args):
-    """Un test de diferenta Sharpe: HAC (Sectiunea 3.1) si bootstrap studentizat (Sectiunea 3.2.2)."""
+    """One Sharpe-difference test: HAC (Section 3.1) and studentized bootstrap (Section 3.2.2)."""
     r1, r2, block = args
     d, se, p = sr_diff_hac(r1, r2)
     res, tstar = sr_diff_boot(r1, r2, block=block)
@@ -948,8 +948,8 @@ def _test_pair(args):
 
 
 def run_tests(pairs, n_jobs=1, blocks=None):
-    """pairs: dict {cheie: (r1, r2)}; blocks: dict {cheie: bloc} deja calibrat (altfel Algoritmul 3.1);
-    n_jobs > 1 foloseste procese paralele (calibrarea e costisitoare)."""
+    """pairs: dict {key: (r1, r2)}; blocks: dict {key: block} already calibrated (otherwise Algorithm 3.1);
+    n_jobs > 1 uses parallel processes (the calibration is expensive)."""
     keys = list(pairs)
     blocks = blocks or {}
     args = [(np.asarray(pairs[k][0], float), np.asarray(pairs[k][1], float), blocks.get(k)) for k in keys]
@@ -963,8 +963,8 @@ def run_tests(pairs, n_jobs=1, blocks=None):
 
 
 def sharpe_tests(bts, bench='1/N', n_jobs=1, blocks=None):
-    """Toate regulile contra 1/N in cele trei universuri; intoarce rezultatele si statisticile bootstrap.
-    blocks: {(univers, regula): bloc} din calibrarea anterioara (optional)."""
+    """All rules against 1/N in the three universes; returns the results and the bootstrap statistics.
+    blocks: {(universe, rule): block} from an earlier calibration (optional)."""
     pairs = {(u, s): (bts[u][0][s], bts[u][0][bench]) for u in bts for s in STRATS if s != bench}
     res = run_tests(pairs, n_jobs, blocks)
     out = {u: {s: res[(u, s)][0] for s in STRATS if s != bench} for u in bts}
@@ -973,7 +973,7 @@ def sharpe_tests(bts, bench='1/N', n_jobs=1, blocks=None):
 
 
 def holm(pvals):
-    """Holm (1979): valori p ajustate pas cu pas descendent, valide sub orice dependenta intre teste."""
+    """Holm (1979): step-down adjusted p-values, valid under any dependence between the tests."""
     keys = list(pvals)
     p = np.array([pvals[k] for k in keys], float)
     m = len(p)
@@ -987,7 +987,7 @@ def holm(pvals):
 
 
 def holm_sharpe(tests):
-    """Ajustarea Holm pe toate testele regula minus 1/N (3 universuri x 7 reguli), HAC si bootstrap."""
+    """Holm adjustment over all rule-minus-1/N tests (3 universes x 7 rules), HAC and bootstrap."""
     out = {}
     for kind in ['p_hac', 'p_boot']:
         adj = holm({f'{u}: {s}': tests[u][s][kind] for u in tests for s in tests[u]})
@@ -1013,7 +1013,7 @@ def fig_sharpe_test(tests, draws):
         ax.axvline(r['z_star'], color='black', ls='--', lw=0.8)
         ax.set_title(f"{u}: {s} minus 1/N, block {r['block']}\nHAC p = {r['p_hac']:.2f}, bootstrap p = {r['p_boot']:.2f}",
                      fontsize=9, loc='left')
-        ax.set_xlabel('(Delta* - Delta) / s(Delta*)')
+        ax.set_xlabel(r'$(\Delta^* - \Delta)/s(\Delta^*)$')
         legend_outside_bottom(ax, ncol=1, y=-0.2)
         res[u] = dict(strategy=s, **r)
     axes[0].set_ylabel('Density')
@@ -1023,11 +1023,11 @@ def fig_sharpe_test(tests, draws):
 
 
 # =============================================================================
-# INFERENTA PE PORTOFOLII ESTIMATE (nivel master)
+# INFERENCE ON ESTIMATED PORTFOLIOS
 # =============================================================================
 def britten_jones(Rex):
-    """Britten-Jones (1999): regresia lui 1 pe randamentele in exces, fara termen liber.
-    b ~ Sigma^-1 mu; testul t al lui b_i = 0 (pondere tangenta nula) si testul F al lui b proportional cu 1 (1/N)."""
+    """Britten-Jones (1999): regression of 1 on the excess returns, without intercept.
+    b ~ Sigma^-1 mu; t test of b_i = 0 (zero tangency weight) and F test of b proportional to 1 (1/N)."""
     X = np.asarray(Rex, float)
     T, N = X.shape
     y = np.ones(T)
@@ -1041,7 +1041,7 @@ def britten_jones(Rex):
     Rb = R @ b
     F = Rb @ np.linalg.solve(R @ XtX_inv @ R.T, Rb) / (N - 1) / s2
     pF = 1 - stats.f.cdf(F, N - 1, T - N)
-    # varianta HAC (Bartlett, Newey-West), pentru abateri de la i.i.d. Normal
+    # HAC variance (Bartlett, Newey-West), for departures from i.i.d. Normal
     L = int(np.floor(4 * (T / 100) ** (2 / 9)))
     Xu = X * u[:, None]
     Om = Xu.T @ Xu / T
@@ -1058,8 +1058,8 @@ def britten_jones(Rex):
 
 
 def kz_bias(theta_ann, N, T):
-    """Kan & Zhou (2007): E[theta_hat^2] = (T theta^2 + N)/(T - N - 2) pentru Sigma_hat de verosimilitate maxima,
-    i.i.d. Normal; intoarce valorile anualizate."""
+    """Kan & Zhou (2007): E[theta_hat^2] = (T theta^2 + N)/(T - N - 2) for the maximum-likelihood Sigma_hat,
+    i.i.d. Normal; returns annualised values."""
     th2 = (theta_ann / np.sqrt(12)) ** 2
     e2 = (T * th2 + N) / (T - N - 2)
     return dict(theta2_m=th2, E_theta2_m=e2, E_theta_ann_approx=float(np.sqrt(e2 * 12)),
@@ -1067,7 +1067,7 @@ def kz_bias(theta_ann, N, T):
 
 
 def theta2_unbiased(Rex):
-    """Estimatorul nedeplasat al lui theta^2 (Kan & Zhou 2007): ((T-N-2) theta_hat^2 - N)/T, Sigma_hat MV."""
+    """Unbiased estimator of theta^2 (Kan & Zhou 2007): ((T-N-2) theta_hat^2 - N)/T, maximum-likelihood Sigma_hat."""
     X = np.asarray(Rex, float)
     T, N = X.shape
     mu, S = X.mean(0), np.cov(X.T, bias=True)
@@ -1078,7 +1078,7 @@ def theta2_unbiased(Rex):
 
 
 def mp_bounds(c, s2=1.0):
-    """Suportul legii Marchenko-Pastur pentru raportul c = N/T < 1."""
+    """Support of the Marchenko-Pastur law for the ratio c = N/T < 1."""
     return s2 * (1 - np.sqrt(c)) ** 2, s2 * (1 + np.sqrt(c)) ** 2
 
 
@@ -1091,7 +1091,7 @@ def mp_density(x, c, s2=1.0):
 
 
 def fig_mp():
-    """Valorile proprii ale matricei de corelatie pe ultima fereastra de 60 de luni vs banda Marchenko-Pastur."""
+    """Eigenvalues of the correlation matrix on the last 60-month window vs the Marchenko-Pastur band."""
     res = {}
     fig, axes = plt.subplots(1, 2, figsize=(7.6, 3.6), sharey=True)
     for ax, (u, syms) in zip(axes, [('Combined', COMBINED), ('Sectors', SECTORS)]):
@@ -1124,11 +1124,11 @@ def fig_mp():
 
 
 def nl_shrink(X):
-    """Shrinkage neliniar analitic (Ledoit & Wolf 2020, Annals of Statistics), cazul N <= T-1."""
+    """Analytical nonlinear shrinkage (Ledoit & Wolf 2020, Annals of Statistics), case N <= T-1."""
     X = np.asarray(X, float)
     X = X - X.mean(0)
     n, p = X.shape
-    n = n - 1                                               # corectie pentru centrare
+    n = n - 1                                               # correction for centring
     S = X.T @ X / n
     lam, U = np.linalg.eigh(S)
     lam = np.maximum(lam, 1e-18)
@@ -1149,7 +1149,7 @@ def nl_shrink(X):
 
 
 def gmv_nl_backtests():
-    """GMV cu shrinkage neliniar (LW 2020) vs GMV si GMV-LW, aceeasi fereastra rulanta de 60 de luni."""
+    """GMV with nonlinear shrinkage (LW 2020) vs GMV and GMV-LW, same 60-month rolling window."""
     out = {}
     for u in ['Sectors', 'Combined']:
         R, Rex, rf = us_monthly(UNIVERSES[u])
@@ -1162,7 +1162,7 @@ def gmv_nl_backtests():
 
 
 def lo_sharpe(r, q=12):
-    """Lo (2002): eroarea standard i.i.d. a raportului Sharpe lunar si factorul de anualizare cu autocorelatii."""
+    """Lo (2002): i.i.d. standard error of the monthly Sharpe ratio and the annualisation factor with autocorrelations."""
     r = np.asarray(r, float)
     T = len(r)
     sr = r.mean() / r.std()
@@ -1176,8 +1176,8 @@ def lo_sharpe(r, q=12):
 
 
 def deflated_sharpe(rets):
-    """Bailey & Lopez de Prado (2014): raportul Sharpe deflatat al celei mai bune reguli din N incercari.
-    rets: dict {nume: serie de randamente lunare in exces}."""
+    """Bailey & Lopez de Prado (2014): deflated Sharpe ratio of the best rule out of N trials.
+    rets: dict {name: series of monthly excess returns}."""
     names = list(rets)
     srs = np.array([np.mean(rets[k]) / np.std(rets[k], ddof=1) for k in names])
     N = len(srs)
@@ -1191,7 +1191,7 @@ def deflated_sharpe(rets):
     z = (s - sr0) * np.sqrt(T - 1) / np.sqrt(1 - g3 * s + (g4 - 1) / 4 * s ** 2)
     psr0 = stats.norm.cdf(s * np.sqrt(T - 1) / np.sqrt(1 - g3 * s + (g4 - 1) / 4 * s ** 2))
     sens = {}
-    for n_eff in (3, 8, N):                  # numarul efectiv de incercari independente (N brut = limita superioara)
+    for n_eff in (3, 8, N):                  # effective number of independent trials (raw N = upper bound)
         s0 = np.sqrt(srs.var(ddof=1)) * ((1 - gam) * stats.norm.ppf(1 - 1 / n_eff) + gam * stats.norm.ppf(1 - 1 / (n_eff * np.e)))
         zz = (s - s0) * np.sqrt(T - 1) / np.sqrt(1 - g3 * s + (g4 - 1) / 4 * s ** 2)
         sens[n_eff] = dict(sr0_ann=float(s0 * np.sqrt(12)), dsr=float(stats.norm.cdf(zz)))
@@ -1201,7 +1201,7 @@ def deflated_sharpe(rets):
 
 
 # =============================================================================
-# FIG 14: Portofoliu de blue chips BVB vs BET-TR si BET (RON)
+# FIG 14: Portfolio of BVB blue chips vs BET-TR and BET (RON)
 # =============================================================================
 BVB_STRATS = ['1/N', 'MV-LO', 'GMV-LO', 'GMV-LW', 'ERC', 'HRP']
 
@@ -1218,9 +1218,9 @@ def fig_bvb(bb, n_jobs=1, blocks=None):
     ret, to, W, bench, removed, m = bb
     fig, ax = plt.subplots(figsize=(7.2, 4.2))
     for s in BVB_STRATS:
-        ax.plot(ret.index, np.cumprod(1 + ret[s]), color=SCOL[s], lw=1.2, label=f'{s} (SR {sharpe(ret[s]):.2f})')
+        ax.plot(ret.index, np.cumprod(1 + ret[s]), color=SCOL[s], lw=1.2, label=f'{s} (Sharpe {sharpe(ret[s]):.2f})')
     for b, c, ls in [('BET-TR', 'black', '-'), ('BET', 'black', ':')]:
-        ax.plot(bench.index, np.cumprod(1 + bench[b]), color=c, ls=ls, lw=1.4, label=f'{b} (SR {sharpe(bench[b]):.2f})')
+        ax.plot(bench.index, np.cumprod(1 + bench[b]), color=c, ls=ls, lw=1.4, label=f'{b} (Sharpe {sharpe(bench[b]):.2f})')
     ax.set_ylabel('Growth of 1 RON')
     ax.set_title(f'Eight BVB blue chips, out-of-sample {ret.index[0]:%b %Y} - {ret.index[-1]:%b %Y}, '
                  '36-month window', fontsize=9, loc='left')
@@ -1241,20 +1241,20 @@ def fig_bvb(bb, n_jobs=1, blocks=None):
 
 
 # =============================================================================
-# STUDIU DE CAZ: FRONTIERA EFICIENTA IMPLEMENTABILA (Jensen, Kelly, Malamud & Pedersen 2026)
+# CASE STUDY: THE IMPLEMENTABLE EFFICIENT FRONTIER (Jensen, Kelly, Malamud & Pedersen 2026)
 # =============================================================================
 JKMP_STOCKS = ['JPM', 'BAC', 'C', 'GS', 'MS', 'WFC', 'NVDA', 'AAPL', 'MSFT', 'AMZN', 'GOOGL', 'CSCO', 'GME', 'MSTR']
 JKMP_ASSETS = [s + '.US' for s in JKMP_STOCKS + SECTORS]
 JKMP_MKT = 'SPY.US'
-JKMP_GAMMA = 10.0                 # aversiunea la risc (Sectiunea 5.1)
-JKMP_W2020 = 1e10                 # averea la sfarsitul lui 2020, creste odata cu piata
+JKMP_GAMMA = 10.0                 # risk aversion (Section 5.1)
+JKMP_W2020 = 1e10                 # wealth at the end of 2020, grows with the market
 JKMP_NLAG = 12
-JKMP_LAMBDAS = np.r_[0.0, np.exp(np.arange(-10, 10.0001, 0.2))]      # Tabelul 1
+JKMP_LAMBDAS = np.r_[0.0, np.exp(np.arange(-10, 10.0001, 0.2))]      # Table 1
 JKMP_PS = [2 ** 6, 2 ** 7, 2 ** 8, 2 ** 9]
 JKMP_ETAS = [np.exp(-3), np.exp(-2)]
 JKMP_VAL_START, JKMP_TEST_START, JKMP_END = 2011, 2014, '2026-08-31'
 JKMP_SEED = 20260929
-# Tabelul 2 din Jensen, Kelly, Malamud & Pedersen (2026): raportul Sharpe net si utilitatea (gamma = 10)
+# Table 2 of Jensen, Kelly, Malamud & Pedersen (2026): net Sharpe ratio and utility (gamma = 10)
 JKMP_TABLE2 = {'Portfolio-ML': (1.33, 0.086), 'Multiperiod-ML*': (0.83, 0.020), 'Static-ML*': (0.81, 0.030),
                '1/N': (0.54, -0.051), 'Market': (0.51, -0.033)}
 JKMP_COL = {'Portfolio-ML': MainBlue, 'Multiperiod-ML*': Forest, 'Static-ML*': Orange, 'Static-ML': Orange,
@@ -1262,7 +1262,7 @@ JKMP_COL = {'Portfolio-ML': MainBlue, 'Multiperiod-ML*': Forest, 'Static-ML*': O
 
 
 def jkmp_split_adjusted(d):
-    """Pretul ajustat doar pentru split-uri (pentru volumul in dolari)."""
+    """Price adjusted for splits only (for the dollar volume)."""
     raw = d['close'].astype(float)
     adj = d['adjusted_close'].astype(float)
     ratio = (adj / adj.shift(1)) / (raw / raw.shift(1))
@@ -1272,7 +1272,7 @@ def jkmp_split_adjusted(d):
 
 
 def jkmp_ew_cov(R, hl_corr=378, hl_var=126):
-    """Covarianta cu ponderi exponentiale: timp de injumatatire 378 zile (corelatii), 126 zile (variante)."""
+    """Exponentially weighted covariance: half-life 378 days (correlations), 126 days (variances)."""
     j = np.arange(len(R))[::-1]
     def wts(hl):
         w = 0.5 ** (j / hl)
@@ -1287,14 +1287,14 @@ def jkmp_ew_cov(R, hl_corr=378, hl_var=126):
 
 
 def jkmp_replication():
-    """Portfolio-ML, Static-ML, Markowitz-ML, varianta minima si 1/N cu costul eq. (35), pe datele cursului."""
+    """Portfolio-ML, Static-ML, Markowitz-ML, minimum variance and 1/N with the cost of eq. (35), on the course data."""
     A, N, GAMMA = JKMP_ASSETS, len(JKMP_ASSETS), JKMP_GAMMA
     frames, dv = {}, {}
     for s in A + [JKMP_MKT]:
         d = read_market(s)
         frames[s] = d['adjusted_close'].astype(float).rename(s)
         dv[s] = (jkmp_split_adjusted(d) * d['volume'].astype(float)).rename(s)
-    P = pd.concat(frames.values(), axis=1).dropna()                  # join pe preturi, zile comune
+    P = pd.concat(frames.values(), axis=1).dropna()                  # align prices on common days
     DV = pd.concat(dv.values(), axis=1).reindex(P.index)
     rd = P.pct_change().dropna()
     me = P.resample('ME').last()
@@ -1304,7 +1304,7 @@ def jkmp_replication():
     months = rm.index[rm.index <= last_full]
     rx = rm[A].sub(rf, axis=0)
     mret = rm[JKMP_MKT]
-    # semnale: ranguri transversale in [0, 1] (Sectiunea 5.1.2)
+    # signals: cross-sectional ranks in [0, 1] (Section 5.1.2)
     lp = np.log(me[A])
     sig = {'ret_1_0': lp - lp.shift(1), 'ret_6_1': lp.shift(1) - lp.shift(6),
            'ret_12_1': lp.shift(1) - lp.shift(12),
@@ -1318,7 +1318,7 @@ def jkmp_replication():
         if not np.isnan(vals).any():
             S[t] = (pd.DataFrame(vals).rank(axis=0).values - 1) / (N - 1)
     smonths = [t for t in months if t in S]
-    # Sigma lunar, Lambda (eq. 35), averea, g (eq. 6), m (Lema 1, eq. 14)
+    # monthly Sigma, Lambda (eq. 35), wealth, g (eq. 6), m (Lemma 1, eq. 14)
     dvm = DV[A].rolling(126).mean().resample('ME').last()
     cum = (1 + mret).cumprod()
     w = JKMP_W2020 * cum / cum.loc['2020-12-31']
@@ -1377,7 +1377,7 @@ def jkmp_replication():
         z = s @ Wdraw[(p, e)]
         return np.hstack([np.sin(z), np.cos(z)]) / np.sqrt(p)
 
-    # Portfolio-ML (Propozitia 4, eq. 24-26, 40)
+    # Portfolio-ML (Proposition 4, eqs. 24-26, 40)
     pml_val = {}
     for p in JKMP_PS:
         for e in JKMP_ETAS:
@@ -1434,7 +1434,7 @@ def jkmp_replication():
             pml[t] = pml_val[bh][t]
     prev0 = idx[idx.index(test[0]) - 1]
     pml[prev0] = pml_val[choice[JKMP_TEST_START]].get(prev0, np.zeros(N))
-    # prognoza randamentelor (Markowitz-ML, Static-ML): ridge pe caracteristici Fourier aleatoare
+    # return forecasts (Markowitz-ML, Static-ML): ridge on random Fourier features
     mu = {}
     for y in range(JKMP_VAL_START - 1, 2027):
         best, bh = np.inf, None
@@ -1491,7 +1491,7 @@ def jkmp_replication():
 
 
 def fig_jkmp_paper():
-    """Tabelul 2 din Jensen, Kelly, Malamud & Pedersen (2026): raportul Sharpe net si utilitatea."""
+    """Table 2 of Jensen, Kelly, Malamud & Pedersen (2026): net Sharpe ratio and utility."""
     names = list(JKMP_TABLE2)
     cols = [JKMP_COL[n] for n in names]
     fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.3))
@@ -1519,7 +1519,7 @@ def fig_jkmp_paper():
 
 
 def fig_jkmp_replication(out):
-    """Planul risc-randament: brut (gol) si net de costuri (plin), cu curbe de utilitate constanta."""
+    """Risk-return plane: gross (hollow) and net of costs (filled), with constant-utility curves."""
     res = out['res']
     names = ['Portfolio-ML', 'Static-ML', 'Minimum variance', '1/N']
     fig, ax = plt.subplots(figsize=(7.2, 4.0))
@@ -1535,7 +1535,7 @@ def fig_jkmp_replication(out):
                     arrowprops=dict(arrowstyle='->', color=c, lw=1.0))
         ax.scatter(r['Vol'], r['R'], s=40, facecolors='none', edgecolors=c, lw=1.2, zorder=3)
         ax.scatter(r['VolN'], r['RTC'], s=40, color=c, zorder=3,
-                   label=f"{n}: net SR {r['SRn']:.2f}, utility {r['U']:.3f}")
+                   label=f"{n}: net Sharpe {r['SRn']:.2f}, utility {r['U']:.3f}")
     ax.scatter([], [], s=40, facecolors='none', edgecolors='black', label='Gross of costs (hollow)')
     ax.set_xlim(0, 0.34)
     ax.set_ylim(-0.42, 0.30)
@@ -1599,7 +1599,7 @@ if __name__ == '__main__':
     R['sharpe_test_fig'] = fig_sharpe_test(R['sharpe_tests'], draws)
     R['holm'] = holm_sharpe(R['sharpe_tests'])
     R['bvb'] = fig_bvb(bvb_backtest(), n_jobs=NJ)
-    # nivel master: inferenta pe portofolii estimate
+    # inference on estimated portfolios
     R_s, Rex_s, _ = us_monthly(SECTORS)
     R['britten_jones'] = britten_jones(Rex_s)
     R['kz_bias'] = kz_bias(R['frontier']['sharpe']['tan'], len(SECTORS), 60)

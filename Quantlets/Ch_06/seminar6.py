@@ -35,11 +35,11 @@ S = {}
 
 
 # =============================================================================
-# PARTEA A
+# PART A
 # =============================================================================
 def joint_tail_prob(q, rho, nu=None):
-    """P(U <= q, V <= q) pentru copula Gaussiana (nu=None) sau t (nu grade de libertate), prin cuadratura
-    unidimensionala deterministica: Y | X = x este Normal(rho x, 1 - rho^2), respectiv
+    """P(U <= q, V <= q) for the Gaussian copula (nu=None) or the t copula (nu degrees of freedom), by deterministic
+    one-dimensional quadrature: Y | X = x is Normal(rho x, 1 - rho^2), or
     t_{nu+1}(rho x, (nu + x^2)(1 - rho^2)/(nu + 1))."""
     if nu is None:
         a = stats.norm.ppf(q)
@@ -51,7 +51,7 @@ def joint_tail_prob(q, rho, nu=None):
 
 
 def a_tail_gauss_t(rho=0.5, nus=(3, 4, 10, 30)):
-    """A1: lambda pentru copula t si probabilitatea conditionata P(V<=q | U<=q) la nivel finit."""
+    """A1: lambda of the t copula and the conditional probability P(V<=q | U<=q) at a finite level."""
     out = {}
     for nu in nus:
         arg = np.sqrt((nu + 1) * (1 - rho) / (1 + rho))
@@ -82,7 +82,7 @@ def fig_tail_gauss_t(rho=0.5):
 
 
 def a_tau_to_theta():
-    """A2: tau Kendall pentru S&P 500 / Euro Stoxx 50 (randamente saptamanale) si parametrii implicati."""
+    """A2: Kendall's tau for S&P 500 / Euro Stoxx 50 (weekly returns) and the implied parameters."""
     W = weekly_returns(['sp500', 'stoxx'], start='2000-01-01')
     U = pseudo_obs(W.values)
     tau = kendall_tau(U[:, 0], U[:, 1])
@@ -101,10 +101,10 @@ def a_forbes_rigobon_example(rho_calm=0.40, rho_crisis=0.60, var_ratio=4.0):
 
 
 # =============================================================================
-# PARTEA B
+# PART B
 # =============================================================================
 def b_dcc_spy_tlt():
-    """B1: DCC pe tot esantionul si pe doua subperioade; LR fata de CCC; schimbarea corelatiei medii a lui z."""
+    """B1: DCC on the full sample and on two subperiods; LR against CCC; the change in the mean correlation of z."""
     R = joint_returns(['spy', 'tlt'])
     P, V, Z, ll = garch_all(R)
     full = dcc_fit(Z)
@@ -122,8 +122,8 @@ def b_dcc_spy_tlt():
 
 
 def b_gauss_vs_t(W, U, B=200, B_test=499):
-    """B2: Gaussian vs t pentru S&P 500 / Euro Stoxx 50 saptamanal: ML, LR pentru nu, adecvare, IC bootstrap pentru lambda.
-    Testele (adecvare si LR) folosesc B_test = 499 replicari, deci p-valoarea minima posibila este 1/500 = 0.002."""
+    """B2: Gaussian vs t for S&P 500 / Euro Stoxx 50 weekly: ML, LR for nu, goodness of fit, bootstrap CI for lambda.
+    The tests (goodness of fit and LR) use B_test = 499 replications, so the smallest possible p-value is 1/500 = 0.002."""
     u, v = U[:, 0], U[:, 1]
     fg, ft = fit_copula('gaussian', u, v), fit_copula('t', u, v)
     gg = gof_test('gaussian', u, v, B=B_test, seed=SEED, fit=fg)
@@ -137,7 +137,7 @@ def b_gauss_vs_t(W, U, B=200, B_test=499):
         lam_b.append(fb['lamL'])
         nu_b.append(fb['par'][1])
     lam_b, nu_b = np.array(lam_b), np.array(nu_b)
-    # p-valoarea LR prin bootstrap parametric sub H0 (copula Gaussiana), pentru ca nu = infinit e pe frontiera
+    # p-value of the LR by a parametric bootstrap under H0 (Gaussian copula), because nu = infinity is on the boundary
     lr_b = []
     for _ in range(B_test):
         X = pseudo_obs(simulate('gaussian', fg['par'], len(u), rng))
@@ -150,8 +150,8 @@ def b_gauss_vs_t(W, U, B=200, B_test=499):
 
 
 def b_losses_copula(B=200):
-    """B3: pierderile zilnice BET / Euro Stoxx 50 (L = -r), filtrate GARCH: Clayton vs Gumbel (plus Gaussiana si t)
-    cu test de adecvare. Gumbel pe pierderi = dependenta in coada superioara a pierderilor."""
+    """B3: daily BET / Euro Stoxx 50 losses (L = -r), GARCH-filtered: Clayton vs Gumbel (plus Gaussian and t)
+    with a goodness-of-fit test. Gumbel on losses = dependence in the upper tail of the losses."""
     R = joint_returns(['bet', 'stoxx'], start='2010-01-01')
     P, V, Z, _ = garch_all(R)
     L = -Z
@@ -182,7 +182,7 @@ def fig_losses_copula(U, res):
 
 
 def b_forbes_rigobon():
-    """B4: Forbes-Rigobon pentru 2008 si 2020, S&P 500 -> Euro Stoxx 50 si BET, plus sensibilitatea la fereastra."""
+    """B4: Forbes-Rigobon for 2008 and 2020, S&P 500 -> Euro Stoxx 50 and BET, plus the sensitivity to the window."""
     r2 = two_day_returns(['sp500', 'stoxx', 'bet'])
     t08 = crisis_table(r2, 'sp500', ['stoxx', 'bet'], CALM08, CRISIS08)
     t20 = crisis_table(r2, 'sp500', ['stoxx', 'bet'], CALM20, CRISIS20)
@@ -194,7 +194,7 @@ def b_forbes_rigobon():
 
 
 def stationary_bootstrap_idx(n, mean_block, rng):
-    """Indicii unui bootstrap stationar (Politis-Romano): blocuri de lungime geometrica."""
+    """Indices of a stationary bootstrap (Politis-Romano): blocks of geometric length."""
     idx = np.empty(n, dtype=int)
     idx[0] = rng.integers(n)
     for t in range(1, n):
@@ -203,7 +203,7 @@ def stationary_bootstrap_idx(n, mean_block, rng):
 
 
 def simulate_dcc2(a, b, Qbar, eta):
-    """Simuleaza reziduuri standardizate bivariate dintr-un DCC(1,1) cu inovatii decorelate eta (T x 2)."""
+    """Simulate bivariate standardised residuals from a DCC(1,1) with decorrelated innovations eta (T x 2)."""
     T = len(eta)
     eps = np.empty_like(eta)
     q11, q22, q12 = Qbar[0, 0], Qbar[1, 1], Qbar[0, 1]
@@ -219,10 +219,10 @@ def simulate_dcc2(a, b, Qbar, eta):
 
 
 def b_btc_bands(B=200):
-    """B5: DCC Bitcoin / S&P 500 cu benzi bootstrap pentru incertitudinea parametrilor (a, b).
-    Bootstrap parametric cu reziduuri: inovatiile decorelate eta_t = L_t^{-1} eps_t (L_t Cholesky al lui R_t)
-    se extrag cu intoarcere, se simuleaza un DCC cu parametrii estimati, se reestimeaza (a, b),
-    iar traiectoria R_t se recalculeaza pe datele originale cu parametrii bootstrap."""
+    """B5: DCC Bitcoin / S&P 500 with bootstrap bands for the uncertainty of the parameters (a, b).
+    Parametric residual bootstrap: the decorrelated innovations eta_t = L_t^{-1} eps_t (L_t the Cholesky factor of R_t)
+    are drawn with replacement, a DCC is simulated with the estimated parameters, (a, b) is re-estimated,
+    and the path R_t is recomputed on the original data with the bootstrap parameters."""
     R = joint_returns(['btc', 'sp500'], start='2014-09-17')
     P, V, Z, _ = garch_all(R)
     d = dcc_fit(Z)
@@ -237,7 +237,7 @@ def b_btc_bands(B=200):
         eb = eta[rng.integers(0, len(eta), len(eta))]
         Xb = simulate_dcc2(d['a'], d['b'], d['Qbar'], eb)
         db = dcc_fit(pd.DataFrame(Xb))
-        Rb = dcc_path(X, db['a'], db['b'], d['Qbar'])       # traiectoria pe datele originale cu parametrii bootstrap
+        Rb = dcc_path(X, db['a'], db['b'], d['Qbar'])       # the path on the original data with the bootstrap parameters
         paths.append(Rb[:, 0, 1])
         ab.append((db['a'], db['b']))
     paths, ab = np.array(paths), np.array(ab)
@@ -259,13 +259,13 @@ def fig_btc_bands(o):
 
 
 # =============================================================================
-# PARTEA C: integrarea BET / Euro Stoxx 50 dupa 2020
+# PART C: BET / Euro Stoxx 50 integration after 2020
 # =============================================================================
 def c_integration(B=2000, block=8):
     W = weekly_returns(['bet', 'stoxx'], start='2010-01-01')
     pre, post = W.loc[:'2019-12-31'], W.loc['2020-01-01':]
     r_pre, r_post = pre.corr().iloc[0, 1], post.corr().iloc[0, 1]
-    # fara saptamanile de criza din martie-aprilie 2020
+    # without the crisis weeks of March-April 2020
     post_x = post.drop(post.loc['2020-02-20':'2020-04-30'].index)
     r_post_x = post_x.corr().iloc[0, 1]
     rng = np.random.default_rng(SEED)
@@ -275,7 +275,7 @@ def c_integration(B=2000, block=8):
         b = post.values[stationary_bootstrap_idx(len(post), block, rng)]
         diffs.append(np.corrcoef(b.T)[0, 1] - np.corrcoef(a.T)[0, 1])
     diffs = np.array(diffs)
-    # Forbes-Rigobon: volatilitatea Euro Stoxx 50 difera intre perioade
+    # Forbes-Rigobon: the Euro Stoxx 50 volatility differs between periods
     delta = post['stoxx'].var() / pre['stoxx'].var() - 1
     adj = fr_adjust(r_post, delta)
     tau_pre = kendall_tau(pre['bet'], pre['stoxx'])
@@ -283,13 +283,13 @@ def c_integration(B=2000, block=8):
     Up, Uq = pseudo_obs(pre.values), pseudo_obs(post.values)
     lamL_pre = empirical_tail_dep(Up[:, 0], Up[:, 1], 0.10)[0]
     lamL_post = empirical_tail_dep(Uq[:, 0], Uq[:, 1], 0.10)[0]
-    # DCC pe randamente saptamanale
+    # DCC on weekly returns
     P, V, Z, _ = garch_all(W)
     d = dcc_fit(Z)
     rc = pd.Series(d['R'][:, 0, 1], index=Z.index)
-    # beta al BET fata de Euro Stoxx 50 (canal de transmisie, independent de nivelul volatilitatii BET)
+    # beta of BET on the Euro Stoxx 50 (transmission channel, independent of the level of BET volatility)
     beta = lambda D: np.cov(D['bet'], D['stoxx'])[0, 1] / D['stoxx'].var()
-    # daily: sincron (ambele se inchid dupa-amiaza, ora Europei Centrale)
+    # daily: synchronous (both close in the afternoon, Central European Time)
     Rd = joint_returns(['bet', 'stoxx'], start='2010-01-01')
     rd_pre, rd_post = Rd.loc[:'2019-12-31'].corr().iloc[0, 1], Rd.loc['2020-01-01':].corr().iloc[0, 1]
     return dict(n_pre=len(pre), n_post=len(post), r_pre=r_pre, r_post=r_post, r_post_x=r_post_x,
@@ -314,13 +314,13 @@ def fig_integration_c(o):
 
 
 # =============================================================================
-# GRAFICE NOI: setup, B1, B2, A2, A3, A5, A6, B3, B4, B5, B6, C1
+# SEMINAR CHARTS: setup, B1, B2, A2, A3, A5, A6, B3, B4, B5, B6, C1
 # =============================================================================
 TEAL = '#17A2B8'
 
 
 def s_manifest():
-    """Numarul de randuri si perioada fiecarui set de date al seminarului (verificarea de la inceput)."""
+    """Number of rows and period of each data set of the seminar (the initial check)."""
     out = {}
     R = joint_returns(['spy', 'tlt'])
     out.update(man_b1_n=len(R), man_b1_start=str(R.index[0].date()), man_b1_end=str(R.index[-1].date()))
@@ -342,15 +342,15 @@ def s_manifest():
 
 
 def acf_sq(x, lags=20):
-    """Autocorelatiile patratelor x_t^2 la decalajele 1..lags."""
+    """Autocorrelations of the squares x_t^2 at lags 1..lags."""
     y = np.asarray(x, float) ** 2
     y = y - y.mean()
     return np.array([np.sum(y[k:] * y[:-k]) / np.sum(y * y) for k in range(1, lags + 1)])
 
 
 def b1_filter_check(R):
-    """B1, pasul 1: GARCH(1,1) pe fiecare serie; autocorelatia patratelor inainte si dupa filtrare;
-    un pas al recursiei DCC (Q_2 din Q_1 = Qbar si z_1)."""
+    """B1, step 1: GARCH(1,1) on each series; the autocorrelation of the squares before and after filtering;
+    one step of the DCC recursion (Q_2 from Q_1 = Qbar and z_1)."""
     P, V, Z, _ = garch_all(R)
     d = dcc_fit(Z)
     out = {}
@@ -371,7 +371,7 @@ def b1_filter_check(R):
 
 
 def fig_b1_returns(R):
-    """B1: randamentele zilnice SPY si TLT pe zilele comune, cu ferestrele de stres."""
+    """B1: daily SPY and TLT returns on common days, with the stress windows."""
     fig, axes = plt.subplots(2, 1, figsize=(5.6, 4.0), sharex=True)
     for ax, c, col, lab in ((axes[0], 'spy', MainBlue, 'SPY daily log return (%)'),
                             (axes[1], 'tlt', IDAred, 'TLT daily log return (%)')):
@@ -387,7 +387,7 @@ def fig_b1_returns(R):
 
 
 def fig_b1_garch(R, V, Z):
-    """B1: volatilitatea GARCH anualizata si autocorelatia patratelor inainte si dupa standardizare."""
+    """B1: annualised GARCH volatility and the autocorrelation of the squares before and after standardisation."""
     fig, axes = plt.subplots(2, 1, figsize=(5.6, 4.8))
     ax = axes[0]
     shade_crises(ax)
@@ -412,11 +412,11 @@ def fig_b1_garch(R, V, Z):
 
 
 def b1_ccc_null_lr(R, B=199):
-    """B1: distributia statisticii LR (DCC contra CCC) sub H0: CCC, prin bootstrap parametric al ambilor pasi
-    (aceeasi procedura si acelasi generator ca in inference_ch6.ccc_null_bootstrap)."""
+    """B1: distribution of the LR statistic (DCC against CCC) under H0: CCC, by a parametric bootstrap of both steps
+    (the same procedure and the same random generator as inference_ch6.ccc_null_bootstrap)."""
     try:
         from inference_ch6 import simulate_garch
-    except ImportError:   # notebook autonom: functia este definita mai sus
+    except ImportError:   # self-contained notebook: the function is defined above
         simulate_garch = globals()['simulate_garch']
     P, V, Z, _ = garch_all(R)
     d = dcc_fit(Z)
@@ -454,7 +454,7 @@ def fig_b1_lr(lr_obs, lrs):
 
 
 def fig_b2_scatter(W, U, q=0.05):
-    """A2/B2: randamentele saptamanale si pseudo-observatiile lor, cu colturile de 5% marcate."""
+    """A2/B2: the weekly returns and their pseudo-observations, with the 5% corners marked."""
     u, v = U[:, 0], U[:, 1]
     fig, axes = plt.subplots(1, 2, figsize=(5.8, 3.0))
     ax = axes[0]
@@ -482,7 +482,7 @@ def fig_b2_scatter(W, U, q=0.05):
 
 
 def fig_b2_tails(U, fg, ft):
-    """B2: probabilitatile la prag finit C(q,q)/q, empirice si din copulele estimate, cu lambda separat."""
+    """B2: the finite-threshold probabilities C(q,q)/q, empirical and from the fitted copulas, with lambda shown separately."""
     u, v = U[:, 0], U[:, 1]
     qs = np.geomspace(0.01, 0.20, 25)
     emp = np.array([empirical_tail_dep(u, v, q) for q in qs])
@@ -506,7 +506,7 @@ def fig_b2_tails(U, fg, ft):
 
 
 def fig_b2_boot(lr, lr_b, nu_b, lam_b, nu_hat, lam_hat):
-    """B2 (extensie): LR sub H0 (Gaussiana) si distributiile bootstrap ale lui nu si lambda."""
+    """B2 Extended: the LR under H0 (Gaussian) and the bootstrap distributions of nu and lambda."""
     fig = plt.figure(figsize=(5.6, 4.4))
     gs = fig.add_gridspec(2, 2)
     axes = [fig.add_subplot(gs[0, :]), fig.add_subplot(gs[1, 0]), fig.add_subplot(gs[1, 1])]
@@ -536,11 +536,11 @@ def fig_b2_boot(lr, lr_b, nu_b, lam_b, nu_hat, lam_hat):
 
 
 def a2_gap_draws():
-    """A2 (e): bootstrap i.i.d. al perechilor saptamanale pentru diferenta rho_S implicat (Gaussiana) - rho_S empiric.
-    Acelasi generator ca inference_ch6.rank_inference: se consuma intai extragerile pentru bancile JPM-BAC."""
+    """A2 Extended (3): i.i.d. bootstrap of the weekly pairs for the gap implied rho_S (Gaussian) - empirical rho_S.
+    Same random generator as inference_ch6.rank_inference: the draws for the JPM-BAC banks are consumed first."""
     try:
         from generate_all_charts import bank_copula_data
-    except ImportError:   # notebook autonom: functia este definita mai sus
+    except ImportError:   # self-contained notebook: the function is defined above
         bank_copula_data = globals()['bank_copula_data']
     _, Zb, _ = bank_copula_data()
     rng = np.random.default_rng(SEED)
@@ -574,7 +574,7 @@ def fig_a2_gap(diff, bs):
 
 
 def fig_a3_curve(rho_calm=0.40, rho_crisis=0.60, var_ratio=4.0):
-    """A3: corelatia masurata in criza in functie de delta; cifrele stilizate ale exercitiului."""
+    """A3: the crisis correlation measured as a function of delta; the stylised numbers of the exercise."""
     delta = var_ratio - 1
     adj = fr_adjust(rho_crisis, delta)
     infl = rho_calm * np.sqrt((1 + delta) / (1 + delta * rho_calm ** 2))
@@ -596,7 +596,7 @@ def fig_a3_curve(rho_calm=0.40, rho_crisis=0.60, var_ratio=4.0):
 
 
 def fig_a3_se(INF):
-    """A3 (extensie): intervale de 95% pentru rho* in 2008, cu delta fixat si cu delta aleator."""
+    """A3 Extended: 95% intervals for rho* in 2008, with delta fixed and with delta random."""
     fig, ax = plt.subplots(figsize=(5.6, 3.0))
     for k, (tg, lab) in enumerate((('stoxx', 'Euro Stoxx 50'), ('bet', 'BET'))):
         adj, r0 = INF[f'frb_08_{tg}_adj'], INF[f'frb_08_{tg}_r0']
@@ -615,8 +615,8 @@ def fig_a3_se(INF):
 
 
 def a5_dcc_numbers(a, b, qbar, eps=(-2.0, 1.0), H=150, M=4000):
-    """A5: o actualizare Q -> R cu tinta [[1, qbar], [qbar, 1]] si raspunsul la un soc: Monte Carlo condiționat
-    (aceleasi inovatii cu si fara soc) comparat cu aproximarea geometrica (a + b)^k."""
+    """A5: one update Q -> R with target [[1, qbar], [qbar, 1]] and the response to a shock: conditional Monte Carlo
+    (the same innovations with and without the shock) compared with the geometric approximation (a + b)^k."""
     Qb = np.array([[1.0, qbar], [qbar, 1.0]])
     e = np.array(eps)
     Q1 = (1 - a - b) * Qb + a * np.outer(e, e) + b * Qb
@@ -658,7 +658,7 @@ def fig_a5_dcc(o):
 
 
 def fig_a6_lognormal(n=2000):
-    """A6: X = e^Z, Y = e^{2Z} (comonoton) si Y = e^{-2Z} (contramonoton): corelatia Pearson nu atinge +/-1."""
+    """A6: X = e^Z, Y = e^{2Z} (comonotonic) and Y = e^{-2Z} (countermonotonic): the Pearson correlation does not reach +/-1."""
     rng = np.random.default_rng(SEED)
     z = rng.standard_normal(n)
     x = np.exp(z)
@@ -686,7 +686,7 @@ def fig_a6_lognormal(n=2000):
 
 
 def fig_b3_tails(U, res, n_sim=400000):
-    """B3: probabilitatea pierderilor comune P(U > 1-q, V > 1-q)/q, empiric si din copulele estimate (simulare)."""
+    """B3: probability of joint losses P(U > 1-q, V > 1-q)/q, empirical and from the fitted copulas (simulation)."""
     u, v = U[:, 0], U[:, 1]
     qs = np.geomspace(0.01, 0.20, 20)
     emp = np.array([empirical_tail_dep(u, v, q)[1] for q in qs])
@@ -711,7 +711,7 @@ def fig_b3_tails(U, res, n_sim=400000):
 
 
 def fig_b4_windows():
-    """B4: randamentele pe 2 zile ale S&P 500 cu ferestrele calma si de criza, 2008 si 2020."""
+    """B4: 2-day S&P 500 returns with the calm and crisis windows, 2008 and 2020."""
     r2 = two_day_returns(['sp500', 'stoxx', 'bet'])['sp500'] * 100
     fig, axes = plt.subplots(2, 1, figsize=(5.6, 4.4))
     for ax, (calm, crisis, lo, hi) in zip(axes, ((CALM08, CRISIS08, '2007-06-01', '2009-09-30'),
@@ -722,7 +722,7 @@ def fig_b4_windows():
         ax.plot(x.index, x, color=MainBlue, lw=0.6)
         ax.axhline(0, color='black', lw=0.5)
         sd0, sd1 = r2.loc[calm[0]:calm[1]].std(), r2.loc[crisis[0]:crisis[1]].std()
-        ax.set_title(f'sd calm {sd0:.2f}%, crisis {sd1:.2f}%', fontsize=8.5, color='black')
+        ax.set_title(f'Std. dev.: calm {sd0:.2f}%, crisis {sd1:.2f}%', fontsize=8.5, color='black')
         ax.xaxis.set_major_locator(mdates.MonthLocator(bymonth=(1, 7)))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
         ax.tick_params(axis='x', labelrotation=0, labelsize=7.5)
@@ -738,7 +738,7 @@ def fig_b4_windows():
 
 
 def b4_fr_draws(B=1999, block=10):
-    """B4 (c): extragerile bootstrap ale lui rho* si D = rho* - rho_calm (acelasi generator ca inference_ch6.fr_bootstrap)."""
+    """B4, task 3: bootstrap draws of rho* and D = rho* - rho_calm (same random generator as inference_ch6.fr_bootstrap)."""
     r2 = two_day_returns(['sp500', 'stoxx', 'bet'])
     out = {}
     for tag, calm, crisis in (('08', CALM08, CRISIS08), ('20', CALM20, CRISIS20)):
@@ -758,8 +758,8 @@ def b4_fr_draws(B=1999, block=10):
 
 
 def fig_forbes_rigobon_sem(t08, t20, draws=None):
-    """B4: corelatii calme, brute si corectate, cu intervalele bootstrap de 90% ale lui rho* (sus)
-    si diferenta D = rho* - rho_calm cu intervalul ei (jos)."""
+    """B4: calm, raw and adjusted correlations, with the 90% bootstrap intervals of rho* (top)
+    and the difference D = rho* - rho_calm with its interval (bottom)."""
     labels, calm, raw, adj, lo, hi, D, Dlo, Dhi = [], [], [], [], [], [], [], [], []
     for yr, tag, t in (('2008', '08', t08), ('2020', '20', t20)):
         for k in t.index:
@@ -811,7 +811,7 @@ def fig_forbes_rigobon_sem(t08, t20, draws=None):
 
 
 def b5_mean_change(o):
-    """B5: diferenta mediilor corelatiei (dupa 2020 minus inainte), pe fiecare traiectorie bootstrap."""
+    """B5: difference in mean correlation (after 2020 minus before), on each bootstrap path."""
     idx = o['rc'].index
     pre, post = idx <= pd.Timestamp('2019-12-31'), idx >= pd.Timestamp('2020-01-01')
     dm = o['paths'][:, post].mean(1) - o['paths'][:, pre].mean(1)
@@ -819,10 +819,10 @@ def b5_mean_change(o):
 
 
 def b6_gas_path():
-    """B6: copula t GAS pe perechile saptamanale S&P 500 / Euro Stoxx 50 (aceeasi estimare ca inference_ch6)."""
+    """B6: GAS t copula on the weekly S&P 500 / Euro Stoxx 50 pairs (same estimation as inference_ch6)."""
     try:
         from inference_ch6 import gas_t_copula
-    except ImportError:   # notebook autonom: functia este definita mai sus
+    except ImportError:   # self-contained notebook: the function is defined above
         gas_t_copula = globals()['gas_t_copula']
     W = weekly_returns(['sp500', 'stoxx'], start='2000-01-01')
     U2 = pseudo_obs(W.values)
@@ -848,7 +848,7 @@ def fig_b6_gas(g, rho):
 
 
 def fig_c1_change(o):
-    """C1: distributia bootstrap a schimbarii corelatiei si cele doua verificari de robustete."""
+    """C1: bootstrap distribution of the change in correlation and the two robustness checks."""
     d = o['diffs']
     lo, hi = o['ci']
     fig, axes = plt.subplots(2, 1, figsize=(5.6, 4.8), gridspec_kw=dict(height_ratios=[1.2, 1]))

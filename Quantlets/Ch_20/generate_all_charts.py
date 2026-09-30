@@ -31,7 +31,7 @@ if not os.path.isdir(S.VOLARE_DIR):
     S.VOLARE_DIR = os.path.join(HERE, '..', '..', 'data', 'volare')
 CACHE = os.path.join(S.VOLARE_DIR, 'ch20_cache')
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -50,14 +50,14 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Course colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
 Amber    = '#B5853F'
 Orange   = '#E67E22'
 Purple   = '#8E44AD'
-Gray     = '#7F7F7F'   # doar linii de referinta, benzi, grila
+Gray     = '#7F7F7F'   # reference lines, bands and grids only
 Teal     = '#17A2B8'
 COL = {'HAR': MainBlue, 'logHAR': Teal, 'HARQ': Purple, 'SHAR': Amber, 'logHAR-K': Orange,
        'Sig-L': Forest, 'Sig-LK': IDAred}
@@ -71,7 +71,7 @@ RES = {}
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -80,12 +80,12 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
 def fig_legend_bottom(fig, axes, ncol=4, y=0.0):
-    """O singura legenda sub o figura cu mai multe panouri."""
+    """One legend below a figure with several panels."""
     h, l = [], []
     for ax in axes:
         for hh, ll in zip(*ax.get_legend_handles_labels()):
@@ -108,7 +108,7 @@ def read_info(kind, sym, h, tag='main'):
 
 
 # -----------------------------------------------------------------------------
-# EVALUARE PE ACTIV
+# EVALUATION BY ASSET
 # -----------------------------------------------------------------------------
 def eval_asset(kind, sym, h):
     fc = read_fc(kind, sym, h)
@@ -146,7 +146,7 @@ def eval_asset(kind, sym, h):
     out['n_filter'] = {m: int(((fc[m] < fc.lo) | (fc[m] > fc.hi)).sum()) for m in M}
     out['n_explode'] = {m: int((fc[m] > 10 * fc.hi).sum()) for m in M}
     out['max_ratio'] = {m: float((fc[m] / fc.hi).max()) for m in M}
-    # variante de robustete (doar modelele cu signaturi)
+    # robustness variants (signature models only)
     rob = {}
     for tag in ['N2', 'noret']:
         f = os.path.join(CACHE, tag, f'fc_{kind}_{sym}_h{h}.csv')
@@ -247,7 +247,7 @@ def aggregate(ev):
             pdm[h][g] = {f'{m}|{b}': panel_dm(h, ks, m, b) for m, b in
                          [('Sig-LK', 'logHAR'), ('Sig-LK', 'HAR'), ('Sig-L', 'logHAR'), ('logHAR-K', 'logHAR'),
                           ('Sig-LK', 'Sig-L'), ('logHAR', 'HAR')]}
-        # victorii pe active, cu corectie pentru testare multipla (familia: cele 50 de active)
+        # wins over assets, with a multiple-testing correction (family: the 50 assets)
         wins[h] = {}
         for comp in ['Sig-LK|logHAR', 'Sig-LK|HAR', 'Sig-L|logHAR', 'logHAR-K|logHAR', 'logHAR|HAR', 'HARQ|HAR',
                      'SHAR|HAR', 'Sig-LK|Sig-L']:
@@ -468,7 +468,7 @@ def chart_dm_heat(E):
 def chart_subperiod(A):
     fig, axes = plt.subplots(1, 3, figsize=(11, 3.3), sharey=False)
     M = ['logHAR', 'HARQ', 'SHAR', 'logHAR-K', 'Sig-L', 'Sig-LK']
-    labels = {'covid': 'COVID-19 crash\n(20 Feb-30 Apr 2020)', 'apr2025': 'Tariff shock\n(2-30 Apr 2025)', 'rest': 'All other days'}
+    labels = {'covid': 'COVID-19 crash\n(20 Feb-30 Apr 2020)', 'apr2025': '2-30 Apr 2025\n(US tariff shock)', 'rest': 'All other days'}
     for ax, h in zip(axes, H):
         w = 0.13
         for i, m in enumerate(M):
@@ -516,7 +516,7 @@ def chart_covid_forecasts():
 def chart_robustness(A):
     fig, ax = plt.subplots(figsize=(8.5, 3.3))
     variants = [('main', 'Main: depth 3, path (t, log RV, return)', IDAred), ('N2', 'Depth 2', Orange),
-                ('noret', 'Path without the return channel', MainBlue), ('filter', 'Insanity filter on all models', Forest)]
+                ('noret', 'Path without the return channel', MainBlue), ('filter', 'BPQ filter on all models', Forest)]
     w = 0.2
     for i, (tag, lab, c) in enumerate(variants):
         v = []
@@ -541,7 +541,7 @@ def chart_robustness(A):
 
 
 def word_labels():
-    ch = ['t', 'lrv', 'ret']
+    ch = ['t', 'ln RV', 'r']
     labs = ['HAR day', 'HAR week', 'HAR month']
     for w in S.sig_words(3, 3):
         labs.append('(' + ','.join(ch[i] for i in w) + ')')

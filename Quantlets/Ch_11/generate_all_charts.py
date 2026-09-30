@@ -1,11 +1,11 @@
 """
-Generator pentru toate graficele si cifrele din Capitolul 11: modele in timp continuu
-====================================================================================
-Toate graficele: fundal transparent, etichete ENG, legenda in afara, jos; seriile de timp in culori din paleta.
-Date zilnice de piata (data/market): S&P 500 (1990-2026), BET (2000-2026), Bitcoin (2014-2026), VIX (1990-2026);
-randamentul titlurilor de stat americane pe 3 luni (FRED, DTB3, 1954-2026).
-Cifrele sunt salvate in ch11_results.json (folosite de generatoarele de slide-uri).
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Charts and numbers of Chapter 11: continuous-time models
+=========================================================
+All charts: transparent background, English labels, legend outside at the bottom; time series in palette colours.
+Daily market data: S&P 500 (1990-2026), BET (2000-2026), Bitcoin (2014-2026), VIX (1990-2026);
+3-month US Treasury bill rate (FRED, DTB3, 1954-2026).
+Numbers are saved in ch11_results.json (used by the slide generators).
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -26,7 +26,7 @@ from ct_models import (scaled_random_walk, bm_paths, quadratic_variation, total_
                        lee_mykland, heston_paths, heston_from_vix, heston_simulate_returns, heston_smile, acf,
                        stylised, short_rate_fits, nw_drift_diffusion, hill)
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -45,7 +45,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Brand colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -54,7 +54,7 @@ Orange   = '#E67E22'
 Purple   = '#8E44AD'
 Crimson  = '#DC3545'
 Teal     = '#17A2B8'
-Gray     = '#7F7F7F'   # doar linii de referinta, benzi, grila
+Gray     = '#7F7F7F'   # reference lines, bands and grid only
 LightGray = '#DADADA'
 MODEL_COL = {'Data': MainBlue, 'GBM': Orange, 'Merton': Purple, 'Heston': Forest}
 
@@ -65,7 +65,7 @@ DT = 1 / 252
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as a transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -74,12 +74,12 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
 def fig_legend_bottom(fig, handles=None, labels=None, ncol=4, y=0.0):
-    """O singura legenda pentru o figura cu mai multe panouri, sub figura."""
+    """A single legend for a multi-panel figure, below the figure."""
     if handles is None:
         handles, labels = [], []
         for ax in fig.axes:
@@ -106,17 +106,17 @@ def jsonable(x):
 
 
 # =============================================================================
-# DATE: randamente log zilnice (nu in %), fiecare serie pe calendarul ei
+# DATA: daily log returns (not in %), each series on its own calendar
 # =============================================================================
 rets = {k: log_returns(k) for k in ['sp500', 'bet', 'btc']}
 DTS = {'sp500': 1 / 252, 'bet': 1 / 252, 'btc': 1 / 365}
 
 
 # =============================================================================
-# 1. DE LA MERSUL ALEATOR LA MISCAREA BROWNIANA
+# 1. FROM RANDOM WALK TO BROWNIAN MOTION
 # =============================================================================
 def fig_donsker():
-    """Mersul aleator scalat pentru n = 5, 50, 5000 si probabilitatea P(max W > 1) (principiul reflexiei)."""
+    """Scaled random walk for n = 5, 50, 5000 and the probability P(max W > 1) (reflection principle)."""
     rng = np.random.default_rng(SEED)
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.4), gridspec_kw={'width_ratios': [1.5, 1]})
     for n, c in zip([5, 50, 5000], [IDAred, Amber, MainBlue]):
@@ -151,7 +151,7 @@ def fig_donsker():
 
 
 def fig_bm_paths():
-    """Traiectorii browniene cu banda +-1.96 sqrt(t) si autosimilaritatea (zoom de 100x in timp, 10x in spatiu)."""
+    """Brownian paths with the +-1.96 sqrt(t) band and self-similarity (zoom 100x in time, 10x in space)."""
     rng = np.random.default_rng(SEED + 1)
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
     t, W = bm_paths(5, 2000, 1.0, rng)
@@ -165,7 +165,7 @@ def fig_bm_paths():
     t2, W2 = bm_paths(1, 100000, 1.0, rng)
     w = W2[0]
     axes[1].plot(t2, w, color=MainBlue, lw=0.5, label='Path on [0, 1]')
-    k = 1000                                             # [0, 0.01] rescalat: timp x100, spatiu x10
+    k = 1000                                             # [0, 0.01] rescaled: time x100, space x10
     axes[1].plot(t2[:k + 1] * 100, w[:k + 1] * 10, color=IDAred, lw=0.5,
                  label=r'Its first 1% of time, rescaled: $10\,W_{t/100}$')
     axes[1].set_xlabel('Time t')
@@ -177,7 +177,7 @@ def fig_bm_paths():
 
 
 def fig_quadratic_variation():
-    """Variatia patratica si totala pe grile tot mai fine; variatia patratica realizata a S&P 500."""
+    """Quadratic and total variation on ever finer grids; realised quadratic variation of the S&P 500."""
     rng = np.random.default_rng(SEED + 2)
     N = 2 ** 16
     _, W = bm_paths(1, N, 1.0, rng)
@@ -215,7 +215,7 @@ def fig_quadratic_variation():
 
 
 def fig_ito():
-    """W_t^2 = 2 int W dW + t pe o traiectorie; diferenta Stratonovich - Ito pe 5000 de traiectorii."""
+    """W_t^2 = 2 int W dW + t on one path; the Stratonovich - Ito difference over 5000 paths."""
     rng = np.random.default_rng(SEED + 3)
     n = 2000
     t, W = bm_paths(1, n, 1.0, rng)
@@ -245,7 +245,7 @@ def fig_ito():
 
 
 def fig_convergence():
-    """Erorile tare si slabe ale schemelor Euler-Maruyama si Milstein pentru ecuatia de test a lui Higham."""
+    """Strong and weak errors of the Euler-Maruyama and Milstein schemes for Higham's test equation."""
     rng = np.random.default_rng(SEED + 4)
     d, P = convergence_study(rng, return_paths=True)
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
@@ -269,21 +269,21 @@ def fig_convergence():
     legend_outside_bottom(axes[1], ncol=2, y=-0.2)
     plt.tight_layout()
     save_fig('ch11_convergence')
-    # pante log-log; intervale de 95% prin bootstrap pe traiectorii intregi (toate rezolutiile impreuna)
+    # log-log slopes; 95% intervals by whole-path bootstrap (all resolutions together)
     rb = np.random.default_rng(SEED + 40)
     se = slope_boot(d['dt'], P['abs_em'], rb)
     sm = slope_boot(d['dt'], P['abs_mil'], rb)
-    # eroarea slaba exacta este determinista: panta pe grila, fara interval de incredere
+    # the exact weak error is deterministic: slope on the grid, no confidence interval
     we = dict(slope=float(np.polyfit(np.log(d['dt']), np.log(d['weak_em_exact']), 1)[0]))
     d.to_csv(os.path.join(HERE, 'ch11_convergence.csv'), index=False)
     return dict(table=d.to_dict('list'), slope_em=se, slope_mil=sm, slope_weak=we)
 
 
 # =============================================================================
-# 2. MISCAREA BROWNIANA GEOMETRICA
+# 2. GEOMETRIC BROWNIAN MOTION
 # =============================================================================
 def gbm_estimates():
-    """Estimatori GBM pentru S&P 500, BET, Bitcoin."""
+    """GBM estimates for the S&P 500, BET, Bitcoin."""
     out = {}
     for k, r in rets.items():
         g = gbm_mle(r.values, DTS[k])
@@ -294,7 +294,7 @@ def gbm_estimates():
 
 
 def fig_gbm_fan(g):
-    """Zece ani de traiectorii GBM pentru S&P 500 pornind de la ultima inchidere: media vs mediana."""
+    """Ten years of GBM paths for the S&P 500 from the last close: mean vs median."""
     rng = np.random.default_rng(SEED + 5)
     S0 = float(load_close('sp500').iloc[-1])
     T, n = 10.0, 2520
@@ -326,7 +326,7 @@ def fig_gbm_fan(g):
 
 
 def fig_lognormal(g):
-    """Distributia lognormala a lui S_T / S_0 dupa 10 ani: modul < mediana < media."""
+    """Lognormal distribution of S_T / S_0 after 10 years: mode < median < mean."""
     mu, sigma, T = g['mu'], g['sigma'], 10.0
     m, s = (mu - 0.5 * sigma ** 2) * T, sigma * np.sqrt(T)
     rng = np.random.default_rng(SEED + 6)
@@ -347,7 +347,7 @@ def fig_lognormal(g):
 
 
 def fig_gbm_vs_data(g):
-    """S&P 500: graficul QQ fata de distributia Normala si autocorelatia lui |r| fata de GBM simulat."""
+    """S&P 500: QQ plot against the Normal distribution and autocorrelation of |r| against simulated GBM."""
     r = rets['sp500'].values
     z = (r - r.mean()) / r.std()
     n = len(z)
@@ -379,7 +379,7 @@ def fig_gbm_vs_data(g):
 
 
 def fig_drift_precision(g):
-    """Precizia estimarii drift-ului: latimea intervalului de 95% vs durata; estimari pe ferestre de 10 ani."""
+    """Precision of the drift estimate: width of the 95% interval vs span; estimates on 10-year windows."""
     years = np.linspace(1, 100, 200)
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
     for k, c in [('sp500', MainBlue), ('btc', Amber)]:
@@ -417,7 +417,7 @@ def fig_drift_precision(g):
 # 3. ORNSTEIN-UHLENBECK
 # =============================================================================
 def fig_ou_paths():
-    """Trei procese OU cu aceleasi socuri si viteze de revenire diferite."""
+    """Three OU processes with the same shocks and different mean-reversion speeds."""
     rng = np.random.default_rng(SEED + 8)
     dt, n = 1 / 252, 252 * 10
     z = rng.standard_normal(n)
@@ -438,7 +438,7 @@ def fig_ou_paths():
 
 
 def fig_vasicek():
-    """Randamentul titlurilor de stat pe 3 luni (FRED, DTB3): estimari Vasicek pe intreaga perioada si pe subperioade."""
+    """3-month Treasury bill rate (FRED, DTB3): Vasicek estimates over the full period and over subperiods."""
     tb = read_fred('DTB3') / 100
     full = ou_mle(tb.values, DT)
     subs = [('1954', '1979'), ('1980', '2007'), ('2008', '2026')]
@@ -478,7 +478,7 @@ def fig_vasicek():
 
 
 def fig_vix_ou():
-    """Logaritmul VIX ca proces OU: nivelul pe termen lung, timpul de injumatatire, autocorelatia."""
+    """Log VIX as an OU process: long-run level, half-life, autocorrelation."""
     vix = load_vix()
     x = np.log(vix)
     f = ou_mle(x.values, DT)
@@ -507,12 +507,12 @@ def fig_vix_ou():
 
 
 # =============================================================================
-# 3b. ESTIMAREA DIFUZIILOR: VEROSIMILITATE EXACTA VS EULER, CKLS, ESTIMARE NEPARAMETRICA
+# 3b. ESTIMATING DIFFUSIONS: EXACT VS EULER LIKELIHOOD, CKLS, NONPARAMETRIC ESTIMATION
 # =============================================================================
 def diffusion_fits():
-    """Vasicek, CIR (exact si Euler) si CKLS pe randamentul titlurilor de stat pe 3 luni (FRED, DTB3), 1954-2007:
-    date zilnice si sfarsit de luna. Perioada 2008-2026 este exclusa: contine cotatii exact zero si negative (in afara
-    domeniului verosimilitatii CIR si al pseudo-verosimilitatii Euler cu r^gamma) si un regim de dobanzi la limita zero."""
+    """Vasicek, CIR (exact and Euler) and CKLS on the 3-month Treasury bill rate (FRED, DTB3), 1954-2007:
+    daily and month-end data. 2008-2026 is excluded: it contains exact zeros and negative quotes (outside the
+    domain of the CIR likelihood and of the Euler pseudo-likelihood with r^gamma) and a zero-lower-bound regime."""
     tb = read_fred('DTB3') / 100
     s = tb.loc['1954':'2007']
     out = {'daily': short_rate_fits(s.values, DT), 'monthly': short_rate_fits(s.resample('ME').last().values, 1 / 12)}
@@ -525,7 +525,7 @@ def diffusion_fits():
 
 
 def fig_np_diffusion(fits):
-    """Driftul si difuzia neparametrice (Nadaraya-Watson) ale ratei pe 3 luni, 1954-2007, fata de Vasicek, CIR, CKLS."""
+    """Nonparametric (Nadaraya-Watson) drift and diffusion of the 3-month rate, 1954-2007, against Vasicek, CIR, CKLS."""
     tb = (read_fred('DTB3') / 100).loc['1954':'2007']
     x = tb.values
     grid = np.linspace(np.quantile(x, 0.02), np.quantile(x, 0.98), 60)
@@ -574,12 +574,12 @@ def fig_np_diffusion(fits):
 
 
 def measure_change(g, vs, hp):
-    """Schimbarea masurii: pretul de piata al riscului pentru S&P 500; preturile obligatiunilor Vasicek (Feynman-Kac);
-    ce identifica VIX in modelul Heston (VIX^2 afin in v_t, cu parametri sub masura neutra la risc).
-    Randamentele Vasicek folosesc parametrii estimati sub P cu ipoteza explicita lambda = 0 (fara prima de risc,
-    deci theta^Q = theta^P); diferenta fata de DGS10 include prima de termen omisa.
-    Corectia xi / b este o aproximare locala, valabila la v_t = theta^Q: difuzia lui y = a + b v este
-    b xi sqrt(v) = xi sqrt(b (y - a)), deci raportul fata de xi_y sqrt(y) depinde de stare."""
+    """Change of measure: the market price of risk for the S&P 500; Vasicek bond prices (Feynman-Kac);
+    what the VIX identifies in the Heston model (VIX^2 affine in v_t, with parameters under the risk-neutral measure).
+    The Vasicek yields use the parameters estimated under P with the explicit assumption lambda = 0 (no risk premium,
+    so theta^Q = theta^P); the gap to DGS10 includes the omitted term premium.
+    The xi / b correction is a local approximation, valid at v_t = theta^Q: the diffusion of y = a + b v is
+    b xi sqrt(v) = xi sqrt(b (y - a)), so its ratio to xi_y sqrt(y) depends on the state."""
     tb = read_fred('DTB3') / 100
     sp = g['sp500']
     rbar = float(tb.loc[sp['start']:].mean())
@@ -604,7 +604,7 @@ def measure_change(g, vs, hp):
 
 
 # =============================================================================
-# 4. SALTURI: MERTON
+# 4. JUMPS: MERTON
 # =============================================================================
 def merton_estimates():
     out = {}
@@ -620,7 +620,7 @@ def merton_estimates():
 
 
 def fig_merton_density(me):
-    """Densitatea randamentelor (scara log): date, distributia Normala, Merton."""
+    """Return density (log scale): data, the Normal distribution, Merton."""
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.5))
     for ax, k in zip(axes, ['sp500', 'btc']):
         r = rets[k].values
@@ -644,7 +644,7 @@ def fig_merton_density(me):
 
 
 def fig_jumps():
-    """Salturi detectate cu testul Lee-Mykland (alpha = 1%) pentru S&P 500 si Bitcoin."""
+    """Jumps detected by the Lee-Mykland test (alpha = 1%) for the S&P 500 and Bitcoin."""
     fig, axes = plt.subplots(2, 1, figsize=(10, 4.6), sharex=False)
     out = {}
     for ax, k in zip(axes, ['sp500', 'btc']):
@@ -670,13 +670,13 @@ def fig_jumps():
 # 5. HESTON
 # =============================================================================
 def heston_estimates():
-    """Parametrii Heston din VIX: pretul S&P 500 si VIX aliniate intai pe zilele comune (randamente pe grila comuna)."""
+    """Heston parameters from the VIX: S&P 500 price and VIX first aligned on common days (returns on the common grid)."""
     hp = heston_from_vix(load_vix(), load_close('sp500'), DT)
     return hp
 
 
 def fig_heston_paths(hp, g):
-    """Trei traiectorii Heston cu parametrii estimati din VIX (media pe termen lung = varianta realizata)."""
+    """Three Heston paths with the parameters estimated from the VIX (long-run mean = realised variance)."""
     rng = np.random.default_rng(SEED + 9)
     t, S, V = heston_paths(100.0, hp['theta_p'], g['mu'], hp['kappa'], hp['theta_p'], hp['xi'], hp['rho'], 5.0, 1260, 3, rng)
     fig, axes = plt.subplots(2, 1, figsize=(9, 4.4), sharex=True, gridspec_kw={'height_ratios': [1.3, 1]})
@@ -694,16 +694,16 @@ def fig_heston_paths(hp, g):
     save_fig('ch11_heston_paths')
     lr = np.diff(np.log(S), axis=0)
     dv = np.diff(V, axis=0)
-    # raportul Feller al parametrilor simulati (theta = varianta realizata), nu al celor din VIX
+    # Feller ratio of the simulated parameters (theta = realised variance), not of the VIX ones
     return dict(corr_sim=float(np.corrcoef(lr.ravel(), dv.ravel())[0, 1]),
                 feller_sim=float(2 * hp['kappa'] * hp['theta_p'] / hp['xi'] ** 2),
                 share_trunc=float(np.mean(V[1:] <= 0)))
 
 
 def fig_heston_smile(hp):
-    """Volatilitatea implicita Black-Scholes a preturilor Heston: efectul lui rho si al scadentei.
-    Ilustrativ: parametrii estimati din VIX (dinamica sub P a aproximarii) sunt folositi ca parametri sub Q;
-    regresia istorica nu identifica kappa^Q, theta^Q (ar fi nevoie de calibrare pe preturi de optiuni)."""
+    """Black-Scholes implied volatility of Heston prices: the effect of rho and of maturity.
+    Illustrative: the parameters estimated from the VIX (P-dynamics of the proxy) are used as Q parameters;
+    the historical regression does not identify kappa^Q, theta^Q (that would need calibration to option prices)."""
     rng = np.random.default_rng(SEED + 10)
     K = np.linspace(0.80, 1.20, 17)
     base = dict(kappa=hp['kappa'], theta=hp['theta'], xi=hp['xi'], rho=hp['rho'], v0=hp['theta'])
@@ -732,7 +732,7 @@ def fig_heston_smile(hp):
 
 
 # =============================================================================
-# 6. MODELE VS DATE
+# 6. MODELS VS DATA
 # =============================================================================
 def simulate_stats(model, p, n, dt, n_sim, rng, mu=0.0):
     out = []
@@ -748,7 +748,7 @@ def simulate_stats(model, p, n, dt, n_sim, rng, mu=0.0):
 
 
 def fig_models_vs_data(g, me, hp):
-    """ACF |r|, aplatizare si indicele de coada: S&P 500 vs GBM, Merton, Heston (100 de simulari fiecare)."""
+    """ACF of |r|, kurtosis and tail index: S&P 500 vs GBM, Merton, Heston (100 simulations each)."""
     rng = np.random.default_rng(SEED + 11)
     r = rets['sp500'].values
     n = len(r)
@@ -788,31 +788,31 @@ def fig_models_vs_data(g, me, hp):
                            p_ge=float(np.mean([x[k] >= d[k] for x in S[m]])))
                    for k in ['exkurt', 'skew', 'hill', 'acf_abs1', 'acf_abs_sum20']}
     summ['Data'] = {k: float(d[k]) for k in ['exkurt', 'skew', 'hill', 'acf_abs1', 'acf_abs_sum20']}
-    # sensibilitatea statisticii Hill la prag (k = 2.5%, 5%, 10% din n) pentru date
+    # sensitivity of the Hill statistic to the threshold (k = 2.5%, 5%, 10% of n) for the data
     summ['Data_hill'] = {f'{q:.3f}': float(hill(-r, q)) for q in (0.025, 0.05, 0.10)}
     return summ
 
 
 # =============================================================================
-# 8. STUDIU DE CAZ: Bennedsen, Lunde & Pakkanen (2022), volatilitate rugoasa si persistenta
-#    Replicare pe SPY (bare de 5 minute, 2020-2026), Delta = 1 zi; reperele din Tabelul 3, Panoul A
-#    (articolul publicat, Journal of Financial Econometrics 20(5), 961-1006)
+# 8. CASE STUDY: Bennedsen, Lunde & Pakkanen (2022), rough and persistent volatility
+#    Application to SPY (5-minute bars, 2020-2026), Delta = 1 day; benchmarks from Table 3, Panel A
+#    (Journal of Financial Econometrics 20(5), 961-1006)
 # =============================================================================
 def variogram(x, ks):
-    """Variograma empirica de ordinul 2: media (x_{i+k} - x_i)^2."""
+    """Empirical variogram of order 2: the mean of (x_{i+k} - x_i)^2."""
     x = np.asarray(x)
     return np.array([np.mean((x[k:] - x[:-k]) ** 2) for k in ks])
 
 
 def alpha_ols(x, m=6):
-    """ec. (2.1): OLS pentru log gamma_2(k) pe log k, k = 1..m; alpha = (a1 - 1)/2."""
+    """eq. (2.1): OLS of log gamma_2(k) on log k, k = 1..m; alpha = (a1 - 1)/2."""
     ks = np.arange(1, m + 1)
     a1 = np.polyfit(np.log(ks), np.log(variogram(x, ks)), 1)[0]
     return (a1 - 1) / 2
 
 
 def alpha_nlls_m(x, m, delta=1.0):
-    """NLLS robust la zgomot (Sectiunea 3.1): gamma_2(k) = b0 + b1 (k Delta)^(2 alpha + 1), k = 1..m."""
+    """Noise-robust NLLS (Section 3.1): gamma_2(k) = b0 + b1 (k Delta)^(2 alpha + 1), k = 1..m."""
     ks = np.arange(1, m + 1)
     g = variogram(x, ks)
     f = lambda p: np.sum((g - p[0] - p[1] * (ks * delta) ** (2 * p[2] + 1)) ** 2)
@@ -826,16 +826,16 @@ def alpha_nlls_m(x, m, delta=1.0):
 
 
 def cauchy_acf(h, a, b):
-    """ACF a clasei Cauchy (Sectiunea 2.1.1): (1 + |h|^(2 alpha + 1))^(-beta/(2 alpha + 1))."""
+    """ACF of the Cauchy class (Section 2.1.1): (1 + |h|^(2 alpha + 1))^(-beta/(2 alpha + 1))."""
     return (1 + np.abs(h) ** (2 * a + 1)) ** (-b / (2 * a + 1))
 
 
 def rough_vol_spy():
-    """log sigma_t zilnic din variatia bipower a randamentelor SPY la 5 minute; alpha (OLS, NLLS) si beta (Cauchy)."""
+    """Daily log sigma_t from the bipower variation of SPY 5-minute returns; alpha (OLS, NLLS) and beta (Cauchy)."""
     r = load_spy_5m()
     day = r.index.date
     bv = r.groupby(day).apply(lambda x: np.pi / 2 * np.sum(np.abs(x.values[1:]) * np.abs(x.values[:-1])))
-    x = 0.5 * np.log(bv.values)                 # log sigma, Delta = 1 zi (constanta 1/Delta nu schimba alpha, beta)
+    x = 0.5 * np.log(bv.values)                 # log sigma, Delta = 1 day (the constant 1/Delta does not change alpha, beta)
     n = len(x)
     a_ols = alpha_ols(x)
     nl = [alpha_nlls_m(x, m) for m in range(10, 21)]
@@ -848,7 +848,7 @@ def rough_vol_spy():
                                  bounds=(0, 5), method='bounded').x
     rob = optimize.minimize(lambda p: np.sum((np.log(rho[:H]) - p[0] - np.log(cauchy_acf(hh, a_nl, p[1]))) ** 2),
                             [-0.1, 0.2], method='L-BFGS-B', bounds=[(None, 0), (0, 5)]).x
-    # contrast cu memorie scurta (OU, alpha = 0): log rho(h) = c - lambda h, pe aceleasi H laguri
+    # short-memory contrast (OU, alpha = 0): log rho(h) = c - lambda h, on the same H lags
     ou = np.polyfit(hh, np.log(rho[:H]), 1)
     return dict(n=n, start=str(bv.index[0]), end=str(bv.index[-1]), H=H, x=x, rho=rho,
                 alpha_ols=a_ols, alpha_nlls=a_nl, alpha_nlls_m=[float(p[2]) for p in nl],
@@ -858,8 +858,8 @@ def rough_vol_spy():
 
 
 def fig_rough_vol(rv):
-    """Stanga: variograma log-log a lui log sigma (SPY, Delta = 1 zi) cu dreapta OLS (k = 1..6) si NLLS;
-    dreapta: ACF empirica fata de clasa Cauchy (rugoasa + persistenta) si de OU (memorie scurta)."""
+    """Left: log-log variogram of log sigma (SPY, Delta = 1 day) with the OLS line (k = 1..6) and NLLS;
+    right: sample ACF against the Cauchy class (rough + persistent) and OU (short memory)."""
     x = rv['x']
     ks = np.arange(1, 31)
     g = variogram(x, ks)
@@ -903,8 +903,8 @@ def fig_rough_vol(rv):
 
 
 def fig_rough_vs_paper(rv):
-    """Tabelul 3, Panoul A (E-mini S&P 500, 2011-2014) pe scale Delta, fata de estimarile pe datele cursului pentru SPY, Delta = 1 zi."""
-    # Tabelul 3, Panoul A (log-volatilitatea E-mini S&P 500, 2011-2014): Delta in minute (390 = o zi de tranzactionare)
+    """Table 3, Panel A (E-mini S&P 500, 2011-2014) across scales Delta, against the SPY estimates on the course data, Delta = 1 day."""
+    # Table 3, Panel A (E-mini S&P 500 log-volatility, 2011-2014): Delta in minutes (390 = one trading day)
     T = {'delta_min': [10, 15, 30, 65, 130, 390],
          'alpha_ols': [-0.38, -0.35, -0.31, -0.30, -0.32, -0.30],
          'alpha_nlls': [-0.38, -0.37, -0.35, -0.35, -0.35, -0.33],
@@ -952,7 +952,7 @@ def rough_case():
 
 # =============================================================================
 if __name__ == '__main__' and sys.argv[1:] == ['extra']:
-    # doar sectiunile noi (estimarea difuziilor, schimbarea masurii), fara a recalcula restul
+    # only the new sections (estimating diffusions, change of measure), without recomputing the rest
     with open(os.path.join(HERE, 'ch11_results.json')) as f:
         R = json.load(f)
     R['diffusion'] = diffusion_fits()
@@ -962,7 +962,7 @@ if __name__ == '__main__' and sys.argv[1:] == ['extra']:
         json.dump(jsonable(R), f, indent=1)
     print('updated ch11_results.json')
 elif __name__ == '__main__' and sys.argv[1:] == ['case']:
-    # doar studiul de caz (volatilitate rugoasa si persistenta), fara a recalcula restul
+    # only the case study (rough and persistent volatility), without recomputing the rest
     with open(os.path.join(HERE, 'ch11_results.json')) as f:
         R = json.load(f)
     R['rough'] = rough_case()

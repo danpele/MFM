@@ -1,14 +1,14 @@
 """
-estimation_risk.py -- Inferenta pentru masurile de risc (Capitolul 7, MFM)
-=========================================================================
-  * erori standard asimptotice pentru VaR si ES istorice (cuantila empirica; ES: Chen, 2008), i.i.d. si HAC;
-  * reprezentarea Rockafellar-Uryasev a ES si portofoliul cu ES minim (program liniar pe scenarii);
-  * agregarea VaR sub incertitudinea dependentei: algoritmul de rearanjare (Embrechts, Puccetti & Rueschendorf, 2013);
-  * riscul de estimare in VaR-ul FHS: bootstrap pe reziduuri (Christoffersen & Goncalves, 2005);
-  * CAViaR cu valoare absoluta simetrica (Engle & Manganelli, 2004), estimat prin pierderea pinball;
-  * indicele extremal (estimatorul pe intervale, Ferro & Segers, 2003) si declusterizarea.
-Conventie: pierderea L = -r in %, VaR_alpha = q_{1-alpha}(L) = -q_alpha(r), ES_alpha = E[L | L >= VaR_alpha].
-Cifrele sunt salvate in ch7_inference.json; graficul ch7_caviar.
+estimation_risk.py -- Inference for risk measures (Chapter 7, MFM)
+===================================================================
+  * asymptotic standard errors of historical VaR and ES (empirical quantile; ES: Chen, 2008), i.i.d. and HAC;
+  * the Rockafellar-Uryasev representation of ES and the minimum-ES portfolio (linear program on scenarios);
+  * VaR aggregation under dependence uncertainty: the rearrangement algorithm (Embrechts, Puccetti & Rueschendorf, 2013);
+  * estimation risk in the FHS VaR: residual bootstrap (Christoffersen & Goncalves, 2005);
+  * symmetric absolute value CAViaR (Engle & Manganelli, 2004), fitted by the pinball loss;
+  * the extremal index (intervals estimator, Ferro & Segers, 2003) and declustering.
+Convention: loss L = -r in %, VaR_alpha = q_{1-alpha}(L) = -q_alpha(r), ES_alpha = E[L | L >= VaR_alpha].
+The numbers are written to ch7_inference.json; chart ch7_caviar.
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """
 
@@ -33,10 +33,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 # =============================================================================
-# 1. Distributia de selectie a VaR si ES istorice
+# 1. Sampling distribution of historical VaR and ES
 # =============================================================================
 def nw_lrv(x):
-    """Dispersia de termen lung (Newey-West, nucleu Bartlett, decalaj floor(4 (n/100)^(2/9)))."""
+    """Long-run variance (Newey-West, Bartlett kernel, lag floor(4 (n/100)^(2/9)))."""
     x = np.asarray(x, float) - np.mean(x)
     n = len(x)
     m = int(np.floor(4 * (n / 100) ** (2 / 9)))
@@ -47,9 +47,9 @@ def nw_lrv(x):
 
 
 def var_es_se(L, a_var=0.01, a_es=0.025):
-    """VaR istoric: avar = a(1-a)/f(q)^2 (densitate prin nucleu Gaussian, regula lui Silverman);
-    ES istoric (Chen, 2008): functia de influenta VaR + (L - VaR)_+/a - ES, avar = Var((L - VaR)_+)/a^2.
-    Varianta HAC: dispersia de termen lung a indicatorului, respectiv a lui (L - VaR)_+."""
+    """Historical VaR: avar = a(1-a)/f(q)^2 (Gaussian kernel density, Silverman's rule);
+    historical ES (Chen, 2008): influence function VaR + (L - VaR)_+/a - ES, avar = Var((L - VaR)_+)/a^2.
+    HAC version: long-run variance of the indicator and of (L - VaR)_+, respectively."""
     L = np.asarray(L, float)
     n = len(L)
     v = np.quantile(L, 1 - a_var)
@@ -67,7 +67,7 @@ def var_es_se(L, a_var=0.01, a_es=0.025):
 
 
 def se_theory(sigma=1.2, n=500, nu=4, alpha=0.01):
-    """SE asimptotic al VaR 1% istoric sub distributia Normala si sub Student-t (aceeasi abatere standard)."""
+    """Asymptotic SE of the historical VaR 1% under the Normal distribution and under a Student-t (same standard deviation)."""
     z = stats.norm.ppf(1 - alpha)
     f_n = stats.norm.pdf(z) / sigma
     s = sigma * np.sqrt((nu - 2) / nu)
@@ -78,7 +78,7 @@ def se_theory(sigma=1.2, n=500, nu=4, alpha=0.01):
 
 
 # =============================================================================
-# 2. Rockafellar-Uryasev: ES ca problema de optimizare
+# 2. Rockafellar-Uryasev: ES as an optimisation problem
 # =============================================================================
 def ru_objective(L, v, alpha):
     return v + np.maximum(np.asarray(L) - v, 0).mean() / alpha
@@ -93,8 +93,8 @@ def ru_check(L, alpha=0.025):
 
 
 def min_es_portfolio(R, alpha=0.025):
-    """ES minim pe scenarii (Rockafellar & Uryasev, 2000): min v + 1/(alpha N) sum u_s,
-    u_s >= -R_s w - v, u_s >= 0, sum w = 1, w >= 0 (fara vanzari in lipsa)."""
+    """Minimum ES on scenarios (Rockafellar & Uryasev, 2000): min v + 1/(alpha N) sum u_s,
+    u_s >= -R_s w - v, u_s >= 0, sum w = 1, w >= 0 (no short sales)."""
     N, d = R.shape
     c = np.concatenate([np.zeros(d), [1.0], np.full(N, 1 / (alpha * N))])
     from scipy.sparse import csr_matrix, hstack as sh, identity
@@ -116,7 +116,7 @@ def min_var_portfolio(R):
 
 
 def drop_largest(L, alpha_var=0.01, alpha_es=0.025):
-    """Sensibilitatea la o singura observatie: VaR 1% si ES 2,5% istorice cu si fara cea mai mare pierdere."""
+    """Sensitivity to a single observation: historical VaR 1% and ES 2.5% with and without the largest loss."""
     L = np.asarray(L, float)
     L2 = np.delete(L, np.argmax(L))
     return dict(max=L.max(), var=np.quantile(L, 1 - alpha_var), var_drop=np.quantile(L2, 1 - alpha_var),
@@ -124,7 +124,7 @@ def drop_largest(L, alpha_var=0.01, alpha_es=0.025):
 
 
 # =============================================================================
-# 3. Agregare sub incertitudinea dependentei: algoritmul de rearanjare
+# 3. Aggregation under dependence uncertainty: the rearrangement algorithm
 # =============================================================================
 def rearrangement(X, tol=1e-10, max_iter=1000):
     X = X.copy()
@@ -132,16 +132,16 @@ def rearrangement(X, tol=1e-10, max_iter=1000):
         old = X.copy()
         for j in range(X.shape[1]):
             rest = X.sum(axis=1) - X[:, j]
-            X[np.argsort(rest), j] = np.sort(X[:, j])[::-1]    # ordonare opusa fata de suma celorlalte coloane
+            X[np.argsort(rest), j] = np.sort(X[:, j])[::-1]    # order opposite to the sum of the other columns
         if np.max(np.abs(X - old)) < tol:
             break
     return X
 
 
 def worst_var_ra(Lcols, alpha=0.01, N=2000):
-    """VaR 1% maxim al sumei cu marginale date (Embrechts, Puccetti & Rueschendorf, 2013):
-    discretizam coada de probabilitate alpha a fiecarei marginale in N puncte (jos / sus) si rearanjam;
-    VaR-ul cel mai rau ~ minimul sumelor pe randuri."""
+    """Worst-case VaR 1% of a sum with given marginals (Embrechts, Puccetti & Rueschendorf, 2013):
+    discretise the tail of probability alpha of each marginal in N points (lower / upper) and rearrange;
+    worst VaR ~ minimum of the row sums."""
     lo = np.column_stack([np.quantile(x, 1 - alpha + alpha * np.arange(N) / N) for x in Lcols])
     hi = np.column_stack([np.quantile(x, 1 - alpha + alpha * np.arange(1, N + 1) / N) for x in Lcols])
     return rearrangement(lo).sum(axis=1).min(), rearrangement(hi).sum(axis=1).min()
@@ -155,7 +155,7 @@ def aggregation(alpha=0.01):
     como = sum(np.quantile(x, 1 - alpha) for x in Lw)
     hist = np.quantile(-(R.values @ W), 1 - alpha)
     lo, hi = worst_var_ra(Lw, alpha)
-    # ES minim (LP) si portofoliul de dispersie minima, alpha = 2.5%
+    # minimum ES (LP) and the minimum-variance portfolio, alpha = 2.5%
     w_es, v_es, es_min = min_es_portfolio(R.values, 0.025)
     w_mv = min_var_portfolio(R.values)
     es_mv = hs_var_es(-(R.values @ w_mv), 0.025)[1]
@@ -167,12 +167,12 @@ def aggregation(alpha=0.01):
 
 
 # =============================================================================
-# 4. Riscul de estimare in VaR-ul FHS (bootstrap pe reziduuri)
+# 4. Estimation risk in the FHS VaR (residual bootstrap)
 # =============================================================================
 def fhs_bootstrap(r, alpha=0.01, B=999, seed=SEED, level=0.90, return_draws=False):
-    """Christoffersen & Goncalves (2005): traiectorii AR(1)-GARCH(1,1) cu reziduuri reesantionate;
-    re-estimam parametrii pe fiecare traiectorie; sigma_{T+1} din datele ORIGINALE cu parametrii bootstrap;
-    cuantila din reziduurile standardizate ale traiectoriei bootstrap."""
+    """Christoffersen & Goncalves (2005): AR(1)-GARCH(1,1) paths with resampled residuals;
+    re-estimate the parameters on each path; sigma_{T+1} from the ORIGINAL data with the bootstrap parameters;
+    quantile from the standardised residuals of the bootstrap path."""
     rng = np.random.default_rng(seed)
     params, mu, sig = garch_filter(r)
     z = ((r - mu) / sig).dropna().values
@@ -195,12 +195,12 @@ def fhs_bootstrap(r, alpha=0.01, B=999, seed=SEED, level=0.90, return_draws=Fals
         rs = pd.Series(rs, index=r.index)
         pb, mub, sgb = garch_filter(rs)
         zb = ((rs - mub) / sgb).dropna().values
-        mb, sb = garch_next(r, pb)                    # istoria ORIGINALA, parametrii bootstrap
+        mb, sb = garch_next(r, pb)                    # ORIGINAL history, bootstrap parameters
         qb = np.quantile(-zb, 1 - alpha)
         out[b] = -mb + sb * qb
         parts[b] = [sb, qb]
     lo, hi = np.quantile(out, [(1 - level) / 2, (1 + level) / 2])
-    # descompunere: doar incertitudinea cuantilei (sigma fixat) vs doar a lui sigma (cuantila fixata)
+    # decomposition: quantile uncertainty only (sigma fixed) vs sigma uncertainty only (quantile fixed)
     q0 = np.quantile(-z, 1 - alpha)
     only_q = np.quantile(-m1 + s1 * parts[:, 1], [(1 - level) / 2, (1 + level) / 2])
     only_s = np.quantile(-m1 + parts[:, 0] * q0, [(1 - level) / 2, (1 + level) / 2])
@@ -212,10 +212,10 @@ def fhs_bootstrap(r, alpha=0.01, B=999, seed=SEED, level=0.90, return_draws=Fals
 
 
 # =============================================================================
-# 5. CAViaR (valoare absoluta simetrica), estimat prin pierderea pinball
+# 5. CAViaR (symmetric absolute value), fitted by the pinball loss
 # =============================================================================
 def caviar_path(beta, r, v0):
-    """VaR_t = b0 + b1 VaR_{t-1} + b2 |r_{t-1}| (VaR pozitiv; cuantila q_t = -VaR_t)."""
+    """VaR_t = b0 + b1 VaR_{t-1} + b2 |r_{t-1}| (positive VaR; quantile q_t = -VaR_t)."""
     b0, b1, b2 = beta
     x = b0 + b2 * np.abs(np.asarray(r, float)[:-1])
     rest = signal.lfilter([1.0], [1.0, -b1], x, zi=[b1 * v0])[0]
@@ -223,13 +223,13 @@ def caviar_path(beta, r, v0):
 
 
 def pinball(r, q, alpha):
-    """Pierderea pinball (tick) medie pentru cuantila q a randamentului: (alpha - 1{r < q})(r - q)."""
+    """Mean pinball (tick) loss for the return quantile q: (alpha - 1{r < q})(r - q)."""
     return np.mean((alpha - (r < q)) * (r - q))
 
 
 def caviar_fit(r, alpha=0.01, n_rand=10_000, n_best=10, seed=SEED):
-    """Engle & Manganelli (2004): 10^4 vectori initiali U(0,1), cei mai buni 10 rafinati alternand simplex
-    si quasi-Newton pana la convergenta; VaR initial = cuantila empirica a primelor 300 de observatii."""
+    """Engle & Manganelli (2004): 10^4 starting vectors U(0,1), the best 10 refined by alternating simplex
+    and quasi-Newton steps until convergence; starting VaR = empirical quantile of the first 300 observations."""
     r = np.asarray(r, float)
     v0 = -np.quantile(r[:300], alpha)
     obj = lambda b: pinball(r, -caviar_path(b, r, v0), alpha) if abs(b[1]) < 1 else 1e6  # noqa: E731
@@ -289,12 +289,12 @@ def fig_caviar(v, fhs, name='sp500', title='S&P 500', start='2016-01-01'):
 
 
 # =============================================================================
-# 6. Indicele extremal (Ferro & Segers, 2003) si declusterizarea
+# 6. The extremal index (Ferro & Segers, 2003) and declustering
 # =============================================================================
 def extremal_index(L, tail=0.05):
-    """Estimatorul pe intervale: timpii dintre depasiri T_i; declusterizare cu cei mai mari C - 1 timpi,
-    C = floor(theta N) + 1 (cel mult N); la egalitati, C scade pana cand T_(C-1) > T_(C) (Ferro & Segers, 2003,
-    Sectiunea 4); GPD pe maximele clusterelor."""
+    """Intervals estimator: inter-exceedance times T_i; declustering with the C - 1 largest times,
+    C = floor(theta N) + 1 (at most N); with ties, C is lowered until T_(C-1) > T_(C) (Ferro & Segers, 2003,
+    Section 4); GPD on the cluster maxima."""
     L = np.asarray(L, float)
     u = np.quantile(L, 1 - tail)
     S = np.flatnonzero(L > u)
@@ -305,8 +305,8 @@ def extremal_index(L, tail=0.05):
     else:
         th = 2 * (T - 1).sum() ** 2 / ((N - 1) * ((T - 1) * (T - 2)).sum())
     th = min(1.0, th)
-    C = min(int(np.floor(th * N)) + 1, N)                        # cel mult un cluster pe depasire
-    cut = np.sort(T)[::-1][C - 2] if C > 1 else np.inf           # al (C-1)-lea cel mai mare timp
+    C = min(int(np.floor(th * N)) + 1, N)                        # at most one cluster per exceedance
+    cut = np.sort(T)[::-1][C - 2] if C > 1 else np.inf           # the (C-1)-th largest time
     breaks = np.flatnonzero(T > cut) if np.sum(T >= cut) > C - 1 else np.flatnonzero(T >= cut)
     groups = np.split(np.arange(N), breaks + 1)
     cmax = np.array([L[S[g]].max() for g in groups])
@@ -319,7 +319,7 @@ def extremal_index(L, tail=0.05):
 
 
 def gev_theta(theta):
-    """VaR 1% zilnic din maximele lunare cu corectia indicelui extremal: H^{-1}((1-alpha)^{n theta})."""
+    """Daily VaR 1% from monthly maxima with the extremal-index correction: H^{-1}((1-alpha)^{n theta})."""
     r = 100 * log_returns('sp500')
     L = -r
     M = L.groupby([L.index.year, L.index.month]).max()
@@ -331,11 +331,11 @@ def gev_theta(theta):
 
 
 # =============================================================================
-# 7. Cifre pentru seminar (A1', A6', A8, B1(c))
+# 7. Numbers for the seminar (A1, A6, A8, B1 Extended)
 # =============================================================================
 def seminar_extras():
     out = {}
-    # A8: dispersia asimptotica a ES 2,5% istoric sub N(0, 1): Var((L - v)_+) / alpha^2, momente de Normala trunchiata
+    # Seminar A8: asymptotic variance of the historical ES 2.5% under N(0, 1): Var((L - v)_+) / alpha^2, truncated Normal moments
     a = 0.025
     v = stats.norm.ppf(1 - a)
     m1 = stats.norm.pdf(v) - v * a                       # E[(L - v)_+]
@@ -343,7 +343,7 @@ def seminar_extras():
     avar = (m2 - m1 ** 2) / a ** 2
     out['a8'] = dict(v=v, phi=stats.norm.pdf(v), m1=m1, m2=m2, var=m2 - m1 ** 2, avar=avar,
                      se500=np.sqrt(avar / 500), se500_pct=1.2 * np.sqrt(avar / 500), es=stats.norm.pdf(v) / a)
-    # A6': monotonia hartii Cornish-Fisher pe z in [z_0.1%, 0]: derivata a z^2 + b z + c > 0
+    # Seminar A6: monotonicity of the Cornish-Fisher map for z in [z_0.1%, 0]: derivative a z^2 + b z + c > 0
     def dmin(S, K):
         z = np.linspace(stats.norm.ppf(0.001), 0, 20001)
         return (1 + z * S / 3 + (3 * z ** 2 - 3) * K / 24 - (6 * z ** 2 - 5) * S ** 2 / 36).min()
@@ -351,11 +351,11 @@ def seminar_extras():
     kmax = optimize.brentq(lambda K: dmin(S, K), 0.1, 30)
     kmax0 = optimize.brentq(lambda K: dmin(0.0, K), 0.1, 30)
     out['a6'] = dict(kmax=kmax, kmax0=kmax0, d3=dmin(S, 3.0), d10=dmin(S, 10.0))
-    # A1': SE asimptotic al VaR 1% istoric sub N(0.04, 1.2^2)
+    # Seminar A1: asymptotic SE of the historical VaR 1% under N(0.04, 1.2^2)
     z = stats.norm.ppf(0.01)
     out['a1'] = dict(f=stats.norm.pdf(z) / 1.2, se500=1.2 * np.sqrt(0.01 * 0.99 / 500) / stats.norm.pdf(z),
                      se6670=1.2 * np.sqrt(0.01 * 0.99 / 6670) / stats.norm.pdf(z))
-    # B1(c): BET, VaR 1%: interval asimptotic (densitate prin nucleu) si bootstrap pe blocuri (20 de zile)
+    # Seminar B1 Extended: BET, VaR 1%: asymptotic interval (kernel density) and block bootstrap (20 days)
     L = (-100 * log_returns('bet')).values
     for tag, x in [('full', L), ('w500', L[-500:])]:
         se = var_es_se(x)
@@ -368,11 +368,11 @@ def seminar_extras():
 
 
 # =============================================================================
-# 8. Graficul preciziei pentru S&P 500 (curs): intervale de 95% pentru VaR 1% si ES 2,5%
+# 8. Precision chart for the S&P 500 (lecture): 95% intervals for VaR 1% and ES 2.5%
 # =============================================================================
 def fig_precision(INF, B6):
-    """Intervale de 95% pentru S&P 500: asimptotic i.i.d., asimptotic HAC (VaR si ES) si bootstrap i.i.d. / pe blocuri (ES).
-    Un rand pentru fiecare masura si selectie; metodele sunt barele decalate din interiorul randului."""
+    """95% intervals for the S&P 500: asymptotic i.i.d., asymptotic HAC (VaR and ES) and i.i.d. / block bootstrap (ES).
+    One row per measure and sample; the methods are the offset bars within each row."""
     plt.rcParams['font.size'] = 9
     col = {'Asymptotic i.i.d.': Teal, 'Asymptotic HAC': Purple, 'i.i.d. bootstrap': MainBlue,
            'Block bootstrap, 20 days': IDAred}

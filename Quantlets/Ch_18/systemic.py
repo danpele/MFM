@@ -24,28 +24,28 @@ warnings.filterwarnings('ignore')
 # MES, LRMES, SRISK
 # =============================================================================
 def mes(r_i, r_m, alpha=0.05):
-    """MES (%): pierderea medie a bancii in zilele in care piata este in coada de probabilitate alpha."""
+    """MES (%): average loss of the bank on the days when the market is in its alpha-probability tail."""
     q = np.quantile(r_m, alpha)
     return -np.mean(np.asarray(r_i)[np.asarray(r_m) <= q])
 
 
 def mes_threshold(r_i, r_m, c=-2.0):
-    """MES (%) in zilele in care piata scade cu mai mult de |c|% (definitia folosita pentru LRMES)."""
+    """MES (%) on the days when the market falls by more than |c|% (the definition used for LRMES)."""
     return -np.mean(np.asarray(r_i)[np.asarray(r_m) < c])
 
 
 def lrmes(mes2_pct):
-    """Pierderea pe termen lung intr-o criza (piata -40% in sase luni): LRMES = 1 - exp(-18 MES), MES in fractii."""
+    """Long-run loss in a crisis (market -40% over six months): LRMES = 1 - exp(-18 MES), MES as a fraction."""
     return 1 - np.exp(-18 * mes2_pct / 100)
 
 
 def srisk_ratio(lrm, leverage, k=0.08):
-    """SRISK / capitalul de piata W: k(L - 1) - (1 - k)(1 - LRMES), cu L = (D + W)/W."""
+    """SRISK / market equity W: k(L - 1) - (1 - k)(1 - LRMES), with L = (D + W)/W."""
     return k * (leverage - 1) - (1 - k) * (1 - lrm)
 
 
 def breakeven_leverage(lrm, k=0.08):
-    """Levierul L* peste care SRISK > 0: L* = 1 + (1 - k)(1 - LRMES)/k."""
+    """Leverage L* above which SRISK > 0: L* = 1 + (1 - k)(1 - LRMES)/k."""
     return 1 + (1 - k) * (1 - lrm) / k
 
 
@@ -53,14 +53,14 @@ def breakeven_leverage(lrm, k=0.08):
 # CoVaR
 # =============================================================================
 def qreg(y, X, q):
-    """Regresie cuantila (Koenker-Bassett); intoarce coeficientii [termen liber, pante]."""
+    """Quantile regression (Koenker-Bassett); returns the coefficients [intercept, slopes]."""
     return QuantReg(np.asarray(y), sm.add_constant(np.asarray(X), has_constant='add')).fit(q=q, max_iter=5000).params
 
 
 def covar_static(x_sys, x_i, alpha=0.01):
-    """CoVaR si Delta-CoVaR necondiționate (%, pozitive = pierderi).
+    """Unconditional CoVaR and Delta-CoVaR (%, positive = losses).
 
-    Regresia cuantila la nivelul alpha: X_sys = a + b X_i;
+    Quantile regression at level alpha: X_sys = a + b X_i;
     CoVaR_alpha = -(a + b q_alpha(X_i)); Delta-CoVaR = b (q_50(X_i) - q_alpha(X_i))."""
     x_sys, x_i = np.asarray(x_sys), np.asarray(x_i)
     a, b = qreg(x_sys, x_i, alpha)
@@ -70,14 +70,14 @@ def covar_static(x_sys, x_i, alpha=0.01):
 
 
 def block_bootstrap_idx(n, block=20, rng=None):
-    """Indici pentru bootstrap pe blocuri mobile (Künsch), blocuri de lungime fixa."""
+    """Indices for the moving-block bootstrap (Künsch), fixed-length blocks."""
     rng = rng or np.random.default_rng(0)
     starts = rng.integers(0, n - block + 1, size=int(np.ceil(n / block)))
     return (starts[:, None] + np.arange(block)[None, :]).ravel()[:n]
 
 
 def covar_boot(x_sys, x_i, alpha=0.01, B=200, block=20, seed=0):
-    """Interval percentil de 95% pentru Delta-CoVaR prin bootstrap pe blocuri mobile."""
+    """95% percentile interval for Delta-CoVaR by moving-block bootstrap."""
     x_sys, x_i = np.asarray(x_sys), np.asarray(x_i)
     rng = np.random.default_rng(seed)
     d = []
@@ -88,10 +88,10 @@ def covar_boot(x_sys, x_i, alpha=0.01, B=200, block=20, seed=0):
 
 
 def covar_dynamic(x_sys, x_i, M, alpha=0.01):
-    """Delta-CoVaR variabil in timp cu variabile de stare M_{t-1} (Adrian & Brunnermeier, 2016).
+    """Time-varying Delta-CoVaR with state variables M_{t-1} (Adrian & Brunnermeier, 2016).
 
-    X_i,t = a + c'M_{t-1} la nivelurile alpha si 50%  ->  VaR_i,t;
-    X_sys,t = a + b X_i,t + c'M_{t-1} la nivelul alpha  ->  Delta-CoVaR_t = b (q50_i,t - qalpha_i,t)."""
+    X_i,t = a + c'M_{t-1} at levels alpha and 50%  ->  VaR_i,t;
+    X_sys,t = a + b X_i,t + c'M_{t-1} at level alpha  ->  Delta-CoVaR_t = b (q50_i,t - qalpha_i,t)."""
     ci_a = qreg(x_i, M, alpha)
     ci_m = qreg(x_i, M, 0.5)
     cs = qreg(x_sys, np.column_stack([x_i, M]), alpha)
@@ -104,7 +104,7 @@ def covar_dynamic(x_sys, x_i, M, alpha=0.01):
 # Diebold-Yilmaz
 # =============================================================================
 def var_fit(Y, p):
-    """VAR(p) estimat prin OLS; intoarce coeficientii A_1..A_p (k x k) si matricea de covarianta a reziduurilor."""
+    """VAR(p) estimated by OLS; returns the coefficients A_1..A_p (k x k) and the residual covariance matrix."""
     Y = np.asarray(Y, float)
     T, k = Y.shape
     X = np.hstack([np.ones((T - p, 1))] + [Y[p - l - 1:T - l - 1] for l in range(p)])
@@ -117,14 +117,14 @@ def var_fit(Y, p):
 
 
 def var_bic(Y, pmax=5):
-    """Ordinul VAR ales prin criteriul BIC (Schwarz), cu matricea de covarianta a reziduurilor de verosimilitate maxima."""
+    """VAR order chosen by the Bayesian information criterion (BIC, Schwarz), with the maximum-likelihood residual covariance matrix."""
     Y = np.asarray(Y, float)
     T, k = Y.shape
     best = None
     n = T - pmax
     for p in range(1, pmax + 1):
         A, S = var_fit(Y[pmax - p:], p)
-        S_ml = S * (n - 1 - p * k) / n                        # covarianta de verosimilitate maxima E'E / n
+        S_ml = S * (n - 1 - p * k) / n                        # maximum-likelihood covariance E'E / n
         bic = np.log(np.linalg.det(S_ml)) + np.log(n) * p * k * k / n
         if best is None or bic < best[1]:
             best = (p, bic)
@@ -132,7 +132,7 @@ def var_bic(Y, pmax=5):
 
 
 def ma_coefs(A, H):
-    """Coeficientii reprezentarii medie mobila Phi_0..Phi_{H-1}."""
+    """Moving-average coefficients Phi_0..Phi_{H-1}."""
     k = A[0].shape[0]
     Phi = [np.eye(k)]
     for h in range(1, H):
@@ -141,7 +141,7 @@ def ma_coefs(A, H):
 
 
 def gfevd(A, S, H=10):
-    """Descompunerea generalizata a dispersiei erorii de prognoza (Pesaran-Shin), normalizata pe linii."""
+    """Generalized forecast error variance decomposition (Pesaran-Shin), rows normalised."""
     Phi = ma_coefs(A, H)
     k = S.shape[0]
     num = np.zeros((k, k))
@@ -155,7 +155,7 @@ def gfevd(A, S, H=10):
 
 
 def spillover_table(theta, names):
-    """Tabelul de conectivitate: contributii (%), FROM, TO, NET si indicele total."""
+    """Connectedness table: contributions (%), FROM, TO, NET and the total index."""
     k = theta.shape[0]
     D = 100 * theta
     off = D - np.diag(np.diag(D))
@@ -167,7 +167,7 @@ def spillover_table(theta, names):
 
 
 def rolling_total(Y, window=250, step=5, p=2, H=10):
-    """Indicele total de conectivitate pe ferestre mobile."""
+    """Total connectedness index on rolling windows."""
     Y = pd.DataFrame(Y)
     out, frm_to = {}, {}
     for end in range(window, len(Y) + 1, step):
@@ -187,7 +187,7 @@ def check_loss(u, tau):
 
 
 def lasso_qr_gacv(y, X, tau=0.05, lambdas=None):
-    """Regresie cuantila penalizata L1; lambda ales prin GACV = sum rho_tau(rez) / (n - df)."""
+    """L1-penalized quantile regression; lambda chosen by the generalized approximate cross-validation criterion GACV = sum rho_tau(res) / (n - df)."""
     y, X = np.asarray(y, float), np.asarray(X, float)
     n = len(y)
     lambdas = np.logspace(-4, -0.5, 15) if lambdas is None else lambdas

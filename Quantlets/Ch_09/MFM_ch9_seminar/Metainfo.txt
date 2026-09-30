@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Intraday data (data/market/intraday): SPY and Bitcoin, 5-minute bars; daily data (data/market): SPY, Bitcoin, CBOE VIX index'
+Datafile: 'Course data: SPY and Bitcoin 5-minute bars; daily prices of SPY, Bitcoin and the CBOE VIX index'
 
 Output: 'ch9_sem_jump_times.pdf, ch9_sem_frequency.pdf, ch9_sem_c1.pdf, ch9_sem_day.pdf, ch9_sem_a1.pdf, ch9_sem_a2.pdf, ch9_sem_a3.pdf, ch9_sem_a4.pdf, ch9_sem_a5.pdf, ch9_sem_a6.pdf, ch9_sem_a7.pdf, ch9_sem_a8.pdf, ch9_sem_b1.pdf, ch9_sem_b2.pdf, ch9_sem_b3.pdf, ch9_sem_b4.pdf, ch9_sem_b5.pdf, ch9_sem_b6.pdf, ch9_sem_b7.pdf, ch9_sem_b8.pdf, ch9_sem_b9.pdf, ch9_sem_c1_boot.pdf'

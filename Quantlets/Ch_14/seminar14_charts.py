@@ -32,7 +32,7 @@ def load_json(name):
 
 
 # =============================================================================
-# PARTEA A
+# PART A
 # =============================================================================
 def sem_a1():
     """A1: ||W^k||_2 against the norm bound ||W||_2^k and rho(W)^k, W = [[0.5, 0.8], [0, 0.5]]."""
@@ -118,7 +118,7 @@ def sem_a8():
     fig, ax = plt.subplots(figsize=(5.6, 2.8))
     w = 0.38
     ax.bar(x - w / 2, stats.binom.pmf(x, T, 0.01), width=w, color=MainBlue, label='True rate 1% (model correct)')
-    ax.bar(x + w / 2, stats.binom.pmf(x, T, 0.0167), width=w, color=Orange, label='True rate 1.67% (raw Chronos-2)')
+    ax.bar(x + w / 2, stats.binom.pmf(x, T, 0.0167), width=w, color=Orange, label='True rate 1.67% (Chronos-2 direct quantiles)')
     for xx in x:
         if xx in rej:
             ax.axvspan(xx - 0.5, xx + 0.5, color=IDAred, alpha=0.12, lw=0)
@@ -150,7 +150,7 @@ def sem_a9():
 
 
 # =============================================================================
-# PARTEA B
+# PART B
 # =============================================================================
 RET_ORDER = ['Historical mean', 'AR(1)', 'LSTM', 'Chronos-2', 'Chronos-Bolt', 'TimesFM-2.5']
 
@@ -319,7 +319,7 @@ def sem_b7():
 
 def sem_b10():
     C = load_json('ch14_inference.json')['conf']
-    meth = [('FHS', 'FHS', RISK_COL['FHS']), ('C2-raw', 'Chronos-2 raw', RISK_COL['C2-raw']),
+    meth = [('FHS', 'FHS', RISK_COL['FHS']), ('C2-raw', 'Chronos-2 direct quantile', RISK_COL['C2-raw']),
             ('C2-SCP', 'Split conformal', Purple), ('C2-ACI', 'Adaptive conformal (ACI)', MainBlue)]
     fig, ax = plt.subplots(figsize=(6.0, 2.7))
     w = 0.2

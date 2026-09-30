@@ -34,10 +34,10 @@ SEM = {}
 
 
 # =============================================================================
-# PARTEA A
+# PART A
 # =============================================================================
 def a1_covar_normal(s_sys=1.5, s_i=2.0, rho=0.6, alpha=0.01):
-    """CoVaR sub distributia Normala bivariata cu medii zero."""
+    """CoVaR under the bivariate Normal distribution with zero means."""
     z = stats.norm.ppf(alpha)
     return {'z': z, 'var_i': -s_i * z, 'var_sys': -s_sys * z, 'cond_sd': s_sys * np.sqrt(1 - rho ** 2),
             'covar': -s_sys * z * (rho + np.sqrt(1 - rho ** 2)), 'covar_med': -s_sys * np.sqrt(1 - rho ** 2) * z,
@@ -45,12 +45,12 @@ def a1_covar_normal(s_sys=1.5, s_i=2.0, rho=0.6, alpha=0.01):
 
 
 def a2_covar_normal():
-    """Doua banci: B are VaR dublu, dar corelatie mai mica cu sistemul."""
+    """Two banks: B has twice the VaR but a lower correlation with the system."""
     return {'A': a1_covar_normal(rho=0.6, s_i=2.0), 'B': a1_covar_normal(rho=0.3, s_i=4.0)}
 
 
 def a2_ge_covar(s_sys=1.5, rho=0.6, alpha=0.01):
-    """CoVaR Girardi-Ergun sub distributia Normala: P(X_sys <= -c, X_i <= q_alpha(X_i)) = alpha^2."""
+    """Girardi-Ergun CoVaR under the Normal distribution: P(X_sys <= -c, X_i <= q_alpha(X_i)) = alpha^2."""
     from scipy.optimize import brentq
     z = stats.norm.ppf(alpha)
     mvn = stats.multivariate_normal(mean=[0, 0], cov=[[1, rho], [rho, 1]])
@@ -61,7 +61,7 @@ def a2_ge_covar(s_sys=1.5, rho=0.6, alpha=0.01):
 
 
 def a3_euler(w=(0.5, 0.5), s=(2.0, 3.0), rho=0.5, alpha=0.05):
-    """Descompunerea Euler a ES sub distributia Normala: ES_p = sum w_i MES_i, cu MES conditionat pe portofoliu."""
+    """Euler decomposition of ES under the Normal distribution: ES_p = sum w_i MES_i, with MES conditional on the portfolio."""
     w, s = np.asarray(w), np.asarray(s)
     C = np.array([[s[0] ** 2, rho * s[0] * s[1]], [rho * s[0] * s[1], s[1] ** 2]])
     sp = np.sqrt(w @ C @ w)
@@ -72,7 +72,7 @@ def a3_euler(w=(0.5, 0.5), s=(2.0, 3.0), rho=0.5, alpha=0.05):
 
 
 def a3_mes_srisk(beta=1.3, s_m=1.0, alpha=0.05, W=100.0, D=1100.0, k=0.08):
-    """MES, LRMES si SRISK pentru o banca ilustrativa, cu randamente Normale bivariate."""
+    """MES, LRMES and SRISK for an illustrative bank, with bivariate Normal returns."""
     z = stats.norm.ppf(alpha)
     es_m = s_m * stats.norm.pdf(z) / alpha
     tail2 = s_m * stats.norm.pdf(2 / s_m) / stats.norm.cdf(-2 / s_m)     # E[-R_m | R_m < -2]
@@ -84,9 +84,9 @@ def a3_mes_srisk(beta=1.3, s_m=1.0, alpha=0.05, W=100.0, D=1100.0, k=0.08):
 
 
 def a4_lrmes_shortcut(beta=1.3, d=0.40):
-    """De unde vine 18: LRMES = 1 - (1 - d)^beta = 1 - exp(-kappa MES^{2%}), kappa = -ln(1 - d) / ES^{2%}(pietei)."""
+    """Where the 18 comes from: LRMES = 1 - (1 - d)^beta = 1 - exp(-kappa MES^{2%}), kappa = -ln(1 - d) / ES^{2%}(market)."""
     m = R['SPX'].values
-    es2 = -m[m < -2].mean() / 100                           # pierderea medie a S&P 500 in zilele sub -2% (fractie)
+    es2 = -m[m < -2].mean() / 100                           # average loss of the S&P 500 on days below -2% (fraction)
     kappa = -np.log(1 - d) / es2
     return {'es2': 100 * es2, 'n2': int((m < -2).sum()), 'kappa': kappa, 'ln': -np.log(1 - d),
             'exact': 1 - (1 - d) ** beta, 'short18': 1 - np.exp(-18 * beta * es2), 'shortk': 1 - np.exp(-kappa * beta * es2),
@@ -94,14 +94,14 @@ def a4_lrmes_shortcut(beta=1.3, d=0.40):
 
 
 def a4_srisk_k():
-    """Aceeasi banca cu k = 5.5% (prag prudential mai mic) si pragul de levier."""
+    """The same bank with k = 5.5% (lower prudential ratio) and the leverage threshold."""
     r8 = a3_mes_srisk()
     r55 = a3_mes_srisk(k=0.055)
     return {'k8': r8, 'k55': r55}
 
 
 def a5_gfevd(A=((0.5, 0.2), (0.1, 0.4)), S=((1.0, 0.5), (0.5, 1.0))):
-    """GFEVD la H = 1 si 2 pentru un VAR(1) bivariat: nenormalizat, normalizat si Cholesky."""
+    """GFEVD at H = 1 and 2 for a bivariate VAR(1): unnormalised, normalised and Cholesky."""
     A, S = np.asarray(A), np.asarray(S)
     out = {}
     for H in (1, 2):
@@ -126,7 +126,7 @@ A6_M = np.array([[55, 25, 15, 5], [20, 50, 20, 10], [10, 15, 65, 10], [5, 5, 10,
 
 
 def dy_from_matrix(M):
-    """Tabelul Diebold-Yilmaz dintr-o matrice de contributii (%, liniile insumeaza 100)."""
+    """Diebold-Yilmaz table from a matrix of contributions (%, rows sum to 100)."""
     off = M - np.diag(np.diag(M))
     frm, to = off.sum(1), off.sum(0)
     return {'from': frm, 'to': to, 'net': to - frm, 'total': off.sum() / len(M), 'pairwise': (off.T - off)}
@@ -153,7 +153,7 @@ def a7_reverse():
 
 
 def a8_reverse():
-    """Scenariul A7 sub o distributie Student-t multivariata cu nu = 4 (aceeasi covarianta)."""
+    """The A7 scenario under a multivariate Student-t distribution with nu = 4 (same covariance)."""
     r = reverse_2f([1.2, 0.8], [[16, 6], [6, 9]], 20)
     nu = 4
     out = {'nu': nu, 'd': r['d'], 'p_norm': r['p'], 'scale': np.sqrt(nu / (nu - 2)),
@@ -166,10 +166,10 @@ def a8_reverse():
 
 
 # =============================================================================
-# PARTEA B
+# PART B
 # =============================================================================
 def b1_us_dcovar5():
-    """Delta-CoVaR 5% pentru bancile americane: interval bootstrap pe blocuri vs i.i.d."""
+    """Delta-CoVaR 5% for the US banks: block-bootstrap vs i.i.d. interval."""
     out = {}
     rng = np.random.default_rng(SEED)
     for i, k in enumerate(US):
@@ -202,7 +202,7 @@ def fig_b1(res):
 
 
 def b2_eu_dcovar():
-    """Delta-CoVaR 1% si 5% pentru bancile europene si clasamentele lor."""
+    """Delta-CoVaR 1% and 5% for the European banks and their rankings."""
     out = {}
     for i, k in enumerate(EU):
         xs, xi = system_ex(k, EU).values, R[k].values
@@ -216,7 +216,7 @@ def b2_eu_dcovar():
 
 
 def b4_rank_boot(B=999):
-    """Corelatia Spearman intre VaR 1% si Delta-CoVaR 1% pe cele 11 banci, cu bootstrap pe blocuri pe zile."""
+    """Spearman correlation between VaR 1% and Delta-CoVaR 1% across the 11 banks, with a block bootstrap over days."""
     ks = US + EU
     def stat(idx):
         v, d = [], []
@@ -235,7 +235,7 @@ def b4_rank_boot(B=999):
 
 
 def cholesky_fevd(A, S, H=10, order=None):
-    """Descompunerea ortogonala (Cholesky) a dispersiei, pentru o ordine data a variabilelor."""
+    """Orthogonal (Cholesky) variance decomposition for a given ordering of the variables."""
     k = S.shape[0]
     order = list(range(k)) if order is None else order
     P = np.eye(k)[order]
@@ -249,7 +249,7 @@ def cholesky_fevd(A, S, H=10, order=None):
 
 
 def b5_dy_sensitivity():
-    """Indicele total pentru orizonturi H si ordine VAR p; generalizat vs Cholesky in doua ordini."""
+    """Total index for horizons H and VAR orders p; generalized vs Cholesky in two orderings."""
     Y = V.values
     grid = {}
     for p in [1, 2, 3, 4]:
@@ -277,7 +277,7 @@ def fig_b5(res):
 
 
 def b6_rolling_test():
-    """Media indicelui total 2020-2026 vs 2010-2019 (erori standard Newey-West pe seria cu pas de 5 zile)."""
+    """Mean total index 2020-2026 vs 2010-2019 (Newey-West standard errors on the series with a 5-day step)."""
     import statsmodels.api as sm
     tot = pd.read_csv(os.path.join(HERE, 'ch18_spill_rolling.csv'), index_col=0, parse_dates=True).iloc[:, 0]
     d = (tot.index >= '2020-01-01').astype(float)
@@ -289,8 +289,8 @@ def b6_rolling_test():
 
 
 def b6_subsample_boot(B=999):
-    """Conectivitatea totala 2010-2019 fata de 2020-2026: VAR(1) pe fiecare subperioada, bootstrap pe blocuri de
-    reziduuri in fiecare subperioada (extrageri independente) -> interval pentru diferenta."""
+    """Total connectedness 2010-2019 against 2020-2026: VAR(1) on each subperiod, residual block bootstrap
+    in each subperiod (independent draws) -> interval for the difference."""
     Y1, Y2 = V.loc[:'2019-12-31'].values, V.loc['2020-01-01':].values
     t1, _ = spill_bootstrap(Y1, 1, B=B, seed=SEED + 61)
     t2, _ = spill_bootstrap(Y2, 1, B=B, seed=SEED + 62)
@@ -303,7 +303,7 @@ def b6_subsample_boot(B=999):
 
 
 def b7_frm_window():
-    """FRM intr-o fereastra: lambda GACV si legaturile active pentru JPMorgan (calm vs COVID-19)."""
+    """FRM in one window: GACV lambda and active links for JPMorgan (calm vs COVID-19)."""
     D = frm_design()
     out = {}
     for end in ['2019-06-28', '2020-03-31']:
@@ -318,11 +318,11 @@ def b7_frm_window():
 
 
 def b8_ro_stress(value=1_000_000):
-    """Portofoliu 50% Banca Transilvania / 50% BRD, rebalansat zilnic: scenarii istorice si un scenariu ipotetic pe factori.
+    """Portfolio 50% Banca Transilvania / 50% BRD, rebalanced daily: historical scenarios and a hypothetical factor scenario.
 
-    Randamentul log exact al portofoliului: 100 ln(1/2 e^{r_TLV/100} + 1/2 e^{r_BRD/100}) (nu media randamentelor log).
-    Scenariul ipotetic: socurile factorilor sunt randamente log saptamanale; randamentul log prezis al fiecarei banci
-    beta_k' f se transforma in randament simplu, apoi se aplica ponderile 50/50."""
+    Exact log return of the portfolio: 100 ln(1/2 e^{r_TLV/100} + 1/2 e^{r_BRD/100}) (not the mean of the log returns).
+    Hypothetical scenario: the factor shocks are weekly log returns; the predicted log return of each bank
+    beta_k' f is converted to a simple return, then the 50/50 weights are applied."""
     X = R[RO]
     port = 100 * np.log(np.exp(X / 100).mean(axis=1))
     out = {}
@@ -338,10 +338,10 @@ def b8_ro_stress(value=1_000_000):
     Xf = np.column_stack([np.ones(len(F)), F.values])
     coefs = {k: np.linalg.lstsq(Xf, W[k].values, rcond=None)[0] for k in RO}
     bet = np.mean([coefs[k][1:] for k in RO], axis=0)
-    shock = np.array([-25.0, -20.0])                             # randamente log saptamanale (%)
-    rhat = {k: coefs[k][1:] @ shock for k in RO}                 # randamentul log prezis al fiecarei banci (%)
-    simple = {k: 100 * (np.exp(rhat[k] / 100) - 1) for k in RO}  # randamentul simplu corespunzator (%)
-    loss = -np.mean([simple[k] for k in RO])                     # pierderea portofoliului 50/50 (%)
+    shock = np.array([-25.0, -20.0])                             # weekly log returns (%)
+    rhat = {k: coefs[k][1:] @ shock for k in RO}                 # predicted log return of each bank (%)
+    simple = {k: 100 * (np.exp(rhat[k] / 100) - 1) for k in RO}  # corresponding simple return (%)
+    loss = -np.mean([simple[k] for k in RO])                     # loss of the 50/50 portfolio (%)
     out['hyp'] = {'b_sx5e': bet[0], 'b_bet': bet[1], 'loss': loss, 'amt': loss / 100 * value,
                   'loglin': -bet @ shock,
                   'b_bank': {k: list(coefs[k][1:]) for k in RO}, 'rhat': rhat, 'simple': simple,
@@ -350,16 +350,16 @@ def b8_ro_stress(value=1_000_000):
 
 
 # =============================================================================
-# PARTEA C
+# PART C
 # =============================================================================
 def c1_ro_exposure():
-    """Expunerea bancilor romanesti la stresul bancar european: CoVaR de expunere, subperioade, conectivitate."""
+    """Exposure of the Romanian banks to European banking stress: exposure CoVaR, subperiods, connectedness."""
     sys_eu = R[EU].mean(axis=1)
     out = {}
     for k in RO:
         row = {}
         for a in [0.05, 0.01]:
-            e = covar_static(R[k], sys_eu, a)                   # banca romaneasca | sistemul european in criza
+            e = covar_static(R[k], sys_eu, a)                   # Romanian bank | European system in distress
             lo, hi = covar_boot(R[k].values, sys_eu.values, a, B=999, block=20, seed=SEED + 30)
             row[f'e{int(a * 100)}'] = {'covar': e['covar'], 'dcovar': e['dcovar'], 'b': e['b'], 'var': -np.quantile(R[k], a),
                                        'lo': lo, 'hi': hi}
@@ -375,14 +375,14 @@ def c1_ro_exposure():
                 dr.append(covar_static(y_[idx], x_[idx], 0.05)['dcovar'])
             row[lab] = {'dcovar': e['dcovar'], 'b': e['b'], 'lo': np.percentile(dr, 2.5), 'hi': np.percentile(dr, 97.5),
                         'se': np.std(dr, ddof=1)}
-        # subperioadele sunt disjuncte: extragerile bootstrap sunt independente, deci se(dif)^2 = se1^2 + se2^2
+        # the subperiods are disjoint: the bootstrap draws are independent, so se(diff)^2 = se1^2 + se2^2
         dd = row['p2']['dcovar'] - row['p1']['dcovar']
         sd = np.sqrt(row['p1']['se'] ** 2 + row['p2']['se'] ** 2)
         row['diff'] = {'d': dd, 'se': sd, 'z': dd / sd, 'p': 2 * stats.norm.sf(abs(dd / sd))}
         row['corr'] = R[k].corr(sys_eu)
         row['corr_bet'] = R[k].corr(R['BET'])
         out[k] = row
-    # conectivitatea (volatilitate): cat din dispersia bancilor romanesti vine de la bancile europene, pe ferestre mobile
+    # connectedness (volatility): how much of the variance of the Romanian banks comes from the European banks, on rolling windows
     Y = V
     rows = {}
     for end in range(250, len(Y) + 1, 5):
@@ -429,10 +429,10 @@ def fig_c1(res, f):
 
 
 # =============================================================================
-# GRAFICE PENTRU REZOLVARI (A1, A7, B2, B3, B4, B6, B7, B8, B10); cifrele raman cele din sem18_results.json
+# CHARTS FOR THE SOLUTIONS (A1, A7, B2, B3, B4, B6, B7, B8, B10); the numbers are those of sem18_results.json
 # =============================================================================
 def fig_a1(s_sys=1.5, s_i=2.0, rho=0.6, alpha=0.01):
-    """Densitatile conditionate ale sistemului: banca la mediana si banca la VaR 1%."""
+    """Conditional densities of the system: bank at its median and bank at its VaR 1%."""
     a = a1_covar_normal(s_sys, s_i, rho, alpha)
     z = a['z']
     sd = a['cond_sd']
@@ -449,8 +449,8 @@ def fig_a1(s_sys=1.5, s_i=2.0, rho=0.6, alpha=0.01):
                 arrowprops=dict(arrowstyle='<->', color='black', lw=0.9))
     ax.text(-a['covar'] - 0.2, y0 + 0.02, f"ΔCoVaR 1% = {a['dcovar']:.2f}", ha='right',
             fontsize=8, color='black')
-    ax.text(-a['covar'], 0.02, f"-CoVaR = {-a['covar']:.2f}", ha='right', fontsize=7.5, color=IDAred)
-    ax.text(-a['covar_med'], 0.02, f" -CoVaR = -{a['covar_med']:.2f}", ha='left', fontsize=7.5, color=MainBlue)
+    ax.text(-a['covar'], 0.02, f"−CoVaR (bank at VaR 1%) = {-a['covar']:.2f}", ha='right', fontsize=7.5, color=IDAred)
+    ax.text(-a['covar_med'], 0.02, f" −CoVaR (bank at median) = -{a['covar_med']:.2f}", ha='left', fontsize=7.5, color=MainBlue)
     ax.set_xlabel('System return X_sys (%)')
     ax.set_ylabel('Conditional density')
     ax.set_ylim(0, 0.42)
@@ -459,7 +459,7 @@ def fig_a1(s_sys=1.5, s_i=2.0, rho=0.6, alpha=0.01):
 
 
 def fig_a7(b=(1.2, 0.8), S=((16, 6), (6, 9)), target=20):
-    """Planul factorilor: elipsele Mahalanobis, dreapta de pierdere -b'f = l* si scenariul cel mai plauzibil."""
+    """Factor plane: Mahalanobis ellipses, the loss line -b'f = l* and the most plausible scenario."""
     b, S = np.asarray(b, float), np.asarray(S, float)
     r = reverse_2f(b, S, target)
     L = np.linalg.cholesky(S)
@@ -483,7 +483,7 @@ def fig_a7(b=(1.2, 0.8), S=((16, 6), (6, 9)), target=20):
 
 
 def fig_b2(sem):
-    """Delta-CoVaR 1% (interval bootstrap pe blocuri) si 5% pentru bancile europene; VaR 1% vs Delta-CoVaR 1%."""
+    """Delta-CoVaR 1% (block-bootstrap interval) and 5% for the European banks; VaR 1% vs Delta-CoVaR 1%."""
     t = sem['B2']['table']
     fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.9), gridspec_kw={'width_ratios': [1.2, 1]})
     ax = axes[0]
@@ -515,8 +515,8 @@ def fig_b2(sem):
 
 
 def lrmes_paths(end, h, C, Sn, seed, want):
-    """Aceeasi simulare ca inference18.lrmes_sim (aceleasi extrageri aleatoare), dar intoarce pierderea fiecarei
-    banci cerute pe traiectoriile de criza (fractii), pentru graficele B3 si B4."""
+    """The same simulation as inference18.lrmes_sim (the same random draws), but returns the loss of each
+    requested bank on the crisis paths (fractions), for the B3 and B4 charts."""
     rng = np.random.default_rng(seed)
     Rs = R.loc[:end]
     out = {}
@@ -559,8 +559,8 @@ def _loss_hist(ax, loss_today, loss_covid, lr_today, lr_covid, title):
 
 
 def fig_b3_b4(inf=None):
-    """Distributia pierderii bancii pe traiectoriile de criza (piata sub -10% in 22 de zile), azi si la 31.03.2020;
-    cu inf (ch18_inference.json) se verifica egalitatea cu LRMES raportat."""
+    """Distribution of the bank loss on the crisis paths (market below -10% in 22 days), today and on 31.03.2020;
+    with inf (ch18_inference.json) the mean is checked against the reported LRMES."""
     end = R.index[-1]
     today = lrmes_paths(end, 22, -0.10, 200000, SEED, ['JPM', 'DBK', 'TLV'])
     covid = lrmes_paths(pd.Timestamp('2020-03-31'), 22, -0.10, 200000, SEED + 3, ['JPM', 'DBK', 'TLV'])
@@ -584,7 +584,7 @@ def fig_b3_b4(inf=None):
 
 
 def fig_b6(sem):
-    """Indicele pe ferestre mobile cu mediile 2010-2019 si 2020-2026; estimarile pe subperioade cu intervale."""
+    """Rolling index with the 2010-2019 and 2020-2026 means; subperiod estimates with intervals."""
     tot = pd.read_csv(os.path.join(HERE, 'ch18_spill_rolling.csv'), index_col=0, parse_dates=True).iloc[:, 0]
     b6, bs = sem['B6'], sem['B6S']
     fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.8), gridspec_kw={'width_ratios': [1.8, 1]})
@@ -611,7 +611,7 @@ def fig_b6(sem):
 
 
 def fig_b7(sem):
-    """Coeficientii regresiei cuantile penalizate pentru JPMorgan, fereastra calma vs fereastra de criza."""
+    """Coefficients of the penalized quantile regression for JPMorgan, calm vs crisis window."""
     D = frm_design()
     names = [NAMES[j] for j in ALL if j != 'JPM'] + ['S&P 500 (t-1)', 'Euro Stoxx 50 (t-1)', 'VIX (t-1)']
     fig, ax = plt.subplots(figsize=(6.6, 3.0))
@@ -633,7 +633,7 @@ def fig_b7(sem):
 
 
 def fig_b8(sem):
-    """Randamentul log cumulat al portofoliului 50/50 BT/BRD in cele doua ferestre, cu cele mai rele 10 zile."""
+    """Cumulative log return of the 50/50 BT/BRD portfolio in the two windows, with the worst 10 days."""
     X = R[RO]
     port = 100 * np.log(np.exp(X / 100).mean(axis=1))
     fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.7))
@@ -657,7 +657,7 @@ def fig_b8(sem):
 
 
 def fig_b10(inf):
-    """Evenimentele comune observate fata de regiunea de acceptare Kupiec; puterea testului."""
+    """Observed joint hits against the Kupiec acceptance region; power of the test."""
     bt = inf['backtest_ge']
     n, p0 = bt['JPM']['n'], 0.05 ** 2
 
@@ -696,7 +696,7 @@ def fig_b10(inf):
 
 
 def solution_charts():
-    """Graficele rezolvarilor, din cifrele deja salvate (sem18_results.json, ch18_inference.json, ch18_results.json)."""
+    """Charts of the solutions, from the saved results (sem18_results.json, ch18_inference.json, ch18_results.json)."""
     with open(os.path.join(HERE, 'sem18_results.json')) as f:
         sem = json.load(f)
     with open(os.path.join(HERE, 'ch18_inference.json')) as f:

@@ -21,7 +21,7 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mfm_text as M   # noqa: E402
 
-# Stil standard MFM: transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -40,7 +40,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Colours
 MainBlue = '#1A3A6E'
 IDAred = '#CD0000'
 Forest = '#2E7D32'
@@ -51,8 +51,8 @@ Crimson = '#DC3545'
 Teal = '#17A2B8'
 Magenta = '#D63384'
 Brown = '#795548'
-Gray = '#7F7F7F'          # doar linii de referinta
-LightGray = '#DADADA'     # doar benzi
+Gray = '#7F7F7F'          # reference lines only
+LightGray = '#DADADA'     # bands only
 
 LAB_COL = {'negative': IDAred, 'neutral': Amber, 'positive': Forest}
 METHODS = ['GI', 'VADER', 'LM', 'TF-IDF + LR', 'MiniLM + LR', 'FinBERT', 'Qwen 0.5B', 'Qwen 1.5B', 'Qwen 3B',
@@ -72,7 +72,7 @@ RES = {}
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -81,12 +81,12 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22, **kw):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False, **kw)
 
 
 def fig_legend_bottom(fig, handles, labels, ncol=3, y=0.0):
-    """O singura legenda pentru toata figura, sub panouri."""
+    """One legend for the whole figure, below the panels."""
     fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
@@ -95,10 +95,10 @@ def load_csv(name, **kw):
 
 
 # =============================================================================
-# CLASIFICAREA TEXTELOR
+# TEXT CLASSIFICATION
 # =============================================================================
 def predictions(d):
-    """Eticheta prezisa de fiecare metoda (coloanele ch15_*_scores.csv)."""
+    """Label predicted by each method (one column per method in the score tables)."""
     v = d['vader'].values
     out = {'GI': M.tone_label(d['GI_tone'].values), 'LM': M.tone_label(d['LM_tone'].values),
            'VADER': np.where(v >= 0.05, 'positive', np.where(v <= -0.05, 'negative', 'neutral')),
@@ -122,12 +122,12 @@ def eval_texts():
             R[name][m] = {'acc': M.acc(y, yh), 'lo': lo, 'hi': hi, 'f1': M.macro_f1(y, yh)}
         R[name]['share'] = d['label'].value_counts(normalize=True).to_dict()
         R[name]['always_neutral_f1'] = M.macro_f1(y, np.full(len(y), 'neutral'))
-    # acordul adnotatorilor (PhraseBank)
+    # annotator agreement (PhraseBank)
     pr = predictions(pb)
     R['agree'] = {lvl: {m: M.acc(pb['label'][pb['agree'] == lvl], pr[m][pb['agree'] == lvl])
                         for m in ('LM', 'FinBERT', 'Qwen 7B', 'Qwen 14B')} for lvl in M.AGREE}
     R['agree_n'] = pb['agree'].value_counts().to_dict()
-    # teste pe perechi (Twitter)
+    # paired tests (Twitter)
     y = tw['label'].values
     pt = predictions(tw)
     R['pairs'] = {}
@@ -137,7 +137,7 @@ def eval_texts():
         lo, hi = M.diff_ci(y, pt[a], pt[b], B=1000)
         R['pairs'][f'{a}|{b}'] = {'n01': n01, 'n10': n10, 'p': p, 'diff': M.acc(y, pt[b]) - M.acc(y, pt[a]),
                                   'lo': lo, 'hi': hi}
-    # formularea cerintei
+    # prompt wording
     R['prompts'] = {}
     for s in ('1.5B', '7B', '14B'):
         labs = {p: M.probs_label(tw[[f'qwen{s}{"" if p == "P1" else "_" + p}_{l}' for l in M.LABELS]].values)
@@ -157,7 +157,7 @@ def eval_texts():
 
 
 def fig_dict_words(top=14):
-    """Cuvintele negative in Harvard IV-4, dar nu in Loughran-McDonald, cele mai frecvente in PhraseBank."""
+    """Words negative in Harvard IV-4 but not in Loughran-McDonald, most frequent in PhraseBank."""
     pb = M.load_phrasebank()
     D = M.load_dictionaries()
     only = D['GI_neg'] - D['LM_neg']
@@ -321,7 +321,7 @@ def fig_learning_curve():
 
 
 # =============================================================================
-# MEMORAREA TRECUTULUI (LOOK-AHEAD)
+# MEMORISING THE PAST (LOOK-AHEAD)
 # =============================================================================
 def auc(p, up):
     p, up = np.asarray(p), np.asarray(up, bool)
@@ -365,7 +365,7 @@ def eval_memory():
                 r[per] = {'auc': auc(p, u), 'lo': lo, 'hi': hi, 'ba': float(ba), 'n': int(sel.sum()),
                           'n_up': int(u.sum()), 'p_rise': float(np.mean(p > 0.5))}
             R[name][s] = r
-    # lunile cele mai cunoscute
+    # the best-known months
     pre = mm.loc[:'2024-08-31']
     worst = pre.nsmallest(8, 'ret')
     R['worst'] = {d.strftime('%Y-%m'): {'ret': float(r['ret']), 'p14': float(r['qwen14B'])} for d, r in worst.iterrows()}
@@ -415,7 +415,7 @@ def fig_memory_auc():
 
 
 # =============================================================================
-# DE LA SENTIMENT LA SEMNAL (FNSPID)
+# FROM SENTIMENT TO SIGNAL (FNSPID)
 # =============================================================================
 def news_panel():
     daily = load_csv('ch15_news_daily.csv', parse_dates=['day']).set_index(['day', 'ticker'])
@@ -430,9 +430,9 @@ def news_panel():
 
 
 def event_groups(x):
-    """Grupurile studiului de eveniment: tercila cea mai negativa si cea mai pozitiva a scorului zilnic. Daca cele
-    doua praguri coincid (tonul LM este exact 0 in aproape jumatate din zilele-actiune), grupurile disjuncte sunt
-    scor < prag si scor > prag, iar zilele egale cu pragul sunt excluse."""
+    """Event-study groups: the most negative and the most positive tercile of the daily score. If the two
+    cut-offs coincide (the LM tone is exactly 0 on almost half of the stock-days), the disjoint groups are
+    score < cut-off and score > cut-off, and days equal to the cut-off are excluded."""
     q1, q2 = x.quantile([1 / 3, 2 / 3])
     if q1 >= q2:
         return x < q1, x > q2
@@ -457,7 +457,7 @@ def eval_news(P, rets):
         for y in ('r0', 'r1', 'r2'):
             R['reg'][f'{c}|{y}'] = {k: float(v) for k, v in M.cluster_ols(P[y].values, P[f'z_{c}'].values,
                                                                            groups).items()}
-    # studiul de eveniment: tercilele scorului FinBERT
+    # event study: terciles of the FinBERT score
     cols = EVENT_COLS
     R['event'] = {}
     for c in ('finbert', 'qwen', 'lm'):
@@ -469,7 +469,7 @@ def eval_news(P, rets):
             ev[grp] = {'car': car.mean().tolist(), 'se': (car.std() / np.sqrt(len(car))).tolist(), 'n_days': len(X),
                        'n': int(sel.sum())}
         R['event'][c] = ev
-    # strategia
+    # the strategy
     days = rets.index[(rets.index >= P.index.get_level_values('day').min())]
     R['strat'] = {}
     for c in SCORE_LBL:
@@ -589,10 +589,10 @@ def fig_subperiods():
 
 
 # =============================================================================
-# STUDIUL DE CAZ: LOPEZ-LIRA & TANG (JFE 2026), cifrele publicate
-# JFE 184 (2026) 104335, Table 5 (portofolii long-short pe stirile de peste noapte) si Figure 8 / Section 8.2
+# CASE STUDY: LOPEZ-LIRA & TANG (JFE 2026), figures reported in the paper
+# JFE 184 (2026) 104335, Table 5 (long-short portfolios on overnight news) and Figure 8 / Section 8.2
 # =============================================================================
-# model: (HR-I, HR-D, SharpeLS, mu_LS in % pe zi)
+# model: (HR-I, HR-D, SharpeLS, mu_LS in % per day)
 LLT_TABLE5 = {'GPT-4': (0.93, 0.58, 2.97, 0.34), 'GPT-3.5': (0.93, 0.56, 1.66, 0.29),
               'FinBERT': (0.90, 0.48, -0.33, -0.07), 'DistilBart': (0.87, 0.56, 1.26, 0.14),
               'BART-Large': (0.86, 0.57, 1.05, 0.12), 'Llama2-70b': (0.86, 0.53, 0.97, 0.14),
@@ -604,7 +604,7 @@ LLT_FULL_SR = 2.97
 
 
 def fig_llt_models():
-    """Tabelul 5 din Lopez-Lira & Tang (2026): ratele de succes si raportul Sharpe al derivei, pe modele."""
+    """Table 5 of Lopez-Lira & Tang (2026): hit rates and the Sharpe ratio of the drift, by model."""
     from matplotlib.patches import Patch
     names = list(LLT_TABLE5)[::-1]
     T = np.array([LLT_TABLE5[m] for m in names])
@@ -634,7 +634,7 @@ def fig_llt_models():
 
 
 def fig_llt_decay():
-    """Figura 8 din Lopez-Lira & Tang (2026): raportul Sharpe anualizat al derivei GPT-4, pe subperioade."""
+    """Figure 8 of Lopez-Lira & Tang (2026): annualised Sharpe ratio of the GPT-4 drift, by subperiod."""
     per = list(LLT_FIG8)
     v = [LLT_FIG8[p] for p in per]
     fig, ax = plt.subplots(figsize=(5.6, 2.9))

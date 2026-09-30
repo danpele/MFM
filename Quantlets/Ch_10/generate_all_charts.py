@@ -1,13 +1,13 @@
 """
-Generator pentru toate graficele si cifrele din Capitolul 10: Microstructura pietei
-==================================================================================
-Toate graficele: fundal transparent, etichete ENG, legenda in afara, jos; niciun text si nicio serie in gri.
-Date: bare de 5 minute SPY (octombrie 2020 - septembrie 2026, sesiunea regulata) si Bitcoin (septembrie 2024 -
-septembrie 2026); date zilnice OHLCV pentru actiuni americane, actiuni BVB si cripto-active (data/market);
-cursul de referinta BNR USD/RON pentru conversia valorilor tranzactionate la BVB; indicele VIX.
-Registrele de ordine din sectiunea 2 si modelul Roll sunt SIMULATE (etichetate ca atare).
-Cifrele sunt salvate in ch10_results.json (folosite de generatoarele de slide-uri).
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Charts and results of Chapter 10: Market Microstructure
+=======================================================
+All charts: transparent background, legend outside at the bottom.
+Data: SPY 5-minute bars (October 2020 - September 2026, regular session) and Bitcoin 5-minute bars (September 2024 -
+September 2026); daily OHLCV for US stocks, BVB stocks and crypto-assets; BNR USD/RON reference rate to convert
+BVB traded values; the VIX index.
+The order books and the Roll model are SIMULATED (and labelled as such).
+Results are written to ch10_results.json.
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -26,7 +26,7 @@ from mfm_data import (ASSETS, GROUPS, LABELS, read_market, ohlc, returns, dollar
 from micro import (roll_spread, cs_spread, ar_terms, amihud, walk_book, gm_quotes, gm_simulate,  # noqa: E402
                    kyle, ac_trajectory, ac_frontier, zi_simulate, edge_spread, roll_mc, price_discovery)
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -45,7 +45,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -54,19 +54,19 @@ Orange   = '#E67E22'
 Purple   = '#8E44AD'
 Crimson  = '#DC3545'
 Teal     = '#17A2B8'
-Gray     = '#7F7F7F'   # doar linii de referinta
+Gray     = '#7F7F7F'   # reference lines only
 GROUP_COL = {'US': MainBlue, 'BVB': IDAred, 'Crypto': Amber}
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 SEED = 42
-START2 = '2024-09-19'          # ultimii doi ani (sectiunea transversala)
-START10 = '2016-09-19'         # ultimii zece ani (serii de timp)
+START2 = '2024-09-19'          # last two years (cross-section)
+START10 = '2016-09-19'         # last ten years (time series)
 B_BOOT = 1000
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as a transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -75,23 +75,23 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
 def fig_legend_bottom(fig, handles, labels, ncol=3, y=0.0):
-    """O singura legenda pentru o figura cu mai multe panouri, sub figura."""
+    """A single legend for a multi-panel figure, below the figure."""
     fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
 # =============================================================================
-# 1. REGISTRUL DE ORDINE SIMULAT
+# 1. SIMULATED ORDER BOOK
 # =============================================================================
 ZI_PARAMS = dict(n_events=300_000, L=40, rate_limit=0.1, rate_market=0.5, rate_cancel=0.02, seed=7)
 
 
 def zi_book():
-    """Simularea registrului de ordine si functia de impact a unui ordin la piata."""
+    """Simulate the order book and the impact function of a market order."""
     path, snaps, _ = zi_simulate(**ZI_PARAMS)
     prof = pd.concat(snaps).groupby('rel')[['bid', 'ask']].mean()
     sizes = [1, 2, 3, 5, 8, 12, 20, 30, 50, 80]
@@ -112,7 +112,7 @@ def zi_book():
 
 
 def pooled_profile(p):
-    """Adancimea medie la distanta k de mijloc: media dintre bid(-k) si ask(+k) (registrul este simetric in medie)."""
+    """Mean depth at distance k from the mid: average of bid(-k) and ask(+k) (the book is symmetric on average)."""
     ask = p['ask'][p.index > 0]
     bid = p['bid'][p.index < 0]
     bid.index = -bid.index
@@ -165,10 +165,10 @@ def fig_impact(zb):
 
 
 # =============================================================================
-# 2. MODELUL ROLL (SIMULAT)
+# 2. THE ROLL MODEL (SIMULATED)
 # =============================================================================
 def roll_sim(n=5000, sigma=0.02, c=0.05, seed=SEED):
-    """Pretul eficient m_t (mers aleator) si pretul tranzactiei p_t = m_t + c q_t, q_t = +1 / -1 (cumparare / vanzare)."""
+    """Efficient price m_t (random walk) and trade price p_t = m_t + c q_t, q_t = +1 / -1 (buy / sell)."""
     rng = np.random.default_rng(seed)
     m = 100 + np.cumsum(rng.normal(0, sigma, n))
     q = np.where(rng.random(n) < 0.5, 1, -1)
@@ -214,10 +214,10 @@ def fig_roll():
 
 
 # =============================================================================
-# 3. TIPARE INTRAZILNICE
+# 3. INTRADAY PATTERNS
 # =============================================================================
 def spy_tod(s):
-    """Profilul pe intervale de 5 minute: media |r| (pb), volumul median (milioane de actiuni), ponderea in volumul zilei."""
+    """Profile by 5-minute interval: mean |r| (bp), median volume (million shares), share of the day's volume."""
     x = s.dropna(subset=['r'])
     tod = x.groupby('tod').agg(absr=('r', lambda v: 1e4 * v.abs().mean()), vol=('volume', 'median'))
     share = (s['volume'] / s.groupby('date')['volume'].transform('sum')).groupby(s['tod']).mean()
@@ -283,14 +283,14 @@ def fig_btc_hours(b):
 
 
 # =============================================================================
-# 4. ESTIMATORI DE SPREAD
+# 4. SPREAD ESTIMATORS
 # =============================================================================
 def intraday_spreads(s):
-    """Estimatorii Roll, Corwin-Schultz si Abdi-Ranaldo calculati pe barele de 5 minute ale fiecarei zile."""
+    """Roll, Corwin-Schultz and Abdi-Ranaldo estimators computed on the 5-minute bars of each day."""
     rows = {}
     for d, g in s.dropna(subset=['close', 'high', 'low']).groupby('date'):
         rs, cov = roll_spread(g['close'])
-        rows[d] = dict(cov=cov, cs=cs_spread(g['high'], g['low']).mean(),          # in cursul sesiunii: fara ajustare de noapte
+        rows[d] = dict(cov=cov, cs=cs_spread(g['high'], g['low']).mean(),          # within the session: no overnight adjustment
                       
                        ar2=ar_terms(g['close'], g['high'], g['low']).mean(), price=g['close'].mean(),
                        edge=edge_spread(g['open'], g['high'], g['low'], g['close']),
@@ -299,7 +299,7 @@ def intraday_spreads(s):
 
 
 def daily_spreads(key, start=START2):
-    """Estimatorii din date zilnice pe ultimii doi ani (valori in puncte de baza)."""
+    """Estimators from daily data over the last two years (values in basis points)."""
     d = ohlc(key, start)
     rs, cov = roll_spread(d['close'])
     cs = cs_spread(d['high'], d['low'], d['close'])
@@ -314,7 +314,7 @@ def fig_spread_frequency(E, sp_daily):
     roll5 = 1e4 * 2 * np.sqrt(max(-E['cov'].mean(), 0))
     cs5 = 1e4 * E['cs'].mean()
     ar5 = 1e4 * np.sqrt(max(E['ar2'].mean(), 0))
-    edge5 = 1e4 * E['edge'].clip(lower=0).mean()     # estimari cu semn, negativele puse la zero (recomandarea autorilor)
+    edge5 = 1e4 * E['edge'].clip(lower=0).mean()     # negative window estimates set to zero before averaging (authors' recommendation)
     vals = {'Roll': (sp_daily['roll'], roll5), 'Corwin-Schultz': (sp_daily['cs'], cs5), 'Abdi-Ranaldo': (sp_daily['ar'], ar5),
             'EDGE': (sp_daily['edge'], edge5)}
     fig, ax = plt.subplots(figsize=(6.8, 3.3))
@@ -363,7 +363,7 @@ def fig_spread_cross(T):
 
 
 # =============================================================================
-# 5. ILICIDITATEA AMIHUD
+# 5. AMIHUD ILLIQUIDITY
 # =============================================================================
 def amihud_table(start=START2):
     out = {}
@@ -392,7 +392,7 @@ def fig_amihud(A):
 
 
 def monthly_illiq(keys, start=START10):
-    """Ilichiditatea Amihud lunara (pb la 1 milion USD) pentru fiecare activ; mediana pe grup."""
+    """Monthly Amihud illiquidity (bp per USD 1 million) for each asset; median by group."""
     cols = {}
     for k in keys:
         x = pd.concat([returns(k, start).rename('r'), dollar_volume(k, start).rename('dv')], axis=1, join='inner').dropna()
@@ -425,7 +425,7 @@ def fig_amihud_time():
 
 
 def spy_illiq_daily(s):
-    """Ilichiditatea intrazilnica: media |r_5min| (pb) la 100 milioane USD tranzactionati, pe zi."""
+    """Intraday illiquidity: mean |r_5min| (bp) per USD 100 million traded, by day."""
     x = s.dropna(subset=['r', 'dv'])
     x = x[x['dv'] > 0]
     return (1e4 * x['r'].abs() / (x['dv'] / 1e8)).groupby(x['date']).mean().rename('illiq')
@@ -455,7 +455,7 @@ def fig_illiq_vix(s):
 
 
 # =============================================================================
-# 6. MODELE: GLOSTEN-MILGROM, KYLE
+# 6. MODELS: GLOSTEN-MILGROM, KYLE
 # =============================================================================
 def fig_gm():
     mus = np.linspace(0, 0.95, 60)
@@ -495,10 +495,10 @@ def fig_kyle():
     prof = [kyle(sv, u)['profit'] for u in su]
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.2))
     axes[0].plot(su, lam, color=MainBlue, lw=1.5, label='Price impact $\\lambda = \\sigma_v / (2\\sigma_u)$')
-    axes[0].set_xlabel('Noise-trader volume $\\sigma_u$ (thousand shares)')
-    axes[0].set_ylabel('$\\lambda$ (price change per thousand shares)')
+    axes[0].set_xlabel('Noise-trading standard deviation $\\sigma_u$ (thousand shares)')
+    axes[0].set_ylabel('$\\lambda$ (USD per thousand shares of order flow)')
     axes[1].plot(su, prof, color=Forest, lw=1.5, label='Expected profit of the insider $\\sigma_v \\sigma_u / 2$')
-    axes[1].set_xlabel('Noise-trader volume $\\sigma_u$ (thousand shares)')
+    axes[1].set_xlabel('Noise-trading standard deviation $\\sigma_u$ (thousand shares)')
     axes[1].set_ylabel('Expected profit (thousand USD)')
     for a in axes:
         a.set_title('$\\sigma_v$ = 2 USD', fontsize=9, loc='left')
@@ -510,7 +510,7 @@ def fig_kyle():
 
 
 # =============================================================================
-# 7. IMPACTUL: RELATIA VOLUM - MISCARE DE PRET PE BARE SPY
+# 7. IMPACT: VOLUME AND PRICE MOVES IN SPY BARS
 # =============================================================================
 def sqrt_relation(s, nb=20):
     x = s.dropna(subset=['r', 'volume']).copy()
@@ -538,9 +538,9 @@ def fig_sqrt(s):
 
 
 # =============================================================================
-# 8. EXECUTIA OPTIMA: ALMGREN-CHRISS
+# 8. OPTIMAL EXECUTION: ALMGREN-CHRISS
 # =============================================================================
-AC = dict(X=1e6, T=5, N=5, sigma=0.95, eta=2.5e-6, gamma=2.5e-7)   # exemplul numeric din Almgren si Chriss (2001)
+AC = dict(X=1e6, T=5, N=5, sigma=0.95, eta=2.5e-6, gamma=2.5e-7)   # numerical example of Almgren and Chriss (2001)
 
 
 def fig_ac():
@@ -574,7 +574,7 @@ def fig_ac():
 
 
 # =============================================================================
-# 9. EPISOADE: FLASH CRASH 2010, APRILIE 2025
+# 9. EPISODES: FLASH CRASH 2010, APRIL 2025
 # =============================================================================
 def fig_flash():
     d = read_market('SPY.US').loc['2010-04-15':'2010-05-28']
@@ -634,7 +634,7 @@ def fig_april2025(s):
 
 
 # =============================================================================
-# 10. BVB: VALOAREA TRANZACTIONATA
+# 10. BVB: TRADED VALUE
 # =============================================================================
 def fig_bvb_turnover():
     keys = [k for k in GROUPS['BVB'] if k != 'TVBETETF']
@@ -647,7 +647,7 @@ def fig_bvb_turnover():
                  colors=cols + [Purple], labels=[LABELS[k] for k in top] + ['Other five blue chips'], alpha=0.9)
     ax.set_ylabel('Monthly traded value (USD million)')
     ax.axvline(pd.Timestamp('2023-07-12'), color='black', lw=0.8, ls=':')
-    ax.text(pd.Timestamp('2023-08-01'), ax.get_ylim()[1] * 0.93, 'Hidroelectrica IPO\n12 July 2023', fontsize=7, color='black', va='top')
+    ax.text(pd.Timestamp('2023-08-01'), ax.get_ylim()[1] * 0.93, 'Hidroelectrica listing (initial\npublic offering), 12 July 2023', fontsize=7, color='black', va='top')
     legend_outside_bottom(ax, ncol=6, y=-0.14)
     save_fig('ch10_bvb_turnover')
     y = m.sum(axis=1).resample('YE').sum()
@@ -657,11 +657,11 @@ def fig_bvb_turnover():
 
 
 # =============================================================================
-# 11. PROPRIETATILE DE SELECTIE ALE ESTIMATORULUI ROLL (Harris, 1990)
+# 11. SMALL-SAMPLE PROPERTIES OF THE ROLL ESTIMATOR (Harris, 1990)
 # =============================================================================
 def roll_small_sample(E):
-    """Covarianta Roll pe zi (77 de randamente de 5 minute): ponderea zilelor cu covarianta pozitiva, observata si
-    simulata sub modelul Roll adevarat (spread de un pas de cotare; fara spread), si deplasarea din demediere."""
+    """Daily Roll covariance (77 five-minute returns): share of days with a positive covariance, observed and
+    simulated under the true Roll model (one-tick spread; no spread), and the bias from subtracting the sample mean."""
     n = 77
     v = E['var'].mean()
     c_tick = (0.01 / E['price']).mean() / 2
@@ -670,13 +670,13 @@ def roll_small_sample(E):
     for tag, c in [('tick', c_tick), ('zero', 0.0)]:
         sig = np.sqrt(v - 2 * c ** 2)
         cov = np.array([roll_mc(c, sig, T=n + 1, R=len(E), seed=SEED + b) for b in range(200)])
-        pos = (cov > 0).mean(axis=1)                        # 200 de "esantioane" de lungimea selectiei reale
+        pos = (cov > 0).mean(axis=1)                        # 200 "samples" of the length of the real sample
         pooled = 1e4 * 2 * np.sqrt(np.clip(-cov.mean(axis=1), 0, None))
         out[f'pos_{tag}'] = float(pos.mean())
         out[f'pos_{tag}_lo'], out[f'pos_{tag}_hi'] = (float(x) for x in np.percentile(pos, [2.5, 97.5]))
         out[f'roll_{tag}'] = float(pooled.mean())
         out[f'roll_{tag}_lo'], out[f'roll_{tag}_hi'] = (float(x) for x in np.percentile(pooled, [2.5, 97.5]))
-    # corectia deplasarii: E[cov_hat] ~ g1 - (g0 + 2 g1) / n  =>  g1 ~ (cov_mediu + var_medie / n) / (1 - 2 / n)
+    # bias correction: E[cov_hat] ~ g1 - (g0 + 2 g1) / n  =>  g1 ~ (mean_cov + mean_var / n) / (1 - 2 / n)
     g1 = (E['cov'].mean() + v / n) / (1 - 2 / n)
     out['roll_corr'] = float(1e4 * 2 * np.sqrt(max(-g1, 0)))
     out['roll5'] = float(1e4 * 2 * np.sqrt(max(-E['cov'].mean(), 0)))
@@ -684,13 +684,13 @@ def roll_small_sample(E):
 
 
 # =============================================================================
-# 12. DESCOPERIREA PRETULUI: ETF-UL PE BET SI INDICELE BET-TR (Hasbrouck, 1995; Gonzalo si Granger, 1995)
+# 12. PRICE DISCOVERY: THE BET ETF AND THE BET-TR INDEX (Hasbrouck, 1995; Gonzalo and Granger, 1995)
 # =============================================================================
 PD_START = START2
 
 
 def bet_etf_pair(start=PD_START):
-    """Logaritmul preturilor de inchidere: ETF-ul Patria-TVBETETF (zilele cu tranzactii) si indicele BET-TR, zile comune."""
+    """Log closing prices: the Patria-TVBETETF (trading days) and the BET-TR index, common days."""
     e = read_market('TVBETETF.RO')
     e = e[e['volume'] > 0]
     idx = read_market('BETTR.INDX')

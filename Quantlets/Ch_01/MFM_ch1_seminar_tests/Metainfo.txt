@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Monday, 21 September 2026'
 
-Datafile: 'Daily market data (data/market): S&P 500, SPY, BET-TR, Bitcoin, BVB blue chips; EUR/RON official reference rate'
+Datafile: 'Daily market data of the course: S&P 500, SPY, BET-TR, Bitcoin, BVB blue chips; EUR/RON official reference rate'
 
 Output: 'ch1_sem_first_look.pdf, ch1_sem_b1_sensitivity.pdf, ch1_sem_a1_path.pdf, ch1_sem_a2_vr.pdf, ch1_sem_a3_chi2.pdf, ch1_sem_a4_drawdown.pdf, ch1_sem_a4_brownian.pdf, ch1_sem_a5_ohlc.pdf, ch1_sem_a6_mixture.pdf, ch1_sem_a7_hill.pdf, ch1_sem_a8_regimes.pdf, ch1_sem_a9_garch.pdf, ch1_sem_a11_hill_sim.pdf, ch1_sem_b2_var.pdf, ch1_sem_b3_acf.pdf, ch1_sem_b4_qq.pdf, ch1_sem_leverage_ro_crypto.pdf, ch1_sem_b6_regimes.pdf, ch1_sem_b7_wealth.pdf, ch1_sem_b8_index_spy.pdf, ch1_sem_robust_acf.pdf, ch1_sem_kurtosis_expanding.pdf, ch1_sem_hill_tails.pdf, ch1_sem_b12_response.pdf, ch1_sem_b13_bootstrap.pdf, ch1_sem_garch_check.pdf, ch1_sem_b14_facts.pdf, ch1_sem_b15_memory.pdf, ch1_sem_bettr_rolling_acf.pdf, ch1_sem_c2_acf.pdf, seminar1_results.json'

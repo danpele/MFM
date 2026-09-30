@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch19_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 19 (project workshop): Hill tail indices and a heteroskedasticity-robust portmanteau for BET and Bitcoin, GARCH-t and GJR-GARCH-t for BET with Wald and profile-likelihood intervals for persistence, VaR and ES backtests for Bitcoin with DQ, FZ0 and the model confidence set, the calendar-join pitfall for Bitcoin and SPY, and a reference analysis of BET tail risk around the 2020 FTSE reclassification (Hill indices, difference-in-differences with WIG20, placebo dates, sup-Wald break test); charts for the solutions: GARCH variance forecast path, Kupiec power, Holm and Benjamini-Hochberg thresholds, sample kurtosis under infinite fourth moments, Hill plots, profile likelihood for persistence, news-impact curves, cumulative VaR breaches and the look-ahead trap.'
+Description: 'Seminar 19 (project workshop): Hill tail indices and a heteroskedasticity-robust portmanteau for BET and Bitcoin, GARCH-t and GJR-GARCH-t for BET with Wald and profile-likelihood intervals for persistence, VaR and ES backtests for Bitcoin with DQ, FZ0 and the model confidence set, the calendar-alignment pitfall for Bitcoin and SPY, and a reference analysis of BET tail risk around the 2020 FTSE reclassification (Hill indices, difference-in-differences with WIG20, placebo dates, sup-Wald break test); charts for the solutions: GARCH variance forecast path, Kupiec power, Holm and Benjamini-Hochberg thresholds, sample kurtosis under infinite fourth moments, Hill plots, profile likelihood for persistence, news-impact curves, cumulative VaR breaches and the look-ahead trap.'
 
 Keywords: 'Hill estimator, GARCH, profile likelihood, value-at-risk, expected shortfall, DQ test, model confidence set, Bitcoin, difference-in-differences, structural break, FTSE reclassification, BET'
 
@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Daily market data (data/market): BET index (official closing values), Bitcoin, SPY'
+Datafile: 'Daily market data (course data): BET index (official closing values), Bitcoin, SPY'
 
 Output: 'ch19_sem_a3_forecast.pdf, ch19_sem_a7_power.pdf, ch19_sem_a9_pvalues.pdf, ch19_sem_a11_kurtosis.pdf, ch19_sem_b1_hill.pdf, ch19_sem_b2_hill.pdf, ch19_sem_b3_profile.pdf, ch19_sem_b4_nic.pdf, ch19_sem_b5_breaches.pdf, ch19_sem_btc_var.pdf, ch19_sem_b7_lookahead.pdf, ch19_sem_join.pdf, ch19_sem_c1_did.pdf, sem19_results.json, ch19_results.json, ch19_forecasts_bet.csv'

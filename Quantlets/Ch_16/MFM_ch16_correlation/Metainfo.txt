@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch16_correlation'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Rolling 250-day correlation of daily returns of Bitcoin with the S&P 500, the Nasdaq 100 (QQQ) and gold, on common trading days (prices joined first), 2018-2026.'
+Description: 'Rolling 250-day correlation of daily returns of Bitcoin with the S&P 500, the Nasdaq 100 (QQQ) and gold, on common trading days (prices aligned first), 2018-2026.'
 
 Keywords: 'Bitcoin, correlation, diversification, S&P 500, gold, rolling window'
 
@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Daily market data (data/market): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama; 4-week Treasury bill rate from FRED'
+Datafile: 'Daily market data (course data): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama; 4-week Treasury bill rate from FRED'
 
 Output: 'ch16_rolling_corr.pdf'

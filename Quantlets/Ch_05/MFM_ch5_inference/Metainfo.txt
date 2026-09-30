@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'Daily market data (data/market): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
+Datafile: 'Daily market data (course data): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
 
 Output: 'ch5_inference.json'

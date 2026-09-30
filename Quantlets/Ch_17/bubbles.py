@@ -19,10 +19,10 @@ from scipy import optimize
 
 
 # =============================================================================
-# TESTE DE EXPLOZIVITATE (PWY 2011, PSY 2015)
+# EXPLOSIVENESS TESTS (PWY 2011, PSY 2015)
 # =============================================================================
 def _cums(y):
-    """Sume cumulate pentru regresia Delta y_t = a + b y_{t-1} (randurile t = 1..n); y poate fi (n+1,) sau (R, n+1)."""
+    """Cumulative sums for the regression Delta y_t = a + b y_{t-1} (rows t = 1..n); y may be (n+1,) or (R, n+1)."""
     y = np.atleast_2d(np.asarray(y, float))
     x, z = y[:, :-1], np.diff(y, axis=1)
     pad = lambda a: np.concatenate([np.zeros((a.shape[0], 1)), np.cumsum(a, axis=1)], axis=1)
@@ -30,7 +30,7 @@ def _cums(y):
 
 
 def _adf_end(C, e, s):
-    """Statistica t a lui b pentru ferestrele [s, e] (s vector), pe toate replicile (randurile lui C)."""
+    """t-statistic of b for the windows [s, e] (s a vector), over all replications (rows of C)."""
     Sx, Sxx, Sz, Szz, Sxz = (c[:, e + 1][:, None] - c[:, s] for c in C)
     n = (e + 1 - s).astype(float)
     den = n * Sxx - Sx ** 2
@@ -41,7 +41,7 @@ def _adf_end(C, e, s):
 
 
 def adf_stat(y):
-    """ADF la dreapta pe intreaga serie (fara lag-uri)."""
+    """Right-tailed ADF on the whole series (no lags)."""
     C = _cums(y)
     n = len(y) - 1
     return float(_adf_end(C, n - 1, np.array([0]))[0, 0])
@@ -54,9 +54,9 @@ def min_window(T, r0=None):
 
 
 def psy(y, r0=None):
-    """ADF, SADF, GSADF si sirurile BSADF (sup pe inceputuri) si ADF recursiv (PWY) pentru y (log-nivel)."""
+    """ADF, SADF, GSADF and the BSADF (sup over start points) and recursive ADF (PWY) sequences for y (log level)."""
     y = np.asarray(y, float)
-    n = len(y) - 1                                  # numarul de randuri de regresie
+    n = len(y) - 1                                  # number of regression rows
     w0, r0 = min_window(n, r0)
     C = _cums(y)
     bsadf = np.full(n, np.nan)
@@ -71,13 +71,13 @@ def psy(y, r0=None):
 
 
 def _null_paths(T, R, rng):
-    """Mers aleator cu drift slab (PSY 2015): y_t = T^{-1} + y_{t-1} + e_t, e_t ~ N(0, 1)."""
+    """Random walk with a weak drift (PSY 2015): y_t = T^{-1} + y_{t-1} + e_t, e_t ~ N(0, 1)."""
     e = rng.standard_normal((R, T))
     return np.concatenate([np.zeros((R, 1)), np.cumsum(1.0 / T + e, axis=1)], axis=1)
 
 
 def _bsadf_paths(Y, w0, chunk=100):
-    """Sirurile BSADF si ADF recursiv pentru mai multe traiectorii (randurile lui Y)."""
+    """BSADF and recursive ADF sequences for several paths (rows of Y)."""
     R, n = Y.shape[0], Y.shape[1] - 1
     bs = np.full((R, n), np.nan)
     fw = np.full((R, n), np.nan)
@@ -91,7 +91,7 @@ def _bsadf_paths(Y, w0, chunk=100):
 
 
 def psy_cv(T, w0, R=1000, seed=42, q=(0.90, 0.95, 0.99)):
-    """Valori critice Monte Carlo: ADF, SADF, GSADF (cuantile) si sirurile BSADF / ADF recursiv la 95%."""
+    """Monte Carlo critical values: ADF, SADF, GSADF (quantiles) and the 95% BSADF / recursive ADF sequences."""
     rng = np.random.default_rng(seed)
     bs, fw = _bsadf_paths(_null_paths(T, R, rng), w0)
     out = dict(T=T, w0=w0, R=R,
@@ -105,7 +105,7 @@ def psy_cv(T, w0, R=1000, seed=42, q=(0.90, 0.95, 0.99)):
 
 
 def wild_cv(y, w0, R=500, seed=42):
-    """Wild bootstrap (semne Rademacher pe Delta y, fara drift): sirul BSADF la 95% si GSADF la 95%."""
+    """Wild bootstrap (Rademacher signs on Delta y, no drift): 95% BSADF sequence and 95% GSADF value."""
     rng = np.random.default_rng(seed)
     dy = np.diff(np.asarray(y, float))
     dy = dy - dy.mean()
@@ -116,7 +116,7 @@ def wild_cv(y, w0, R=500, seed=42):
 
 
 def episodes(stat, cv, index, min_len):
-    """Episoade in care stat > cv cel putin min_len perioade: (inceput, sfarsit) datat in timp real."""
+    """Episodes in which stat > cv for at least min_len periods: (start, end) dated in real time."""
     above = np.asarray(stat > cv)
     above[np.isnan(stat) | np.isnan(cv)] = False
     out, i, n = [], 0, len(above)
@@ -134,10 +134,10 @@ def episodes(stat, cv, index, min_len):
 
 
 # =============================================================================
-# BULE RATIONALE SIMULATE
+# SIMULATED RATIONAL BUBBLES
 # =============================================================================
 def blanchard_watson(T=400, r=0.01, pi=0.97, b0=1.0, sd=0.5, seed=7):
-    """Bula Blanchard-Watson: supravietuieste cu prob. pi si creste cu (1+r)/pi, altfel revine la zgomot."""
+    """Blanchard-Watson bubble: survives with prob. pi and grows at (1+r)/pi, otherwise returns to noise."""
     rng = np.random.default_rng(seed)
     b = np.empty(T)
     b[0] = b0
@@ -148,7 +148,7 @@ def blanchard_watson(T=400, r=0.01, pi=0.97, b0=1.0, sd=0.5, seed=7):
 
 
 def evans_bubble(T=400, r=0.02, alpha=1.0, delta=0.5, pi=0.85, seed=11):
-    """Bula care se prabuseste periodic (Evans 1991): creste cu (1+r) sub alpha, apoi explodeaza sau revine la delta."""
+    """Periodically collapsing bubble (Evans 1991): grows at (1+r) below alpha, then explodes or restarts at delta."""
     rng = np.random.default_rng(seed)
     u = np.exp(rng.normal(-0.5 * 0.07 ** 2, 0.07, T))   # u_t > 0, E[u_t] = 1 exact (lognormal)
     B = np.empty(T)
@@ -163,15 +163,15 @@ def evans_bubble(T=400, r=0.02, alpha=1.0, delta=0.5, pi=0.85, seed=11):
 
 
 # =============================================================================
-# LPPLS (Johansen-Ledoit-Sornette; calibrare Filimonov-Sornette 2013)
-# Spatiul de cautare, filtrele si ferestrele: Shu & Zhu (2020), Physica A 557, 124892, sectiunea 2.2,
-# ecuatiile (11)-(12), dupa Sornette et al. (2015)
+# LPPLS (Johansen-Ledoit-Sornette; Filimonov-Sornette 2013 calibration)
+# Search space, filters and windows: Shu & Zhu (2020), Physica A 557, 124892, Section 2.2,
+# equations (11)-(12), following Sornette et al. (2015)
 # =============================================================================
-LPPLS_SEARCH = dict(m=(0.0, 1.0), w=(1.0, 50.0), tc_frac=(0.0, 1 / 3), damping_min=1.0)            # ec. (11)
-LPPLS_FILTER = dict(m=(0.01, 0.99), w=(2.0, 25.0), tc_frac=(0.0, 1 / 5), osc_min=2.5,             # ec. (12)
+LPPLS_SEARCH = dict(m=(0.0, 1.0), w=(1.0, 50.0), tc_frac=(0.0, 1 / 3), damping_min=1.0)            # eq. (11)
+LPPLS_FILTER = dict(m=(0.01, 0.99), w=(2.0, 25.0), tc_frac=(0.0, 1 / 5), osc_min=2.5,             # eq. (12)
                     rel_err_max=0.15, lomb_alpha=0.10, ar1_alpha=0.10)
-LPPLS_WINDOWS = list(range(750, 45, -5))       # t2 - t1 de la 750 la 50 de observatii, pas 5: 141 de ferestre
-LPPLS_STEP = 5                                 # t2 se muta cu 5 observatii
+LPPLS_WINDOWS = list(range(750, 45, -5))       # t2 - t1 from 750 down to 50 observations, step 5: 141 windows
+LPPLS_STEP = 5                                 # t2 moves by 5 observations
 
 
 def lppls_design(t, tc, m, w):
@@ -182,7 +182,7 @@ def lppls_design(t, tc, m, w):
 
 
 def lppls_linear(t, y, tc, m, w):
-    """Pentru (tc, m, omega) dati: A, B, C1, C2 prin MCO si suma patratelor reziduurilor."""
+    """For given (tc, m, omega): A, B, C1, C2 by OLS and the sum of squared residuals."""
     X = lppls_design(t, tc, m, w)
     beta, *_ = np.linalg.lstsq(X, y, rcond=None)
     res = y - X @ beta
@@ -208,8 +208,8 @@ def _grid(t, y, tcs, ms, ws):
 
 
 def lppls_fit(t, y, search=LPPLS_SEARCH, refine=True, grid=(8, 8, 16)):
-    """Calibrare LPPLS pe fereastra (t, y), t in ani: minimul SSR in spatiul de cautare al ec. (11)
-    (tc in [t2, t2 + (t2 - t1)/3], m in [0, 1], omega in [1, 50], amortizare >= 1): grila + Nelder-Mead."""
+    """LPPLS calibration on the window (t, y), t in years: minimum SSR over the search space of eq. (11)
+    (tc in [t2, t2 + (t2 - t1)/3], m in [0, 1], omega in [1, 50], damping >= 1): grid + Nelder-Mead."""
     t = np.asarray(t, float)
     y = np.asarray(y, float)
     t1, t2 = t[0], t[-1]
@@ -244,8 +244,8 @@ def lppls_fit(t, y, search=LPPLS_SEARCH, refine=True, grid=(8, 8, 16)):
 
 
 def lomb_pvalue(fit, wmin=2.0, wmax=25.0, nw=200):
-    """Testul Lomb: rezidualul fara tendinta r = (tc - t)^(-m) (ln p - A - B (tc - t)^m) ca functie de ln(tc - t);
-    probabilitatea ca varful maxim al periodogramei normalizate sa apara intamplator."""
+    """Lomb test: the detrended residual r = (tc - t)^(-m) (ln p - A - B (tc - t)^m) as a function of ln(tc - t);
+    probability that the highest peak of the normalised periodogram arises by chance."""
     from scipy.signal import lombscargle
     t, y = fit['_t'], fit['_y']
     dt = np.maximum(fit['tc'] - t, 1e-9)
@@ -253,15 +253,15 @@ def lomb_pvalue(fit, wmin=2.0, wmax=25.0, nw=200):
     x = np.log(dt)
     r = r - r.mean()
     ws = np.linspace(wmin, wmax, nw)
-    p = lombscargle(x, r, ws) / r.var()                          # periodograma normalizata (Scargle 1982): P_N = P / var(r)
+    p = lombscargle(x, r, ws) / r.var()                          # normalised periodogram (Scargle 1982): P_N = P / var(r)
     z = p.max()
     M = min(nw, len(r))
     return float(1 - (1 - np.exp(-z)) ** M)
 
 
 def ar1_pass(fit, alpha):
-    """Reziduul ln(p_hat) - ln(p) este AR(1) (Ornstein-Uhlenbeck): testele Dickey-Fuller si Phillips-Perron resping
-    radacina unitara la nivelul alpha."""
+    """The residual ln(p_hat) - ln(p) is AR(1) (Ornstein-Uhlenbeck): the Dickey-Fuller and Phillips-Perron tests reject
+    a unit root at level alpha."""
     from statsmodels.tsa.stattools import adfuller
     from arch.unitroot import PhillipsPerron
     e = fit['_yhat'] - fit['_y']
@@ -269,9 +269,9 @@ def ar1_pass(fit, alpha):
 
 
 def lppls_conditions(fit, flt=LPPLS_FILTER, search=LPPLS_SEARCH):
-    """Conditiile ec. (12) (plus amortizarea din ec. 11); bula pozitiva: B < 0. Conditiile de parametri si eroarea relativa
-    se evalueaza fiecare separat; testul Lomb doar daca toate trec, iar testul de radacina unitara al reziduului doar daca
-    trece si Lomb (ponderi cumulative pentru ultimele doua)."""
+    """Conditions of eq. (12) (plus the damping of eq. 11); positive bubble: B < 0. The parameter conditions and the relative
+    error are evaluated separately; the Lomb test only if all of them pass, and the unit-root test of the residual only
+    if Lomb passes too (cumulative shares for the last two)."""
     if fit is None:
         return None
     D = fit['t2'] - fit['t1']
@@ -293,13 +293,13 @@ def lppls_qualified(fit, flt=LPPLS_FILTER):
 
 
 def lppls_path(fit, t):
-    """Traiectoria LPPLS ajustata (log-pret), pentru t < tc."""
+    """Fitted LPPLS path (log price), for t < tc."""
     t = np.asarray(t, float)
     return lppls_design(t, fit['tc'], fit['m'], fit['w']) @ np.array([fit['A'], fit['B'], fit['C1'], fit['C2']])
 
 
 def lppls_confidence(t, y, t2_idx, windows=LPPLS_WINDOWS):
-    """Indicatorul de incredere LPPLS (bule pozitive) la t2: ponderea ferestrelor [t2 - L, t2] cu ajustari calificate."""
+    """LPPLS confidence indicator (positive bubbles) at t2: share of windows [t2 - L, t2] with qualified fits."""
     q = []
     for L in windows:
         i1 = t2_idx - L
@@ -314,5 +314,5 @@ def lppls_confidence(t, y, t2_idx, windows=LPPLS_WINDOWS):
 # DRAWDOWN
 # =============================================================================
 def drawdown(p):
-    """Scaderea fata de maximul anterior: p_t / max_{s<=t} p_s - 1."""
+    """Fall from the previous peak: p_t / max_{s<=t} p_s - 1."""
     return p / p.cummax() - 1

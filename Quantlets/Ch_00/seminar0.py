@@ -37,7 +37,7 @@ def _load(name, start, end):
 
 
 def load(name, start=mfm_data.START, end=mfm_data.END):
-    """mfm_data.load, memorata in timpul rularii (fiecare serie online se descarca o singura data)."""
+    """mfm_data.load, cached during the run (each online series is downloaded once)."""
     return _load(name, start, end).copy()
 
 
@@ -47,7 +47,7 @@ from generate_all_charts import (MainBlue, IDAred, Forest, Amber, Orange, Purple
                                  save_fig, legend_outside_bottom, log_axis, drawdown, clean_series,
                                  ann_stats, to_usd)
 
-# graficele de seminar se afiseaza pe ~0,85 din latimea slide-ului: figuri de 5,6 inch, font 9
+# seminar charts fill ~0.85 of the slide width: 5.6-inch figures, font 9
 plt.rcParams['font.size'] = 9
 plt.rcParams['axes.titlesize'] = 9.5
 plt.rcParams['legend.fontsize'] = 8
@@ -57,7 +57,7 @@ OUT = {}
 
 
 def bottom_legend(fig, ncol=3, handles=None, labels=None, fontsize=7.5):
-    """Legenda sub figura (in afara axelor), dupa tight_layout; save_fig o include (bbox_inches='tight')."""
+    """Legend below the figure (outside the axes), after tight_layout; save_fig keeps it (bbox_inches='tight')."""
     plt.tight_layout()
     if handles is None:
         handles, labels, seen = [], [], set()
@@ -74,7 +74,7 @@ def fmt_pct(ax, axis='y', dec=0):
 
 
 # =============================================================================
-# FUNCTII AJUTATOARE (identice cu notebook-ul seminarului)
+# HELPER FUNCTIONS (as in the seminar notebook)
 # =============================================================================
 def sb_index(n, mean_block, rng):
     """Stationary bootstrap (Politis and Romano, 1994): blocks of random, geometric length with mean mean_block, wrapped around."""
@@ -108,7 +108,7 @@ def se_opdyke(R, q):
 
 
 def drawdown_spells(p):
-    """Spells below a previous peak: a spell starts ON the (last) peak date and ends on the first close >= peak;
+    """Spells below a previous peak: a spell starts on the last day the running peak was set (equal peaks: the latest) and ends on the first close >= peak;
     a spell still open at the end of the sample is right-censored (end = None)."""
     peak = p.cummax(); spells, start = [], None
     for t, below in (p < peak).items():
@@ -141,7 +141,7 @@ def nw_lags(n):
 
 
 # =============================================================================
-# A1, A2: exemple pe hartie
+# A1, A2: pen-and-paper examples
 # =============================================================================
 def a1_a2():
     P = np.array([100., 110., 99.])
@@ -193,7 +193,7 @@ def a1_a2():
 
 
 # =============================================================================
-# SETUP: previzualizarea datelor
+# SETUP: data preview
 # =============================================================================
 def setup_preview():
     spy = load('SPY', start='2015-01-02')
@@ -203,7 +203,7 @@ def setup_preview():
 
 
 # =============================================================================
-# B6: cotatii eronate EUR/RON
+# B6: EUR/RON bad ticks
 # =============================================================================
 def b6():
     m = load('EUR/RON (EODHD)', start='2015-01-01'); bnr = load('EUR/RON', start='2015-01-01')
@@ -229,10 +229,10 @@ def b6():
                rho1_raw=np.log(m).diff().dropna().autocorr(1))
     OUT['B6'] = res
 
-    # grafic pentru cerinta: seria bruta si variatiile zilnice
+    # task chart: raw series and daily changes
     r = np.log(m).diff().dropna()
     fig, axes = plt.subplots(2, 1, figsize=(W, 2.5), sharex=True, gridspec_kw={'height_ratios': [1.2, 1]})
-    axes[0].plot(m.index, m, color=IDAred, lw=0.6, label='EURRON.FOREX close (EODHD)')
+    axes[0].plot(m.index, m, color=IDAred, lw=0.6, label='EODHD EUR/RON series')
     axes[0].set_ylabel('RON per EUR')
     axes[1].plot(r.index, r, color=MainBlue, lw=0.5, label='Daily log change')
     fmt_pct(axes[1]); axes[1].set_ylabel('Log change')
@@ -240,7 +240,7 @@ def b6():
     bottom_legend(fig, ncol=2)
     save_fig('ch0_sem_b6_raw')
 
-    # grafic pentru rezolvare: vârful din aug. 2025 (eroare) vs mai 2026 (miscare reala) + volatilitati
+    # solution chart: the Aug 2025 spike (error) vs May 2026 (real move) + volatilities
     fig, axes = plt.subplots(1, 3, figsize=(W, 2.2), gridspec_kw={'width_ratios': [1, 1, 0.8]})
     for ax, (a, b, ttl) in zip(axes[:2], [('2025-07-28', '2025-08-29', 'Aug 2025: bad tick (removed)'),
                                            ('2026-04-22', '2026-05-22', 'May 2026: genuine move (kept)')]):
@@ -272,7 +272,7 @@ def b6():
 
 
 # =============================================================================
-# B1: tabloul pe clase de active
+# B1: cross-asset dashboard
 # =============================================================================
 def assets_b1():
     px = load_panel(['SPY', 'Euro Stoxx 50', 'Nikkei 225', 'Gold', 'US Treasuries 20y+ (TLT)', 'Bitcoin'])
@@ -282,7 +282,7 @@ def assets_b1():
               'Nikkei 225 (USD)': to_usd(px['Nikkei 225'].dropna(), fx_usd['JPY per USD'], invert=True),
               'Gold': px['Gold'].dropna(), 'TLT': px['US Treasuries 20y+ (TLT)'].dropna(), 'Bitcoin': px['Bitcoin'].dropna()}
     assets = {k: v.loc['2015-01-02':] for k, v in assets.items()}
-    # cate date folosesc un curs FRED din zilele anterioare (regula: ultimul curs, cel mult 5 zile calendaristice)
+    # how many dates use a FRED rate from earlier days (rule: last rate, at most 5 calendar days)
     carried = {}
     for n, loc, fx in [('Euro Stoxx 50 (USD)', px['Euro Stoxx 50'], fx_usd['USD per EUR']),
                        ('Nikkei 225 (USD)', px['Nikkei 225'], fx_usd['JPY per USD'])]:
@@ -310,7 +310,7 @@ def b1(assets, carried):
         axes[0].plot(g.index, g, color=cols[n], lw=0.8, label=n)
         ends[n] = (g.index[-1], g.iloc[-1])
     ypos, last = {}, None
-    for n in sorted(ends, key=lambda k: ends[k][1]):             # etichete finale separate pe scara log
+    for n in sorted(ends, key=lambda k: ends[k][1]):             # end labels spread on the log scale
         y_ = np.log10(ends[n][1]) if last is None else max(np.log10(ends[n][1]), last + 0.16)
         ypos[n] = y_; last = y_
     for n, (t, v) in ends.items():
@@ -337,11 +337,11 @@ def b1(assets, carried):
 
 
 # =============================================================================
-# B3: corelatii si calendare
+# B3: correlations and calendars
 # =============================================================================
 def b3():
     eq, btc, tlt = load('S&P 500'), load('Bitcoin'), load('US Treasuries 20y+ (TLT)')
-    # extras vineri -> luni: de ce facem join pe preturi inainte de randamente
+    # Friday -> Monday extract: why prices are joined before computing returns
     fri = pd.Timestamp('2024-03-08')
     days = pd.date_range(fri, fri + pd.Timedelta(days=3))
     exc = pd.concat([eq.reindex(days), btc.reindex(days)], axis=1, keys=['spx', 'btc'])
@@ -392,11 +392,11 @@ def b3():
 
 
 # =============================================================================
-# BOOTSTRAP: B1 extins -> B3 extins -> B5 extins -> C1 (un singur generator, seed 42)
+# BOOTSTRAP: B1 extended -> B3 extended -> B5 extended -> C1 (one generator, seed 42)
 # =============================================================================
 def bootstraps(assets, cb, weekly, sb):
     rng = np.random.default_rng(42)
-    # ---- B1 extins: Sharpe, SE, intervale bootstrap pe active
+    # ---- B1 extended: Sharpe, SE, bootstrap intervals per asset
     rows, draws = {}, {}
     for n, p in assets.items():
         q = obs_per_year(p); years = (p.index[-1] - p.index[0]).days / 365.25
@@ -414,21 +414,21 @@ def bootstraps(assets, cb, weekly, sb):
         rows[n] = row
     j = np.log(pd.concat([assets['S&P 500 TR (SPY)'], assets['Gold']], axis=1).dropna()).diff().dropna(); Rj = np.expm1(j.values)
     d0 = sharpe(Rj[:, 0], 252) - sharpe(Rj[:, 1], 252)
-    first_idx = sb_index(len(Rj), 20, rng)          # prima reesantionare (afisata in slide-ul despre mecanism)
+    first_idx = sb_index(len(Rj), 20, rng)          # first resample (shown on the mechanism slide)
     ds = [sharpe(Rj[first_idx, 0], 252) - sharpe(Rj[first_idx, 1], 252)]
     ds += [sharpe(Rj[i, 0], 252) - sharpe(Rj[i, 1], 252) for i in (sb_index(len(Rj), 20, rng) for _ in range(1999))]
     ds = np.array(ds)
     OUT['B1x'] = dict(rows=rows, spy_gold=dict(n=len(Rj), d=d0, ci=np.percentile(ds, [2.5, 97.5]).tolist(),
                                                p=min(1, 2 * min((ds <= 0).mean(), (ds >= 0).mean())),
                                                share_pos=(ds > 0).mean(), sd=ds.std()))
-    # prima reesantionare: blocurile (start, lungime)
+    # first resample: the blocks (start, length)
     blocks, s0 = [], 0
     for t in range(1, len(first_idx) + 1):
         if t == len(first_idx) or first_idx[t] != (first_idx[t - 1] + 1) % len(Rj):
             blocks.append((int(first_idx[s0]), t - s0)); s0 = t
     OUT['B1x']['first_blocks'] = blocks[:6]; OUT['B1x']['n_blocks'] = len(blocks)
     OUT['B1x']['first_dates'] = [str(j.index[b].date()) for b, _ in blocks[:3]]
-    # perechile (Bonferroni): generator separat 2026
+    # the pairs (Bonferroni): separate generator 2026
     rng_pairs = np.random.default_rng(2026); pairs = []
     for a, b in itertools.combinations([k for k in assets if k != 'Bitcoin'], 2):
         jj = np.log(pd.concat([assets[a], assets[b]], axis=1).dropna()).diff().dropna(); Rp = np.expm1(jj.values)
@@ -438,7 +438,7 @@ def bootstraps(assets, cb, weekly, sb):
     OUT['B1x']['pairs'] = pairs
     b1x_charts(rows, draws, ds, d0, j, first_idx)
 
-    # ---- B3 extins: corelatia actiuni-obligatiuni
+    # ---- B3 extended: the stock-bond correlation
     a, c = sb.loc['2010':'2020'].values, sb.loc['2022':].values
     r1, r2 = np.corrcoef(a.T)[0, 1], np.corrcoef(c.T)[0, 1]
     se = np.sqrt(1 / (len(a) - 3) + 1 / (len(c) - 3))
@@ -464,7 +464,7 @@ def bootstraps(assets, cb, weekly, sb):
                         p=2 * min((gb <= 0).mean(), (gb >= 0).mean()))
     b3x_chart(dsb, b3x, gb)
 
-    # ---- B5 extins: bootstrap pentru corelatia BET-TR / EUR-RON
+    # ---- B5 extended: bootstrap for the BET-TR / EUR-RON correlation
     d = b5_data()
     arr = d.values
     bs = [np.corrcoef(arr[sb_index(len(arr), 20, rng)].T)[0, 1] for _ in range(2000)]
@@ -518,7 +518,7 @@ def b1x_charts(rows, draws, ds, d0, j, first_idx):
     bottom_legend(fig, ncol=2)
     save_fig('ch0_sem_b1x_diff')
 
-    # mecanismul: prima reesantionare, primele 120 de pozitii
+    # the mechanism: first resample, first 120 positions
     n_show = 120
     fig, ax = plt.subplots(figsize=(W, 1.75))
     idx = first_idx[:n_show]
@@ -584,7 +584,7 @@ def c1_chart(r, c1):
 
 
 # =============================================================================
-# B2: drawdown-uri si timp de revenire
+# B2: drawdowns and recovery time
 # =============================================================================
 def b2():
     res, series = {}, {}
@@ -601,7 +601,7 @@ def b2():
                       long_peak=s[longest[0]], current=dd.iloc[-1], last_peak=str(s.idxmax().date()), p_max=s.max(),
                       open_spell=spells[-1][1] is None, p_last=s.iloc[-1])
         series[n] = (s, dd, longest)
-    # orizont comun: S&P 500 din 17 sep. 2014
+    # common horizon: S&P 500 from 17 Sep 2014
     s = load('S&P 500', start='2014-09-17'); dd = drawdown(s); sp = drawdown_spells(s)
     lg = max(sp, key=lambda x: ((x[1] or s.index[-1]) - x[0]).days)
     res['S&P 500 (common horizon)'] = dict(mdd=dd.min(), trough=str(dd.idxmin().date()),
@@ -678,7 +678,7 @@ def b2x():
 
 
 # =============================================================================
-# C2: critica unui raspuns AI
+# C2: critique of an AI answer
 # =============================================================================
 def c2():
     full = lambda sym: read_market(sym)
@@ -878,7 +878,7 @@ def a8():
 
 
 # =============================================================================
-# B4: stablecoin-uri
+# B4: stablecoins
 # =============================================================================
 def b4():
     s = load('Stablecoins', start='2018-01-01'); s = s[s > 0]
@@ -958,7 +958,7 @@ def b4x():
 
 
 # =============================================================================
-# B5: BET-TR in RON si in EUR
+# B5: BET-TR in RON and in EUR
 # =============================================================================
 def b5_data():
     return np.log(pd.concat([load('BET-TR', start='2015-01-05'), load('EUR/RON', start='2015-01-01')], axis=1,
@@ -1005,7 +1005,7 @@ def b5():
 
 
 # =============================================================================
-# B6 extins: prag Hampel calibrat
+# B6 extended: calibrated Hampel threshold
 # =============================================================================
 def b6x(wd, bnr, flagged):
     rows = {c: hampel_flags(bnr, c).mean() for c in [3, 5, 10, 20]}
@@ -1022,7 +1022,7 @@ def b6x(wd, bnr, flagged):
         fl = hampel_flags(wd, best[floor], floor)
         applied[floor] = dict(c=best[floor], flagged=int(fl.sum()), common=len(set(wd.index[fl]) & set(flagged)),
                               vol=vol(wd[~fl]), kept_2022=bool(not fl.get(pd.Timestamp('2022-08-09'), False)))
-    # fereastra lucrata: 11 cotatii in jurul 13 aug. 2025
+    # worked window: 11 quotes around 13 Aug 2025
     t = wd.index.get_loc(pd.Timestamp('2025-08-13')); w = wd.iloc[t - 5:t + 6]
     med = np.median(w.values); mad = np.median(np.abs(w.values - med))
     t2 = wd.index.get_loc(pd.Timestamp('2022-08-09')); w2 = wd.iloc[t2 - 5:t2 + 6]
@@ -1048,7 +1048,7 @@ def b6x(wd, bnr, flagged):
 
 
 # =============================================================================
-# B7, B8: studiu de eveniment, taxa bancara din decembrie 2018
+# B7, B8: event study, the December 2018 bank tax
 # =============================================================================
 def event(name, mkt):
     r = np.log(pd.concat([load(name, start='2017-01-01'), mkt], axis=1, keys=['i', 'm']).dropna()).diff().dropna()
@@ -1059,7 +1059,7 @@ def event(name, mkt):
     se0 = sig * np.sqrt(1 + 1 / T + (ev['m'].iloc[0] - mb) ** 2 / Sxx)
     seC = sig * np.sqrt(L + L ** 2 / T + (ev['m'].sum() - L * mb) ** 2 / Sxx)
     pv = lambda z: 2 * (1 - stats.t.cdf(abs(z), T - 2))
-    # SE al CAR[0, tau] pentru fiecare tau (banda din grafic)
+    # SE of CAR[0, tau] for each tau (band in the chart)
     se_path = [sig * np.sqrt(l + l ** 2 / T + (ev['m'].iloc[:l].sum() - l * mb) ** 2 / Sxx) for l in range(1, L + 1)]
     wide = r.iloc[t0 - 10:t0 + 6]
     pred = b[0] + b[1] * wide['m']
@@ -1086,19 +1086,27 @@ def b7_b8():
     axes[0].axvspan(-0.5, 5.5, color=IDAred, alpha=0.06, lw=0)
     fmt_pct(axes[0]); axes[0].set_xlabel('Trading day relative to 19 Dec 2018'); axes[0].set_ylabel('Log return')
     axes[0].set_title('Returns around the event', loc='left', fontsize=8.5)
-    for res, c, lab in [(tlv, MainBlue, 'Banca Transilvania'), (brd, Purple, 'BRD')]:
-        car = np.cumsum(res['ar']); se = np.array(res['se_path'])
-        axes[1].plot(range(6), car, 'o-', color=c, lw=1.2, ms=3.5, label=f'CAR, {lab}')
-        axes[1].fill_between(range(6), car - 1.96 * se, car + 1.96 * se, color=c, alpha=0.12, lw=0)
-    axes[1].axhline(0, color=Gray, lw=0.6)
-    fmt_pct(axes[1]); axes[1].set_xlabel('Event day $\\tau$'); axes[1].set_ylabel('CAR[0, $\\tau$]')
-    axes[1].set_title('CAR with $\\pm 1.96$ SE bands', loc='left', fontsize=8.5)
+    def car_panel(ax, banks):
+        for res, c, lab in banks:
+            car = np.cumsum(res['ar']); se = np.array(res['se_path'])
+            ax.plot(range(6), car, 'o-', color=c, lw=1.2, ms=3.5, label=f'CAR, {lab}')
+            ax.fill_between(range(6), car - 1.96 * se, car + 1.96 * se, color=c, alpha=0.12, lw=0)
+        ax.axhline(0, color=Gray, lw=0.6)
+        fmt_pct(ax); ax.set_xlabel('Event day $\\tau$'); ax.set_ylabel('CAR[0, $\\tau$]')
+        ax.set_title('CAR with $\\pm 1.96$ SE bands', loc='left', fontsize=8.5)
+    # B7 [Solved]: Banca Transilvania only (the BRD path answers B8 [Proposed])
+    car_panel(axes[1], [(tlv, MainBlue, 'Banca Transilvania')])
     bottom_legend(fig, ncol=3, fontsize=7.2)
     save_fig('ch0_sem_b7_event')
+    # B8: both banks, for the instructor version only
+    fig, ax = plt.subplots(figsize=(W * 0.62, 2.0))
+    car_panel(ax, [(tlv, MainBlue, 'Banca Transilvania'), (brd, Purple, 'BRD')])
+    bottom_legend(fig, ncol=2, fontsize=7.2)
+    save_fig('ch0_sem_b8_car')
 
 
 # =============================================================================
-# C3: investitii pasive si elasticitatea cererii (simulare)
+# C3: passive investing and demand elasticity (simulation)
 # =============================================================================
 def c3_run(seed, chi=2.97, K=2000, N=40, mode='rep'):
     """Simulated cross-section: K stocks, N active investors each; A_k = active share of stock k (fraction of all shares),
@@ -1133,7 +1141,7 @@ def c3():
             bs = [o[0] for o in out]
             res[f'{chi}_{mode}'] = dict(mean=np.mean(bs), min=np.min(bs), max=np.max(bs), theory=out[0][1])
     res['E_level_seed1'] = c3_run(1, chi=2.97)[2]
-    # exemplul cu doi investitori
+    # the two-investor example
     s = np.array([0.4, 0.3]); e = np.array([1.0, 3.0]); chi = 2.97; A = s.sum()
     E0 = (s * e).sum() / (1 + chi * A)
     ex = dict(A=A, E0=E0)
@@ -1156,7 +1164,7 @@ def c3():
             ax.annotate(f'{v:.2f}', (b_.get_x() + b_.get_width() / 2, v), xytext=(0, 3 if v >= 0 else -9),
                         textcoords='offset points', ha='center', fontsize=7.2)
         ax.axhline(res[f'{chi}_rep']['theory'], color=c, ls='--', lw=1.0,
-                   label=f"eq. (27) pass-through, $\\chi$ = {chi:g}: {res[f'{chi}_rep']['theory']:.3f}")
+                   label=f"eq. (28) pass-through, $\\chi$ = {chi:g}: {res[f'{chi}_rep']['theory']:.3f}")
     ax.axhline(0, color=Gray, lw=0.5)
     ax.set_xticks(xx); ax.set_xticklabels([m_[1] for m_ in modes])
     ax.set_ylabel('Slope'); ax.set_ylim(-0.5, 2.6)

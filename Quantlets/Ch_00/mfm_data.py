@@ -81,7 +81,7 @@ def read_market(symbol):
 
 
 def fetch_daily(symbol, source='market', field='close', start=START, end=END):
-    """Punctul unic de acces la date: intoarce o pd.Series zilnica (fara NaN)."""
+    """Single access point to the data: returns a daily pd.Series (no NaN)."""
     if source == 'market':
         s = read_market(symbol)[field]
     elif source == 'fred':
@@ -93,9 +93,9 @@ def fetch_daily(symbol, source='market', field='close', start=START, end=END):
                                      headers={'User-Agent': 'Mozilla/5.0'})
         d = json.load(urllib.request.urlopen(req, timeout=90))
         s = pd.Series({pd.to_datetime(int(x['date']), unit='s'): x['totalCirculatingUSD'].get('peggedUSD', 0)
-                       for x in d}) / 1e9                                   # miliarde USD
+                       for x in d}) / 1e9                                   # billion USD
     elif source == 'bnr':
-        # cursul oficial BNR (RON pentru o unitate de valuta), arhive XML anuale
+        # official BNR rate (RON per unit of currency), yearly XML archives
         import re
         rows = []
         for y in range(max(int(start[:4]), 2005), int(end[:4]) + 1):
@@ -119,7 +119,7 @@ WEEKDAYS_ONLY = {'Gold', 'EUR/USD'}   # cotatii FX/OTC: sesiunile partiale de we
 
 
 def load(name, start=START, end=END):
-    """Seria cu numele din SERIES (pentru aur si EUR/USD: doar zilele lucratoare)."""
+    """The series named in SERIES (gold and EUR/USD: weekdays only)."""
     source, symbol, field = SERIES[name]
     s = fetch_daily(symbol, source, field, start, end).rename(name)
     if name in WEEKDAYS_ONLY:
@@ -128,5 +128,5 @@ def load(name, start=START, end=END):
 
 
 def load_panel(names, start=START, end=END):
-    """Mai multe serii aliniate pe data (NaN acolo unde o piata nu tranzactioneaza)."""
+    """Several series aligned on date (NaN where a market does not trade)."""
     return pd.concat([load(n, start, end) for n in names], axis=1)

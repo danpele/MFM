@@ -38,7 +38,7 @@ DEC_LEVELS = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
 
 # =============================================================================
-# DATE
+# DATA
 # =============================================================================
 def read_market(symbol):
     """Read data/market/<SYMBOL>.csv locally or from the GitHub repository."""
@@ -78,7 +78,7 @@ def load_spy_daily():
 
 
 # =============================================================================
-# MODELE FUNDATIONALE (zero-shot)
+# FOUNDATION MODELS (zero-shot)
 # =============================================================================
 _FM = {}
 
@@ -215,7 +215,7 @@ def t_std_q(nu, a):
 
 
 def t_std_es(nu, a):
-    """ES_a (pozitiv) al distributiei Student-t standardizate: -E[Z | Z <= q_a]."""
+    """ES_a (positive) of the standardised Student-t distribution: -E[Z | Z <= q_a]."""
     q = stats.t.ppf(a, nu)
     return stats.t.pdf(q, nu) / a * (nu + q ** 2) / (nu - 1) * np.sqrt((nu - 2) / nu)
 
@@ -255,7 +255,7 @@ def risk_table(r, origins, fm_sigma=None):
 
 
 # =============================================================================
-# VOLATILITATE REALIZATA: HAR
+# REALISED VOLATILITY: HAR
 # =============================================================================
 def har_design(y):
     """HAR regressors: yesterday's level, the 5-day average and the 22-day average."""

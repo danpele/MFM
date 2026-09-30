@@ -70,7 +70,7 @@ def texts_block():
         except Exception:
             pass
         tick(f'Qwen {size}', t0)
-    # embeddings + regresie logistica, invatate pe setul de antrenare Twitter
+    # embeddings + logistic regression, trained on the Twitter training set
     from sklearn.linear_model import LogisticRegression
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.decomposition import PCA
@@ -90,7 +90,7 @@ def texts_block():
     xy = pc.transform(Etw)
     out['tw']['pc1'], out['tw']['pc2'] = xy[:, 0], xy[:, 1]
     tick('embeddings', t0)
-    # curba de invatare: cate etichete sunt necesare?
+    # learning curve: how many labels are needed?
     rng = np.random.default_rng(SEED)
     rows = []
     for n in (100, 200, 400, 800, 1600, 3200, 6400, len(tr)):
@@ -118,7 +118,7 @@ MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augus
 
 
 def memory_block(sizes=('1.5B', '7B', '14B')):
-    """Directia lunara a S&P 500 (2000-2026) si directia zilnica a Apple, intrebate fara niciun context."""
+    """Monthly direction of the S&P 500 (2000-2026) and daily direction of Apple, asked with no context."""
     t0 = time.time()
     px = M.read_market('GSPC.INDX')['close']
     mon = px.resample('ME').last()
@@ -147,7 +147,7 @@ def memory_block(sizes=('1.5B', '7B', '14B')):
 
 
 def news_block(paths=None, llm='7B', batch=64):
-    """Scoruri pentru fiecare titlu, apoi medii pe (zi de tranzactionare, actiune)."""
+    """Scores for each headline, then means by (trading day, stock)."""
     t0 = time.time()
     news = M.load_fnspid(paths)
     tick(f'FNSPID {len(news)} headlines', t0)
@@ -178,7 +178,7 @@ def news_block(paths=None, llm='7B', batch=64):
     hour = news['ts'].dt.tz_convert('UTC').dt.hour.value_counts().reindex(range(24), fill_value=0)
     exact = ((news['ts'].dt.hour == 0) & (news['ts'].dt.minute == 0) & (news['ts'].dt.second == 0)).mean()
     pd.DataFrame({'n': hour, 'share_midnight': exact}).to_csv(os.path.join(HERE, 'ch15_news_hours.csv'))
-    # scorurile titlurilor individuale (fara text) pentru comparatia metodelor
+    # scores of the individual headlines (without text) for the comparison of methods
     news[['day', 'ticker', 'finbert', 'finbert_lab', 'lm', 'lm_hit', 'qwen']].round(5).to_csv(
         os.path.join(HERE, 'ch15_news_headlines.csv.gz'), index=False, compression='gzip')
     tick('news done', t0)

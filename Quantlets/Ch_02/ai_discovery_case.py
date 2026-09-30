@@ -45,13 +45,13 @@ a, b = stats_win(pre), stats_win(post)
 z = (b['rho1'] - a['rho1']) / np.hypot(a['se'], b['se'])
 out = dict(pre=a, post=b, drho=b['rho1'] - a['rho1'], z_diff=float(z),
            mde_rho=float(2.8 * np.hypot(a['se'], b['se'])))
-# placebo: date false, aceeasi lungime a ferestrelor, ambele ferestre inainte de data reala
+# placebo: false dates, same window length, both windows before the real date
 plac = []
 for y in range(2016, 2024):
     d = pd.Timestamp(f'{y}-01-11')
     q = r.loc[d:].iloc[:L]
     p = r.loc[:d - pd.Timedelta(days=1)].iloc[-L:]
-    if len(p) < L or q.index[-1] >= BREAK:      # fereastra placebo nu atinge data reala
+    if len(p) < L or q.index[-1] >= BREAK:      # the placebo window does not reach the real date
         continue
     sp, sq = stats_win(p), stats_win(q)
     plac.append(dict(date=str(d.date()), drho=sq['rho1'] - sp['rho1'],
@@ -64,7 +64,7 @@ out['placebo_maxabsz'] = float(max(abs(p['z']) for p in plac))
 
 
 def fig_ai_etf(o):
-    """rho1 inainte/dupa ETF-urile spot cu intervale robuste, diferenta cu +-MDE si comparatia placebo."""
+    """rho1 before/after the spot ETFs with robust intervals, the difference with +-MDE and the placebo comparison."""
     from generate_all_charts import plt, MainBlue, IDAred, Amber, Forest, Purple, Gray, save_fig
     fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.0), gridspec_kw={'width_ratios': [1.1, 1.4]})
     ax = axes[0]

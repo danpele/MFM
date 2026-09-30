@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'SPY and Bitcoin 5-minute bars (data/market/intraday); daily open, high, low, close and volume for US stocks, Bucharest Stock Exchange stocks and crypto-assets (data/market); CBOE VIX; BET-TR; USD/RON official reference rate of the National Bank of Romania'
+Datafile: 'SPY and Bitcoin 5-minute bars; daily open, high, low, close and volume for US stocks, Bucharest Stock Exchange stocks and crypto-assets; CBOE VIX; BET-TR; USD/RON official reference rate of the National Bank of Romania'
 
 Output: 'ch10_sem_ushape.pdf, ch10_sem_cross.pdf, ch10_sem_premium.pdf, ch10_sem_a1_bounce.pdf, ch10_sem_a2_sampling.pdf, ch10_sem_a3_spread.pdf, ch10_sem_a4_learning.pdf, ch10_sem_a6_kyle.pdf, ch10_sem_ac.pdf, ch10_sem_pin.pdf, ch10_sem_b2_estimates.pdf, ch10_sem_b2_mc.pdf, ch10_sem_b4.pdf, ch10_sem_b5.pdf, ch10_sem_b6.pdf, ch10_sem_b7.pdf, ch10_sem_b8_prices.pdf, ch10_sem_b8_shares.pdf, ch10_sem_c1.pdf, ch10_sem_c2_roundtrip.pdf, ch10_sem_c3_tax.pdf'

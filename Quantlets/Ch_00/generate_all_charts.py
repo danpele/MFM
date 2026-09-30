@@ -18,7 +18,7 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mfm_data import load, load_panel  # noqa: E402
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -37,7 +37,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Chart colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -54,7 +54,7 @@ CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as transparent PDF and PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -63,12 +63,12 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
 def bottom_legend(fig, ncol=3, handles=None, labels=None, fontsize=8):
-    """Legenda sub figura (in afara axelor), dupa tight_layout; save_fig o include (bbox_inches='tight')."""
+    """Legend below the figure (outside the axes), after tight_layout; save_fig keeps it (bbox_inches='tight')."""
     plt.tight_layout()
     if handles is None:
         handles, labels, seen = [], [], set()
@@ -80,7 +80,7 @@ def bottom_legend(fig, ncol=3, handles=None, labels=None, fontsize=8):
 
 
 def log_axis(ax, ticks):
-    """Axa logaritmica cu etichete lizibile (fara notatie stiintifica)."""
+    """Log axis with readable labels (no scientific notation)."""
     ax.set_yscale('log')
     ax.set_yticks(ticks)
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f'{v:g}'))
@@ -109,16 +109,16 @@ fx_usd = load_panel(['USD per EUR', 'JPY per USD'])   # FRED
 
 
 def to_usd(local, fx, invert=False):
-    """Converteste un indice in moneda locala in USD cu cursul FRED din aceeasi zi
-    (ultimul curs disponibil, cel mult 5 zile in urma, daca ziua lipseste)."""
+    """Convert a local-currency index to USD with the FRED rate of the same day
+    (the last available rate, at most 5 days back, if the day is missing)."""
     f = fx.dropna().reindex(local.index, method='ffill', tolerance=pd.Timedelta(days=5))
     return (local / f if invert else local * f).dropna()
 
 
 def cross_panel():
-    """Seriile comparate pe clase de active, toate in USD:
-    S&P 500 = SPY ajustat (randament total); Euro Stoxx 50 si Nikkei 225 = indici de pret convertiti in USD;
-    TLT = randament total; aur = spot; Bitcoin = pret."""
+    """Cross-asset series, all in USD:
+    S&P 500 = adjusted SPY (total return); Euro Stoxx 50 and Nikkei 225 = price indices converted to USD;
+    TLT = total return; gold = spot; Bitcoin = price."""
     return {
         'S&P 500 TR (SPY)': px['SPY'].dropna(),
         'Euro Stoxx 50 (USD)': to_usd(px['Euro Stoxx 50'].dropna(), fx_usd['USD per EUR']),
@@ -132,28 +132,28 @@ def cross_panel():
 
 
 def dividend_gap(start='2015-01-02'):
-    """Diferenta de CAGR dintre S&P 500 cu dividende reinvestite (SPY ajustat) si indicele de pret."""
+    """CAGR gap between the S&P 500 with dividends reinvested (adjusted SPY) and the price index."""
     c_tr, _ = ann_stats(px['SPY'].loc[start:])
     c_px, _ = ann_stats(px['S&P 500'].loc[start:])
     return c_tr, c_px, c_tr - c_px
 
 
 def clean_series(y, max_dev=1.0, window=11):
-    """Elimina weekend-urile si punctele aflate la peste max_dev de mediana mobila centrata."""
+    """Drop weekend rows and points more than max_dev from the centred rolling median."""
     y = y[y.index.dayofweek < 5]
     med = y.rolling(window, center=True, min_periods=3).median()
     return y[(y - med).abs() <= max_dev]
 
 
 def drawdown(p):
-    """Drawdown fata de maximul anterior: P_t / max_{s<=t} P_s - 1."""
+    """Drawdown from the previous peak: P_t / max_{s<=t} P_s - 1."""
     return p / p.cummax() - 1
 
 
 def ann_stats(p, periods=252):
-    """Randament anualizat (CAGR) si volatilitate anualizata din preturi zilnice.
+    """Annualised return (CAGR) and annualised volatility from daily prices.
 
-    periods='obs' foloseste numarul efectiv de observatii pe an al seriei.
+    periods='obs' uses the observed number of observations per year of the series.
     """
     p = p.dropna()
     years = (p.index[-1] - p.index[0]).days / 365.25
@@ -204,7 +204,7 @@ def fig_risk_return(start='2015-01-02'):
     panel = cross_panel()
     for n in names:
         s = (eurron if n == 'EUR/RON' else panel[n]).loc[start:].dropna()
-        cagr, v = ann_stats(s, 'obs')          # q = numarul observat de zile de tranzactionare pe an
+        cagr, v = ann_stats(s, 'obs')          # q = observed number of trading days per year
         rows.append((n, cagr, v, s.index[0]))
     res = pd.DataFrame(rows, columns=['asset', 'cagr', 'vol', 'from']).set_index('asset')
     fig, ax = plt.subplots(figsize=(4.7, 3.1))
@@ -280,7 +280,7 @@ def fig_vix_regimes():
     ax.axhline(30, color=IDAred, ls='--', lw=0.8)
     ax.text(1.005, 20 / (v.max() * 1.18), 'VIX = 20', fontsize=7, color=Amber, transform=ax.transAxes, va='center')
     ax.text(1.005, 30 / (v.max() * 1.18), 'VIX = 30', fontsize=7, color=IDAred, transform=ax.transAxes, va='center')
-    # cele mai mari varfuri, separate prin cel putin 2 ani
+    # largest peaks, at least 2 years apart
     peaks = []
     for t in v.sort_values(ascending=False).index:
         if all(abs((t - p).days) > 730 for p in peaks):
@@ -304,8 +304,8 @@ def fig_vix_regimes():
 # FIG 4b: VIX vs volatilitatea realizata ulterior (prima de risc de varianta)
 # =============================================================================
 def fig_vix_vrp(h=21):
-    """VIX (implicita, % pe an) vs volatilitatea realizata a S&P 500 in urmatoarele h = 21 de zile de tranzactionare:
-    sqrt(252/h * suma r^2), fara ferestrele incomplete de la final; jos: varianta implicita minus cea realizata."""
+    """VIX (implied, % a year) vs the realised volatility of the S&P 500 over the next h = 21 trading days:
+    sqrt(252/h * sum r^2), without the incomplete windows at the end; bottom: implied minus realised variance."""
     v = px['VIX'].dropna(); s = px['S&P 500'].dropna()
     r = np.log(s).diff()
     rv = np.sqrt((r ** 2)[::-1].rolling(h).sum()[::-1].shift(-1) * 252 / h) * 100
@@ -387,13 +387,13 @@ def fig_concentration():
 # FIG 7: Corelatii rulante: actiuni-obligatiuni si Bitcoin-actiuni
 # =============================================================================
 def fig_rolling_correlations(window=252):
-    eq = np.log(px['S&P 500'].dropna()).diff()              # dropna inainte de diff: calendarul propriu
+    eq = np.log(px['S&P 500'].dropna()).diff()              # dropna before diff: own calendar
     bd = np.log(px['US Treasuries 20y+ (TLT)'].dropna()).diff()
     btc = np.log(px['Bitcoin'].dropna()).diff()
     both = pd.concat([eq, bd], axis=1).dropna()
     c_sb = both.iloc[:, 0].rolling(window).corr(both.iloc[:, 1])
-    # analiza comuna: join pe PRETURI in zilele comune, apoi diff -> ambele randamente acopera
-    # acelasi interval (de ex. vineri -> luni); diff inainte de join ar da Bitcoin duminica -> luni
+    # several series: join the PRICES on common days, then diff -> both returns cover
+    # the same interval (e.g. Friday -> Monday); diff before the join would give Bitcoin Sunday -> Monday
     pp = pd.concat([px['S&P 500'], px['Bitcoin']], axis=1).dropna()
     trio = np.log(pp).diff().dropna()
     c_be = trio.iloc[:, 0].rolling(window).corr(trio.iloc[:, 1])
@@ -445,8 +445,8 @@ def fig_stablecoins():
     ax.plot(s.index, s.values, color=Forest, lw=0.9)
     ax.set_ylabel('bn USD')
     pts = {}
-    peak = s.loc['2022'].idxmax()                         # maximul din 2022
-    trough = s.loc[peak:'2023-12-31'].idxmin()            # minimul exact de dupa maxim
+    peak = s.loc['2022'].idxmax()                         # 2022 peak
+    trough = s.loc[peak:'2023-12-31'].idxmin()            # exact trough after the peak
     for tt in [s.loc['2020-01-01':].index[0], peak, trough, s.index[-1]]:
         pts[tt.date()] = s.loc[tt]
         ax.annotate(f'{s.loc[tt]:.1f} bn\n{tt:%d %b %Y}', (tt, s.loc[tt]), xytext=(0, 6),
@@ -463,7 +463,7 @@ def fig_stablecoins():
 # FIG 9b: Tether (USDT): abaterea fata de paritatea de 1 USD
 # =============================================================================
 def fig_usdt_peg():
-    """Pretul USDT (close) 2019-2026, abaterea fata de 1 USD in %, benzi de +-0,5% si +-1%, detaliu martie 2020."""
+    """USDT price (close) 2019-2026, deviation from 1 USD in %, bands of +-0.5% and +-1%, March 2020 detail."""
     u = load('Tether (USDT)', start='2019-01-01').dropna()
     dev = 100 * (u - 1)
     fig, ax = plt.subplots(figsize=(6.6, 2.1))
@@ -519,7 +519,7 @@ def fig_ibit():
 # FIG 11: Piata romaneasca: BET, blue chips BVB, EUR/RON
 # =============================================================================
 def fig_romania():
-    """BET-TR si blue chips BVB (ajustate pentru dividende), EUR/RON (BNR), randamente 10 ani RO vs DE."""
+    """BET-TR and BVB blue chips (dividend-adjusted), EUR/RON (BNR), 10-year yields Romania vs Germany."""
     fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.5), gridspec_kw={'width_ratios': [1.35, 0.9, 0.9]})
     start = '2015-01-05'
     out = {}
@@ -561,12 +561,12 @@ def fig_romania():
 
 
 def fig_bad_ticks():
-    """EUR/RON: seria EODHD (cotatii eronate) vs cursul BNR, 2015-2026, cu volatilitatile anualizate."""
+    """EUR/RON: EODHD series (bad ticks) vs the BNR rate, 2015-2026, with annualised volatilities."""
     mk = eurron_mkt.loc['2015':]; bn = eurron.loc['2015':]
     res = data_pitfall()
     fig, ax = plt.subplots(figsize=(6.6, 2.1))
     ax.plot(mk.index, mk.values, color=IDAred, lw=0.6,
-            label=f"EODHD series (EURRON.FOREX): volatility {res['vol_market']:.1%}")
+            label=f"EODHD EUR/RON series: volatility {res['vol_market']:.1%}")
     ax.plot(bn.index, bn.values, color=MainBlue, lw=0.9, label=f"BNR reference rate: volatility {res['vol_bnr']:.1%}")
     for d, dy in [('2025-08-13', 0), ('2022-01-05', 0)]:
         t = pd.Timestamp(d)
@@ -580,11 +580,11 @@ def fig_bad_ticks():
 
 
 def data_pitfall():
-    """EUR/RON: seria EODHD (cu erori de cotatie) vs BNR, 2015-2026."""
+    """EUR/RON: EODHD series (with bad ticks) vs BNR, 2015-2026."""
     r_e = np.log(eurron_mkt).diff().dropna().loc['2015':]
     r_b = np.log(eurron).diff().dropna().loc['2015':]
     top = r_e.abs().sort_values(ascending=False).head(6)
-    q = lambda r: len(r) / ((r.index[-1] - r.index[0]).days / 365.25)   # frecventa observata (FX: nu 252)
+    q = lambda r: len(r) / ((r.index[-1] - r.index[0]).days / 365.25)   # observed frequency (FX: not 252)
     return dict(vol_market=r_e.std() * np.sqrt(q(r_e)), vol_bnr=r_b.std() * np.sqrt(q(r_b)),
                 largest={d.date(): round(r_e.loc[d], 4) for d in top.index})
 
@@ -594,7 +594,7 @@ def data_pitfall():
 # FIG: Istoria BVB - BET 1997-2011, BET-XT din 2011, BET-TR din 2014 (scara log)
 # =============================================================================
 def fig_bvb_history():
-    """Indicele BET 1997-2026 pe scara log, valori oficiale de inchidere, cu evenimente marcate."""
+    """BET index 1997-2026 on a log scale, official closing values, with events marked."""
     bet = load('BET', start='1997-01-01').dropna()
     full = bet
     fig, ax = plt.subplots(figsize=(6.8, 2.45))
@@ -629,14 +629,14 @@ HHL = dict(active0=0.81, chi=2.97, pass_through=0.33)   # Sectiunea V.A; Tabelul
 
 
 def etf_share():
-    """Ponderea ETF-urilor in actiunile corporative SUA (Financial Accounts of the US), trimestrial, 2001 Q1 - ultimul trimestru."""
+    """ETF share of US corporate equities (Financial Accounts of the US), quarterly, 2001 Q1 - latest quarter."""
     q = load_panel(['ETF equities', 'All equities'], start='2001-01-01').dropna()
     return (q['ETF equities'] / q['All equities']).rename('ETF share')
 
 
 def fig_hhl_passive():
-    """Stanga: ponderea ETF. Dreapta: regula din Sectiunea V.A (81% activi la start, transmisie 0,33):
-    scaderea ponderii active si scaderea implicita a elasticitatii agregate E_agg fata de 2001 Q1."""
+    """Left: ETF share. Right: the rule of Section V.A (81% active at the start, pass-through 0.33):
+    fall in the active share and implied fall in the aggregate elasticity E_agg relative to 2001 Q1."""
     s = etf_share()
     active = HHL['active0'] - (s - s.iloc[0])
     d_active = active / HHL['active0'] - 1
@@ -675,8 +675,8 @@ def fig_hhl_passive():
 
 
 def fig_hhl_elasticity():
-    """Ec. (5): elasticitatea agregata dupa ce o fractie 1 - alpha din investitori devine pasiva,
-    relativ la piata fara investitori pasivi: alpha (1 + chi) / (1 + chi alpha)."""
+    """Eq. (5): aggregate elasticity after a fraction 1 - alpha of investors turns passive,
+    relative to the market without passive investors: alpha (1 + chi) / (1 + chi alpha)."""
     alpha = np.linspace(0, 1, 401)
     rel = lambda chi: alpha * (1 + chi) / (1 + chi * alpha)
     fig, ax = plt.subplots(figsize=(4.7, 3.0))

@@ -42,7 +42,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Brand colours
 MainBlue = '#1A3A6E'
 IDAred = '#CD0000'
 Forest = '#2E7D32'
@@ -164,7 +164,7 @@ def fig_acf():
 
 
 # =============================================================================
-# FIG 3: tokenizarea Chronos (scalare prin media valorilor absolute + cuantizare uniforma)
+# FIG 3: Chronos tokenisation (mean-absolute scaling + uniform quantisation)
 # =============================================================================
 def fig_tokenization():
     r = M.load_returns('sp500')
@@ -347,7 +347,7 @@ def fig_lstm_seeds():
 
 
 # =============================================================================
-# EVALUARE: volatilitatea realizata (SPY)
+# EVALUATION: realised volatility (SPY)
 # =============================================================================
 def eval_rv():
     d = load_csv('ch14_rv.csv')
@@ -423,7 +423,7 @@ def fig_context():
 
 
 # =============================================================================
-# EVALUARE: VaR 1%, ES 2.5%
+# EVALUATION: VaR 1%, ES 2.5%
 # =============================================================================
 def eval_risk():
     out, series = {}, {}

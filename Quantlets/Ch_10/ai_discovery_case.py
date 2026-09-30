@@ -1,16 +1,16 @@
 """
-ai_discovery_case.py -- Capitolul 10, secțiunea „AI pentru descoperire științifică”: mini-caz
-=============================================================================================
-Întrebare: măsoară estimatorul Corwin--Schultz (CS) din bare zilnice costul tranzacționării sau volatilitatea?
+ai_discovery_case.py -- Chapter 10, section "AI for Scientific Discovery": mini-case
+====================================================================================
+Question: does the Corwin--Schultz (CS) estimator from daily bars measure trading cost or volatility?
 
-  * Pasul 0 (replicare): mediana CS pe grupuri (US, BVB, cripto), cifrele din curs (ch10_results.json)
-  * Implicații testabile, pe secțiunea transversală a celor 25 de active (septembrie 2024 -- septembrie 2026):
-      H_spread: rangul CS urmează rangul ilichidității Amihud (costul real al tranzacționării)
-      H_vol:    rangul CS urmează rangul volatilității zilnice (abaterea standard a randamentelor log)
-  * Statistici: corelații Spearman, corelația parțială Spearman CS--Amihud controlând volatilitatea,
-    bootstrap pe active (10 000 de replicări) pentru diferența rho(CS, vol) - rho(CS, Amihud)
-Iesire: ai_discovery_case.json
-Modelarea Pietelor Financiare - Daniel Traian PELE
+  * Step 0 (replication): median CS by group (US, BVB, crypto), the lecture figures (ch10_results.json)
+  * Testable implications, on the cross-section of the 25 assets (September 2024 -- September 2026):
+      H_spread: the CS rank follows the rank of Amihud illiquidity (the actual trading cost)
+      H_vol:    the CS rank follows the rank of daily volatility (standard deviation of log returns)
+  * Statistics: Spearman correlations, the partial Spearman correlation CS--Amihud controlling for volatility,
+    bootstrap over assets (10 000 resamples) for the difference rho(CS, vol) - rho(CS, Amihud)
+Output: ai_discovery_case.json
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -29,7 +29,7 @@ SEED = 7
 
 
 def partial_spearman(x, y, z):
-    """Corelația parțială Spearman dintre x și y, controlând z (pe ranguri)."""
+    """Partial Spearman correlation of x and y, controlling for z (on ranks)."""
     rx, ry, rz = (stats.rankdata(v) for v in (x, y, z))
     ex = rx - np.polyval(np.polyfit(rz, rx, 1), rz)
     ey = ry - np.polyval(np.polyfit(rz, ry, 1), rz)
@@ -41,7 +41,7 @@ def main():
     keys = list(ASSETS)
     cs = np.array([R['spreads'][k]['cs'] for k in keys])
     il = np.array([R['amihud'][k]['illiq'] for k in keys])
-    vol = np.array([1e4 * returns(k, START2).std() for k in keys])         # bp pe zi
+    vol = np.array([1e4 * returns(k, START2).std() for k in keys])         # bp per day
     rep = {g: float(np.median([R['spreads'][k]['cs'] for k in GROUPS[g]])) for g in GROUPS}
     r_cs_vol = stats.spearmanr(cs, vol)
     r_cs_il = stats.spearmanr(cs, il)
@@ -52,7 +52,7 @@ def main():
         i = rng.integers(0, len(keys), len(keys))
         diff.append(stats.spearmanr(cs[i], vol[i])[0] - stats.spearmanr(cs[i], il[i])[0])
     diff = np.array(diff)
-    # robustete: bootstrap stratificat pe piete (reesantionam activele in interiorul fiecarei piete, compozitia ramane fixa)
+    # robustness: bootstrap stratified by market (resample assets within each market; the composition stays fixed)
     grp = np.array([ASSETS[k][2] for k in keys])
     strata = [np.flatnonzero(grp == g) for g in GROUPS]
     diff_s = []
@@ -60,7 +60,7 @@ def main():
         i = np.concatenate([rng.choice(ix, len(ix), replace=True) for ix in strata])
         diff_s.append(stats.spearmanr(cs[i], vol[i])[0] - stats.spearmanr(cs[i], il[i])[0])
     diff_s = np.array(diff_s)
-    # excluderea pe rand a cate unei piete
+    # leave one market out at a time
     lomo = {}
     for g in GROUPS:
         m = grp != g

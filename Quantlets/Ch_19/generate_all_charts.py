@@ -1,12 +1,12 @@
 """
-Generator pentru graficele si cifrele Capitolului 19: recapitulare si studiu de caz integrat
+Charts and numbers of Chapter 19: review and integrated case study
 ==========================================================================================
-Studiul de caz: indicele BET (valori oficiale de inchidere, 2000-2026), un singur fir:
-fapte stilizate -> GARCH(1,1)-t -> VaR 1% pentru ziua urmatoare -> backtesting.
-Toate graficele: fundal transparent, etichete ENG, legenda in afara, jos.
-Conventie: nivelul = probabilitatea cozii alpha (VaR 1%); pierderea L = -r, in % din pozitie.
-Cifrele sunt salvate in ch19_results.json (folosite de generatoarele de slide-uri).
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Case study: the BET index (official closing values, 2000-2026), one thread:
+stylised facts -> GARCH(1,1)-t -> next-day VaR 1% -> backtesting.
+All charts: transparent background, English labels, legend outside, below.
+Convention: level = tail probability alpha (VaR 1%); loss L = -r, in % of the position.
+The numbers are saved in ch19_results.json (used by the slide generators).
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import os
@@ -25,7 +25,7 @@ from case_study import (ALPHA, MODELS, stylised_facts, kurtosis_boot_ci, garch_t
                         rolling_var, backtest_table, kupiec, binom_band, t_std_q, acf)
 from inference19 import hill_ci, profile_ci, formal_eval, kupiec_power, kupiec_mde  # noqa: E402
 
-# Stil standard MFM (identic cu SFM): transparent + ENG + legenda jos
+# Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
 plt.rcParams['axes.facecolor'] = 'none'
 plt.rcParams['savefig.facecolor'] = 'none'
@@ -44,14 +44,14 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Culori brand
+# Course colours
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
 Amber    = '#B5853F'
 Orange   = '#E67E22'
 Purple   = '#8E44AD'
-Gray     = '#7F7F7F'   # doar linii de referinta, benzi, grila
+Gray     = '#7F7F7F'   # reference lines, bands and grid only
 Teal     = '#17A2B8'
 MODEL_COL = {'HS': MainBlue, 'Normal': Orange, 'GARCH-t': Forest, 'FHS': IDAred}
 
@@ -61,7 +61,7 @@ EVAL_FROM = '2005-01-01'
 
 
 def save_fig(name):
-    """Salveaza figura ca PDF si PNG transparent."""
+    """Save the figure as PDF and transparent PNG."""
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -70,12 +70,12 @@ def save_fig(name):
 
 
 def legend_outside_bottom(ax, ncol=2, y=-0.22):
-    """Plaseaza legenda in afara graficului, jos-centru."""
+    """Place the legend outside the plot, bottom centre."""
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
 def fig_legend_bottom(fig, axes, ncol=3):
-    """O singura legenda sub o figura cu mai multe panouri."""
+    """One legend below a multi-panel figure."""
     h, l = [], []
     for ax in axes:
         for hh, ll in zip(*ax.get_legend_handles_labels()):
@@ -86,18 +86,18 @@ def fig_legend_bottom(fig, axes, ncol=3):
 
 
 # =============================================================================
-# DATE: randamente log zilnice ale BET, in %
+# DATA: daily log returns of the BET, in %
 # =============================================================================
 r = 100 * log_returns('bet')
 RES = {}
 
 
 # =============================================================================
-# 1. FAPTE STILIZATE
+# 1. STYLISED FACTS
 # =============================================================================
 def part_facts():
     sf = stylised_facts(r)
-    h = hill_ci(r.values)                     # indicele de coada (kurtosis-ul nu este consistent daca alpha < 4)
+    h = hill_ci(r.values)                     # tail index (the kurtosis is not consistent if alpha < 4)
     sf['hill'] = {k: v for k, v in h.items() if k != 'draws'}
     sf['ppy'] = len(r) / ((r.index[-1] - r.index[0]).days / 365.25)
     sf['ann_vol'] = r.std() * np.sqrt(sf['ppy'])
@@ -130,13 +130,13 @@ def part_facts():
 
 
 # =============================================================================
-# 2. GARCH(1,1)-t PE TOATA SELECTIA
+# 2. GARCH(1,1)-t ON THE FULL SAMPLE
 # =============================================================================
 def part_garch():
     res = garch_t_fit(r)
     g = garch_summary(res)
     RES['garch'] = g
-    RES['garch']['profile'] = profile_ci(r.values, res)   # CI profil pentru alpha + beta, restrans la < 1
+    RES['garch']['profile'] = profile_ci(r.values, res)   # profile CI for alpha + beta, restricted to <= 1
     sig = res.conditional_volatility
     fig, ax = plt.subplots(figsize=(7.6, 4.2))
     ax.plot(r.index, r.values, color=MainBlue, lw=0.4, label='BET daily log return (%)')
@@ -158,7 +158,7 @@ def part_garch():
 
 
 # =============================================================================
-# 3-4. VaR 1% PENTRU ZIUA URMATOARE SI BACKTESTING
+# 3-4. NEXT-DAY VaR 1% AND BACKTESTING
 # =============================================================================
 def part_var(full_res):
     fc = rolling_var(r, EVAL_FROM)
@@ -185,7 +185,7 @@ def part_var(full_res):
     legend_outside_bottom(ax, ncol=2, y=-0.16)
     save_fig('ch19_kupiec_power')
 
-    # grafic: pierderi si VaR 1% (2020-2026)
+    # chart: losses and VaR 1% (2020-2026)
     d = fc.loc['2020-01-01':]
     fig, ax = plt.subplots(figsize=(7.6, 4.2))
     ax.bar(d.index, d['L'].clip(lower=0), width=1.5, color=Teal, alpha=0.7, label='Daily loss (gains set to 0)')
@@ -200,7 +200,7 @@ def part_var(full_res):
                           fhs_max=float(d['FHS'].max()), fhs_max_date=str(d['FHS'].idxmax().date()),
                           fhs_last=float(fc['FHS'].iloc[-1]), normal_last=float(fc['Normal'].iloc[-1]))
 
-    # grafic: ratele depasirilor
+    # chart: breach rates
     fig, ax = plt.subplots(figsize=(6.4, 4.0))
     x = np.arange(len(MODELS))
     rates = [100 * bt[m]['rate'] for m in MODELS]
@@ -215,7 +215,7 @@ def part_var(full_res):
     legend_outside_bottom(ax, ncol=2, y=-0.16)
     save_fig('ch19_breach_rates')
 
-    # grafic: depasiri pe 250 de zile si zonele Basel
+    # chart: breaches over 250 days and the Basel zones
     fig, ax = plt.subplots(figsize=(7.6, 4.2))
     ax.axhspan(-0.5, 4.5, color=Forest, alpha=0.08, lw=0, label='Green zone (0-4)')
     ax.axhspan(4.5, 9.5, color=Amber, alpha=0.15, lw=0, label='Yellow zone (5-9)')
@@ -231,7 +231,7 @@ def part_var(full_res):
     legend_outside_bottom(ax, ncol=4, y=-0.1)
     save_fig('ch19_rolling_breaches')
 
-    # capcana: look-ahead bias (parametri estimati pe toata selectia)
+    # trap: look-ahead bias (parameters estimated on the full sample)
     p = full_res.params
     sig_full = full_res.conditional_volatility.loc[fc.index]
     var_full = -(p['mu'] + sig_full * t_std_q(p['nu'], ALPHA))

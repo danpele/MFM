@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Monday, 21 September 2026'
 
-Datafile: 'Daily market data (data/market in the MFM repository); FRED exchange rates and Financial Accounts; BNR EUR/RON reference rate; DefiLlama stablecoin supply'
+Datafile: 'Daily market data from the MFM course repository; FRED exchange rates and Financial Accounts; BNR EUR/RON reference rate; DefiLlama stablecoin supply'
 
 Output: 'ch0_sem_a1_returns.pdf, ch0_sem_a2_drawdown.pdf, ch0_sem_b6_raw.pdf, ch0_sem_b6_audit.pdf, ch0_sem_b6x_calibration.pdf, ch0_sem_b1_dashboard.pdf, ch0_sem_b3_correlations.pdf, ch0_sem_bootstrap_demo.pdf, ch0_sem_b1x_sharpe.pdf, ch0_sem_b1x_diff.pdf, ch0_sem_b3x_change.pdf, ch0_sem_c1_correlation.pdf, ch0_sem_b2_underwater.pdf, ch0_sem_b2x_distributions.pdf, ch0_sem_c2_correction.pdf, ch0_sem_a5_drag.pdf, ch0_sem_a6_acf.pdf, ch0_sem_a7_weekly.pdf, ch0_sem_a9_leadlag.pdf, ch0_sem_a8_se_span.pdf, ch0_sem_b4_supply.pdf, ch0_sem_b4x_break.pdf, ch0_sem_b5_currency.pdf, ch0_sem_b7_event.pdf, ch0_sem_c3_slopes.pdf'

@@ -1,14 +1,14 @@
 """
-risk_measures.py -- Masurile de risc ale Capitolului 7 (MFM): VaR si Expected Shortfall
-=====================================================================================
-Conventia nivelului (probabilitatea cozii alpha, ex. alpha = 1%):
-  VaR_alpha(X) = -inf{x : P(X <= x) > alpha} = -q_alpha(X), pierderea depasita cu probabilitatea alpha;
-  ES_alpha(X)  = -(1/alpha) * integrala_0^alpha q_u(X) du = -E[X | X <= q_alpha(X)] (distributii continue).
-Codul lucreaza cu pierderea L = -X (in %): VaR_alpha = q_{1-alpha}(L), ES_alpha = E[L | L >= VaR_alpha];
-VaR si ES sunt numere POZITIVE atunci cand reprezinta pierderi.
+risk_measures.py -- Risk measures of Chapter 7 (MFM): VaR and Expected Shortfall
+================================================================================
+Level convention (tail probability alpha, e.g. alpha = 1%):
+  VaR_alpha(X) = -inf{x : P(X <= x) > alpha} = -q_alpha(X), the loss exceeded with probability alpha;
+  ES_alpha(X)  = -(1/alpha) * integral_0^alpha q_u(X) du = -E[X | X <= q_alpha(X)] (continuous distributions).
+The code works with the loss L = -X (in %): VaR_alpha = q_{1-alpha}(L), ES_alpha = E[L | L >= VaR_alpha];
+VaR and ES are POSITIVE numbers when they are losses.
 
-Metode: istorica (HS), distributia Normala, Student-t, Cornish-Fisher, FHS (GARCH filtrat),
-EVT: POT/GPD (necondiționat) si EVT conditionat (McNeil & Frey, 2000); GEV pe maxime pe blocuri.
+Methods: historical (HS), Normal distribution, Student-t, Cornish-Fisher, FHS (GARCH-filtered),
+EVT: POT/GPD (unconditional) and conditional EVT (McNeil & Frey, 2000); GEV on block maxima.
 
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """
@@ -20,7 +20,7 @@ from arch import arch_model
 
 
 def hs_var_es(L, alpha):
-    """Simulare istorica: VaR alpha = cuantila empirica 1 - alpha a pierderii; ES = media pierderilor de dincolo."""
+    """Historical simulation: VaR alpha = empirical (1 - alpha)-quantile of the loss; ES = mean of the losses beyond it."""
     L = np.asarray(L)
     v = np.quantile(L, 1 - alpha)
     return v, L[L >= v].mean()
@@ -34,24 +34,24 @@ def normal_var_es(L, alpha):
 
 
 def t_fit(L):
-    """Student-t cu locatie si scala, estimata prin verosimilitate maxima."""
+    """Student-t with location and scale, fitted by maximum likelihood."""
     return stats.t.fit(np.asarray(L))
 
 
 def t_var_es(L, alpha, params=None):
-    """Student-t pe pierderi: VaR = m + s t_{1-alpha}, ES = m + s g(t_alpha)/alpha (nu + t_alpha^2)/(nu - 1)."""
+    """Student-t on losses: VaR = m + s t_{1-alpha}, ES = m + s g(t_alpha)/alpha (nu + t_alpha^2)/(nu - 1)."""
     nu, m, s = params if params is not None else t_fit(L)
     q = stats.t.ppf(1 - alpha, nu)
     return m + s * q, m + s * stats.t.pdf(q, nu) / alpha * (nu + q ** 2) / (nu - 1)
 
 
 def cf_quantile(z, S, K):
-    """Cuantila Cornish-Fisher standardizata: z = cuantila Normala, S = asimetria, K = excesul de aplatizare."""
+    """Standardised Cornish-Fisher quantile: z = Normal quantile, S = skewness, K = excess kurtosis."""
     return z + (z ** 2 - 1) * S / 6 + (z ** 3 - 3 * z) * K / 24 - (2 * z ** 3 - 5 * z) * S ** 2 / 36
 
 
 def cf_var_es(L, alpha):
-    """Cornish-Fisher pe randamente X = -L: VaR = -(mu_X + sigma z~_alpha); ES = media lui VaR_u pentru u in (0, alpha)."""
+    """Cornish-Fisher on returns X = -L: VaR = -(mu_X + sigma z~_alpha); ES = mean of VaR_u for u in (0, alpha)."""
     X = -np.asarray(L)
     mu, s = X.mean(), X.std(ddof=1)
     S, K = stats.skew(X), stats.kurtosis(X)
@@ -61,7 +61,7 @@ def cf_var_es(L, alpha):
 
 
 def gpd_fit(L, tail=0.05):
-    """POT: pragul u lasa deasupra proportia tail din pierderi; GPD estimata prin verosimilitate maxima pe excese."""
+    """POT: the threshold u leaves the share tail of the losses above it; GPD fitted by maximum likelihood to the excesses."""
     L = np.asarray(L)
     u = np.quantile(L, 1 - tail)
     ex = L[L > u] - u
@@ -70,27 +70,27 @@ def gpd_fit(L, tail=0.05):
 
 
 def gpd_var_es(fit, alpha):
-    """VaR si ES cu probabilitatea cozii alpha din coada GPD (estimatorul de tip Smith)."""
+    """VaR and ES at tail probability alpha from the GPD tail (Smith-type estimator)."""
     u, xi, beta, nu, n = fit['u'], fit['xi'], fit['beta'], fit['nu'], fit['n']
     var = u + beta / xi * (((n / nu) * alpha) ** (-xi) - 1)
     return var, var / (1 - xi) + (beta - xi * u) / (1 - xi)
 
 
 def gpd_se(fit):
-    """Erori standard asimptotice ale MLE pentru GPD (xi > -1/2)."""
+    """Asymptotic standard errors of the GPD maximum likelihood estimates (xi > -1/2)."""
     xi, beta, nu = fit['xi'], fit['beta'], fit['nu']
     return np.sqrt((1 + xi) ** 2 / nu), np.sqrt(2 * beta ** 2 * (1 + xi) / nu)
 
 
 def mean_excess(L, us):
-    """Functia de exces mediu e(u) = E[L - u | L > u] pe o grila de praguri."""
+    """Mean excess function e(u) = E[L - u | L > u] on a grid of thresholds."""
     L = np.asarray(L)
     return np.array([(L[L > u] - u).mean() for u in us]), np.array([(L > u).sum() for u in us])
 
 
 def garch_backcast(x):
-    """Valoarea initiala a dispersiei (ca in arch): media EWMA (0,94) a primelor 75 de reziduuri patratice
-    ale unui AR(1) estimat prin OLS, calculata DOAR pe esantionul de estimare x."""
+    """Starting value of the variance (as in arch): EWMA mean (0.94) of the first 75 squared residuals
+    of an AR(1) fitted by OLS, computed ONLY on the estimation sample x."""
     x = np.asarray(x, float)
     X = np.column_stack([np.ones(len(x) - 1), x[:-1]])
     e = x[1:] - X @ np.linalg.lstsq(X, x[1:], rcond=None)[0]
@@ -100,10 +100,10 @@ def garch_backcast(x):
 
 
 def garch_filter(r, params=None, last_obs=None):
-    """AR(1)-GARCH(1,1) cu QML Normal (Capitolul 5); r in %.
-    Parametrii se estimeaza pe datele de dinainte de last_obs; filtrul este cauzal: mu_t si sigma_t folosesc
-    doar r_1..r_{t-1}, iar valoarea initiala a dispersiei vine doar din esantionul de estimare.
-    Intoarce parametrii si seriile mu_t, sigma_t pentru toata selectia."""
+    """AR(1)-GARCH(1,1) by Normal QML (Chapter 5); r in %.
+    Parameters are estimated on the data before last_obs; the filter is causal: mu_t and sigma_t use
+    only r_1..r_{t-1}, and the starting variance comes only from the estimation sample.
+    Returns the parameters and the series mu_t, sigma_t for the whole sample."""
     if params is None:
         am = arch_model(r, mean='AR', lags=1, vol='GARCH', p=1, q=1, dist='normal', rescale=False)
         params = am.fit(disp='off', last_obs=last_obs).params
@@ -122,7 +122,7 @@ def garch_filter(r, params=None, last_obs=None):
 
 
 def garch_next(r, params):
-    """Media si volatilitatea conditionate pentru ziua urmatoare ultimei observatii."""
+    """Conditional mean and volatility for the day after the last observation."""
     c, phi, om, al, be = params.values[:5]
     _, mu, sig = garch_filter(r, params)
     e = r.iloc[-1] - mu.iloc[-1]
@@ -130,8 +130,8 @@ def garch_next(r, params):
 
 
 def fhs_mc(r, params, z, h, n_paths=100_000, seed=42):
-    """Monte Carlo FHS: traiectorii AR(1)-GARCH(1,1) pe h zile cu reziduuri standardizate reesantionate.
-    Intoarce pierderile cumulate pe h zile (in %, randamente log)."""
+    """FHS Monte Carlo: h-day AR(1)-GARCH(1,1) paths with resampled standardised residuals.
+    Returns the cumulative h-day losses (in %, log returns)."""
     rng = np.random.default_rng(seed)
     c, phi, om, al, be = params.values[:5]
     _, mu, sig = garch_filter(r, params)
@@ -149,9 +149,9 @@ def fhs_mc(r, params, z, h, n_paths=100_000, seed=42):
 
 
 def rolling_conditional(r, first_year, window_hs=500, alpha=0.01, tail_evt=0.10):
-    """VaR/ES conditionat zi de zi: parametrii AR(1)-GARCH re-estimati la fiecare inceput de an
-    pe toate datele anterioare; FHS si EVT conditionat folosesc reziduurile standardizate anterioare.
-    Pentru comparatie: HS pe fereastra mobila de window_hs zile. Fara look-ahead bias."""
+    """Day-by-day conditional VaR/ES: AR(1)-GARCH parameters re-estimated at the start of every year
+    on all earlier data; FHS and conditional EVT use the earlier standardised residuals.
+    For comparison: HS on a rolling window of window_hs days. No look-ahead bias."""
     out = []
     L = -r
     for y in range(first_year, r.index[-1].year + 1):

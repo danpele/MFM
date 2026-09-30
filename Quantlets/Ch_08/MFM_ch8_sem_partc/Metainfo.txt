@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch8_sem_partc'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 8, Part C (reference analysis): a RON trading book, 50% BET and 50% euro at the BNR reference rate; six VaR/ES models backtested with coverage, duration, Z2, traffic-light, FZ0 and MCS criteria.'
+Description: 'Seminar 8, Part C (reference analysis): a RON trading portfolio, 50% BET and 50% euro at the BNR reference rate; six VaR/ES models backtested with coverage, duration, Z2, traffic-light, FZ0 and MCS criteria.'
 
 Keywords: 'model validation, trading book, BET, EUR/RON, FRTB, backtesting, model confidence set'
 
@@ -10,6 +10,6 @@ Author: 'Daniel Traian Pele'
 
 Submitted: 'Tuesday, 22 September 2026'
 
-Datafile: 'BET (data/market) and EUR/RON (BNR reference rate)'
+Datafile: 'BET daily closes (course data) and EUR/RON (BNR reference rate)'
 
 Output: 'ch8_sem_partc.pdf'

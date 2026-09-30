@@ -37,23 +37,23 @@ SEED = 42
 # 1. REGRESIA PREDICTIVA SI DEPLASAREA STAMBAUGH
 # =============================================================================
 def monthly_data(start='1934-01-31', end='2026-08-31'):
-    """Randamentul lunar in exces al S&P 500 (log, cu dividende) si log D/P la sfarsitul lunii anterioare."""
+    """S&P 500 monthly excess log return (with dividends) and log D/P at the end of the previous month."""
     d = sp500_monthly(end)
-    rf = fred('TB3MS') / 100                                   # dobanda anualizata la T-bill pe 3 luni
+    rf = fred('TB3MS') / 100                                   # annualised 3-month T-bill rate
     r = np.log((d['P'] + d['D'] / 12) / d['P'].shift(1))
-    rf_m = np.log(1 + rf / 12).reindex(d.index).shift(1)       # cunoscuta la inceputul lunii
+    rf_m = np.log(1 + rf / 12).reindex(d.index).shift(1)       # known at the start of the month
     out = pd.DataFrame({'ex': r - rf_m, 'dp': np.log(d['D'] / d['P'])})
     out['dp_lag'] = out['dp'].shift(1)
     return out.loc[start:end].dropna(), d.attrs
 
 
 def predictive_regression(df, nw_lags=12):
-    """OLS cu erori Newey-West, regresia AR(1) a predictorului, corelatia inovatiilor si corectia Stambaugh."""
+    """OLS with Newey-West errors, AR(1) regression of the predictor, innovation correlation and the Stambaugh correction."""
     y, x = df['ex'].values, df['dp_lag'].values
     X = sm.add_constant(x)
     ols = sm.OLS(y, X).fit()
     hac = sm.OLS(y, X).fit(cov_type='HAC', cov_kwds={'maxlags': nw_lags})
-    ar = sm.OLS(df['dp'].values, X).fit()                      # dp_t pe dp_{t-1}
+    ar = sm.OLS(df['dp'].values, X).fit()                      # dp_t on dp_{t-1}
     u, v = ols.resid, ar.resid
     T = len(y)
     rho = ar.params[1]
@@ -68,7 +68,7 @@ def predictive_regression(df, nw_lags=12):
 
 
 def simulate_stambaugh(rho, corr_uv, T, n_sim=2000, seed=SEED):
-    """Deplasarea lui beta si marimea testului t la 5% cand beta = 0 (predictor persistent, inovatii corelate)."""
+    """Bias of beta and size of the 5% t-test when beta = 0 (persistent predictor, correlated innovations)."""
     rng = np.random.default_rng(seed)
     betas, rej = [], 0
     for _ in range(n_sim):
@@ -84,8 +84,8 @@ def simulate_stambaugh(rho, corr_uv, T, n_sim=2000, seed=SEED):
 
 
 def oos_r2(df, oos_start='1970-01-31', nw_lags=12):
-    """Prognoze recursive (fereastra extinsa): regresia predictiva vs media istorica.
-    R2_OS (Welch-Goyal), Clark-West, varianta cu restrictii Campbell-Thompson."""
+    """Recursive (expanding-window) forecasts: predictive regression vs historical mean.
+    R2_OS (Welch-Goyal), Clark-West, and the version with Campbell-Thompson restrictions."""
     rows = []
     idx = df.index
     first = idx.get_loc(idx[idx >= oos_start][0])
@@ -104,8 +104,8 @@ def oos_r2(df, oos_start='1970-01-31', nw_lags=12):
     dm = sm.OLS((e0 ** 2 - e1 ** 2).values, np.ones(len(f))).fit(cov_type='HAC', cov_kwds={'maxlags': nw_lags})
     o['cum_dsse'] = (e0 ** 2 - e1 ** 2).cumsum()
     o['cum_dsse_ct'] = (e0 ** 2 - e2 ** 2).cumsum()
-    sr_m = df['ex'].mean() / df['ex'].std()                       # Sharpe lunar necondiționat
-    binds = float(((o['ct'] - o['pred']).abs() > 1e-12).mean())       # cat de des leaga restrictiile
+    sr_m = df['ex'].mean() / df['ex'].std()                       # unconditional monthly Sharpe ratio
+    binds = float(((o['ct'] - o['pred']).abs() > 1e-12).mean())       # how often the restrictions bind
     ct_gain = lambda r2_: r2_ / (1 - r2_) * (1 + sr_m ** 2) / sr_m ** 2
     return o, dict(n=len(o), start=str(o.index[0].date()), r2=r2, r2_ct=r2_ct, cw_t=cw.tvalues[0],
                    cw_p=1 - stats.norm.cdf(cw.tvalues[0]), dm_t=dm.tvalues[0], sr_m=sr_m,
@@ -116,7 +116,7 @@ def fig_oos(o):
     fig, ax = plt.subplots(figsize=(7.0, 3.0))
     ax.plot(o.index, o['cum_dsse'], color=IDAred, lw=1.0, label='Predictive regression on log D/P vs historical mean')
     ax.axhline(0, color=Gray, lw=0.7, ls='--')
-    ax.set_ylabel('Cumulative SSE(mean) - SSE(model)')
+    ax.set_ylabel('Cumulative reduction in squared\nforecast errors vs historical mean')
     ax.set_title('Out-of-sample: does the dividend-price ratio beat the historical mean? (S&P 500, monthly)',
                  fontsize=9, loc='left')
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.13), ncol=1, frameon=False)
@@ -128,7 +128,7 @@ def fig_oos(o):
 # 2. MEMORIE LUNGA: WHITTLE LOCAL
 # =============================================================================
 def local_whittle(x, m):
-    """d estimat prin minimizarea functiei Whittle locale (Robinson, 1995); SE asimptotica 1/(2 sqrt(m))."""
+    """d estimated by minimising the local Whittle function (Robinson, 1995); asymptotic SE 1/(2 sqrt(m))."""
     x = np.asarray(x, dtype=float)
     T = len(x)
     w = np.fft.fft(x - x.mean())
@@ -144,7 +144,7 @@ def local_whittle(x, m):
 # 3. TESTUL PORTMANTEAU AUTOMAT (ESCANCIANO-LOBATO)
 # =============================================================================
 def el_autoportmanteau(x, d_max=10, q=2.4):
-    """AQ = T sum_{j<=p~} rho~_j^2 cu rho~_j^2 = gamma_j^2 / tau_j (robust); p~ ales din date; AQ ~ chi2(1)."""
+    """AQ = T sum_{j<=p~} rho~_j^2 with rho~_j^2 = gamma_j^2 / tau_j (robust); p~ chosen from the data; AQ ~ chi2(1)."""
     y = np.asarray(x, dtype=float)
     T = len(y)
     e = y - y.mean()
@@ -159,7 +159,7 @@ def el_autoportmanteau(x, d_max=10, q=2.4):
     rt = np.array(rt)
     Q = T * np.cumsum(rt)
     p = np.arange(1, d_max + 1)
-    pen = p * np.log(T) if np.sqrt(T * np.max(rt)) <= np.sqrt(q * np.log(T)) else 2 * p   # comutare pe corelatiile robuste
+    pen = p * np.log(T) if np.sqrt(T * np.max(rt)) <= np.sqrt(q * np.log(T)) else 2 * p   # switch based on the robust correlations
     L = Q - pen
     pt = int(p[np.argmax(L)])
     AQ = Q[pt - 1]
@@ -170,9 +170,9 @@ def el_autoportmanteau(x, d_max=10, q=2.4):
 # 4. STUDIU DE EVENIMENT: TAXA BANCARA, TLV SI BRD
 # =============================================================================
 def event_study_bank_tax(event='2018-12-19', est=(-250, -11), win=(0, 5)):
-    """Model de piata pe [-250, -11]; AR cu dispersia erorii de predictie; test pe portofoliu vs independenta."""
+    """Market model on [-250, -11]; abnormal returns with the prediction-error variance; portfolio test vs independence."""
     px = pd.concat({'TLV': read_market('TLV.RO')['adjusted_close'], 'BRD': read_market('BRD.RO')['adjusted_close'],
-                    'BET': read_market('BET')['close']}, axis=1).dropna()        # join pe preturi, zile comune
+                    'BET': read_market('BET')['close']}, axis=1).dropna()        # align prices on common trading days
     px = px[px.index.dayofweek < 5]
     r = np.log(px).diff().dropna()
     t0 = r.index.get_loc(pd.Timestamp(event))
@@ -187,9 +187,9 @@ def event_study_bank_tax(event='2018-12-19', est=(-250, -11), win=(0, 5)):
         s2 = f.mse_resid
         resid[k] = f.resid
         ar = yW - f.params['const'] - f.params['BET'] * rm
-        pe = s2 * (1 + 1 / T0 + (rm - mu_m) ** 2 / ((T0 - 1) * var_m))          # dispersia erorii de predictie
+        pe = s2 * (1 + 1 / T0 + (rm - mu_m) ** 2 / ((T0 - 1) * var_m))          # prediction-error variance
         car = ar.sum()
-        # CAR: suma dispersiilor de predictie + covarianta indusa de estimarea parametrilor (MacKinlay, 1997)
+        # CAR: sum of prediction variances + covariance induced by parameter estimation (MacKinlay, 1997)
         Xs = np.column_stack([np.ones(len(rm)), rm.values])
         XE = np.column_stack([np.ones(T0), E['BET'].values])
         V = s2 * (np.eye(len(rm)) + Xs @ np.linalg.inv(XE.T @ XE) @ Xs.T)
@@ -198,8 +198,8 @@ def event_study_bank_tax(event='2018-12-19', est=(-250, -11), win=(0, 5)):
                       t_car=car / np.sqrt(V.sum()), t_car_naive=car / np.sqrt(s2 * len(rm)),
                       var_car=V.sum(), car_post=ar.iloc[1:].sum(), t_car_post=ar.iloc[1:].sum() / np.sqrt(V[1:, 1:].sum()))
     rbar = np.corrcoef(resid['TLV'], resid['BRD'])[0, 1]
-    # test comun presupunand independenta: media AR0 / (sqrt(s1^2 + s2^2)/2)
-    # sub independenta: aceleasi dispersii ale erorii de predictie ca la portofoliu, fara covarianta intre firme
+    # joint test assuming independence: mean AR0 / (sqrt(s1^2 + s2^2)/2)
+    # under independence: the same prediction-error variances as for the portfolio, no covariance between firms
     s_ind = np.sqrt(out['TLV']['sigma'] ** 2 * out['TLV']['infl0'] + out['BRD']['sigma'] ** 2 * out['BRD']['infl0']) / 2
     ar0_mean = (out['TLV']['ar0'] + out['BRD']['ar0']) / 2
     car_mean = (out['TLV']['car'] + out['BRD']['car']) / 2
@@ -208,8 +208,8 @@ def event_study_bank_tax(event='2018-12-19', est=(-250, -11), win=(0, 5)):
                 ar0_mean=ar0_mean, t_indep=ar0_mean / s_ind, t_port=out['PORT']['t0'],
                 car_mean=car_mean, tcar_indep=car_mean / s_car_ind, tcar_port=out['PORT']['t_car'],
                 kp_factor=np.sqrt((1 - rbar) / (1 + rbar)),
-                varmean10=1 + 9 * rbar,                       # Var(media a 10 AR) / Var sub independenta
-                kp_inflation10=(1 + 9 * rbar) / (1 - rbar))  # supra-evaluarea dispersiei statisticii transversale
+                varmean10=1 + 9 * rbar,                       # Var(mean of 10 ARs) / Var under independence
+                kp_inflation10=(1 + 9 * rbar) / (1 - rbar))  # overstatement of the variance of the cross-sectional statistic
 
 
 # =============================================================================
@@ -219,7 +219,7 @@ CAL_MARKETS = ['sp500', 'bet', 'stoxx', 'wig20', 'bux']
 
 
 def _nw_se(X, u, L=5):
-    """Matricea de covarianta Newey-West (Bartlett, L decalaje) pentru OLS."""
+    """Newey-West covariance matrix (Bartlett kernel, L lags) for OLS."""
     T = len(u)
     Xu = X * u[:, None]
     S = Xu.T @ Xu / T
@@ -231,8 +231,8 @@ def _nw_se(X, u, L=5):
 
 
 def _cal_est(r, dow, month):
-    """Estimatiile si covariantele HAC ale celor 3 efecte pentru o piata.
-    dow: ziua saptamanii a fiecarei observatii; month: eticheta intreaga a lunii, (bloc sau an) * 100 + luna."""
+    """Estimates and HAC covariances of the 3 effects for one market.
+    dow: weekday of each observation; month: integer month label, (block or year) * 100 + month."""
     D = np.column_stack([(dow == d).astype(float) for d in range(5)])
     grp = pd.Series(np.arange(len(r))).groupby(month)
     rank = grp.cumcount().values
@@ -243,7 +243,7 @@ def _cal_est(r, dow, month):
     X = np.column_stack([np.ones(len(r)), tom])
     bt = np.linalg.lstsq(X, r, rcond=None)[0]
     Vt = _nw_se(X, r - X @ bt, 5)
-    ms = np.expm1(pd.Series(r).groupby(month).sum())          # randamente lunare simple, ca in january_regression
+    ms = np.expm1(pd.Series(r).groupby(month).sum())          # simple monthly returns, as in january_regression
     jan = (np.asarray(ms.index) % 100 == 1).astype(float)
     Xm = np.column_stack([np.ones(len(ms)), jan])
     bj = np.linalg.lstsq(Xm, ms.values, rcond=None)[0]
@@ -255,8 +255,8 @@ _R = np.column_stack([np.ones(4), -np.eye(4)])
 
 
 def _cal_p(est, center=None):
-    """p-valori: Wald (4 g.l.) pentru ziua saptamanii, z bilateral pentru ianuarie si TOM.
-    center: estimatiile pe datele originale (statistica bootstrap centrata, ca in Romano-Wolf)."""
+    """p-values: Wald (4 df) for the day of the week, two-sided z for January and TOM.
+    center: the estimates on the original data (bootstrap statistic centred, as in Romano-Wolf)."""
     out = {}
     bd, Vd = est['dow']
     d = _R @ (bd - (center['dow'][0] if center else 0))
@@ -269,9 +269,9 @@ def _cal_p(est, center=None):
 
 
 def stepm_calendar(n_boot=999, block=3, alpha=0.05, seed=SEED):
-    """Romano-Wolf StepM cu statistica min-p: se reeșantionează ACELEASI blocuri de luni calendaristice pentru
-    toate pietele (pastreaza dependenta intre piete si structura calendarului in interiorul lunii);
-    statisticile bootstrap sunt centrate in estimatiile originale."""
+    """Romano-Wolf StepM with the min-p statistic: the SAME blocks of calendar months are resampled for
+    all markets (keeps the dependence across markets and the calendar structure within the month);
+    the bootstrap statistics are centred at the original estimates."""
     rets = {k: complete_months(log_returns(k)) for k in CAL_MARKETS}
     months = pd.period_range('2000-01', max(r.index[-1] for r in rets.values()).to_period('M'), freq='M')
     orig, p0, pos = {}, {}, {}
@@ -293,7 +293,7 @@ def stepm_calendar(n_boot=999, block=3, alpha=0.05, seed=SEED):
             parts = [pos[k][months[m]] for m in msel]
             idx = np.concatenate(parts)
             lab = np.concatenate([np.full(len(pp), j) for j, pp in enumerate(parts)])
-            newlab = lab * 100 + mnum[msel][lab]          # eticheta = pozitia blocului * 100 + luna originala
+            newlab = lab * 100 + mnum[msel][lab]          # label = block position * 100 + original month
             est = _cal_est(r.values[idx], r.index.dayofweek.values[idx], newlab)
             for e, pv in _cal_p(est, orig[k]).items():
                 boot_p[b, keys.index((k, e))] = pv

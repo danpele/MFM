@@ -1,18 +1,18 @@
 """
-case_study.py -- Studiul de caz integrat al Capitolului 19 (MFM)
+case_study.py -- Integrated case study of Chapter 19 (MFM)
 ================================================================
-Un singur fir, pe o singura serie: fapte stilizate (Cap. 1) -> GARCH(1,1)-t (Cap. 5)
--> VaR 1% si ES 2.5% pentru ziua urmatoare (Cap. 7) -> backtesting (Cap. 8).
+One thread, on one series: stylised facts (Ch. 1) -> GARCH(1,1)-t (Ch. 5)
+-> next-day VaR 1% and ES 2.5% (Ch. 7) -> backtesting (Ch. 8).
 
-  * stylised_facts(r)        -- momente, testele Jarque-Bera si Ljung-Box pe r si r^2, ACF
-  * garch_t_fit(r)           -- GARCH(1,1) cu inovatii Student-t (medie constanta), r in %
-  * rolling_var(r, ...)      -- prognoze VaR 1% (si ES 2.5%) pentru ziua urmatoare, fereastra mobila,
-                                patru modele: HS, Normal, GARCH-t, FHS (simulare istorica filtrata)
-  * kupiec / christoffersen  -- testele de acoperire si de independenta ale depasirilor
-  * traffic_light            -- zonele Basel pentru x depasiri in 250 de zile
+  * stylised_facts(r)        -- moments, Jarque-Bera and Ljung-Box tests on r and r^2, ACF
+  * garch_t_fit(r)           -- GARCH(1,1) with Student-t innovations (constant mean), r in %
+  * rolling_var(r, ...)      -- next-day VaR 1% (and ES 2.5%) forecasts, rolling window,
+                                four models: HS, Normal, GARCH-t, FHS (filtered historical simulation)
+  * kupiec / christoffersen  -- coverage and independence tests of the breaches
+  * traffic_light            -- Basel zones for x breaches in 250 days
 
-Conventie: alpha = probabilitatea cozii (VaR 1%); pierderea L = -r; VaR si ES sunt pozitive, in % din pozitie.
-Modelarea Pietelor Financiare - Daniel Traian PELE
+Convention: alpha = tail probability (VaR 1%); loss L = -r; VaR and ES are positive, in % of the position.
+Modelling Financial Markets - Daniel Traian PELE
 """
 
 import numpy as np
@@ -22,17 +22,17 @@ from arch import arch_model
 
 ALPHA = 0.01          # VaR 1%
 ALPHA_ES = 0.025      # ES 2.5%
-WINDOW = 1000         # zile in fereastra de estimare
-REFIT = 21            # reestimare GARCH la fiecare 21 de zile
-HS_WINDOW = 500       # fereastra pentru HS si pentru distributia Normala
+WINDOW = 1000         # days in the estimation window
+REFIT = 21            # GARCH re-estimated every 21 days
+HS_WINDOW = 500       # window for HS and for the Normal distribution
 MODELS = ['HS', 'Normal', 'GARCH-t', 'FHS']
 
 
 # -----------------------------------------------------------------------------
-# 1. FAPTE STILIZATE
+# 1. STYLISED FACTS
 # -----------------------------------------------------------------------------
 def ljung_box(x, m=10):
-    """Q(m) = T(T+2) sum rho_k^2/(T-k) si p-valoarea chi2(m)."""
+    """Q(m) = T(T+2) sum rho_k^2/(T-k) and its chi2(m) p-value."""
     x = np.asarray(x) - np.mean(x)
     T = len(x)
     rho = np.array([np.sum(x[k:] * x[:-k]) for k in range(1, m + 1)]) / np.sum(x ** 2)
@@ -47,7 +47,7 @@ def acf(x, nlags):
 
 
 def stylised_facts(r):
-    """Rezumatul faptelor stilizate pentru randamentele r (in %)."""
+    """Summary of the stylised facts of the returns r (in %)."""
     jb, jbp = stats.jarque_bera(r)
     q_r, q_rp = ljung_box(r)
     q_r2, q_r2p = ljung_box(r ** 2)
@@ -61,7 +61,7 @@ def stylised_facts(r):
 
 
 def kurtosis_boot_ci(r, B=2000, block=20, seed=0):
-    """CI 95% pentru excesul de kurtosis prin bootstrap pe blocuri mobile (pastreaza gruparea volatilitatii)."""
+    """95% CI for the excess kurtosis by moving-block bootstrap (keeps volatility clustering)."""
     rng = np.random.default_rng(seed)
     x = np.asarray(r)
     T = len(x)
@@ -82,8 +82,8 @@ def garch_t_fit(r, last_obs=None):
 
 
 def garch_summary(res, ppy=None):
-    """Parametri, erori standard robuste, persistenta si timpul de injumatatire; volatilitatea de termen lung
-    anualizata cu frecventa reala a seriei (ppy = observatii pe an; implicit din datele estimarii)."""
+    """Parameters, robust standard errors, persistence and half-life; long-run volatility
+    annualised with the real frequency of the series (ppy = observations per year; by default from the estimation data)."""
     p, se = res.params, res.std_err
     if ppy is None:
         ix = res.resid.dropna().index
@@ -96,22 +96,22 @@ def garch_summary(res, ppy=None):
 
 
 def t_std_q(nu, a):
-    """Cuantila de ordin a a distributiei Student-t standardizate (varianta 1)."""
+    """Quantile of order a of the standardised Student-t distribution (variance 1)."""
     return stats.t.ppf(a, nu) * np.sqrt((nu - 2) / nu)
 
 
 def t_std_es(nu, a):
-    """E[Z | Z <= q_a] pentru Student-t standardizata (negativ)."""
+    """E[Z | Z <= q_a] for the standardised Student-t (negative)."""
     q = stats.t.ppf(a, nu)
     return -(stats.t.pdf(q, nu) / a) * (nu + q ** 2) / (nu - 1) * np.sqrt((nu - 2) / nu)
 
 
 # -----------------------------------------------------------------------------
-# 3. PROGNOZE VaR 1% PENTRU ZIUA URMATOARE (fereastra mobila)
+# 3. NEXT-DAY VaR 1% FORECASTS (rolling window)
 # -----------------------------------------------------------------------------
 def rolling_var(r, eval_from, window=WINDOW, refit=REFIT, a=ALPHA, a_es=ALPHA_ES):
-    """Prognoze VaR (nivel a) si ES (nivel a_es) pentru fiecare zi t >= eval_from, cu informatia pana la t-1.
-    Intoarce un DataFrame cu pierderea L_t si VaR/ES pentru HS, Normal, GARCH-t si FHS."""
+    """VaR (level a) and ES (level a_es) forecasts for every day t >= eval_from, with information up to t-1.
+    Returns a DataFrame with the loss L_t and VaR/ES for HS, Normal, GARCH-t and FHS."""
     r = r.dropna()
     idx = r.index
     start = idx.searchsorted(pd.Timestamp(eval_from))
@@ -120,8 +120,8 @@ def rolling_var(r, eval_from, window=WINDOW, refit=REFIT, a=ALPHA, a_es=ALPHA_ES
     for b0 in range(start, len(r), refit):
         b1 = min(b0 + refit, len(r))
         est = r.iloc[b0 - window:b0]
-        # estimare DOAR pe fereastra (fara date din blocul de evaluare); sigma_t pentru t >= b0 prin recursia
-        # GARCH pornita din ultima varianta filtrata a ferestrei, cu randamentele deja observate (pana la t-1)
+        # estimation ONLY on the window (no data from the evaluation block); sigma_t for t >= b0 by the GARCH
+        # recursion started from the last filtered variance of the window, with the returns already observed (up to t-1)
         res = arch_model(est, mean='Constant', vol='GARCH', p=1, q=1, dist='t', rescale=False).fit(disp='off')
         mu, nu = res.params['mu'], res.params['nu']
         om, al, be = res.params['omega'], res.params['alpha[1]'], res.params['beta[1]']
@@ -132,7 +132,7 @@ def rolling_var(r, eval_from, window=WINDOW, refit=REFIT, a=ALPHA, a_es=ALPHA_ES
             s2[i] = om + al * prev_e ** 2 + be * prev_s2
             prev_s2, prev_e = s2[i], r.iloc[b0 + i] - mu
         sig = pd.Series(np.concatenate([s_tr, np.sqrt(s2)]), index=r.index[b0 - window:b1])
-        z = ((est - mu) / sig.iloc[:window]).values   # reziduuri standardizate din fereastra
+        z = ((est - mu) / sig.iloc[:window]).values   # standardised residuals of the window
         zq = np.quantile(z, a)
         zq_es = np.quantile(z, a_es)
         zes = z[z <= zq_es].mean()
@@ -150,7 +150,7 @@ def rolling_var(r, eval_from, window=WINDOW, refit=REFIT, a=ALPHA, a_es=ALPHA_ES
                              **{'GARCH-t': -(mu + s * t_std_q(nu, a)),
                                 'GARCH-t_ES': -(mu + s * t_std_es(nu, a_es))},
                              FHS=-(mu + s * zq), FHS_ES=-(mu + s * zes),
-                             # VaR la nivelul ES (2.5%): perechea (VaR, ES) la acelasi nivel, pentru scorul FZ0
+                             # VaR at the ES level (2.5%): the (VaR, ES) pair at the same level, for the FZ0 score
                              HS_V25=q_hs_es, Normal_V25=-(m + sd * stats.norm.ppf(a_es)),
                              **{'GARCH-t_V25': -(mu + s * t_std_q(nu, a_es))}, FHS_V25=-(mu + s * zq_es)))
     return pd.DataFrame(rows).set_index('date')
@@ -160,7 +160,7 @@ def rolling_var(r, eval_from, window=WINDOW, refit=REFIT, a=ALPHA, a_es=ALPHA_ES
 # 4. BACKTESTING
 # -----------------------------------------------------------------------------
 def kupiec(hits, p=ALPHA):
-    """Testul de acoperire (POF) al lui Kupiec: LR_uc ~ chi2(1)."""
+    """Kupiec proportion-of-failures (POF) coverage test: LR_uc ~ chi2(1)."""
     hits = np.asarray(hits, int)
     T, x = len(hits), int(hits.sum())
     ph = x / T
@@ -171,7 +171,7 @@ def kupiec(hits, p=ALPHA):
 
 
 def christoffersen(hits, p=ALPHA):
-    """Testul de independenta (lant Markov de ordinul 1) si testul combinat LR_cc = LR_uc + LR_ind."""
+    """Independence test (first-order Markov chain) and the joint test LR_cc = LR_uc + LR_ind."""
     h = np.asarray(hits, int)
     a, b = h[:-1], h[1:]
     n00, n01 = np.sum((a == 0) & (b == 0)), np.sum((a == 0) & (b == 1))
@@ -191,7 +191,7 @@ def christoffersen(hits, p=ALPHA):
 
 
 def traffic_light(x, T=250, p=ALPHA):
-    """Zona Basel pentru x depasiri in T zile: verde (<5), galben (5-9), rosu (>=10) la T=250, p=1%."""
+    """Basel zone for x breaches in T days: green (<5), yellow (5-9), red (>=10) at T=250, p=1%."""
     cum = stats.binom.cdf(x, T, p)
     return 'green' if cum < 0.95 else ('yellow' if cum < 0.9999 else 'red')
 
@@ -211,6 +211,6 @@ def backtest_table(fc, models=MODELS, a=ALPHA):
 
 
 def binom_band(T, p=ALPHA, level=0.95):
-    """Intervalul binomial central pentru rata depasirilor, sub H0: rata = p."""
+    """Central binomial interval for the breach rate under H0: rate = p."""
     lo, hi = stats.binom.ppf([(1 - level) / 2, 1 - (1 - level) / 2], T, p)
     return lo / T, hi / T

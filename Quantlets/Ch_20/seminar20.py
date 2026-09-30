@@ -35,7 +35,7 @@ RES = {}
 
 
 def lecture_results():
-    """Published results of the lecture case study (ch20_results.json in this folder or on GitHub)."""
+    """Results of the Lecture 20 case study (DM p-values and tuned kernel temperatures), loaded from the course repository."""
     f = os.path.join(HERE, 'ch20_results.json')
     if os.path.exists(f):
         return json.load(open(f))
@@ -74,7 +74,7 @@ def ols_hac(y, X, lag):
 
 
 # -----------------------------------------------------------------------------
-# PARTEA A
+# PART A
 # -----------------------------------------------------------------------------
 def part_a():
     A = {}
@@ -196,7 +196,7 @@ def chart_a9(d):
 
 
 # -----------------------------------------------------------------------------
-# PARTEA B
+# PART B
 # -----------------------------------------------------------------------------
 def levy_regression(kind, sym, chart):
     """Does the Levy area (return, log RV) of the last 22 days predict the next-month change of log RV?"""
@@ -382,7 +382,7 @@ def part_b():
 
 
 # -----------------------------------------------------------------------------
-# PARTEA C: nucleu cu punct de baza (vede nivelul volatilitatii)
+# PART C: basepoint kernel (sees the volatility level)
 # -----------------------------------------------------------------------------
 def _outer(A, B_):
     return (A[:, :, None] * B_[:, None, :]).reshape(A.shape[0], -1)

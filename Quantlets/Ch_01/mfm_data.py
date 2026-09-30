@@ -21,22 +21,22 @@ SOURCES = {
     'sp500':  ('GSPC.INDX',    'close', '1990-01-01'),
     'bettr':  ('BETTR.INDX',   'close', '2014-09-01'),
     'btc':    ('BTC-USD.CC',   'close', '2014-09-17'),
-    'eurron': ('REF:EUR',      'close', '2005-07-01'),   # de la introducerea leului nou (RON), 1 iulie 2005
+    'eurron': ('REF:EUR',      'close', '2005-07-01'),   # from the introduction of the new leu (RON), 1 July 2005
     'gold':   ('XAUUSD.FOREX', 'close', '1990-01-01'),
 }
 
 LABELS = {'sp500': 'S&P 500', 'bettr': 'BET-TR (Romania)', 'btc': 'Bitcoin',
           'eurron': 'EUR/RON', 'gold': 'Gold'}
 
-# cotatii OTC (aur): sesiunile partiale de sambata/duminica rup randamentul vineri -> luni,
-# deci pastram doar zilele lucratoare (aceeasi conventie ca in Capitolul 0)
+# OTC quotes (gold): partial Saturday/Sunday sessions break the Friday -> Monday return,
+# so we keep weekdays only (the same convention as in Chapter 0)
 WEEKDAYS_ONLY = {'gold'}
 
 _CACHE = {}
 
 
 def read_market(symbol):
-    """Citeste data/market/<SIMBOL>.csv local sau din repo-ul GitHub."""
+    """Read the daily price table of one symbol (local copy or GitHub)."""
     fname = f'{symbol}.csv'
     path = os.path.join(MARKET_DIR, fname)
     src = path if os.path.exists(path) else REPO_RAW + fname
@@ -46,7 +46,7 @@ def read_market(symbol):
 
 
 def read_reference_rate(currency='EUR', start='2005-07-01', end='2026-09-18'):
-    """Cursul oficial de referinta RON (arhive XML anuale BNR)."""
+    """Official RON reference rate (BNR annual XML archives)."""
     key = (currency, start, end)
     if key in _CACHE:
         return _CACHE[key]
@@ -68,7 +68,7 @@ def read_reference_rate(currency='EUR', start='2005-07-01', end='2026-09-18'):
 
 
 def load_data(name='sp500'):
-    """OHLCV zilnic cu coloane Open/High/Low/Close/Volume (Close = pretul folosit)."""
+    """Daily OHLCV with columns Open/High/Low/Close/Volume (Close = the price used)."""
     symbol, col, start = SOURCES[name]
     if symbol.startswith('REF:'):
         return read_reference_rate(symbol.split(':')[1], start=start)
@@ -81,7 +81,7 @@ def load_data(name='sp500'):
 
 
 def log_returns(close, max_abs=None):
-    """Randamente log; optional elimina erori de date (|r| > max_abs, ex. cotatii FX gresite)."""
+    """Log returns; optionally drop data errors (|r| > max_abs, e.g. wrong FX quotes)."""
     r = np.log(close).diff().dropna()
     if max_abs is not None:
         r = r[r.abs() < max_abs]
@@ -126,11 +126,11 @@ def vol_yang_zhang(df, n=21, periods=252):
 
 
 def drawdown(close):
-    """Drawdown procentual fata de maximul anterior."""
+    """Percentage drawdown from the running maximum."""
     return close / close.cummax() - 1
 
 
 
 def load_close(name):
-    """Pretul de inchidere, folosit in toate graficele."""
+    """Closing price, used in all charts."""
     return load_data(name)['Close'].dropna()
