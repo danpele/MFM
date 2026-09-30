@@ -9,7 +9,7 @@ Conventii (ca in capitolele 0 si 1):
   * indicii bursieri: doar zilele lucratoare; zilele cu inchidere identica cu ziua precedenta
     (sarbatori completate cu ultimul pret) sunt eliminate;
   * cripto: 7 zile din 7;
-  * EUR/RON: cursul oficial de referinta BNR (fisierul de piata are cotatii eronate).
+  * EUR/RON: cursul oficial de referinta BNR (seria EODHD are cotatii eronate).
 
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """

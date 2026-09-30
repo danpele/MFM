@@ -11,7 +11,7 @@ Conventii (ca in capitolele 1 si 2):
     (sarbatori completate cu ultimul pret) sunt eliminate;
   * aur (XAU/USD): fara cotatiile de weekend; anualizare cu frecventa reala (aprox. 260 de zile pe an);
   * cripto: 7 zile din 7;
-  * EUR/RON: cursul oficial de referinta BNR (fisierul de piata are cotatii eronate).
+  * EUR/RON: cursul oficial de referinta BNR (seria EODHD are cotatii eronate).
 
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """

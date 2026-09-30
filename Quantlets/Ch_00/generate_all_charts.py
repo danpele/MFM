@@ -100,7 +100,7 @@ ibit_volume = load('IBIT volume')
 fred = load_panel(['DGS10', 'DGS2', 'FEDFUNDS'])    # FRED
 stable = load('Stablecoins')                        # DefiLlama (mld. USD)
 eurron = load('EUR/RON')                            # BNR (curs oficial de referinta)
-eurron_mkt = load('EUR/RON (market file)')          # fisierul de piata: contine erori de cotatie (slide-ul Data pitfalls)
+eurron_mkt = load('EUR/RON (EODHD)')          # seria EODHD: contine erori de cotatie (slide-ul Data pitfalls)
 bonds = load_panel(['Romania 10y', 'Germany 10y'])  # curatate in fig_romania: 0.00% (24 Dec 2013), duminici 2022
 
 CROSS = ['S&P 500 TR (SPY)', 'Euro Stoxx 50 (USD)', 'Nikkei 225 (USD)', 'Gold', 'US Treasuries 20y+ (TLT)', 'Bitcoin']
@@ -561,12 +561,12 @@ def fig_romania():
 
 
 def fig_bad_ticks():
-    """EUR/RON: fisierul de piata (cotatii eronate) vs cursul BNR, 2015-2026, cu volatilitatile anualizate."""
+    """EUR/RON: seria EODHD (cotatii eronate) vs cursul BNR, 2015-2026, cu volatilitatile anualizate."""
     mk = eurron_mkt.loc['2015':]; bn = eurron.loc['2015':]
     res = data_pitfall()
     fig, ax = plt.subplots(figsize=(6.6, 2.1))
     ax.plot(mk.index, mk.values, color=IDAred, lw=0.6,
-            label=f"Market file (EURRON.FOREX): volatility {res['vol_market']:.1%}")
+            label=f"EODHD series (EURRON.FOREX): volatility {res['vol_market']:.1%}")
     ax.plot(bn.index, bn.values, color=MainBlue, lw=0.9, label=f"BNR reference rate: volatility {res['vol_bnr']:.1%}")
     for d, dy in [('2025-08-13', 0), ('2022-01-05', 0)]:
         t = pd.Timestamp(d)
@@ -580,7 +580,7 @@ def fig_bad_ticks():
 
 
 def data_pitfall():
-    """EUR/RON: fisierul de piata (cu erori de cotatie) vs BNR, 2015-2026."""
+    """EUR/RON: seria EODHD (cu erori de cotatie) vs BNR, 2015-2026."""
     r_e = np.log(eurron_mkt).diff().dropna().loc['2015':]
     r_b = np.log(eurron).diff().dropna().loc['2015':]
     top = r_e.abs().sort_values(ascending=False).head(6)

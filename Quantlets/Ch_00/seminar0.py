@@ -206,7 +206,7 @@ def setup_preview():
 # B6: cotatii eronate EUR/RON
 # =============================================================================
 def b6():
-    m = load('EUR/RON (market file)', start='2015-01-01'); bnr = load('EUR/RON', start='2015-01-01')
+    m = load('EUR/RON (EODHD)', start='2015-01-01'); bnr = load('EUR/RON', start='2015-01-01')
     vol = lambda x: np.log(x).diff().dropna().std() * np.sqrt(obs_per_year(x))
     wd = m[m.index.dayofweek < 5]
     med = wd.rolling(11, center=True, min_periods=3).median()
@@ -232,11 +232,11 @@ def b6():
     # grafic pentru cerinta: seria bruta si variatiile zilnice
     r = np.log(m).diff().dropna()
     fig, axes = plt.subplots(2, 1, figsize=(W, 2.5), sharex=True, gridspec_kw={'height_ratios': [1.2, 1]})
-    axes[0].plot(m.index, m, color=IDAred, lw=0.6, label='EURRON.FOREX close (market file)')
+    axes[0].plot(m.index, m, color=IDAred, lw=0.6, label='EURRON.FOREX close (EODHD)')
     axes[0].set_ylabel('RON per EUR')
     axes[1].plot(r.index, r, color=MainBlue, lw=0.5, label='Daily log change')
     fmt_pct(axes[1]); axes[1].set_ylabel('Log change')
-    axes[0].set_title('EUR/RON market file, 2015-2026: level and daily log changes', loc='left')
+    axes[0].set_title('EUR/RON series from EODHD, 2015-2026: level and daily log changes', loc='left')
     bottom_legend(fig, ncol=2)
     save_fig('ch0_sem_b6_raw')
 
@@ -245,7 +245,7 @@ def b6():
     for ax, (a, b, ttl) in zip(axes[:2], [('2025-07-28', '2025-08-29', 'Aug 2025: bad tick (removed)'),
                                            ('2026-04-22', '2026-05-22', 'May 2026: genuine move (kept)')]):
         seg = wd.loc[a:b]; bs = bnr.loc[a:b]
-        ax.plot(seg.index, seg, 'o-', color=IDAred, lw=0.8, ms=2.5, label='Market file (weekdays)')
+        ax.plot(seg.index, seg, 'o-', color=IDAred, lw=0.8, ms=2.5, label='EODHD series (weekdays)')
         ax.plot(med.loc[a:b].index, med.loc[a:b], color=Amber, lw=1.0, ls='--', label='11-day centred median')
         ax.plot(bs.index, bs, 's-', color=MainBlue, lw=0.8, ms=2.2, label='BNR fixing (13:00)')
         for d in flagged:
@@ -764,7 +764,7 @@ def a6():
     fx = load('EUR/RON', start='2005-07-01'); rf = np.log(fx).diff().dropna()
     rho = rf.autocorr(1); vol = rf.std() * np.sqrt(252); f = np.sqrt((1 + rho) / (1 - rho))
     k = 252; exact = np.sqrt(1 + 2 * sum((1 - j / k) * rho ** j for j in range(1, k)))
-    mk = load('EUR/RON (market file)', start='2015-01-01'); rm = np.log(mk).diff().dropna(); rm1 = rm.autocorr(1)
+    mk = load('EUR/RON (EODHD)', start='2015-01-01'); rm = np.log(mk).diff().dropna(); rm1 = rm.autocorr(1)
     mon = np.log(fx.resample('ME').last()).diff().dropna()
     acf = [rf.autocorr(j) for j in range(1, 11)]
     full_acf = np.sqrt(1 + 2 * sum((1 - j / k) * rf.autocorr(j) for j in range(1, 21)))
