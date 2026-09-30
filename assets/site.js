@@ -231,6 +231,66 @@
         if (activeChapter) showQuiz(activeChapter);
     }
 
+    // ------------------------------------------------------------
+    // INSTRUCTOR ACCESS - its own Google sign-in, separate from the quiz login;
+    // the attendance QR links appear only for an account listed in CFG.INSTRUCTORS
+    // ------------------------------------------------------------
+    let gisMode = 'quiz';
+    function gisInit() {
+        if (gisInit.done || !(window.google && google.accounts && google.accounts.id)) return !!gisInit.done;
+        gisInit.done = true;
+        google.accounts.id.initialize({
+            client_id: CFG.GOOGLE_CLIENT_ID, auto_select: true,
+            callback: resp => (gisMode === 'teacher' ? onTeacherCredential : onGoogleCredential)(resp)
+        });
+        return true;
+    }
+
+    const isInstructor = email => (CFG.INSTRUCTORS || []).map(e => e.toLowerCase())
+        .includes(String(email || '').toLowerCase());
+
+    function getTeacher() {
+        const u = decodeJwt(session.get('teacher-credential') || '');
+        return u && u.exp * 1000 > Date.now() && isInstructor(u.email) ? u : null;
+    }
+
+    function onTeacherCredential(resp) {
+        gisMode = 'quiz';
+        const u = decodeJwt(resp.credential);
+        if (!u || !isInstructor(u.email)) {
+            $('teacher-msg').textContent = T.teacherDenied;
+            return;
+        }
+        session.set('teacher-credential', resp.credential);
+        renderTeacher();
+    }
+
+    function renderTeacher() {
+        const ok = isConfigured(CFG.ATTENDANCE_QR_URL) && loginEnabled();
+        const btn = $('teacher-btn'), box = $('teacher-login');
+        const teacher = ok && getTeacher();
+        $('qr-teachers').hidden = !teacher;
+        btn.hidden = !ok;
+        box.hidden = true;
+        if (!ok) return;
+        if (teacher) {
+            btn.textContent = `${T.logout} (${teacher.email})`;
+            btn.onclick = () => { session.del('teacher-credential'); btn.textContent = T.teacherBtn; renderTeacher(); };
+            return;
+        }
+        btn.textContent = T.teacherBtn;
+        btn.onclick = () => {
+            if (!box.hidden) { box.hidden = true; return; }
+            box.innerHTML = `<p>${T.teacherPrompt}</p><div id="teacher-g-button"></div><p class="login-msg" id="teacher-msg" aria-live="polite"></p>`;
+            box.hidden = false;
+            if (gisInit()) {
+                google.accounts.id.renderButton($('teacher-g-button'),
+                    { theme: 'outline', size: 'large', text: 'signin_with', locale: LANG, width: 280,
+                      click_listener: () => { gisMode = 'teacher'; } });
+            }
+        };
+    }
+
     function renderLogin() {
         const box = $('quiz-login');
         if (!loginEnabled()) { box.style.display = 'none'; return; }
@@ -250,10 +310,10 @@
         box.innerHTML = `<p>${T.loginPrompt}</p><div id="g-button"></div><p class="login-msg" id="login-msg" aria-live="polite"></p>`;
         const draw = () => {
             const el = $('g-button');
-            if (!el || el.dataset.drawn || !(window.google && google.accounts && google.accounts.id)) return;
+            if (!el || el.dataset.drawn || !gisInit()) return;
             el.dataset.drawn = '1';
-            google.accounts.id.initialize({ client_id: CFG.GOOGLE_CLIENT_ID, callback: onGoogleCredential, auto_select: true });
-            google.accounts.id.renderButton(el, { theme: 'outline', size: 'large', text: 'signin_with', locale: LANG, width: 280 });
+            google.accounts.id.renderButton(el, { theme: 'outline', size: 'large', text: 'signin_with', locale: LANG, width: 280,
+                click_listener: () => { gisMode = 'quiz'; } });
         };
         draw();
         window.addEventListener('load', draw, { once: true });
@@ -430,13 +490,13 @@
         if (isConfigured(CFG.ATTENDANCE_QR_URL)) {
             $('qr-lecture').href = CFG.ATTENDANCE_QR_URL + '?t=curs';
             $('qr-seminar').href = CFG.ATTENDANCE_QR_URL + '?t=seminar';
-            $('qr-teachers').hidden = false;
         }
         renderChapters();
         renderProject();
         renderResources();
         renderContact();
         renderLogin();
+        renderTeacher();
         renderQuizTabs();
         const first = D.chapters.find(c => D.quizzes[c.id]) || D.chapters[0];
         showQuiz(first.id);

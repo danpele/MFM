@@ -582,3 +582,6 @@ body.no-scroll { overflow: hidden; }
 .hero-teachers { margin-top: 1rem; font-size: 0.85rem; opacity: 0.85; }
 .hero-teachers a { color: white; text-decoration: underline; }
 .hero-teachers[hidden] { display: none; }
+.teacher-btn { background: none; border: 0; padding: 0; color: white; font: inherit; text-decoration: underline; cursor: pointer; }
+.teacher-btn[hidden] { display: none; }
+#teacher-g-button { display: inline-block; margin-top: 0.4rem; }

@@ -11,5 +11,7 @@ window.MFM_CONFIG = {
     ATTENDANCE_FORM_URL: 'https://forms.gle/ANZuwZorJYpcroGo7',
     // Instructor-only page with today's attendance QR code (checks the Google account)
     ATTENDANCE_QR_URL: 'https://script.google.com/a/macros/ase.ro/s/AKfycbwS7ZLw_mkFi39wbBRs_muRyvE8qs5nzWbUSRyQeTmeq_fPGu5j_UMM03NvbeboEQZIZA/exec',
+    // The QR links appear on the site only after one of these accounts signs in with Google
+    INSTRUCTORS: ['danpele@ase.ro'],
     QUIZ_SCORES_URL: 'https://script.google.com/macros/s/AKfycbzaF6BMoREZWPCV9hnh0WnabJz-AY2C7ivfcqFazpP6e29PcAC73LmQ2FogMenGrA4iMg/exec'
 };
