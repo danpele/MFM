@@ -2,14 +2,14 @@ Name of QuantLet: 'MFM_ch0_passive_elasticity'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Case study Haddad, Huebner and Loualiche (2025, American Economic Review), How Competitive Is the Stock Market?: the share of exchange-traded funds in US corporate equities (Financial Accounts of the United States, quarterly, 2001 Q1 to the latest quarter) and the implied fall in the active share and in the aggregate demand elasticity under the rule of Section V.A of the paper (81% active investors in 2001, pass-through 0.33); and the aggregate elasticity of eq. (5) as a function of the share of investors turned passive, for a degree of strategic response of 0, 2.97 (Table 2) and 10.'
+Description: 'Case study Haddad, Huebner and Loualiche (2025, American Economic Review), How Competitive Is the Stock Market?: the aggregate demand elasticity of eq. (5) of the paper, relative to a market of active investors, as a function of the share of investors turned passive, for a degree of strategic response of 0, 2.97 (Table 2, row 1) and 10, with the worked point at 30% passive.'
 
-Keywords: 'passive investing, ETF, demand elasticity, strategic response, demand system, Financial Accounts, FRED'
+Keywords: 'passive investing, demand elasticity, strategic response, demand system, price impact'
 
 Author: 'Daniel Traian Pele'
 
 Submitted: 'Monday, 21 September 2026'
 
-Datafile: 'FRED series BOGZ1LM563064100Q (exchange-traded funds; corporate equities) and BOGZ1LM893064105Q (all sectors; corporate equities)'
+Datafile: 'None (closed-form eq. (5) with the published estimate of the strategic response)'
 
-Output: 'ch0_hhl_passive.pdf, ch0_hhl_elasticity.pdf'
+Output: 'ch0_hhl_elasticity.pdf'

@@ -23,14 +23,14 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 },
                 "ro": {
                     "title": "Gradientul care dispare",
-                    "text": "De ce dispar gradienții când o rețea recurentă simplă (RNN) este antrenată pe secvențe lungi?",
+                    "text": "De ce dispar gradienții cînd o rețea recurentă simplă (RNN) este antrenată pe secvențe lungi?",
                     "options": [
-                        "Gradientul față de o intrare aflată cu k pași în urmă este un produs de k matrice jacobiene; când normele lor sunt sub 1, produsul scade geometric",
+                        "Gradientul față de o intrare aflată cu k pași în urmă este un produs de k matrice jacobiene; cînd normele lor sînt sub 1, produsul scade geometric",
                         "Pentru că funcția de pierdere a unei RNN este mereu convexă",
-                        "Pentru că rata de învățare a lui Adam scade la zero după câteva epoci",
+                        "Pentru că rata de învățare a lui Adam scade la zero după cîteva epoci",
                         "Pentru că rețelele recurente nu pot folosi funcția de activare tanh"
                     ],
-                    "correctExplanation": "Propagarea înapoi în timp înmulțește câte o matrice jacobiană pe pas; cu norme sub 1 (tanh saturat, ponderi mici), produsul scade ca |w|^k.",
+                    "correctExplanation": "Propagarea înapoi în timp înmulțește cîte o matrice jacobiană pe pas; cu norme sub 1 (tanh saturat, ponderi mici), produsul scade ca |w|^k.",
                     "incorrectExplanation": "Cauza este produsul repetat de matrice jacobiene de-a lungul pașilor de timp, nu optimizatorul sau forma pierderii."
                 }
             },
@@ -52,12 +52,12 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "title": "Starea celulei LSTM",
                     "text": "Într-un LSTM, starea celulei evoluează după c_t = f_t ⊙ c_{t-1} + i_t ⊙ g_t. Ce implică acest lucru pentru învățarea memoriei lungi?",
                     "options": [
-                        "Doar poarta de ieșire decide cât de departe în urmă poate ajunge gradientul",
-                        "Pe drumul direct al stării celulei (cu porțile și candidatul fixate), derivata lui c_T în raport cu c_{T-k} este produsul porților de uitare, deci memoria supraviețuiește când poarta de uitare rămâne aproape de 1",
+                        "Doar poarta de ieșire decide cît de departe în urmă poate ajunge gradientul",
+                        "Pe drumul direct al stării celulei (cu porțile și candidatul fixate), derivata lui c_T în raport cu c_{T-k} este produsul porților de uitare, deci memoria supraviețuiește cînd poarta de uitare rămîne aproape de 1",
                         "Candidatul g_t trebuie să fie zero pentru ca rețeaua să-și amintească",
                         "Starea celulei este resetată la zero la fiecare pas, deci nu există memorie lungă"
                     ],
-                    "correctExplanation": "Pe drumul stării celulei singurul multiplicator este poarta de uitare: acest drum contribuie la gradient cu ∏ f_t, care scade încet când f_t este aproape de 1; porțile și candidatul adaugă alte drumuri, prin h_{t-1}.",
+                    "correctExplanation": "Pe drumul stării celulei singurul multiplicator este poarta de uitare: acest drum contribuie la gradient cu ∏ f_t, care scade încet cînd f_t este aproape de 1; porțile și candidatul adaugă alte drumuri, prin h_{t-1}.",
                     "incorrectExplanation": "Drumul esențial este actualizarea aditivă a stării celulei; pe acest drum gradientul este produsul porților de uitare."
                 }
             },
@@ -77,7 +77,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 },
                 "ro": {
                     "title": "Deplasarea porții de uitare",
-                    "text": "O poartă de uitare constantă f = σ(3) ≈ 0,953 este comparată cu f = σ(0) = 0,5. Ce fracțiune din semnal rămâne după 50 de pași în fiecare caz?",
+                    "text": "O poartă de uitare constantă f = σ(3) ≈ 0,953 este comparată cu f = σ(0) = 0,5. Ce fracțiune din semnal rămîne după 50 de pași în fiecare caz?",
                     "options": [
                         "Circa 50% în ambele cazuri",
                         "Exact zero în ambele cazuri",
@@ -111,7 +111,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Pentru că un model AR(1) este nestaționar pentru randamentele zilnice",
                         "Prognoza zero este imbricată în AR(1): sub ipoteza nulă modelul mai mare doar adaugă zgomot de estimare, statistica DM nu este N(0,1) și respinge prea rar; folosiți Clark–West"
                     ],
-                    "correctExplanation": "Coeficienții AR(1) egali cu zero dau prognoza zero. Sub H0 erorile din populație sunt egale, dar AR(1) estimat adaugă zgomot erorii pătratice; Clark și West (2007) adaugă înapoi (ŷ0 − ŷ1)² pentru corecție.",
+                    "correctExplanation": "Coeficienții AR(1) egali cu zero dau prognoza zero. Sub H0 erorile din populație sînt egale, dar AR(1) estimat adaugă zgomot erorii pătratice; Clark și West (2007) adaugă înapoi (ŷ0 − ŷ1)² pentru corecție.",
                     "incorrectExplanation": "Problema este imbricarea: reperul este un caz particular al modelului, deci statistica DM respinge prea rar sub ipoteza nulă. Ajustarea Clark–West o corectează."
                 }
             },
@@ -131,9 +131,9 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 },
                 "ro": {
                     "title": "Atenția cu produs scalar scalat",
-                    "text": "În mecanismul de atenție, softmax(QK^T / √d_k) V, de ce sunt scorurile împărțite la √d_k?",
+                    "text": "În mecanismul de atenție, softmax(QK^T / √d_k) V, de ce sînt scorurile împărțite la √d_k?",
                     "options": [
-                        "Ca produsele scalare să nu crească odată cu dimensiunea, astfel încât softmax să nu se satureze și gradienții să rămână utilizabili",
+                        "Ca produsele scalare să nu crească odată cu dimensiunea, astfel încît softmax să nu se satureze și gradienții să rămînă utilizabili",
                         "Ca ponderile de atenție să devină probabilități cu suma d_k",
                         "Ca să nu mai fie nevoie de informația de poziție",
                         "Ca modelul să fie invariant la scala seriei de intrare"
@@ -158,7 +158,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 },
                 "ro": {
                     "title": "Multe modele, o singură perioadă de test",
-                    "text": "Șase modele sunt testate față de prognoza zero pe trei piețe (18 teste). Cea mai mică valoare p DM unilaterală este 0,008, pentru LSTM pe BET. Ce concluzionați?",
+                    "text": "Șase modele sînt testate față de prognoza zero pe trei piețe (18 teste). Cea mai mică valoare p DM unilaterală este 0,008, pentru LSTM pe BET. Ce concluzionați?",
                     "options": [
                         "Semnalul LSTM pe BET este real, pentru că 0,008 este sub 0,05",
                         "Pentru familia de 18 teste nu este semnificativ (pragul Bonferroni 0,05/18 ≈ 0,0028; p ajustat Holm ≈ 0,14); trebuie aplicată o metodă pentru familia de teste, precum Romano–Wolf sau SPA, familiei declarate",
@@ -185,7 +185,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 },
                 "ro": {
                     "title": "Împărțirea în patch-uri",
-                    "text": "Chronos-2 împarte un context de 512 zile în patch-uri de câte 16 zile. Care este câștigul principal?",
+                    "text": "Chronos-2 împarte un context de 512 zile în patch-uri de cîte 16 zile. Care este cîștigul principal?",
                     "options": [
                         "Împărțirea în patch-uri elimină nevoia de scalare a seriei",
                         "Împărțirea în patch-uri garantează prognoze nedeplasate",
@@ -193,7 +193,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Împărțirea în patch-uri face ca modelul să prognozeze doar la orizontul de 16 zile"
                     ],
                     "correctExplanation": "Costul atenției crește cu pătratul numărului de tokeni; 512/16 = 32 de tokeni este mult mai ieftin, iar fiecare patch rezumă dinamica locală.",
-                    "incorrectExplanation": "Câștigul este de calcul și de reprezentare: tokeni mai puțini și mai bogați."
+                    "incorrectExplanation": "Cîștigul este de calcul și de reprezentare: tokeni mai puțini și mai bogați."
                 }
             },
             {
@@ -216,10 +216,10 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "options": [
                         "Distribuția predictivă este prea largă: prea puține rezultate în cozi",
                         "Media predictivă este deplasată în sus, iar dispersia este corectă",
-                        "Prognoza este perfect calibrată, pentru că valorile PIT sunt între 0 și 1",
-                        "Coada stângă a distribuției predictive este prea subțire: prea multe rezultate cad sub cuantila ei de 1%; testul Berkowitz pe Φ⁻¹(u_t) o cuantifică"
+                        "Prognoza este perfect calibrată, pentru că valorile PIT sînt între 0 și 1",
+                        "Coada stîngă a distribuției predictive este prea subțire: prea multe rezultate cad sub cuantila ei de 1%; testul Berkowitz pe Φ⁻¹(u_t) o cuantifică"
                     ],
-                    "correctExplanation": "La o calibrare corectă PIT este i.i.d. uniformă, deci 1% din zile ar trebui să cadă sub 0,01. Un exces în coada stângă înseamnă că acolo cuantilele prognozate sunt prea înguste (Chronos-2 direct pe S&P 500).",
+                    "correctExplanation": "La o calibrare corectă PIT este i.i.d. uniformă, deci 1% din zile ar trebui să cadă sub 0,01. Un exces în coada stîngă înseamnă că acolo cuantilele prognozate sînt prea înguste (Chronos-2 direct pe S&P 500).",
                     "incorrectExplanation": "Excesul de masă într-un interval de coadă al PIT înseamnă o distribuție predictivă prea îngustă în acea coadă; o prognoză prea largă dă prea puțină masă în cozi."
                 }
             },
@@ -246,7 +246,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Independența contează doar pentru ES, nu și pentru VaR",
                         "Depășirile grupate înseamnă că VaR este prea mare în medie"
                     ],
-                    "correctExplanation": "Este hibridul Chronos-2 pe S&P 500: rata de depășire 0,93%, dar depășirile urmează depășirilor. Testul DQ (Engle–Manganelli) regresează depășirile pe depășirile întârziate și pe VaR și respinge și el.",
+                    "correctExplanation": "Este hibridul Chronos-2 pe S&P 500: rata de depășire 0,93%, dar depășirile urmează depășirilor. Testul DQ (Engle–Manganelli) regresează depășirile pe depășirile întîrziate și pe VaR și respinge și el.",
                     "incorrectExplanation": "O rată necondiționată corectă nu implică o acoperire condiționată corectă; testele de independență și DQ detectează depășirile care vin grupate."
                 }
             },
@@ -266,7 +266,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 },
                 "ro": {
                     "title": "Nivelurile cuantilelor",
-                    "text": "Chronos-Bolt produce cuantile doar între 10% și 90%. Ce se întâmplă dacă îi cereți VaR 1%?",
+                    "text": "Chronos-Bolt produce cuantile doar între 10% și 90%. Ce se întîmplă dacă îi cereți VaR 1%?",
                     "options": [
                         "Modelul extrapolează exact coada cu o distribuție Pareto generalizată",
                         "Cuantila de 1% cerută este înlocuită cu cuantila de 10%, deci rata depășirilor este în jur de 10% sau mai mult, nu 1%",
@@ -293,11 +293,11 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 },
                 "ro": {
                     "title": "ES dintr-o grilă de cuantile",
-                    "text": "Un model dă cuantile la 1%, 5%, 10%, ... Calculați ES 2,5% integrând funcția cuantilă de la 0 la 2,5% și păstrând-o constantă sub 1%. Presupunând că funcția cuantilă este exactă între 1% și 2,5%, în ce sens este eroarea produsă de această limitare?",
+                    "text": "Un model dă cuantile la 1%, 5%, 10%, ... Calculați ES 2,5% integrînd funcția cuantilă de la 0 la 2,5% și păstrînd-o constantă sub 1%. Presupunînd că funcția cuantilă este exactă între 1% și 2,5%, în ce sens este eroarea produsă de această limitare?",
                     "options": [
                         "ES este supraestimat, pentru că grila este prea rară",
                         "Nu există eroare: ES depinde doar de cuantila de 2,5%",
-                        "ES este subestimat, pentru că adevăratele cuantile sub 1% sunt mai negative decât cuantila de 1%",
+                        "ES este subestimat, pentru că adevăratele cuantile sub 1% sînt mai negative decît cuantila de 1%",
                         "ES devine negativ"
                     ],
                     "correctExplanation": "Păstrarea cuantilei la valoarea de 1% sub nivelul de 1% taie partea cea mai extremă a cozii, deci pierderea medie din coadă iese prea mică; interpolarea între nivelurile grilei ar adăuga o eroare de orice semn.",
@@ -320,10 +320,10 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 },
                 "ro": {
                     "title": "Leakage prin pre-antrenare",
-                    "text": "De ce poate un model fundațional să pară mai bun decât este când este evaluat pe serii financiare publice?",
+                    "text": "De ce poate un model fundațional să pară mai bun decît este cînd este evaluat pe serii financiare publice?",
                     "options": [
-                        "Pentru că modelele fundaționale au mereu mai mulți parametri decât GARCH",
-                        "Pentru că seriile financiare sunt prea scurte pentru orice test",
+                        "Pentru că modelele fundaționale au mereu mai mulți parametri decît GARCH",
+                        "Pentru că seriile financiare sînt prea scurte pentru orice test",
                         "Pentru că modelele zero-shot nu pot fi evaluate cu funcții de scor",
                         "Corpusul lui de pre-antrenare poate conține aceleași serii sau serii înrudite din perioada de test, deci testul nu este cu adevărat în afara eșantionului"
                     ],
@@ -354,7 +354,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Exact 0,05, nivelul testului",
                         "Nu se poate calcula fără a cunoaște distribuția randamentelor"
                     ],
-                    "correctExplanation": "Testul respinge pentru x = 0 sau x ≥ 6 depășiri; sub Bin(220; 0,0167) probabilitatea este 0,025 + 0,165 ≈ 0,19. Pentru o putere de 80% sunt necesare circa 2.100–2.300 de zile.",
+                    "correctExplanation": "Testul respinge pentru x = 0 sau x ≥ 6 depășiri; sub Bin(220; 0,0167) probabilitatea este 0,025 + 0,165 ≈ 0,19. Pentru o putere de 80% sînt necesare circa 2.100–2.300 de zile.",
                     "incorrectExplanation": "Sub alternativă numărul de depășiri este Binomial(T; 1,67%); suma probabilităților pe regiunea de respingere dă puterea, mică pentru T = 220."
                 }
             },
@@ -378,11 +378,11 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "options": [
                         "Acoperire corectă în fiecare zi",
                         "O rată de depășire pe termen lung apropiată de 1% pentru orice secvență de date, fără un model corect; nu garantează un VaR precis sau o pierdere FZ0 mică",
-                        "Un VaR mereu mai mic decât VaR-ul FHS",
+                        "Un VaR mereu mai mic decît VaR-ul FHS",
                         "Consistența estimării ES sub cuantila de 1%"
                     ],
                     "correctExplanation": "Actualizarea nivelului α_{t+1} = α_t + γ(α − err_t) limitează diferența dintre rata medie de depășire și α la (max(α_1, 1 − α_1) + γ)/(γT). În capitol aduce acoperirea aproape de 1% pe toate cele trei piețe, dar DQ încă respinge pe S&P 500 și BET, iar VaR-ul mai larg pierde comparația FZ0 cu FHS.",
-                    "incorrectExplanation": "Garanția privește doar rata medie de depășire pe termen lung; precizia, acoperirea zilnică și ES nu sunt controlate."
+                    "incorrectExplanation": "Garanția privește doar rata medie de depășire pe termen lung; precizia, acoperirea zilnică și ES nu sînt controlate."
                 }
             },
             {
@@ -403,12 +403,12 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "title": "Pierderea QLIKE",
                     "text": "De ce este preferată pierderea QLIKE în locul MSE pentru a compara prognozele de volatilitate cu varianța realizată?",
                     "options": [
-                        "Este întotdeauna mai mică decât MSE",
+                        "Este întotdeauna mai mică decît MSE",
                         "Nu cere ca prognozele să fie pozitive",
-                        "La fel ca MSE, ierarhizează corect prognozele când varianța realizată este o aproximare condiționat nedeplasată, dar depinde de raportul dintre realizare și prognoză și este mai puțin dominată de câteva zile extreme",
+                        "La fel ca MSE, ierarhizează corect prognozele cînd varianța realizată este o aproximare condiționat nedeplasată, dar depinde de raportul dintre realizare și prognoză și este mai puțin dominată de cîteva zile extreme",
                         "Ignoră subestimarea volatilității"
                     ],
-                    "correctExplanation": "Patton (2011): atât MSE, cât și QLIKE păstrează ierarhia varianței adevărate când E[RV | F] = σ²; QLIKE = y/f − log(y/f) − 1 penalizează erorile relative y/f, astfel încât câteva zile cu varianță mare nu domină comparația.",
+                    "correctExplanation": "Patton (2011): atît MSE, cît și QLIKE păstrează ierarhia varianței adevărate cînd E[RV | F] = σ²; QLIKE = y/f − log(y/f) − 1 penalizează erorile relative y/f, astfel încît cîteva zile cu varianță mare nu domină comparația.",
                     "incorrectExplanation": "Robustețea la aproximare este comună cu MSE; motivul pentru QLIKE este scala erorilor relative; QLIKE cere prognoze pozitive și penalizează puternic subestimarea."
                 }
             },
@@ -455,12 +455,12 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 },
                 "ro": {
                     "title": "Mulțimea de modele de încredere",
-                    "text": "Ce înseamnă că mai multe modele sunt în mulțimea de modele de încredere (MCS) de 90% pentru pierderea QLIKE?",
+                    "text": "Ce înseamnă că mai multe modele sînt în mulțimea de modele de încredere (MCS) de 90% pentru pierderea QLIKE?",
                     "options": [
-                        "Datele nu le pot distinge: niciunul nu este semnificativ mai slab decât cel mai bun la pragul de 10%",
+                        "Datele nu le pot distinge: niciunul nu este semnificativ mai slab decît cel mai bun la pragul de 10%",
                         "Toate au exact aceeași pierdere medie",
                         "Fiecare bate modelul random walk cu probabilitatea 90%",
-                        "Sunt cele trei modele cu cei mai puțini parametri"
+                        "Sînt cele trei modele cu cei mai puțini parametri"
                     ],
                     "correctExplanation": "MCS păstrează orice model a cărui eliminare nu este susținută de date la pragul ales (Hansen, Lunde & Nason, 2011).",
                     "incorrectExplanation": "Apartenența înseamnă „nerespins ca fiind mai slab”, nu pierderi egale sau o probabilitate de a bate un reper."
@@ -513,7 +513,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "options": [
                         "Pentru că eșantionarea aleatoare este mai lentă pe procesor",
                         "Pentru că oprirea timpurie funcționează doar cu pierderea MSE",
-                        "Ferestrele suprapuse din zile vecine sunt aproape identice; o împărțire aleatoare pune aproape-copii ale ferestrelor de validare în setul de antrenare și face pierderea de validare prea optimistă",
+                        "Ferestrele suprapuse din zile vecine sînt aproape identice; o împărțire aleatoare pune aproape-copii ale ferestrelor de validare în setul de antrenare și face pierderea de validare prea optimistă",
                         "Pentru că împărțirea în ordinea timpului dă mereu o pierdere de validare mai mică"
                     ],
                     "correctExplanation": "Cu ferestre suprapuse, o împărțire amestecată produce leakage între antrenare și validare; împărțirea în ordinea timpului imită prognoza reală.",
@@ -538,12 +538,12 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "title": "Semințele aleatoare",
                     "text": "Cinci LSTM-uri cu aceleași date și aceeași arhitectură, dar cu semințe aleatoare diferite, dau valori diferite ale R² în afara eșantionului. Care este practica corectă de raportare?",
                     "options": [
-                        "Raportați doar cea mai bună sămânță, pentru că arată potențialul metodei",
-                        "Raportați doar prima sămânță, pentru că alegerea este arbitrară",
-                        "Creșteți numărul de epoci până când toate semințele dau același R²",
+                        "Raportați doar cea mai bună sămînță, pentru că arată potențialul metodei",
+                        "Raportați doar prima sămînță, pentru că alegerea este arbitrară",
+                        "Creșteți numărul de epoci pînă cînd toate semințele dau același R²",
                         "Raportați întreaga distribuție pe semințe (sau media ansamblului), nu cea mai bună rulare"
                     ],
-                    "correctExplanation": "Când semnalul este slab, variația de la o sămânță la alta are aceeași mărime ca efectul; alegerea celei mai bune semințe este o formă de overfitting al backtestului.",
+                    "correctExplanation": "Cînd semnalul este slab, variația de la o sămînță la alta are aceeași mărime ca efectul; alegerea celei mai bune semințe este o formă de overfitting al backtestului.",
                     "incorrectExplanation": "Alegerea celei mai bune semințe după ce ați văzut rezultatele de test supraestimează performanța; raportați toate semințele sau un ansamblu."
                 }
             },
@@ -567,7 +567,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "options": [
                         "ES nu este elicitabil singur, dar perechea (VaR, ES) la același nivel este elicitabilă în comun, deci FZ0 clasifică prognozele perechii consecvent",
                         "Pentru că FZ0 este definită doar pentru VaR",
-                        "Pentru că ES 2,5% este mereu mai mic decât VaR 2,5%",
+                        "Pentru că ES 2,5% este mereu mai mic decît VaR 2,5%",
                         "Pentru că regulile Basel interzic funcțiile de scor pentru ES"
                     ],
                     "correctExplanation": "Fissler și Ziegel (2016) arată că (VaR_α, ES_α) este elicitabilă în comun; FZ0 (Patton, Ziegel & Chen, 2019) face parte din această familie.",
@@ -590,15 +590,15 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 },
                 "ro": {
                     "title": "Lungimea contextului",
-                    "text": "Pentru Chronos-2 aplicat logaritmului varianței realizate, pierderea QLIKE scade când contextul crește de la 32 la 512 zile. Care este motivul cel mai plauzibil?",
+                    "text": "Pentru Chronos-2 aplicat logaritmului varianței realizate, pierderea QLIKE scade cînd contextul crește de la 32 la 512 zile. Care este motivul cel mai plauzibil?",
                     "options": [
                         "Contextele mai lungi fac orice model mai precis",
                         "Volatilitatea are memorie lungă: un context mai lung îi dă modelului mai multă informație despre nivelul volatilității, care scade încet",
                         "Modelul a fost antrenat doar pe serii de 512 zile",
                         "Un context mai lung elimină nevoia de scalare"
                     ],
-                    "correctExplanation": "Memoria lungă a volatilității înseamnă că informația de acum câteva luni încă ajută; un context de 32 de zile ratează componenta lentă.",
-                    "incorrectExplanation": "Câștigul reflectă memoria lungă a volatilității, nu o regulă generală că mai lung înseamnă mereu mai bine."
+                    "correctExplanation": "Memoria lungă a volatilității înseamnă că informația de acum cîteva luni încă ajută; un context de 32 de zile ratează componenta lentă.",
+                    "incorrectExplanation": "Cîștigul reflectă memoria lungă a volatilității, nu o regulă generală că mai lung înseamnă mereu mai bine."
                 }
             },
             {
@@ -617,15 +617,15 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 },
                 "ro": {
                     "title": "Decile și VaR 10%",
-                    "text": "Chronos-Bolt și TimesFM-2.5 dau decile. Pe randamente zilnice, cuantilele lor de 10% sunt depășite în mai mult de 10% din zile. Ce indică acest lucru?",
+                    "text": "Chronos-Bolt și TimesFM-2.5 dau decile. Pe randamente zilnice, cuantilele lor de 10% sînt depășite în mai mult de 10% din zile. Ce indică acest lucru?",
                     "options": [
-                        "Distribuțiile lor predictive sunt prea largi",
+                        "Distribuțiile lor predictive sînt prea largi",
                         "Prognozează media randamentului prea pesimist",
-                        "Distribuțiile lor predictive pentru randamente sunt prea înguste în coada stângă",
+                        "Distribuțiile lor predictive pentru randamente sînt prea înguste în coada stîngă",
                         "Perioada de test nu conține crize"
                     ],
-                    "correctExplanation": "Mai multe depășiri decât nivelul nominal înseamnă că cuantila prognozată nu este suficient de departe în coadă: distribuția predictivă este prea îngustă.",
-                    "incorrectExplanation": "Prea multe depășiri ale unei prognoze de cuantilă înseamnă că coada stângă este subestimată, adică distribuția este prea îngustă."
+                    "correctExplanation": "Mai multe depășiri decît nivelul nominal înseamnă că cuantila prognozată nu este suficient de departe în coadă: distribuția predictivă este prea îngustă.",
+                    "incorrectExplanation": "Prea multe depășiri ale unei prognoze de cuantilă înseamnă că coada stîngă este subestimată, adică distribuția este prea îngustă."
                 }
             },
             {
@@ -644,7 +644,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 },
                 "ro": {
                     "title": "De ce o fereastră de după publicare",
-                    "text": "În acest capitol, prognozele sunt evaluate și de la 3 noiembrie 2025 încolo. De ce?",
+                    "text": "În acest capitol, prognozele sînt evaluate și de la 3 noiembrie 2025 încolo. De ce?",
                     "options": [
                         "Pentru că piețele au fost mai calme după această dată",
                         "Pentru că modelele fundaționale nu funcționează pe date mai vechi",
@@ -673,9 +673,9 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "title": "Găsiți eroarea AI: fereastra de context",
                     "text": "Un asistent AI scrie: „Pentru prognoza la o zi a lui r_t, dați lui Chronos cele mai recente 512 randamente, context = r[t-511 : t+1] în Python.” Ce este greșit?",
                     "options": [
-                        "512 zile sunt prea puține pentru un model fundațional",
+                        "512 zile sînt prea puține pentru un model fundațional",
                         "Chronos trebuie să primească prețuri, nu randamente",
-                        "Contextul trebuie mai întâi standardizat la varianță unitară",
+                        "Contextul trebuie mai întîi standardizat la varianță unitară",
                         "Fragmentul se termină cu r_t, valoarea prognozată: contextul trebuie să se oprească la r_{t-1}, adică r[t-512 : t]"
                     ],
                     "correctExplanation": "Un fragment Python a:b include a și exclude b, deci r[t-511 : t+1] se termină la r_t; prognoza folosește atunci răspunsul (look-ahead bias), iar backtestul arată mult prea bine.",
@@ -700,12 +700,12 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "title": "Găsiți eroarea AI: prea puține depășiri",
                     "text": "Un asistent AI scrie: „Pe 1.500 de zile, VaR 1% al Chronos a avut doar 5 depășiri față de 15 așteptate: modelul este prudent, deci trece ușor testul Kupiec.” Ce este greșit?",
                     "options": [
-                        "Testul Kupiec verifică doar dacă depășirile sunt independente",
+                        "Testul Kupiec verifică doar dacă depășirile sînt independente",
                         "Testul Kupiec este bilateral: 5 depășiri în 1.500 de zile dau LR = 9,1 și o valoare p de aproximativ 0,003, deci acoperirea corectă este respinsă",
                         "Numărul așteptat de depășiri este 1,5, nu 15",
-                        "5 depășiri sunt prea multe, deci VaR este prea mic"
+                        "5 depășiri sînt prea multe, deci VaR este prea mic"
                     ],
-                    "correctExplanation": "Testul de acoperire necondiționată respinge atât prea multe, cât și prea puține depășiri; prea puține înseamnă un VaR prea mare și, într-un backtest, sunt adesea simptomul unui look-ahead bias.",
+                    "correctExplanation": "Testul de acoperire necondiționată respinge atît prea multe, cît și prea puține depășiri; prea puține înseamnă un VaR prea mare și, într-un backtest, sînt adesea simptomul unui look-ahead bias.",
                     "incorrectExplanation": "Calculați statistica raportului de verosimilitate a testului de acoperire necondiționată în loc să comparați 5 cu 15 din ochi."
                 }
             }

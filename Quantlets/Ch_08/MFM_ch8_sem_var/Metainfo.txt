@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch8_sem_var'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 8, B1-B2 and B9: VaR backtests of six models on the S&P 500 with asymptotic and exact p-values and the DQ test; Basel traffic light and FRTB desk check for the GARCH-t VaR on the BET index; parametric bootstrap of the Kupiec test under estimation risk.'
+Description: 'Seminar 8 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A1 Extended, A3, A5, A6, A7, A8, B1, B3, B5, B7 with code and output. The proposed exercises A2, A4, A9, A10, B2, B4, B6, B8, B9, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'VaR backtesting, Kupiec, Christoffersen, duration test, traffic light, BET, FRTB'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily closes from the course data: S&P 500, BET, Bitcoin; EUR/RON: BNR reference rate'
 
-Output: 'ch8_sem_traffic_bet.pdf, ch8_sem_b1_timing.pdf, ch8_sem_b1_results.pdf, ch8_sem_b9_estrisk.pdf, ch8_sem_c2_lookahead.pdf'
+Output: 'ch8_sem_b1_results.pdf, ch8_sem_b1_timing.pdf, ch8_sem_traffic_bet.pdf'

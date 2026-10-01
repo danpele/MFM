@@ -54,11 +54,11 @@ window.MFM_DATA.quizzes['options'] = {
                 "options": [
                     "Nimic: aripile SVI trebuie să fie liniare în k",
                     "Panta aripii trebuie să fie exact 2",
-                    "Încalcă limita lui Lee: w(k)/|k| nu poate depăși 2 asimptotic, când |k| crește, deci zâmbetul estimat admite arbitraj în aripă",
-                    "Nimic: doar aripa stângă este constrânsă de absența arbitrajului"
+                    "Încalcă limita lui Lee: w(k)/|k| nu poate depăși 2 asimptotic, cînd |k| crește, deci zîmbetul estimat admite arbitraj în aripă",
+                    "Nimic: doar aripa stîngă este constrînsă de absența arbitrajului"
                 ],
                 "correctExplanation": "Lee (2004): limsup w(k)/|k| este în [0, 2] în ambele aripi, iar panta fixează numărul de momente finite ale lui S_T; estimările din curs au pante de cel mult 0,39.",
-                "incorrectExplanation": "Absența arbitrajului permite cel mult o creștere liniară a varianței totale, cu panta cel mult 2, în ambele aripi; liniar este permis, mai abrupt decât 2 nu."
+                "incorrectExplanation": "Absența arbitrajului permite cel mult o creștere liniară a varianței totale, cu panta cel mult 2, în ambele aripi; liniar este permis, mai abrupt decît 2 nu."
             }
         },
         {
@@ -77,15 +77,15 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "Exercitarea anticipată",
-                "text": "Presupunând o rată fără risc strict pozitivă, ce opțiune americană poate fi exercitată optim înainte de scadență, chiar fără dividende?",
+                "text": "Presupunînd o rată fără risc strict pozitivă, ce opțiune americană poate fi exercitată optim înainte de scadență, chiar fără dividende?",
                 "options": [
                     "Un call pe o acțiune fără dividende",
                     "Orice opțiune în afara banilor",
                     "Niciuna: exercitarea anticipată nu este niciodată optimă",
-                    "Un put adânc în bani"
+                    "Un put adînc în bani"
                 ],
-                "correctExplanation": "Adânc în bani, a încasa K acum și a câștiga dobânda poate valora mai mult decât a păstra put-ul.",
-                "incorrectExplanation": "Cu r > 0, un call pe o acțiune fără dividende valorează mai mult neexercitat decât exercitat (cel puțin S - K e^{-r tau} > S - K); la put-uri dobânda la K face valoroasă exercitarea anticipată."
+                "correctExplanation": "Adînc în bani, a încasa K acum și a cîștiga dobînda poate valora mai mult decît a păstra put-ul.",
+                "incorrectExplanation": "Cu r > 0, un call pe o acțiune fără dividende valorează mai mult neexercitat decît exercitat (cel puțin S - K e^{-r tau} > S - K); la put-uri dobînda la K face valoroasă exercitarea anticipată."
             }
         },
         {
@@ -106,12 +106,12 @@ window.MFM_DATA.quizzes['options'] = {
                 "title": "Teste comune și teste individuale",
                 "text": "Regresia Mincer-Zarnowitz a varianței realizate pe 21 de zile pe VIX^2: termenul liber -51,9 (e.s. 34,4), panta 0,86 (e.s. 0,10), statistica Wald comună 41,7 cu 2 grade de libertate. Ce concluzionați?",
                 "options": [
-                    "Prognoza nedeplasată nu este respinsă, pentru că ambele statistici t sunt sub 2",
-                    "Prognoza nedeplasată este respinsă împreună, deși niciun coeficient luat separat nu diferă semnificativ de (0, 1): cele două estimări sunt puternic corelate negativ",
+                    "Prognoza nedeplasată nu este respinsă, pentru că ambele statistici t sînt sub 2",
+                    "Prognoza nedeplasată este respinsă împreună, deși niciun coeficient luat separat nu diferă semnificativ de (0, 1): cele două estimări sînt puternic corelate negativ",
                     "Prognoza nedeplasată este respinsă pentru că R^2 este sub 1",
                     "VIX este nedeplasat pentru că panta este aproape de 1"
                 ],
-                "correctExplanation": "Statisticile t sunt -1,50 și -1,34, dar estimările sunt corelate -0,90, deci elipsa de încredere este îngustă și înclinată, iar (0, 1) este mult în afara ei (p sub 10^-9).",
+                "correctExplanation": "Statisticile t sînt -1,50 și -1,34, dar estimările sînt corelate -0,90, deci elipsa de încredere este îngustă și înclinată, iar (0, 1) este mult în afara ei (p sub 10^-9).",
                 "incorrectExplanation": "O ipoteză asupra a doi parametri cere testul comun, care folosește covarianța lor; două teste t separate o ignoră, iar R^2 nu spune nimic despre deplasare."
             }
         },
@@ -131,15 +131,15 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "Gamma aproape de scadență",
-                "text": "Cum se schimbă gamma unei opțiuni la bani când se apropie scadența?",
+                "text": "Cum se schimbă gamma unei opțiuni la bani cînd se apropie scadența?",
                 "options": [
                     "Scade la zero",
-                    "Rămâne constantă",
+                    "Rămîne constantă",
                     "Explodează: cu o zi înainte de scadență este de aproximativ sqrt(21) ori valoarea de cu o lună înainte",
                     "Devine negativă"
                 ],
                 "correctExplanation": "Gamma ATM este proporțională cu 1/(sigma sqrt(tau)): cu o zi în loc de 21 de zile de tranzacționare este de aproximativ 4,6 ori mai mare.",
-                "incorrectExplanation": "Gamma unei opțiuni la bani crește ca 1/sqrt(tau), motiv pentru care hedging-ul opțiunilor aproape de scadență este atât de solicitant."
+                "incorrectExplanation": "Gamma unei opțiuni la bani crește ca 1/sqrt(tau), motiv pentru care hedging-ul opțiunilor aproape de scadență este atît de solicitant."
             }
         },
         {
@@ -160,12 +160,12 @@ window.MFM_DATA.quizzes['options'] = {
                 "title": "Theta și gamma",
                 "text": "Pentru o poziție în opțiuni cu delta hedging, în modelul Black-Scholes, care este legătura dintre theta și gamma?",
                 "options": [
-                    "Nu sunt legate",
+                    "Nu sînt legate",
                     "Theta este egală cu gamma",
-                    "Ambele sunt mereu pozitive pentru o opțiune cumpărată",
+                    "Ambele sînt mereu pozitive pentru o opțiune cumpărată",
                     "Theta + 0,5 sigma^2 S^2 Gamma + r S Delta - r C = 0: gamma pozitivă se plătește prin erodarea în timp"
                 ],
-                "correctExplanation": "Aceasta este ecuația cu derivate parțiale Black-Scholes: după finanțarea delta hedging-ului, Theta + r S Delta - r C = -0,5 sigma^2 S^2 Gamma < 0, deci o poziție cu delta hedging și gamma pozitivă pierde valoare în timp, iar una cu gamma negativă o câștigă. Theta singură poate fi pozitivă, de exemplu pentru un put adânc în bani.",
+                "correctExplanation": "Aceasta este ecuația cu derivate parțiale Black-Scholes: după finanțarea delta hedging-ului, Theta + r S Delta - r C = -0,5 sigma^2 S^2 Gamma < 0, deci o poziție cu delta hedging și gamma pozitivă pierde valoare în timp, iar una cu gamma negativă o cîștigă. Theta singură poate fi pozitivă, de exemplu pentru un put adînc în bani.",
                 "incorrectExplanation": "Ecuația Black-Scholes leagă theta de gamma: după costul finanțării, deținătorul convexității o plătește prin erodarea în timp."
             }
         },
@@ -211,7 +211,7 @@ window.MFM_DATA.quizzes['options'] = {
                 "incorrectExplanation": "Delta hedging removes the directional exposure, not the volatility exposure: the seller loses when realised volatility exceeds the implied one."
             },
             "ro": {
-                "title": "Vânzarea volatilității",
+                "title": "Vînzarea volatilității",
                 "text": "Un dealer vinde un call la volatilitatea implicită de 20% și îi face zilnic delta hedging. Volatilitatea realizată se dovedește a fi 25%. Care este rezultatul așteptat?",
                 "options": [
                     "Un profit, pentru că prima a fost încasată",
@@ -219,8 +219,8 @@ window.MFM_DATA.quizzes['options'] = {
                     "Zero, pentru că poziția are delta hedging",
                     "Un profit egal cu theta înmulțită cu numărul de zile"
                 ],
-                "correctExplanation": "O opțiune cu delta hedging câștigă varianța implicită minus cea realizată, ponderată cu gamma: cu realizata peste implicită, vânzătorul pierde aproximativ vega x 5 puncte.",
-                "incorrectExplanation": "Delta hedging-ul elimină expunerea la direcție, nu expunerea la volatilitate: vânzătorul pierde când volatilitatea realizată o depășește pe cea implicită."
+                "correctExplanation": "O opțiune cu delta hedging cîștigă varianța implicită minus cea realizată, ponderată cu gamma: cu realizata peste implicită, vînzătorul pierde aproximativ vega x 5 puncte.",
+                "incorrectExplanation": "Delta hedging-ul elimină expunerea la direcție, nu expunerea la volatilitate: vînzătorul pierde cînd volatilitatea realizată o depășește pe cea implicită."
             }
         },
         {
@@ -239,15 +239,15 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "Opțiuni S&P 500 cu delta hedging",
-                "text": "Vânzarea de call-uri S&P 500 la bani pe o lună la VIX, cu delta hedging zilnic, 1990-2026, a dat un rezultat lunar mediu de 0,48% din indice. De ce?",
+                "text": "Vînzarea de call-uri S&P 500 la bani pe o lună la VIX, cu delta hedging zilnic, 1990-2026, a dat un rezultat lunar mediu de 0,48% din indice. De ce?",
                 "options": [
                     "Pentru că S&P 500 a crescut în medie",
-                    "Din cauza dobânzii la contul de numerar",
+                    "Din cauza dobînzii la contul de numerar",
                     "Pentru că VIX a fost peste volatilitatea realizată ulterior în majoritatea lunilor: o primă de risc a volatilității",
                     "Din cauza unei convenții de calcul care ignoră pierderile"
                 ],
-                "correctExplanation": "VIX a depășit volatilitatea realizată a lunii în 85% din luni: vânzătorii de opțiuni încasează o primă pentru asigurarea împotriva turbulențelor.",
-                "incorrectExplanation": "O opțiune cu delta hedging nu pariază pe direcție; câștigul ei mediu este diferența dintre volatilitatea implicită și cea realizată, prima de risc a volatilității."
+                "correctExplanation": "VIX a depășit volatilitatea realizată a lunii în 85% din luni: vînzătorii de opțiuni încasează o primă pentru asigurarea împotriva turbulențelor.",
+                "incorrectExplanation": "O opțiune cu delta hedging nu pariază pe direcție; cîștigul ei mediu este diferența dintre volatilitatea implicită și cea realizată, prima de risc a volatilității."
             }
         },
         {
@@ -270,10 +270,10 @@ window.MFM_DATA.quizzes['options'] = {
                 "options": [
                     "Erorile heteroscedastice deplasează panta OLS spre 0",
                     "Ferestrele suprapuse de 21 de zile deplasează panta OLS",
-                    "VIX^2 măsoară cu eroare varianța așteptată adevărată, ceea ce atenuează panta; instrumentarea cu VIX^2 întârziat corectează acest lucru",
+                    "VIX^2 măsoară cu eroare varianța așteptată adevărată, ceea ce atenuează panta; instrumentarea cu VIX^2 întîrziat corectează acest lucru",
                     "Reziduurile care nu urmează distribuția Normală deplasează panta OLS"
                 ],
-                "correctExplanation": "Eroarea clasică de măsurare într-un regresor deplasează OLS spre 0 (Christensen și Prabhala, 1998); o valoare întârziată este un instrument valid dacă eroarea ei este necorelată cu cea de azi. În datele cursului corecția este mică: 1,06 (OLS) și 1,02 (instrumente), în logaritmi.",
+                "correctExplanation": "Eroarea clasică de măsurare într-un regresor deplasează OLS spre 0 (Christensen și Prabhala, 1998); o valoare întîrziată este un instrument valid dacă eroarea ei este necorelată cu cea de azi. În datele cursului corecția este mică: 1,06 (OLS) și 1,02 (instrumente), în logaritmi.",
                 "incorrectExplanation": "Heteroscedasticitatea, suprapunerea și abaterile de la distribuția Normală afectează erorile standard, nu consistența OLS; atenuarea vine din eroarea din regresor."
             }
         },
@@ -293,15 +293,15 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "Asimetria acțiunilor",
-                "text": "De ce put-urile cu preț de exercitare mic pe indici bursieri sunt mai scumpe, în volatilitate implicită, decât opțiunile la bani?",
+                "text": "De ce put-urile cu preț de exercitare mic pe indici bursieri sînt mai scumpe, în volatilitate implicită, decît opțiunile la bani?",
                 "options": [
-                    "Cozi stângi groase, volatilitate care crește când prețurile scad și cererea de asigurare împotriva crahurilor",
-                    "Pentru că put-urile costă întotdeauna mai mult decât call-urile",
-                    "Din cauza ratei dobânzii",
+                    "Cozi stîngi groase, volatilitate care crește cînd prețurile scad și cererea de asigurare împotriva crahurilor",
+                    "Pentru că put-urile costă întotdeauna mai mult decît call-urile",
+                    "Din cauza ratei dobînzii",
                     "Pentru că Black-Scholes presupune asimetrie negativă"
                 ],
-                "correctExplanation": "Cozile stângi grele, efectul de levier și prima pentru riscul de crah ridică toate prețul put-urilor cu preț de exercitare mic.",
-                "incorrectExplanation": "Asimetria nu este o proprietate a modelului Black-Scholes, care implică un zâmbet plat; ea vine din distribuția randamentelor și din primele de risc."
+                "correctExplanation": "Cozile stîngi grele, efectul de levier și prima pentru riscul de crah ridică toate prețul put-urilor cu preț de exercitare mic.",
+                "incorrectExplanation": "Asimetria nu este o proprietate a modelului Black-Scholes, care implică un zîmbet plat; ea vine din distribuția randamentelor și din primele de risc."
             }
         },
         {
@@ -320,7 +320,7 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "De unde vine rezultatul hedging-ului",
-                "text": "O opțiune cumpărată, cu delta hedging, câștigă (1/2) Gamma S^2 (sigma_real^2 - sigma_imp^2) dt. Unde se concentrează rezultatul?",
+                "text": "O opțiune cumpărată, cu delta hedging, cîștigă (1/2) Gamma S^2 (sigma_real^2 - sigma_imp^2) dt. Unde se concentrează rezultatul?",
                 "options": [
                     "Aproape de prețul de exercitare și de scadență, unde gamma este mare, deci contează traiectoria prețului, nu doar varianța realizată totală",
                     "Depinde doar de varianța realizată totală pe durata opțiunii, ca un swap de varianță",
@@ -328,7 +328,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Doar de data scadenței"
                 ],
                 "correctExplanation": "Diferența de varianță este ponderată cu Gamma S^2, maximă la bani și aproape de scadență; un swap de varianță are ponderi constante, o opțiune cu delta hedging are ponderi aleatoare.",
-                "incorrectExplanation": "Drift-ul dispare din rezultatul cu hedging; rămâne diferența de varianță ponderată cu gamma de-a lungul traiectoriei."
+                "incorrectExplanation": "Drift-ul dispare din rezultatul cu hedging; rămîne diferența de varianță ponderată cu gamma de-a lungul traiectoriei."
             }
         },
         {
@@ -347,14 +347,14 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "Estimarea densității neutre la risc",
-                "text": "De ce au nevoie densitățile neutre la risc obținute cu Breeden-Litzenberger de netezire și de constrângeri de formă?",
+                "text": "De ce au nevoie densitățile neutre la risc obținute cu Breeden-Litzenberger de netezire și de constrîngeri de formă?",
                 "options": [
-                    "Pentru că opțiunile call pe indici sunt americane",
-                    "Pentru că rata dobânzii nu este zero",
+                    "Pentru că opțiunile call pe indici sînt americane",
+                    "Pentru că rata dobînzii nu este zero",
                     "Pentru că distribuția log-normală este densitatea adevărată",
                     "Pentru că derivarea de două ori a cotațiilor le amplifică zgomotul, iar fără convexitate în K densitatea estimată poate fi negativă"
                 ],
-                "correctExplanation": "q = e^{r tau} d^2C/dK^2 este o problemă inversă prost condiționată; în lanțul Deribit din curs 7 din 732 de fluturi de marcare sunt negativi, toți în interiorul spread-ului bid-ask.",
+                "correctExplanation": "q = e^{r tau} d^2C/dK^2 este o problemă inversă prost condiționată; în lanțul Deribit din curs 7 din 732 de fluturi de marcare sînt negativi, toți în interiorul spread-ului bid-ask.",
                 "incorrectExplanation": "Problema este statistică: o derivată a doua a unor prețuri discrete și zgomotoase, care trebuie să fie convexe în prețul de exercitare pentru a da o densitate nenegativă."
             }
         },
@@ -379,10 +379,10 @@ window.MFM_DATA.quizzes['options'] = {
                     "Erori standard White robuste la heteroscedasticitate (HC0)",
                     "Erori standard Hodrick (1992) sau Hansen-Hodrick, ori Newey-West cu cel puțin h - 1 lag-uri, plus un bootstrap pentru deplasarea dată de un regresor persistent",
                     "Erori standard grupate pe ani calendaristici",
-                    "Niciuna: OLS este nedeplasat, deci erorile standard obișnuite sunt suficiente"
+                    "Niciuna: OLS este nedeplasat, deci erorile standard obișnuite sînt suficiente"
                 ],
                 "correctExplanation": "Suprapunerea face erorile MA(11); HC0 o ignoră și supraestimează t. În curs niciun orizont de 1-12 luni nu este semnificativ pe 1990-2026, cu oricare dintre aceste corecții.",
-                "incorrectExplanation": "Ferestrele consecutive de 12 luni au 11 luni în comun, deci erorile sunt autocorelate; corecția trebuie să acopere suprapunerea, iar un predictor persistent adaugă deplasare în eșantion mic."
+                "incorrectExplanation": "Ferestrele consecutive de 12 luni au 11 luni în comun, deci erorile sînt autocorelate; corecția trebuie să acopere suprapunerea, iar un predictor persistent adaugă deplasare în eșantion mic."
             }
         },
         {
@@ -404,7 +404,7 @@ window.MFM_DATA.quizzes['options'] = {
                 "text": "Cum se obține densitatea neutră la risc a lui S_T din prețurile opțiunilor (Breeden-Litzenberger)?",
                 "options": [
                     "Ca e^{r tau} înmulțit cu derivata a doua a prețurilor call în raport cu prețul de exercitare",
-                    "Ca derivata întâi a prețului put în raport cu timpul",
+                    "Ca derivata întîi a prețului put în raport cu timpul",
                     "Din distribuția istorică a randamentelor",
                     "Ca raportul dintre prețurile call și put"
                 ],
@@ -435,8 +435,8 @@ window.MFM_DATA.quizzes['options'] = {
                     "Că un crah va avea loc cu probabilitatea 1,2%",
                     "Că estimarea SVI este greșită"
                 ],
-                "correctExplanation": "Coada densității neutre la risc este de câteva ori mai grea decât cea log-normală: coada crahurilor este locul unde Black-Scholes greșește cel mai mult.",
-                "incorrectExplanation": "Probabilitățile neutre la risc sunt prețuri ale asigurării, nu prognoze; comparația arată cât de grea este coada evaluată față de cea log-normală."
+                "correctExplanation": "Coada densității neutre la risc este de cîteva ori mai grea decît cea log-normală: coada crahurilor este locul unde Black-Scholes greșește cel mai mult.",
+                "incorrectExplanation": "Probabilitățile neutre la risc sînt prețuri ale asigurării, nu prognoze; comparația arată cît de grea este coada evaluată față de cea log-normală."
             }
         },
         {
@@ -482,15 +482,15 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "Structura la termen a VIX",
-                "text": "VIX a fost peste VIX3M (backwardation) în 7,6% din zile, din 2011. Când se întâmplă acest lucru?",
+                "text": "VIX a fost peste VIX3M (backwardation) în 7,6% din zile, din 2011. Cînd se întîmplă acest lucru?",
                 "options": [
                     "În piețe calme, în creștere",
                     "Aleatoriu, fără legătură cu condițiile de piață",
                     "Doar în zilele de scadență a opțiunilor",
-                    "În crize, când frica se concentrează pe termen scurt"
+                    "În crize, cînd frica se concentrează pe termen scurt"
                 ],
                 "correctExplanation": "Backwardation semnalează stresul; în următoarele 21 de zile volatilitatea realizată a fost în medie 26,7% față de 13,6% în contango.",
-                "incorrectExplanation": "De obicei structura la termen este crescătoare (contango); se inversează în crize, când domină incertitudinea pe termen scurt."
+                "incorrectExplanation": "De obicei structura la termen este crescătoare (contango); se inversează în crize, cînd domină incertitudinea pe termen scurt."
             }
         },
         {
@@ -536,14 +536,14 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "Ferestre suprapuse",
-                "text": "De ce sunt necesare erori standard Newey-West când mediem prima zilnică de risc a varianței?",
+                "text": "De ce sînt necesare erori standard Newey-West cînd mediem prima zilnică de risc a varianței?",
                 "options": [
                     "Pentru că prima urmează distribuția Normală",
-                    "Pentru că ferestrele consecutive de 21 de zile au în comun 20 de zile, deci valorile zilnice sunt puternic autocorelate",
+                    "Pentru că ferestrele consecutive de 21 de zile au în comun 20 de zile, deci valorile zilnice sînt puternic autocorelate",
                     "Pentru că VIX este măsurat cu erori de rotunjire",
                     "Pentru că eșantionul este prea mic"
                 ],
-                "correctExplanation": "Ferestrele suprapuse fac eroarea standard naivă de câteva ori prea mică; Newey-West cu 21 de lag-uri o corectează.",
+                "correctExplanation": "Ferestrele suprapuse fac eroarea standard naivă de cîteva ori prea mică; Newey-West cu 21 de lag-uri o corectează.",
                 "incorrectExplanation": "Problema este autocorelația dată de ferestrele suprapuse, pe care formula naivă o ignoră."
             }
         },
@@ -567,11 +567,11 @@ window.MFM_DATA.quizzes['options'] = {
                 "options": [
                     "VIX este o prognoză nedeplasată",
                     "VIX subestimează volatilitatea viitoare",
-                    "VIX este prea mare în medie, cel mai mult când este mare: conține o primă de risc",
+                    "VIX este prea mare în medie, cel mai mult cînd este mare: conține o primă de risc",
                     "VIX nu conține informație despre volatilitatea viitoare"
                 ],
-                "correctExplanation": "O prognoză nedeplasată cere termen liber 0 și pantă 1; nicio statistică t separată nu respinge, dar testul Wald comun respinge (41,7, p sub 10^-9): VIX supraestimează varianța realizată, dar explică mai mult (R^2 0,37) decât varianța trecută (0,29).",
-                "incorrectExplanation": "Regresia arată o deplasare în sus dată de prima de risc, dar VIX rămâne informativ pentru volatilitatea viitoare."
+                "correctExplanation": "O prognoză nedeplasată cere termen liber 0 și pantă 1; nicio statistică t separată nu respinge, dar testul Wald comun respinge (41,7, p sub 10^-9): VIX supraestimează varianța realizată, dar explică mai mult (R^2 0,37) decît varianța trecută (0,29).",
+                "incorrectExplanation": "Regresia arată o deplasare în sus dată de prima de risc, dar VIX rămîne informativ pentru volatilitatea viitoare."
             }
         },
         {
@@ -592,12 +592,12 @@ window.MFM_DATA.quizzes['options'] = {
                 "title": "Prima de varianță ex ante și ex post",
                 "text": "Ce deosebește prima de risc a varianței ex ante de cea ex post?",
                 "options": [
-                    "Sunt aceeași mărime, măsurată în unități diferite",
+                    "Sînt aceeași mărime, măsurată în unități diferite",
                     "Prima ex post folosește varianța realizată trecută, cea ex ante varianța realizată viitoare",
                     "Prima ex ante E^Q_t[RV] - E^P_t[RV], aproximată prin VIX^2 minus varianța realizată trecută, este cunoscută la t și poate fi folosită ca predictor; prima ex post folosește varianța realizată viitoare și este rezultatul realizat al unui swap de varianță",
                     "Doar prima ex post poate fi testată cu erori Newey-West"
                 ],
-                "correctExplanation": "Un predictor trebuie să fie cunoscut la data prognozei; VIX_t^2 - RV_{t,t+21} este cunoscută abia la t+21 și măsoară ce a câștigat vânzătorul unui swap de varianță, nu ce putea vedea un investitor. Varianța realizată trecută este doar o prognoză pentru E^P_t[RV], deci VIX_t^2 - RV_{t-21,t} este o aproximare a primei ex ante.",
+                "correctExplanation": "Un predictor trebuie să fie cunoscut la data prognozei; VIX_t^2 - RV_{t,t+21} este cunoscută abia la t+21 și măsoară ce a cîștigat vînzătorul unui swap de varianță, nu ce putea vedea un investitor. Varianța realizată trecută este doar o prognoză pentru E^P_t[RV], deci VIX_t^2 - RV_{t-21,t} este o aproximare a primei ex ante.",
                 "incorrectExplanation": "Cele două diferă prin moment: versiunea ex post scade varianța realizată după t, deci nu poate fi folosită ca predictor la t."
             }
         },
@@ -619,13 +619,13 @@ window.MFM_DATA.quizzes['options'] = {
                 "title": "Prima de varianță Bitcoin",
                 "text": "Pentru Bitcoin (2021-2026) media DVOL a fost 60,3, iar media volatilității realizate în următoarele 30 de zile 51,7. Ce afirmație este corectă?",
                 "options": [
-                    "Și vânzătorii de opțiuni Bitcoin au câștigat în medie o primă, dar cu episoade lungi de primă negativă",
-                    "Opțiunile Bitcoin sunt mereu ieftine față de volatilitatea realizată",
+                    "Și vînzătorii de opțiuni Bitcoin au cîștigat în medie o primă, dar cu episoade lungi de primă negativă",
+                    "Opțiunile Bitcoin sînt mereu ieftine față de volatilitatea realizată",
                     "Prima este exact aceeași ca pentru S&P 500 în puncte de volatilitate",
                     "DVOL nu are legătură cu prețurile opțiunilor"
                 ],
-                "correctExplanation": "Prima a fost de aproximativ 8,5 puncte de volatilitate, pozitivă în 71% din zile: mai mare în puncte decât pentru S&P 500, dar mai puțin regulată.",
-                "incorrectExplanation": "DVOL este construit din prețurile opțiunilor Bitcoin; a depășit în medie volatilitatea realizată, deși mai puțin constant decât VIX."
+                "correctExplanation": "Prima a fost de aproximativ 8,5 puncte de volatilitate, pozitivă în 71% din zile: mai mare în puncte decît pentru S&P 500, dar mai puțin regulată.",
+                "incorrectExplanation": "DVOL este construit din prețurile opțiunilor Bitcoin; a depășit în medie volatilitatea realizată, deși mai puțin constant decît VIX."
             }
         },
         {
@@ -644,15 +644,15 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "Swap-ul de varianță",
-                "text": "Ce încasează și ce plătește vânzătorul unui swap de varianță?",
+                "text": "Ce încasează și ce plătește vînzătorul unui swap de varianță?",
                 "options": [
                     "Încasează varianța realizată, plătește un preț de exercitare fix",
-                    "Încasează un preț de exercitare fix (varianța implicită), plătește varianța realizată: câștiguri mici în majoritatea lunilor, pierderi mari în crahuri",
+                    "Încasează un preț de exercitare fix (varianța implicită), plătește varianța realizată: cîștiguri mici în majoritatea lunilor, pierderi mari în crahuri",
                     "Încasează nivelul VIX în puncte, nu plătește nimic",
                     "Încasează dividendele indicelui"
                 ],
-                "correctExplanation": "Plata pentru vânzător este notional înmulțit cu (prețul de exercitare minus varianța realizată); varianța realizată explodează în crahuri, deci pierderile sunt convexe.",
-                "incorrectExplanation": "Vânzătorul de varianță a vândut o asigurare împotriva volatilității: prețul de exercitare se fixează la început, varianța realizată se plătește la final."
+                "correctExplanation": "Plata pentru vînzător este notional înmulțit cu (prețul de exercitare minus varianța realizată); varianța realizată explodează în crahuri, deci pierderile sînt convexe.",
+                "incorrectExplanation": "Vînzătorul de varianță a vîndut o asigurare împotriva volatilității: prețul de exercitare se fixează la început, varianța realizată se plătește la final."
             }
         },
         {
@@ -673,12 +673,12 @@ window.MFM_DATA.quizzes['options'] = {
                 "title": "Găsiți eroarea AI: scadența",
                 "text": "Un asistent AI scrie: „Pentru un call la bani pe 30 de zile, puneți T = 30 în formula Black-Scholes, cu sigma = 0,20 și r = 0,04 pe an.” Ce este greșit?",
                 "options": [
-                    "T trebuie exprimat în ani, T = 30/365 = 0,082, pentru că sigma și r sunt anuale",
+                    "T trebuie exprimat în ani, T = 30/365 = 0,082, pentru că sigma și r sînt anuale",
                     "sigma trebuie introdus ca 20, nu 0,20",
                     "r trebuie transformat într-o rată zilnică, nu T",
                     "Black-Scholes nu poate evalua opțiuni la bani"
                 ],
-                "correctExplanation": "sigma și r sunt pe an, deci și timpul trebuie exprimat în ani; cu T = 30, call-ul este evaluat ca și cum ar avea 30 de ani până la scadență.",
+                "correctExplanation": "sigma și r sînt pe an, deci și timpul trebuie exprimat în ani; cu T = 30, call-ul este evaluat ca și cum ar avea 30 de ani pînă la scadență.",
                 "incorrectExplanation": "Verificați unitățile: toate datele de intrare Black-Scholes trebuie să folosească aceeași unitate de timp, iar volatilitatea intră ca număr zecimal."
             }
         },
@@ -698,9 +698,9 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "Găsiți eroarea AI: paritatea put-call",
-                "text": "Un asistent AI scrie: „Din paritatea put-call, P = C + S - K e^{-r tau}. Cu C = 4, S = 100, K = 105 și r = 0, put-ul valorează -1: îl cumpărați și sunteți plătiți.” Ce este greșit?",
+                "text": "Un asistent AI scrie: „Din paritatea put-call, P = C + S - K e^{-r tau}. Cu C = 4, S = 100, K = 105 și r = 0, put-ul valorează -1: îl cumpărați și sînteți plătiți.” Ce este greșit?",
                 "options": [
-                    "Nimic: prețurile negative ale put-urilor sunt posibile când ratele sunt zero",
+                    "Nimic: prețurile negative ale put-urilor sînt posibile cînd ratele sînt zero",
                     "Semnul este greșit: P = C - S + K e^{-r tau} = 4 - 100 + 105 = 9",
                     "Paritatea este valabilă doar pentru opțiuni americane",
                     "Cu r = 0, call-urile și put-urile au același preț, deci put-ul valorează 4"

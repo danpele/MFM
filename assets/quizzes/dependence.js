@@ -26,10 +26,10 @@ window.MFM_DATA.quizzes['dependence'] = {
                 title: "CML pe reziduuri GARCH",
                 text: "O copulă t este estimată prin verosimilitate maximă canonică (CML) pe rangurile reziduurilor standardizate GARCH. Față de același estimator pe rangurile inovațiilor adevărate, varianța sa asimptotică este:",
                 options: [
-                    "Mai mare, pentru că parametrii GARCH sunt estimați într-un prim pas",
+                    "Mai mare, pentru că parametrii GARCH sînt estimați într-un prim pas",
                     "Neschimbată: estimarea GARCH din primul pas nu afectează distribuția limită (Chen și Fan, 2006)",
                     "Mai mică, pentru că filtrarea elimină gruparea volatilității",
-                    "Nedefinită, pentru că rangurile reziduurilor nu sunt independente"
+                    "Nedefinită, pentru că rangurile reziduurilor nu sînt independente"
                 ],
                 correctExplanation: "Chen și Fan (2006) arată că CML pe rangurile reziduurilor GARCH estimate are aceeași limită ca pe inovațiile adevărate; în simularea Monte Carlo din curs abaterile standard au fost 0,0081 și 0,0082.",
                 incorrectExplanation: "Intuiția sugerează o penalizare pentru primul pas, dar pentru CML pe ranguri ale reziduurilor GARCH distribuția limită nu se schimbă; este necesar doar termenul de rang Genest, Ghoudi și Rivest."
@@ -51,7 +51,7 @@ window.MFM_DATA.quizzes['dependence'] = {
             },
             ro: {
                 title: 'Corelația acțiuni–obligațiuni',
-                text: 'Corelația zilnică SPY–TLT a fost -0,40 în 2002–2021 și 0,11 din 2022. Ce s-a întâmplat cu un portofoliu 60/40?',
+                text: 'Corelația zilnică SPY–TLT a fost -0,40 în 2002–2021 și 0,11 din 2022. Ce s-a întîmplat cu un portofoliu 60/40?',
                 options: [
                     'Volatilitatea lui a crescut de la circa 10,4% la 13,2%, chiar cu volatilitățile activelor neschimbate',
                     'Volatilitatea a scăzut, pentru că o corelație pozitivă reduce întotdeauna riscul',
@@ -82,11 +82,11 @@ window.MFM_DATA.quizzes['dependence'] = {
                 options: [
                     "Log-verosimilitatea copulei nu este concavă",
                     "Copula estimată este întotdeauna specificată greșit",
-                    "Randamentele financiare sunt dependente serial",
-                    "Pseudo-observațiile sunt ranguri estimate, ceea ce adaugă un termen de varianță din marginalele empirice (Genest, Ghoudi și Rivest, 1995)"
+                    "Randamentele financiare sînt dependente serial",
+                    "Pseudo-observațiile sînt ranguri estimate, ceea ce adaugă un termen de varianță din marginalele empirice (Genest, Ghoudi și Rivest, 1995)"
                 ],
-                correctExplanation: "Sandwich-ul A⁻¹ΣA⁻¹ adaugă W1(U) + W2(V) la scor; pentru copula Gaussiană S&P 500–Euro Stoxx 50 săptămânală, eroarea standard a lui ρ crește de la 0,0085 la 0,0137.",
-                incorrectExplanation: "Problema nu este concavitatea sau dependența serială: marginalele sunt estimate prin ranguri, iar această eroare de estimare trebuie să intre în varianță."
+                correctExplanation: "Sandwich-ul A⁻¹ΣA⁻¹ adaugă W1(U) + W2(V) la scor; pentru copula Gaussiană S&P 500–Euro Stoxx 50 săptămînală, eroarea standard a lui ρ crește de la 0,0085 la 0,0137.",
+                incorrectExplanation: "Problema nu este concavitatea sau dependența serială: marginalele sînt estimate prin ranguri, iar această eroare de estimare trebuie să intre în varianță."
             }
         },
         {
@@ -109,7 +109,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                 options: [
                     "Doar ρ: τ = (2/π) arcsin ρ pentru orice ν",
                     "Doar ν",
-                    "Atât ρ, cât și ν",
+                    "Atît ρ, cît și ν",
                     "De niciunul: τ este întotdeauna 0,5"
                 ],
                 correctExplanation: "Tau Kendall este același pentru toate copulele eliptice cu același ρ, deci τ identifică ρ, dar niciodată ν; ν vine din verosimilitate sau din cozi.",
@@ -132,12 +132,12 @@ window.MFM_DATA.quizzes['dependence'] = {
             },
             ro: {
                 title: 'Tranzacționarea asincronă',
-                text: 'Corelația zilnică SPY–Euro Stoxx 50 este 0,59, cea săptămânală 0,79. De ce diferă?',
+                text: 'Corelația zilnică SPY–Euro Stoxx 50 este 0,59, cea săptămînală 0,79. De ce diferă?',
                 options: [
-                    'Randamentele săptămânale sunt întotdeauna mai corelate pentru orice pereche de active',
+                    'Randamentele săptămînale sînt întotdeauna mai corelate pentru orice pereche de active',
                     'Datele zilnice conțin mai multe crize',
-                    'Europa se închide înaintea New York-ului, deci știrile americane ajung în prețurile europene cu o zi întârziere, iar corelația zilnică este deplasată spre zero',
-                    'Randamentele săptămânale elimină media'
+                    'Europa se închide înaintea New York-ului, deci știrile americane ajung în prețurile europene cu o zi întîrziere, iar corelația zilnică este deplasată spre zero',
+                    'Randamentele săptămînale elimină media'
                 ],
                 correctExplanation: 'Închiderile nesincrone împart un șoc comun pe două zile europene; corelația zilnică decalată (0,20) arată partea lipsă.',
                 incorrectExplanation: 'Cauza este tranzacționarea nesincronă între fusuri orare; frecvențele mai mici sau termenii decalați recuperează mișcarea comună.'
@@ -159,9 +159,9 @@ window.MFM_DATA.quizzes['dependence'] = {
             },
             ro: {
                 title: "Corelația posibilă",
-                text: "X = exp(Z) și Y = exp(3Z), cu Z având distribuția Normală standard, deci X și Y sunt variabile lognormale comonotone. Corelația lor Pearson este:",
+                text: "X = exp(Z) și Y = exp(3Z), cu Z avînd distribuția Normală standard, deci X și Y sînt variabile lognormale comonotone. Corelația lor Pearson este:",
                 options: [
-                    "1, pentru că variabilele comonotone sunt perfect corelate",
+                    "1, pentru că variabilele comonotone sînt perfect corelate",
                     "0, pentru că varianțele lor diferă",
                     "Aproximativ 0,16: (e^3 - 1) / sqrt((e - 1)(e^9 - 1))",
                     "Nu se poate calcula fără date"
@@ -242,13 +242,13 @@ window.MFM_DATA.quizzes['dependence'] = {
                 title: 'Estimarea în doi pași',
                 text: 'Care este o slăbiciune cunoscută a erorilor standard din pasul al doilea al estimării DCC?',
                 options: [
-                    'Sunt prea mari, pentru că primul pas este eficient',
-                    'Sunt exacte în eșantioane finite',
-                    'Ignoră eroarea de estimare a modelelor GARCH din primul pas, deci sunt prea mici',
+                    'Sînt prea mari, pentru că primul pas este eficient',
+                    'Sînt exacte în eșantioane finite',
+                    'Ignoră eroarea de estimare a modelelor GARCH din primul pas, deci sînt prea mici',
                     'Cer reziduuri cu distribuția Normală pentru a fi consistente'
                 ],
                 correctExplanation: 'Pasul 2 tratează volatilitățile GARCH ca fiind cunoscute; incertitudinea suplimentară din pasul 1 este ignorată.',
-                incorrectExplanation: 'Erorile standard din pasul 2 ignoră eroarea din pasul 1 și sunt deci prea mici.'
+                incorrectExplanation: 'Erorile standard din pasul 2 ignoră eroarea din pasul 1 și sînt deci prea mici.'
             }
         },
         {
@@ -267,7 +267,7 @@ window.MFM_DATA.quizzes['dependence'] = {
             },
             ro: {
                 title: 'Persistența DCC',
-                text: 'Pentru SPY–TLT estimările DCC sunt a = 0,052, b = 0,934. Care este timpul de înjumătățire aproximativ al unui șoc asupra recursiei DCC Q_t?',
+                text: 'Pentru SPY–TLT estimările DCC sînt a = 0,052, b = 0,934. Care este timpul de înjumătățire aproximativ al unui șoc asupra recursiei DCC Q_t?',
                 options: [
                     'Aproximativ 1 zi',
                     'Aproximativ 48 de zile',
@@ -301,7 +301,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     'Pentru că testul are doi parametri',
                     'Pentru că sub a = 0 parametrul b nu este identificat (o problemă de tip Davies)'
                 ],
-                correctExplanation: 'Când a = 0, b dispare din model; asimptotica standard nu mai funcționează, iar referința hi-pătrat este doar un ghid aproximativ.',
+                correctExplanation: 'Cînd a = 0, b dispare din model; asimptotica standard nu mai funcționează, iar referința hi-pătrat este doar un ghid aproximativ.',
                 incorrectExplanation: 'Parametrul de perturbație b nu este identificat sub ipoteza nulă, ceea ce strică asimptotica hi-pătrat standard.'
             }
         },
@@ -348,11 +348,11 @@ window.MFM_DATA.quizzes['dependence'] = {
             },
             ro: {
                 title: "Forbes–Rigobon cu un șoc comun",
-                text: "Într-o criză, un șoc global crește atât varianța pieței-sursă, cât și varianța idiosincratică a pieței-țintă. Corelația corectată Forbes–Rigobon atunci:",
+                text: "Într-o criză, un șoc global crește atît varianța pieței-sursă, cît și varianța idiosincratică a pieței-țintă. Corelația corectată Forbes–Rigobon atunci:",
                 options: [
                     "Este nedeplasată, pentru că corecția folosește raportul varianțelor",
-                    "Corectează excesiv, deplasând testul spre „nicio contagiune” (Corsetti, Pericoli și Sbracia, 2005)",
-                    "Corectează insuficient, deplasând testul spre contagiune",
+                    "Corectează excesiv, deplasînd testul spre „nicio contagiune” (Corsetti, Pericoli și Sbracia, 2005)",
+                    "Corectează insuficient, deplasînd testul spre contagiune",
                     "Devine negativă prin construcție"
                 ],
                 correctExplanation: "Corecția presupune o varianță idiosincratică constantă; un șoc comun umflă raportul varianțelor și elimină prea mult din creșterea corelației, deci contagiunea reală poate fi ascunsă.",
@@ -429,14 +429,14 @@ window.MFM_DATA.quizzes['dependence'] = {
             },
             ro: {
                 title: 'Corelația de depășire',
-                text: 'Pentru distribuția Normală bivariată, ce se întâmplă cu corelația de depășire când pragul se mută spre cozi?',
+                text: 'Pentru distribuția Normală bivariată, ce se întîmplă cu corelația de depășire cînd pragul se mută spre cozi?',
                 options: [
                     'Crește spre 1',
-                    'Rămâne egală cu ρ',
+                    'Rămîne egală cu ρ',
                     'Devine negativă',
                     'Scade spre 0'
                 ],
-                correctExplanation: 'Extremele Normale sunt asimptotic independente; datele arată valori mult mai mari (de exemplu 0,80 pentru pierderi comune la q = 0,10, față de 0,41 sub normalitate).',
+                correctExplanation: 'Extremele Normale sînt asimptotic independente; datele arată valori mult mai mari (de exemplu 0,80 pentru pierderi comune la q = 0,10, față de 0,41 sub normalitate).',
                 incorrectExplanation: 'Sub normalitate, condiționarea pe extreme duce corelația spre zero.'
             }
         },
@@ -460,7 +460,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                 options: [
                     "Exact pentru orice T",
                     "Prea larg, deci conservator",
-                    "Valid când T depășește 250",
+                    "Valid cînd T depășește 250",
                     "Prea îngust: varianța corelației depinde de momentele de ordinul patru și de dependența serială a produselor încrucișate"
                 ],
                 correctExplanation: "Pentru SPY–TLT în 2002–2021, eroarea standard HAC prin metoda delta a fost 0,0227, față de 0,0120 din formula Fisher, de circa 1,9 ori mai mare.",
@@ -488,7 +488,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     "Cu nivel real prea mare: data a fost aleasă din date; folosiți un test cu dată necunoscută, precum Wied, Krämer și Dehling (2012)",
                     "Cu nivel exact, pentru că data este fixată înainte de calculul statisticii",
                     "Cu nivel real prea mic, pentru că graficul netezește datele",
-                    "Valid oricând eșantionul este mare"
+                    "Valid oricînd eșantionul este mare"
                 ],
                 correctExplanation: "O dată aleasă după ce am văzut datele este ea însăși aleatoare, deci distribuția statisticii sub ipoteza nulă depinde de regula de alegere, iar valorile critice Normale resping prea des; un test cu dată necunoscută, precum Wied, Krämer și Dehling (2012), este definit cu propria limită de tip punte browniană. Pe reziduurile SPY–TLT el pune ruptura în august 2020, nu în ianuarie 2022.",
                 incorrectExplanation: "O dată aleasă din date face ca distribuția sub ipoteza nulă să depindă de modul de alegere a datei, deci valorile critice Normale resping prea des."
@@ -537,11 +537,11 @@ window.MFM_DATA.quizzes['dependence'] = {
             },
             ro: {
                 title: 'Adecvarea',
-                text: 'Pentru JPM–BAC (T = 4202), toate cele cinci copule statice sunt respinse de testul Rosenblatt, deși copula t are de departe cel mai bun AIC. Concluzia cea mai rezonabilă este:',
+                text: 'Pentru JPM–BAC (T = 4202), toate cele cinci copule statice sînt respinse de testul Rosenblatt, deși copula t are de departe cel mai bun AIC. Concluzia cea mai rezonabilă este:',
                 options: [
                     'Copula t este inutilă',
                     'Testul este greșit',
-                    'Cu mii de observații sunt detectate și abateri mici; o copulă statică poate rata și dependența variabilă în timp',
+                    'Cu mii de observații sînt detectate și abateri mici; o copulă statică poate rata și dependența variabilă în timp',
                     'AIC și testele de adecvare coincid întotdeauna'
                 ],
                 correctExplanation: 'Eșantioanele mari dau putere mare împotriva abaterilor mici; dependența variabilă în timp este o explicație posibilă (o copulă t dinamică se potrivește mult mai bine pentru JPM–BAC). AIC ordonează modelele, testul verifică adecvarea absolută.',
@@ -568,10 +568,10 @@ window.MFM_DATA.quizzes['dependence'] = {
                 options: [
                     'Crahurile comune se află în colțul superior al copulei pierderilor, unde Gumbel are dependență în cozi, iar Clayton nu',
                     'Clayton nu poate fi estimată pe pierderi',
-                    'Gumbel este întotdeauna mai bună decât Clayton',
-                    'Pierderile sunt independente'
+                    'Gumbel este întotdeauna mai bună decît Clayton',
+                    'Pierderile sînt independente'
                 ],
-                correctExplanation: 'Gumbel pe pierderi surprinde crahurile comune (λU = 0,26); Clayton pune dependența în colțul câștigurilor comune.',
+                correctExplanation: 'Gumbel pe pierderi surprinde crahurile comune (λU = 0,26); Clayton pune dependența în colțul cîștigurilor comune.',
                 incorrectExplanation: 'Coada superioară a pierderilor conține crahurile comune; doar Gumbel pune dependența acolo.'
             }
         },
@@ -598,7 +598,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     'Nu putea fi calibrată',
                     'Folosea tau al lui Kendall'
                 ],
-                correctExplanation: 'Falimentele comune nu erau imposibile în model (la o probabilitate de faliment finită ele apar), dar cu λ = 0 și o singură corelație statică, calibrată în anii calmi, modelul dădea probabilități ale multor falimente extreme mai mici decât modelele cu dependență în cozi.',
+                correctExplanation: 'Falimentele comune nu erau imposibile în model (la o probabilitate de faliment finită ele apar), dar cu λ = 0 și o singură corelație statică, calibrată în anii calmi, modelul dădea probabilități ale multor falimente extreme mai mici decît modelele cu dependență în cozi.',
                 incorrectExplanation: 'Problema a fost dependența asimptotică zero în cozi combinată cu o calibrare statică, nu imposibilitatea falimentelor comune.'
             }
         },
@@ -618,14 +618,14 @@ window.MFM_DATA.quizzes['dependence'] = {
             },
             ro: {
                 title: 'Rețeaua băncilor',
-                text: 'În arborele de acoperire minimă al celor șase bănci (randamente săptămânale 2010–2026), cum sunt legate băncile românești de celelalte?',
+                text: 'În arborele de acoperire minimă al celor șase bănci (randamente săptămînale 2010–2026), cum sînt legate băncile românești de celelalte?',
                 options: [
                     'Prin JPM',
-                    'Nu sunt legate',
+                    'Nu sînt legate',
                     'Doar prin Deutsche Bank, cu cea mai mare corelație din arbore',
                     'Prin legătura BNP–BRD, una dintre cele mai slabe muchii (0,35)'
                 ],
-                correctExplanation: 'Arborele leagă TLV și BRD (0,65) și le atașează zonei euro prin BNP–BRD (0,35): băncile românești sunt cele mai puțin conectate.',
+                correctExplanation: 'Arborele leagă TLV și BRD (0,65) și le atașează zonei euro prin BNP–BRD (0,35): băncile românești sînt cele mai puțin conectate.',
                 incorrectExplanation: 'Blocul românesc este legat prin BNP–BRD, o legătură slabă.'
             }
         },
@@ -645,15 +645,15 @@ window.MFM_DATA.quizzes['dependence'] = {
             },
             ro: {
                 title: 'Integrarea după 2020',
-                text: 'Corelația săptămânală BET–Euro Stoxx 50 a crescut de la 0,45 (2010–2019) la 0,62 (2020–2026), cu un interval bootstrap de 95% pentru schimbare de [-0,05; 0,34]. Care este concluzia cea mai corectă?',
+                text: 'Corelația săptămînală BET–Euro Stoxx 50 a crescut de la 0,45 (2010–2019) la 0,62 (2020–2026), cu un interval bootstrap de 95% pentru schimbare de [-0,05; 0,34]. Care este concluzia cea mai corectă?',
                 options: [
                     'Integrare puternică și semnificativă',
                     'România s-a decuplat de zona euro',
                     'Dovezi modeste și fragile: intervalul conține zero, iar creșterea este concentrată în anii de criză',
                     'Corelația nu s-a schimbat deloc'
                 ],
-                correctExplanation: 'Estimarea punctuală crește, dar intervalul conține zero, excluderea săptămânilor crahului din 2020 o reduce, iar dependența în coada inferioară nu a crescut.',
-                incorrectExplanation: 'Schimbarea nu este semnificativă la 5% și depinde de săptămânile de criză.'
+                correctExplanation: 'Estimarea punctuală crește, dar intervalul conține zero, excluderea săptămînilor crahului din 2020 o reduce, iar dependența în coada inferioară nu a crescut.',
+                incorrectExplanation: 'Schimbarea nu este semnificativă la 5% și depinde de săptămînile de criză.'
             }
         },
         {
@@ -704,7 +704,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     "Pentru copulele eliptice rho = sin(pi tau / 2) = 0,588; formula folosită este legătura Gaussiană pentru rho Spearman",
                     "Pentru copulele eliptice rho = tau, deci rho = 0,4",
                     "Copula t nu are parametru de corelație, doar grade de libertate",
-                    "Tau Kendall trebuie întâi transformat în corelația Pearson a randamentelor brute"
+                    "Tau Kendall trebuie întîi transformat în corelația Pearson a randamentelor brute"
                 ],
                 correctExplanation: "Pentru copulele Gaussiană și t, tau = (2/pi) arcsin(rho), deci rho = sin(pi tau / 2) = sin(0,2 pi) = 0,588. Relația rho = 2 sin(pi rho_S / 6) leagă copula Gaussiană de rho_S Spearman, nu de tau Kendall.",
                 incorrectExplanation: "Inversarea pentru tau Kendall este rho = sin(pi tau / 2), care dă 0,588; 2 sin(pi x / 6) este relația pentru Spearman."

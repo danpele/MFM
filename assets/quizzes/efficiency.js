@@ -79,7 +79,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "title": "Martingala și volatilitatea",
                 "text": "Dacă randamentele în exces formează un joc echitabil (diferență de martingală), ce afirmație este adevărată?",
                 "options": [
-                    "Randamentele sunt necorelate cu trecutul, dar volatilitatea lor poate fi totuși predictibilă",
+                    "Randamentele sînt necorelate cu trecutul, dar volatilitatea lor poate fi totuși predictibilă",
                     "Randamentele trebuie să fie independente și identic distribuite",
                     "Pătratele randamentelor trebuie să fie necorelate",
                     "Volatilitatea trebuie să fie constantă în timp"
@@ -106,8 +106,8 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "title": "Grossman–Stiglitz",
                 "text": "Ce implică paradoxul Grossman–Stiglitz?",
                 "options": [
-                    "Piețele sunt întotdeauna perfect eficiente",
-                    "Trebuie să rămână o anumită ineficiență, suficientă cât să plătească traderii informați pentru informația costisitoare",
+                    "Piețele sînt întotdeauna perfect eficiente",
+                    "Trebuie să rămînă o anumită ineficiență, suficientă cît să plătească traderii informați pentru informația costisitoare",
                     "Prețurile nu reflectă niciodată informația privată",
                     "Arbitrajul este gratuit și fără risc"
                 ],
@@ -139,7 +139,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Pentru că S&P 500 este un indice de preț"
                 ],
                 "correctExplanation": "Cu grupare a volatilității, dispersia autocorelației de selecție este suma lui e_t² e_{t-1}² împărțită la pătratul sumei pătratelor, care depășește 1/T.",
-                "incorrectExplanation": "Gruparea volatilității, nu lungimea selecției sau media, face ca eroarea standard robustă să fie mai mare decât 1/√T."
+                "incorrectExplanation": "Gruparea volatilității, nu lungimea selecției sau media, face ca eroarea standard robustă să fie mai mare decît 1/√T."
             }
         },
         {
@@ -158,7 +158,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
             },
             "ro": {
                 "title": "Distribuția nulă a raportului dispersiilor",
-                "text": "Sub RW1, T = 6 714 randamente zilnice și VR(2) estimat = 0,901. Cât este aproximativ statistica z omoscedastică?",
+                "text": "Sub RW1, T = 6 714 randamente zilnice și VR(2) estimat = 0,901. Cît este aproximativ statistica z omoscedastică?",
                 "options": [
                     "−8,1, pentru că dispersia asimptotică a lui √T(VR(2) − 1) este 1",
                     "−0,099, distanța lui VR(2) față de unu",
@@ -185,7 +185,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
             },
             "ro": {
                 "title": "Exponentul Hurst al unui proces cu memorie scurtă",
-                "text": "Pentru un AR(1) cu ρ = −0,1, către ce tinde exponentul Hurst implicat H(q) = 0,5 + ln VR(q)/(2 ln q) când q → ∞?",
+                "text": "Pentru un AR(1) cu ρ = −0,1, către ce tinde exponentul Hurst implicat H(q) = 0,5 + ln VR(q)/(2 ln q) cînd q → ∞?",
                 "options": [
                     "0,45, valoarea la q = 20",
                     "0, pentru că procesul este anti-persistent",
@@ -193,7 +193,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "0,5, pentru că VR(q) tinde la constanta (1 + ρ)/(1 − ρ)"
                 ],
                 "correctExplanation": "Pentru memorie scurtă cu dispersie pe termen lung pozitivă VR(q) → 1 + 2Σρ_k = (1 + ρ)/(1 − ρ) ≈ 0,818, o constantă pozitivă, deci ln VR(q)/(2 ln q) → 0 și H(q) → 0,5.",
-                "incorrectExplanation": "VR(q) al unui proces cu memorie scurtă și dispersie pe termen lung pozitivă, precum acest AR(1), converge la o constantă pozitivă, deci logaritmul rămâne mărginit în timp ce ln q crește: H(q) → 0,5. Valorile sub 0,5 la q finit reflectă inversarea pe termen scurt, nu memoria lungă."
+                "incorrectExplanation": "VR(q) al unui proces cu memorie scurtă și dispersie pe termen lung pozitivă, precum acest AR(1), converge la o constantă pozitivă, deci logaritmul rămîne mărginit în timp ce ln q crește: H(q) → 0,5. Valorile sub 0,5 la q finit reflectă inversarea pe termen scurt, nu memoria lungă."
             }
         },
         {
@@ -243,7 +243,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "options": [
                     "Este mai puternic împotriva oricărei alternative",
                     "Nu are nevoie de randamente",
-                    "Controlează pragul global când se testează mai multe orizonturi; valoarea critică de 5% devine 2,49",
+                    "Controlează pragul global cînd se testează mai multe orizonturi; valoarea critică de 5% devine 2,49",
                     "Elimină gruparea volatilității"
                 ],
                 "correctExplanation": "Testarea mai multor orizonturi mărește șansa unei respingeri false; maximul |z*| se compară cu valoarea critică a modulului maxim studentizat.",
@@ -268,8 +268,8 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "title": "Testul secvențelor",
                 "text": "Indicele BET are statistica testului secvențelor z = −6,05. Ce înseamnă?",
                 "options": [
-                    "Mai puține secvențe decât ne-am aștepta: semnele persistă (dependență pozitivă a semnelor)",
-                    "Mai multe secvențe decât ne-am aștepta: inversări frecvente",
+                    "Mai puține secvențe decît ne-am aștepta: semnele persistă (dependență pozitivă a semnelor)",
+                    "Mai multe secvențe decît ne-am aștepta: inversări frecvente",
                     "Randamentele urmează distribuția Normală",
                     "Testul nu se poate aplica indicilor"
                 ],
@@ -354,7 +354,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "R/S cere randamente cu distribuția Normală",
                     "R/S ignoră semnul randamentelor"
                 ],
-                "correctExplanation": "Lo înlocuiește abaterea standard cu o abatere standard de termen lung (HAC), astfel încât memoria scurtă nu mai imită memoria lungă; sub memorie scurtă V se află în [0,809; 1,862] cu probabilitate 95%.",
+                "correctExplanation": "Lo înlocuiește abaterea standard cu o abatere standard de termen lung (HAC), astfel încît memoria scurtă nu mai imită memoria lungă; sub memorie scurtă V se află în [0,809; 1,862] cu probabilitate 95%.",
                 "incorrectExplanation": "Statistica modificată face testul robust la dependența pe termen scurt."
             }
         },
@@ -403,13 +403,13 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "title": "R² în afara selecției",
                 "text": "Un predictor are R² în selecție de 2%, dar R²_OS în afara selecției de −1,5% față de media istorică. Ce înseamnă?",
                 "options": [
-                    "Prognozele lui recursive au o eroare pătratică medie mai mare decât media istorică recursivă",
+                    "Prognozele lui recursive au o eroare pătratică medie mai mare decît media istorică recursivă",
                     "R² din selecție a fost calculat greșit",
-                    "Randamentele sunt imprevizibile chiar și în selecție",
+                    "Randamentele sînt imprevizibile chiar și în selecție",
                     "Un R² negativ poate proveni doar dintr-o eroare de cod"
                 ],
-                "correctExplanation": "R²_OS = 1 − Σ(r − r̂)²/Σ(r − r̄)² este negativ când prognozele modelului pierd în fața mediei istorice în afara selecției, ca la majoritatea predictorilor din Welch și Goyal (2008).",
-                "incorrectExplanation": "R²_OS compară erorile de prognoză cu cele ale mediei istorice; poate fi negativ și adesea este, când eroarea de estimare și instabilitatea depășesc potrivirea din selecție."
+                "correctExplanation": "R²_OS = 1 − Σ(r − r̂)²/Σ(r − r̄)² este negativ cînd prognozele modelului pierd în fața mediei istorice în afara selecției, ca la majoritatea predictorilor din Welch și Goyal (2008).",
+                "incorrectExplanation": "R²_OS compară erorile de prognoză cu cele ale mediei istorice; poate fi negativ și adesea este, cînd eroarea de estimare și instabilitatea depășesc potrivirea din selecție."
             }
         },
         {
@@ -431,12 +431,12 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "text": "Pe ferestre mobile, S&P 500 respinge mersul aleator (|z*(5)| > 1,96) în 6,4% din ferestre. Cum trebuie citit acest rezultat?",
                 "options": [
                     "Ca dovadă puternică de ineficiență în 6,4% din ani",
-                    "Ca fiind aproape de cei 5% așteptați din întâmplare, ținând cont că ferestrele suprapuse sunt corelate",
+                    "Ca fiind aproape de cei 5% așteptați din întîmplare, ținînd cont că ferestrele suprapuse sînt corelate",
                     "Ca dovadă că S&P 500 este perfect eficient",
                     "Ca semn că testul nu are putere"
                 ],
-                "correctExplanation": "Sub ipoteza nulă circa 5% din ferestre resping din întâmplare, iar ferestrele suprapuse nu sunt dovezi independente.",
-                "incorrectExplanation": "Proporția trebuie comparată cu nivelul întâmplător de 5%, iar respingerile consecutive pe ferestre suprapuse sunt corelate."
+                "correctExplanation": "Sub ipoteza nulă circa 5% din ferestre resping din întîmplare, iar ferestrele suprapuse nu sînt dovezi independente.",
+                "incorrectExplanation": "Proporția trebuie comparată cu nivelul întîmplător de 5%, iar respingerile consecutive pe ferestre suprapuse sînt corelate."
             }
         },
         {
@@ -460,7 +460,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Concluziile despre eficiența cripto depind de test, de selecție și de inferența folosită",
                     "Urquhart a făcut o greșeală de calcul",
                     "Bitcoin a fost întotdeauna perfect eficient",
-                    "Testele anuale sunt mai puternice decât cele pe întreaga selecție"
+                    "Testele anuale sînt mai puternice decît cele pe întreaga selecție"
                 ],
                 "correctExplanation": "Baterii de teste diferite, surse de prețuri diferite și erori clasice versus robuste duc la concluzii diferite; un singur an de date are și putere mică.",
                 "incorrectExplanation": "Contrastul arată că rezultatele privind eficiența depind de test și de inferență, nu că un studiu este greșit."
@@ -482,14 +482,14 @@ window.MFM_DATA.quizzes['efficiency'] = {
             },
             "ro": {
                 "title": "Zile de eveniment comune",
-                "text": "Două bănci sunt afectate de același anunț, în aceeași zi. De ce poate un test transversal care tratează randamentele lor anormale ca independente să respingă prea des?",
+                "text": "Două bănci sînt afectate de același anunț, în aceeași zi. De ce poate un test transversal care tratează randamentele lor anormale ca independente să respingă prea des?",
                 "options": [
                     "Pentru că astfel de teste cer cel puțin 30 de firme",
                     "Pentru că ignoră fereastra de estimare",
-                    "Pentru că randamentele anormale sunt corelate transversal, deci dispersia mediei lor este subestimată",
+                    "Pentru că randamentele anormale sînt corelate transversal, deci dispersia mediei lor este subestimată",
                     "Pentru că băncile au beta peste unu"
                 ],
-                "correctExplanation": "Cu o dată comună a evenimentului reziduurile sunt corelate (r̄ > 0); dispersia randamentului anormal mediu este mai mare decât σ²/N. Kolari și Pynnönen (2010) corectează pentru aceasta; un test pe portofoliu o face automat.",
+                "correctExplanation": "Cu o dată comună a evenimentului reziduurile sînt corelate (r̄ > 0); dispersia randamentului anormal mediu este mai mare decît σ²/N. Kolari și Pynnönen (2010) corectează pentru aceasta; un test pe portofoliu o face automat.",
                 "incorrectExplanation": "Corelația transversală a randamentelor anormale într-o zi comună umflă dispersia mediei lor cu (1 + (N − 1)r̄); ignorată, face t prea mare."
             }
         },
@@ -514,10 +514,10 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Pentru a crește R²",
                     "Pentru a elimina valorile extreme",
                     "Pentru ca estimatorii coeficienților să fie nedeplasați",
-                    "Pentru că reziduurile sunt heteroscedastice și autocorelate, deci erorile standard OLS nu sunt valide"
+                    "Pentru că reziduurile sînt heteroscedastice și autocorelate, deci erorile standard OLS nu sînt valide"
                 ],
-                "correctExplanation": "Erorile standard HAC rămân valide sub heteroscedasticitate și autocorelație; coeficienții nu se schimbă.",
-                "incorrectExplanation": "HAC schimbă doar erorile standard, făcând inferența validă când reziduurile sunt heteroscedastice și autocorelate."
+                "correctExplanation": "Erorile standard HAC rămîn valide sub heteroscedasticitate și autocorelație; coeficienții nu se schimbă.",
+                "incorrectExplanation": "HAC schimbă doar erorile standard, făcînd inferența validă cînd reziduurile sînt heteroscedastice și autocorelate."
             }
         },
         {
@@ -562,16 +562,16 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "incorrectExplanation": "Under the null, roughly 5% of tests reject by chance; this is why multiple testing must be corrected."
             },
             "ro": {
-                "title": "Anomalii din întâmplare",
-                "text": "În curs au fost testate 2000 de reguli aleatoare fără sens pe S&P 500. Aproximativ câte au fost „semnificative” la 5%?",
+                "title": "Anomalii din întîmplare",
+                "text": "În curs au fost testate 2000 de reguli aleatoare fără sens pe S&P 500. Aproximativ cîte au fost „semnificative” la 5%?",
                 "options": [
-                    "Aproximativ 5%, cât promite testul sub ipoteza nulă",
-                    "Niciuna, pentru că regulile sunt aleatoare",
+                    "Aproximativ 5%, cît promite testul sub ipoteza nulă",
+                    "Niciuna, pentru că regulile sînt aleatoare",
                     "Aproximativ 50%",
                     "Toate, pentru că S&P 500 este ineficient"
                 ],
                 "correctExplanation": "Aproximativ 4,9% au avut |t| > 1,96: încercarea multor reguli și raportarea celei mai bune produce mereu o anomalie aparentă (data snooping).",
-                "incorrectExplanation": "Sub ipoteza nulă, aproximativ 5% din teste resping din întâmplare; de aceea testarea multiplă trebuie corectată."
+                "incorrectExplanation": "Sub ipoteza nulă, aproximativ 5% din teste resping din întîmplare; de aceea testarea multiplă trebuie corectată."
             }
         },
         {
@@ -590,14 +590,14 @@ window.MFM_DATA.quizzes['efficiency'] = {
             },
             "ro": {
                 "title": "Deplasarea Stambaugh",
-                "text": "Un predictor este foarte persistent (ρ = 0,99), iar inovațiile lui sunt puternic negativ corelate cu inovațiile randamentelor. În selecții mici, panta OLS a randamentelor pe predictorul decalat este…",
+                "text": "Un predictor este foarte persistent (ρ = 0,99), iar inovațiile lui sînt puternic negativ corelate cu inovațiile randamentelor. În selecții mici, panta OLS a randamentelor pe predictorul decalat este…",
                 "options": [
                     "Nedeplasată, pentru că OLS este BLUE",
                     "Deplasată spre zero",
                     "Inconsistentă",
                     "Deplasată în sus"
                 ],
-                "correctExplanation": "E[β̂ − β] ≈ −(σ_uv/σ_v²)(1 + 3ρ)/T; cu σ_uv < 0 deplasarea este pozitivă, deci predictibilitatea pare mai puternică decât este (Stambaugh, 1999).",
+                "correctExplanation": "E[β̂ − β] ≈ −(σ_uv/σ_v²)(1 + 3ρ)/T; cu σ_uv < 0 deplasarea este pozitivă, deci predictibilitatea pare mai puternică decît este (Stambaugh, 1999).",
                 "incorrectExplanation": "Regresorul este predeterminat, nu strict exogen, deci OLS este deplasat: deplasarea în jos a lui ρ̂ trece în β̂ prin corelația negativă a inovațiilor și îl împinge în sus."
             }
         },
@@ -624,7 +624,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Momentum-ul bate întotdeauna strategia cumpără-și-păstrează",
                     "Un tipar semnificativ statistic nu adaugă neapărat valoare economică față de un reper simplu"
                 ],
-                "correctExplanation": "O mare parte din randamentul momentum este prima de risc a acțiunilor câștigată pe pozițiile lungi; semnificația față de zero nu este semnificație față de cumpără-și-păstrează.",
+                "correctExplanation": "O mare parte din randamentul momentum este prima de risc a acțiunilor cîștigată pe pozițiile lungi; semnificația față de zero nu este semnificație față de cumpără-și-păstrează.",
                 "incorrectExplanation": "Respingerea statistică nu este același lucru cu o îmbunătățire exploatabilă: comparați cu reperul relevant și cu costurile."
             }
         },
@@ -644,7 +644,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
             },
             "ro": {
                 "title": "Găsiți eroarea AI: raportul dispersiilor și ρ₁",
-                "text": "Un asistent AI scrie: „VR(2) = 0,90. Deoarece VR(2) = 1 + 2ρ₁, autocorelația de ordinul întâi este ρ₁ = −0,05.” Ce este greșit?",
+                "text": "Un asistent AI scrie: „VR(2) = 0,90. Deoarece VR(2) = 1 + 2ρ₁, autocorelația de ordinul întîi este ρ₁ = −0,05.” Ce este greșit?",
                 "options": [
                     "VR(q) = 1 + 2 Σ (1 − k/q) ρ_k, deci VR(2) = 1 + ρ₁ și ρ₁ ≈ −0,10",
                     "VR(2) = 0,90 implică ρ₁ = +0,10",

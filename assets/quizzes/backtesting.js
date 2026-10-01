@@ -106,13 +106,13 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "title": "Puterea testelor de acoperire",
                 "text": "De ce testele de acoperire au putere redusă pe un an de VaR 1%?",
                 "options": [
-                    "Pentru că randamentele zilnice sunt Normale",
+                    "Pentru că randamentele zilnice sînt Normale",
                     "Pentru că se așteaptă doar circa 2,5 depășiri, deci modelele greșite produc des numărări acceptabile",
                     "Pentru că aproximarea hi-pătrat este exactă",
-                    "Pentru că depășirile sunt mereu independente"
+                    "Pentru că depășirile sînt mereu independente"
                 ],
                 "correctExplanation": "Cu T = 250 și alpha = 1%, numărul așteptat este 2,5; un model cu rata reală de 2% cade totuși în regiunea de acceptare (1--6 depășiri) aproximativ de trei ori din patru.",
-                "incorrectExplanation": "Evenimentele din coadă sunt rare: un an conține prea puține depășiri pentru a separa modelele bune de cele mediocre."
+                "incorrectExplanation": "Evenimentele din coadă sînt rare: un an conține prea puține depășiri pentru a separa modelele bune de cele mediocre."
             }
         },
         {
@@ -192,8 +192,8 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "O distribuție Normală a pierderilor",
                     "Prea multe durate scurte: depășirile vin grupate"
                 ],
-                "correctExplanation": "b = 1 este cazul fără memorie (exponențial); b < 1 înseamnă că intervalele scurte dintre depășiri sunt prea frecvente, semnul grupării. Pe S&P 500, HS are b = 0,52.",
-                "incorrectExplanation": "O formă sub unu înseamnă depășiri grupate: duratele scurte sunt suprareprezentate."
+                "correctExplanation": "b = 1 este cazul fără memorie (exponențial); b < 1 înseamnă că intervalele scurte dintre depășiri sînt prea frecvente, semnul grupării. Pe S&P 500, HS are b = 0,52.",
+                "incorrectExplanation": "O formă sub unu înseamnă depășiri grupate: duratele scurte sînt suprareprezentate."
             }
         },
         {
@@ -214,12 +214,12 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "title": "DQ versus Christoffersen",
                 "text": "Depășirile unui model tind să apară la cinci zile după o depășire anterioară, iar probabilitatea de depășire în ziua de după o depășire este normală. Ce test este construit să detecteze aceasta?",
                 "options": [
-                    "Testul de independență Christoffersen, cu lanț Markov de ordinul întâi",
+                    "Testul de independență Christoffersen, cu lanț Markov de ordinul întîi",
                     "Testul POF Kupiec",
                     "Semaforul Basel",
-                    "Testul DQ cu depășiri întârziate până la decalajul 5 (sau testul de durată)"
+                    "Testul DQ cu depășiri întîrziate pînă la decalajul 5 (sau testul de durată)"
                 ],
-                "correctExplanation": "Regresia DQ a lui Hit_t pe depășirile întârziate și pe nivelul VaR detectează previzibilitatea la orice decalaj inclus; testul de durată vede și el distanțele neobișnuite. Un lanț de ordinul întâi compară doar ziua de ieri cu cea de azi.",
+                "correctExplanation": "Regresia DQ a lui Hit_t pe depășirile întîrziate și pe nivelul VaR detectează previzibilitatea la orice decalaj inclus; testul de durată vede și el distanțele neobișnuite. Un lanț de ordinul întîi compară doar ziua de ieri cu cea de azi.",
                 "incorrectExplanation": "Numărările de acoperire și semaforul ignoră momentul depășirilor, iar testul Markov privește doar o zi înapoi, deci un tipar la decalajul 5 le scapă tuturor."
             }
         },
@@ -247,7 +247,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "Testul de acoperire condiționată Christoffersen este supradimensionat"
                 ],
                 "correctExplanation": "La T = 250, P(x = 0) = 0,99^250 = 8,1% se află deja în regiunea de respingere Kupiec, deci mărimea exactă este de circa 9,5%; testul de durată nu este definit în 28% din eșantioane și este supradimensionat, iar CC este subdimensionat.",
-                "incorrectExplanation": "Cu doar 2,5 depășiri așteptate, nivelurile asimptotice hi-pătrat nu sunt atinse: mărimea trebuie simulată la lungimea eșantionului folosit."
+                "incorrectExplanation": "Cu doar 2,5 depășiri așteptate, nivelurile asimptotice hi-pătrat nu sînt atinse: mărimea trebuie simulată la lungimea eșantionului folosit."
             }
         },
         {
@@ -266,10 +266,10 @@ window.MFM_DATA.quizzes['backtesting'] = {
             },
             "ro": {
                 "title": "De ce ES este dificil",
-                "text": "De ce ES este mai greu de testat decât VaR?",
+                "text": "De ce ES este mai greu de testat decît VaR?",
                 "options": [
                     "Depinde de mărimea pierderilor de dincolo de VaR, iar doar circa alpha T zile din coadă aduc informație",
-                    "Este întotdeauna mai mic decât VaR",
+                    "Este întotdeauna mai mic decît VaR",
                     "Nu poate fi calculat pentru distribuții cu cozi groase",
                     "Reglementatorii nu permit teste pentru ES"
                 ],
@@ -327,7 +327,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "este consistentă dacă T este suficient de mare",
                     "este echivalentă cu clasificarea după Z1"
                 ],
-                "correctExplanation": "ES singur nu este elicitabil: mulțimile lui de nivel nu sunt convexe, deci niciun scor care depinde doar de ES nu recompensează valoarea adevărată; în plus, zilele cu depășire depind de prognoza VaR. Clasificarea consistentă cere un scor comun (VaR, ES), precum FZ0.",
+                "correctExplanation": "ES singur nu este elicitabil: mulțimile lui de nivel nu sînt convexe, deci niciun scor care depinde doar de ES nu recompensează valoarea adevărată; în plus, zilele cu depășire depind de prognoza VaR. Clasificarea consistentă cere un scor comun (VaR, ES), precum FZ0.",
                 "incorrectExplanation": "Un eșantion mai mare nu repară un scor inconsistent; ES este o medie condiționată doar dat fiind VaR, pe care eroarea pătratică nu îl punctează."
             }
         },
@@ -347,14 +347,14 @@ window.MFM_DATA.quizzes['backtesting'] = {
             },
             "ro": {
                 "title": "De ce este consistentă pierderea pinball",
-                "text": "Fie L cu densitatea f > 0 în jurul cuantilei sale unice de ordin 1 - alpha. Derivând E[(1{L > v} - alpha)(L - v)] în raport cu v obținem F(v) - (1 - alpha). Ce rezultă?",
+                "text": "Fie L cu densitatea f > 0 în jurul cuantilei sale unice de ordin 1 - alpha. Derivînd E[(1{L > v} - alpha)(L - v)] în raport cu v obținem F(v) - (1 - alpha). Ce rezultă?",
                 "options": [
                     "Punctul de minim este media lui L",
                     "Punctul de minim satisface F(v) = 1 - alpha, adică v = VaR_alpha, iar derivata a doua f(v) > 0 îl face minim",
                     "Punctul de minim este ES_alpha",
                     "Pierderea pinball nu are un minim unic sub această ipoteză"
                 ],
-                "correctExplanation": "Condiția de ordinul întâi identifică cuantila de ordin 1 - alpha a pierderii, adică VaR_alpha; funcția de identificare 1{L <= v} - (1 - alpha) are media zero doar acolo.",
+                "correctExplanation": "Condiția de ordinul întîi identifică cuantila de ordin 1 - alpha a pierderii, adică VaR_alpha; funcția de identificare 1{L <= v} - (1 - alpha) are media zero doar acolo.",
                 "incorrectExplanation": "Egalați derivata cu zero: P(L > v) = alpha, care este chiar definiția VaR, nu a mediei sau a ES."
             }
         },
@@ -378,7 +378,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "options": [
                     "ES este elicitabil singur, cu eroarea pătratică",
                     "ES nu este elicitabil singur, dar perechea (VaR, ES) este elicitabilă împreună",
-                    "Nici VaR, nici ES nu sunt elicitabile",
+                    "Nici VaR, nici ES nu sînt elicitabile",
                     "ES este elicitabil doar pentru distribuții Normale"
                 ],
                 "correctExplanation": "Gneiting (2011) a arătat că ES singur nu este elicitabil; Fissler și Ziegel (2016) au caracterizat funcțiile de scor care fac perechea (VaR, ES) elicitabilă, de exemplu FZ0.",
@@ -403,7 +403,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "title": "Pierderea FZ0",
                 "text": "În pierderea FZ0 (1{L>v}(L-v))/(alpha e) + v/e + ln e - 1, ce face primul termen?",
                 "options": [
-                    "Crește când ES raportat crește, la pierdere și VaR fixe",
+                    "Crește cînd ES raportat crește, la pierdere și VaR fixe",
                     "Penalizează prognozele în zilele liniștite",
                     "Penalizează depășirile, proporțional cu pierderea în exces și invers proporțional cu ES raportat",
                     "Măsoară dispersia pierderilor"
@@ -431,12 +431,12 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "text": "De ce se folosește o dispersie Newey-West (HAC) în testul Diebold-Mariano pe pierderile FZ0?",
                 "options": [
                     "Pentru că pierderile din coadă se grupează, deci diferența de pierdere este autocorelată",
-                    "Pentru că pierderile FZ0 sunt mereu Normale",
+                    "Pentru că pierderile FZ0 sînt mereu Normale",
                     "Pentru a face testul unilateral",
                     "Pentru că testul are nevoie de cel puțin două active"
                 ],
                 "correctExplanation": "Dispersia pe termen lung ține cont de autocorelație; pentru HS față de FHS pe S&P 500 este de circa 2,3 ori dispersia obișnuită, iar statistica t naivă supraestimează semnificația.",
-                "incorrectExplanation": "Diferențele de pierdere sunt autocorelate în crize; o dispersie HAC pe termen lung corectează eroarea standard."
+                "incorrectExplanation": "Diferențele de pierdere sînt autocorelate în crize; o dispersie HAC pe termen lung corectează eroarea standard."
             }
         },
         {
@@ -460,10 +460,10 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "Doar cel mai bun model",
                     "Toate modelele care trec testul Kupiec",
                     "Modelele cu statistici DM pozitive",
-                    "O mulțime construită prin eliminări succesive astfel încât să conțină modelele cele mai bune cu o probabilitate asimptotică dată"
+                    "O mulțime construită prin eliminări succesive astfel încît să conțină modelele cele mai bune cu o probabilitate asimptotică dată"
                 ],
-                "correctExplanation": "Modelele sunt eliminate unul câte unul cât timp egalitatea abilității predictive este respinsă; cele rămase formează MCS. Pe Bitcoin rămân toate cele șase modele: datele nu le pot separa.",
-                "incorrectExplanation": "MCS este o mulțime de modele pe care datele nu le pot separa de cel mai bun, nu un singur câștigător; nerespingerea nu dovedește performanțe egale."
+                "correctExplanation": "Modelele sînt eliminate unul cîte unul cît timp egalitatea abilității predictive este respinsă; cele rămase formează MCS. Pe Bitcoin rămîn toate cele șase modele: datele nu le pot separa.",
+                "incorrectExplanation": "MCS este o mulțime de modele pe care datele nu le pot separa de cel mai bun, nu un singur cîștigător; nerespingerea nu dovedește performanțe egale."
             }
         },
         {
@@ -487,7 +487,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "1/(n + 1)",
                     "pasul ACI gamma",
                     "zero, datorită garanției în eșantion finit",
-                    "distanțe ponderate în variație totală între vectorul comun al scorurilor și vectorii obținuți schimbând scorul de test cu fiecare scor de calibrare (Barber et al., 2023)"
+                    "distanțe ponderate în variație totală între vectorul comun al scorurilor și vectorii obținuți schimbînd scorul de test cu fiecare scor de calibrare (Barber et al., 2023)"
                 ],
                 "correctExplanation": "Barber, Candès, Ramdas și Tibshirani (2023) mărginesc pierderea de acoperire marginală prin distanțe ponderate în variație totală între vectorul comun al scorurilor și versiunile lui cu scoruri schimbate; marginea privește acoperirea marginală, nu acoperirea în zilele de criză.",
                 "incorrectExplanation": "Garanția în eșantion finit cere schimbabilitate; 1/(n + 1) este doar marja superioară a acoperirii sub schimbabilitate, iar gamma ține de ACI."
@@ -566,11 +566,11 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "text": "Pentru VaR 1% pe S&P 500, cum și-a menținut ACI rata de depășire pe termen lung aproape de 1%?",
                 "options": [
                     "Folosind un model GARCH",
-                    "Reducând mulțimea de calibrare la 20 de zile",
-                    "Ignorând zilele de criză",
-                    "Dând un VaR infinit într-o parte importantă a zilelor (circa 13%)"
+                    "Reducînd mulțimea de calibrare la 20 de zile",
+                    "Ignorînd zilele de criză",
+                    "Dînd un VaR infinit într-o parte importantă a zilelor (circa 13%)"
                 ],
-                "correctExplanation": "Când alpha_t scade sub 1/(n+1), cuantila cerută nu există și VaR devine infinit; aceasta s-a întâmplat în circa 13% dintre zilele S&P 500: acoperire fără informație.",
+                "correctExplanation": "Cînd alpha_t scade sub 1/(n+1), cuantila cerută nu există și VaR devine infinit; aceasta s-a întîmplat în circa 13% dintre zilele S&P 500: acoperire fără informație.",
                 "incorrectExplanation": "Garanția a fost obținută prin prognoze VaR infinite în multe zile."
             }
         },
@@ -593,11 +593,11 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "text": "Pentru VaR 1% pe S&P 500, curbele scorurilor elementare medii ale GARCH-t și FHS se intersectează de mai multe ori. Ce rezultă?",
                 "options": [
                     "FHS domină GARCH-t sub orice scor consistent",
-                    "Ambele prognoze sunt decalibrate",
+                    "Ambele prognoze sînt decalibrate",
                     "Unele funcții de scor consistente pun GARCH-t pe primul loc, altele FHS: clasamentul după pierderea pinball depinde de scor",
                     "Testul Diebold-Mariano nu este valid pentru aceste prognoze"
                 ],
-                "correctExplanation": "Orice scor consistent pentru cuantile este o mixtură de scoruri elementare; o prognoză domină doar dacă curba ei este mai jos la fiecare prag. Curbele care se intersectează arată că clasamentul depinde de ponderi, de exemplu de cât contează pragurile de criză.",
+                "correctExplanation": "Orice scor consistent pentru cuantile este o mixtură de scoruri elementare; o prognoză domină doar dacă curba ei este mai jos la fiecare prag. Curbele care se intersectează arată că clasamentul depinde de ponderi, de exemplu de cît contează pragurile de criză.",
                 "incorrectExplanation": "Dominanța cere ca o curbă să fie sub cealaltă peste tot; intersecția curbelor nu spune nimic despre calibrare sau despre validitatea unui test pe un scor ales."
             }
         },
@@ -620,7 +620,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "text": "În februarie-iunie 2020 (104 zile), VaR 1% pentru S&P 500 a fost depășit de 12 ori de HS și de 2 ori de FHS. Ce explică diferența?",
                 "options": [
                     "FHS folosește o fereastră mai lungă",
-                    "FHS scalează cuantilele cu volatilitatea GARCH curentă, care a crescut în câteva zile",
+                    "FHS scalează cuantilele cu volatilitatea GARCH curentă, care a crescut în cîteva zile",
                     "HS presupune distribuția Normală",
                     "FHS ignoră cele mai mari pierderi"
                 ],
@@ -671,7 +671,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
             },
             "ro": {
                 "title": "Găsiți eroarea AI: testul Christoffersen",
-                "text": "Un asistent AI scrie: „Statistica de acoperire condiționată LR_cc = LR_uc + LR_ind se compară cu distribuția hi-pătrat cu 1 grad de libertate, deci respingem la 5% când LR_cc > 3,84.” Ce este greșit?",
+                "text": "Un asistent AI scrie: „Statistica de acoperire condiționată LR_cc = LR_uc + LR_ind se compară cu distribuția hi-pătrat cu 1 grad de libertate, deci respingem la 5% cînd LR_cc > 3,84.” Ce este greșit?",
                 "options": [
                     "LR_cc ar trebui să fie produsul lui LR_uc și LR_ind, nu suma lor",
                     "Testul Christoffersen folosește distribuția Normală, nu hi-pătrat",
@@ -698,15 +698,15 @@ window.MFM_DATA.quizzes['backtesting'] = {
             },
             "ro": {
                 "title": "Găsiți eroarea AI: fereastra VaR mobilă",
-                "text": "Un asistent AI scrie: „Pentru VaR 1% prin simulare istorică în ziua t, luați minus cuantila de 1% a celor 250 de randamente r_{t-249}, ..., r_t, apoi marcați o excepție când -r_t îl depășește.” Ce este greșit?",
+                "text": "Un asistent AI scrie: „Pentru VaR 1% prin simulare istorică în ziua t, luați minus cuantila de 1% a celor 250 de randamente r_{t-249}, ..., r_t, apoi marcați o excepție cînd -r_t îl depășește.” Ce este greșit?",
                 "options": [
                     "VaR ar trebui să fie plus cuantila de 1%, nu minus",
                     "Fereastra îl conține chiar pe r_t: VaR_t trebuie să folosească doar randamentele cunoscute în t-1, adică r_{t-250}, ..., r_{t-1}",
-                    "O excepție apare când r_t depășește VaR, nu -r_t",
+                    "O excepție apare cînd r_t depășește VaR, nu -r_t",
                     "Simularea istorică cere cel puțin 1.000 de zile, deci 250 nu este permis"
                 ],
-                "correctExplanation": "Acesta este look-ahead bias: o pierdere mare în ziua t intră în propria cuantilă și ascunde excepția, astfel că backtest-ul pare mai bun decât este. Convenția de semn (VaR = minus cuantila, excepție când pierderea -r_t depășește VaR) este corectă.",
-                "incorrectExplanation": "Convenția de semn și regula de excepție sunt corecte; greșeala este că prognoza pentru ziua t folosește randamentul din ziua t."
+                "correctExplanation": "Acesta este look-ahead bias: o pierdere mare în ziua t intră în propria cuantilă și ascunde excepția, astfel că backtest-ul pare mai bun decît este. Convenția de semn (VaR = minus cuantila, excepție cînd pierderea -r_t depășește VaR) este corectă.",
+                "incorrectExplanation": "Convenția de semn și regula de excepție sînt corecte; greșeala este că prognoza pentru ziua t folosește randamentul din ziua t."
             }
         }
     ]

@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch6_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 6 computations: Gaussian versus t tail dependence, Kendall tau and copula parameters, DCC for SPY and TLT with subsamples, Gaussian versus t copula with bootstrap likelihood ratio and intervals, Clayton versus Gumbel for joint losses of BET and Euro Stoxx 50, Forbes-Rigobon for 2008 and 2020, a residual-bootstrap band for the Bitcoin-S&P 500 DCC and the integration of BET with the Euro Stoxx 50 after 2020.'
+Description: 'Seminar 6 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, A2 Extended, A3, A3 Extended, B1, B1 Extended, B2, B2 Extended with code and output. The proposed exercises A4, A5, A6, B3, B4, B5, B6, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'tail dependence, copula goodness of fit, DCC, bootstrap, Forbes-Rigobon, contagion, Bitcoin, BET, market integration'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily market data of the course: SPY, TLT, S&P 500, Euro Stoxx 50, BET, Bitcoin, JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania, BRD-Groupe Societe Generale'
 
-Output: 'ch6_sem_tail_gauss_t.pdf, ch6_sem_losses_copula.pdf, ch6_sem_forbes_rigobon.pdf, ch6_sem_btc_bands.pdf, ch6_sem_integration.pdf, ch6_sem_b1_returns.pdf, ch6_sem_b1_garch.pdf, ch6_sem_b1_lr.pdf, ch6_sem_b2_scatter.pdf, ch6_sem_b2_tails.pdf, ch6_sem_b2_boot.pdf, ch6_sem_a2_gap.pdf, ch6_sem_a3_curve.pdf, ch6_sem_a3_se.pdf, ch6_sem_a5_dcc.pdf, ch6_sem_a6_lognormal.pdf, ch6_sem_b3_tails.pdf, ch6_sem_b4_windows.pdf, ch6_sem_b6_gas.pdf, ch6_sem_c1_change.pdf, ch6_sem_fr_2008.csv, ch6_sem_fr_2020.csv'
+Output: 'ch6_sem_a2_gap.pdf, ch6_sem_a3_curve.pdf, ch6_sem_a3_se.pdf, ch6_sem_b1_garch.pdf, ch6_sem_b1_lr.pdf, ch6_sem_b1_returns.pdf, ch6_sem_b2_boot.pdf, ch6_sem_b2_scatter.pdf, ch6_sem_b2_tails.pdf, ch6_sem_b4_windows.pdf, ch6_sem_losses_copula.pdf, ch6_sem_tail_gauss_t.pdf'

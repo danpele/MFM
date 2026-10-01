@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch10_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 10 computations: moments, bias and standard error of the Roll estimator, Glosten-Milgrom for any prior and learning speed, the Kyle equilibrium and lambda as a regression slope, Almgren-Chriss by Euler-Lagrange, the PIN likelihood in stable form; intraday U-shape with day-block bootstrap, spread estimators at two frequencies, spread and Amihud measures across 25 assets, illiquidity and the VIX with HAC errors, the volume-price relation with an instrumental variable, the Bitcoin clock, price discovery between the BET ETF and BET-TR, and the time-series illiquidity premium on the BVB, US and crypto markets.'
+Description: 'Seminar 10 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A5, A7, A9, B1, B2, B4, B6, B8 with code and output. The proposed exercises A2, A4, A6, A8, A10, B3, B5, B7, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'market microstructure, bid-ask spread, Amihud illiquidity, bootstrap, HAC, liquidity premium, Bucharest Stock Exchange, Bitcoin'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'SPY and Bitcoin 5-minute bars; daily open, high, low, close and volume for US stocks, Bucharest Stock Exchange stocks and crypto-assets; CBOE VIX; BET-TR; USD/RON official reference rate of the National Bank of Romania'
 
-Output: 'ch10_sem_ushape.pdf, ch10_sem_cross.pdf, ch10_sem_premium.pdf, ch10_sem_a1_bounce.pdf, ch10_sem_a2_sampling.pdf, ch10_sem_a3_spread.pdf, ch10_sem_a4_learning.pdf, ch10_sem_a6_kyle.pdf, ch10_sem_ac.pdf, ch10_sem_pin.pdf, ch10_sem_b2_estimates.pdf, ch10_sem_b2_mc.pdf, ch10_sem_b4.pdf, ch10_sem_b5.pdf, ch10_sem_b6.pdf, ch10_sem_b7.pdf, ch10_sem_b8_prices.pdf, ch10_sem_b8_shares.pdf, ch10_sem_c1.pdf, ch10_sem_c2_roundtrip.pdf, ch10_sem_c3_tax.pdf'
+Output: 'ch10_sem_a1_bounce.pdf, ch10_sem_a3_spread.pdf, ch10_sem_ac.pdf, ch10_sem_b2_estimates.pdf, ch10_sem_b2_mc.pdf, ch10_sem_b4.pdf, ch10_sem_b6.pdf, ch10_sem_b8_prices.pdf, ch10_sem_b8_shares.pdf, ch10_sem_pin.pdf, ch10_sem_ushape.pdf'

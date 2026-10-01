@@ -12,4 +12,4 @@ Submitted: 'Monday, 21 September 2026'
 
 Datafile: 'Daily market data from the MFM course repository; BNR official EUR/RON reference rate'
 
-Output: 'ch0_romania.pdf, ch0_bad_ticks.pdf'
+Output: 'ch0_romania.pdf, ch0_romania_equities.pdf, ch0_eurron.pdf, ch0_ro_yields.pdf, ch0_bad_ticks.pdf'

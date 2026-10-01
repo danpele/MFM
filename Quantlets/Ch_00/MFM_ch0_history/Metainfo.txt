@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch0_history'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Two timelines for the history part of Chapter 0: exchanges and traded securities versus bubbles, panics and crashes, 1250-2026 (Bruges, Antwerp, the VOC shares of 1602, London, the Buttonwood Agreement, Bucharest 1882; tulips 1637, 1720, 1792, 1873, 1929, 1987, 2008, 2020); and milestones of financial modelling, 1900-2026, in seven lanes from random walks and portfolio theory to machine learning, generative AI and quantum computing.'
+
+Keywords: 'history of finance, stock exchanges, bubbles, crashes, financial models, timeline'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Monday, 21 September 2026'
+
+Datafile: 'None (dates from the literature cited in the lecture)'
+
+Output: 'ch0_market_history.pdf, ch0_model_history.pdf'

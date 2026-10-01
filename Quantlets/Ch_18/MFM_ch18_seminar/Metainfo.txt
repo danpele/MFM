@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch18_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 18 computations: CoVaR and MES under the bivariate Normal distribution, SRISK and break-even leverage, connectedness tables, reverse stress tests, Delta-CoVaR of US and European banks with block and i.i.d. bootstrap intervals, VaR versus Delta-CoVaR rank correlation, robustness of the Diebold-Yilmaz index, a Newey-West test on the rolling index, the FRM penalty in one window, a stress test of a Romanian bank portfolio and the exposure of Romanian banks to euro-area banking stress; charts for the solutions (conditional densities behind Delta-CoVaR, the reverse stress geometry, crisis-path loss distributions of LRMES, the FRM coefficients, the Kupiec acceptance region and power).'
+Description: 'Seminar 18 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A5, A7, B1, B3, B5, B7, B9 with code and output. The proposed exercises A2, A4, A6, A8, B2, B4, B6, B8, B10, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'CoVaR, MES, SRISK, Diebold-Yilmaz, reverse stress test, block bootstrap, Newey-West, FRM, Banca Transilvania, BRD, Bucharest Stock Exchange'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily market data (data/market), January 2010 - September 2026: JPMorgan Chase, Bank of America, Citigroup, Goldman Sachs, Morgan Stanley, Wells Fargo, Deutsche Bank, BNP Paribas, Santander, ING, HSBC, Banca Transilvania, BRD-Groupe Societe Generale; S&P 500, Euro Stoxx 50, BET and VIX indices'
 
-Output: 'ch18_sem_b1.pdf, ch18_sem_b5.pdf, ch18_sem_c1.pdf, ch18_sem_a1.pdf, ch18_sem_a7.pdf, ch18_sem_b2.pdf, ch18_sem_b3.pdf, ch18_sem_b4.pdf, ch18_sem_b6.pdf, ch18_sem_b7.pdf, ch18_sem_b8.pdf, ch18_sem_b10.pdf'
+Output: 'ch18_sem_a1.pdf, ch18_sem_a7.pdf, ch18_sem_b1.pdf, ch18_sem_b3.pdf, ch18_sem_b5.pdf, ch18_sem_b7.pdf'

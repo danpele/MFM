@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch15_sem_partA'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 15, Part A: attenuation of a regression slope on a misclassified sentiment label, variance and power of paired accuracy tests, LLM label probabilities and the optimal temperature, Fleiss kappa and a Dawid-Skene step, break-even costs with delta-method standard errors.'
+Description: 'Seminar 15 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A5, A7, B1, B3, B5, B7, B9 with code and output. The proposed exercises A2, A4, A6, A8, B2, B4, B6, B8, B10, B11, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'sentiment dictionary, confusion matrix, precision, recall, F1, softmax, temperature, exercises'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Financial PhraseBank v1.0 (Malo et al., 2014; CC BY-NC-SA 3.0) and Twitter Financial News Sentiment (MIT licence), both from the Hugging Face Hub; Loughran-McDonald and Harvard IV-4 word lists; FNSPID financial news headlines (Dong, Fan & Peng, 2024; CC BY-NC 4.0) for 16 US stocks; daily adjusted closes of the same stocks and SPY (data/market)'
 
-Output: 'ch15_sem_a1_attenuation.pdf, ch15_sem_a2_attenuation.pdf, ch15_sem_a3_power.pdf, ch15_sem_a4_power.pdf, ch15_sem_a7_cost.pdf, ch15_sem_a8_cost.pdf'
+Output: 'ch15_sem_a1_attenuation.pdf, ch15_sem_a3_power.pdf, ch15_sem_a7_cost.pdf'

@@ -25,12 +25,12 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "title": "Intervale suprapuse",
                 "text": "Intervalele bootstrap pe blocuri de 95% ale Delta-CoVaR 1% pentru JPMorgan și Citigroup se suprapun. Ce puteți concluziona despre egalitatea contribuțiilor?",
                 "options": [
-                    "Cele două bănci sunt la fel de sistemice",
+                    "Cele două bănci sînt la fel de sistemice",
                     "Încă nimic: testăm diferența pe extrageri bootstrap comune ale acelorași zile (test pe perechi) sau cu un test de dominanță",
                     "Clasamentul celor două bănci este semnificativ la 5%",
                     "Aplicăm o corecție Bonferroni fiecărui interval separat"
                 ],
-                "correctExplanation": "Ambele estimări folosesc aceleași zile, deci sunt dependente (semnul dependenței trebuie estimat, nu presupus); intervalul diferenței, calculat pe extrageri comune care păstrează această dependență, poate exclude zero chiar dacă intervalele marginale se suprapun. Doar un test pe diferență răspunde la întrebare.",
+                "correctExplanation": "Ambele estimări folosesc aceleași zile, deci sînt dependente (semnul dependenței trebuie estimat, nu presupus); intervalul diferenței, calculat pe extrageri comune care păstrează această dependență, poate exclude zero chiar dacă intervalele marginale se suprapun. Doar un test pe diferență răspunde la întrebare.",
                 "incorrectExplanation": "Suprapunerea a două intervale marginale nu este nici test al egalității, nici al clasamentului; diferența se testează direct, cu extrageri care reeșantionează aceleași zile pentru ambele bănci."
             }
         },
@@ -53,11 +53,11 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "text": "Delta-CoVaR la 1% este estimat prin regresie cuantilă pe toate cele 3.960 de zile, dar doar aproximativ 40 dintre ele se află în coada de 1%. De ce pot fi inexacte erorile standard obișnuite ale regresiei cuantile?",
                 "options": [
                     "Regresia cuantilă nu are erori standard",
-                    "Doar pentru că reziduurile sunt heteroscedastice",
+                    "Doar pentru că reziduurile sînt heteroscedastice",
                     "Pentru că banca este inclusă în portofoliul sistemului",
                     "Pentru că eșantionul efectiv din coadă (alpha înmulțit cu n) este mic, deci aproximarea Normală pentru cuantile centrale poate fi slabă; inferența pentru cuantile extreme sau subeșantionarea este alternativa construită pentru acest caz"
                 ],
-                "correctExplanation": "Asimptotica regresiei cuantile cere multe observații în jurul cuantilei; cu alpha n de câteva zeci, estimarea rarefierii este zgomotoasă, iar teoria cuantilelor extreme este construită pentru acest caz; cât de slabă este aproximarea Normală depinde și de regresori și de coadă.",
+                "correctExplanation": "Asimptotica regresiei cuantile cere multe observații în jurul cuantilei; cu alpha n de cîteva zeci, estimarea rarefierii este zgomotoasă, iar teoria cuantilelor extreme este construită pentru acest caz; cît de slabă este aproximarea Normală depinde și de regresori și de coadă.",
                 "incorrectExplanation": "Erorile standard există, iar sistemul exclude banca; problema este numărul mic de observații din coadă, care poate face inexactă aproximarea Normală pentru cuantile centrale."
             }
         },
@@ -79,7 +79,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "title": "SRISK: LRMES prin simulare",
                 "text": "Cum obțin Brownlees și Engle (2017) LRMES care intră în SRISK?",
                 "options": [
-                    "Prin simularea unor traiectorii de 22 de zile ale băncii și pieței din modele GJR-GARCH și DCC cu inovații standardizate reeșantionate, păstrând traiectoriile în care piața scade sub -10%",
+                    "Prin simularea unor traiectorii de 22 de zile ale băncii și pieței din modele GJR-GARCH și DCC cu inovații standardizate reeșantionate, păstrînd traiectoriile în care piața scade sub -10%",
                     "Doar prin aproximarea 1 - exp(-18 x MES)",
                     "Ca medie istorică a randamentelor pe șase luni ale băncii",
                     "Din volatilitatea implicită a opțiunilor pe acțiunile băncii"
@@ -131,7 +131,7 @@ window.MFM_DATA.quizzes['systemic'] = {
             },
             "ro": {
                 "title": "SRISK",
-                "text": "O bancă are datorii D = 900, capital de piață W = 100, LRMES = 50% și k = 8%. Cât este SRISK?",
+                "text": "O bancă are datorii D = 900, capital de piață W = 100, LRMES = 50% și k = 8%. Cît este SRISK?",
                 "options": [
                     "26",
                     "72",
@@ -158,7 +158,7 @@ window.MFM_DATA.quizzes['systemic'] = {
             },
             "ro": {
                 "title": "Levierul de echilibru",
-                "text": "Ce se întâmplă cu levierul de echilibru L* = 1 + (1 - k)(1 - LRMES)/k când LRMES crește?",
+                "text": "Ce se întîmplă cu levierul de echilibru L* = 1 + (1 - k)(1 - LRMES)/k cînd LRMES crește?",
                 "options": [
                     "Crește",
                     "Scade: banca își permite mai puține datorii înainte ca o criză să creeze un deficit",
@@ -268,10 +268,10 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "title": "VaR și Delta-CoVaR",
                 "text": "În curs, corelația de rang Spearman dintre VaR 1% și Delta-CoVaR 1% pentru unsprezece bănci a fost de aproximativ 0,16. Ce rezultă?",
                 "options": [
-                    "Băncile cu VaR mare sunt cele mai sistemice",
+                    "Băncile cu VaR mare sînt cele mai sistemice",
                     "Ordonarea băncilor după propriul VaR nu identifică băncile care contribuie cel mai mult la riscul sistemului",
                     "Delta-CoVaR este inutil",
-                    "VaR și Delta-CoVaR sunt aceeași măsură"
+                    "VaR și Delta-CoVaR sînt aceeași măsură"
                 ],
                 "correctExplanation": "O corelație de rang slabă înseamnă că cele două măsuri ordonează băncile diferit: mesajul central al lui Adrian și Brunnermeier.",
                 "incorrectExplanation": "O corelație apropiată de zero înseamnă clasamente diferite; nu face sistemice băncile cu VaR mare și nici nu face Delta-CoVaR redundant."
@@ -295,8 +295,8 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "title": "Intervale bootstrap",
                 "text": "De ce folosește cursul bootstrap pe blocuri mobile de 20 de zile pentru Delta-CoVaR?",
                 "options": [
-                    "Pentru că randamentele sunt Normale",
-                    "Pentru că este mai rapid decât bootstrap-ul i.i.d.",
+                    "Pentru că randamentele sînt Normale",
+                    "Pentru că este mai rapid decît bootstrap-ul i.i.d.",
                     "Pentru că zilele din coadă se grupează în crize, iar blocurile păstrează aceste grupări",
                     "Pentru că regresia cuantilă are nevoie de exact 20 de observații"
                 ],
@@ -325,9 +325,9 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Pentru a reduce timpul de calcul",
                     "Pentru că banca nu are date",
                     "Pentru că o cer autoritățile",
-                    "Pentru că propriul randament ar apărea de ambele părți ale regresiei, introducând o contribuție mecanică proprie"
+                    "Pentru că propriul randament ar apărea de ambele părți ale regresiei, introducînd o contribuție mecanică proprie"
                 ],
-                "correctExplanation": "Cu banca i în sistem, X_i intră atât în variabila dependentă, cât și în cea explicativă, ceea ce adaugă o contribuție mecanică proprie la legătura estimată (nu neapărat o pantă mai mare).",
+                "correctExplanation": "Cu banca i în sistem, X_i intră atît în variabila dependentă, cît și în cea explicativă, ceea ce adaugă o contribuție mecanică proprie la legătura estimată (nu neapărat o pantă mai mare).",
                 "incorrectExplanation": "Motivul este statistic: includerea băncii creează o corelație mecanică între sistem și bancă."
             }
         },
@@ -349,8 +349,8 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "title": "Delta-CoVaR variabil în timp",
                 "text": "În curs, de ce s-a mișcat Delta-CoVaR al celor șase bănci aproape împreună în timp?",
                 "options": [
-                    "Pentru că cele șase bănci sunt aceeași companie",
-                    "Pentru că variabilele de stare întârziate comune conduc cuantilele condiționate ale băncilor",
+                    "Pentru că cele șase bănci sînt aceeași companie",
+                    "Pentru că variabilele de stare întîrziate comune conduc cuantilele condiționate ale băncilor",
                     "Pentru că nu s-a folosit bootstrap-ul",
                     "Pentru că panta b se schimbă în fiecare zi"
                 ],
@@ -376,7 +376,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "title": "Descompunerea generalizată a dispersiei",
                 "text": "De ce folosesc Diebold și Yilmaz descompunerea generalizată a dispersiei erorii de prognoză?",
                 "options": [
-                    "Pentru că este întotdeauna mai mică decât cea Cholesky",
+                    "Pentru că este întotdeauna mai mică decît cea Cholesky",
                     "Pentru că elimină nevoia unui VAR",
                     "Pentru că rezultatele ei nu depind de ordinea variabilelor",
                     "Pentru că face ca liniile să însumeze zero"
@@ -405,11 +405,11 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "options": [
                     "169 de coeficienți de pantă din 250 de zile dau o eroare de estimare mare: raportăm intervale bootstrap și luăm în calcul VAR-uri cu shrinkage (elastic net)",
                     "Tabelul depinde de ordinea băncilor",
-                    "Logaritmii volatilităților nu sunt staționari",
+                    "Logaritmii volatilităților nu sînt staționari",
                     "Orizontul H = 10 este prea scurt"
                 ],
-                "correctExplanation": "Fiecare element al tabelului este o funcție neliniară de mulți coeficienți zgomotoși; în ferestrele scurte zgomotul adaugă legături false, deci sunt necesare intervale și regularizare (ca în Demirer et al., 2018).",
-                "incorrectExplanation": "Descompunerea generalizată nu depinde de ordine, iar logaritmii volatilităților sunt persistenți, dar staționari; problema principală este numărul de parametri față de lungimea ferestrei."
+                "correctExplanation": "Fiecare element al tabelului este o funcție neliniară de mulți coeficienți zgomotoși; în ferestrele scurte zgomotul adaugă legături false, deci sînt necesare intervale și regularizare (ca în Demirer et al., 2018).",
+                "incorrectExplanation": "Descompunerea generalizată nu depinde de ordine, iar logaritmii volatilităților sînt persistenți, dar staționari; problema principală este numărul de parametri față de lungimea ferestrei."
             }
         },
         {
@@ -435,7 +435,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Liniile celei generalizate însumează numărul de variabile",
                     "Coincid, iar liniile celei generalizate însumează deja unu"
                 ],
-                "correctExplanation": "Cu Sigma diagonală, impulsul generalizat Sigma e_j / sqrt(sigma_jj) este egal cu impulsul Cholesky sqrt(sigma_jj) e_j, deci cele două descompuneri sunt identice și nu mai este nevoie de normalizare.",
+                "correctExplanation": "Cu Sigma diagonală, impulsul generalizat Sigma e_j / sqrt(sigma_jj) este egal cu impulsul Cholesky sqrt(sigma_jj) e_j, deci cele două descompuneri sînt identice și nu mai este nevoie de normalizare.",
                 "incorrectExplanation": "Diferențele dintre cele două descompuneri vin doar din șocurile corelate; cu o covarianță diagonală nu există un șoc comun de alocat, iar ordinea nu contează."
             }
         },
@@ -459,7 +459,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "options": [
                     "O scădere la cea mai mică valoare",
                     "Nicio schimbare",
-                    "Un salt la cele mai mari valori în câteva zile, urmat de o scădere lentă",
+                    "Un salt la cele mai mari valori în cîteva zile, urmat de o scădere lentă",
                     "O dublare permanentă"
                 ],
                 "correctExplanation": "Conectivitatea totală a crescut de la aproximativ 62% în 2019 la aproximativ 78% în primăvara lui 2020 și a scăzut în anul următor.",
@@ -489,7 +489,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Ca transmițători către băncile americane",
                     "Ca receptori neți, cu o pondere proprie mare a dispersiei"
                 ],
-                "correctExplanation": "Ponderile lor proprii au fost peste 70%, iar spillover-urile nete negative: sunt conduse mai ales de șocuri interne și primesc mai mult decât trimit.",
+                "correctExplanation": "Ponderile lor proprii au fost peste 70%, iar spillover-urile nete negative: sînt conduse mai ales de șocuri interne și primesc mai mult decît trimit.",
                 "incorrectExplanation": "Băncile românești primesc puțin de la băncile americane și europene și nu trimit aproape nimic înapoi."
             }
         },
@@ -539,12 +539,12 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "text": "Cu 13 bănci, 15 regresori și ferestre de 63 de zile, de ce a fost penalizarea aleasă prin GACV mică și zgomotoasă?",
                 "options": [
                     "Pentru că datele erau greșite",
-                    "Pentru că estimarea fără penalizare este posibilă când sunt mult mai puțini regresori decât zile",
+                    "Pentru că estimarea fără penalizare este posibilă cînd sînt mult mai puțini regresori decît zile",
                     "Pentru că GACV alege întotdeauna lambda = 0",
                     "Pentru că randamentele au fost standardizate"
                 ],
-                "correctExplanation": "FRM este construit pentru secțiuni transversale mari (mai mulți regresori decât zile), unde penalizarea este necesară; cu puțini regresori GACV preferă o penalizare mică.",
-                "incorrectExplanation": "Problema este dimensiunea: cu p mult mai mic decât n, estimarea aproape nu are nevoie de penalizare, deci valoarea aleasă este zgomotoasă."
+                "correctExplanation": "FRM este construit pentru secțiuni transversale mari (mai mulți regresori decît zile), unde penalizarea este necesară; cu puțini regresori GACV preferă o penalizare mică.",
+                "incorrectExplanation": "Problema este dimensiunea: cu p mult mai mic decît n, estimarea aproape nu are nevoie de penalizare, deci valoarea aleasă este zgomotoasă."
             }
         },
         {
@@ -566,12 +566,12 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "text": "Pentru factori f cu medie zero, cu distribuția Normală și covarianța Sigma, și randamentul portofoliului b'f, care este cel mai plauzibil scenariu f* care produce pierderea -b'f = l*?",
                 "options": [
                     "Toți factorii scad cu l*",
-                    "Factorul cu cea mai mare dispersie scade cu l*, ceilalți rămân neschimbați",
+                    "Factorul cu cea mai mare dispersie scade cu l*, ceilalți rămîn neschimbați",
                     "f* = -l* Sigma b / (b' Sigma b)",
                     "f* = -l* b"
                 ],
                 "correctExplanation": "Minimizarea distanței Mahalanobis cu condiția -b'f = l* dă f* = -l* Sigma b / (b' Sigma b).",
-                "incorrectExplanation": "Cel mai plauzibil scenariu ponderează fiecare factor după covarianța lui cu portofoliul: Sigma b, scalat astfel încât pierderea să fie l*."
+                "incorrectExplanation": "Cel mai plauzibil scenariu ponderează fiecare factor după covarianța lui cu portofoliul: Sigma b, scalat astfel încît pierderea să fie l*."
             }
         },
         {
@@ -590,14 +590,14 @@ window.MFM_DATA.quizzes['systemic'] = {
             },
             "ro": {
                 "title": "Probabilitățile scenariilor inverse de stres",
-                "text": "Testul invers de stres a dat o distanță Mahalanobis de aproximativ 4,3 pentru o pierdere log de 25% în patru săptămâni, dar în 2020 portofoliul bancar a pierdut aproximativ 52% (randament log) în patru săptămâni. Care este lecția?",
+                "text": "Testul invers de stres a dat o distanță Mahalanobis de aproximativ 4,3 pentru o pierdere log de 25% în patru săptămîni, dar în 2020 portofoliul bancar a pierdut aproximativ 52% (randament log) în patru săptămîni. Care este lecția?",
                 "options": [
-                    "Datele sunt greșite",
+                    "Datele sînt greșite",
                     "Modelul factorial este exact",
-                    "Testele inverse de stres sunt inutile",
-                    "Forma scenariului este informativă, dar probabilitățile modelului Normal sunt mult prea mici din cauza cozilor grele și a corelațiilor care cresc"
+                    "Testele inverse de stres sînt inutile",
+                    "Forma scenariului este informativă, dar probabilitățile modelului Normal sînt mult prea mici din cauza cozilor grele și a corelațiilor care cresc"
                 ],
-                "correctExplanation": "Cozile grele și corelațiile din crize fac pierderile extreme mult mai probabile decât implică modelul Normal.",
+                "correctExplanation": "Cozile grele și corelațiile din crize fac pierderile extreme mult mai probabile decît implică modelul Normal.",
                 "incorrectExplanation": "Folosiți direcția scenariului, nu probabilitatea lui Normală: coada reală este mult mai grea."
             }
         },
@@ -651,7 +651,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Băncile românești au crescut",
                     "Au fost afectate doar băncile americane"
                 ],
-                "correctExplanation": "Banca Transilvania și BRD au pierdut aproximativ 26% în cele mai rele 10 zile, mai mult decât orice bancă internațională în acea fereastră.",
+                "correctExplanation": "Banca Transilvania și BRD au pierdut aproximativ 26% în cele mai rele 10 zile, mai mult decît orice bancă internațională în acea fereastră.",
                 "incorrectExplanation": "Episodul a fost în principal intern: un test de stres construit doar pe crize globale l-ar rata."
             }
         },
@@ -698,15 +698,15 @@ window.MFM_DATA.quizzes['systemic'] = {
             },
             "ro": {
                 "title": "Găsiți eroarea: rețea Granger pe prețuri",
-                "text": "Un asistent AI construiește o rețea de cauzalitate Granger pentru zece bănci, estimând VAR-uri pe perechi pe nivelurile zilnice ale prețurilor, și raportează că aproape toate perechile sunt semnificative la 1%. Care este cea mai probabilă problemă?",
+                "text": "Un asistent AI construiește o rețea de cauzalitate Granger pentru zece bănci, estimînd VAR-uri pe perechi pe nivelurile zilnice ale prețurilor, și raportează că aproape toate perechile sînt semnificative la 1%. Care este cea mai probabilă problemă?",
                 "options": [
-                    "VAR-urile au nevoie de mai multe întârzieri",
-                    "Prețurile sunt nestaționare: testele Granger pe niveluri dau o semnificație falsă; folosiți randamente (sau o metodă construită pentru serii integrate)",
-                    "Zece bănci sunt prea puține pentru o rețea",
+                    "VAR-urile au nevoie de mai multe întîrzieri",
+                    "Prețurile sînt nestaționare: testele Granger pe niveluri dau o semnificație falsă; folosiți randamente (sau o metodă construită pentru serii integrate)",
+                    "Zece bănci sînt prea puține pentru o rețea",
                     "Rețeaua trebuie construită cu o ordonare Cholesky a băncilor"
                 ],
-                "correctExplanation": "Cu prețuri cu rădăcină unitară, testul Wald obișnuit nu are distribuția standard și apar legături false. Rețelele de cauzalitate Granger se construiesc pe randamente (staționare) sau cu proceduri gândite pentru serii integrate.",
-                "incorrectExplanation": "Problema este intrarea, nu numărul de întârzieri sau de bănci: prețurile băncilor au rădăcină unitară, deci testele pe niveluri resping prea des; aplicați testele pe randamente."
+                "correctExplanation": "Cu prețuri cu rădăcină unitară, testul Wald obișnuit nu are distribuția standard și apar legături false. Rețelele de cauzalitate Granger se construiesc pe randamente (staționare) sau cu proceduri gîndite pentru serii integrate.",
+                "incorrectExplanation": "Problema este intrarea, nu numărul de întîrzieri sau de bănci: prețurile băncilor au rădăcină unitară, deci testele pe niveluri resping prea des; aplicați testele pe randamente."
             }
         }
     ]

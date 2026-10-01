@@ -350,10 +350,13 @@ def fig_rates():
     bottom_legend(fig, ncol=3, fontsize=7.5)
     save_fig('ch0_rates')
     runs = (spread < 0).astype(int)
-    first_neg = inv[inv < 0].index.min()
-    last_neg = inv[inv < 0].index.max()
+    neg = inv < 0                                   # consecutive spells of negative spread, 2022-2024
+    spell_id = (neg != neg.shift()).cumsum()
+    spells = [(g.index[0].date(), g.index[-1].date(), len(g)) for _, g in inv[neg].groupby(spell_id[neg])]
+    longest = max(spells, key=lambda t: t[2])
     return dict(min_spread=round(spread.min(), 2), min_date=spread.idxmin().date(),
-                inversion_2022_24=(first_neg.date(), last_neg.date(), int((inv < 0).sum())),
+                inversion_spells_2022_24=spells, longest_inversion=longest,
+                negative_days_2022_24=int(neg.sum()),
                 last_10y=round(d['DGS10'].iloc[-1], 2), last_2y=round(d['DGS2'].iloc[-1], 2),
                 last_date=d.index[-1].date(), last_ff=round(ff.iloc[-1], 2), share_inverted=runs.mean())
 
@@ -560,6 +563,48 @@ def fig_romania():
                 bonds_first=y.index[0].date(), h2o_first=bvb['Hidroelectrica'].first_valid_index().date())
 
 
+def fig_romania_split():
+    """The three Romanian panels as separate full-width figures: equities, EUR/RON, 10-year yields."""
+    start = '2015-01-05'
+    # 1. BET-TR and blue chips, growth of 1 RON (dividend-adjusted), log scale
+    fig, ax = plt.subplots(figsize=(6.4, 2.9))
+    b = px['BET-TR'].loc[start:].dropna()
+    ax.plot(b.index, b / b.iloc[0], color='black', lw=1.5, label=f'BET-TR x{b.iloc[-1] / b.iloc[0]:.1f}')
+    for n, c in zip(['Banca Transilvania', 'OMV Petrom', 'BRD', 'Transgaz', 'Romgaz'],
+                    [MainBlue, Amber, Forest, Purple, Orange]):
+        g = bvb[n].loc[start:].dropna()
+        g = g / g.iloc[0]
+        ax.plot(g.index, g.values, color=c, lw=0.9, label=f'{n} x{g.iloc[-1]:.1f}')
+    log_axis(ax, [0.5, 1, 2, 4, 8, 16])
+    ax.set_ylabel('Growth of 1 RON (log scale)')
+    ax.xaxis.set_major_locator(mdates.YearLocator(2))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+    bottom_legend(fig, ncol=3)
+    save_fig('ch0_romania_equities')
+    # 2. EUR/RON, BNR reference rate
+    fig, ax = plt.subplots(figsize=(6.4, 2.7))
+    fx = eurron.loc['2005-07-01':]
+    ax.plot(fx.index, fx.values, color=IDAred, lw=1.0, label='EUR/RON, BNR reference rate (RON per EUR)')
+    ax.set_ylabel('RON per EUR')
+    ax.xaxis.set_major_locator(mdates.YearLocator(2))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+    bottom_legend(fig, ncol=1)
+    save_fig('ch0_eurron')
+    # 3. 10-year government yields, Romania (RON) vs Germany (EUR)
+    fig, ax = plt.subplots(figsize=(6.4, 2.7))
+    y = pd.concat([clean_series(bonds[c].dropna()) for c in bonds], axis=1).dropna()
+    ax.plot(y.index, y['Romania 10y'], color=MainBlue, lw=1.0, label='Romania 10-year (bonds in RON)')
+    ax.plot(y.index, y['Germany 10y'], color=IDAred, lw=1.0, label='Germany 10-year (bonds in EUR)')
+    ax.axhline(0, color='black', lw=0.5)
+    ax.set_ylabel('Yield (%)')
+    ax.xaxis.set_major_locator(mdates.YearLocator(2))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+    bottom_legend(fig, ncol=2)
+    save_fig('ch0_ro_yields')
+    return dict(bettr=b.iloc[-1] / b.iloc[0], eurron_first=fx.iloc[0], eurron_last=fx.iloc[-1],
+                ro10y_last=y['Romania 10y'].iloc[-1], de10y_last=y['Germany 10y'].iloc[-1])
+
+
 def fig_bad_ticks():
     """EUR/RON: EODHD series (bad ticks) vs the BNR rate, 2015-2026, with annualised volatilities."""
     mk = eurron_mkt.loc['2015':]; bn = eurron.loc['2015':]
@@ -573,7 +618,7 @@ def fig_bad_ticks():
         ax.annotate(f'{t:%d %b %Y}: {mk[t]:.2f}', (t, mk[t]), xytext=(-8, 0), textcoords='offset points', ha='right',
                     va='center', fontsize=7, color='black')
     ax.set_ylabel('RON per EUR'); ax.set_ylim(4.2, 6.05)
-    ax.set_title('EUR/RON 2015-2026: isolated bad ticks, each reversed the next day', fontsize=9, loc='left')
+    ax.set_title('EUR/RON 2015-2026 from two sources', fontsize=9, loc='left')
     bottom_legend(fig, ncol=2)
     save_fig('ch0_bad_ticks')
     return res
@@ -626,52 +671,6 @@ def fig_bvb_history():
 # STUDIU DE CAZ: Haddad, Huebner si Loualiche (2025), "How Competitive Is the Stock Market?"
 # =============================================================================
 HHL = dict(active0=0.81, chi=2.97, pass_through=0.33)   # Sectiunea V.A; Tabelul 2, randul 1; ec. (28)
-
-
-def etf_share():
-    """ETF share of US corporate equities (Financial Accounts of the US), quarterly, 2001 Q1 - latest quarter."""
-    q = load_panel(['ETF equities', 'All equities'], start='2001-01-01').dropna()
-    return (q['ETF equities'] / q['All equities']).rename('ETF share')
-
-
-def fig_hhl_passive():
-    """Left: ETF share. Right: the rule of Section V.A (81% active at the start, pass-through 0.33):
-    fall in the active share and implied fall in the aggregate elasticity E_agg relative to 2001 Q1."""
-    s = etf_share()
-    active = HHL['active0'] - (s - s.iloc[0])
-    d_active = active / HHL['active0'] - 1
-    d_elast = HHL['pass_through'] * d_active
-    fig, axes = plt.subplots(1, 2, figsize=(6.6, 2.35))
-    axes[0].plot(s.index, 100 * s.values, color=Teal, lw=1.1, label='ETF share of US corporate equities')
-    for d in [s.index[0], pd.Timestamp('2020-10-01'), s.index[-1]]:
-        axes[0].plot(d, 100 * s.loc[d], 'o', ms=3.5, color=Teal)
-        axes[0].annotate(f'{100 * s.loc[d]:.1f}%', xy=(d, 100 * s.loc[d]), xytext=(0, 6),
-                         textcoords='offset points', ha='center', fontsize=7, color='black')
-    axes[0].set_ylabel('Share of market value (%)')
-    axes[0].set_ylim(0, 12.5)
-    axes[0].set_xlim(pd.Timestamp('2000-01-01'), pd.Timestamp('2027-12-31'))
-    axes[0].set_title('ETF share, 2001 Q1 - ' + f'{s.index[-1].year} Q{s.index[-1].quarter}', fontsize=9, loc='left')
-    axes[1].plot(d_active.index, 100 * d_active.values, color=IDAred, lw=1.1,
-                 label='Active share = elasticity if $\\chi = 0$')
-    axes[1].plot(d_elast.index, 100 * d_elast.values, color=MainBlue, lw=1.1,
-                 label='Elasticity, pass-through 0.33 ($\\chi = 2.97$)')
-    axes[1].axhline(0, color=Gray, lw=0.5, ls=':')
-    for d in [pd.Timestamp('2020-10-01'), s.index[-1]]:
-        for ser, c in [(d_active, IDAred), (d_elast, MainBlue)]:
-            axes[1].plot(d, 100 * ser.loc[d], 'o', ms=3.5, color=c)
-            axes[1].annotate(f'{100 * ser.loc[d]:.1f}%', xy=(d, 100 * ser.loc[d]), xytext=(-4, -9),
-                             textcoords='offset points', ha='right', fontsize=7, color='black')
-    axes[1].set_ylabel('Change since 2001 Q1 (%)')
-    axes[1].set_ylim(-15, 1.5)
-    axes[1].set_title('Implied change (81% active in 2001)', fontsize=9, loc='left')
-    for ax in axes:
-        ax.xaxis.set_major_locator(mdates.YearLocator(5))
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-        ax.tick_params(axis='x', labelsize=7.5)
-    bottom_legend(fig, ncol=3, fontsize=7.5)
-    save_fig('ch0_hhl_passive')
-    pick = lambda d: dict(etf=round(s.loc[d], 4), active=round(d_active.loc[d], 4), elast=round(d_elast.loc[d], 4))
-    return {str(d.date()): pick(d) for d in [s.index[0], pd.Timestamp('2020-10-01'), s.index[-1]]}
 
 
 def fig_hhl_elasticity():
@@ -728,57 +727,49 @@ def _timeline(ax, rows, x0, x1, levels=(0.22, -0.22, 0.40, -0.40), fs=6.3):
     ax.spines['left'].set_visible(False)
 
 
-def fig_market_history(lang='en'):
+def fig_market_history():
     """Exchanges (top lane) and bubbles/crashes (bottom lane), 1250-2026."""
-    ro = lang == 'ro'
-    ex = [(1270, 1500, 'Bruges, Ter Beurze\n(13th-15th c.)' if not ro else 'Bruges, Ter Beurze\n(sec. XIII-XV)', 0),
-          (1531, 'Antwerp\n1531' if not ro else 'Anvers\n1531', 1), (1602, 'VOC shares\n1602' if not ro else 'acțiuni VOC\n1602', 0),
-          (1698, 'London,\nJonathan\'s\n1698' if not ro else 'Londra,\nJonathan\'s\n1698', 2, -14),
-          (1773, 'London\n"Stock Exchange"\n1773' if not ro else 'Londra\n"Stock Exchange"\n1773', 0),
-          (1792, 'Buttonwood\n1792', 1), (1882, 'Bucharest\n1882' if not ro else 'București\n1882', 0)]
-    cr = [(1637, 'Tulips\n1637' if not ro else 'Lalele\n1637', 1),
-          (1720, 'Mississippi,\nSouth Sea\n1720' if not ro else 'Mississippi,\nMarea Sudului\n1720', 0),
-          (1792, 'Panic\n1792' if not ro else 'Panica\n1792', 1), (1873, '1873', 0), (1929, '1929', 1),
-          (1987, '1987', 0), (2008, '2008', 1), (2020, '2020', 2)]
-    rows = [('Exchanges and traded securities' if not ro else 'Burse și titluri tranzacționate', MainBlue, ex),
-            ('Bubbles, panics and crashes' if not ro else 'Bule, panici și crahuri', IDAred, cr)]
+    ex = [(1270, 1500, 'Bruges, Ter Beurze\n(13th-15th c.)', 0), (1531, 'Antwerp\n1531', 1), (1602, 'VOC shares\n1602', 0),
+          (1698, "London,\nJonathan's\n1698", 2, -14), (1773, 'London\n"Stock Exchange"\n1773', 0),
+          (1792, 'Buttonwood\n1792', 1), (1882, 'Bucharest\n1882', 0)]
+    cr = [(1637, 'Tulips\n1637', 1), (1720, 'Mississippi,\nSouth Sea\n1720', 0), (1792, 'Panic\n1792', 1),
+          (1873, '1873', 0), (1929, '1929', 1), (1987, '1987', 0), (2008, '2008', 1), (2020, '2020', 2)]
+    rows = [('Exchanges and traded securities', MainBlue, ex), ('Bubbles, panics and crashes', IDAred, cr)]
     fig, ax = plt.subplots(figsize=(5.5, 2.2))
     _timeline(ax, rows, 1250, 2035, levels=(0.18, -0.18, 0.42, -0.42), fs=7)
     ax.set_ylim(-1.6, 0.85)
     ax.set_xticks(range(1300, 2001, 100))
     bottom_legend(fig, ncol=2)
-    save_fig('ch0_market_history' + ('_ro' if ro else ''))
+    save_fig('ch0_market_history')
 
 
-def fig_model_history(lang='en'):
+def fig_model_history():
     """Milestones of financial modelling, 1900-2026, one lane per family."""
-    ro = lang == 'ro'
-    T = (lambda en, r: r) if ro else (lambda en, r: en)
     rows = [
-        (T('Random walk and efficiency', 'Mers aleator și eficiență'), MainBlue,
+        ('Random walk and efficiency', MainBlue,
          [(1900, 'Bachelier', 0), (1963, 'Mandelbrot', 1, -3), (1965, 'Samuelson', 0), (1970, 'Fama', 1, 2)]),
-        (T('Portfolio and equilibrium', 'Portofoliu și echilibru'), Forest,
+        ('Portfolio and equilibrium', Forest,
          [(1952, 'Markowitz', 0), (1958, 'Tobin', 1), (1964, 'CAPM', 0), (1976, 'APT', 1), (1993, 'Fama-French', 0)]),
-        (T('Derivatives, continuous time', 'Derivate, timp continuu'), Purple,
+        ('Derivatives, continuous time', Purple,
          [(1973, 'Black-Scholes-Merton', 0, -5), (1977, 'Vasicek', 1), (1985, 'CIR', 0), (1992, 'HJM', 1),
-          (1993, 'Heston', 2), (2018, T('rough vol.', 'rough vol.'), 0)]),
-        (T('Volatility and risk', 'Volatilitate și risc'), IDAred,
-         [(1982, 'ARCH', 0, -3), (1986, 'GARCH', 1, -2), (1994, 'RiskMetrics', 0, -2), (1999, T('coherent', 'coerență'), 1, -4),
-          (2000, T('copula', 'copula'), 2, 2), (2003, T('realised vol.', 'vol. realizată'), 3, 4), (2019, 'FRTB: ES', 1, 4)]),
-        (T('Machine learning', 'Machine learning'), Orange,
-         [(1994, T('neural nets', 'rețele neuronale'), 0), (2019, 'deep hedging', 1, -3), (2020, T('ML asset pricing', 'ML în evaluare'), 0, 2)]),
-        (T('Generative AI', 'AI generativ'), Amber,
+          (1993, 'Heston', 2), (2018, 'rough vol.', 0)]),
+        ('Volatility and risk', IDAred,
+         [(1982, 'ARCH', 0, -3), (1986, 'GARCH', 1, -2), (1994, 'RiskMetrics', 0, -2), (1999, 'coherent', 1, -4),
+          (2000, 'copula', 2, 2), (2003, 'realised vol.', 3, 4), (2019, 'FRTB: ES', 1, 4)]),
+        ('Machine learning', Orange,
+         [(1994, 'neural nets', 0), (2019, 'deep hedging', 1, -3), (2020, 'ML asset pricing', 0, 2)]),
+        ('Generative AI', Amber,
          [(2017, 'Transformer', 0, -4), (2023, 'BloombergGPT', 1), (2024, 'Chronos', 0, 3)]),
-        (T('Quantum computing', 'Calcul cuantic'), Teal,
-         [(2015, T('quantum MC', 'MC cuantic'), 1, -8), (2018, T('option pricing', 'evaluare opțiuni'), 0), (2021, T('advantage threshold', 'pragul avantajului'), 3, 3)]),
+        ('Quantum computing', Teal,
+         [(2015, 'quantum MC', 1, -8), (2018, 'option pricing', 0), (2021, 'advantage threshold', 3, 3)]),
     ]
-    fig, ax = plt.subplots(figsize=(6.2, 3.4))
-    _timeline(ax, rows, 1895, 2033, levels=(0.17, -0.17, 0.34, -0.34), fs=7)
+    fig, ax = plt.subplots(figsize=(7.6, 3.0))
+    _timeline(ax, rows, 1895, 2033, levels=(0.17, -0.17, 0.34, -0.34), fs=6.6)
     ax.set_ylim(-len(rows) + 0.35, 0.5)
     ax.set_xticks(range(1900, 2021, 20))
     ax.tick_params(axis='x', labelsize=8)
     bottom_legend(fig, ncol=4, fontsize=7.5)
-    save_fig('ch0_model_history' + ('_ro' if ro else ''))
+    save_fig('ch0_model_history')
 
 # =============================================================================
 # MAIN
@@ -798,10 +789,9 @@ if __name__ == '__main__':
     print(fig_usdt_peg())
     print(fig_ibit())
     print(fig_romania())
+    print(fig_romania_split())
     print(fig_bvb_history())
     print(fig_bad_ticks())
-    print(fig_hhl_passive())
     print(fig_hhl_elasticity())
-    for lang in ('en', 'ro'):
-        fig_market_history(lang)
-        fig_model_history(lang)
+    fig_market_history()
+    fig_model_history()

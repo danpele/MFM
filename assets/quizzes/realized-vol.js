@@ -27,7 +27,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "options": [
                     "Deoarece limita este Normală mixtă, iar convergența este stabilă, deci studentizarea cu o estimare consistentă a varianței aleatoare dă N(0,1)",
                     "Deoarece cvarticitatea integrată este constantă în cursul zilei",
-                    "Deoarece randamentele intraday sunt Normale și independente de volatilitate",
+                    "Deoarece randamentele intraday sînt Normale și independente de volatilitate",
                     "Deoarece RQ_t este un estimator nedeplasat al lui IQ_t"
                 ],
                 "correctExplanation": "Barndorff-Nielsen și Shephard: sqrt(M)(RV − IV) converge stabil la MN(0, 2 IQ); convergența stabilă permite studentizarea cu sqrt(2 RQ/M), deoarece RQ estimează consistent IQ aleator.",
@@ -50,14 +50,14 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             },
             "ro": {
                 "title": "Limita RV",
-                "text": "Fără zgomot și fără salturi, când numărul de randamente intraday crește, RV_t converge la:",
+                "text": "Fără zgomot și fără salturi, cînd numărul de randamente intraday crește, RV_t converge la:",
                 "options": [
                     "Zero, deoarece fiecare randament devine foarte mic",
                     "Varianța integrată, integrala varianței instantanee pe durata zilei",
                     "Randamentul zilnic la pătrat",
                     "Varianța necondiționată a seriei de randamente"
                 ],
-                "correctExplanation": "Barndorff-Nielsen și Shephard: RV_t converge la variația pătratică, egală cu varianța integrată când nu există salturi.",
+                "correctExplanation": "Barndorff-Nielsen și Shephard: RV_t converge la variația pătratică, egală cu varianța integrată cînd nu există salturi.",
                 "incorrectExplanation": "Randamentele scad, dar numărul lor crește; suma pătratelor converge la varianța integrată, o mărime specifică zilei t."
             }
         },
@@ -107,12 +107,12 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "text": "Estimatorul de scalare aplicat volatilității realizate zilnice dă Ĥ = 0,11 pentru SPY. Ce afirmație este cea mai ușor de susținut?",
                 "options": [
                     "H = 0,11 este demonstrat pentru volatilitatea SPY",
-                    "Zgomotul de măsurare din RV deplasează Ĥ în sus, deci volatilitatea este și mai aspră decât 0,11",
+                    "Zgomotul de măsurare din RV deplasează Ĥ în sus, deci volatilitatea este și mai aspră decît 0,11",
                     "Exponentul Hurst este irelevant pentru prognoza volatilității",
                     "Eroarea de măsurare din RV coboară Ĥ, iar estimatorul este inconsistent pe indicatori zgomotoși, deci 0,11 poate exagera asprimea"
                 ],
                 "correctExplanation": "Zgomotul adaugă o constantă la momentele incrementelor și aplatizează panta de scalare; Fukasawa, Takabatake și Westphal arată că pentru consistență e nevoie de asimptotica de înaltă frecvență.",
-                "incorrectExplanation": "O estimare dintr-un indicator zgomotos nu este o demonstrație, deplasarea din eroarea de măsurare merge spre un H mai mic, iar H influențează atât panta zâmbetului, cât și ponderile prognozei."
+                "incorrectExplanation": "O estimare dintr-un indicator zgomotos nu este o demonstrație, deplasarea din eroarea de măsurare merge spre un H mai mic, iar H influențează atît panta zîmbetului, cît și ponderile prognozei."
             }
         },
         {
@@ -188,7 +188,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "text": "Ce arată graficul semnăturii volatilității?",
                 "options": [
                     "RV în funcție de ora din zi",
-                    "Autocorelația RV pe întârzieri",
+                    "Autocorelația RV pe întîrzieri",
                     "RV medie în funcție de intervalul de eșantionare; o creștere la frecvențe mari semnalează zgomot",
                     "Volatilitatea implicită în funcție de prețul de exercitare"
                 ],
@@ -219,7 +219,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "RV scade puternic de la 5 la 130 de minute",
                     "Graficul este plat, iar autocorelația de ordinul 1 este aproximativ -0,01: zgomotul este neglijabil la 5 minute"
                 ],
-                "correctExplanation": "Volatilitatea anualizată din RV medie rămâne între 12,6% și 13,1% de la 5 la 130 de minute; corecțiile de zgomot schimbă puțin la această frecvență.",
+                "correctExplanation": "Volatilitatea anualizată din RV medie rămîne între 12,6% și 13,1% de la 5 la 130 de minute; corecțiile de zgomot schimbă puțin la această frecvență.",
                 "incorrectExplanation": "Pentru un ETF lichid la 5 minute zgomotul este invizibil: graficul semnăturii este plat, iar autocorelația randamentelor este aproape zero."
             }
         },
@@ -269,7 +269,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "text": "De ce este variația bipower robustă la salturi?",
                 "options": [
                     "Elimină toate randamentele mai mari de 1%",
-                    "Un salt intră într-un singur randament și este înmulțit cu un randament vecin mic, deci efectul lui dispare când M crește",
+                    "Un salt intră într-un singur randament și este înmulțit cu un randament vecin mic, deci efectul lui dispare cînd M crește",
                     "Folosește doar randamentele la pătrat",
                     "Se calculează din randamente zilnice"
                 ],
@@ -293,7 +293,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             },
             "ro": {
                 "title": "Rata descoperirilor false pentru zilele cu salt",
-                "text": "Testul zilnic de salturi pe 1.489 de zile SPY la 5% dă 235 de respingeri. Ce procedură ordonează cele N valori p zilnice și respinge cele mai mici k, cu k cel mai mare indice pentru care p_(k) ≤ k × 0,05/N, astfel încât ponderea așteptată a zilelor cu salt false printre zilele respinse să rămână cel mult 5%?",
+                "text": "Testul zilnic de salturi pe 1.489 de zile SPY la 5% dă 235 de respingeri. Ce procedură ordonează cele N valori p zilnice și respinge cele mai mici k, cu k cel mai mare indice pentru care p_(k) ≤ k × 0,05/N, astfel încît ponderea așteptată a zilelor cu salt false printre zilele respinse să rămînă cel mult 5%?",
                 "options": [
                     "Bonferroni la 5%",
                     "Creșterea numărului de randamente intraday M",
@@ -325,7 +325,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "235 de respingeri dovedesc că fiecare astfel de zi a avut un salt",
                     "Testul nu este valid pentru date zilnice",
                     "Nivelul de 5% face imposibile alarmele false",
-                    "Aproximativ 74 de respingeri sunt așteptate chiar fără salturi, deci nu orice respingere este un salt produs de știri"
+                    "Aproximativ 74 de respingeri sînt așteptate chiar fără salturi, deci nu orice respingere este un salt produs de știri"
                 ],
                 "correctExplanation": "Cu un test pe zi, alfa înmulțit cu numărul de zile reprezintă alarme false; un nivel mai strict, ca 0,1%, le menține puține.",
                 "incorrectExplanation": "Testarea multor zile produce alarme false; la 5% aproximativ 74 din 1.489 de zile ar respinge fără salturi."
@@ -347,15 +347,15 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             },
             "ro": {
                 "title": "HAR ca AR(22) restricționat",
-                "text": "Privit ca un AR(22) pentru log RV, câte restricții liniare impune modelul HAR asupra coeficienților întârzierilor?",
+                "text": "Privit ca un AR(22) pentru log RV, cîte restricții liniare impune modelul HAR asupra coeficienților întîrzierilor?",
                 "options": [
-                    "19: coeficienți egali pe întârzierile 2–5 (3 restricții) și pe întârzierile 6–22 (16 restricții)",
-                    "3, câte una pentru fiecare componentă",
-                    "21, toate întârzierile după prima",
+                    "19: coeficienți egali pe întîrzierile 2–5 (3 restricții) și pe întîrzierile 6–22 (16 restricții)",
+                    "3, cîte una pentru fiecare componentă",
+                    "21, toate întîrzierile după prima",
                     "Niciuna: HAR este un AR(22) nerestricționat"
                 ],
                 "correctExplanation": "Scara fixează φ2 = … = φ5 și φ6 = … = φ22; pentru SPY testul Wald al celor 19 restricții dă p = 0,51.",
-                "incorrectExplanation": "HAR are 3 pante libere din 22 de coeficienți ai întârzierilor, deci 22 − 3 = 19 restricții: egalități în blocurile săptămânal și lunar, nu întârzieri nule."
+                "incorrectExplanation": "HAR are 3 pante libere din 22 de coeficienți ai întîrzierilor, deci 22 − 3 = 19 restricții: egalități în blocurile săptămînal și lunar, nu întîrzieri nule."
             }
         },
         {
@@ -401,14 +401,14 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             },
             "ro": {
                 "title": "Memoria lungă",
-                "text": "Autocorelația log RV pentru SPY este 0,64 la întârzierea 1 și 0,24 la 22 de zile. Ce indică acest lucru?",
+                "text": "Autocorelația log RV pentru SPY este 0,64 la întîrzierea 1 și 0,24 la 22 de zile. Ce indică acest lucru?",
                 "options": [
                     "Lipsa memoriei: RV este i.i.d.",
                     "Memorie scurtă: un AR(1) se potrivește perfect",
-                    "Memorie lungă: autocorelațiile scad mult mai lent decât la un AR(1)",
+                    "Memorie lungă: autocorelațiile scad mult mai lent decît la un AR(1)",
                     "O tendință negativă a volatilității"
                 ],
-                "correctExplanation": "Un AR(1) cu 0,64 ar da aproximativ 0,00005 la întârzierea 22; valoarea observată 0,24 arată o scădere lentă.",
+                "correctExplanation": "Un AR(1) cu 0,64 ar da aproximativ 0,00005 la întîrzierea 22; valoarea observată 0,24 arată o scădere lentă.",
                 "incorrectExplanation": "Șocurile de volatilitate persistă luni de zile; autocorelația la o lună este încă departe de zero."
             }
         },
@@ -431,12 +431,12 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "text": "De ce este RV trunchiată, suma lui r² pe randamentele cu |r| ≤ c·Δ^ϖ și 0 < ϖ < 1/2, robustă la salturi?",
                 "options": [
                     "Deoarece un exponent ϖ peste 1/2 păstrează toate randamentele difuzive",
-                    "Deoarece pragul rămâne fix când Δ scade",
+                    "Deoarece pragul rămîne fix cînd Δ scade",
                     "Deoarece înmulțește randamentele absolute alăturate",
-                    "Deoarece incrementele difuzive sunt de ordinul Δ^(1/2) și ajung sub prag, în timp ce salturile sunt de ordinul 1 și sunt eliminate"
+                    "Deoarece incrementele difuzive sînt de ordinul Δ^(1/2) și ajung sub prag, în timp ce salturile sînt de ordinul 1 și sînt eliminate"
                 ],
-                "correctExplanation": "Mancini (2009): cu ϖ < 1/2 pragul scade mai lent decât incrementele difuzive, dar tot tinde la zero, deci salturile sunt eliminate asimptotic.",
-                "incorrectExplanation": "Pragul trebuie să scadă odată cu Δ, dar mai lent decât Δ^(1/2); înmulțirea randamentelor alăturate este variația bipower, un alt estimator."
+                "correctExplanation": "Mancini (2009): cu ϖ < 1/2 pragul scade mai lent decît incrementele difuzive, dar tot tinde la zero, deci salturile sînt eliminate asimptotic.",
+                "incorrectExplanation": "Pragul trebuie să scadă odată cu Δ, dar mai lent decît Δ^(1/2); înmulțirea randamentelor alăturate este variația bipower, un alt estimator."
             }
         },
         {
@@ -459,7 +459,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "options": [
                     "VIX este mai mare: investitorii plătesc o primă pentru a se asigura împotriva volatilității",
                     "VIX este mai mic, cu aproximativ 4 puncte",
-                    "Sunt exact egale în medie",
+                    "Sînt exact egale în medie",
                     "VIX nu are legătură cu volatilitatea viitoare"
                 ],
                 "correctExplanation": "VIX mediu 19,5 față de 15,2 realizată; VIX a depășit volatilitatea realizată în aproximativ 88% din zile.",
@@ -484,13 +484,13 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "title": "Atenuarea în HAR și HARQ",
                 "text": "De ce ar trebui ca ponderea RV de ieri într-o prognoză HAR să fie mai mică în zilele cu cvarticitate realizată mare?",
                 "options": [
-                    "Efectul de pârghie: randamentele negative cresc RV viitoare",
+                    "Efectul de pîrghie: randamentele negative cresc RV viitoare",
                     "RV_t măsoară IV_t cu o eroare a cărei varianță este proporțională cu IQ_t, iar eroarea dintr-un regresor îi atenuează panta",
-                    "Salturile sunt mai frecvente în acele zile",
-                    "Componenta săptămânală preia efectul zilnic"
+                    "Salturile sînt mai frecvente în acele zile",
+                    "Componenta săptămînală preia efectul zilnic"
                 ],
-                "correctExplanation": "Bollerslev, Patton și Quaedvlieg (2016): raportul semnal/zgomot al lui RV_t scade când IQ_t este mare, deci HARQ folosește β_d + β_Q sqrt(RQ_t) cu β_Q < 0.",
-                "incorrectExplanation": "Mecanismul este cel al erorilor în variabile: CLT dă Var(RV − IV) = 2 IQ/M, deci un regresor mai zgomotos merită o pondere mai mică; efectul de pârghie și salturile sunt extensii separate."
+                "correctExplanation": "Bollerslev, Patton și Quaedvlieg (2016): raportul semnal/zgomot al lui RV_t scade cînd IQ_t este mare, deci HARQ folosește β_d + β_Q sqrt(RQ_t) cu β_Q < 0.",
+                "incorrectExplanation": "Mecanismul este cel al erorilor în variabile: CLT dă Var(RV − IV) = 2 IQ/M, deci un regresor mai zgomotos merită o pondere mai mică; efectul de pîrghie și salturile sînt extensii separate."
             }
         },
         {
@@ -508,16 +508,16 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "incorrectExplanation": "Lag 1 gets all three terms, lags 2-5 get the weekly and monthly terms, lags 6-22 only the monthly term."
             },
             "ro": {
-                "title": "Ponderile HAR pe întârzieri",
-                "text": "Într-un HAR cu coeficienții beta_d, beta_w, beta_m, ce pondere primește întârzierea 10?",
+                "title": "Ponderile HAR pe întîrzieri",
+                "text": "Într-un HAR cu coeficienții beta_d, beta_w, beta_m, ce pondere primește întîrzierea 10?",
                 "options": [
                     "beta_d + beta_w/5 + beta_m/22",
                     "beta_w/5 + beta_m/22",
                     "beta_m / 22",
                     "Zero"
                 ],
-                "correctExplanation": "Întârzierea 10 este în afara săptămânii, dar în interiorul lunii, deci contribuie doar media lunară: beta_m/22.",
-                "incorrectExplanation": "Întârzierea 1 primește toți cei trei termeni, întârzierile 2-5 termenii săptămânal și lunar, întârzierile 6-22 doar termenul lunar."
+                "correctExplanation": "Întîrzierea 10 este în afara săptămînii, dar în interiorul lunii, deci contribuie doar media lunară: beta_m/22.",
+                "incorrectExplanation": "Întîrzierea 1 primește toți cei trei termeni, întîrzierile 2-5 termenii săptămînal și lunar, întîrzierile 6-22 doar termenul lunar."
             }
         },
         {
@@ -536,7 +536,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             },
             "ro": {
                 "title": "Ce funcție de pierdere rezistă unui proxy zgomotos",
-                "text": "Prognozele sunt evaluate față de RV, un proxy zgomotos al varianței adevărate, nedeplasat condiționat: E[RV_t | trecut] = E[IV_t | trecut]. Ce funcție de pierdere ordonează prognozele la fel ca varianța adevărată?",
+                "text": "Prognozele sînt evaluate față de RV, un proxy zgomotos al varianței adevărate, nedeplasat condiționat: E[RV_t | trecut] = E[IV_t | trecut]. Ce funcție de pierdere ordonează prognozele la fel ca varianța adevărată?",
                 "options": [
                     "MSE pe volatilitate, (sqrt(RV) − sqrt(F))²",
                     "Eroarea absolută medie pe varianță",
@@ -544,7 +544,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "QLIKE pe varianță, RV/F − ln(RV/F) − 1"
                 ],
                 "correctExplanation": "Patton (2011): diferența QLIKE dintre două prognoze este liniară în RV, deci speranța ei condiționată depinde de RV doar prin E[RV | trecut] = E[IV | trecut]; ordonarea așteptată este cea dată de varianța adevărată.",
-                "incorrectExplanation": "Funcțiile de pierdere pe volatilitate sau cu erori absolute sunt minimizate de altă prognoză decât varianța condiționată (din Jensen, (E sqrt(RV))² este sub E RV), deci zgomotul proxy-ului distorsionează ordonarea."
+                "incorrectExplanation": "Funcțiile de pierdere pe volatilitate sau cu erori absolute sînt minimizate de altă prognoză decît varianța condiționată (din Jensen, (E sqrt(RV))² este sub E RV), deci zgomotul proxy-ului distorsionează ordonarea."
             }
         },
         {
@@ -571,7 +571,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "Niciuna, deoarece QLIKE este zero pentru toate prognozele"
                 ],
                 "correctExplanation": "QLIKE este 0,307 pentru 0,5 și 0,193 pentru 2,0: subestimarea riscului costă mai mult.",
-                "incorrectExplanation": "QLIKE = RV/F - log(RV/F) - 1 crește rapid când F este prea mic; MSE ar ordona cele două invers."
+                "incorrectExplanation": "QLIKE = RV/F - log(RV/F) - 1 crește rapid cînd F este prea mic; MSE ar ordona cele două invers."
             }
         },
         {
@@ -592,12 +592,12 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "title": "Mulțimea de încredere a modelelor",
                 "text": "Pentru prognozele SPY pe o zi din 2022, mulțimea de încredere a modelelor la 90% conține log-HAR și SHAR. Ce înseamnă aceasta?",
                 "options": [
-                    "SHAR este semnificativ mai bun decât log-HAR",
+                    "SHAR este semnificativ mai bun decît log-HAR",
                     "Datele nu le pot separa, iar mulțimea conține cel mai bun model cu probabilitate de cel puțin 90%",
                     "Toate celelalte modele au QLIKE peste 0,5",
                     "Fiecare model rămas a trecut 21 de teste Diebold–Mariano separate la 5%"
                 ],
-                "correctExplanation": "Hansen, Lunde și Nason (2011): modelele sunt eliminate succesiv până când egalitatea capacității predictive nu mai este respinsă; cele rămase formează o mulțime de încredere pentru cel mai bun model.",
+                "correctExplanation": "Hansen, Lunde și Nason (2011): modelele sînt eliminate succesiv pînă cînd egalitatea capacității predictive nu mai este respinsă; cele rămase formează o mulțime de încredere pentru cel mai bun model.",
                 "incorrectExplanation": "MCS este o afirmație despre o mulțime, cu controlul multiplicității, nu un clasament între modelele rămase și nici un șir de teste pe perechi neajustate."
             }
         },
@@ -605,11 +605,11 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             "correct": 2,
             "en": {
                 "title": "Joint test in Mincer–Zarnowitz",
-                "text": "In the MZ regression for GARCH, â = 0.2418 (SE 0.2310), b̂ = 0.7046 (SE 0.2382) and corr(â, b̂) = −0.9750. How should unbiasedness, (a, b) = (0, 1), be tested?",
+                "text": "In the MZ regression for GARCH, î = 0.2418 (SE 0.2310), b̂ = 0.7046 (SE 0.2382) and corr(î, b̂) = −0.9750. How should unbiasedness, (a, b) = (0, 1), be tested?",
                 "options": [
                     "Two separate t-tests, rejecting if either rejects",
                     "Test b = 1 only, because the intercept is irrelevant",
-                    "A joint Wald test using the full HAC covariance matrix of (â, b̂)",
+                    "A joint Wald test using the full HAC covariance matrix of (î, b̂)",
                     "Compare the R² of the regression with 1"
                 ],
                 "correctExplanation": "With strongly correlated estimates only the joint Wald statistic has the right size; here W = 2.07, p = 0.35.",
@@ -617,12 +617,12 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             },
             "ro": {
                 "title": "Testul comun în Mincer–Zarnowitz",
-                "text": "În regresia MZ pentru GARCH, â = 0,2418 (SE 0,2310), b̂ = 0,7046 (SE 0,2382) și corr(â, b̂) = −0,9750. Cum trebuie testată nedeplasarea, (a, b) = (0, 1)?",
+                "text": "În regresia MZ pentru GARCH, î = 0,2418 (SE 0,2310), b̂ = 0,7046 (SE 0,2382) și corr(î, b̂) = −0,9750. Cum trebuie testată nedeplasarea, (a, b) = (0, 1)?",
                 "options": [
-                    "Două teste t separate, respingând dacă oricare respinge",
+                    "Două teste t separate, respingînd dacă oricare respinge",
                     "Doar testul b = 1, deoarece termenul liber este irelevant",
-                    "Un test Wald comun, cu matricea de covarianță HAC completă a lui (â, b̂)",
-                    "Comparând R² al regresiei cu 1"
+                    "Un test Wald comun, cu matricea de covarianță HAC completă a lui (î, b̂)",
+                    "Comparînd R² al regresiei cu 1"
                 ],
                 "correctExplanation": "Cu estimări puternic corelate doar statistica Wald comună are mărimea corectă; aici W = 2,07, p = 0,35.",
                 "incorrectExplanation": "Testele t separate ignoră corelația și au mărimea comună greșită, termenul liber face parte din ipoteză, iar R² este limitat sub 1 de zgomotul din RV."
@@ -646,10 +646,10 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "title": "Volatilitatea aspră",
                 "text": "Capitolul estimează exponentul Hurst H al log-volatilității la aproximativ 0,1. Ce înseamnă H < 0,5?",
                 "options": [
-                    "Volatilitatea este mai netedă decât o mișcare browniană și are tendință",
+                    "Volatilitatea este mai netedă decît o mișcare browniană și are tendință",
                     "Volatilitatea este constantă",
                     "Volatilitatea este un mers aleator cu H exact 0,5",
-                    "Log-volatilitatea este mai aspră decât o mișcare browniană: incrementele ei sunt corelate negativ"
+                    "Log-volatilitatea este mai aspră decît o mișcare browniană: incrementele ei sînt corelate negativ"
                 ],
                 "correctExplanation": "H = 0,5 este mișcarea browniană; H aproximativ 0,1 înseamnă traiectorii foarte aspre (Gatheral, Jaisson și Rosenbaum); eroarea de măsurare din RV poate coborî H.",
                 "incorrectExplanation": "Asprimea înseamnă H mult sub 0,5; capitolul găsește 0,11 pentru SPY și 0,08 pentru Bitcoin, cu precauția privind eroarea de măsurare."
@@ -675,7 +675,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "options": [
                     "SPY trebuie anualizat cu 365 de zile, nu cu 252",
                     "Varianța realizată nu poate fi anualizată deloc",
-                    "RV zilnică trebuie mai întâi împărțită la 252",
+                    "RV zilnică trebuie mai întîi împărțită la 252",
                     "Volatilitatea crește cu rădăcina pătrată a timpului: sqrt(252 x 1,0e-4) = 15,9%"
                 ],
                 "correctExplanation": "Varianța crește proporțional cu timpul, iar volatilitatea cu rădăcina lui pătrată, deci volatilitatea anuală este sqrt(252 x RV) = 15,9%. Cifra de 252% ar trebui să pice și testul de plauzibilitate: VIX este de obicei între 12 și 30.",
@@ -698,11 +698,11 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             },
             "ro": {
                 "title": "Găsiți eroarea AI: eșantionarea fiecărei tranzacții",
-                "text": "Un asistent AI scrie: „Pentru SPY, adunați pătratele randamentelor la fiecare tranzacție: cu cât sunt mai multe randamente intraday, cu atât eroarea varianței realizate este mai mică, deci eșantionarea tranzacție cu tranzacție este întotdeauna cea mai bună.” Ce este greșit?",
+                "text": "Un asistent AI scrie: „Pentru SPY, adunați pătratele randamentelor la fiecare tranzacție: cu cît sînt mai multe randamente intraday, cu atît eroarea varianței realizate este mai mică, deci eșantionarea tranzacție cu tranzacție este întotdeauna cea mai bună.” Ce este greșit?",
                 "options": [
                     "Zgomotul de microstructură: cu un zgomot de varianță omega^2, E[RV] = IV + 2n omega^2, deci deplasarea crește cu numărul de randamente n; eșantionați la 1-5 minute sau folosiți un estimator robust la zgomot",
                     "Varianța realizată ar trebui să folosească randamente absolute, nu pătratele lor",
-                    "Datele pe tranzacții sunt prea puține pentru a estima o varianță zilnică",
+                    "Datele pe tranzacții sînt prea puține pentru a estima o varianță zilnică",
                     "Pătratele randamentelor trebuie calculate din randamente simple, niciodată din randamente log"
                 ],
                 "correctExplanation": "Oscilația bid-ask și discretizarea prețului adaugă zgomot fiecărui preț observat. Contribuția lui, 2n omega^2, crește cu frecvența de eșantionare, de aceea graficul semnăturii urcă la intervale scurte (Bandi și Russell, 2008; Zhang, Mykland și Ait-Sahalia, 2005).",

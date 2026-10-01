@@ -23,9 +23,9 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Deplasarea raportului Sharpe în eșantion",
-                "text": "Randamentele sunt i.i.d. din distribuția Normală, cu N = 10 active și T = 60 de luni; θ² = μ'Σ⁻¹μ este pătratul raportului Sharpe maxim adevărat, iar θ̂² estimatorul său cu covarianța de verosimilitate maximă. Ce este adevărat?",
+                "text": "Randamentele sînt i.i.d. din distribuția Normală, cu N = 10 active și T = 60 de luni; θ² = μ'Σ⁻¹μ este pătratul raportului Sharpe maxim adevărat, iar θ̂² estimatorul său cu covarianța de verosimilitate maximă. Ce este adevărat?",
                 "options": [
-                    "θ̂² este nedeplasat, pentru că media și covarianța de selecție sunt nedeplasate",
+                    "θ̂² este nedeplasat, pentru că media și covarianța de selecție sînt nedeplasate",
                     "θ̂² este deplasat în jos, pentru că Σ̂⁻¹ subestimează Σ⁻¹",
                     "E[θ̂²] = (Tθ² + N)/(T − N − 2), peste θ²",
                     "Deplasarea este proporțională cu 1/T și nu depinde de N"
@@ -50,7 +50,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Regresia Britten-Jones",
-                "text": "Regresați constanta 1 pe vectorul randamentelor în exces r_t, fără termen liber. Coeficienții OLS sunt proporționali cu…",
+                "text": "Regresați constanta 1 pe vectorul randamentelor în exces r_t, fără termen liber. Coeficienții OLS sînt proporționali cu…",
                 "options": [
                     "ponderile tangente de selecție Σ̂⁻¹μ̂, deci o pondere tangentă nulă se testează cu un test t OLS",
                     "ponderile GMV de selecție Σ̂⁻¹1",
@@ -79,13 +79,13 @@ window.MFM_DATA.quizzes['portfolio'] = {
                 "title": "Marchenko–Pastur",
                 "text": "N = 16 active, T = 64 de luni, randamente i.i.d. cu Σ = σ²I. Pentru N și T mari, unde se află cea mai mare valoare proprie de selecție?",
                 "options": [
-                    "Aproape de σ², pentru că toate valorile proprii adevărate sunt σ²",
+                    "Aproape de σ², pentru că toate valorile proprii adevărate sînt σ²",
                     "Aproape de 16σ², urma lui Σ",
                     "Aproape de σ²(1 + 0,25) = 1,25σ²",
                     "Aproape de σ²(1 + √0,25)² = 2,25σ²"
                 ],
                 "correctExplanation": "Cu c = N/T = 0,25, valorile proprii de selecție umplu [σ²(1 − √c)², σ²(1 + √c)²] = [0,25σ², 2,25σ²]: zgomotul singur le împrăștie de nouă ori.",
-                "incorrectExplanation": "Zgomotul de eșantionare împrăștie valorile proprii în jurul lui σ² chiar când cele adevărate sunt egale; marginea conține rădăcina pătrată a lui c = N/T, iar urma este suma, nu cea mai mare valoare proprie."
+                "incorrectExplanation": "Zgomotul de eșantionare împrăștie valorile proprii în jurul lui σ² chiar cînd cele adevărate sînt egale; marginea conține rădăcina pătrată a lui c = N/T, iar urma este suma, nu cea mai mare valoare proprie."
             }
         },
         {
@@ -131,7 +131,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Precizia mediei",
-                "text": "SPY are o volatilitate anuală de circa 15%. Aproximativ câți ani de date dau o eroare standard de 1% pentru media anuală?",
+                "text": "SPY are o volatilitate anuală de circa 15%. Aproximativ cîți ani de date dau o eroare standard de 1% pentru media anuală?",
                 "options": [
                     "Circa 2 ani de date zilnice",
                     "Circa 220 de ani",
@@ -165,7 +165,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "1/N are cea mai mică varianță dintre toate regulile",
                     "Doar shrinkage-ul bate 1/N"
                 ],
-                "correctExplanation": "Eroarea de estimare anulează câștigul optimizării; cu 25 de active, MV de selecție are nevoie de circa 3000 de luni de date.",
+                "correctExplanation": "Eroarea de estimare anulează cîștigul optimizării; cu 25 de active, MV de selecție are nevoie de circa 3000 de luni de date.",
                 "incorrectExplanation": "Rezultatul lor este că niciun model nu a bătut consecvent ponderile egale în raport Sharpe, echivalent cert sau turnover."
             }
         },
@@ -185,14 +185,14 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Intensitatea Ledoit–Wolf",
-                "text": "N este fix, lungimea eșantionului T crește, iar ținta converge la o matrice diferită de matricea de covarianță adevărată. Ce se întâmplă cu intensitatea optimă de shrinkage Ledoit–Wolf δ* = κ/T?",
+                "text": "N este fix, lungimea eșantionului T crește, iar ținta converge la o matrice diferită de matricea de covarianță adevărată. Ce se întîmplă cu intensitatea optimă de shrinkage Ledoit–Wolf δ* = κ/T?",
                 "options": [
                     "Tinde la 1: ținta domină",
                     "Tinde la 0 cu viteza 1/T",
-                    "Rămâne constantă, pentru că κ nu depinde de T",
+                    "Rămîne constantă, pentru că κ nu depinde de T",
                     "Tinde la 0 cu viteza 1/√T, viteza covarianței de selecție"
                 ],
-                "correctExplanation": "Cu o țintă greșit specificată, κ converge la o constantă, deci δ* = κ/T scade ca 1/T: în eșantioane lungi câștigă matricea de selecție, consistentă (dacă ținta ar fi corectă, deplasarea ei ar dispărea și δ* nu ar tinde neapărat la zero).",
+                "correctExplanation": "Cu o țintă greșit specificată, κ converge la o constantă, deci δ* = κ/T scade ca 1/T: în eșantioane lungi cîștigă matricea de selecție, consistentă (dacă ținta ar fi corectă, deplasarea ei ar dispărea și δ* nu ar tinde neapărat la zero).",
                 "incorrectExplanation": "Eroarea de estimare a lui S scade cu T, dar deplasarea țintei nu, deci ponderea țintei trebuie să dispară; viteza este cea a lui δ* = κ/T, nu viteza √T a estimatorului."
             }
         },
@@ -212,14 +212,14 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Black–Litterman cu opinii certe",
-                "text": "În Black–Litterman, opiniile sunt sigure (Ω → 0). Ce devine media a posteriori μ_BL?",
+                "text": "În Black–Litterman, opiniile sînt sigure (Ω → 0). Ce devine media a posteriori μ_BL?",
                 "options": [
-                    "Randamentele implicite π: opiniile sunt ignorate",
+                    "Randamentele implicite π: opiniile sînt ignorate",
                     "q pentru fiecare activ, chiar și pentru cele din afara opiniilor",
                     "Proiecția GLS a lui π care satisface exact Pμ_BL = q",
                     "Nu este definită, pentru că Ω⁻¹ nu există"
                 ],
-                "correctExplanation": "μ_BL = π + τΣP'(PτΣP' + Ω)⁻¹(q − Pπ); cu Ω = 0 opiniile sunt satisfăcute exact, iar π se mută cât mai puțin în metrica τΣ (cele mai mici pătrate cu restricții).",
+                "correctExplanation": "μ_BL = π + τΣP'(PτΣP' + Ω)⁻¹(q − Pπ); cu Ω = 0 opiniile sînt satisfăcute exact, iar π se mută cît mai puțin în metrica τΣ (cele mai mici pătrate cu restricții).",
                 "incorrectExplanation": "Opiniile fixează Pμ_BL la q; mediile activelor din afara opiniilor se pot și ele modifica prin covarianța cu combinațiile din opinii, iar limita există sub forma π + τΣP'(PτΣP')⁻¹(q − Pπ)."
             }
         },
@@ -246,7 +246,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "O medie ponderată δF + (1 − δ)S între o țintă structurată și matricea de selecție",
                     "Matricea identitate"
                 ],
-                "correctExplanation": "δ este ales din date astfel încât să minimizeze distanța pătratică așteptată față de matricea adevărată.",
+                "correctExplanation": "δ este ales din date astfel încît să minimizeze distanța pătratică așteptată față de matricea adevărată.",
                 "incorrectExplanation": "Shrinkage-ul combină matricea de selecție zgomotoasă cu o țintă deplasată, dar stabilă."
             }
         },
@@ -266,11 +266,11 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Restricțiile ca shrinkage",
-                "text": "Ce au arătat Jagannathan și Ma (2003) despre restricțiile fără vânzări în lipsă?",
+                "text": "Ce au arătat Jagannathan și Ma (2003) despre restricțiile fără vînzări în lipsă?",
                 "options": [
                     "Scad întotdeauna raportul Sharpe",
                     "Fac matricea de covarianță singulară",
-                    "Sunt echivalente cu adăugarea unui activ fără risc",
+                    "Sînt echivalente cu adăugarea unui activ fără risc",
                     "Acționează ca un shrinkage al matricei de covarianță și pot reduce riscul în afara eșantionului"
                 ],
                 "correctExplanation": "GMV doar long este GMV fără restricții al unei matrice de covarianță modificate: restricția „greșită” ajută.",
@@ -293,7 +293,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Randamentele implicite",
-                "text": "În Black–Litterman, ce sunt randamentele implicite (de echilibru) π?",
+                "text": "În Black–Litterman, ce sînt randamentele implicite (de echilibru) π?",
                 "options": [
                     "Mediile de selecție din ultimii zece ani",
                     "Randamentele care fac optim portofoliul de referință: π = δΣw_b",
@@ -376,7 +376,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                 "title": "Bootstrap studentizat",
                 "text": "De ce aplică Ledoit și Wolf (2008) bootstrap statisticii studentizate |Δ̂* − Δ̂|/s(Δ̂*), și nu direct lui Δ̂*?",
                 "options": [
-                    "Statistica studentizată este asimptotic pivotală, deci testul bootstrap este mai precis decât aproximarea Normală",
+                    "Statistica studentizată este asimptotic pivotală, deci testul bootstrap este mai precis decît aproximarea Normală",
                     "Studentizarea elimină dependența serială a randamentelor",
                     "Studentizarea face randamentele să urmeze distribuția Normală",
                     "Studentizarea reduce timpul de calcul"
@@ -409,7 +409,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Nesemnificativ, pentru că 21 × 0,03 = 0,63 > 0,05"
                 ],
                 "correctExplanation": "Holm compară cea mai mică valoare p cu 0,05/21 ≈ 0,0024; valoarea ajustată 0,63 este mult peste 5%, iar Holm este valid sub orice dependență.",
-                "incorrectExplanation": "O valoare p sub 0,05 este de așteptat din întâmplare printre 21 de teste; Holm controlează probabilitatea de cel puțin o eroare în familie sub orice dependență, deci corelația nici nu elimină ajustarea, nici nu o interzice."
+                "incorrectExplanation": "O valoare p sub 0,05 este de așteptat din întîmplare printre 21 de teste; Holm controlează probabilitatea de cel puțin o eroare în familie sub orice dependență, deci corelația nici nu elimină ajustarea, nici nu o interzice."
             }
         },
         {
@@ -433,7 +433,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "σ_ERC ≤ σ_GMV ≤ σ_1/N",
                     "σ_1/N ≤ σ_ERC ≤ σ_GMV",
                     "σ_GMV ≤ σ_ERC ≤ σ_1/N",
-                    "Sunt întotdeauna egale"
+                    "Sînt întotdeauna egale"
                 ],
                 "correctExplanation": "ERC se află între varianța minimă și ponderile egale; pe setul multi-active: GMV-LO 5,8%, ERC 7,9%, 1/N 9,4%.",
                 "incorrectExplanation": "GMV are prin definiție cea mai mică varianță; ERC se află între ea și 1/N."
@@ -463,7 +463,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Circa 31%"
                 ],
                 "correctExplanation": "Volatilitatea SPY (14,7%) este de peste două ori cea a IEF (6,6%), iar corelația ușor negativă, deci SPY domină riscul.",
-                "incorrectExplanation": "Ponderile nu sunt cote de risc: activul volatil poartă cea mai mare parte a riscului."
+                "incorrectExplanation": "Ponderile nu sînt cote de risc: activul volatil poartă cea mai mare parte a riscului."
             }
         },
         {
@@ -489,7 +489,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Poate produce ponderi negative",
                     "Grupează activele după distanța de corelație și împarte ponderea prin bisecție recursivă, fără a inversa Σ"
                 ],
-                "correctExplanation": "HRP funcționează chiar dacă Σ este singulară; toate ponderile sale sunt pozitive.",
+                "correctExplanation": "HRP funcționează chiar dacă Σ este singulară; toate ponderile sale sînt pozitive.",
                 "incorrectExplanation": "HRP folosește un arbore și alocări invers proporționale cu varianța, niciodată o inversare de matrice sau randamente așteptate."
             }
         },
@@ -509,10 +509,10 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Mecanismul Jagannathan–Ma",
-                "text": "GMV fără vânzări în lipsă este GMV nerestricționat al matricei modificate S̃ = S − (λ1' + 1λ'), cu λ ≥ 0 multiplicatorii restricțiilor w ≥ 0. Ce face o restricție activă pe activul i?",
+                "text": "GMV fără vînzări în lipsă este GMV nerestricționat al matricei modificate S̃ = S − (λ1' + 1λ'), cu λ ≥ 0 multiplicatorii restricțiilor w ≥ 0. Ce face o restricție activă pe activul i?",
                 "options": [
                     "Crește varianța activului i",
-                    "Scade toate covarianțele activului i cu λ_i, aplicând shrinkage estimărilor mari",
+                    "Scade toate covarianțele activului i cu λ_i, aplicînd shrinkage estimărilor mari",
                     "Anulează corelațiile activului i",
                     "Lasă matricea de covarianță neschimbată"
                 ],
@@ -543,7 +543,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Nicio regulă nu a bătut semnificativ 1/N; MV de selecție a eșuat în toate universurile",
                     "HRP a bătut toate regulile după costuri"
                 ],
-                "correctExplanation": "Cel mai mare câștig față de 1/N (MV-LO pe setul multi-active, +0,29) a avut p = 0,12; diferențele semnificative au fost pierderi.",
+                "correctExplanation": "Cel mai mare cîștig față de 1/N (MV-LO pe setul multi-active, +0,29) a avut p = 0,12; diferențele semnificative au fost pierderi.",
                 "incorrectExplanation": "Diferențele față de 1/N au fost fie nesemnificative, fie negative."
             }
         },
@@ -563,7 +563,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Testarea diferențelor de Sharpe",
-                "text": "De ce sunt preferate testele HAC sau bootstrap pe blocuri formulei i.i.d. pentru diferențele de raport Sharpe?",
+                "text": "De ce sînt preferate testele HAC sau bootstrap pe blocuri formulei i.i.d. pentru diferențele de raport Sharpe?",
                 "options": [
                     "Randamentele au cozi groase și grupări de volatilitate, pe care formula i.i.d. Normală le ignoră",
                     "Formula i.i.d. nu poate trata strategii corelate",
@@ -590,7 +590,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Anualizarea raportului Sharpe",
-                "text": "Raportul Sharpe lunar este pozitiv. Randamentele lunare au autocorelația de ordinul întâi ρ₁ = 0,2 și nicio altă autocorelație. Față de înmulțirea raportului Sharpe lunar cu √12, raportul Sharpe anual corect (Lo, 2002) este…",
+                "text": "Raportul Sharpe lunar este pozitiv. Randamentele lunare au autocorelația de ordinul întîi ρ₁ = 0,2 și nicio altă autocorelație. Față de înmulțirea raportului Sharpe lunar cu √12, raportul Sharpe anual corect (Lo, 2002) este…",
                 "options": [
                     "identic, pentru că √12 este exact pentru orice proces",
                     "mai mare, pentru că autocorelația adaugă randament",
@@ -598,7 +598,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "nedefinit, pentru că rapoartele Sharpe nu se pot anualiza"
                 ],
                 "correctExplanation": "SR(q) = η(q)·SR, cu η(q) = q/√(q + 2Σ(q−k)ρ_k); cu ρ₁ = 0,2, η(12) = 12/√(12 + 4,4) = 2,96 < √12 = 3,46.",
-                "incorrectExplanation": "Regula √12 presupune randamente necorelate serial; autocorelația pozitivă face varianța anuală să crească mai repede decât de 12 ori varianța lunară, în timp ce media crește tot de 12 ori."
+                "incorrectExplanation": "Regula √12 presupune randamente necorelate serial; autocorelația pozitivă face varianța anuală să crească mai repede decît de 12 ori varianța lunară, în timp ce media crește tot de 12 ori."
             }
         },
         {
@@ -675,11 +675,11 @@ window.MFM_DATA.quizzes['portfolio'] = {
                 "options": [
                     "Rapoartele Sharpe lunare se anualizează cu sqrt(252), nu cu sqrt(12)",
                     "Ponderile folosesc date din lunile evaluate (look-ahead bias), deci raportul Sharpe este în eșantion, nu în afara eșantionului",
-                    "Ponderile GMV sunt proporționale cu inversa matricei de covarianță înmulțită cu randamentele așteptate, nu cu un vector de unu",
+                    "Ponderile GMV sînt proporționale cu inversa matricei de covarianță înmulțită cu randamentele așteptate, nu cu un vector de unu",
                     "Ponderile GMV nu pot fi reechilibrate lunar, deoarece nu însumează unu"
                 ],
-                "correctExplanation": "În afara eșantionului înseamnă că ponderile lunii t folosesc doar date până în luna t-1, de exemplu o fereastră rulantă de 60 de luni. O matrice de covarianță din tot eșantionul introduce look-ahead bias; sqrt(12) este factorul corect pentru randamente lunare necorelate serial.",
-                "incorrectExplanation": "Anualizarea cu sqrt(12) (randamente lunare necorelate serial) și formula GMV sunt corecte; problema este că matricea de covarianță conține deja lunile evaluate (look-ahead bias)."
+                "correctExplanation": "În afara eșantionului înseamnă că ponderile lunii t folosesc doar date pînă în luna t-1, de exemplu o fereastră rulantă de 60 de luni. O matrice de covarianță din tot eșantionul introduce look-ahead bias; sqrt(12) este factorul corect pentru randamente lunare necorelate serial.",
+                "incorrectExplanation": "Anualizarea cu sqrt(12) (randamente lunare necorelate serial) și formula GMV sînt corecte; problema este că matricea de covarianță conține deja lunile evaluate (look-ahead bias)."
             }
         },
         {
@@ -705,8 +705,8 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Într-un portofoliu 60/40 obligațiunile poartă cea mai mare parte a riscului",
                     "Formula ignoră corelațiile: RC_i = w_i (Sigma w)_i / sigma_p, iar cu ea acțiunile poartă mult mai mult de 60% din risc"
                 ],
-                "correctExplanation": "Contribuțiile Euler folosesc riscul marginal (Sigma w)_i / sigma_p, care include covarianțele; ele însumează sigma_p. Deoarece acțiunile sunt mult mai volatile decât obligațiunile, ele poartă de regulă 90% sau mai mult din riscul unui portofoliu 60/40.",
-                "incorrectExplanation": "Contribuțiile însumează într-adevăr volatilitatea portofoliului, dar numai cu RC_i = w_i (Sigma w)_i / sigma_p; cu această formulă acțiunile, mai volatile, poartă mult mai mult decât ponderea lor de 60% în bani."
+                "correctExplanation": "Contribuțiile Euler folosesc riscul marginal (Sigma w)_i / sigma_p, care include covarianțele; ele însumează sigma_p. Deoarece acțiunile sînt mult mai volatile decît obligațiunile, ele poartă de regulă 90% sau mai mult din riscul unui portofoliu 60/40.",
+                "incorrectExplanation": "Contribuțiile însumează într-adevăr volatilitatea portofoliului, dar numai cu RC_i = w_i (Sigma w)_i / sigma_p; cu această formulă acțiunile, mai volatile, poartă mult mai mult decît ponderea lor de 60% în bani."
             }
         }
     ]

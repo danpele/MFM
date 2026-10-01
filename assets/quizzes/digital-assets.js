@@ -23,12 +23,12 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "GRS cu cozi grele",
-                "text": "Randamentele săptămânale ale activelor cripto de test au un indice de coadă Hill de aproximativ 2,7. Ce afirmație despre testul F GRS pentru alfa nule este corectă?",
+                "text": "Randamentele săptămînale ale activelor cripto de test au un indice de coadă Hill de aproximativ 2,7. Ce afirmație despre testul F GRS pentru alfa nule este corectă?",
                 "options": [
                     "Este exact pentru orice distribuție a erorilor, fiindcă este o statistică F",
                     "Distribuția F exactă cere erori i.i.d. cu distribuția Normală; este nevoie de un test Wald HAC sau de o versiune bootstrap",
                     "Cere doar T > N, oricare ar fi cozile",
-                    "Cozile grele îl fac conservator, deci respingerile lui sunt mereu sigure"
+                    "Cozile grele îl fac conservator, deci respingerile lui sînt mereu sigure"
                 ],
                 "correctExplanation": "Distribuția F(N, T - N - K) a statisticii GRS este derivată pentru erori i.i.d. cu distribuția Normală; cu cozi grele și grupare a volatilității folosim un test Wald GMM/HAC sau un bootstrap sălbatic sub ipoteza nulă.",
                 "incorrectExplanation": "GRS este exact F doar pentru erori i.i.d. cu distribuția Normală; cozile grele pot deplasa nivelul testului în orice direcție, deci este nevoie de o versiune robustă sau bootstrap."
@@ -52,8 +52,8 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "title": "Partea liberă la tranzacționare",
                 "text": "De ce au fost lăsate XRP și Chainlink în afara universului indicelui în acest capitol?",
                 "options": [
-                    "Prețurile lor nu sunt disponibile",
-                    "Sunt stablecoin-uri",
+                    "Prețurile lor nu sînt disponibile",
+                    "Sînt stablecoin-uri",
                     "Oferta lor raportată include tokenurile deținute de emitent",
                     "Se tranzacționează doar în zilele lucrătoare"
                 ],
@@ -106,13 +106,13 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "title": "Corecția Shanken",
                 "text": "Ce sursă de incertitudine adaugă corecția Shanken erorilor standard Fama-MacBeth ale primelor factorilor cripto?",
                 "options": [
-                    "Autocorelarea estimărilor săptămânale ale primei",
+                    "Autocorelarea estimărilor săptămînale ale primei",
                     "Faptul că factorul pieței cripto nu este un portofoliu tranzacționat",
                     "Numărul de monede din secțiunea transversală",
                     "Eroarea de estimare a coeficienților beta din prima etapă (erori în variabile)"
                 ],
                 "correctExplanation": "A doua etapă tratează beta estimate ca și cum ar fi cunoscute; Shanken (1992) înmulțește partea varianței care provine din reziduuri cu (1 + lambda' Sigma_f^-1 lambda) și adaugă o singură dată, fără acest factor, partea provenită din variația factorilor, Sigma_f / T.",
-                "incorrectExplanation": "Corecția Shanken tratează eroarea în variabile: beta din a doua etapă sunt estimări, lucru ignorat de erorile standard Fama-MacBeth. Autocorelarea estimărilor primei este o problemă separată, tratată cu erori standard HAC."
+                "incorrectExplanation": "Corecția Shanken tratează eroarea în variabile: beta din a doua etapă sînt estimări, lucru ignorat de erorile standard Fama-MacBeth. Autocorelarea estimărilor primei este o problemă separată, tratată cu erori standard HAC."
             }
         },
         {
@@ -134,12 +134,12 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "text": "Ce au arătat datele despre randamentele Bitcoin în weekend?",
                 "options": [
                     "Dispersia de weekend este sub jumătate din cea din zilele lucrătoare, înainte și după ETF-urile spot",
-                    "Weekendurile sunt zilele cele mai volatile",
+                    "Weekendurile sînt zilele cele mai volatile",
                     "Efectul de weekend a apărut doar după ETF-urile spot",
                     "În weekend nu se tranzacționează"
                 ],
                 "correctExplanation": "Raportul dispersiilor weekend / zile lucrătoare a fost aproximativ 0,45 înainte și 0,39 după ianuarie 2024; modificarea nu este semnificativă.",
-                "incorrectExplanation": "Bitcoin se tranzacționează în weekend, dar randamentele de weekend sunt mult mai calme, iar acest lucru era adevărat și înainte de ETF-uri."
+                "incorrectExplanation": "Bitcoin se tranzacționează în weekend, dar randamentele de weekend sînt mult mai calme, iar acest lucru era adevărat și înainte de ETF-uri."
             }
         },
         {
@@ -158,7 +158,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "Corelația cu acțiunile",
-                "text": "Când a devenit Bitcoin clar corelat pozitiv cu S&P 500?",
+                "text": "Cînd a devenit Bitcoin clar corelat pozitiv cu S&P 500?",
                 "options": [
                     "În 2017",
                     "Doar după ETF-urile spot din 2024",
@@ -184,7 +184,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "incorrectExplanation": "When alpha < 4 the population kurtosis is infinite, so no standard error or rescaling rescues the sample kurtosis; the Hill index is the right summary of the tail."
             },
             "ro": {
-                "title": "Aplatizarea când indicele de coadă este sub 4",
+                "title": "Aplatizarea cînd indicele de coadă este sub 4",
                 "text": "Indicele de coadă Hill al Bitcoin este 2,7, iar excesul de aplatizare de selecție 14,8. Ce rezultă?",
                 "options": [
                     "Momentul de ordinul patru al populației este probabil infinit, deci aplatizarea de selecție nu este un estimator consistent, iar CI bootstrap pentru ea nu este de încredere",
@@ -193,7 +193,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "Rescalarea randamentelor la varianță unitară face aplatizarea finită"
                 ],
                 "correctExplanation": "Cu alpha < 4 momentul de ordinul patru nu există; aplatizarea de selecție crește odată cu eșantionul și este dominată de cele mai mari zile, iar bootstrap-ul eșuează la momente infinite (Athreya, 1987): raportăm indicele de coadă cu CI.",
-                "incorrectExplanation": "Când alpha < 4, aplatizarea populației este infinită, deci nicio eroare standard și nicio rescalare nu salvează aplatizarea de selecție; indicele Hill este rezumatul potrivit al cozii."
+                "incorrectExplanation": "Cînd alpha < 4, aplatizarea populației este infinită, deci nicio eroare standard și nicio rescalare nu salvează aplatizarea de selecție; indicele Hill este rezumatul potrivit al cozii."
             }
         },
         {
@@ -239,12 +239,12 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "Penalizarea AIC",
-                "text": "În forma gaussiană a criteriului CRIX, AIC = T ln(s_k^2) + 2s, cu s numărul de monede adăugate, când este admis încă un constituent?",
+                "text": "În forma gaussiană a criteriului CRIX, AIC = T ln(s_k^2) + 2s, cu s numărul de monede adăugate, cînd este admis încă un constituent?",
                 "options": [
-                    "Când prețul lui crește",
-                    "Când are cea mai mică volatilitate",
+                    "Cînd prețul lui crește",
+                    "Cînd are cea mai mică volatilitate",
                     "Întotdeauna",
-                    "Când scade T ln(s_k^2) cu mai mult de 2"
+                    "Cînd scade T ln(s_k^2) cu mai mult de 2"
                 ],
                 "correctExplanation": "Fiecare monedă în plus costă 2 în penalizare; este admisă dacă îmbunătățirea urmăririi este mai mare.",
                 "incorrectExplanation": "Regula compară scăderea lui T ln(s_k^2) cu penalizarea de 2 pentru fiecare constituent adăugat."
@@ -266,12 +266,12 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "Identificarea AR cu prag",
-                "text": "Când testăm un AR(1) liniar împotriva unui AR cu prag pentru abaterile de la paritate ale unui stablecoin, de ce sunt invalide valorile critice chi-pătrat?",
+                "text": "Cînd testăm un AR(1) liniar împotriva unui AR cu prag pentru abaterile de la paritate ale unui stablecoin, de ce sînt invalide valorile critice chi-pătrat?",
                 "options": [
-                    "Sunt prea puține observații în afara benzii",
+                    "Sînt prea puține observații în afara benzii",
                     "Coeficientul AR din afara benzii este negativ",
                     "Pragul nu este identificat sub ipoteza nulă (problema Davies), deci statistica sup-Wald cere p-valori bootstrap",
-                    "Abaterile sunt măsurate în puncte de bază"
+                    "Abaterile sînt măsurate în puncte de bază"
                 ],
                 "correctExplanation": "Sub ipoteza nulă liniară, pragul c nu apare în model, deci supremul după c al lui W(c) nu are distribuția chi-pătrat; Hansen (1996) obține p-valorile dintr-un bootstrap cu regresori ficși.",
                 "incorrectExplanation": "Problema este un parametru de perturbare neidentificat sub ipoteza nulă: supremul după praguri are o distribuție nestandard."
@@ -325,10 +325,10 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "O parte din rezerve era expusă la Silicon Valley Bank, falimentată, iar răscumpărarea nu se putea deconta în weekend",
                     "Contractul inteligent a fost spart",
                     "Blockchain-ul Terra s-a oprit",
-                    "Rezerva Federală a crescut dobânda în acea zi"
+                    "Rezerva Federală a crescut dobînda în acea zi"
                 ],
-                "correctExplanation": "SVB a fost închisă pe 10 martie; USD Coin depindea de rezerve deținute acolo, iar băncile au fost închise până luni.",
-                "incorrectExplanation": "Declanșatorul a fost un faliment bancar care afecta rezervele, nu un atac informatic sau o decizie de dobândă."
+                "correctExplanation": "SVB a fost închisă pe 10 martie; USD Coin depindea de rezerve deținute acolo, iar băncile au fost închise pînă luni.",
+                "incorrectExplanation": "Declanșatorul a fost un faliment bancar care afecta rezervele, nu un atac informatic sau o decizie de dobîndă."
             }
         },
         {
@@ -351,7 +351,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "options": [
                     "Comisionul perceput la fiecare schimb",
                     "Concavitatea în P (gamma negativă): rata LVR este -V''(P) sigma^2 P^2 / (2V) = sigma^2 / 8",
-                    "Pierderea impermanentă de la sfârșitul perioadei de deținere",
+                    "Pierderea impermanentă de la sfîrșitul perioadei de deținere",
                     "Liniaritatea în P"
                 ],
                 "correctExplanation": "Prin Itô, portofoliul de reechilibrare minus fondul crește cu -0,5 V'' sigma^2 P^2 dt; cu V'' = -0,5 sqrt(k) P^(-3/2) aceasta este (sigma^2/8) V dt.",
@@ -379,7 +379,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "Comisioanele mari de tranzacționare",
                     "Rezervele în titluri de stat și-au pierdut valoarea",
                     "Autoritățile i-au înghețat conturile",
-                    "Răscumpărarea a creat mai mult din al doilea token (LUNA), împingându-i prețul în jos, fără garanții externe"
+                    "Răscumpărarea a creat mai mult din al doilea token (LUNA), împingîndu-i prețul în jos, fără garanții externe"
                 ],
                 "correctExplanation": "Fără rezerve, răscumpărările în LUNA au diluat LUNA și au slăbit și mai mult paritatea: o spirală a morții.",
                 "incorrectExplanation": "TerraUSD nu avea garanții externe; paritatea se sprijinea pe încredere și pe valoarea LUNA."
@@ -401,7 +401,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "Formula schimbului",
-                "text": "Cu comisionul f și gamma = 1 - f, cât Y primește un participant pentru Delta x?",
+                "text": "Cu comisionul f și gamma = 1 - f, cît Y primește un participant pentru Delta x?",
                 "options": [
                     "y Delta x / x",
                     "y gamma Delta x / (x + gamma Delta x)",
@@ -485,7 +485,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "text": "De ce este valoarea totală blocată (TVL) în DeFi o măsură slabă a adoptării?",
                 "options": [
                     "Numără doar Bitcoin",
-                    "Depozitele sunt evaluate la prețul pieței, deci TVL amestecă schimbările de preț cu depunerile și se mișcă strâns cu Ether",
+                    "Depozitele sînt evaluate la prețul pieței, deci TVL amestecă schimbările de preț cu depunerile și se mișcă strîns cu Ether",
                     "Se publică doar o dată pe an",
                     "Exclude stablecoin-urile"
                 ],
@@ -509,14 +509,14 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "Urmărirea ETF",
-                "text": "IBIT față de Bitcoin are R^2 zilnic de aproximativ 0,82, dar R^2 săptămânal de aproximativ 0,98. De ce?",
+                "text": "IBIT față de Bitcoin are R^2 zilnic de aproximativ 0,82, dar R^2 săptămînal de aproximativ 0,98. De ce?",
                 "options": [
-                    "Cele două prețuri de închidere sunt înregistrate la ore diferite; nepotrivirea se compensează într-o săptămână",
+                    "Cele două prețuri de închidere sînt înregistrate la ore diferite; nepotrivirea se compensează într-o săptămînă",
                     "IBIT deține contracte futures, nu Bitcoin",
                     "IBIT se tranzacționează în weekend",
-                    "Bitcoin este mai puțin volatil săptămânal"
+                    "Bitcoin este mai puțin volatil săptămînal"
                 ],
-                "correctExplanation": "Randamentele zilnice compară prețuri din momente diferite; randamentele săptămânale reduc zgomotul de moment.",
+                "correctExplanation": "Randamentele zilnice compară prețuri din momente diferite; randamentele săptămînale reduc zgomotul de moment.",
                 "incorrectExplanation": "Fondul deține Bitcoin spot; R^2 zilnic scăzut este un artefact de măsurare."
             }
         },
@@ -563,15 +563,15 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "Acțiunile „cripto”",
-                "text": "O regresie săptămânală cu doi factori dă pentru Strategy un beta față de Bitcoin de aproximativ 1,2 și un beta față de S&P 500 de aproximativ 1,0. Care este cea mai bună descriere?",
+                "text": "O regresie săptămînală cu doi factori dă pentru Strategy un beta față de Bitcoin de aproximativ 1,2 și un beta față de S&P 500 de aproximativ 1,0. Care este cea mai bună descriere?",
                 "options": [
                     "Un instrument care urmărește pur Bitcoin",
                     "O acțiune defensivă",
                     "O acțiune necorelată cu cripto",
                     "O poziție în Bitcoin cu efect de levier, plus riscul pieței de acțiuni"
                 ],
-                "correctExplanation": "Un beta peste 1 față de Bitcoin plus un beta de acțiune: mai mult decât expunerea la Bitcoin, plus riscul bursei.",
-                "incorrectExplanation": "Ambii beta sunt importanți, deci acțiunea nu este nici un instrument pur, nici defensivă."
+                "correctExplanation": "Un beta peste 1 față de Bitcoin plus un beta de acțiune: mai mult decît expunerea la Bitcoin, plus riscul bursei.",
+                "incorrectExplanation": "Ambii beta sînt importanți, deci acțiunea nu este nici un instrument pur, nici defensivă."
             }
         },
         {
@@ -644,14 +644,14 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "Închideri nesincrone",
-                "text": "Beta OLS zilnic al IBIT față de Bitcoin este 0,93, iar beta săptămânal 1,01. Ce estimator zilnic corectează deplasarea?",
+                "text": "Beta OLS zilnic al IBIT față de Bitcoin este 0,93, iar beta săptămînal 1,01. Ce estimator zilnic corectează deplasarea?",
                 "options": [
                     "OLS cu erori standard Newey-West",
                     "Eliminarea randamentelor de weekend ale Bitcoin",
                     "Cele mai mici pătrate generalizate",
                     "Beta sumă Dimson, cu termeni decalați și avansați"
                 ],
-                "correctExplanation": "Suma coeficienților randamentelor Bitcoin din ziua anterioară, din ziua curentă și din ziua următoare (Dimson, 1979) captează mișcările care ajung în ETF cu o zi întârziere; aici suma este aproximativ 1,00.",
+                "correctExplanation": "Suma coeficienților randamentelor Bitcoin din ziua anterioară, din ziua curentă și din ziua următoare (Dimson, 1979) captează mișcările care ajung în ETF cu o zi întîrziere; aici suma este aproximativ 1,00.",
                 "incorrectExplanation": "Newey-West schimbă doar eroarea standard, nu și deplasarea în jos din închiderile nesincrone; beta sumă Dimson o elimină."
             }
         },
@@ -679,7 +679,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "Volatilitatea zilnică trebuie înmulțită cu sqrt(12)"
                 ],
                 "correctExplanation": "Factorul este rădăcina pătrată a numărului de randamente pe an; cu tranzacționare 7 zile din 7 acesta este 365, iar 252 subestimează volatilitatea cu aproximativ 17%.",
-                "incorrectExplanation": "Numărați câte randamente zilnice conține un an de date Bitcoin."
+                "incorrectExplanation": "Numărați cîte randamente zilnice conține un an de date Bitcoin."
             }
         },
         {
@@ -702,10 +702,10 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "options": [
                     "USDC și-a pierdut paritatea în martie 2023 (minim de aproximativ 0,88), iar împrumutul adaugă riscul platformei; rata fără risc este randamentul bonurilor de trezorerie",
                     "USDC este acoperit cu Bitcoin, nu cu dolari",
-                    "Singura eroare este că împrumutul de USDC nu plătește dobândă",
+                    "Singura eroare este că împrumutul de USDC nu plătește dobîndă",
                     "Raportul Sharpe nu trebuie să scadă nicio rată fără risc"
                 ],
-                "correctExplanation": "După falimentul Silicon Valley Bank, USDC a coborât până la aproximativ 0,88 pe 11 martie 2023; un randament peste bonurile de trezorerie este o primă pentru riscul emitentului, al parității și al contractului inteligent.",
+                "correctExplanation": "După falimentul Silicon Valley Bank, USDC a coborît pînă la aproximativ 0,88 pe 11 martie 2023; un randament peste bonurile de trezorerie este o primă pentru riscul emitentului, al parității și al contractului inteligent.",
                 "incorrectExplanation": "Verificați afirmația cu istoricul prețului USDC și cu definiția unui activ fără risc: fără risc de neplată și fără risc de preț."
             }
         }

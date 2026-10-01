@@ -26,7 +26,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "text": "În modelul Roll, semnele tranzacțiilor formează un lanț Markov simetric și staționar cu Corr(q_t, q_{t-k}) = 0,5^k (ordine împărțite), independent de inovațiile prețului eficient și fără informație. Față de jumătatea adevărată de spread c, estimatorul Roll sqrt(-Cov(dp_t, dp_{t-1}))...",
                 "options": [
                     "...supraestimează c, fiindcă fluxul persistent adaugă autocorelație negativă",
-                    "...este nedeplasat, fiindcă prețul eficient rămâne un mers aleator",
+                    "...este nedeplasat, fiindcă prețul eficient rămîne un mers aleator",
                     "...subestimează c: converge la c(1 - 0,5) = 0,5c",
                     "...nu este definit, fiindcă covarianța devine pozitivă"
                 ],
@@ -50,14 +50,14 @@ window.MFM_DATA.quizzes['microstructure'] = {
             },
             "ro": {
                 "title": "Kyle: intensitatea investitorului din interior",
-                "text": "În modelul Kyle formatorul de piață stabilește p = p_0 + lambda y. Maximizând E[(v - p) x | v] după x, intensitatea beta din x = beta (v - p_0) este...",
+                "text": "În modelul Kyle formatorul de piață stabilește p = p_0 + lambda y. Maximizînd E[(v - p) x | v] după x, intensitatea beta din x = beta (v - p_0) este...",
                 "options": [
                     "1/(2 lambda)",
                     "1/lambda",
                     "lambda",
                     "sigma_v/sigma_u"
                 ],
-                "correctExplanation": "Obiectivul este (v - p_0) x - lambda x^2; condiția de ordinul întâi dă x = (v - p_0)/(2 lambda). La echilibru aceasta este sigma_u/sigma_v.",
+                "correctExplanation": "Obiectivul este (v - p_0) x - lambda x^2; condiția de ordinul întîi dă x = (v - p_0)/(2 lambda). La echilibru aceasta este sigma_u/sigma_v.",
                 "incorrectExplanation": "Propriul ordin mișcă prețul cu lambda x, deci obiectivul este pătratic, (v - p_0) x - lambda x^2; anularea derivatei înjumătățește intensitatea naivă."
             }
         },
@@ -104,12 +104,12 @@ window.MFM_DATA.quizzes['microstructure'] = {
             },
             "ro": {
                 "title": "Limitele ponderii informaționale",
-                "text": "Prețurile aceluiași activ pe două platforme sunt cointegrate. Ponderea informațională Hasbrouck a platformei 1 este raportată ca intervalul [0,55; 0,80]. De ce un interval și nu un număr?",
+                "text": "Prețurile aceluiași activ pe două platforme sînt cointegrate. Ponderea informațională Hasbrouck a platformei 1 este raportată ca intervalul [0,55; 0,80]. De ce un interval și nu un număr?",
                 "options": [
                     "Este un interval de încredere de 95% din eroarea de selecție",
-                    "Ponderea depinde de ordonarea Cholesky când inovațiile VECM sunt corelate",
+                    "Ponderea depinde de ordonarea Cholesky cînd inovațiile VECM sînt corelate",
                     "Există doi vectori de cointegrare",
-                    "Prețurile sunt nestaționare, deci ponderea nu este identificată"
+                    "Prețurile sînt nestaționare, deci ponderea nu este identificată"
                 ],
                 "correctExplanation": "Ponderea informațională folosește un factor Cholesky al covarianței inovațiilor; cu inovații corelate, cele două ordonări dau ponderi diferite, raportate ca limite.",
                 "incorrectExplanation": "Intervalul vine din identificare, nu din selecție: corelația contemporană a inovațiilor este atribuită uneia sau alteia dintre platforme, după ordonare."
@@ -131,7 +131,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
             },
             "ro": {
                 "title": "MRR: ponderea selecției adverse",
-                "text": "În modelul Madhavan-Richardson-Roomans estimările sunt theta = 0,03 (impactul permanent al surprizei din fluxul de ordine) și phi = 0,01 (costul tranzitoriu). Ce parte din jumătatea de spread efectiv este selecție adversă?",
+                "text": "În modelul Madhavan-Richardson-Roomans estimările sînt theta = 0,03 (impactul permanent al surprizei din fluxul de ordine) și phi = 0,01 (costul tranzitoriu). Ce parte din jumătatea de spread efectiv este selecție adversă?",
                 "options": [
                     "75%",
                     "25%",
@@ -211,8 +211,8 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "incorrectExplanation": "The formula 2 sqrt(-Cov) needs a non-positive sample covariance for a real-valued result. Positive sample values can arise from sampling error even when the Roll model holds, or from departures from its assumptions (trends, stale prices)."
             },
             "ro": {
-                "title": "Când Roll eșuează",
-                "text": "Ce dă estimatorul Roll când autocovarianța de selecție a variațiilor de preț este pozitivă?",
+                "title": "Cînd Roll eșuează",
+                "text": "Ce dă estimatorul Roll cînd autocovarianța de selecție a variațiilor de preț este pozitivă?",
                 "options": [
                     "Un spread negativ",
                     "Un spread zero",
@@ -220,7 +220,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Nicio estimare: rădăcina pătrată a unui număr negativ nu există"
                 ],
                 "correctExplanation": "Cu autocovarianță pozitivă, -Cov este negativă și estimatorul nu este definit.",
-                "incorrectExplanation": "Formula 2 sqrt(-Cov) cere o covarianță de selecție nepozitivă pentru un rezultat real. Valorile de selecție pozitive pot apărea din eroarea de selecție chiar când modelul Roll este adevărat sau din abateri de la ipotezele lui (tendințe, prețuri vechi)."
+                "incorrectExplanation": "Formula 2 sqrt(-Cov) cere o covarianță de selecție nepozitivă pentru un rezultat real. Valorile de selecție pozitive pot apărea din eroarea de selecție chiar cînd modelul Roll este adevărat sau din abateri de la ipotezele lui (tendințe, prețuri vechi)."
             }
         },
         {
@@ -269,12 +269,12 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "text": "Pentru SPY, Corwin-Schultz zilnic dă circa 27 pb, iar un pas de cotare este circa 0,2 pb. Ce explică diferența?",
                 "options": [
                     "Spread-ul SPY este chiar de 27 pb",
-                    "Datele sunt greșite",
+                    "Datele sînt greșite",
                     "Pe date zilnice, intervalul maxim-minim este dominat de volatilitate",
                     "Estimatorul funcționează doar pentru cripto-active"
                 ],
                 "correctExplanation": "Cu o volatilitate zilnică de circa 1%, intervalul este aproape numai mișcare de preț; barele de 5 minute coboară estimarea la circa 3 pb.",
-                "incorrectExplanation": "Estimatorul confundă volatilitatea cu spread-ul când intervalul este lung în raport cu spread-ul."
+                "incorrectExplanation": "Estimatorul confundă volatilitatea cu spread-ul cînd intervalul este lung în raport cu spread-ul."
             }
         },
         {
@@ -301,7 +301,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Volatilitatea volumului"
                 ],
                 "correctExplanation": "ILLIQ este media rapoartelor zilnice |r_d| / valoarea tranzacționată_d: o aproximare a ilichidității, randamentul absolut per unitate de bani tranzacționați, nu un impact cauzal identificat.",
-                "incorrectExplanation": "Amihud împarte randamentul zilnic absolut la valoarea tranzacționată, obținând impactul per unitate de bani."
+                "incorrectExplanation": "Amihud împarte randamentul zilnic absolut la valoarea tranzacționată, obținînd impactul per unitate de bani."
             }
         },
         {
@@ -322,12 +322,12 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "title": "Lichiditatea BVB",
                 "text": "Comparativ cu marile companii americane, ce spune raportul Amihud despre acțiunile blue-chip BVB (2024-2026)?",
                 "options": [
-                    "Sunt aproape la fel de lichide",
-                    "Sunt de două ori mai nelichide",
-                    "Sunt mai lichide",
+                    "Sînt aproape la fel de lichide",
+                    "Sînt de două ori mai nelichide",
+                    "Sînt mai lichide",
                     "Cer de mii de ori mai multă mișcare de preț per dolar tranzacționat"
                 ],
-                "correctExplanation": "Banca Transilvania, cea mai lichidă acțiune BVB, are un raport Amihud de circa cincisprezece mii de ori mai mare decât SPY.",
+                "correctExplanation": "Banca Transilvania, cea mai lichidă acțiune BVB, are un raport Amihud de circa cincisprezece mii de ori mai mare decît SPY.",
                 "incorrectExplanation": "Raportul Amihud separă BVB de marile companii americane prin mai multe ordine de mărime, spre deosebire de aproximările zilnice ale spread-ului."
             }
         },
@@ -376,12 +376,12 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "title": "Simultaneitatea",
                 "text": "Regresia lui log |r| pe log volumul relativ, pe barele SPY de 5 minute, dă o pantă de circa 0,3. De ce nu este aceasta elasticitatea cauzală a impactului?",
                 "options": [
-                    "Reziduurile sunt heteroscedastice",
+                    "Reziduurile sînt heteroscedastice",
                     "Forma de U intrazilnică deplasează panta",
-                    "Prețurile sunt rotunjite la un pas de cotare",
+                    "Prețurile sînt rotunjite la un pas de cotare",
                     "Știrile mișcă și volumul, și |r| (simultaneitate), iar tranzacțiile opuse dintr-o bară se anulează"
                 ],
-                "correctExplanation": "Volumul nu este exogen: știrile cresc atât tranzacționarea, cât și mișcările de preț, iar o bară amestecă cumpărători și vânzători, deci panta nu este efectul ordinului net al unui investitor.",
+                "correctExplanation": "Volumul nu este exogen: știrile cresc atît tranzacționarea, cît și mișcările de preț, iar o bară amestecă cumpărători și vînzători, deci panta nu este efectul ordinului net al unui investitor.",
                 "incorrectExplanation": "Heteroscedasticitatea afectează erorile standard, nu sensul pantei; problema este endogenitatea volumului și anularea tranzacțiilor opuse."
             }
         },
@@ -403,13 +403,13 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "title": "Lichiditatea și VIX",
                 "text": "Cum este legată ilichiditatea intrazilnică a SPY de VIX?",
                 "options": [
-                    "Crește când crește VIX, aproape proporțional",
-                    "Scade când crește VIX",
+                    "Crește cînd crește VIX, aproape proporțional",
+                    "Scade cînd crește VIX",
                     "Nu are legătură cu VIX",
-                    "Depinde doar de ziua săptămânii"
+                    "Depinde doar de ziua săptămînii"
                 ],
-                "correctExplanation": "Elasticitatea logaritmului ilichidității în raport cu logaritmul VIX este circa 0,95: lichiditatea dispare când volatilitatea crește.",
-                "incorrectExplanation": "Formatorii de piață lărgesc cotațiile și reduc adâncimea când riscul crește, deci ilichiditatea și VIX evoluează împreună."
+                "correctExplanation": "Elasticitatea logaritmului ilichidității în raport cu logaritmul VIX este circa 0,95: lichiditatea dispare cînd volatilitatea crește.",
+                "incorrectExplanation": "Formatorii de piață lărgesc cotațiile și reduc adîncimea cînd riscul crește, deci ilichiditatea și VIX evoluează împreună."
             }
         },
         {
@@ -462,7 +462,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "sigma_v / (2 sigma_u)",
                     "2 sigma_u / sigma_v"
                 ],
-                "correctExplanation": "lambda = sigma_v / (2 sigma_u): mai mult zgomot face piața mai adâncă.",
+                "correctExplanation": "lambda = sigma_v / (2 sigma_u): mai mult zgomot face piața mai adîncă.",
                 "incorrectExplanation": "sigma_u / sigma_v este intensitatea beta a investitorului din interior, iar sigma_v sigma_u / 2 este profitul său așteptat."
             }
         },
@@ -482,7 +482,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
             },
             "ro": {
                 "title": "Informația din prețul Kyle",
-                "text": "În echilibrul Kyle cu o singură perioadă, cât din informația investitorului din interior este dezvăluită de preț?",
+                "text": "În echilibrul Kyle cu o singură perioadă, cît din informația investitorului din interior este dezvăluită de preț?",
                 "options": [
                     "Exact jumătate: Var(v | p) = sigma_v^2 / 2",
                     "Toată",
@@ -490,7 +490,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Un sfert"
                 ],
                 "correctExplanation": "Dispersia a posteriori este jumătate din dispersia a priori: prețul dezvăluie jumătate din informația privată.",
-                "incorrectExplanation": "Investitorul din interior tranzacționează astfel încât formatorul de piață află exact jumătate din dispersia valorii."
+                "incorrectExplanation": "Investitorul din interior tranzacționează astfel încît formatorul de piață află exact jumătate din dispersia valorii."
             }
         },
         {
@@ -540,7 +540,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "options": [
                     "Vinde totul la început",
                     "Vinde aceeași cantitate în fiecare perioadă",
-                    "Vinde totul la sfârșit",
+                    "Vinde totul la sfîrșit",
                     "Așteaptă un preț mai bun"
                 ],
                 "correctExplanation": "Cu lambda = 0, kappa = 0 și deținerea scade liniar: programul ponderat în timp.",
@@ -568,10 +568,10 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Pentru a reduce costul așteptat al impactului",
                     "Pentru că impactul permanent dispare",
                     "Pentru a reduce dispersia costului provocată de mișcările viitoare ale prețului",
-                    "Pentru că spread-urile sunt mai înguste la început"
+                    "Pentru că spread-urile sînt mai înguste la început"
                 ],
-                "correctExplanation": "Vânzarea timpurie reduce expunerea la riscul de preț, cu prețul unui impact temporar mai mare.",
-                "incorrectExplanation": "Vânzarea timpurie crește costul așteptat al impactului; este aleasă pentru a reduce dispersia costului de implementare."
+                "correctExplanation": "Vînzarea timpurie reduce expunerea la riscul de preț, cu prețul unui impact temporar mai mare.",
+                "incorrectExplanation": "Vînzarea timpurie crește costul așteptat al impactului; este aleasă pentru a reduce dispersia costului de implementare."
             }
         },
         {
@@ -593,11 +593,11 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "text": "Un formator de piață Avellaneda-Stoikov are stoc pozitiv (q > 0). Prețul său de rezervă r = s - q gamma sigma^2 (T - t) este...",
                 "options": [
                     "peste prețul de mijloc, deci ridică ambele cotații",
-                    "sub prețul de mijloc, deci coboară ambele cotații ca să vândă",
+                    "sub prețul de mijloc, deci coboară ambele cotații ca să vîndă",
                     "egal cu prețul de mijloc, fiindcă spread-ul este simetric",
                     "independent de volatilitatea sigma"
                 ],
-                "correctExplanation": "Cu q > 0, r < s: deținerea a mai mult activ riscant îi scade valoarea pentru ea, deci ambele cotații coboară, ca să atragă cumpărători și să descurajeze vânzătorii.",
+                "correctExplanation": "Cu q > 0, r < s: deținerea a mai mult activ riscant îi scade valoarea pentru ea, deci ambele cotații coboară, ca să atragă cumpărători și să descurajeze vînzătorii.",
                 "incorrectExplanation": "Termenul de stoc q gamma sigma^2 (T - t) se scade din prețul de mijloc și crește cu volatilitatea și cu timpul rămas."
             }
         },
@@ -621,10 +621,10 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "options": [
                     "Modelul Roll este respins, fiindcă o oscilație adevărată dă covarianțe negative",
                     "Piața este ineficientă în 41% din zile",
-                    "Zilele pozitive nu sunt, singure, o dovadă împotriva Roll: cu c/sigma aproape de 0,01, apar în aproape jumătate din zile; ponderea observată este chiar sub bandă, adică o autocorelație mai negativă decât o oscilație de un pas",
+                    "Zilele pozitive nu sînt, singure, o dovadă împotriva Roll: cu c/sigma aproape de 0,01, apar în aproape jumătate din zile; ponderea observată este chiar sub bandă, adică o autocorelație mai negativă decît o oscilație de un pas",
                     "Spread-ul SPY este circa 41% dintr-un pas"
                 ],
-                "correctExplanation": "Harris (1990): când c^2 este mic față de sigma^2 / sqrt(T), P(Cov-estimat > 0) este aproape de o jumătate chiar dacă modelul este adevărat. Cei 41% observați sunt sub banda pentru un pas, deci datele sunt mai negativ autocorelate, nu mai puțin, decât o oscilație de un pas.",
+                "correctExplanation": "Harris (1990): cînd c^2 este mic față de sigma^2 / sqrt(T), P(Cov-estimat > 0) este aproape de o jumătate chiar dacă modelul este adevărat. Cei 41% observați sînt sub banda pentru un pas, deci datele sînt mai negativ autocorelate, nu mai puțin, decît o oscilație de un pas.",
                 "incorrectExplanation": "Comparați ponderea observată cu distribuția de selecție sub ipoteza nulă: o oscilație minusculă față de volatilitate dă putere mică în 77 de observații."
             }
         },
@@ -706,7 +706,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Amihud folosește randamente intraday, nu randamente zilnice"
                 ],
                 "correctExplanation": "Amihud (2002) definește ILLIQ ca media lui |r_d| / DVOL_d, cu DVOL_d valoarea tranzacționată în monedă. Cu numărul de acțiuni, raportul depinde de nivelul prețului, face un salt la o divizare a acțiunilor și nu poate fi comparat între acțiuni.",
-                "incorrectExplanation": "Randamentul zilnic absolut și media pe zile sunt corecte; numitorul trebuie măsurat în bani, nu în număr de acțiuni."
+                "incorrectExplanation": "Randamentul zilnic absolut și media pe zile sînt corecte; numitorul trebuie măsurat în bani, nu în număr de acțiuni."
             }
         }
     ]

@@ -23,15 +23,15 @@ window.MFM_DATA.quizzes['llm'] = {
             },
             "ro": {
                 "title": "Atenuarea prin clasificare greșită",
-                "text": "Regresați randamentele zilei următoare pe o variabilă egală cu 1 când FinBERT etichetează un titlu drept negativ. Pe Twitter, FinBERT ratează 23,9% din titlurile cu adevărat negative și numește negative 13,3% dintre celelalte (14,5% dintre titluri sunt negative). Presupuneți că modelul randamentelor este corect specificat în eticheta adevărată și că clasificarea greșită este nediferențială (fără legătură cu șocul randamentului, dată fiind eticheta adevărată). Ce se întâmplă cu panta?",
+                "text": "Regresați randamentele zilei următoare pe o variabilă egală cu 1 cînd FinBERT etichetează un titlu drept negativ. Pe Twitter, FinBERT ratează 23,9% din titlurile cu adevărat negative și numește negative 13,3% dintre celelalte (14,5% dintre titluri sînt negative). Presupuneți că modelul randamentelor este corect specificat în eticheta adevărată și că clasificarea greșită este nediferențială (fără legătură cu șocul randamentului, dată fiind eticheta adevărată). Ce se întîmplă cu panta?",
                 "options": [
                     "Este atenuată: limita ei în probabilitate este de circa 0,45 ori efectul adevărat, deci efectul adevărat este de circa 2,2 ori mai mare în valoare absolută",
                     "Este nedistorsionată, dar mai puțin precisă, pentru că erorile de clasificare se compensează",
                     "Este distorsionată departe de zero, pentru că falsele negative exagerează contrastul",
                     "Nu este afectată, pentru că clasificarea greșită schimbă doar termenul liber"
                 ],
-                "correctExplanation": "Cu un regresor binar clasificat greșit (Aigner, 1973), plim b = β·π(1 − π)(1 − α0 − α1)/[p(1 − p)] = β·0,449 aici. Semnul se păstrează cât timp α0 + α1 < 1, dar mărimea scade.",
-                "incorrectExplanation": "Eroarea de măsurare din regresor este o distorsiune, nu doar o pierdere de precizie: covarianța dintre variabila binară și tonul adevărat este π(1 − π)(1 − α0 − α1), mai mică decât varianța variabilei, deci panta se apropie de zero."
+                "correctExplanation": "Cu un regresor binar clasificat greșit (Aigner, 1973), plim b = β·π(1 − π)(1 − α0 − α1)/[p(1 − p)] = β·0,449 aici. Semnul se păstrează cît timp α0 + α1 < 1, dar mărimea scade.",
+                "incorrectExplanation": "Eroarea de măsurare din regresor este o distorsiune, nu doar o pierdere de precizie: covarianța dintre variabila binară și tonul adevărat este π(1 − π)(1 − α0 − α1), mai mică decît varianța variabilei, deci panta se apropie de zero."
             }
         },
         {
@@ -50,14 +50,14 @@ window.MFM_DATA.quizzes['llm'] = {
             },
             "ro": {
                 "title": "Dicționar generic versus financiar",
-                "text": "În listele folosite în curs, 1 552 dintre cele 2 007 cuvinte negative din Harvard General Inquirer (GI) nu sunt negative în lista Loughran-McDonald (LM). Ce implică acest lucru?",
+                "text": "În listele folosite în curs, 1 552 dintre cele 2 007 cuvinte negative din Harvard General Inquirer (GI) nu sînt negative în lista Loughran-McDonald (LM). Ce implică acest lucru?",
                 "options": [
-                    "GI este mai precis decât LM pe știri financiare, deoarece are mai multe cuvinte negative",
-                    "Multe cuvinte negative din GI, precum „service”, „capital” sau „board”, sunt cuvinte obișnuite de afaceri, deci GI citește greșit textele financiare",
+                    "GI este mai precis decît LM pe știri financiare, deoarece are mai multe cuvinte negative",
+                    "Multe cuvinte negative din GI, precum „service”, „capital” sau „board”, sînt cuvinte obișnuite de afaceri, deci GI citește greșit textele financiare",
                     "LM ratează majoritatea cuvintelor financiare negative și ar trebui înlocuit cu GI",
-                    "Cele două dicționare dau același ton pe texte financiare, fiind amândouă liste de cuvinte"
+                    "Cele două dicționare dau același ton pe texte financiare, fiind amîndouă liste de cuvinte"
                 ],
-                "correctExplanation": "Circa 77% dintre cuvintele negative din GI nu sunt negative pentru LM. În Financial PhraseBank, propozițiile cu „service”, „capital” sau „board” nu sunt aproape niciodată etichetate negativ: finanțele au propriul vocabular.",
+                "correctExplanation": "Circa 77% dintre cuvintele negative din GI nu sînt negative pentru LM. În Financial PhraseBank, propozițiile cu „service”, „capital” sau „board” nu sînt aproape niciodată etichetate negativ: finanțele au propriul vocabular.",
                 "incorrectExplanation": "Suprapunerea este mică: GI, un dicționar de psihologie din anii 1960, marchează substantive de afaceri drept negative; de aceea pierde chiar și în fața clasei majoritare pe ambele seturi etichetate."
             }
         },
@@ -77,15 +77,15 @@ window.MFM_DATA.quizzes['llm'] = {
             },
             "ro": {
                 "title": "Limita oricărei liste de cuvinte",
-                "text": "Doar 26% dintre propozițiile din Financial PhraseBank care conțin „lower” nu sunt etichetate negativ, totuși „lower costs” este o veste bună. Ce arată acest lucru despre dicționarul Loughran-McDonald (LM)?",
+                "text": "Doar 26% dintre propozițiile din Financial PhraseBank care conțin „lower” nu sînt etichetate negativ, totuși „lower costs” este o veste bună. Ce arată acest lucru despre dicționarul Loughran-McDonald (LM)?",
                 "options": [
                     "LM ar trebui să elimine „lower” din lista negativă, iar problema ar fi rezolvată",
                     "Adnotatorii din Financial PhraseBank au greșit la propozițiile cu „lower”",
-                    "LM corectează vocabularul financiar, dar nu contextul: semnul unui cuvânt poate depinde de cuvântul următor",
+                    "LM corectează vocabularul financiar, dar nu contextul: semnul unui cuvînt poate depinde de cuvîntul următor",
                     "O listă mai lungă de cuvinte pozitive i-ar permite lui LM să citească negația și contextul"
                 ],
-                "correctExplanation": "Modelul bag of words ignoră ordinea cuvintelor. „Lower sales” este o veste proastă, iar „lower costs” una bună: niciun semn fix pe cuvânt nu le poate surprinde pe amândouă; de aceea ajută modelele care citesc cuvintele în context.",
-                "incorrectExplanation": "Modificarea listei nu ajută: același cuvânt este negativ într-o expresie și pozitiv în alta. Problema este contextul, pe care o numărare de cuvinte nu îl vede."
+                "correctExplanation": "Modelul bag of words ignoră ordinea cuvintelor. „Lower sales” este o veste proastă, iar „lower costs” una bună: niciun semn fix pe cuvînt nu le poate surprinde pe amîndouă; de aceea ajută modelele care citesc cuvintele în context.",
+                "incorrectExplanation": "Modificarea listei nu ajută: același cuvînt este negativ într-o expresie și pozitiv în alta. Problema este contextul, pe care o numărare de cuvinte nu îl vede."
             }
         },
         {
@@ -112,7 +112,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "Media LLM pe cele 100 000 de titluri neetichetate minus eroarea medie a LLM (scor minus etichetă) estimată pe cele 500 de titluri etichetate"
                 ],
                 "correctExplanation": "Prediction-powered inference (Angelopoulos et al., 2023) corectează media modelului cu o corecție estimată pe eșantionul etichetat; cu eșantioane independente, etichetat (n) și neetichetat (N), varianța este Var(f)/N + Var(f − Y)/n. Pe Twitter, media simplă FinBERT are chiar semnul greșit (−0,014 față de 0,054 adevărat).",
-                "incorrectExplanation": "Media simplă a LLM converge la un număr greșit când modelul este distorsionat; media doar a etichetelor este validă, dar ignoră scorurile; o medie ad hoc nu are o varianță validă. Estimatorul corectat le combină pe amândouă."
+                "incorrectExplanation": "Media simplă a LLM converge la un număr greșit cînd modelul este distorsionat; media doar a etichetelor este validă, dar ignoră scorurile; o medie ad hoc nu are o varianță validă. Estimatorul corectat le combină pe amîndouă."
             }
         },
         {
@@ -131,14 +131,14 @@ window.MFM_DATA.quizzes['llm'] = {
             },
             "ro": {
                 "title": "Două scoruri ca instrumente",
-                "text": "Scorurile zilnice FinBERT și Qwen2.5-7B au corelația 0,66. Instrumentând Qwen cu FinBERT se obține o pantă în aceeași zi de 59 bp; instrumentând Qwen cu dicționarul LM, 37 bp (diferența z = 5,4). Ce concluzionați?",
+                "text": "Scorurile zilnice FinBERT și Qwen2.5-7B au corelația 0,66. Instrumentînd Qwen cu FinBERT se obține o pantă în aceeași zi de 59 bp; instrumentînd Qwen cu dicționarul LM, 37 bp (diferența z = 5,4). Ce concluzionați?",
                 "options": [
                     "Cel puțin un instrument sau o ipoteză a modelului nu este valabilă: două instrumente valide ar da aceeași estimare, dar testul nu arată care este invalid",
                     "Variabilele instrumentale eșuează mereu la corelații sub 0,9",
-                    "Ambele estimări sunt valide; diferența este zgomot de eșantionare",
+                    "Ambele estimări sînt valide; diferența este zgomot de eșantionare",
                     "Dicționarul LM trebuie să fie instrumentul mai bun pentru că este mai puțin corelat cu Qwen"
                 ],
-                "correctExplanation": "Fiecare estimare IV este consistentă pentru același coeficient doar dacă eroarea de măsurare a instrumentului este necorelată cu eroarea lui Qwen și cu șocul randamentului. O diferență de 22 bp cu z = 5,4 respinge aceste restricții comune. Erorile comune FinBERT–Qwen (texte de antrenare care se suprapun) sunt o cauză plauzibilă, o eroare LM legată de randamente este alta; testul nu le poate separa.",
+                "correctExplanation": "Fiecare estimare IV este consistentă pentru același coeficient doar dacă eroarea de măsurare a instrumentului este necorelată cu eroarea lui Qwen și cu șocul randamentului. O diferență de 22 bp cu z = 5,4 respinge aceste restricții comune. Erorile comune FinBERT–Qwen (texte de antrenare care se suprapun) sînt o cauză plauzibilă, o eroare LM legată de randamente este alta; testul nu le poate separa.",
                 "incorrectExplanation": "Problema nu este mărimea corelației, ci validitatea. Două instrumente valide trebuie să estimeze același coeficient, iar diferența observată depășește cu mult zgomotul de eșantionare."
             }
         },
@@ -160,13 +160,13 @@ window.MFM_DATA.quizzes['llm'] = {
                 "title": "Cel mai bun clasificator pe Twitter",
                 "text": "Pe Twitter Financial News, GI obține 43,6%, LM 60,5%, FinBERT 72,5%, Qwen2.5-7B zero-shot 74,2%, iar TF-IDF (Term Frequency - Inverse Document Frequency) + regresie logistică antrenată pe setul de antrenare Twitter 83,2%. Care este lecția?",
                 "options": [
-                    "Modelele mai mari sunt întotdeauna mai precise decât cele mici",
-                    "Datele etichetate din domeniul-țintă contează mai mult decât mărimea modelului",
-                    "Dicționarele sunt metoda cea mai sigură pentru titluri scurte",
-                    "TF-IDF câștigă doar pentru că a memorat titlurile de validare"
+                    "Modelele mai mari sînt întotdeauna mai precise decît cele mici",
+                    "Datele etichetate din domeniul-țintă contează mai mult decît mărimea modelului",
+                    "Dicționarele sînt metoda cea mai sigură pentru titluri scurte",
+                    "TF-IDF cîștigă doar pentru că a memorat titlurile de validare"
                 ],
-                "correctExplanation": "Cel mai simplu model supervizat, antrenat pe etichete din domeniu, depășește atât FinBERT, cât și un model mare de limbaj (LLM) cu 7 miliarde de parametri care nu a văzut etichete Twitter.",
-                "incorrectExplanation": "Clasamentul nu urmează mărimea: o regresie logistică pe frecvențe de cuvinte, antrenată pe datele-țintă, conduce. Titlurile de validare sunt separate de setul ei de antrenare."
+                "correctExplanation": "Cel mai simplu model supervizat, antrenat pe etichete din domeniu, depășește atît FinBERT, cît și un model mare de limbaj (LLM) cu 7 miliarde de parametri care nu a văzut etichete Twitter.",
+                "incorrectExplanation": "Clasamentul nu urmează mărimea: o regresie logistică pe frecvențe de cuvinte, antrenată pe datele-țintă, conduce. Titlurile de validare sînt separate de setul ei de antrenare."
             }
         },
         {
@@ -185,15 +185,15 @@ window.MFM_DATA.quizzes['llm'] = {
             },
             "ro": {
                 "title": "Acordul adnotatorilor",
-                "text": "Pe Financial PhraseBank (5–8 adnotatori pe propoziție), FinBERT atinge 97% acuratețe pe propozițiile unde toți adnotatorii propoziției sunt de acord, dar 70% unde acordul este de la 50% până sub 66% (Qwen2.5-14B: 94% și 55%). Cum trebuie interpretat acest lucru?",
+                "text": "Pe Financial PhraseBank (5–8 adnotatori pe propoziție), FinBERT atinge 97% acuratețe pe propozițiile unde toți adnotatorii propoziției sînt de acord, dar 70% unde acordul este de la 50% pînă sub 66% (Qwen2.5-14B: 94% și 55%). Cum trebuie interpretat acest lucru?",
                 "options": [
                     "FinBERT nu funcționează pe propoziții lungi",
-                    "Adnotatorii cu pregătire financiară sunt mai puțin fiabili decât modelele",
-                    "Multe propoziții sunt cu adevărat ambigue: când experții se împart, eticheta însăși pune un plafon acurateței",
-                    "Propozițiile cu acord scăzut sunt toate neutre, deci acuratețea acolo nu contează"
+                    "Adnotatorii cu pregătire financiară sînt mai puțin fiabili decît modelele",
+                    "Multe propoziții sînt cu adevărat ambigue: cînd experții se împart, eticheta însăși pune un plafon acurateței",
+                    "Propozițiile cu acord scăzut sînt toate neutre, deci acuratețea acolo nu contează"
                 ],
-                "correctExplanation": "Un model nu poate fi judecat pe o etichetă asupra căreia oamenii nu cad de acord. Pentru semnale, un ton puternic și neambiguu este mai informativ decât unul la limită.",
-                "incorrectExplanation": "Scăderea urmează adnotatorii, nu modelul: unde experții nu sunt de acord nu există un răspuns corect clar, deci toate modelele scad."
+                "correctExplanation": "Un model nu poate fi judecat pe o etichetă asupra căreia oamenii nu cad de acord. Pentru semnale, un ton puternic și neambiguu este mai informativ decît unul la limită.",
+                "incorrectExplanation": "Scăderea urmează adnotatorii, nu modelul: unde experții nu sînt de acord nu există un răspuns corect clar, deci toate modelele scad."
             }
         },
         {
@@ -214,12 +214,12 @@ window.MFM_DATA.quizzes['llm'] = {
                 "title": "Capcana evaluării în eșantion",
                 "text": "Modelul public FinBERT obține 89,0% pe Financial PhraseBank și 72,5% pe Twitter Financial News; Qwen2.5-7B, neajustat fin pe aceste etichete, obține 81,4% și 74,2%. Ce explică scăderea mai mare a lui FinBERT?",
                 "options": [
-                    "Titlurile de pe Twitter sunt scrise într-o limbă pe care FinBERT nu o cunoaște",
+                    "Titlurile de pe Twitter sînt scrise într-o limbă pe care FinBERT nu o cunoaște",
                     "Qwen2.5-7B a fost ajustat fin pe Twitter Financial News",
-                    "FinBERT are mai mulți parametri decât Qwen2.5-7B și face overfitting pe textele scurte",
+                    "FinBERT are mai mulți parametri decît Qwen2.5-7B și face overfitting pe textele scurte",
                     "FinBERT a fost ajustat fin pe cea mai mare parte din Financial PhraseBank, deci o parte din avantajul său acolo provine probabil din suprapunerea cu datele de antrenare"
                 ],
-                "correctExplanation": "Și Qwen2.5-7B scade, cu 7,2 puncte, pentru că titlurile Twitter sunt mai grele. Dacă ambele modele ar pierde la fel fără suprapunerea cu datele de antrenare (o ipoteză de identificare, netestabilă aici), diferența diferențelor, 9,2 puncte (CI bootstrap [6,7; 11,9]), se datorează suprapunerii; CI acoperă doar zgomotul de eșantionare. Evaluați un model de limbaj doar pe texte pe care nu le-a văzut niciodată.",
+                "correctExplanation": "Și Qwen2.5-7B scade, cu 7,2 puncte, pentru că titlurile Twitter sînt mai grele. Dacă ambele modele ar pierde la fel fără suprapunerea cu datele de antrenare (o ipoteză de identificare, netestabilă aici), diferența diferențelor, 9,2 puncte (CI bootstrap [6,7; 11,9]), se datorează suprapunerii; CI acoperă doar zgomotul de eșantionare. Evaluați un model de limbaj doar pe texte pe care nu le-a văzut niciodată.",
                 "incorrectExplanation": "FinBERT-ul public (ProsusAI/finbert) a fost ajustat fin pe o parte de antrenare din Financial PhraseBank (3 101 din 4 845 de propoziții la Araci, 2019); scorul lui acolo este în mare parte în eșantion, deci comparația nu este corectă."
             }
         },
@@ -246,7 +246,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "Modelul este perfect calibrat, deoarece găsește aproape toate titlurile pozitive",
                     "Erorile nu contează, pentru că în tranzacționare contează doar acuratețea"
                 ],
-                "correctExplanation": "Modelul mare de limbaj „vede” sentiment acolo unde adnotatorii au văzut fapte simple. Precizia pe clasa pozitivă este 414/(414 + 325 + 4) ≈ 56%, deci aproape jumătate din semnalele de cumpărare sunt false.",
+                "correctExplanation": "Modelul mare de limbaj „vede” sentiment acolo unde adnotatorii au văzut fapte simple. Precizia pe clasa pozitivă este 414/(414 + 325 + 4) ≈ 56%, deci aproape jumătate din semnalele de cumpărare sînt false.",
                 "incorrectExplanation": "A găsi aproape toate titlurile pozitive înseamnă recall mare; a eticheta multe titluri neutre drept pozitive scade precizia, iar fals-pozitivele declanșează tranzacții costisitoare."
             }
         },
@@ -271,7 +271,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "Este semnificativă la 1%, pentru că t > 1,96 cu 18 282 de observații",
                     "Cu 16 grupuri SE grupată este subestimată și t nu este N(0, 1): wild cluster bootstrap dă p = 0,061, iar 0,37 după Holm pe cele nouă regresii",
                     "Gruparea pe acțiuni este mereu conservatoare, deci valoarea p adevărată este și mai mică",
-                    "Gruparea este necesară doar când regresorul este o variabilă binară"
+                    "Gruparea este necesară doar cînd regresorul este o variabilă binară"
                 ],
                 "correctExplanation": "Inferența se sprijină pe 16 sume pe grupuri, nu pe 18 282 de observații: folosiți valori critice t15 sau un wild cluster bootstrap cu ipoteza nulă impusă (Cameron, Gelbach & Miller, 2008) și numărați toate regresiile încercate.",
                 "incorrectExplanation": "Numărul unităților independente este numărul de grupuri. Cu 16 grupuri, estimatorul sandwich subestimează varianța, iar aproximarea normală exagerează semnificația."
@@ -295,7 +295,7 @@ window.MFM_DATA.quizzes['llm'] = {
                 "title": "Mărimea modelului și acuratețea",
                 "text": "Pentru Qwen2.5 zero-shot pe Twitter Financial News, F1 macro este 55,3% pentru 1.5B, 72,6% pentru 7B și din nou mai mic pentru 14B (B: miliarde de parametri); FinBERT are 66,8%. Care este concluzia corectă?",
                 "options": [
-                    "Modelele mai mari sunt întotdeauna mai bune, deci trebuie folosit modelul 14B",
+                    "Modelele mai mari sînt întotdeauna mai bune, deci trebuie folosit modelul 14B",
                     "Mărimea nu contează deloc pentru sentimentul zero-shot",
                     "Mărimea ajută în medie, dar nu monoton; modelele mici reacționează puternic la formularea prompt-ului",
                     "Modelul 1.5B este cel mai bun, deoarece răspunde cel mai rar „neutral”"
@@ -349,12 +349,12 @@ window.MFM_DATA.quizzes['llm'] = {
                 "title": "LLM versus FinBERT",
                 "text": "Pe Twitter, Qwen2.5-7B obține 74,2%, iar FinBERT 72,5%: n01 = 395, n10 = 355, McNemar p = 0,154, diferența +1,7 puncte cu CI 95% [−0,5; +3,8]. Ce concluzionați?",
                 "options": [
-                    "Nicio diferență semnificativă: un model cu de 70 până la 130 de ori mai mulți parametri nu este mai precis pe aceste titluri",
+                    "Nicio diferență semnificativă: un model cu de 70 pînă la 130 de ori mai mulți parametri nu este mai precis pe aceste titluri",
                     "Qwen2.5-7B este semnificativ mai bun, deoarece are acuratețea mai mare",
                     "FinBERT este semnificativ mai bun, deoarece CI include valori negative",
                     "Testul nu este valid, deoarece cele două modele au arhitecturi diferite"
                 ],
-                "correctExplanation": "Atât testul pe perechi, cât și intervalul sunt compatibile cu diferența zero. Modelele mari de limbaj ajută în altă parte: fără etichete, alte limbi, documente mai lungi.",
+                "correctExplanation": "Atît testul pe perechi, cît și intervalul sînt compatibile cu diferența zero. Modelele mari de limbaj ajută în altă parte: fără etichete, alte limbi, documente mai lungi.",
                 "incorrectExplanation": "O valoare p de 0,154 și un interval de încredere care conține 0 arată că diferența de 1,7 puncte poate fi zgomot; niciun model nu se dovedește mai bun."
             }
         },
@@ -400,16 +400,16 @@ window.MFM_DATA.quizzes['llm'] = {
                 "incorrectExplanation": "Embeddings start high (69.0% with 100 labels) and pass FinBERT from about 400 labels; TF-IDF starts lower (66.9%) but keeps improving to 83.1%."
             },
             "ro": {
-                "title": "Câte etichete sunt necesare?",
+                "title": "Cîte etichete sînt necesare?",
                 "text": "În curba de învățare pe Twitter Financial News, care afirmație corespunde cursului?",
                 "options": [
-                    "FinBERT depășește orice model supervizat, oricâte etichete ar exista",
+                    "FinBERT depășește orice model supervizat, oricîte etichete ar exista",
                     "Embedding-urile au nevoie de întregul set de 9 543 de etichete pentru a depăși FinBERT",
                     "Embedding-urile + regresia logistică depășesc FinBERT de la circa 400 de etichete; cu toate cele 9 543 de etichete, TF-IDF ajunge la 83,1%, peste embedding-uri (78,6%)",
-                    "TF-IDF este cel mai bun cu 100 de etichete, dar embedding-urile îl depășesc când există multe etichete"
+                    "TF-IDF este cel mai bun cu 100 de etichete, dar embedding-urile îl depășesc cînd există multe etichete"
                 ],
-                "correctExplanation": "Vectorii preantrenați conțin deja aproape tot ce trebuie, deci câteva sute de etichete din domeniu sunt suficiente; cu multe etichete, cuvintele exacte precum „upgrade”, „cuts” sau „misses” poartă semnalul, iar TF-IDF câștigă.",
-                "incorrectExplanation": "Embedding-urile pornesc sus (69,0% cu 100 de etichete) și trec de FinBERT de la circa 400 de etichete; TF-IDF pornește mai jos (66,9%), dar crește până la 83,1%."
+                "correctExplanation": "Vectorii preantrenați conțin deja aproape tot ce trebuie, deci cîteva sute de etichete din domeniu sînt suficiente; cu multe etichete, cuvintele exacte precum „upgrade”, „cuts” sau „misses” poartă semnalul, iar TF-IDF cîștigă.",
+                "incorrectExplanation": "Embedding-urile pornesc sus (69,0% cu 100 de etichete) și trec de FinBERT de la circa 400 de etichete; TF-IDF pornește mai jos (66,9%), dar crește pînă la 83,1%."
             }
         },
         {
@@ -431,12 +431,12 @@ window.MFM_DATA.quizzes['llm'] = {
                 "text": "Întrebat fără context dacă S&P 500 a crescut sau a scăzut într-o anumită lună, Qwen2.5-14B atinge un AUC (Area Under the ROC Curve) de 0,69 pe lunile dinaintea publicării sale; întrebat despre zile individuale ale acțiunii Apple, AUC-ul este între 0,48 și 0,52. Care este concluzia?",
                 "options": [
                     "Modelul prognozează bine lunile viitoare, deci este un bun instrument de prognoză",
-                    "Ambele rezultate sunt compatibile cu lipsa oricărei cunoașteri",
-                    "Modelul își amintește zilele individuale mai bine decât lunile",
+                    "Ambele rezultate sînt compatibile cu lipsa oricărei cunoașteri",
+                    "Modelul își amintește zilele individuale mai bine decît lunile",
                     "Își amintește parțial direcția lunară (regimuri, luni celebre), dar nu mișcările zilnice: look-ahead bias este un pericol la orizontul evenimentelor cunoscute"
                 ],
                 "correctExplanation": "Un AUC de 0,5 înseamnă nicio cunoaștere. Un AUC lunar mult peste 0,5 înainte de publicare este memoria istoriei pieței (de exemplu octombrie 2008, martie 2020); zgomotul zilnic nu este memorat.",
-                "incorrectExplanation": "Sunt luni trecute despre care modelul a citit la antrenare, nu prognoze; 0,69 pentru luni față de circa 0,5 pentru zile înseamnă doar o memorie grosieră a regimurilor și a episoadelor celebre."
+                "incorrectExplanation": "Sînt luni trecute despre care modelul a citit la antrenare, nu prognoze; 0,69 pentru luni față de circa 0,5 pentru zile înseamnă doar o memorie grosieră a regimurilor și a episoadelor celebre."
             }
         },
         {
@@ -463,7 +463,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "Extinderea backtest-ului mai departe în trecut, pentru mai multe observații"
                 ],
                 "correctExplanation": "Lopez-Lira & Tang (2026) testează GPT-4 pe titluri de după data-limită; Sarkar & Vafa (2024) propun modele point-in-time; Glasserman & Lin (2023) anonimizează textul pentru a măsura și a reduce distorsiunea, dar produsele, evenimentele sau citatele pot identifica în continuare episodul. Raportați mereu versiunea modelului și data publicării ponderilor.",
-                "incorrectExplanation": "Modelele mai mari memorează mai mult, prompt-urile nu șterg memoria, iar datele mai vechi sunt și mai probabil incluse în textele de antrenare. Datele de după data-limită sau modelele point-in-time separă perioada de test de textul de antrenare; anonimizarea doar atenuează distorsiunea."
+                "incorrectExplanation": "Modelele mai mari memorează mai mult, prompt-urile nu șterg memoria, iar datele mai vechi sînt și mai probabil incluse în textele de antrenare. Datele de după data-limită sau modelele point-in-time separă perioada de test de textul de antrenare; anonimizarea doar atenuează distorsiunea."
             }
         },
         {
@@ -490,7 +490,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "Randamentul de la deschiderea la închiderea zilei d"
                 ],
                 "correctExplanation": "Sursa dă data, nu ora: un titlu datat d poate apărea înainte de deschidere, în timpul ședinței sau după închidere. Randamentele din d și d + 1 pot conține încă reacția, deci d + 2 este primul randament pe care se poate tranzacționa.",
-                "incorrectExplanation": "Deoarece se cunoaște doar data, titlul poate fi publicat după închiderea din d; poziția poate fi deschisă sigur abia la închiderea din d + 1, câștigând randamentul din d + 2."
+                "incorrectExplanation": "Deoarece se cunoaște doar data, titlul poate fi publicat după închiderea din d; poziția poate fi deschisă sigur abia la închiderea din d + 1, cîștigînd randamentul din d + 2."
             }
         },
         {
@@ -509,14 +509,14 @@ window.MFM_DATA.quizzes['llm'] = {
             },
             "ro": {
                 "title": "Erori standard grupate",
-                "text": "Regresia pe date cumulate a randamentelor în exces pe scorul zilnic standardizat de sentiment folosește toate zilele-acțiune cu știri. De ce sunt erorile standard grupate pe zile de tranzacționare (Petersen, 2009)?",
+                "text": "Regresia pe date cumulate a randamentelor în exces pe scorul zilnic standardizat de sentiment folosește toate zilele-acțiune cu știri. De ce sînt erorile standard grupate pe zile de tranzacționare (Petersen, 2009)?",
                 "options": [
                     "Pentru că scorurile de sentiment nu urmează distribuția Normală",
                     "Pentru că fiecare acțiune are un număr diferit de titluri",
                     "Pentru că erorile acțiunilor diferite din aceeași zi pot fi corelate prin șocuri comune, pe care erorile standard obișnuite le ignoră",
                     "Pentru că gruparea elimină look-ahead bias al modelului de limbaj"
                 ],
-                "correctExplanation": "Șocurile comune de piață pot lovi mai multe acțiuni în aceeași zi. Covarianța grupată însumează X_gᵀ ε̂_g ε̂_gᵀ X_g pe zilele g și permite orice corelație în cadrul unei zile. Corecția poate merge în ambele sensuri: aici SE grupată pe zile a pantei LM este mai mică decât cea obișnuită (1,81 față de 2,32 bp).",
+                "correctExplanation": "Șocurile comune de piață pot lovi mai multe acțiuni în aceeași zi. Covarianța grupată însumează X_gᵀ ε̂_g ε̂_gᵀ X_g pe zilele g și permite orice corelație în cadrul unei zile. Corecția poate merge în ambele sensuri: aici SE grupată pe zile a pantei LM este mai mică decît cea obișnuită (1,81 față de 2,32 bp).",
                 "incorrectExplanation": "Problema este dependența din cadrul unei zile: tratarea observațiilor din aceeași zi ca independente folosește o varianță greșită, indiferent de sensul erorii."
             }
         },
@@ -565,13 +565,13 @@ window.MFM_DATA.quizzes['llm'] = {
                 "title": "Studiu de eveniment în jurul zilelor cu știri",
                 "text": "Pentru treimea cea mai pozitivă a zilelor cu știri (FinBERT), randamentul în exces cumulat este +0,63% în cele 5 zile dinainte, +0,50% în ziua d și +0,11% în d + 1. Cum trebuie interpretat?",
                 "options": [
-                    "Până când un trader poate acționa, prețul s-a ajustat în mare parte; mișcările dinaintea evenimentului sugerează information leakage sau titluri scrise după mișcare",
+                    "Pînă cînd un trader poate acționa, prețul s-a ajustat în mare parte; mișcările dinaintea evenimentului sugerează information leakage sau titluri scrise după mișcare",
                     "Știrea produce un drift lent, ușor de tranzacționat în ziua d + 2",
-                    "Mișcarea dinaintea evenimentului dovedește că datele sunt greșite",
-                    "Zilele cu știri pozitive sunt întotdeauna urmate de reveniri"
+                    "Mișcarea dinaintea evenimentului dovedește că datele sînt greșite",
+                    "Zilele cu știri pozitive sînt întotdeauna urmate de reveniri"
                 ],
-                "correctExplanation": "Cea mai mare parte a mișcării are loc înainte de știre și în ziua ei, în acord cu piețele eficiente (Capitolul 2). Zilele tranzacționabile d + 2 până la d + 5 aduc puțin și similar pentru știrile pozitive (+0,43%) și negative (+0,19%).",
-                "incorrectExplanation": "Randamentul cumulat se obține mai ales înainte de ziua d și în ziua d; ce rămâne pentru fereastra tranzacționabilă este mic și nu separă clar știrile pozitive de cele negative."
+                "correctExplanation": "Cea mai mare parte a mișcării are loc înainte de știre și în ziua ei, în acord cu piețele eficiente (Capitolul 2). Zilele tranzacționabile d + 2 pînă la d + 5 aduc puțin și similar pentru știrile pozitive (+0,43%) și negative (+0,19%).",
+                "incorrectExplanation": "Randamentul cumulat se obține mai ales înainte de ziua d și în ziua d; ce rămîne pentru fereastra tranzacționabilă este mic și nu separă clar știrile pozitive de cele negative."
             }
         },
         {
@@ -590,14 +590,14 @@ window.MFM_DATA.quizzes['llm'] = {
             },
             "ro": {
                 "title": "Costul de echilibru",
-                "text": "Strategia zilnică Qwen2.5-7B câștigă brut circa 6 bp în zilele cu poziții; fiecare astfel de zi necesită patru tranzacții (acțiunea și SPY, la intrare și la ieșire) de câte 5 bp. Care sunt costul de echilibru pe tranzacție și rezultatul net?",
+                "text": "Strategia zilnică Qwen2.5-7B cîștigă brut circa 6 bp în zilele cu poziții; fiecare astfel de zi necesită patru tranzacții (acțiunea și SPY, la intrare și la ieșire) de cîte 5 bp. Care sînt costul de echilibru pe tranzacție și rezultatul net?",
                 "options": [
                     "Circa 6 bp pe tranzacție; strategia este profitabilă după costuri",
                     "Circa 1,5 bp pe tranzacție, mult sub 5 bp: raportul Sharpe trece de la +0,63 înainte de costuri la −1,48 după",
                     "Circa 1,2 bp pe tranzacție; costurile nu contează pentru semnificație",
                     "Circa 24 bp pe tranzacție; strategia acoperă ușor 20 bp de costuri zilnice"
                 ],
-                "correctExplanation": "Costul de echilibru = randamentul brut în zilele cu poziții / 4 = 6/4 = 1,5 bp pe tranzacție. Costurile reale sunt 4 × 5 = 20 bp pe zi, mult peste avantajul brut.",
+                "correctExplanation": "Costul de echilibru = randamentul brut în zilele cu poziții / 4 = 6/4 = 1,5 bp pe tranzacție. Costurile reale sînt 4 × 5 = 20 bp pe zi, mult peste avantajul brut.",
                 "incorrectExplanation": "Împărțiți randamentul brut zilnic la cele patru tranzacții: circa 1,5 bp pe tranzacție. La 5 bp pe tranzacție, costul zilnic de 20 bp anulează avantajul."
             }
         },
@@ -617,15 +617,15 @@ window.MFM_DATA.quizzes['llm'] = {
             },
             "ro": {
                 "title": "Stabilitatea pe subperioade",
-                "text": "Strategia FinBERT câștigă înainte de costuri +1,4 bp pe zi în 2010–2015, −1,8 bp în 2016–2019, +24,3 bp în 2020–2021 (t = +1,89) și −1,8 bp în 2022–2023. Care este interpretarea onestă?",
+                "text": "Strategia FinBERT cîștigă înainte de costuri +1,4 bp pe zi în 2010–2015, −1,8 bp în 2016–2019, +24,3 bp în 2020–2021 (t = +1,89) și −1,8 bp în 2022–2023. Care este interpretarea onestă?",
                 "options": [
                     "Strategia este robustă, deoarece media pe întregul eșantion este pozitivă",
                     "Rezultatul din 2020–2021 este semnificativ la 5% și dovedește că semnalul funcționează",
-                    "Dovezile sunt slabe: doar doi ani de meme stocks ies în evidență, nesemnificativ la 5%, iar 20 bp de costuri zilnice abia ar fi acoperite chiar și acolo",
+                    "Dovezile sînt slabe: doar doi ani de meme stocks ies în evidență, nesemnificativ la 5%, iar 20 bp de costuri zilnice abia ar fi acoperite chiar și acolo",
                     "Subperioadele arată o creștere constantă a profitabilității"
                 ],
                 "correctExplanation": "O singură perioadă scurtă și specială determină media. Cu 16 acțiuni foarte urmărite, marcaje doar la nivel de dată și frecvență zilnică, semnalul așteptat este mic; un rezultat negativ arată totuși unde semnalul nu există.",
-                "incorrectExplanation": "Trei din patru subperioade sunt aproape de zero, iar t = +1,89 pentru 2020–2021 este sub pragul de 5%; cu patru tranzacții de 5 bp pe zi, chiar și acea perioadă abia ajunge la echilibru."
+                "incorrectExplanation": "Trei din patru subperioade sînt aproape de zero, iar t = +1,89 pentru 2020–2021 este sub pragul de 5%; cu patru tranzacții de 5 bp pe zi, chiar și acea perioadă abia ajunge la echilibru."
             }
         },
         {
@@ -644,15 +644,15 @@ window.MFM_DATA.quizzes['llm'] = {
             },
             "ro": {
                 "title": "Curba specificațiilor",
-                "text": "Din 36 de variante ale strategiei pe titluri (3 scoruri × 3 praguri × 4 zile ale câștigului), 3 au t > 1,96. Schimbând aleator semnul pozițiilor în blocuri de 10 zile de semnal, aceleași schimbări pentru toate variantele, 3 sau mai multe astfel de valori t apar cu probabilitatea 0,113. Ce este corect să raportați?",
+                "text": "Din 36 de variante ale strategiei pe titluri (3 scoruri × 3 praguri × 4 zile ale cîștigului), 3 au t > 1,96. Schimbînd aleator semnul pozițiilor în blocuri de 10 zile de semnal, aceleași schimbări pentru toate variantele, 3 sau mai multe astfel de valori t apar cu probabilitatea 0,113. Ce este corect să raportați?",
                 "options": [
                     "Cea mai bună variantă, pentru că are t > 1,96",
                     "Cele trei variante semnificative, pentru că se confirmă reciproc",
                     "Media celor 36 de statistici t, pentru că media elimină zgomotul",
-                    "Întreaga curbă, cu testul comun: dovezile sunt compatibile cu lipsa predictibilității la 5%"
+                    "Întreaga curbă, cu testul comun: dovezile sînt compatibile cu lipsa predictibilității la 5%"
                 ],
                 "correctExplanation": "O curbă a specificațiilor (Simonsohn, Simmons & Nelson, 2020) raportează toate alegerile rezonabile și le testează împreună. Schimbările comune, pe blocuri, păstrează dependența dintre variante și dependența serială pe termen scurt; testul presupune randamente cu semn simetrice sub nul și blocuri aproximativ independente. Aici valoarea p comună este 0,113, iar t median este 0,50.",
-                "incorrectExplanation": "Variantele folosesc aceleași zile și acțiuni, deci statisticile lor t sunt dependente; selecția sau media lor ignoră căutarea. Este nevoie de un test comun sub un nul comun."
+                "incorrectExplanation": "Variantele folosesc aceleași zile și acțiuni, deci statisticile lor t sînt dependente; selecția sau media lor ignoră căutarea. Este nevoie de un test comun sub un nul comun."
             }
         },
         {
@@ -678,7 +678,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "FinBERT trebuia înlocuit cu un dicționar pentru o astfel de regresie",
                     "Nu este nicio eroare, deoarece t = 17 depășește cu mult orice valoare critică"
                 ],
-                "correctExplanation": "99,8% dintre marcajele FNSPID sunt 00:00 UTC. Un titlu datat d poate raporta chiar mișcarea („shares jump”); în d + 2 cursul găsește −0,5 bp cu t = −0,25 pentru FinBERT.",
+                "correctExplanation": "99,8% dintre marcajele FNSPID sînt 00:00 UTC. Un titlu datat d poate raporta chiar mișcarea („shares jump”); în d + 2 cursul găsește −0,5 bp cu t = −0,25 pentru FinBERT.",
                 "incorrectExplanation": "Un t mare pe randamentul din aceeași zi arată că titlurile descriu prețurile; o prognoză trebuie să folosească un randament care începe după ce știrea este sigur publică, aici d + 2."
             }
         },
@@ -701,12 +701,12 @@ window.MFM_DATA.quizzes['llm'] = {
                 "text": "Un asistent AI scrie: „Am evaluat titlurile din 2010–2023 cu Qwen2.5-7B, ale cărui ponderi au fost publicate în septembrie 2024. Modelul nu a fost niciodată estimat pe randamentele noastre, deci backtest-ul este complet în afara eșantionului, iar +5,64 bp pe zi (t = 2,26) este o prognoză autentică.” Care este eroarea?",
                 "options": [
                     "Statistica t zilnică trebuia înlocuită cu una lunară",
-                    "Un model antrenat pe texte până în 2024 își poate aminti ce a urmat știrilor din 2010–2023, deci testul nu este în afara eșantionului; o parte din avantaj poate fi memorarea prețurilor",
-                    "Rezultatul este invalid doar pentru că modelul are mai puțini parametri decât GPT-4",
+                    "Un model antrenat pe texte pînă în 2024 își poate aminti ce a urmat știrilor din 2010–2023, deci testul nu este în afara eșantionului; o parte din avantaj poate fi memorarea prețurilor",
+                    "Rezultatul este invalid doar pentru că modelul are mai puțini parametri decît GPT-4",
                     "Nu este nicio eroare: faptul că modelul nu a fost estimat pe randamente este suficient pentru a fi în afara eșantionului"
                 ],
                 "correctExplanation": "Look-ahead bias: un LLM publicat în 2024 poate conține informații despre ce a urmat titlurilor anterioare, deci nu este dovedit că testul folosește doar informația disponibilă la momentul respectiv. Testele curate folosesc titluri de după data-limită sau modele point-in-time (textul anonimizat atenuează problema, fără a o elimina dovedit); în plus, cei 5,64 bp dispar după costuri.",
-                "incorrectExplanation": "În afara eșantionului înseamnă că modelul nu a avut acces la informația din perioada de test; un model antrenat pe texte până în 2024 poate să o fi avut, chiar dacă nu a văzut direct seria de randamente."
+                "incorrectExplanation": "În afara eșantionului înseamnă că modelul nu a avut acces la informația din perioada de test; un model antrenat pe texte pînă în 2024 poate să o fi avut, chiar dacă nu a văzut direct seria de randamente."
             }
         }
     ]

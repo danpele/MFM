@@ -13,7 +13,7 @@
 |---|---|---|---|---|
 | nyse_floor_2011.jpg | https://commons.wikimedia.org/wiki/File:No_Known_Restrictions_Trading_Floor,_New_York_Stock_Exchange_(Highsmith_LOC)_(6718386525).jpg | Carol M. Highsmith (Library of Congress) | Public domain | 2011-07-10 20:03 |
 | nyse_crowd_1929.jpg | https://commons.wikimedia.org/wiki/File:Crowd_outside_nyse.jpg | U.S. government photograph | Public domain | Taken on 29 October 1929 |
-| bitcoin_whitepaper.jpg | https://commons.wikimedia.org/wiki/File:Bitcoin-whitepaper-poster_page-0001.jpg | Satoshi Nakamoto (poster edition) | CC0 | 2018-10-31 |
+| bitcoin_whitepaper.jpg | https://commons.wikimedia.org/wiki/File:Bitcoin-whitepaper-poster_page-0001.jpg | Text: Satoshi Nakamoto (2008); poster: DailyCoinPost (2018) | CC0 | 2018-10-31 |
 | cbot_screens_1992.jpg | https://commons.wikimedia.org/wiki/File:Chicago_Board_of_Trade_electronic_displays.jpg | Lars Plougmann | CC BY-SA 2.0 | Taken on 7 May 1992 |
 | bachelier.jpg | https://commons.wikimedia.org/wiki/File:LouisBachelier.jpg | Unknown author | Public domain | 2010-12-31 |
 | gauss_1840.jpg | https://commons.wikimedia.org/wiki/File:Carl_Friedrich_Gauss_1840_by_Jensen.jpg | Christian Albrecht Jensen | Public domain | 1840date QS:P571,+1840-00-00T0 |

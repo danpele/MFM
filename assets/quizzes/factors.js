@@ -26,12 +26,12 @@ window.MFM_DATA.quizzes['factors'] = {
                 text: "Cu momente de verosimilitate maximă, forma pătratică GRS α̂′Σ̂⁻¹α̂ este egală cu…",
                 options: [
                     "Media pătratelor valorilor alfa ale activelor de test",
-                    "SR²(factori + active de test) − SR²(factori): câștigul de raport Sharpe maxim la pătrat adus de activele de test",
+                    "SR²(factori + active de test) − SR²(factori): cîștigul de raport Sharpe maxim la pătrat adus de activele de test",
                     "Media R² a regresiilor în serii de timp",
                     "Pătratul raportului Sharpe al factorilor, SR²(factori)"
                 ],
                 correctExplanation: "Din inversa partiționată a covarianței lui (f, R), μ′V⁻¹μ = SR²(f) + α′Σ⁻¹α. Pe cele 25 de portofolii, raportul Sharpe lunar crește de la 0,134 la 0,405, iar GRS = 4,20.",
-                incorrectExplanation: "Forma pătratică ponderează valorile alfa cu Σ̂⁻¹ și este egală cu creșterea pătratului raportului Sharpe tangent când activele de test se adaugă la factori."
+                incorrectExplanation: "Forma pătratică ponderează valorile alfa cu Σ̂⁻¹ și este egală cu creșterea pătratului raportului Sharpe tangent cînd activele de test se adaugă la factori."
             }
         },
         {
@@ -52,13 +52,13 @@ window.MFM_DATA.quizzes['factors'] = {
                 title: "O evaluare sceptică a lui R²",
                 text: "Un nou model cu trei factori atinge un R² transversal de 80% pe cele 25 de portofolii mărime × B/M. De ce este o dovadă slabă (Lewellen, Nagel și Shanken, 2010)?",
                 options: [
-                    "Pentru că 25 de portofolii sunt prea multe active de test",
+                    "Pentru că 25 de portofolii sînt prea multe active de test",
                     "Pentru că un R² credibil trebuie să depășească 95%",
                     "Pentru că R² OLS este mereu 80% pe aceste portofolii",
                     "Pentru că aceste portofolii au o structură factorială puternică, deci orice factori corelați cu SMB și HML le potrivesc; adăugați alte active de test și raportați R² GLS cu intervale de încredere"
                 ],
                 correctExplanation: "În curs, FF3 are R² OLS 0,66 pe cele 25 de portofolii, dar 0,21 după adăugarea a 30 de industrii, iar R² GLS este cel mult 0,20.",
-                incorrectExplanation: "Un R² OLS mare pe cele 25 de portofolii mărime × B/M este un prag jos: activele sunt acoperite de trei factori și multe seturi de factori fără legătură le potrivesc."
+                incorrectExplanation: "Un R² OLS mare pe cele 25 de portofolii mărime × B/M este un prag jos: activele sînt acoperite de trei factori și multe seturi de factori fără legătură le potrivesc."
             }
         },
         {
@@ -79,13 +79,13 @@ window.MFM_DATA.quizzes['factors'] = {
                 title: "Factor inutil",
                 text: "Un factor macroeconomic este statistic independent de toate randamentele. Într-o regresie în două etape cu un model greșit specificat, prima lui estimată λ̂…",
                 options: [
-                    "Poate părea semnificativă: testul t Fama–MacBeth respinge prea des, pentru că valorile beta pe acest factor sunt doar zgomot de ordinul T^(−1/2)",
+                    "Poate părea semnificativă: testul t Fama–MacBeth respinge prea des, pentru că valorile beta pe acest factor sînt doar zgomot de ordinul T^(−1/2)",
                     "Este exact zero",
                     "Este mereu nesemnificativă",
                     "Este egală cu media factorului în timp"
                 ],
                 correctExplanation: "Kan și Zhang (1999): etapa 2 împarte la zgomot, deci λ̂ nu converge la zero. În simularea din curs, λ = 0 a fost respins în 60% din replicări cu erori Fama–MacBeth, la nivelul de 5%.",
-                incorrectExplanation: "Independența față de randamente nu protejează etapa 2: valorile beta sunt estimate cu zgomot, iar prima estimată moștenește o eroare care nu dispare; testați întâi valorile beta din prima etapă."
+                incorrectExplanation: "Independența față de randamente nu protejează etapa 2: valorile beta sînt estimate cu zgomot, iar prima estimată moștenește o eroare care nu dispare; testați întîi valorile beta din prima etapă."
             }
         },
         {
@@ -112,7 +112,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Pentru că varianța reziduurilor se schimbă odată cu volatilitatea pieței (heteroscedasticitate), iar erorile clasice o ignoră"
                 ],
                 correctExplanation: "Newey–West păstrează estimația OLS și îi corectează varianța pentru heteroscedasticitate și autocorelare; gruparea volatilității face erorile clasice prea mici.",
-                incorrectExplanation: "Estimația punctuală este aceeași; se schimbă doar eroarea standard, pentru că reziduurile sunt heteroscedastice."
+                incorrectExplanation: "Estimația punctuală este aceeași; se schimbă doar eroarea standard, pentru că reziduurile sînt heteroscedastice."
             }
         },
         {
@@ -158,15 +158,15 @@ window.MFM_DATA.quizzes['factors'] = {
             },
             ro: {
                 title: "Tranzacționare asincronă",
-                text: "Valorile beta OLS zilnice ale acțiunilor puțin lichide de la Bursa de Valori București față de indicele BET sunt…",
+                text: "Valorile beta OLS zilnice ale acțiunilor puțin lichide de la Bursa de Valori București față de indicele BET sînt…",
                 options: [
                     "Deplasate în sus",
-                    "Deplasate spre zero; suma Dimson a pantelor pe randamentele BET întârziate, curente și anticipate corectează cea mai mare parte",
+                    "Deplasate spre zero; suma Dimson a pantelor pe randamentele BET întîrziate, curente și anticipate corectează cea mai mare parte",
                     "Nedeplasate, pentru că OLS este nedeplasat",
-                    "Nedefinite când o acțiune nu se tranzacționează"
+                    "Nedefinite cînd o acțiune nu se tranzacționează"
                 ],
                 correctExplanation: "Prețurile vechi împrăștie reacția la știrile pieței pe mai multe zile. În seminar, beta Dimson al Nuclearelectrica crește de la 0,80 la 0,94, iar al Digi de la 0,67 la 0,75.",
-                incorrectExplanation: "O acțiune care se tranzacționează cu întârziere reacționează mâine la mișcarea de azi a pieței, deci covarianța contemporană subestimează beta; adunați pantele anticipate și întârziate."
+                incorrectExplanation: "O acțiune care se tranzacționează cu întîrziere reacționează mîine la mișcarea de azi a pieței, deci covarianța contemporană subestimează beta; adunați pantele anticipate și întîrziate."
             }
         },
         {
@@ -189,8 +189,8 @@ window.MFM_DATA.quizzes['factors'] = {
                 options: [
                     "Că factorul nu este tranzacționat",
                     "Că media în timp este deplasată",
-                    "Că erorile Shanken sunt prea mici",
-                    "Specificarea greșită a modelului pentru aceste active de test sau identificarea slabă a primei când valorile beta variază foarte puțin"
+                    "Că erorile Shanken sînt prea mici",
+                    "Specificarea greșită a modelului pentru aceste active de test sau identificarea slabă a primei cînd valorile beta variază foarte puțin"
                 ],
                 correctExplanation: "Un factor tranzacționat se evaluează pe sine, deci λ ar trebui să fie egal cu E[f]. Valorile beta de piață acoperă doar 0,86–1,42 pe cele 25 de portofolii, deci termenul liber absoarbe nivelul, iar λ_m este slab identificat.",
                 incorrectExplanation: "Diferența este un diagnostic despre model și activele de test, nu despre media factorului sau erorile standard."
@@ -212,7 +212,7 @@ window.MFM_DATA.quizzes['factors'] = {
             },
             ro: {
                 title: "Test de alfa pentru N mare",
-                text: "Vreți să testați valorile alfa pentru N = 100 de portofolii cu T = 96 de randamente lunare. Ce se întâmplă cu testul GRS?",
+                text: "Vreți să testați valorile alfa pentru N = 100 de portofolii cu T = 96 de randamente lunare. Ce se întîmplă cu testul GRS?",
                 options: [
                     "Nu se poate calcula: matricea de covarianță a reziduurilor are rangul cel mult T − 2 < N, deci este singulară; folosiți un test pentru N mare, precum Pesaran–Yamagata",
                     "Este valid, dar are putere mică",
@@ -220,7 +220,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Este valid cu erori Newey–West"
                 ],
                 correctExplanation: "Σ̂ este construită din T vectori de reziduuri cu doi parametri estimați, deci rangul ei este cel mult T − 2 = 94 < 100, iar Σ̂⁻¹ nu există.",
-                incorrectExplanation: "Problema nu este puterea sau normalitatea: Σ̂⁻¹ nu există când N ≥ T − 1, iar GRS are nevoie de ea."
+                incorrectExplanation: "Problema nu este puterea sau normalitatea: Σ̂⁻¹ nu există cînd N ≥ T − 1, iar GRS are nevoie de ea."
             }
         },
         {
@@ -241,7 +241,7 @@ window.MFM_DATA.quizzes['factors'] = {
                 title: "Putere redusă",
                 text: "Testul GRS nu respinge CAPM pe 9 ETF-uri sectoriale din SUA (p = 0,85), dar îl respinge categoric pe cele 25 de portofolii mărime × B/M. De ce?",
                 options: [
-                    "ETF-urile sectoriale sunt mai eficiente decât portofoliile",
+                    "ETF-urile sectoriale sînt mai eficiente decît portofoliile",
                     "CAPM este adevărat pentru sectoare",
                     "Sectoarele nu împrăștie mărimea și valoarea, deci au puțină dispersie în valorile alfa care contează: testul are putere mică",
                     "Eșantionul sectorial este mai lung"
@@ -273,7 +273,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "CAPM este exact adevărat",
                     "Portofoliile cu beta mai mare nu au avut randamente medii mai mari: SML empirică este plată sau negativă"
                 ],
-                correctExplanation: "CAPM prezice o pantă egală cu prima (7,2%); o SML plată sau negativă este eșecul empiric clasic, explicat de exemplu prin constrângerile de levier (Black; Frazzini–Pedersen).",
+                correctExplanation: "CAPM prezice o pantă egală cu prima (7,2%); o SML plată sau negativă este eșecul empiric clasic, explicat de exemplu prin constrîngerile de levier (Black; Frazzini–Pedersen).",
                 incorrectExplanation: "Prima pieței în timp a fost pozitivă (7,2%); eșecul constă în faptul că beta nu explică secțiunea transversală."
             }
         },
@@ -296,7 +296,7 @@ window.MFM_DATA.quizzes['factors'] = {
                 text: "Cum este construit factorul BAB (Betting Against Beta) al lui Frazzini și Pedersen?",
                 options: [
                     "Long acțiuni cu beta mare, short acțiuni cu beta mic",
-                    "Long acțiuni cu beta mic cu levier și short acțiuni cu beta mare cu levier redus, astfel încât portofoliul să aibă beta zero",
+                    "Long acțiuni cu beta mic cu levier și short acțiuni cu beta mare cu levier redus, astfel încît portofoliul să aibă beta zero",
                     "Long piața, short activul fără risc",
                     "Long firme mici, short firme mari"
                 ],
@@ -325,7 +325,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Portofoliul adevărat al pieței, cu toată averea, nu este observabil, deci orice test verifică și dacă aproximarea lui este eficientă medie–varianță",
                     "Beta nu poate fi estimat prin OLS",
                     "Rata fără risc nu este constantă",
-                    "Datele lunare sunt prea zgomotoase"
+                    "Datele lunare sînt prea zgomotoase"
                 ],
                 correctExplanation: "Orice portofoliu eficient medie–varianță evaluează exact toate activele prin beta, deci respingerea CAPM cu un indice bursier poate respinge doar eficiența acelui indice.",
                 incorrectExplanation: "Critica privește portofoliul pieței neobservabil, nu metodele de estimare sau frecvența datelor."
@@ -351,10 +351,10 @@ window.MFM_DATA.quizzes['factors'] = {
                 options: [
                     "O regresie în serii de timp pentru fiecare activ",
                     "Matricea de covarianță a factorilor",
-                    "O regresie transversală a randamentelor pe valorile beta estimate, pentru fiecare perioadă; primele sunt mediile acestor pante",
+                    "O regresie transversală a randamentelor pe valorile beta estimate, pentru fiecare perioadă; primele sînt mediile acestor pante",
                     "Statistica GRS"
                 ],
-                correctExplanation: "Etapa 1 estimează beta; etapa 2 face T regresii transversale și mediază pantele λ̂_t; eroarea standard este abaterea lor standard împărțită la √T (Newey–West dacă pantele sunt autocorelate).",
+                correctExplanation: "Etapa 1 estimează beta; etapa 2 face T regresii transversale și mediază pantele λ̂_t; eroarea standard este abaterea lor standard împărțită la √T (Newey–West dacă pantele sînt autocorelate).",
                 incorrectExplanation: "Beta din serii de timp provine din prima etapă; a doua etapă este transversală, perioadă cu perioadă."
             }
         },
@@ -379,7 +379,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Pentru a corecta autocorelarea randamentelor",
                     "Pentru a face primele pozitive",
                     "Pentru a corecta distribuțiile non-Normale ale randamentelor",
-                    "Pentru că valorile beta sunt estimate, nu cunoscute (erori în variabile), ceea ce face erorile obișnuite prea mici"
+                    "Pentru că valorile beta sînt estimate, nu cunoscute (erori în variabile), ceea ce face erorile obișnuite prea mici"
                 ],
                 correctExplanation: "Var_Sh = (1 + c)(Var_FM − Σ_f/T) + Σ_f/T, cu c = λ′Σ_f⁻¹λ: doar partea datorată erorilor în variabile este scalată. Pentru factori tranzacționați lunari c este mic (0,03 pentru FF3), deci HML păstrează t ≈ 2,99.",
                 incorrectExplanation: "Corecția tratează eroarea de estimare a valorilor beta folosite în a doua etapă."
@@ -401,7 +401,7 @@ window.MFM_DATA.quizzes['factors'] = {
             },
             ro: {
                 title: "Numărul de factori",
-                text: "Ce estimator alege numărul de factori k maximizând raportul valorilor proprii consecutive μ_k/μ_(k+1) ale matricei de covarianță de selecție?",
+                text: "Ce estimator alege numărul de factori k maximizînd raportul valorilor proprii consecutive μ_k/μ_(k+1) ale matricei de covarianță de selecție?",
                 options: [
                     "Regula Kaiser",
                     "Criteriul informațional Bai–Ng",
@@ -428,14 +428,14 @@ window.MFM_DATA.quizzes['factors'] = {
             },
             ro: {
                 title: "Compararea modelelor",
-                text: "Barillas și Shanken (2018): ce active de test sunt necesare pentru a compara două modele factoriale ai căror factori sunt randamente în exces tranzacționate?",
+                text: "Barillas și Shanken (2018): ce active de test sînt necesare pentru a compara două modele factoriale ai căror factori sînt randamente în exces tranzacționate?",
                 options: [
                     "Cele 25 de portofolii mărime × B/M",
                     "Niciunul în afara factorilor înșiși: se compară rapoartele Sharpe maxime la pătrat ale celor două seturi de factori",
                     "Portofoliile pe industrii",
                     "Toate acțiunile individuale"
                 ],
-                correctExplanation: "Capacitatea unui model de a evalua orice activ este rezumată de SR²(f) al factorilor săi. În curs, FF5 și Carhart ating amândouă un raport Sharpe anual de 0,97 în 1963–2026.",
+                correctExplanation: "Capacitatea unui model de a evalua orice activ este rezumată de SR²(f) al factorilor săi. În curs, FF5 și Carhart ating amîndouă un raport Sharpe anual de 0,97 în 1963–2026.",
                 incorrectExplanation: "Comparația se face pe factori: activele de test adaugă aceeași informație ambelor modele și se anulează."
             }
         },
@@ -455,7 +455,7 @@ window.MFM_DATA.quizzes['factors'] = {
             },
             ro: {
                 title: "Scăderea primelor",
-                text: "Ce s-a întâmplat cu prima de momentum după 2000, în datele Kenneth French?",
+                text: "Ce s-a întîmplat cu prima de momentum după 2000, în datele Kenneth French?",
                 options: [
                     "S-a dublat",
                     "A rămas la fel",
@@ -482,7 +482,7 @@ window.MFM_DATA.quizzes['factors'] = {
             },
             ro: {
                 title: "Factor zoo",
-                text: "Cu 300 de factori independenți fără primă reală, câți v-ați aștepta să treacă pragul |t| > 1,96?",
+                text: "Cu 300 de factori independenți fără primă reală, cîți v-ați aștepta să treacă pragul |t| > 1,96?",
                 options: [
                     "Aproximativ 15",
                     "Aproximativ 0",
@@ -509,15 +509,15 @@ window.MFM_DATA.quizzes['factors'] = {
             },
             ro: {
                 title: "Testare multiplă",
-                text: "Ce procedură vizează direct rata descoperirilor false (ponderea așteptată a respingerilor false în totalul respingerilor), permițând mai multe descoperiri decât controlul erorii pe familie?",
+                text: "Ce procedură vizează direct rata descoperirilor false (ponderea așteptată a respingerilor false în totalul respingerilor), permițînd mai multe descoperiri decît controlul erorii pe familie?",
                 options: [
                     "Bonferroni",
                     "Benjamini–Hochberg",
                     "Holm",
                     "Testul naiv de 5%"
                 ],
-                correctExplanation: "Benjamini–Hochberg respinge ipotezele până la cel mai mare j cu p_(j) ≤ jα/M și controlează FDR pentru teste independente sau sub dependență de regresie pozitivă; Bonferroni și Holm controlează rata erorii pe familie, mai strictă.",
-                incorrectExplanation: "Bonferroni și Holm controlează probabilitatea oricărei respingeri false (FWER); deoarece FDR ≤ FWER, ele limitează și FDR, dar sunt mai conservatoare și nu îl vizează."
+                correctExplanation: "Benjamini–Hochberg respinge ipotezele pînă la cel mai mare j cu p_(j) ≤ jα/M și controlează FDR pentru teste independente sau sub dependență de regresie pozitivă; Bonferroni și Holm controlează rata erorii pe familie, mai strictă.",
+                incorrectExplanation: "Bonferroni și Holm controlează probabilitatea oricărei respingeri false (FWER); deoarece FDR ≤ FWER, ele limitează și FDR, dar sînt mai conservatoare și nu îl vizează."
             }
         },
         {
@@ -539,9 +539,9 @@ window.MFM_DATA.quizzes['factors'] = {
                 text: "De ce propun Harvey, Liu și Zhu (2016) o statistică t peste 3 pentru factorii noi?",
                 options: [
                     "Pentru că randamentele urmează distribuția Normală",
-                    "Pentru că randamentele factorilor sunt mereu mari",
+                    "Pentru că randamentele factorilor sînt mereu mari",
                     "Pentru că sute de factori au fost testați, deci pragul obișnuit de 1,96 produce multe descoperiri false",
-                    "Pentru că erorile Fama–MacBeth sunt prea mari"
+                    "Pentru că erorile Fama–MacBeth sînt prea mari"
                 ],
                 correctExplanation: "Testarea multiplă ridică ștacheta: cu 300 de factori inutili, cel mai bun are un |t| median de aproximativ 3,06.",
                 incorrectExplanation: "Pragul mai mare este o corecție pentru testarea multiplă din factor zoo."
@@ -563,7 +563,7 @@ window.MFM_DATA.quizzes['factors'] = {
             },
             ro: {
                 title: "Mărimea corecției Shanken",
-                text: "Un factor tranzacționat are prima lunară λ = 0,5% și volatilitatea lunară σ_f = 4,5%. Cu cât mărește factorul Shanken (1 + c), c = λ²/σ_f², partea din varianța Fama–MacBeth datorată erorilor în variabile?",
+                text: "Un factor tranzacționat are prima lunară λ = 0,5% și volatilitatea lunară σ_f = 4,5%. Cu cît mărește factorul Shanken (1 + c), c = λ²/σ_f², partea din varianța Fama–MacBeth datorată erorilor în variabile?",
                 options: [
                     "Cu aproximativ 11%",
                     "Cu aproximativ 0,5%",
@@ -571,7 +571,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Cu aproximativ 1,2%"
                 ],
                 correctExplanation: "c = (0,005/0,045)² = 0,012: pentru factori tranzacționați lunari corecția este mică; cursul găsește c = 0,03 pentru FF3, iar eroarea standard a HML abia se schimbă.",
-                incorrectExplanation: "c este pătratul raportului Sharpe al primei pe perioadă, nu raportul Sharpe însuși; rapoartele Sharpe lunare sunt mici, deci c este mic."
+                incorrectExplanation: "c este pătratul raportului Sharpe al primei pe perioadă, nu raportul Sharpe însuși; rapoartele Sharpe lunare sînt mici, deci c este mic."
             }
         },
         {
@@ -592,7 +592,7 @@ window.MFM_DATA.quizzes['factors'] = {
                 title: "Prima componentă principală",
                 text: "În PCA pe 11 ETF-uri sectoriale din SUA (2018–2026), cum trebuie interpretată prima componentă principală?",
                 options: [
-                    "Ca factor de piață: toate încărcările sunt pozitive, iar corelația cu SPY este 0,95",
+                    "Ca factor de piață: toate încărcările sînt pozitive, iar corelația cu SPY este 0,95",
                     "Ca factor de valoare",
                     "Ca factor defensiv versus creștere",
                     "Ca zgomot pur"
@@ -619,9 +619,9 @@ window.MFM_DATA.quizzes['factors'] = {
                 title: "IPCA",
                 text: "Care este ideea de bază a PCA instrumentate (Kelly, Pruitt și Su, 2019)?",
                 options: [
-                    "Factorii sunt aleși de investitor",
-                    "Încărcările factoriale sunt funcții liniare de caracteristici observate ale firmelor, estimate împreună cu factorii latenți",
-                    "Încărcările sunt constante în timp",
+                    "Factorii sînt aleși de investitor",
+                    "Încărcările factoriale sînt funcții liniare de caracteristici observate ale firmelor, estimate împreună cu factorii latenți",
+                    "Încărcările sînt constante în timp",
                     "Se folosește doar factorul de piață"
                 ],
                 correctExplanation: "β_{i,t}′ = z_{i,t}′Γ_β permite ca beta să se schimbe cu caracteristicile; articolul arată că acestea contează prin covarianțe, nu ca alfa.",
@@ -671,7 +671,7 @@ window.MFM_DATA.quizzes['factors'] = {
             },
             ro: {
                 title: "Găsiți eroarea AI: un semnal de momentum",
-                text: "Un asistent AI scrie acest backtest de momentum: „mom = P.pct_change(12); la fiecare sfârșit de lună t, ordonați acțiunile după mom la t și înregistrați randamentul primelor minus ultimelor acțiuni în luna t.” Rezultatul este circa 50% pe an. Ce este greșit?",
+                text: "Un asistent AI scrie acest backtest de momentum: „mom = P.pct_change(12); la fiecare sfîrșit de lună t, ordonați acțiunile după mom la t și înregistrați randamentul primelor minus ultimelor acțiuni în luna t.” Rezultatul este circa 50% pe an. Ce este greșit?",
                 options: [
                     "Momentum-ul se calculează pe 36 de luni, nu pe 12",
                     "Look-ahead bias: semnalul la t conține randamentul lunii t, luna în care portofoliul este deținut; semnalul trebuie să fie cunoscut înainte de începutul lunii",
@@ -679,7 +679,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Un portofoliu long–short are mereu randamentul mediu zero"
                 ],
                 correctExplanation: "Ordonarea după un randament pe 12 luni care se termină la t, urmată de deținerea în luna t, folosește chiar randamentul perioadei de deținere pentru alegerea acțiunilor. Decalați semnalul, de exemplu semnalul 12–1 P.shift(2)/P.shift(13) − 1.",
-                incorrectExplanation: "Semnalul conține chiar randamentul pe care ar trebui să-l prognozeze: folosiți doar prețuri cunoscute la începutul lunii de deținere, de exemplu lunile t−12 până la t−2."
+                incorrectExplanation: "Semnalul conține chiar randamentul pe care ar trebui să-l prognozeze: folosiți doar prețuri cunoscute la începutul lunii de deținere, de exemplu lunile t−12 pînă la t−2."
             }
         },
         {
@@ -702,8 +702,8 @@ window.MFM_DATA.quizzes['factors'] = {
                 options: [
                     "Ajustarea Blume îndepărtează beta de 1, nu îl apropie",
                     "Beta Blume se aplică doar portofoliilor, niciodată acțiunilor individuale",
-                    "Beta ajustat trebuie să fie egal cu beta OLS când β̂ > 1",
-                    "Ponderile sunt inversate: β_B = 0,33 + 0,67 β̂, deci β_B = 1,335"
+                    "Beta ajustat trebuie să fie egal cu beta OLS cînd β̂ > 1",
+                    "Ponderile sînt inversate: β_B = 0,33 + 0,67 β̂, deci β_B = 1,335"
                 ],
                 correctExplanation: "Blume (1971): β_B = 0,33 + 0,67 β̂, care apropie estimarea de 1: 0,33 + 0,67 × 1,5 = 1,335. Ponderile inversate micșorează mult prea mult.",
                 incorrectExplanation: "În regula lui Blume beta estimat primește ponderea 0,67, iar constanta este 0,33: pentru β̂ = 1,5 beta ajustat este 1,335."

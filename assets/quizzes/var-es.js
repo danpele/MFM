@@ -57,8 +57,8 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "ES_alpha(L) = E[L | L > VaR_alpha(L)] pentru orice L discret",
                     "ES_alpha(L) = maximul după v al { v + E[(L - v)+] / alpha }"
                 ],
-                "correctExplanation": "Funcția obiectiv v + E[(L - v)+]/alpha este convexă în v, cu derivata la dreapta 1 - P(L > v)/alpha și derivata la stânga 1 - P(L >= v)/alpha; v o minimizează când P(L > v) <= alpha <= P(L >= v), condiție îndeplinită în VaR_alpha (derivată obișnuită nulă doar pentru L continuă). Valoarea minimă este ES_alpha, inclusiv când L are atomi.",
-                "incorrectExplanation": "Reprezentarea este un minim, nu un maxim (funcția obiectiv este convexă și nemărginită superior); media condiționată dincolo de VaR eșuează când distribuția are atomi, iar nu apare niciun adaos de volatilitate."
+                "correctExplanation": "Funcția obiectiv v + E[(L - v)+]/alpha este convexă în v, cu derivata la dreapta 1 - P(L > v)/alpha și derivata la stînga 1 - P(L >= v)/alpha; v o minimizează cînd P(L > v) <= alpha <= P(L >= v), condiție îndeplinită în VaR_alpha (derivată obișnuită nulă doar pentru L continuă). Valoarea minimă este ES_alpha, inclusiv cînd L are atomi.",
+                "incorrectExplanation": "Reprezentarea este un minim, nu un maxim (funcția obiectiv este convexă și nemărginită superior); media condiționată dincolo de VaR eșuează cînd distribuția are atomi, iar nu apare niciun adaos de volatilitate."
             }
         },
         {
@@ -131,7 +131,7 @@ window.MFM_DATA.quizzes['var-es'] = {
             },
             "ro": {
                 "title": "Indicele extremal",
-                "text": "Pierderile zilnice sunt grupate, cu indicele extremal theta = 0,5. Cum trebuie corectată aproximarea P(maximul lunar <= x) ~ F(x)^n?",
+                "text": "Pierderile zilnice sînt grupate, cu indicele extremal theta = 0,5. Cum trebuie corectată aproximarea P(maximul lunar <= x) ~ F(x)^n?",
                 "options": [
                     "Este exactă, pentru că maximul lunar nu depinde de grupare",
                     "Înlocuim F(x)^n cu F(x)^(n theta); ignorarea lui theta deplasează în jos VaR-ul zilnic implicat",
@@ -139,7 +139,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Păstrăm F(x)^n: theta schimbă doar parametrul de formă xi"
                 ],
                 "correctExplanation": "Cu grupare, P(M_n <= u_n) tinde la exp(-theta tau): cele n zile se comportă ca n theta zile independente. Folosirea lui F^n în loc de F^(n theta) dă o cuantilă zilnică implicată prea mică.",
-                "incorrectExplanation": "Gruparea reduce numărul efectiv de zile independente la n theta, mai mic decât n; parametrul de formă nu se schimbă, dar legătura dintre maximele pe blocuri și cuantilele zilnice da."
+                "incorrectExplanation": "Gruparea reduce numărul efectiv de zile independente la n theta, mai mic decît n; parametrul de formă nu se schimbă, dar legătura dintre maximele pe blocuri și cuantilele zilnice da."
             }
         },
         {
@@ -162,10 +162,10 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "options": [
                     "Media de selecție este prea mare",
                     "Distribuția Normală supraestimează coada",
-                    "Pierderile zilnice au cozi mai grele decât distribuția Normală",
+                    "Pierderile zilnice au cozi mai grele decît distribuția Normală",
                     "Simularea istorică supraestimează mereu VaR"
                 ],
-                "correctExplanation": "Un exces de aplatizare peste 10 pune mai multă probabilitate departe de centru decât permite distribuția Normală, deci cuantila empirică este mai mare.",
+                "correctExplanation": "Un exces de aplatizare peste 10 pune mai multă probabilitate departe de centru decît permite distribuția Normală, deci cuantila empirică este mai mare.",
                 "incorrectExplanation": "Diferența vine din cozile grele: distribuția Normală cu aceeași abatere standard este prea subțire în coadă."
             }
         },
@@ -185,12 +185,12 @@ window.MFM_DATA.quizzes['var-es'] = {
             },
             "ro": {
                 "title": "Cornish-Fisher",
-                "text": "Când dă dezvoltarea Cornish-Fisher estimări VaR nesigure?",
+                "text": "Cînd dă dezvoltarea Cornish-Fisher estimări VaR nesigure?",
                 "options": [
-                    "Când asimetria și excesul de aplatizare sunt mari, ca la randamentele zilnice cu aplatizare în jur de 10",
-                    "Când distribuția este exact Normală",
-                    "Când selecția este foarte lungă",
-                    "Când probabilitatea cozii este 10%"
+                    "Cînd asimetria și excesul de aplatizare sînt mari, ca la randamentele zilnice cu aplatizare în jur de 10",
+                    "Cînd distribuția este exact Normală",
+                    "Cînd selecția este foarte lungă",
+                    "Cînd probabilitatea cozii este 10%"
                 ],
                 "correctExplanation": "Dezvoltarea corectează cuantila Normală pentru abateri mici; cu o aplatizare în jur de 10, termenul de aplatizare depășește ținta, de ex. 6,08% față de 3,45% pentru S&P 500.",
                 "incorrectExplanation": "Cornish-Fisher este exactă pentru distribuția Normală și funcționează pentru abateri mici; asimetria și aplatizarea mari o strică."
@@ -216,11 +216,11 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "options": [
                     "VaR istoric; ES istoric nu este",
                     "Doar ES istoric, pentru că ES este coerent",
-                    "Amândoi, pentru că ambii se calculează din distribuția empirică",
+                    "Amîndoi, pentru că ambii se calculează din distribuția empirică",
                     "Niciunul, pentru că ambii depind de coadă"
                 ],
                 "correctExplanation": "O mică schimbare a distribuției datelor schimbă puțin VaR istoric, dar o singură pierdere extremă poate muta arbitrar ES istoric: coerența și robustețea trag în direcții opuse.",
-                "incorrectExplanation": "Coerența și robustețea sunt proprietăți diferite: ES este coerent, dar reacționează nemărginit la o singură observație extremă, în timp ce o cuantilă nu depinde de cât de departe se află observațiile extreme."
+                "incorrectExplanation": "Coerența și robustețea sînt proprietăți diferite: ES este coerent, dar reacționează nemărginit la o singură observație extremă, în timp ce o cuantilă nu depinde de cît de departe se află observațiile extreme."
             }
         },
         {
@@ -239,14 +239,14 @@ window.MFM_DATA.quizzes['var-es'] = {
             },
             "ro": {
                 "title": "Riscul de estimare în VaR FHS",
-                "text": "Un interval de încredere de 90% pentru VaR 1% de mâine din simularea istorică filtrată trebuie să includă eroarea de selecție a cui?",
+                "text": "Un interval de încredere de 90% pentru VaR 1% de mîine din simularea istorică filtrată trebuie să includă eroarea de selecție a cui?",
                 "options": [
                     "Doar a cuantilei empirice a reziduurilor standardizate",
                     "Doar a prognozei volatilității sigma_{t+1}",
-                    "Atât a parametrilor GARCH estimați (prin sigma_{t+1}), cât și a cuantilei empirice a reziduurilor",
+                    "Atît a parametrilor GARCH estimați (prin sigma_{t+1}), cît și a cuantilei empirice a reziduurilor",
                     "A nimic: o prognoză nu este o estimare"
                 ],
-                "correctExplanation": "VaR FHS este -mu_{t+1} + sigma_{t+1} înmulțit cu o cuantilă a reziduurilor; ambii factori sunt estimați, deci un bootstrap pe reziduuri care re-estimează modelul GARCH pe fiecare traiectorie surprinde ambele surse.",
+                "correctExplanation": "VaR FHS este -mu_{t+1} + sigma_{t+1} înmulțit cu o cuantilă a reziduurilor; ambii factori sînt estimați, deci un bootstrap pe reziduuri care re-estimează modelul GARCH pe fiecare traiectorie surprinde ambele surse.",
                 "incorrectExplanation": "Prognoza volatilității depinde de parametrii GARCH estimați, iar cuantila reziduurilor de un eșantion finit; ignorarea oricăreia dintre surse dă intervale prea înguste."
             }
         },
@@ -273,8 +273,8 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Măsura de risc nu se adaptează la gruparea volatilității",
                     "Datele conțin erori"
                 ],
-                "correctExplanation": "O prognoză VaR zilnică bună produce depășiri împrăștiate în timp; grupurile arată că fereastra reacționează prea târziu la șocurile de volatilitate.",
-                "incorrectExplanation": "Depășirile grupate sunt semnătura unei măsuri necondiționate pe o piață cu grupare a volatilității."
+                "correctExplanation": "O prognoză VaR zilnică bună produce depășiri împrăștiate în timp; grupurile arată că fereastra reacționează prea tîrziu la șocurile de volatilitate.",
+                "incorrectExplanation": "Depășirile grupate sînt semnătura unei măsuri necondiționate pe o piață cu grupare a volatilității."
             }
         },
         {
@@ -301,7 +301,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Prin minimizarea pierderii pinball (tick), suma lui (alpha - 1{r_t < q_t})(r_t - q_t)"
                 ],
                 "correctExplanation": "CAViaR este o regresie cuantilă: adevărata cuantilă condiționată minimizează pierderea pinball așteptată, deci nu este nevoie de nicio ipoteză de distribuție.",
-                "incorrectExplanation": "Cele mai mici pătrate și verosimilitatea Gaussiană vizează media și dispersia, nu o cuantilă; numărul de depășiri este o funcție în trepte cu multe puncte de minim și ignoră cât de departe cad randamentele dincolo de cuantilă."
+                "incorrectExplanation": "Cele mai mici pătrate și verosimilitatea Gaussiană vizează media și dispersia, nu o cuantilă; numărul de depășiri este o funcție în trepte cu multe puncte de minim și ignoră cît de departe cad randamentele dincolo de cuantilă."
             }
         },
         {
@@ -328,7 +328,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Autocorelația pozitivă a randamentelor zilnice (autocorelația de ordin 1 egală cu 0,109)"
                 ],
                 "correctExplanation": "Autocorelația pozitivă ridică dispersia sumelor pe mai multe zile peste h sigma^2 (raportul dispersiilor peste 1), deci radical(h) subestimează.",
-                "incorrectExplanation": "Cheia este persistența: randamentele autocorelate pozitiv se acumulează, iar coada pe mai multe zile devine mai largă decât sugerează radical(h)."
+                "incorrectExplanation": "Cheia este persistența: randamentele autocorelate pozitiv se acumulează, iar coada pe mai multe zile devine mai largă decît sugerează radical(h)."
             }
         },
         {
@@ -349,9 +349,9 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "title": "Alocarea Euler",
                 "text": "De ce componentele VaR C_i = w_i dVaR/dw_i se adună exact la VaR-ul portofoliului?",
                 "options": [
-                    "Pentru că corelațiile sunt zero",
+                    "Pentru că corelațiile sînt zero",
                     "Pentru că VaR este pozitiv omogen de grad unu în ponderi (teorema lui Euler)",
-                    "Pentru că randamentele sunt Normale",
+                    "Pentru că randamentele sînt Normale",
                     "Pentru că ponderile însumează unu"
                 ],
                 "correctExplanation": "Pentru o funcție omogenă de grad unu, suma_i w_i dRho/dw_i = Rho; acest lucru este valabil pentru VaR și ES.",
@@ -435,7 +435,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "O coadă de tip putere (Frechet) cu indicele de coadă aproximativ 1/0,19 = 5,3",
                     "Dispersia este infinită"
                 ],
-                "correctExplanation": "xi > 0 înseamnă o coadă grea de tip putere; momentele există până la un ordin sub 1/xi, aici aproximativ 5.",
+                "correctExplanation": "xi > 0 înseamnă o coadă grea de tip putere; momentele există pînă la un ordin sub 1/xi, aici aproximativ 5.",
                 "incorrectExplanation": "Un parametru de formă pozitiv implică o coadă grea de tip Frechet; xi = 0 ar fi exponențială, iar xi < 0 mărginită."
             }
         },
@@ -462,7 +462,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "O împrăștiere aleatoare în jurul lui zero",
                     "O creștere aproximativ liniară cu pragul"
                 ],
-                "correctExplanation": "Pentru o coadă GPD cu xi < 1 (medie finită), e(u) este liniară în u cu panta xi/(1 - xi): crescătoare când 0 < xi < 1.",
+                "correctExplanation": "Pentru o coadă GPD cu xi < 1 (medie finită), e(u) este liniară în u cu panta xi/(1 - xi): crescătoare cînd 0 < xi < 1.",
                 "incorrectExplanation": "Un exces mediu constant indică o coadă exponențială, unul descrescător o coadă mărginită; cozile grele dau o linie crescătoare."
             }
         },
@@ -516,8 +516,8 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Șocurile Normale au cozi prea subțiri chiar și după filtrare",
                     "Probabilitatea cozii a fost 2,5%"
                 ],
-                "correctExplanation": "Reziduurile standardizate rămân cu cozi grele (minus cuantila lor de 1% este aproximativ 2,8 față de 2,33), deci cuantila Normală este prea mică.",
-                "incorrectExplanation": "GARCH prinde corect momentul; nivelul este greșit pentru că distribuția șocurilor are cozi mai grele decât distribuția Normală."
+                "correctExplanation": "Reziduurile standardizate rămîn cu cozi grele (minus cuantila lor de 1% este aproximativ 2,8 față de 2,33), deci cuantila Normală este prea mică.",
+                "incorrectExplanation": "GARCH prinde corect momentul; nivelul este greșit pentru că distribuția șocurilor are cozi mai grele decît distribuția Normală."
             }
         },
         {
@@ -536,7 +536,7 @@ window.MFM_DATA.quizzes['var-es'] = {
             },
             "ro": {
                 "title": "VaR sub incertitudinea dependenței",
-                "text": "Marginalele lui L1 și L2 sunt cunoscute, dar copula lor nu. Ce se poate spune despre VaR 1% maxim al lui L1 + L2?",
+                "text": "Marginalele lui L1 și L2 sînt cunoscute, dar copula lor nu. Ce se poate spune despre VaR 1% maxim al lui L1 + L2?",
                 "options": [
                     "Este egal cu VaR(L1) + VaR(L2), valoarea comonotonă",
                     "Poate depăși VaR(L1) + VaR(L2)",
@@ -544,7 +544,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Este mărginit de VaR sub o copulă Gaussiană"
                 ],
                 "correctExplanation": "VaR nu este subaditiv, deci o structură de dependență care concentrează masa din coadă poate împinge VaR-ul sumei peste suma comonotonă; algoritmul de rearanjare calculează acest caz cel mai rău.",
-                "incorrectExplanation": "Pentru VaR, suma comonotonă nu este neapărat cazul cel mai rău: acesta se găsește rearanjând cozile și este adesea peste ea, mult peste independență sau o copulă Gaussiană. Suma comonotonă este cazul cel mai rău pentru ES, care este subaditiv și aditiv comonoton."
+                "incorrectExplanation": "Pentru VaR, suma comonotonă nu este neapărat cazul cel mai rău: acesta se găsește rearanjînd cozile și este adesea peste ea, mult peste independență sau o copulă Gaussiană. Suma comonotonă este cazul cel mai rău pentru ES, care este subaditiv și aditiv comonoton."
             }
         },
         {
@@ -565,13 +565,13 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "title": "De ce ES 2,5%",
                 "text": "De ce ES a fost stabilit la 2,5% și nu la 1%, vechiul nivel al VaR?",
                 "options": [
-                    "Sub distribuția Normală, ES 2,5% este aproape egal cu VaR 1%, deci capitalul rămâne similar pentru cozi subțiri, dar crește pentru cozi grele",
-                    "Pentru că ES 2,5% este mai ușor de supus backtesting-ului decât orice VaR",
+                    "Sub distribuția Normală, ES 2,5% este aproape egal cu VaR 1%, deci capitalul rămîne similar pentru cozi subțiri, dar crește pentru cozi grele",
+                    "Pentru că ES 2,5% este mai ușor de supus backtesting-ului decît orice VaR",
                     "Pentru că ES 1% nu există",
                     "Pentru că reduce capitalul pentru toate portofoliile"
                 ],
                 "correctExplanation": "2,338 sigma față de 2,326 sigma: trecerea este neutră pentru cozi subțiri și cere mai mult acolo unde coada este grea.",
-                "incorrectExplanation": "Alegerea păstrează capitalul comparabil în cazul Normal, făcându-l în același timp sensibil la coada de dincolo de cuantilă."
+                "incorrectExplanation": "Alegerea păstrează capitalul comparabil în cazul Normal, făcîndu-l în același timp sensibil la coada de dincolo de cuantilă."
             }
         },
         {
@@ -595,7 +595,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "ES singur este elicitabil, VaR nu",
                     "VaR este elicitabil; ES singur nu este, dar perechea (VaR, ES) este elicitabilă împreună",
                     "Nici VaR, nici ES nu pot fi supuse backtesting-ului",
-                    "Ambele sunt elicitabile cu eroarea pătratică"
+                    "Ambele sînt elicitabile cu eroarea pătratică"
                 ],
                 "correctExplanation": "Cuantila minimizează funcția de pierdere pinball; Gneiting (2011) a arătat că ES singur nu este elicitabil, iar Fissler și Ziegel (2016) au arătat elicitabilitatea comună.",
                 "incorrectExplanation": "VaR este elicitabil, ES doar împreună cu VaR; de aceea backtesting-ul ES este mai dificilă (Capitolul 8)."
@@ -617,7 +617,7 @@ window.MFM_DATA.quizzes['var-es'] = {
             },
             "ro": {
                 "title": "Precizia ES",
-                "text": "ES 2,5% istoric pe o fereastră de 500 de zile face media a câte observații?",
+                "text": "ES 2,5% istoric pe o fereastră de 500 de zile face media a cîte observații?",
                 "options": [
                     "500",
                     "50",

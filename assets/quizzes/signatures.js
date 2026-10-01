@@ -32,7 +32,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Maximul fiecărui canal pe fereastră"
                 ],
                 "correctExplanation": "S^i = integrala lui dX^i = X^i_b - X^i_a: nivelul 1 păstrează doar schimbarea netă a fiecărui canal.",
-                "incorrectExplanation": "Nivelul 1 este prima integrală iterată, care se reduce la schimbarea netă; mediile, varianțele și extremele cer niveluri superioare sau nu sunt termeni ai semnăturii."
+                "incorrectExplanation": "Nivelul 1 este prima integrală iterată, care se reduce la schimbarea netă; mediile, varianțele și extremele cer niveluri superioare sau nu sînt termeni ai semnăturii."
             }
         },
         {
@@ -59,7 +59,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Nu este definită pentru o dreaptă"
                 ],
                 "correctExplanation": "Pe o dreaptă toate integralele iterate se factorizează: nivelul k este D⊗...⊗D / k!, exponențiala tensorială a lui D.",
-                "incorrectExplanation": "Nivelurile superioare ale unui segment drept nu sunt zero: sunt puterile tensoriale simetrice ale creșterii împărțite la k!."
+                "incorrectExplanation": "Nivelurile superioare ale unui segment drept nu sînt zero: sînt puterile tensoriale simetrice ale creșterii împărțite la k!."
             }
         },
         {
@@ -139,7 +139,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "S^{ij} = S^{ji} pentru orice traiectorie",
                     "S^i S^j = 0 pentru i ≠ j"
                 ],
-                "correctExplanation": "Produsele termenilor semnăturii sunt combinații liniare de termeni superiori; de aceea un model liniar în semnătură conține deja polinoame în creșteri.",
+                "correctExplanation": "Produsele termenilor semnăturii sînt combinații liniare de termeni superiori; de aceea un model liniar în semnătură conține deja polinoame în creșteri.",
                 "incorrectExplanation": "Produsul shuffle transformă produsul a doi termeni într-o sumă pe intercalările cuvintelor lor; S^{ij} și S^{ji} diferă în general (diferența lor este de două ori aria Lévy)."
             }
         },
@@ -163,11 +163,11 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "options": [
                     "Face semnătura invariantă la viteza de parcurgere a traiectoriei",
                     "Reduce numărul de termeni ai semnăturii",
-                    "Face ca întreaga semnătură să determine traiectoria până la punctul de start și să vadă când au avut loc mișcările",
-                    "Elimină nevoia unei adâncimi de trunchiere"
+                    "Face ca întreaga semnătură să determine traiectoria pînă la punctul de start și să vadă cînd au avut loc mișcările",
+                    "Elimină nevoia unei adîncimi de trunchiere"
                 ],
-                "correctExplanation": "Fără timp, semnătura este invariantă la reparametrizare și la bucățile de tip arbore; un canal strict crescător le elimină pe amândouă, deci întreaga semnătură determină traiectoria până la o translație (Hambly și Lyons, 2010). Punctul de start trebuie fixat sau furnizat separat, iar o trunchiere finită nu determină traiectoria.",
-                "incorrectExplanation": "Augmentarea cu timpul adaugă termeni, nu îi reduce, și elimină, nu creează, invarianța la viteză; trunchierea rămâne necesară."
+                "correctExplanation": "Fără timp, semnătura este invariantă la reparametrizare și la bucățile de tip arbore; un canal strict crescător le elimină pe amîndouă, deci întreaga semnătură determină traiectoria pînă la o translație (Hambly și Lyons, 2010). Punctul de start trebuie fixat sau furnizat separat, iar o trunchiere finită nu determină traiectoria.",
+                "incorrectExplanation": "Augmentarea cu timpul adaugă termeni, nu îi reduce, și elimină, nu creează, invarianța la viteză; trunchierea rămîne necesară."
             }
         },
         {
@@ -186,7 +186,7 @@ window.MFM_DATA.quizzes['signatures'] = {
             },
             "ro": {
                 "title": "Dimensiunea trunchierii",
-                "text": "O traiectorie cu d = 3 canale este trunchiată la adâncimea N = 3. Câți termeni are semnătura (nivelurile 1-3)?",
+                "text": "O traiectorie cu d = 3 canale este trunchiată la adîncimea N = 3. Cîți termeni are semnătura (nivelurile 1-3)?",
                 "options": [
                     "9",
                     "39",
@@ -220,7 +220,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Semnăturile nu depind de traiectorie",
                     "Pe o mulțime compactă de traiectorii augmentate cu timpul, cu un punct de start comun, orice funcție continuă este aproximată uniform de o funcțională liniară a semnăturii"
                 ],
-                "correctExplanation": "Prin Stone-Weierstrass și identitatea shuffle, funcționalele liniare ale semnăturii sunt dense în funcțiile continue pe mulțimi compacte de traiectorii augmentate cu timpul, cu un punct de start comun; fără el, (t, 0) și (t, 10) au aceeași semnătură, iar nivelul lor de start nu poate fi aproximat.",
+                "correctExplanation": "Prin Stone-Weierstrass și identitatea shuffle, funcționalele liniare ale semnăturii sînt dense în funcțiile continue pe mulțimi compacte de traiectorii augmentate cu timpul, cu un punct de start comun; fără el, (t, 0) și (t, 10) au aceeași semnătură, iar nivelul lor de start nu poate fi aproximat.",
                 "incorrectExplanation": "Proprietatea se referă la aproximarea funcțiilor traiectoriei prin aplicații liniare ale semnăturii; nu spune nimic despre raritate sau despre finitudinea semnăturii infinite."
             }
         },
@@ -247,8 +247,8 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Semnătura trebuie calculată doar pe randamente",
                     "Log RV nu poate fi folosit ca un canal"
                 ],
-                "correctExplanation": "Doar creșterile intră în semnătură; cursul adaugă log RV_t și mediile lui săptămânale și lunare, așa cum Gu et al. adaugă factorii externi x_tau.",
-                "incorrectExplanation": "Invarianța la translație elimină complet nivelul; nu favorizează nivelurile mari, iar log RV poate fi un canal atât timp cât nivelul lui este furnizat separat."
+                "correctExplanation": "Doar creșterile intră în semnătură; cursul adaugă log RV_t și mediile lui săptămînale și lunare, așa cum Gu et al. adaugă factorii externi x_tau.",
+                "incorrectExplanation": "Invarianța la translație elimină complet nivelul; nu favorizează nivelurile mari, iar log RV poate fi un canal atît timp cît nivelul lui este furnizat separat."
             }
         },
         {
@@ -294,7 +294,7 @@ window.MFM_DATA.quizzes['signatures'] = {
             },
             "ro": {
                 "title": "Ponderile nucleului la temperatura zero",
-                "text": "Cu ponderi w_tau proporționale cu exp(-gamma d_tau), ce se întâmplă când gamma tinde la 0?",
+                "text": "Cu ponderi w_tau proporționale cu exp(-gamma d_tau), ce se întîmplă cînd gamma tinde la 0?",
                 "options": [
                     "Toată ponderea merge la fereastra trecută cea mai asemănătoare",
                     "Ponderile devin egale, iar regresia este cea obișnuită",
@@ -328,7 +328,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Suma pătratelor ponderilor",
                     "1 / suma lui w_tau^2"
                 ],
-                "correctExplanation": "n_eff = 1 / suma w^2 este n pentru ponderi egale și 1 când toată ponderea stă pe o singură observație.",
+                "correctExplanation": "n_eff = 1 / suma w^2 este n pentru ponderi egale și 1 cînd toată ponderea stă pe o singură observație.",
                 "incorrectExplanation": "Formula Kish folosește suma pătratelor ponderilor; cu ponderi egale 1/n dă n."
             }
         },
@@ -351,12 +351,12 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "text": "De ce reestimează Gu et al. modelul prin OLS pe suportul selectat de LASSO?",
                 "options": [
                     "LASSO aplică shrinkage spre zero coeficienților păstrați; OLS pe suport elimină această deplasare",
-                    "OLS selectează mai multe variabile decât LASSO",
+                    "OLS selectează mai multe variabile decît LASSO",
                     "LASSO nu poate folosi ponderi",
                     "OLS face modelul robust la cozi groase"
                 ],
                 "correctExplanation": "Cele mai mici pătrate după selecție (Belloni și Chernozhukov, 2013) păstrează raritatea LASSO, dar nu și biasul lui de shrinkage.",
-                "incorrectExplanation": "Reestimarea este restrânsă la suportul selectat, deci nu adaugă variabile; ponderile pot fi folosite în ambii pași."
+                "incorrectExplanation": "Reestimarea este restrînsă la suportul selectat, deci nu adaugă variabile; ponderile pot fi folosite în ambii pași."
             }
         },
         {
@@ -402,7 +402,7 @@ window.MFM_DATA.quizzes['signatures'] = {
             },
             "ro": {
                 "title": "HAR ca AR(22) restricționat",
-                "text": "Câte restricții liniare impune modelul HAR asupra celor 22 de coeficienți de pantă ai unui AR(22)?",
+                "text": "Cîte restricții liniare impune modelul HAR asupra celor 22 de coeficienți de pantă ai unui AR(22)?",
                 "options": [
                     "3",
                     "19",
@@ -437,7 +437,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "În zilele în care RV este măsurată mai imprecis (cvarticitate mare), prognoza se bazează mai puțin pe RV din acea zi"
                 ],
                 "correctExplanation": "RV este o estimare zgomotoasă, cu varianța erorii proporțională cu cvarticitatea; un beta_Q negativ corectează atenuarea din zilele zgomotoase (Bollerslev, Patton și Quaedvlieg, 2016).",
-                "incorrectExplanation": "Interacțiunea scade coeficientul zilnic efectiv când eroarea de măsurare este mare; este semnul așteptat, nu un semn de specificare greșită."
+                "incorrectExplanation": "Interacțiunea scade coeficientul zilnic efectiv cînd eroarea de măsurare este mare; este semnul așteptat, nu un semn de specificare greșită."
             }
         },
         {
@@ -458,8 +458,8 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "title": "Semivarianțele în SHAR",
                 "text": "Patton și Sheppard (2015) găsesc beta^- > beta^+ în SHAR. Ce înseamnă?",
                 "options": [
-                    "Varianța din randamentele intraday negative este mai persistentă decât cea din randamentele pozitive",
-                    "Randamentele pozitive sunt mai volatile",
+                    "Varianța din randamentele intraday negative este mai persistentă decît cea din randamentele pozitive",
+                    "Randamentele pozitive sînt mai volatile",
                     "Semivarianțele nu se adună la RV",
                     "Modelul HAR ar trebui să folosească doar randamentele pozitive"
                 ],
@@ -490,7 +490,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Media condiționată E[RV]",
                     "Modul condiționat al RV"
                 ],
-                "correctExplanation": "Anulând derivata -E[RV]/F^2 + 1/F obținem F = E[RV]; cu o aproximare condiționat nedeplasată față de informația prognozelor, ordinea pierderilor așteptate este aceeași ca cu varianța adevărată (Patton, 2011).",
+                "correctExplanation": "Anulînd derivata -E[RV]/F^2 + 1/F obținem F = E[RV]; cu o aproximare condiționat nedeplasată față de informația prognozelor, ordinea pierderilor așteptate este aceeași ca cu varianța adevărată (Patton, 2011).",
                 "incorrectExplanation": "Media armonică minimizează QLIKE cu argumentele inversate; QLIKE corectă este minimizată de media condiționată."
             }
         },
@@ -515,7 +515,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Ambele dau aceeași pierdere, ca MSE",
                     "F = 0,5 dă aproximativ 0,31, F = 1,5 aproximativ 0,07: subestimarea este penalizată mai mult",
                     "F = 1,5 dă pierderea mai mare",
-                    "Ambele pierderi sunt negative"
+                    "Ambele pierderi sînt negative"
                 ],
                 "correctExplanation": "QLIKE(1; 0,5) = 2 - ln 2 - 1 = 0,307 și QLIKE(1; 1,5) = 0,667 + ln 1,5 - 1 = 0,072: subestimarea varianței costă de aproximativ patru ori mai mult.",
                 "incorrectExplanation": "QLIKE este nenegativă și asimetrică; MSE ar da 0,25 în ambele cazuri."
@@ -540,11 +540,11 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "text": "De ce are nevoie un test Diebold-Mariano pentru prognoze pe 22 de zile ale RV medii de o varianță HAC?",
                 "options": [
                     "Pentru că QLIKE nu este simetrică",
-                    "Pentru că prognozele sunt în logaritmi",
+                    "Pentru că prognozele sînt în logaritmi",
                     "Pentru că diferența de pierdere are mereu distribuția Normală",
-                    "Pentru că țintele consecutive se suprapun, deci diferențele de pierdere sunt autocorelate chiar sub ipoteza nulă"
+                    "Pentru că țintele consecutive se suprapun, deci diferențele de pierdere sînt autocorelate chiar sub ipoteza nulă"
                 ],
-                "correctExplanation": "Țintele RV_{t+1:t+22} și RV_{t+2:t+23} au 21 de zile în comun, ceea ce induce dependență serială până la lagul h - 1 = 21, iar RV persistentă o poate prelungi; este nevoie de o varianță HAC (Newey-West) cu o lățime de bandă justificată, aici cel puțin h, și de verificări de sensibilitate.",
+                "correctExplanation": "Țintele RV_{t+1:t+22} și RV_{t+2:t+23} au 21 de zile în comun, ceea ce induce dependență serială pînă la lagul h - 1 = 21, iar RV persistentă o poate prelungi; este nevoie de o varianță HAC (Newey-West) cu o lățime de bandă justificată, aici cel puțin h, și de verificări de sensibilitate.",
                 "incorrectExplanation": "Nevoia de HAC vine din țintele suprapuse și din autocorelație, nu din forma funcției de pierdere sau din transformarea logaritmică."
             }
         },
@@ -564,7 +564,7 @@ window.MFM_DATA.quizzes['signatures'] = {
             },
             "ro": {
                 "title": "Holm versus BH",
-                "text": "Pe 50 de active, câte un test DM pentru fiecare, cu valori p valide, independente sau pozitiv dependente (PRDS): ce controlează corecțiile Holm și Benjamini-Hochberg?",
+                "text": "Pe 50 de active, cîte un test DM pentru fiecare, cu valori p valide, independente sau pozitiv dependente (PRDS): ce controlează corecțiile Holm și Benjamini-Hochberg?",
                 "options": [
                     "Holm: probabilitatea a cel puțin unei victorii false (FWER); BH: proporția așteptată de victorii false printre cele declarate (FDR)",
                     "Ambele controlează FWER",
@@ -572,7 +572,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Ambele controlează puterea testelor"
                 ],
                 "correctExplanation": "Holm este o procedură descendentă de control al FWER, validă sub orice dependență; BH este o procedură ascendentă de control al FDR, validă sub independență sau PRDS (Benjamini și Yekutieli, 2001, dau o variantă pentru dependență arbitrară), și respinge cel puțin la fel de des ca Holm.",
-                "incorrectExplanation": "FWER și FDR sunt rate de eroare diferite; niciuna dintre corecții nu controlează puterea."
+                "incorrectExplanation": "FWER și FDR sînt rate de eroare diferite; niciuna dintre corecții nu controlează puterea."
             }
         },
         {
@@ -598,8 +598,8 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "O mulțime de modele care conține cel(e) mai bun(e) model(e) cu probabilitatea de cel puțin 90%",
                     "Cele mai precise 90% dintre prognozele fiecărui model"
                 ],
-                "correctExplanation": "MCS elimină modelele secvențial prin teste de echivalență; mulțimea rămasă conține cele mai bune modele cu încrederea aleasă și este mare când datele nu le pot separa.",
-                "incorrectExplanation": "MCS este o mulțime, nu un singur model; mărimea ei arată cât de informative sunt datele despre diferențele de pierdere."
+                "correctExplanation": "MCS elimină modelele secvențial prin teste de echivalență; mulțimea rămasă conține cele mai bune modele cu încrederea aleasă și este mare cînd datele nu le pot separa.",
+                "incorrectExplanation": "MCS este o mulțime, nu un singur model; mărimea ei arată cît de informative sînt datele despre diferențele de pierdere."
             }
         },
         {
@@ -623,10 +623,10 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "A bătut log-HAR pe majoritatea activelor după corecția Holm",
                     "Nu a bătut log-HAR: o QLIKE medie puțin mai mare și nicio victorie semnificativă după corecție",
                     "A pierdut în fața HAR în nivel pe fiecare activ",
-                    "A reprodus câștigul de cinci ori raportat de Gu et al."
+                    "A reprodus cîștigul de cinci ori raportat de Gu et al."
                 ],
                 "correctExplanation": "QLIKE medie relativ la log-HAR a fost aproximativ 1,05 la h = 1, împinsă în sus de petrol, cu două victorii necorectate (ES, TSLA) și nicio victorie semnificativă după Holm din 50; la 5 și 22 de zile modelele cu semnături au fost mai slabe.",
-                "incorrectExplanation": "Victoria față de HAR în nivel a venit din ținta logaritmică, nu din semnături; față de log-HAR nu a existat niciun câștig și nimic apropiat de o îmbunătățire de cinci ori."
+                "incorrectExplanation": "Victoria față de HAR în nivel a venit din ținta logaritmică, nu din semnături; față de log-HAR nu a existat niciun cîștig și nimic apropiat de o îmbunătățire de cinci ori."
             }
         },
         {
@@ -652,8 +652,8 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "LASSO a eliminat nucleul",
                     "Nucleul de semnătură este invariant la translație: compară forma ferestrelor, nu nivelul volatilității"
                 ],
-                "correctExplanation": "O fereastră în creștere din martie 2020 are altă formă decât ferestrele trecute cu vârf și scădere, indiferent de nivelul lor; de aceea nucleul nu a evidențiat crizele trecute.",
-                "incorrectExplanation": "Fereastra de antrenare conținea scăderile de la sfârșitul lui 2018; ponderile intră în funcția obiectiv a LASSO și nu pot fi eliminate de ea."
+                "correctExplanation": "O fereastră în creștere din martie 2020 are altă formă decît ferestrele trecute cu vîrf și scădere, indiferent de nivelul lor; de aceea nucleul nu a evidențiat crizele trecute.",
+                "incorrectExplanation": "Fereastra de antrenare conținea scăderile de la sfîrșitul lui 2018; ponderile intră în funcția obiectiv a LASSO și nu pot fi eliminate de ea."
             }
         },
         {
@@ -672,15 +672,15 @@ window.MFM_DATA.quizzes['signatures'] = {
             },
             "ro": {
                 "title": "Găsiți eroarea din acest răspuns AI: variabilele de semnătură",
-                "text": "Un asistent AI scrie: „Pentru fiecare zi, calculați semnătura de adâncime 3 a ultimelor 22 de valori ale log RV (o traiectorie unidimensională) și folosiți cei trei termeni ca trăsături; semnătura surprinde forma traiectoriei volatilității.” Ce este greșit?",
+                "text": "Un asistent AI scrie: „Pentru fiecare zi, calculați semnătura de adîncime 3 a ultimelor 22 de valori ale log RV (o traiectorie unidimensională) și folosiți cei trei termeni ca trăsături; semnătura surprinde forma traiectoriei volatilității.” Ce este greșit?",
                 "options": [
                     "O traiectorie unidimensională are semnătura (D, D^2/2, D^3/6): doar schimbarea netă pe fereastră, fără formă și fără ordine; traiectoria are nevoie de un canal de timp (și de mai multe canale)",
-                    "Adâncimea 3 este prea mare pentru 22 de observații",
+                    "Adîncimea 3 este prea mare pentru 22 de observații",
                     "Semnăturile nu pot fi calculate pe logaritmi",
-                    "Log RV trebuie întâi diferențiat"
+                    "Log RV trebuie întîi diferențiat"
                 ],
-                "correctExplanation": "Fără un al doilea canal, toate integralele iterate sunt puteri ale creșterii totale; augmentarea cu timpul (și un canal al randamentelor) aduce informația despre formă și despre avans-întârziere.",
-                "incorrectExplanation": "Adâncimea nu este problema: într-o dimensiune, fiecare nivel este o funcție de schimbarea netă, indiferent de adâncime."
+                "correctExplanation": "Fără un al doilea canal, toate integralele iterate sînt puteri ale creșterii totale; augmentarea cu timpul (și un canal al randamentelor) aduce informația despre formă și despre avans-întîrziere.",
+                "incorrectExplanation": "Adîncimea nu este problema: într-o dimensiune, fiecare nivel este o funcție de schimbarea netă, indiferent de adîncime."
             }
         },
         {
@@ -699,7 +699,7 @@ window.MFM_DATA.quizzes['signatures'] = {
             },
             "ro": {
                 "title": "Găsiți eroarea din acest răspuns AI: evaluarea",
-                "text": "Un asistent AI scrie: „Am ales lambda cu LassoCV pe tot eșantionul, am estimat pe primele 70% și am calculat qlike(prognoza, realizat) pe ultimele 30%; LASSO-ul pe semnături are o valoare QLIKE mai mică decât HAR.” Ce pereche de erori conține răspunsul?",
+                "text": "Un asistent AI scrie: „Am ales lambda cu LassoCV pe tot eșantionul, am estimat pe primele 70% și am calculat qlike(prognoza, realizat) pe ultimele 30%; LASSO-ul pe semnături are o valoare QLIKE mai mică decît HAR.” Ce pereche de erori conține răspunsul?",
                 "options": [
                     "Folosirea log RV și folosirea a 70% pentru antrenare",
                     "Folosirea LASSO și a QLIKE în loc de MSE",
@@ -707,7 +707,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Folosirea unei singure împărțiri și raportarea QLIKE cu trei zecimale"
                 ],
                 "correctExplanation": "Calibrarea trebuie să folosească doar datele de antrenare; qlike(F, RV) = F/RV - ln(F/RV) - 1 este minimizată de media armonică, nu de E[RV]. Afirmației îi lipsesc și calculul reperului și un test DM.",
-                "incorrectExplanation": "Ținta logaritmică, LASSO și QLIKE sunt alegeri legitime; erorile sunt look-ahead bias la calibrare și pierderea inversată."
+                "incorrectExplanation": "Ținta logaritmică, LASSO și QLIKE sînt alegeri legitime; erorile sînt look-ahead bias la calibrare și pierderea inversată."
             }
         }
     ]

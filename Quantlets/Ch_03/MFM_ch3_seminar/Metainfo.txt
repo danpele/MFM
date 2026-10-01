@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch3_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 3 charts and worked numbers: the in-sample tangency portfolio prices every sector exactly (A1); GRS as a squared Sharpe-ratio gain (A2); the Vasicek posterior and beta forecasts (A3); Blume slope against the implied shrinkage weight (A4); Bonferroni, Holm, Benjamini-Hochberg and Benjamini-Yekutieli thresholds (A5, B7); a useless factor in the second pass (A6); errors-in-variables attenuation (A7); equicorrelated assets (A8); XLK beta with classical, White, Newey-West and block-bootstrap inference (B1); GRS on sector ETFs (B2); PCA and the number of factors (B3, B8); BVB betas with Vasicek and Dimson corrections (B4); Fama-MacBeth on ETFs (B5); factor-ETF alphas (B6); Lewellen-Nagel-Shanken R2 (B9); model comparison by maximum Sharpe ratios (B10); GRS under a residual bootstrap (B11); and the correction of an AI momentum backtest on BVB blue chips (C2).'
+Description: 'Seminar 3 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A1 Extended, A3, A5, A7, B1, B2, B3 with code and output. The proposed exercises A2, A4, A6, A8, B4, B5, B6, B7, B8, B9, B10, B11, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'CAPM, tangency portfolio, GRS test, Vasicek, Blume, multiple testing, Fama-MacBeth, PCA, number of factors, Dimson beta, bootstrap, Newey-West, Sharpe ratio, momentum, Bucharest Stock Exchange'
 
@@ -12,4 +12,4 @@ Submitted: 'Monday, 21 September 2026'
 
 Datafile: 'Daily market data (data/market): sector and factor ETFs, SPY, BVB blue chips, BET; portfolios and factors from the Kenneth French Data Library'
 
-Output: 'ch3_sem_a1_sml.pdf, ch3_sem_a2_grs.pdf, ch3_sem_a3_bayes.pdf, ch3_sem_a4_blume.pdf, ch3_sem_a5_pvalues.pdf, ch3_sem_a6_useless.pdf, ch3_sem_a7_eiv.pdf, ch3_sem_a8_equicorr.pdf, ch3_sem_b1_xlk.pdf, ch3_sem_b2_grs.pdf, ch3_sem_b3_pca.pdf, ch3_sem_b4_bvb.pdf, ch3_sem_b5_fm.pdf, ch3_sem_b6_alpha.pdf, ch3_sem_b7_alphas.pdf, ch3_sem_b8_bvb_pca.pdf, ch3_sem_b9_lns.pdf, ch3_sem_b10_sharpe.pdf, ch3_sem_b11_boot.pdf, ch3_sem_c2_correction.pdf'
+Output: 'ch3_sem_a1_sml.pdf, ch3_sem_a3_bayes.pdf, ch3_sem_a5_pvalues.pdf, ch3_sem_a7_eiv.pdf, ch3_sem_b1_xlk.pdf, ch3_sem_b2_grs.pdf, ch3_sem_b3_pca.pdf'

@@ -545,7 +545,7 @@
                 projectTitle: 'Proiectul de echipă și utilizarea AI',
                 aiTitle: 'Utilizarea AI în acest curs',
                 quizzes: 'Quiz-uri de autoevaluare',
-                quizIntro: 'La fiecare încercare se extrag aleator 20 de întrebări din banca de întrebări a capitolului, iar variantele de răspuns sunt amestecate. Răspunsul se blochează după selectare.',
+                quizIntro: 'La fiecare încercare se extrag aleator 20 de întrebări din banca de întrebări a capitolului, iar variantele de răspuns sînt amestecate. Răspunsul se blochează după selectare.',
                 loginPrompt: 'Autentificați-vă cu contul Google ASE (@ase.ro sau @stud.ase.ro) pentru a rezolva quiz-urile. Numele și scorul se înregistrează pentru nota de la curs.',
                 loginRequired: 'Autentificați-vă mai sus cu contul Google ASE pentru a vedea acest quiz.',
                 loginWrongDomain: 'Folosiți contul ASE (@ase.ro sau @stud.ase.ro).',
@@ -593,7 +593,7 @@
             ],
             ro: [
                 { h: 'Curs', p: ['Modelarea piețelor financiare', 'Masterul Statistică aplicată și Data Science', 'Academia de Studii Economice din București'] },
-                { h: 'Orar', p: ['<strong>Curs:</strong> 2 ore/săptămână', '<strong>Seminar:</strong> 2 ore/săptămână', 'Anul universitar 2026/2027'] },
+                { h: 'Orar', p: ['<strong>Curs:</strong> 2 ore/săptămînă', '<strong>Seminar:</strong> 2 ore/săptămînă', 'Anul universitar 2026/2027'] },
                 { h: 'Cunoștințe necesare', p: ['Probabilități și statistică', 'Econometrie / serii de timp', 'Programare în Python'] },
                 { h: 'Evaluare', p: ['Proiect în echipă (GitHub + prezentare + susținere orală): 70%', 'Quiz-uri și activitate: 20%', 'Prezență: 10% (cel puțin 4 cursuri și 4 seminarii)'] },
                 { h: 'Instrumente', p: ['Python, Jupyter / Google Colab', 'GitHub, Quantlet, Quantinar'] }
@@ -848,7 +848,7 @@
                 { h: '4. Present and defend', p: ['Team presentation, then a 10-minute oral defence without AI.', 'Each member explains one result and answers a "what changes if..." question. Grades can differ between team members.'] }
             ],
             ro: [
-                { h: '1. Replicați', p: ['Reproduceți integral un tabel sau o figură publicată, celulă cu celulă (DOI, pagină, număr de tabel), și explicați orice diferență.', 'Un asistent AI nu poate ghici o cifră publicată exactă: dacă o obțineți, datele și codul vostru sunt corecte.'] },
+                { h: '1. Replicați', p: ['Reproduceți integral un tabel sau o figură publicată, celulă cu celulă (DOI, pagină, număr de tabel), și explicați orice diferență.', 'Un asistent AI nu poate ghici o cifră publicată exactă: dacă o obțineți, datele și codul vostru sînt corecte.'] },
                 { h: '2. Pre-înregistrați și extindeți', p: ['Înainte de a deschide perioada de test, încărcați în repository un plan de analiză: ipoteza nulă, testul, funcția de pierdere, împărțirea eșantionului, strategia de identificare (piață de control, date placebo, test de ruptură la dată necunoscută) și o declarație de putere / efect minim detectabil.', 'Extindeți pe date noi sau pe altă piață; raportați o curbă a specificațiilor cu corecție pentru teste multiple.'] },
                 { h: '3. Livrați pe GitHub', p: ['Un repository reproductibil (seed-uri fixate, proveniența datelor, o singură comandă regenerează fiecare cifră), cu <code>AI_USE.md</code> și <code>AI_ERRORS.md</code>.', 'O lucrare de 8–12 pagini cu 10–15 referințe, dintre care cel puțin trei din ultimii cinci ani.'] },
                 { h: '4. Prezentați și susțineți', p: ['Prezentarea echipei, apoi o susținere orală de 10 minute, fără AI.', 'Fiecare membru explică un rezultat și răspunde la o întrebare de tipul „ce se schimbă dacă...”. Notele pot diferi între membrii echipei.'] }
@@ -868,7 +868,7 @@
             ro: [
                 '<strong>AI-ul este permis</strong> pentru cod, depanare, căutarea literaturii și redactare, în proiect și la seminar.',
                 '<strong>Utilizarea AI se declară</strong> în <code>AI_USE.md</code>: ce instrument, pentru ce și ce ați verificat voi. Utilizarea nedeclarată a AI este tratată ca plagiat.',
-                '<strong>Răspundeți pentru fiecare rând.</strong> „L-a scris AI-ul” nu este o explicație la susținerea orală.',
+                '<strong>Răspundeți pentru fiecare rînd.</strong> „L-a scris AI-ul” nu este o explicație la susținerea orală.',
                 '<strong>Notați erorile găsite</strong> în <code>AI_ERRORS.md</code>: cel puțin trei locuri în care asistentul a greșit (o formulă greșită, look-ahead bias, semnul VaR, date inventate sau o referință care nu există) și cum v-ați dat seama.',
                 '<strong>Verificați fiecare referință.</strong> Fiecare citare are nevoie de un DOI sau link funcțional. O referință care nu există este tratată ca date fabricate.',
                 '<strong>Ce notăm:</strong> întrebarea, verificările, interpretarea și răspunsurile de la susținere, nu cantitatea de cod.',
@@ -890,7 +890,7 @@
 
         dataSources: [
             { name: 'yfinance', href: 'https://github.com/ranaroussi/yfinance', en: 'Yahoo Finance prices (Python)', ro: 'Prețuri Yahoo Finance (Python)' },
-            { name: 'FRED', href: 'https://fred.stlouisfed.org', en: 'Macro and interest-rate data', ro: 'Date macroeconomice și de dobândă' },
+            { name: 'FRED', href: 'https://fred.stlouisfed.org', en: 'Macro and interest-rate data', ro: 'Date macroeconomice și de dobîndă' },
             { name: 'CCXT', href: 'https://github.com/ccxt/ccxt', en: 'Crypto exchange data (order books, trades)', ro: 'Date de pe exchange-uri cripto (order book, tranzacții)' },
             { name: 'BVB', href: 'https://www.bvb.ro', en: 'Bucharest Stock Exchange', ro: 'Bursa de Valori București' }
         ],

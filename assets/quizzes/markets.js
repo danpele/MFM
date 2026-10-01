@@ -35,30 +35,30 @@ window.MFM_DATA.quizzes['markets'] = {
             }
         },
         {
-            "correct": 0,
+            "correct": 1,
             "en": {
-                "title": "Square-root-of-time under AR(1)",
-                "text": "EUR/RON (BNR fixing): daily lag-1 autocorrelation 0.17; the sqrt(252) rule gives an annual volatility of 4.4%. Assuming an AR(1), what is the corrected annual volatility?",
+                "title": "Annualising with the observed frequency",
+                "text": "Bitcoin trades every day: 4,277 daily returns in 11.71 years (q = 365.25). Its daily log-return standard deviation is 3.49%. Which annualised volatility is right, and why?",
                 "options": [
-                    "About 5.3%: factor sqrt(1.17/0.83)",
-                    "4.4%: autocorrelation does not affect annual volatility",
-                    "About 3.7%: factor sqrt(0.83/1.17)",
-                    "About 5.1%: factor 1.17"
+                    "55.4%: always use sqrt(252), the number of trading days of a year",
+                    "66.7%: multiply by sqrt(q) with q = n/Y = 365.25, the observed returns per year",
+                    "1,274%: multiply by 365.25",
+                    "3.49%: volatility is not annualised"
                 ],
-                "correctExplanation": "For an AR(1) the variance ratio tends to (1 + rho)/(1 - rho), so volatility is multiplied by sqrt(1.17/0.83) = 1.19: 4.4% becomes 5.3%. This holds only under the AR(1) assumption: for the BNR series the negative autocorrelations at lags 2-4 offset lag 1, and monthly returns give 4.4% again.",
-                "incorrectExplanation": "Positive autocorrelation makes multi-day variance larger than h times the daily one: the factor is sqrt((1 + rho)/(1 - rho)) = 1.19, so about 5.3%."
+                "correctExplanation": "Annualise with the observed number of return intervals per year: 3.49% x sqrt(365.25) = 66.7%. Using 252 understates Bitcoin's annual volatility by 11 pp; for gold (q = 260.5) the difference is only 0.3 pp.",
+                "incorrectExplanation": "With iid daily returns the annual variance is q times the daily variance, with q the observed returns per year: 365.25 for Bitcoin, so 3.49% x sqrt(365.25) = 66.7%."
             },
             "ro": {
-                "title": "Regula rădăcinii pătrate a timpului pentru un AR(1)",
-                "text": "EUR/RON (fixing BNR): autocorelația zilnică de ordinul 1 este 0,17; regula sqrt(252) dă o volatilitate anuală de 4,4%. Presupunând un AR(1), care este volatilitatea anuală corectată?",
+                "title": "Anualizarea cu frecvența observată",
+                "text": "Bitcoin se tranzacționează în fiecare zi: 4.277 de randamente zilnice în 11,71 ani (q = 365,25). Abaterea standard a log-randamentelor zilnice este 3,49%. Care volatilitate anualizată este corectă și de ce?",
                 "options": [
-                    "Circa 5,3%: factorul sqrt(1,17/0,83)",
-                    "4,4%: autocorelația nu afectează volatilitatea anuală",
-                    "Circa 3,7%: factorul sqrt(0,83/1,17)",
-                    "Circa 5,1%: factorul 1,17"
+                    "55,4%: folosim întotdeauna sqrt(252), numărul zilelor de tranzacționare dintr-un an",
+                    "66,7%: înmulțim cu sqrt(q), cu q = n/Y = 365,25, randamentele observate pe an",
+                    "1.274%: înmulțim cu 365,25",
+                    "3,49%: volatilitatea nu se anualizează"
                 ],
-                "correctExplanation": "Pentru un AR(1) raportul varianțelor tinde la (1 + rho)/(1 - rho), deci volatilitatea se înmulțește cu sqrt(1,17/0,83) = 1,19: 4,4% devine 5,3%. Aceasta este valabilă doar sub ipoteza AR(1): pentru seria BNR, autocorelațiile negative de la decalajele 2-4 compensează decalajul 1, iar randamentele lunare dau din nou 4,4%.",
-                "incorrectExplanation": "Autocorelația pozitivă face varianța pe mai multe zile mai mare decât de h ori cea zilnică: factorul este sqrt((1 + rho)/(1 - rho)) = 1,19, deci circa 5,3%."
+                "correctExplanation": "Anualizăm cu numărul observat de intervale de randament pe an: 3,49% x sqrt(365,25) = 66,7%. Cu 252, volatilitatea anuală a Bitcoin ar fi subestimată cu 11 pp; la aur (q = 260,5) diferența este doar 0,3 pp.",
+                "incorrectExplanation": "Cu randamente zilnice iid, varianța anuală este de q ori varianța zilnică, cu q numărul observat de randamente pe an: 365,25 la Bitcoin, deci 3,49% x sqrt(365,25) = 66,7%."
             }
         },
         {
@@ -82,7 +82,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "0,018: unu supra rădăcina numărului de zile",
                     "0,24: raportul Sharpe împărțit la sqrt(Y)",
                     "0,34: sqrt((1 + SR^2/2)/Y) cu SR anual",
-                    "0,29: circa 1/sqrt(Y) când SR este estimat din date zilnice"
+                    "0,29: circa 1/sqrt(Y) cînd SR este estimat din date zilnice"
                 ],
                 "correctExplanation": "Prin metoda delta Var(SR_a) = q(1 + SR_d^2/2)/T = (1 + SR_a^2/(2q))/Y, circa 1/Y: SE = 0,29 (Lo, 2002, aplicat la frecvența zilnică).",
                 "incorrectExplanation": "Cu date zilnice SR anualizat are varianța q(1 + SR_d^2/2)/T, circa 1/Y, deci SE este circa 0,29; formula cu SR anual tratează eșantionul ca 11,7 observații anuale."
@@ -109,10 +109,10 @@ window.MFM_DATA.quizzes['markets'] = {
                     "Diferența dintre maximul și minimul zilei",
                     "Comisionul plătit brokerului",
                     "Diferența dintre prețurile a două burse",
-                    "Cea mai bună ofertă de vânzare minus cea mai bună ofertă de cumpărare: prețul execuției imediate"
+                    "Cea mai bună ofertă de vînzare minus cea mai bună ofertă de cumpărare: prețul execuției imediate"
                 ],
                 "correctExplanation": "Spread-ul este diferența dintre cel mai mic preț la care cineva vinde și cel mai mare preț la care cineva cumpără: costul imediateței.",
-                "incorrectExplanation": "Spread-ul bid-ask este cea mai bună ofertă de vânzare minus cea mai bună ofertă de cumpărare, costul tranzacționării imediate."
+                "incorrectExplanation": "Spread-ul bid-ask este cea mai bună ofertă de vînzare minus cea mai bună ofertă de cumpărare, costul tranzacționării imediate."
             }
         },
         {
@@ -143,30 +143,30 @@ window.MFM_DATA.quizzes['markets'] = {
             }
         },
         {
-            "correct": 1,
+            "correct": 3,
             "en": {
-                "title": "Maximum drawdown and the horizon",
-                "text": "The log price follows a Brownian motion with zero drift and constant volatility, observed over 10 years and over 40 years. How does the expected maximum drawdown (log scale) of the 40-year sample compare?",
+                "title": "Comparing maximum drawdowns",
+                "text": "S&P 500: maximum drawdown -56.8% since 2000 and -33.9% since 17 Sep 2014. Bitcoin: -83.4% since 17 Sep 2014. Which comparison of the two assets is valid?",
                 "options": [
-                    "It is the same: drawdown does not depend on the horizon",
-                    "About twice as large: it grows with sqrt(T)",
-                    "About four times as large: it grows with T",
-                    "Smaller: longer samples average out the losses"
+                    "-56.8% vs -83.4%: each asset with its full history",
+                    "-56.8% vs -33.9%: the S&P 500 with itself",
+                    "No comparison is possible: drawdowns are not statistics",
+                    "-33.9% vs -83.4%: both measured from 17 Sep 2014"
                 ],
-                "correctExplanation": "For a driftless Brownian motion E[MDD] = sqrt(pi/2) sigma sqrt(T) (Magdon-Ismail et al., 2004): four times the horizon doubles the expected drawdown.",
-                "incorrectExplanation": "The expected maximum drawdown of a driftless Brownian motion grows with sqrt(T), so 40 years give about twice the 10-year value; drawdowns from samples of different length are not comparable."
+                "correctExplanation": "The magnitude of the maximum drawdown cannot decrease when the sample is extended, so MDDs are comparable only over the same horizon: since 17 Sep 2014, -33.9% for the S&P 500 against -83.4% for Bitcoin.",
+                "incorrectExplanation": "A longer sample can only keep or deepen the maximum drawdown; comparing the S&P 500 since 2000 with Bitcoin since 2014 mixes horizons. The valid comparison uses the common horizon from 17 Sep 2014."
             },
             "ro": {
-                "title": "Drawdown-ul maxim și orizontul",
-                "text": "Logaritmul prețului urmează o mișcare browniană fără drift și cu volatilitate constantă, observată pe 10 ani și pe 40 de ani. Cum se compară drawdown-ul maxim așteptat (pe scară logaritmică) al eșantionului de 40 de ani?",
+                "title": "Compararea drawdown-urilor maxime",
+                "text": "S&P 500: drawdown maxim -56,8% din 2000 și -33,9% din 17 sep. 2014. Bitcoin: -83,4% din 17 sep. 2014. Care comparație între cele două active este validă?",
                 "options": [
-                    "Este același: drawdown-ul nu depinde de orizont",
-                    "Circa de două ori mai mare: crește cu sqrt(T)",
-                    "Circa de patru ori mai mare: crește cu T",
-                    "Mai mic: eșantioanele lungi compensează pierderile"
+                    "-56,8% față de -83,4%: fiecare activ cu tot istoricul lui",
+                    "-56,8% față de -33,9%: S&P 500 cu el însuși",
+                    "Nicio comparație nu este posibilă: drawdown-urile nu sînt statistici",
+                    "-33,9% față de -83,4%: ambele măsurate din 17 sep. 2014"
                 ],
-                "correctExplanation": "Pentru o mișcare browniană fără drift E[MDD] = sqrt(pi/2) sigma sqrt(T) (Magdon-Ismail et al., 2004): un orizont de patru ori mai lung dublează drawdown-ul așteptat.",
-                "incorrectExplanation": "Drawdown-ul maxim așteptat al unei mișcări browniene fără drift crește cu sqrt(T), deci 40 de ani dau circa dublul valorii pe 10 ani; drawdown-urile din eșantioane de lungimi diferite nu sunt comparabile."
+                "correctExplanation": "Mărimea drawdown-ului maxim nu poate scădea cînd eșantionul se extinde, deci MDD-urile se compară doar pe același orizont: din 17 sep. 2014, -33,9% la S&P 500 față de -83,4% la Bitcoin.",
+                "incorrectExplanation": "Un eșantion mai lung poate doar să păstreze sau să adîncească drawdown-ul maxim; S&P 500 din 2000 comparat cu Bitcoin din 2014 amestecă orizonturile. Comparația validă folosește orizontul comun, din 17 sep. 2014."
             }
         },
         {
@@ -197,30 +197,30 @@ window.MFM_DATA.quizzes['markets'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 0,
             "en": {
-                "title": "Yield-curve inversion",
-                "text": "What does a negative US 10-year minus 2-year Treasury spread (persistently from July 2022 to August 2024 in our data) mean?",
+                "title": "Reading a log-scale chart",
+                "text": "A chart shows the growth of 1 USD invested on 2 Jan 2015 in six assets on a logarithmic vertical axis. What does an equal vertical distance mean anywhere on this axis?",
                 "options": [
-                    "Long-term rates were above short-term rates",
-                    "The Fed had cut rates to zero",
-                    "Bond prices could not fall",
-                    "Short-term yields were above long-term yields: an inverted yield curve"
+                    "The same percentage change",
+                    "The same change in USD",
+                    "The same volatility",
+                    "The same Sharpe ratio"
                 ],
-                "correctExplanation": "When the 2-year yield exceeds the 10-year yield the curve is inverted; in our data, after a brief dip on 1-4 April 2022, the persistent inversion ran from 6 July 2022 to 26 August 2024 (537 trading days), with a minimum of -1.08 pp on 3 July 2023.",
-                "incorrectExplanation": "A negative 10y-2y spread means short-term yields exceed long-term yields, an inverted curve."
+                "correctExplanation": "On a log scale the vertical distance is ln(P2) - ln(P1) = ln(P2/P1): equal distances are equal growth multiples, so a move from 1 to 2 looks as large as one from 100 to 200. This is why assets that grew 0.9 times and 257 times fit on one readable chart.",
+                "incorrectExplanation": "The log axis plots ln(P): an equal vertical distance is an equal ratio P2/P1, i.e. the same percentage change, not the same amount in USD."
             },
             "ro": {
-                "title": "Inversarea curbei randamentelor",
-                "text": "Ce înseamnă un spread negativ între randamentul titlurilor de stat americane pe 10 ani și cel pe 2 ani (persistent din iulie 2022 până în august 2024 în datele noastre)?",
+                "title": "Citirea unui grafic pe scară logaritmică",
+                "text": "Un grafic arată creșterea a 1 USD investit pe 2 ian. 2015 în șase active, cu axa verticală logaritmică. Ce înseamnă o distanță verticală egală oriunde pe această axă?",
                 "options": [
-                    "Dobânzile pe termen lung erau peste cele pe termen scurt",
-                    "Fed redusese dobânda la zero",
-                    "Prețurile obligațiunilor nu puteau scădea",
-                    "Randamentele pe termen scurt erau peste cele pe termen lung: o curbă inversată"
+                    "Aceeași variație procentuală",
+                    "Aceeași variație în USD",
+                    "Aceeași volatilitate",
+                    "Același raport Sharpe"
                 ],
-                "correctExplanation": "Când randamentul pe 2 ani depășește randamentul pe 10 ani, curba este inversată; în datele noastre, după o scurtă inversare pe 1-4 aprilie 2022, inversarea persistentă a durat de pe 6 iulie 2022 până pe 26 august 2024 (537 de zile de tranzacționare), cu un minim de -1,08 pp pe 3 iulie 2023.",
-                "incorrectExplanation": "Un spread 10 ani -- 2 ani negativ înseamnă că randamentele pe termen scurt le depășesc pe cele pe termen lung, o curbă inversată."
+                "correctExplanation": "Pe scară logaritmică distanța verticală este ln(P2) - ln(P1) = ln(P2/P1): distanțe egale înseamnă multipli de creștere egali, deci trecerea de la 1 la 2 arată la fel de mare ca trecerea de la 100 la 200. De aceea active care au crescut de 0,9 ori și de 257 de ori încap pe același grafic lizibil.",
+                "incorrectExplanation": "Axa logaritmică reprezintă ln(P): o distanță verticală egală este un raport P2/P1 egal, adică aceeași variație procentuală, nu aceeași sumă în USD."
             }
         },
         {
@@ -242,11 +242,11 @@ window.MFM_DATA.quizzes['markets'] = {
                 "text": "Corelația mobilă pe 1 an dintre randamentele S&P 500 și ale obligațiunilor Trezoreriei pe termen lung (TLT) a fost în medie -0,43 în 2010–2020 și +0,08 în 2022–2026. Ce implică acest lucru?",
                 "options": [
                     "Obligațiunile pe termen lung au oferit un hedge mai slab pentru pierderile la acțiuni după șocul inflaționist din 2022",
-                    "Obligațiunile au devenit mai riscante decât Bitcoin",
-                    "Corelațiile sunt constante în timp",
+                    "Obligațiunile au devenit mai riscante decît Bitcoin",
+                    "Corelațiile sînt constante în timp",
                     "Acțiunile și obligațiunile se mișcă acum mereu în sens opus"
                 ],
-                "correctExplanation": "O corelație negativă acțiuni-obligațiuni face din obligațiuni un hedge; când a devenit pozitivă, obligațiunile și acțiunile au scăzut împreună, ca în 2022.",
+                "correctExplanation": "O corelație negativă acțiuni-obligațiuni face din obligațiuni un hedge; cînd a devenit pozitivă, obligațiunile și acțiunile au scăzut împreună, ca în 2022.",
                 "incorrectExplanation": "Trecerea de la -0,43 la +0,08 înseamnă că obligațiunile și-au pierdut mult din valoarea de hedge după 2022."
             }
         },
@@ -270,38 +270,38 @@ window.MFM_DATA.quizzes['markets'] = {
                 "options": [
                     "Bitcoin a devenit un hedge perfect pentru acțiuni",
                     "Volatilitatea Bitcoin a scăzut la nivelul acțiunilor",
-                    "Bitcoin oferă mai puțină diversificare față de riscul acțiunilor decât înainte",
+                    "Bitcoin oferă mai puțină diversificare față de riscul acțiunilor decît înainte",
                     "Corelația dovedește că Bitcoin este o acțiune"
                 ],
-                "correctExplanation": "O corelație mai mare înseamnă că Bitcoin tinde să scadă când scad acțiunile, deci beneficiul de diversificare s-a redus.",
+                "correctExplanation": "O corelație mai mare înseamnă că Bitcoin tinde să scadă cînd scad acțiunile, deci beneficiul de diversificare s-a redus.",
                 "incorrectExplanation": "Creșterea corelației reduce beneficiul de diversificare; nu face din Bitcoin un hedge sau o acțiune."
             }
         },
         {
-            "correct": 0,
+            "correct": 2,
             "en": {
-                "title": "Correlation in turbulent periods",
-                "text": "Two markets are linked by y = beta x + e, with beta and the variance of e constant and e uncorrelated with x. You estimate their correlation only on days when the variance of x is several times higher. What happens to the estimate?",
+                "title": "Rolling or whole-period correlation?",
+                "text": "Bitcoin vs S&P 500, daily log returns on common days, 2022-2026: whole-period correlation 0.42; mean of the 252-day rolling correlations 0.38 (the first windows start in 2021). Which number answers \"what was the correlation in 2022-2026\"?",
                 "options": [
-                    "It is higher in absolute value although the link is unchanged (Forbes-Rigobon)",
-                    "It is unbiased, only noisier",
-                    "It is biased toward zero",
-                    "It is undefined because the variance changes"
+                    "0.38: rolling correlations are always more accurate",
+                    "Their average, 0.40",
+                    "0.42: the mean of rolling correlations averages one-year windows, partly from 2021, a different estimand",
+                    "Neither: correlations cannot be estimated over several years"
                 ],
-                "correctExplanation": "Conditioning on high variance gives rho* = rho sqrt((1 + delta)/(1 + delta rho^2)), larger than rho in absolute value: Bitcoin-S&P 500 is 0.52 on high-VIX days but 0.27 after the adjustment.",
-                "incorrectExplanation": "With a fixed link y = beta x + e, a higher variance of x raises the share of y explained by x, so the correlation rises: rho* = rho sqrt((1 + delta)/(1 + delta rho^2)) (Forbes and Rigobon, 2002)."
+                "correctExplanation": "The whole-period correlation on common days estimates the 2022-2026 correlation; the mean of rolling correlations averages one-year windows, some starting in 2021, which is a different quantity.",
+                "incorrectExplanation": "The question asks for one correlation over 2022-2026: the whole-period estimate on common days, 0.42. The mean of 252-day rolling correlations is the average of one-year correlations, partly measured in 2021."
             },
             "ro": {
-                "title": "Corelația în perioade turbulente",
-                "text": "Două piețe sunt legate prin y = beta x + e, cu beta și varianța lui e constante și e necorelat cu x. Estimați corelația lor doar în zilele în care varianța lui x este de câteva ori mai mare. Ce se întâmplă cu estimația?",
+                "title": "Corelație mobilă sau pe toată perioada?",
+                "text": "Bitcoin vs S&P 500, log-randamente zilnice pe zilele comune, 2022-2026: corelația pe toată perioada 0,42; media corelațiilor mobile pe 252 de zile 0,38 (primele ferestre încep în 2021). Ce cifră răspunde la întrebarea „care a fost corelația în 2022-2026”?",
                 "options": [
-                    "Este mai mare în valoare absolută, deși legătura nu s-a schimbat (Forbes-Rigobon)",
-                    "Este nedeplasată, doar mai zgomotoasă",
-                    "Este deplasată spre zero",
-                    "Nu este definită, pentru că varianța se schimbă"
+                    "0,38: corelațiile mobile sînt întotdeauna mai precise",
+                    "Media lor, 0,40",
+                    "0,42: media corelațiilor mobile face media unor ferestre de un an, parțial din 2021, adică altă mărime estimată",
+                    "Niciuna: corelațiile nu se pot estima pe mai mulți ani"
                 ],
-                "correctExplanation": "Condiționarea pe varianță mare dă rho* = rho sqrt((1 + delta)/(1 + delta rho^2)), mai mare decât rho în valoare absolută: Bitcoin-S&P 500 are 0,52 în zilele cu VIX ridicat, dar 0,27 după ajustare.",
-                "incorrectExplanation": "Cu o legătură fixă y = beta x + e, o varianță mai mare a lui x crește partea din y explicată de x, deci corelația crește: rho* = rho sqrt((1 + delta)/(1 + delta rho^2)) (Forbes și Rigobon, 2002)."
+                "correctExplanation": "Corelația pe toată perioada, pe zilele comune, estimează corelația din 2022-2026; media corelațiilor mobile face media unor ferestre de un an, unele începute în 2021, adică altă mărime.",
+                "incorrectExplanation": "Întrebarea cere o singură corelație pentru 2022-2026: estimația pe toată perioada, pe zilele comune, 0,42. Media corelațiilor mobile pe 252 de zile este media unor corelații anuale, măsurate parțial în 2021."
             }
         },
         {
@@ -320,12 +320,12 @@ window.MFM_DATA.quizzes['markets'] = {
             },
             "ro": {
                 "title": "Concentrare",
-                "text": "Raportul SPY / RSP (ETF pe S&P 500 ponderat după capitalizare față de cel cu ponderi egale) a crescut cu circa 31% din ianuarie 2023 până în septembrie 2026. Ce indică acest lucru?",
+                "text": "Raportul SPY / RSP (ETF pe S&P 500 ponderat după capitalizare față de cel cu ponderi egale) a crescut cu circa 31% din ianuarie 2023 pînă în septembrie 2026. Ce indică acest lucru?",
                 "options": [
-                    "Firmele mici au avut randamente mai bune decât cele mari",
+                    "Firmele mici au avut randamente mai bune decît cele mari",
                     "S&P 500 a scăzut",
                     "ETF-urile nu mai replică indicele",
-                    "Fondul ponderat după capitalizare l-a depășit pe cel cu ponderi egale: acțiunile cu ponderile cele mai mari au avut randamente mai bune decât acțiunea medie"
+                    "Fondul ponderat după capitalizare l-a depășit pe cel cu ponderi egale: acțiunile cu ponderile cele mai mari au avut randamente mai bune decît acțiunea medie"
                 ],
                 "correctExplanation": "Fondul ponderat după capitalizare dă o pondere mai mare celor mai mari companii; performanța sa superioară înseamnă că acțiunile cu ponderi mari au condus randamentul indicelui. Dacă a crescut concentrarea se verifică din ponderile componentelor (de exemplu numărul efectiv de acțiuni).",
                 "incorrectExplanation": "Un raport SPY/RSP în creștere înseamnă că acțiunile cu ponderi mari au depășit acțiunea tipică; ponderile componentelor arată dacă a crescut și concentrarea."
@@ -349,7 +349,7 @@ window.MFM_DATA.quizzes['markets'] = {
                 "title": "Crearea și răscumpărarea unităților ETF",
                 "text": "Ce menține prețul de piață al unui ETF aproape de valoarea activului net?",
                 "options": [
-                    "Participanții autorizați schimbă coșuri de active suport pe unități ETF (și invers) când prețurile se îndepărtează",
+                    "Participanții autorizați schimbă coșuri de active suport pe unități ETF (și invers) cînd prețurile se îndepărtează",
                     "Bursa fixează zilnic prețul ETF-ului",
                     "Emitentul ETF garantează prețul",
                     "ETF-urile nu se pot tranzacționa în timpul zilei"
@@ -376,9 +376,9 @@ window.MFM_DATA.quizzes['markets'] = {
                 "title": "ETF-uri și volatilitate",
                 "text": "Ce arată Ben-David, Franzoni și Moussawi (2018) despre deținerile ETF?",
                 "options": [
-                    "Acțiunile deținute de ETF-uri sunt mai puțin volatile",
+                    "Acțiunile deținute de ETF-uri sînt mai puțin volatile",
                     "Deținerile ETF nu au niciun efect asupra acțiunilor",
-                    "Acțiunile cu deținere ETF mai mare sunt mai volatile",
+                    "Acțiunile cu deținere ETF mai mare sînt mai volatile",
                     "ETF-urile elimină spread-ul bid-ask"
                 ],
                 "correctExplanation": "Rezultatul lor este că o deținere ETF mai mare este asociată cu o volatilitate mai mare a acțiunilor suport, prin tranzacții de arbitraj care propagă șocurile de lichiditate.",
@@ -386,30 +386,30 @@ window.MFM_DATA.quizzes['markets'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 1,
             "en": {
-                "title": "Fisher z under volatility clustering",
-                "text": "The stationary-bootstrap interval for the change in the stock-bond correlation is 1.54 times wider than the Fisher z interval. Why?",
+                "title": "An interval for a change in correlation",
+                "text": "The S&P 500 - TLT correlation moved from -0.47 (2010-2020) to +0.11 (2022-2026). The iid 95% interval for the change is [0.52; 0.65] (Fisher, iid pairs from a bivariate Normal distribution). What can you conclude?",
                 "options": [
-                    "The bootstrap is biased and should not be used for correlations",
-                    "The factor 1/(n - 3) is too large for long samples",
-                    "Fisher z requires a positive correlation",
-                    "Fisher's variance 1/(n - 3) assumes iid pairs; volatility clustering raises the variance of the estimated correlation"
+                    "The 2022 inflation shock caused the change",
+                    "The change is far larger than iid sampling error, but the interval does not identify its cause and assumes iid returns",
+                    "The change is not significant because the 2022-2026 correlation is close to zero",
+                    "The interval proves that the correlation will stay positive"
                 ],
-                "correctExplanation": "atanh of the sample correlation has variance 1/(n - 3) only for iid Normal pairs; with dependent, heteroskedastic returns the sampling variance is larger, which the block bootstrap captures.",
-                "incorrectExplanation": "The iid Fisher formula ignores the dependence created by volatility clustering; the stationary bootstrap resamples blocks of days and keeps it, so its interval is wider."
+                "correctExplanation": "The interval excludes zero by a wide margin, so the sign change is not iid sampling noise; it is an association between two periods, not a cause, and the iid assumption ignores volatility clustering (a bootstrap interval is wider, but still excludes zero).",
+                "incorrectExplanation": "A confidence interval for a change measures sampling uncertainty about the difference between the two population correlations; it says nothing about causes or the future, and its iid assumption must be checked."
             },
             "ro": {
-                "title": "Fisher z și gruparea volatilității",
-                "text": "Intervalul bootstrap staționar pentru schimbarea corelației acțiuni-obligațiuni este de 1,54 ori mai larg decât intervalul Fisher z. De ce?",
+                "title": "Un interval pentru o schimbare de corelație",
+                "text": "Corelația S&P 500 - TLT a trecut de la -0,47 (2010-2020) la +0,11 (2022-2026). Intervalul iid de 95% pentru schimbare este [0,52; 0,65] (Fisher, perechi iid dintr-o distribuție Normală bivariată). Ce puteți conclude?",
                 "options": [
-                    "Bootstrap-ul este deplasat și nu trebuie folosit pentru corelații",
-                    "Factorul 1/(n - 3) este prea mare pentru eșantioane lungi",
-                    "Fisher z cere o corelație pozitivă",
-                    "Varianța 1/(n - 3) a lui Fisher presupune perechi iid; gruparea volatilității crește varianța corelației estimate"
+                    "Șocul inflaționist din 2022 a cauzat schimbarea",
+                    "Schimbarea depășește cu mult eroarea de eșantionare iid, dar intervalul nu îi identifică cauza și presupune randamente iid",
+                    "Schimbarea nu este semnificativă, pentru că corelația din 2022-2026 este aproape de zero",
+                    "Intervalul dovedește că corelația va rămîne pozitivă"
                 ],
-                "correctExplanation": "atanh din corelația de eșantion are varianța 1/(n - 3) doar pentru perechi iid cu distribuția Normală; cu randamente dependente și heteroscedastice varianța de eșantionare este mai mare, iar bootstrap-ul pe blocuri o surprinde.",
-                "incorrectExplanation": "Formula iid a lui Fisher ignoră dependența creată de gruparea volatilității; bootstrap-ul staționar reeșantionează blocuri de zile și o păstrează, deci intervalul lui este mai larg."
+                "correctExplanation": "Intervalul exclude zero cu mult, deci schimbarea de semn nu este zgomot de eșantionare iid; este o asociere între două perioade, nu o cauză, iar ipoteza iid ignoră gruparea volatilității (un interval bootstrap este mai larg, dar exclude tot zero).",
+                "incorrectExplanation": "Un interval de încredere pentru o schimbare măsoară incertitudinea de eșantionare a diferenței dintre cele două corelații din populație; nu spune nimic despre cauze sau despre viitor, iar ipoteza iid trebuie verificată."
             }
         },
         {
@@ -455,7 +455,7 @@ window.MFM_DATA.quizzes['markets'] = {
             },
             "ro": {
                 "title": "Stablecoins",
-                "text": "Oferta totală de stablecoins legate de USD a atins maximul de 187,4 mld. USD pe 2 aprilie 2022 și a scăzut la 122,7 mld. USD pe 19 august 2023. Ce s-a întâmplat între timp?",
+                "text": "Oferta totală de stablecoins legate de USD a atins maximul de 187,4 mld. USD pe 2 aprilie 2022 și a scăzut la 122,7 mld. USD pe 19 august 2023. Ce s-a întîmplat între timp?",
                 "options": [
                     "Stablecoin-urile au fost interzise la nivel mondial",
                     "Fed a emis un dolar digital",
@@ -467,57 +467,57 @@ window.MFM_DATA.quizzes['markets'] = {
             }
         },
         {
-            "correct": 2,
+            "correct": 3,
             "en": {
-                "title": "Daily versus weekly correlation",
-                "text": "Bitcoin vs S&P 500, 2022-2026: daily correlation 0.42, weekly 0.30. Which explanation is NOT consistent with the weekly value being lower?",
+                "title": "Forward-filling weekends",
+                "text": "To correlate the S&P 500 with Bitcoin you put both on Bitcoin's calendar (every day) and forward-fill the S&P 500 on weekends, then take log returns. What happens?",
                 "options": [
-                    "Sampling noise of a 246-week estimate",
-                    "Negative lagged cross-covariances between the two daily series",
-                    "The Epps effect",
-                    "The choice of the weekday used to anchor weekly returns"
+                    "Nothing: forward-filling only fills missing values",
+                    "The S&P 500 gains two extra genuine returns per week",
+                    "Bitcoin's weekend returns disappear",
+                    "Each weekend creates two zero S&P 500 returns paired with Bitcoin's weekend moves, which biases the correlation"
                 ],
-                "correctExplanation": "The Epps effect says correlations measured over short intervals are biased toward zero, so it predicts a weekly correlation above the daily one; the observed gap has the opposite sign.",
-                "incorrectExplanation": "Noise, negative lagged cross-covariances and the anchor day can all lower the weekly value; the Epps effect would raise it."
+                "correctExplanation": "Forward-filled weekend prices give S&P 500 returns of exactly zero on Saturday and Sunday, paired with Bitcoin's real weekend moves; in 2022-2026 the correlation falls from 0.42 (common days) to 0.39. Join the prices on common days first, then take returns.",
+                "incorrectExplanation": "The filled prices repeat Friday's close, so the S&P 500 return is zero on Saturday and Sunday while Bitcoin moves: artificial pairs that change the correlation. Join prices on common days first."
             },
             "ro": {
-                "title": "Corelația zilnică versus cea săptămânală",
-                "text": "Bitcoin vs S&P 500, 2022-2026: corelația zilnică 0,42, cea săptămânală 0,30. Care explicație NU este compatibilă cu valoarea săptămânală mai mică?",
+                "title": "Completarea weekendurilor",
+                "text": "Pentru a corela S&P 500 cu Bitcoin, puneți ambele serii pe calendarul Bitcoin (în fiecare zi) și completați S&P 500 în weekend cu ultimul preț, apoi calculați log-randamentele. Ce se întîmplă?",
                 "options": [
-                    "Zgomotul de eșantionare al unei estimații pe 246 de săptămâni",
-                    "Covarianțe încrucișate decalate negative între cele două serii zilnice",
-                    "Efectul Epps",
-                    "Alegerea zilei din săptămână pentru ancorarea randamentelor săptămânale"
+                    "Nimic: completarea doar umple valorile lipsă",
+                    "S&P 500 primește două randamente reale în plus pe săptămînă",
+                    "Randamentele Bitcoin din weekend dispar",
+                    "Fiecare weekend creează două randamente nule ale S&P 500, puse lîngă mișcările Bitcoin din weekend, ceea ce deformează corelația"
                 ],
-                "correctExplanation": "Efectul Epps spune că corelațiile măsurate pe intervale scurte sunt deplasate spre zero, deci prezice o corelație săptămânală peste cea zilnică; diferența observată are semnul opus.",
-                "incorrectExplanation": "Zgomotul, covarianțele încrucișate decalate negative și ziua de ancorare pot toate coborî valoarea săptămânală; efectul Epps ar ridica-o."
+                "correctExplanation": "Prețurile completate în weekend dau randamente S&P 500 exact nule sîmbăta și duminica, puse lîngă mișcările reale ale Bitcoin; în 2022-2026 corelația scade de la 0,42 (zile comune) la 0,39. Aliniați întîi prețurile pe zilele comune, apoi calculați randamentele.",
+                "incorrectExplanation": "Prețurile completate repetă închiderea de vineri, deci randamentul S&P 500 este zero sîmbăta și duminica, în timp ce Bitcoin se mișcă: perechi artificiale care schimbă corelația. Aliniați întîi prețurile pe zilele comune."
             }
         },
         {
-            "correct": 3,
+            "correct": 0,
             "en": {
-                "title": "Tokenisation",
-                "text": "In the BIS view of a \"unified ledger\", what is tokenised?",
+                "title": "Ranking two Sharpe ratios",
+                "text": "2015-2026, 11.7 years: SPY Sharpe ratio 0.82, gold 0.77. A paired stationary-bootstrap 95% interval for the difference SPY minus gold is [-0.65; +0.88]. What follows?",
                 "options": [
-                    "Only cryptocurrencies such as Bitcoin",
-                    "Only stock-exchange shares",
-                    "Only central bank reserves",
-                    "Central bank money, commercial bank deposits and other assets on a shared programmable platform"
+                    "The sample does not rank SPY above gold: the interval contains zero",
+                    "SPY is significantly better because 0.82 > 0.77",
+                    "Gold is significantly better because the interval reaches -0.65",
+                    "The bootstrap is invalid because Sharpe ratios are not means"
                 ],
-                "correctExplanation": "The BIS blueprint combines tokenised central bank money, deposits and assets on one ledger, so transfers and settlement become programmable.",
-                "incorrectExplanation": "The unified ledger brings central bank money, deposits and assets together on one programmable platform."
+                "correctExplanation": "With about 11.7 years each Sharpe ratio has a standard error near 1/sqrt(11.7) = 0.29, and the interval of the difference contains zero: the table describes the sample, it does not rank the assets.",
+                "incorrectExplanation": "A difference of 0.05 is tiny relative to its sampling uncertainty; the interval [-0.65; +0.88] contains zero, so neither asset is shown to be better."
             },
             "ro": {
-                "title": "Tokenizare",
-                "text": "În viziunea BIS despre un „registru unificat”, ce este tokenizat?",
+                "title": "Clasarea a două rapoarte Sharpe",
+                "text": "2015-2026, 11,7 ani: raportul Sharpe al SPY 0,82, al aurului 0,77. Un interval bootstrap staționar de 95%, pe perechi, pentru diferența SPY minus aur este [-0,65; +0,88]. Ce rezultă?",
                 "options": [
-                    "Doar criptomonede precum Bitcoin",
-                    "Doar acțiunile listate la bursă",
-                    "Doar rezervele la banca centrală",
-                    "Banii de bancă centrală, depozitele bancare și alte active, pe o platformă comună programabilă"
+                    "Eșantionul nu plasează SPY deasupra aurului: intervalul îl conține pe zero",
+                    "SPY este semnificativ mai bun, pentru că 0,82 > 0,77",
+                    "Aurul este semnificativ mai bun, pentru că intervalul ajunge la -0,65",
+                    "Bootstrap-ul nu este valid, pentru că rapoartele Sharpe nu sînt medii"
                 ],
-                "correctExplanation": "Proiectul BIS combină bani de bancă centrală, depozite și active tokenizate pe un singur registru, astfel încât transferurile și decontarea devin programabile.",
-                "incorrectExplanation": "Registrul unificat reunește banii de bancă centrală, depozitele și activele pe o platformă programabilă."
+                "correctExplanation": "Cu circa 11,7 ani, fiecare raport Sharpe are o eroare standard de aproximativ 1/sqrt(11,7) = 0,29, iar intervalul diferenței îl conține pe zero: tabelul descrie eșantionul, nu clasează activele.",
+                "incorrectExplanation": "O diferență de 0,05 este foarte mică față de incertitudinea ei de eșantionare; intervalul [-0,65; +0,88] îl conține pe zero, deci niciun activ nu se dovedește mai bun."
             }
         },
         {
@@ -543,8 +543,8 @@ window.MFM_DATA.quizzes['markets'] = {
                     "BET-TR este cotat în euro",
                     "Nu există nicio diferență"
                 ],
-                "correctExplanation": "Un indice de randament total presupune reinvestirea dividendelor, deci crește mai repede decât indicele de preț când companiile plătesc dividende mari, cum fac multe blue chips românești.",
-                "incorrectExplanation": "BET-TR este varianta de randament total a BET: dividendele sunt reinvestite."
+                "correctExplanation": "Un indice de randament total presupune reinvestirea dividendelor, deci crește mai repede decît indicele de preț cînd companiile plătesc dividende mari, cum fac multe blue chips românești.",
+                "incorrectExplanation": "BET-TR este varianta de randament total a BET: dividendele sînt reinvestite."
             }
         },
         {
@@ -597,7 +597,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "EUR/RON este mai volatil dimineața",
                     "Cele două serii folosesc monede diferite"
                 ],
-                "correctExplanation": "Câteva vârfuri inversate a doua zi umflă abaterea standard de peste cinci ori; eliminând rândurile de weekend și valorile aberante se obține circa 2,6%.",
+                "correctExplanation": "Cîteva vîrfuri inversate a doua zi umflă abaterea standard de peste cinci ori; eliminînd rîndurile de weekend și valorile aberante se obține circa 2,6%.",
                 "incorrectExplanation": "Cotațiile eronate izolate, inversate a doua zi, umflă volatilitatea măsurată."
             }
         },
@@ -617,14 +617,14 @@ window.MFM_DATA.quizzes['markets'] = {
             },
             "ro": {
                 "title": "Prețuri ajustate",
-                "text": "Ce câmp de preț trebuie folosit pentru randamentele acțiunilor și ale ETF-urilor, precum SPY sau Banca Transilvania?",
+                "text": "Ce cîmp de preț trebuie folosit pentru randamentele acțiunilor și ale ETF-urilor, precum SPY sau Banca Transilvania?",
                 "options": [
                     "Prețul de deschidere",
                     "Prețul de închidere neajustat",
                     "Maximul zilei",
                     "Prețul de închidere ajustat, care ține cont de dividende și split-uri"
                 ],
-                "correctExplanation": "Prețurile ajustate includ dividendele și corecțiile pentru split-uri, deci randamentele reflectă ce a câștigat efectiv investitorul.",
+                "correctExplanation": "Prețurile ajustate includ dividendele și corecțiile pentru split-uri, deci randamentele reflectă ce a cîștigat efectiv investitorul.",
                 "incorrectExplanation": "Folosiți prețul de închidere ajustat pentru acțiuni și ETF-uri; prețurile neajustate arată scăderi false la datele de dividend și split."
             }
         },
@@ -649,10 +649,10 @@ window.MFM_DATA.quizzes['markets'] = {
                     "Fiecare randament de luni devine lipsă, pentru că prețul de duminică lipsește",
                     "Nimic: rezultatul este identic",
                     "Randamentele Bitcoin devin zero în zilele lucrătoare",
-                    "S&P 500 câștigă zile de tranzacționare în plus"
+                    "S&P 500 cîștigă zile de tranzacționare în plus"
                 ],
-                "correctExplanation": "Diferențierea peste o valoare lipsă dă un randament lipsă, deci toate randamentele de luni dispar pe tăcute; pentru o singură serie, calculați randamentele pe calendarul ei; pentru o analiză comună (corelație, portofoliu), întâi join pe prețuri în zilele comune, apoi randamente, ca ambele să acopere același interval (vineri - luni).",
-                "incorrectExplanation": "Pe un calendar reunit, golul de duminică elimină fiecare randament de luni al acțiunilor. Pentru o analiză comună, faceți întâi join pe prețuri în zilele comune, apoi calculați randamentele."
+                "correctExplanation": "Diferențierea peste o valoare lipsă dă un randament lipsă, deci toate randamentele de luni dispar pe tăcute; pentru o singură serie, calculați randamentele pe calendarul ei; pentru o analiză comună (corelație, portofoliu), întîi join pe prețuri în zilele comune, apoi randamente, ca ambele să acopere același interval (vineri - luni).",
+                "incorrectExplanation": "Pe un calendar reunit, golul de duminică elimină fiecare randament de luni al acțiunilor. Pentru o analiză comună, faceți întîi join pe prețuri în zilele comune, apoi calculați randamentele."
             }
         },
         {
@@ -678,7 +678,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "Efectul Epps",
                     "Tranzacționarea nesincronă între burse"
                 ],
-                "correctExplanation": "Alegerea componentelor cu informația de azi păstrează doar câștigătorii; monedele eșuate sunt excluse, deci randamentul reconstruit ex post este deplasat în sus (Brown et al., 1992).",
+                "correctExplanation": "Alegerea componentelor cu informația de azi păstrează doar cîștigătorii; monedele eșuate sînt excluse, deci randamentul reconstruit ex post este deplasat în sus (Brown et al., 1992).",
                 "incorrectExplanation": "Indicele este construit din supraviețuitorii cunoscuți azi, ceea ce deplasează în sus randamentele trecute; celelalte efecte nu explică o selecție făcută ex post."
             }
         },
@@ -698,9 +698,9 @@ window.MFM_DATA.quizzes['markets'] = {
             },
             "ro": {
                 "title": "Recuperarea după un crah",
-                "text": "Indicele BET a atins maximul de 10.813,59 pe 24 iulie 2007 și a coborât la 1.887,14 pe 25 februarie 2009 (un drawdown de -82,5%). Când a închis pentru prima dată din nou peste maximul din 2007?",
+                "text": "Indicele BET a atins maximul de 10.813,59 pe 24 iulie 2007 și a coborît la 1.887,14 pe 25 februarie 2009 (un drawdown de -82,5%). Cînd a închis pentru prima dată din nou peste maximul din 2007?",
                 "options": [
-                    "În 2009, la câteva luni după minim",
+                    "În 2009, la cîteva luni după minim",
                     "În 2012, la aproximativ cinci ani după maxim",
                     "În martie 2021, la aproximativ 13,6 ani după maxim",
                     "Nu a mai recuperat niciodată maximul din 2007"
@@ -725,7 +725,7 @@ window.MFM_DATA.quizzes['markets'] = {
             },
             "ro": {
                 "title": "Găsiți eroarea AI: anualizarea volatilității",
-                "text": "Un asistent AI scrie: „Volatilitatea zilnică a S&P 500 este 1,2%. Pentru anualizare, înmulțim cu 252 de zile de tranzacționare: volatilitatea anuală este 302%.” Presupunând randamente zilnice necorelate, cu varianță constantă, ce este greșit?",
+                "text": "Un asistent AI scrie: „Volatilitatea zilnică a S&P 500 este 1,2%. Pentru anualizare, înmulțim cu 252 de zile de tranzacționare: volatilitatea anuală este 302%.” Presupunînd randamente zilnice necorelate, cu varianță constantă, ce este greșit?",
                 "options": [
                     "Volatilitatea crește cu rădăcina pătrată a timpului: 1,2% × √252 ≈ 19,0% pe an",
                     "Un indice bursier se anualizează cu 365 de zile, nu cu 252",
@@ -755,7 +755,7 @@ window.MFM_DATA.quizzes['markets'] = {
                 "text": "Un asistent AI scrie: „Pentru raportul Sharpe al SPY folosiți coloana close: ea include deja dividendele plătite de ETF.” Ce este greșit?",
                 "options": [
                     "Raportul Sharpe se calculează din prețuri, nu din randamente",
-                    "ETF-urile nu plătesc dividende, deci cele două coloane sunt identice",
+                    "ETF-urile nu plătesc dividende, deci cele două coloane sînt identice",
                     "Close este prețul tranzacționat fără dividende; pentru acțiuni și ETF-uri, adjusted close este cel corectat pentru dividende și splituri",
                     "Adjusted close corectează doar pentru splituri, niciodată pentru dividende"
                 ],

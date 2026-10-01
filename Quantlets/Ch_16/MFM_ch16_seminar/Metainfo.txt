@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch16_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 16 computations: a three-coin index and its divisor, constituent replacement; the no-arbitrage band and the optimal arbitrage trade of a constant-product pool with fees and of a weighted pool; impermanent loss of a weighted pool and its loss-versus-rebalancing rate; block-bootstrap volatility and weekend effect for Bitcoin, Ether and Solana; equilibrium threshold autoregressions for USD Coin, Tether and Dai with the Hansen (1996) fixed-regressor bootstrap; IBIT and ETHA tracking, fee drift with HAC errors, ADF and KPSS tests and Dimson betas; sup-Wald break tests for the Strategy and Coinbase betas; hedge, safe-haven, Forbes-Rigobon and quantile-regression tests for Bitcoin before and after the spot ETFs.'
+Description: 'Seminar 16 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A5, A7, B1, B3, B5, B7 with code and output. The proposed exercises A2, A4, A6, A8, B2, B4, B6, B8, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'cryptocurrency index, automated market maker, stablecoin, threshold autoregression, block bootstrap, spot ETF, structural break, hedge, safe haven'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily market data (course data): Bitcoin, Ether, Solana, XRP, Cardano, Dogecoin, Litecoin, Chainlink, BNB, Tether, USD Coin, Dai, IBIT, ETHA, Coinbase, Strategy, QQQ, GLD, TLT, S&P 500, gold and further equity, currency, commodity and bond series; coins in circulation from Coin Metrics Community Data; DeFi total value locked and stablecoin supply from DefiLlama; 4-week Treasury bill rate from FRED'
 
-Output: 'ch16_sem_a1_index.pdf, ch16_sem_a3_profit.pdf, ch16_sem_a5_il.pdf, ch16_sem_a7_path.pdf, ch16_sem_weekend.pdf, ch16_sem_b2_vol.pdf, ch16_sem_usdc.pdf, ch16_sem_b4_tar.pdf, ch16_sem_b5_ratio.pdf, ch16_sem_b6_ratio.pdf, ch16_sem_b7_break.pdf, ch16_sem_b8_break.pdf, ch16_sem_hedge.pdf, ch16_sem_c2_correction.pdf'
+Output: 'ch16_sem_a1_index.pdf, ch16_sem_a3_profit.pdf, ch16_sem_a5_il.pdf, ch16_sem_a7_path.pdf, ch16_sem_b5_ratio.pdf, ch16_sem_b7_break.pdf, ch16_sem_usdc.pdf, ch16_sem_weekend.pdf'

@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch14_sem_partB'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 14, B1-B7: out-of-sample R-squared of return forecasts with block-bootstrap intervals and Diebold-Mariano tests; QLIKE, Diebold-Mariano and model confidence sets for SPY realised variance; median versus mean forecasts and context length; VaR 1% and ES 2.5% backtests; VaR 10% of the foundation models; LSTM seed-to-seed variation.'
+Description: 'Seminar 14 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A5, A8, A10, B1, B3, B5, B7, B9 with code and output. The proposed exercises A2, A4, A6, A7, A9, B2, B4, B6, B8, B10, B11, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'out-of-sample R-squared, QLIKE, model confidence set, VaR backtest, FZ0, LSTM seeds, exercises'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), Bitcoin (BTC-USD.CC), BET; SPY 5-minute bars (data/market/intraday/SPY.US_5m.csv) and SPY daily adjusted closes (data/market)'
 
-Output: 'printed tables'
+Output: 'none (the notebook draws the charts of the solved exercises)'

@@ -27,7 +27,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "options": [
                     "Doar driftul; coeficientul de difuzie, deci și variația pătratică, este același sub P și Q",
                     "Doar volatilitatea; driftul este fixat de date",
-                    "Atât driftul, cât și volatilitatea",
+                    "Atît driftul, cît și volatilitatea",
                     "Nimic, deoarece măsurile echivalente dau aceleași valori așteptate"
                 ],
                 "correctExplanation": "Sub Q, W devine W~ plus o deplasare de drift, deci dX = (a - b theta) dt + b dW~: driftul se mută, b și variația pătratică nu. Sub GBM cu volatilitate constantă, varianța realizată măsoară deci sigma care evaluează opțiunile; cu volatilitate stochastică, P și Q pot pondera totuși diferit traiectoriile viitoare ale varianței.",
@@ -77,15 +77,15 @@ window.MFM_DATA.quizzes['continuous-time'] = {
             },
             "ro": {
                 "title": "Infill versus orizont lung",
-                "text": "Un proces OU este observat din ce în ce mai des pe o fereastră fixă de 5 ani: intervalul de eșantionare tinde la zero, deci n crește nelimitat, iar T = 5 rămâne fix. Ce parametru se estimează consistent?",
+                "text": "Un proces OU este observat din ce în ce mai des pe o fereastră fixă de 5 ani: intervalul de eșantionare tinde la zero, deci n crește nelimitat, iar T = 5 rămîne fix. Ce parametru se estimează consistent?",
                 "options": [
                     "Viteza de revenire la medie kappa",
                     "Media pe termen lung theta",
                     "Volatilitatea sigma",
                     "Toți trei, deoarece n tinde la infinit"
                 ],
-                "correctExplanation": "Asimptotica infill: suma pătratelor creșterilor converge la varianța integrată, deci sigma este identificat fără eroare; kappa și theta sunt parametri de drift, a căror informație crește doar cu T.",
-                "incorrectExplanation": "Parametrii de drift (kappa, theta) sunt identificați de durata calendaristică T, nu de numărul de observații: Var(kappa estimat) este circa (exp(2 kappa Delta) - 1) / (T Delta), care tinde la 2 kappa / T, nu la zero, când pasul Delta scade, iar T rămâne fix."
+                "correctExplanation": "Asimptotica infill: suma pătratelor creșterilor converge la varianța integrată, deci sigma este identificat fără eroare; kappa și theta sînt parametri de drift, a căror informație crește doar cu T.",
+                "incorrectExplanation": "Parametrii de drift (kappa, theta) sînt identificați de durata calendaristică T, nu de numărul de observații: Var(kappa estimat) este circa (exp(2 kappa Delta) - 1) / (T Delta), care tinde la 2 kappa / T, nu la zero, cînd pasul Delta scade, iar T rămîne fix."
             }
         },
         {
@@ -111,7 +111,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Egal cu varianța pe termen lung theta",
                     "Independent de v_t"
                 ],
-                "correctExplanation": "Integrând E^Q[v_s | v_t] = theta^Q + (v_t - theta^Q) exp(-kappa^Q (s - t)) pe 30 de zile obținem a + b v_t, cu b = (1 - exp(-kappa^Q tau)) / (kappa^Q tau) < 1: o regresie CIR pe VIX^2 atenuează volatilitatea volatilității, cu factorul b la v_t = theta^Q (în rest, atenuarea depinde de stare).",
+                "correctExplanation": "Integrînd E^Q[v_s | v_t] = theta^Q + (v_t - theta^Q) exp(-kappa^Q (s - t)) pe 30 de zile obținem a + b v_t, cu b = (1 - exp(-kappa^Q tau)) / (kappa^Q tau) < 1: o regresie CIR pe VIX^2 atenuează volatilitatea volatilității, cu factorul b la v_t = theta^Q (în rest, atenuarea depinde de stare).",
                 "incorrectExplanation": "VIX mediază varianța așteptată în următoarele 30 de zile sub Q; revenirea la medie trage această medie spre theta^Q, deci depinde de v_t, dar cu o pantă sub unu."
             }
         },
@@ -131,14 +131,14 @@ window.MFM_DATA.quizzes['continuous-time'] = {
             },
             "ro": {
                 "title": "Integrala Itô",
-                "text": "De ce finanțele folosesc integrala Itô, evaluată în capătul stâng al fiecărui interval?",
+                "text": "De ce finanțele folosesc integrala Itô, evaluată în capătul stîng al fiecărui interval?",
                 "options": [
                     "Este singura integrală cu o formă închisă",
                     "Regula punctului de mijloc nu converge",
                     "Poziția trebuie aleasă înainte de a cunoaște următoarea mișcare a prețului, deci integrandul nu poate privi în viitor",
                     "Face mișcarea browniană derivabilă"
                 ],
-                "correctExplanation": "Evaluarea în capătul stâng păstrează integrandul adaptat: o strategie de tranzacționare decisă cu informația de azi.",
+                "correctExplanation": "Evaluarea în capătul stîng păstrează integrandul adaptat: o strategie de tranzacționare decisă cu informația de azi.",
                 "incorrectExplanation": "Sumele la punctul de mijloc (Stratonovich) converg și ele, dar folosesc informație despre creșterea următoare, pe care un investitor nu o are."
             }
         },
@@ -165,7 +165,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "W_T - T",
                     "0"
                 ],
-                "correctExplanation": "Sumând identitatea pentru fiecare creștere se obține W_T^2/2 minus jumătate din variația pătratică, T/2.",
+                "correctExplanation": "Sumînd identitatea pentru fiecare creștere se obține W_T^2/2 minus jumătate din variația pătratică, T/2.",
                 "incorrectExplanation": "Calculul obișnuit ar da W_T^2/2; termenul suplimentar -T/2 vine din variația pătratică, iar rezultatul este aleator, nu 0."
             }
         },
@@ -212,7 +212,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
             },
             "ro": {
                 "title": "Logaritmul prețului sub GBM",
-                "text": "Dacă dS = mu S dt + sigma S dW, cât este d ln S?",
+                "text": "Dacă dS = mu S dt + sigma S dW, cît este d ln S?",
                 "options": [
                     "mu dt + sigma dW",
                     "(mu - sigma^2/2) dt + sigma dW",
@@ -246,8 +246,8 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "u_t + (1/2) u_xx = 0, oricare ar fi driftul",
                     "u_t + a u_x + (1/2) b^2 u_xx - r u = 0, cu u(T, x) = g(x)"
                 ],
-                "correctExplanation": "Valoarea actualizată u(t, X_t) este o Q-martingală; lema lui Itô dă driftul u_t + a u_x + (1/2) b^2 u_xx - r u, care trebuie să fie zero. Obligațiunea Vasicek și ecuația Black-Scholes sunt cazuri particulare.",
-                "incorrectExplanation": "Termenul Itô de ordinul doi are factorul o jumătate, actualizarea intră cu semnul minus, iar driftul a al lui X apare în termenul de ordinul întâi."
+                "correctExplanation": "Valoarea actualizată u(t, X_t) este o Q-martingală; lema lui Itô dă driftul u_t + a u_x + (1/2) b^2 u_xx - r u, care trebuie să fie zero. Obligațiunea Vasicek și ecuația Black-Scholes sînt cazuri particulare.",
+                "incorrectExplanation": "Termenul Itô de ordinul doi are factorul o jumătate, actualizarea intră cu semnul minus, iar driftul a al lui X apare în termenul de ordinul întîi."
             }
         },
         {
@@ -327,7 +327,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "O corecție a mediei creșterilor",
                     "Termenul (1/2) b b' [(dW)^2 - dt], care ridică ordinul tare la 1"
                 ],
-                "correctExplanation": "Următorul termen Itô-Taylor (1/2) b b' [(dW)^2 - dt] are media zero, dar corectează fiecare traiectorie, dând ordinul tare 1.",
+                "correctExplanation": "Următorul termen Itô-Taylor (1/2) b b' [(dW)^2 - dt] are media zero, dar corectează fiecare traiectorie, dînd ordinul tare 1.",
                 "incorrectExplanation": "Milstein păstrează o singură mișcare browniană și un drift explicit; corecția are media zero, deci nu schimbă media creșterilor."
             }
         },
@@ -354,7 +354,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Lognormală",
                     "O mixtură Poisson de distribuții Normale"
                 ],
-                "correctExplanation": "2c r_{t + Delta} condiționat de r_t este chi-pătrat necentral cu 4 kappa theta / sigma^2 grade de libertate și parametrul de necentralitate 2c r_t exp(-kappa Delta), c = 2 kappa / (sigma^2 (1 - exp(-kappa Delta))): verosimilitatea exactă este disponibilă, iar condiția Feller este îndeplinită când gradele de libertate sunt cel puțin 2.",
+                "correctExplanation": "2c r_{t + Delta} condiționat de r_t este chi-pătrat necentral cu 4 kappa theta / sigma^2 grade de libertate și parametrul de necentralitate 2c r_t exp(-kappa Delta), c = 2 kappa / (sigma^2 (1 - exp(-kappa Delta))): verosimilitatea exactă este disponibilă, iar condiția Feller este îndeplinită cînd gradele de libertate sînt cel puțin 2.",
                 "incorrectExplanation": "Difuzia de tip rădăcină pătrată menține rata nenegativă și face legea asimetrică la dreapta; legea Normală este cea Vasicek, iar mixtura Poisson aparține modelului Merton cu salturi."
             }
         },
@@ -374,14 +374,14 @@ window.MFM_DATA.quizzes['continuous-time'] = {
             },
             "ro": {
                 "title": "Testul LR pentru salturi pe frontieră",
-                "text": "Testați Merton (lambda > 0) față de GBM (lambda = 0) cu statistica raportului de verosimilitate. Ce se întâmplă cu valoarea critică chi-pătrat(3)?",
+                "text": "Testați Merton (lambda > 0) față de GBM (lambda = 0) cu statistica raportului de verosimilitate. Ce se întîmplă cu valoarea critică chi-pătrat(3)?",
                 "options": [
                     "Este validă, deoarece Merton adaugă trei parametri",
                     "Este validă cu chi-pătrat(1), deoarece se testează doar lambda",
-                    "Nu este validă: lambda = 0 se află pe frontieră, iar mu_J, sigma_J nu sunt identificați sub ipoteza nulă; folosiți un bootstrap parametric",
+                    "Nu este validă: lambda = 0 se află pe frontieră, iar mu_J, sigma_J nu sînt identificați sub ipoteza nulă; folosiți un bootstrap parametric",
                     "Este validă dacă eșantionul depășește zece ani"
                 ],
-                "correctExplanation": "Teorema lui Wilks cere o ipoteză nulă interioară și parametri identificați; ambele condiții lipsesc aici, deci distribuția sub ipoteza nulă se obține simulând eșantioane GBM și reestimând ambele modele (Seminarul B6).",
+                "correctExplanation": "Teorema lui Wilks cere o ipoteză nulă interioară și parametri identificați; ambele condiții lipsesc aici, deci distribuția sub ipoteza nulă se obține simulînd eșantioane GBM și reestimînd ambele modele (Seminarul B6).",
                 "incorrectExplanation": "Nici numărarea parametrilor, nici un eșantion mai lung nu repară o ipoteză nulă pe frontieră cu parametri de perturbare neidentificați: distribuția chi-pătrat de referință nu se aplică."
             }
         },
@@ -409,7 +409,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "xi S_t dt"
                 ],
                 "correctExplanation": "d(Sv) = S dv + v dS + d[S, v], iar d[S, v] = (sqrt(v) S)(xi sqrt(v)) rho dt = rho xi v S dt: corelația intră în driftul produsului.",
-                "incorrectExplanation": "Covariația pătratică a celor doi termeni de difuzie este produsul coeficienților lor înmulțit cu rho dt; nu dispare când mișcările browniene sunt corelate."
+                "incorrectExplanation": "Covariația pătratică a celor doi termeni de difuzie este produsul coeficienților lor înmulțit cu rho dt; nu dispare cînd mișcările browniene sînt corelate."
             }
         },
         {
@@ -435,7 +435,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Deplasat în jos",
                     "Deplasat doar cu date zilnice"
                 ],
-                "correctExplanation": "Simularea din curs dă o deplasare de 0,063 pentru cei 72 de ani de randamente ale titlurilor de stat, aproape de 4/T = 0,055: revenirea la medie pare mai rapidă decât este.",
+                "correctExplanation": "Simularea din curs dă o deplasare de 0,063 pentru cei 72 de ani de randamente ale titlurilor de stat, aproape de 4/T = 0,055: revenirea la medie pare mai rapidă decît este.",
                 "incorrectExplanation": "Deplasarea depinde de durata calendaristică, nu de frecvența eșantionării, și este în sus."
             }
         },
@@ -462,7 +462,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "CIR are salturi",
                     "Vasicek are formă închisă pentru prețurile obligațiunilor, iar CIR nu"
                 ],
-                "correctExplanation": "În modelul Vasicek, rata urmează distribuția Normală și poate deveni negativă; difuzia sqrt(r) din CIR scade lângă zero.",
+                "correctExplanation": "În modelul Vasicek, rata urmează distribuția Normală și poate deveni negativă; difuzia sqrt(r) din CIR scade lîngă zero.",
                 "incorrectExplanation": "Ambele modele revin la medie, nu au salturi și dau prețurile obligațiunilor în formă închisă."
             }
         },
@@ -490,7 +490,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Salturile explică gruparea volatilității"
                 ],
                 "correctExplanation": "Un model i.i.d. nu poate separa un salt de o perioadă volatilă, așa că folosește salturi mici și frecvente pentru a îngroșa cozile; testul Lee-Mykland marchează sub un salt candidat pe an.",
-                "incorrectExplanation": "Randamentele Merton rămân independente în timp, deci nu pot produce grupare; salturile detectate în datele zilnice sunt rare."
+                "incorrectExplanation": "Randamentele Merton rămîn independente în timp, deci nu pot produce grupare; salturile detectate în datele zilnice sînt rare."
             }
         },
         {
@@ -512,8 +512,8 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "text": "De ce niciunul dintre cele mai mari zece randamente S&P 500 în valoare absolută nu a fost marcat ca salt de testul Lee-Mykland?",
                 "options": [
                     "Testul detectează doar salturile pozitive",
-                    "Testul folosește date săptămânale",
-                    "Randamentele mari sunt eliminate înainte de test",
+                    "Testul folosește date săptămînale",
+                    "Randamentele mari sînt eliminate înainte de test",
                     "Au apărut în perioade agitate, deci nu erau mari în raport cu volatilitatea locală"
                 ],
                 "correctExplanation": "Statistica împarte fiecare randament la o volatilitate locală bipower; în 2008 și 2020 volatilitatea era deja ridicată.",
@@ -539,7 +539,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "text": "Cum se modifică excesul de aplatizare al randamentelor Merton cu orizontul Delta t?",
                 "options": [
                     "Crește ca Delta t",
-                    "Rămâne constant",
+                    "Rămîne constant",
                     "Scade ca 1/Delta t",
                     "Scade ca 1/sqrt(Delta t)"
                 ],
@@ -565,13 +565,13 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "title": "Efectul de levier și panta",
                 "text": "În modelul Heston cu rho = -0,69, cum variază volatilitățile implicite pe trei luni cu prețul de exercitare?",
                 "options": [
-                    "Sunt constante",
+                    "Sînt constante",
                     "Cresc odată cu prețul de exercitare",
                     "Scad odată cu prețul de exercitare: o pantă descendentă, ca la opțiunile pe indici bursieri",
-                    "Formează un zâmbet simetric în jurul prețului la bani"
+                    "Formează un zîmbet simetric în jurul prețului la bani"
                 ],
-                "correctExplanation": "Corelația negativă dintre randamente și varianță îngroașă coada stângă, deci prețurile de exercitare mici au volatilități implicite mai mari.",
-                "incorrectExplanation": "O linie orizontală este cazul Black-Scholes; un zâmbet simetric apare cu rho = 0, iar o curbă crescătoare cu rho > 0."
+                "correctExplanation": "Corelația negativă dintre randamente și varianță îngroașă coada stîngă, deci prețurile de exercitare mici au volatilități implicite mai mari.",
+                "incorrectExplanation": "O linie orizontală este cazul Black-Scholes; un zîmbet simetric apare cu rho = 0, iar o curbă crescătoare cu rho > 0."
             }
         },
         {
@@ -590,14 +590,14 @@ window.MFM_DATA.quizzes['continuous-time'] = {
             },
             "ro": {
                 "title": "GARCH și limita sa de difuzie",
-                "text": "GARCH(1,1) converge slab la o difuzie cu volatilitate stochastică când pasul de timp scade (Nelson, 1990). Rezultă că inferența statistică este aceeași în cele două modele?",
+                "text": "GARCH(1,1) converge slab la o difuzie cu volatilitate stochastică cînd pasul de timp scade (Nelson, 1990). Rezultă că inferența statistică este aceeași în cele două modele?",
                 "options": [
-                    "Nu: cele două nu sunt experimente asimptotic echivalente, deoarece GARCH are o singură sursă de zgomot, iar difuzia are două",
+                    "Nu: cele două nu sînt experimente asimptotic echivalente, deoarece GARCH are o singură sursă de zgomot, iar difuzia are două",
                     "Da, convergența slabă implică inferență echivalentă",
-                    "Da, oricând alpha + beta < 1",
+                    "Da, oricînd alpha + beta < 1",
                     "Doar pentru parametrii de drift"
                 ],
-                "correctExplanation": "Wang (2002) arată că GARCH și limita sa de difuzie nu sunt asimptotic echivalente: inferența bazată pe verosimilitate poate diferi chiar când pasul tinde la zero.",
+                "correctExplanation": "Wang (2002) arată că GARCH și limita sa de difuzie nu sînt asimptotic echivalente: inferența bazată pe verosimilitate poate diferi chiar cînd pasul tinde la zero.",
                 "incorrectExplanation": "Convergența slabă a proceselor privește distribuțiile lor, nu informația din datele observate; condițiile de staționaritate nu schimbă acest lucru."
             }
         },
@@ -678,7 +678,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "S-a folosit calculul obișnuit în loc de calculul Itô: d ln S = (mu - sigma^2/2) dt + sigma dW, deci mediana este S_0 exp((mu - sigma^2/2) T)",
                     "ln S_T are o distribuție Student-t, deci nu are mediană"
                 ],
-                "correctExplanation": "Pentru f(S) = ln S, lema lui Itô adaugă (1/2) f''(S) sigma^2 S^2 = -sigma^2/2, deoarece (dW)^2 = dt. Media rămâne S_0 exp(mu T); mediana este mai mică, S_0 exp((mu - sigma^2/2) T).",
+                "correctExplanation": "Pentru f(S) = ln S, lema lui Itô adaugă (1/2) f''(S) sigma^2 S^2 = -sigma^2/2, deoarece (dW)^2 = dt. Media rămîne S_0 exp(mu T); mediana este mai mică, S_0 exp((mu - sigma^2/2) T).",
                 "incorrectExplanation": "Ecuația GBM este corectă; greșeala este aplicarea regulii obișnuite de derivare unei difuzii, care pierde termenul -sigma^2/2."
             }
         },

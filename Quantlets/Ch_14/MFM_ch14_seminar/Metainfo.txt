@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch14_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 14, charts of the solutions: norms of W^k against the norm bound (A1), Chronos mean scaling of a four-day context (A3), VaR 1% and ES 2.5% from the Chronos-2 quantile grid (A5), the binomial distributions behind the exact Kupiec power (A8) and power against the backtest length (A9), out-of-sample R-squared with block-bootstrap intervals (B1, B2), QLIKE differences to log-HAR with HAC intervals (B3), context length and median versus mean (B4), cumulative VaR 1% breaches (B5), VaR 10% breach rates (B6), LSTM seeds (B7), conformal recalibration (B10) and the pre/post-release test (B11).'
+Description: 'Seminar 14 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A5, A8, A10, B1, B3, B5, B7, B9 with code and output. The proposed exercises A2, A4, A6, A7, A9, B2, B4, B6, B8, B10, B11, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'vanishing gradient, tokenisation, quantile grid, Kupiec power, out-of-sample R-squared, QLIKE, VaR backtest, conformal, exercises'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily closes (data/market): S&P 500 (GSPC.INDX), Bitcoin (BTC-USD.CC), BET; SPY 5-minute bars (data/market/intraday/SPY.US_5m.csv) and SPY daily adjusted closes (data/market); results of seminar14.py and inference_tests.py (sem14_results.json, ch14_inference.json)'
 
-Output: 'ch14_sem_a1_norms.pdf, ch14_sem_a3_tokens.pdf, ch14_sem_a5_grid.pdf, ch14_sem_a8_binom.pdf, ch14_sem_a9_power.pdf, ch14_sem_b1_r2.pdf, ch14_sem_b2_r2.pdf, ch14_sem_b3_qlike.pdf, ch14_sem_b4_context.pdf, ch14_sem_b5_breaches.pdf, ch14_sem_b6_var10.pdf, ch14_sem_b7_seeds.pdf, ch14_sem_b10_conformal.pdf, ch14_sem_b11_prepost.pdf'
+Output: 'ch14_sem_a1_norms.pdf, ch14_sem_a3_tokens.pdf, ch14_sem_a5_grid.pdf, ch14_sem_a8_binom.pdf, ch14_sem_b1_r2.pdf, ch14_sem_b3_qlike.pdf, ch14_sem_b5_breaches.pdf, ch14_sem_b7_seeds.pdf'

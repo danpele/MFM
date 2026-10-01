@@ -28,10 +28,10 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Cu rata de creștere a dividendelor g",
                     "Trebuie să scadă în timp",
                     "Cu randamentul cerut r: E_t[B_{t+1}] = (1 + r) B_t",
-                    "Trebuie să rămână constantă"
+                    "Trebuie să rămînă constantă"
                 ],
                 "correctExplanation": "În modelul valorii prezente cu randament cerut constant r (o ipoteză a modelului, nu o consecință doar a nearbitrajului), ecuația de preț impune E_t[B_{t+1}] = (1 + r) B_t: investitorii păstrează bula doar dacă aduce randamentul cerut.",
-                "incorrectExplanation": "Bula nu plătește dividende, deci creșterea ei așteptată trebuie să fie egală cu randamentul cerut r; o creștere mai lentă i-ar face pe deținători să vândă."
+                "incorrectExplanation": "Bula nu plătește dividende, deci creșterea ei așteptată trebuie să fie egală cu randamentul cerut r; o creștere mai lentă i-ar face pe deținători să vîndă."
             }
         },
         {
@@ -50,14 +50,14 @@ window.MFM_DATA.quizzes['bubbles'] = {
             },
             "ro": {
                 "title": "Limita SADF sub ipoteza nulă",
-                "text": "Sub aceeași ipoteză nulă de mers aleator homoscedastic, aceeași specificare a întârzierilor și aceiași termeni determiniști, de ce valorile critice SADF simulate pentru o mărime a eșantionului T și o fereastră minimă r0 pot fi refolosite pentru serii cu dispersii diferite ale șocurilor?",
+                "text": "Sub aceeași ipoteză nulă de mers aleator homoscedastic, aceeași specificare a întîrzierilor și aceiași termeni determiniști, de ce valorile critice SADF simulate pentru o mărime a eșantionului T și o fereastră minimă r0 pot fi refolosite pentru serii cu dispersii diferite ale șocurilor?",
                 "options": [
                     "Pentru că SADF are asimptotic distribuția Normală",
                     "Pentru că valorile critice depind de dispersia datelor, pe care simularea o reproduce",
                     "Pentru că sub ipoteza nulă a rădăcinii unitare statistica tinde la o funcțională a mișcării browniene standard care depinde doar de r0 și de termenii determiniști",
-                    "Pentru că întârzierile ADF elimină orice dependență din date"
+                    "Pentru că întîrzierile ADF elimină orice dependență din date"
                 ],
-                "correctExplanation": "Sub un mers aleator cu drift asimptotic neglijabilă, fiecare ADF pe fereastră tinde la un raport de funcționale browniene în care sigma se simplifică; SADF și GSADF sunt supremuri ale acestei funcționale, deci cuantilele lor depind doar de r0 (și de specificarea termenului liber/drift-ului).",
+                "correctExplanation": "Sub un mers aleator cu drift asimptotic neglijabilă, fiecare ADF pe fereastră tinde la un raport de funcționale browniene în care sigma se simplifică; SADF și GSADF sînt supremuri ale acestei funcționale, deci cuantilele lor depind doar de r0 (și de specificarea termenului liber/drift-ului).",
                 "incorrectExplanation": "Limita este pivotală, dar nestandard: sigma și drift-ul dispar, iar supremul pe ferestre nu urmează distribuția Normală. Argumentul este asimptotic și presupune dispersie constantă; la schimbări de volatilitate nivelul în eșantioane finite este distorsionat și este nevoie de wild bootstrap."
             }
         },
@@ -77,15 +77,15 @@ window.MFM_DATA.quizzes['bubbles'] = {
             },
             "ro": {
                 "title": "Alternativa ușor explozivă",
-                "text": "Sub rho_T = 1 + c/k_T cu c > 0, k_T -> infinit și k_T = o(T), ce se întâmplă cu raportul t ADF la dreapta când T crește?",
+                "text": "Sub rho_T = 1 + c/k_T cu c > 0, k_T -> infinit și k_T = o(T), ce se întîmplă cu raportul t ADF la dreapta cînd T crește?",
                 "options": [
                     "Tinde la distribuția Dickey-Fuller",
                     "Diverge la plus infinit, deci testul la dreapta este consistent",
                     "Tinde la N(0, 1)",
                     "Diverge la minus infinit"
                 ],
-                "correctExplanation": "Phillips și Magdalinos arată că (rho_T^T/(rho_T^2 - 1))(rho_hat - rho_T) are o limită Cauchy; estimatorul converge atât de repede încât raportul t al lui rho - 1 crește ca rho_T^T, deci puterea tinde la unu.",
-                "incorrectExplanation": "O rădăcină ușor explozivă nu este local-unitară: eroarea de estimare dispare cu viteza k_T rho_T^T, iar abaterea c/k_T rămâne, deci raportul t explodează în sus, nu tinde la o distribuție fixă."
+                "correctExplanation": "Phillips și Magdalinos arată că (rho_T^T/(rho_T^2 - 1))(rho_hat - rho_T) are o limită Cauchy; estimatorul converge atît de repede încît raportul t al lui rho - 1 crește ca rho_T^T, deci puterea tinde la unu.",
+                "incorrectExplanation": "O rădăcină ușor explozivă nu este local-unitară: eroarea de estimare dispare cu viteza k_T rho_T^T, iar abaterea c/k_T rămîne, deci raportul t explodează în sus, nu tinde la o distribuție fixă."
             }
         },
         {
@@ -106,7 +106,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "title": "Argumentul Diba-Grossman",
                 "text": "De ce nu poate fi negativă o bulă rațională (Diba și Grossman)?",
                 "options": [
-                    "Pentru că dividendele sunt mereu pozitive",
+                    "Pentru că dividendele sînt mereu pozitive",
                     "Pentru că autoritățile o interzic",
                     "Pentru că volatilitatea este mereu pozitivă",
                     "Pentru că o bulă negativă care crește cu rata r ar împinge în cele din urmă prețul sub zero, ceea ce libera renunțare exclude"
@@ -135,7 +135,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "options": [
                     "Niciunul: fiecare comparație are nivelul 5%, deci întreaga procedură are nivelul 5%",
                     "Regula duratei minime face eroarea pe familie exact 5%",
-                    "Riscul există doar pentru datele săptămânale",
+                    "Riscul există doar pentru datele săptămînale",
                     "Probabilitatea a cel puțin unui episod fals pe selecție este mult peste 5%; folosiți valori critice pe familie (bootstrap pentru supremul pe fereastră) sau o valoare critică ce crește lent"
                 ],
                 "correctExplanation": "Sute de teste dependente la 5% produc aproape sigur o depășire; în simularea din acest capitol, aproximativ jumătate dintre mersurile aleatoare conțin un episod datat fals. Phillips și Shi fac bootstrap pentru maximul BSADF pe o fereastră ca să controleze eroarea pe familie; teoria de consistență PSY lasă valoarea critică să crească lent.",
@@ -163,7 +163,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Un test de rădăcină unitară pe toată selecția adesea nu le detectează, pentru că colapsurile fac seria să pară că revine la medie",
                     "Fac prețurile staționare în nivel",
                     "Pot apărea doar la criptomonede",
-                    "Sunt mereu detectate de testul Jarque-Bera"
+                    "Sînt mereu detectate de testul Jarque-Bera"
                 ],
                 "correctExplanation": "Colapsurile readuc prețul în jos de mai multe ori, așa că un singur test pe toată selecția caută o singură rădăcină explozivă și le ratează pe cele scurte.",
                 "incorrectExplanation": "Problema este puterea testului: o regresie pe toată selecția amestecă fazele explozive cu colapsurile, ceea ce motivează ferestrele recursive și mobile."
@@ -187,13 +187,13 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "title": "SADF vs GSADF",
                 "text": "Care este diferența principală dintre SADF (Phillips-Wu-Yu) și GSADF (Phillips-Shi-Yu)?",
                 "options": [
-                    "SADF folosește date săptămânale, GSADF date zilnice",
+                    "SADF folosește date săptămînale, GSADF date zilnice",
                     "GSADF nu folosește valori critice",
-                    "SADF fixează începutul ferestrei la prima observație; GSADF mută și începutul, și sfârșitul",
+                    "SADF fixează începutul ferestrei la prima observație; GSADF mută și începutul, și sfîrșitul",
                     "SADF permite lag-uri, GSADF nu"
                 ],
                 "correctExplanation": "SADF ia supremul pe ferestre care cresc de la observația 1; GSADF mută și începutul, ceea ce îi dă putere împotriva unei a doua bule după un colaps.",
-                "incorrectExplanation": "Ambele sunt supremuri ale statisticii ADF la dreapta; diferă prin mulțimea ferestrelor: doar ferestre care cresc (SADF) sau toate ferestrele mai lungi decât minimul (GSADF)."
+                "incorrectExplanation": "Ambele sînt supremuri ale statisticii ADF la dreapta; diferă prin mulțimea ferestrelor: doar ferestre care cresc (SADF) sau toate ferestrele mai lungi decît minimul (GSADF)."
             }
         },
         {
@@ -214,7 +214,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "title": "Datarea în timp real",
                 "text": "Statistica BSADF la data t folosește ce observații?",
                 "options": [
-                    "Doar observațiile până la t, pe ferestre care se termină la t",
+                    "Doar observațiile pînă la t, pe ferestre care se termină la t",
                     "Toate observațiile din selecție",
                     "Doar observațiile de după t",
                     "O singură fereastră fixă de 36 de luni"
@@ -241,13 +241,13 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "title": "Nivelul la o schimbare de volatilitate",
                 "text": "O serie nu are rădăcină explozivă, dar volatilitatea ei se triplează la mijlocul eșantionului. Ce face GSADF cu valori critice Monte Carlo simulate sub dispersie constantă?",
                 "options": [
-                    "Respinge prea des, semnalând explozivitate falsă; un wild bootstrap care păstrează traiectoria dispersiei readuce un nivel aproximativ corect",
+                    "Respinge prea des, semnalînd explozivitate falsă; un wild bootstrap care păstrează traiectoria dispersiei readuce un nivel aproximativ corect",
                     "Respinge mereu prea rar",
-                    "Nivelul rămâne exact 5%",
+                    "Nivelul rămîne exact 5%",
                     "Schimbarea scade doar puterea; nivelul nu este afectat"
                 ],
                 "correctExplanation": "Dispersia mare din ferestrele recente umflă supremul statisticilor ADF pe ferestre; în simularea Monte Carlo din acest capitol rata de respingere a fost de aproximativ 32% în loc de 5% și de circa 4% cu wild bootstrap (Harvey, Leybourne, Sollis și Taylor).",
-                "incorrectExplanation": "Distribuția nulă sub dispersie constantă este referința greșită când volatilitatea crește târziu în eșantion: șocurile recente mari par accelerare, deci respingerile false se înmulțesc; bootstrap-ul variațiilor observate cu semne aleatoare corectează asta."
+                "incorrectExplanation": "Distribuția nulă sub dispersie constantă este referința greșită cînd volatilitatea crește tîrziu în eșantion: șocurile recente mari par accelerare, deci respingerile false se înmulțesc; bootstrap-ul variațiilor observate cu semne aleatoare corectează asta."
             }
         },
         {
@@ -295,8 +295,8 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "title": "Raportul preț/dividend",
                 "text": "De ce testăm raportul preț/dividend și nu nivelul prețului pentru S&P 500?",
                 "options": [
-                    "Pentru că, dacă dividendele sunt I(1) și nu există bulă, raportul preț/dividend nu ar trebui să fie exploziv; explozivitatea indică atunci partea nefundamentală",
-                    "Pentru că dividendele sunt explozive",
+                    "Pentru că, dacă dividendele sînt I(1) și nu există bulă, raportul preț/dividend nu ar trebui să fie exploziv; explozivitatea indică atunci partea nefundamentală",
+                    "Pentru că dividendele sînt explozive",
                     "Pentru că nivelul prețului nu se observă",
                     "Pentru că raportul nu are sezonalitate"
                 ],
@@ -324,10 +324,10 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "options": [
                     "Pentru că proporțiile nu pot fi comparate niciodată",
                     "Pentru că eșantionul este prea mare pentru un test z",
-                    "Pentru că ferestrele rezultatului se suprapun și semnalele vin în serii, deci observațiile sunt dependente; folosiți un bootstrap pe blocuri sau o regresie cu erori standard HAC",
+                    "Pentru că ferestrele rezultatului se suprapun și semnalele vin în serii, deci observațiile sînt dependente; folosiți un bootstrap pe blocuri sau o regresie cu erori standard HAC",
                     "Pentru că scăderile de preț urmează distribuția Normală"
                 ],
-                "correctExplanation": "Datele consecutive au în comun până la 85 din cele 90 de zile ale rezultatului, iar indicatorul este persistent, deci numărul efectiv de observații independente este mult mai mic; un bootstrap pe blocuri circulare de 90 de zile sau erorile standard Newey-West dau un interval onest.",
+                "correctExplanation": "Datele consecutive au în comun pînă la 85 din cele 90 de zile ale rezultatului, iar indicatorul este persistent, deci numărul efectiv de observații independente este mult mai mic; un bootstrap pe blocuri circulare de 90 de zile sau erorile standard Newey-West dau un interval onest.",
                 "incorrectExplanation": "Testul z presupune date independente. Rezultatele suprapuse și semnalele grupate îi fac eroarea standard prea mică, ceea ce exagerează semnificația."
             }
         },
@@ -350,7 +350,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "text": "Ce aduce reformularea Filimonov-Sornette a modelului LPPLS?",
                 "options": [
                     "Elimină oscilațiile",
-                    "Face patru parametri liniari, astfel încât doar tc, m și omega se caută neliniar",
+                    "Face patru parametri liniari, astfel încît doar tc, m și omega se caută neliniar",
                     "Garantează data crahului",
                     "Transformă modelul într-un GARCH"
                 ],
@@ -377,11 +377,11 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "text": "Ce au arătat ajustările LPPLS pe ferestre mobile din acest capitol despre momentul critic estimat?",
                 "options": [
                     "Este stabil de la o dată de estimare la alta",
-                    "Coincide mereu cu vârful real",
-                    "Se mută pe măsură ce fereastra se termină mai târziu, variază cu luni de la o fereastră la alta și, fiind constrâns să fie ulterior sfârșitului ferestrei, se mută mereu înaintea datei curente",
+                    "Coincide mereu cu vîrful real",
+                    "Se mută pe măsură ce fereastra se termină mai tîrziu, variază cu luni de la o fereastră la alta și, fiind constrîns să fie ulterior sfîrșitului ferestrei, se mută mereu înaintea datei curente",
                     "Este mereu în trecut"
                 ],
-                "correctExplanation": "Pentru Bitcoin în 2017 și Nasdaq 100 în 2000, tc s-a deplasat odată cu sfârșitul ferestrei și a variat pe mai multe luni înaintea vârfului; spațiul de căutare impune tc ulterior datei t2, deci faptul că rămâne înaintea datei curente este o constrângere, nu o dovadă.",
+                "correctExplanation": "Pentru Bitcoin în 2017 și Nasdaq 100 în 2000, tc s-a deplasat odată cu sfîrșitul ferestrei și a variat pe mai multe luni înaintea vîrfului; spațiul de căutare impune tc ulterior datei t2, deci faptul că rămîne înaintea datei curente este o constrîngere, nu o dovadă.",
                 "incorrectExplanation": "O singură ajustare poate impresiona, dar estimarea depinde de fereastră; o evaluare onestă privește întreaga succesiune de ajustări în timp real."
             }
         },
@@ -405,11 +405,11 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "options": [
                     "R-pătrat-ul unei ajustări LPPLS",
                     "Ponderea ferestrelor de estimare care se termină la t2 a căror ajustare trece filtrul de calificare",
-                    "Probabilitatea unui crah mâine",
+                    "Probabilitatea unui crah mîine",
                     "Valoarea p a testului GSADF"
                 ],
-                "correctExplanation": "Se ajustează multe ferestre [t2 - L, t2]; indicatorul este fracția celor ai căror parametri sunt în intervalele admise, o măsură a robusteții semnalului de bulă.",
-                "incorrectExplanation": "Agregă multe ajustări în loc să se bazeze pe una singură și se calculează doar cu datele până la t2."
+                "correctExplanation": "Se ajustează multe ferestre [t2 - L, t2]; indicatorul este fracția celor ai căror parametri sînt în intervalele admise, o măsură a robusteții semnalului de bulă.",
+                "incorrectExplanation": "Agregă multe ajustări în loc să se bazeze pe una singură și se calculează doar cu datele pînă la t2."
             }
         },
         {
@@ -427,15 +427,15 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "incorrectExplanation": "The problem is not the sample size or the sign of the statistic: the LR test of the number of regimes is non-standard, so its critical values must come from bounds, an optimal test or a bootstrap."
             },
             "ro": {
-                "title": "Câte regimuri Markov?",
-                "text": "Pentru randamentele săptămânale Bitcoin, statistica raportului de verosimilitate pentru un regim vs două regimuri Markov este aproximativ 123. De ce comparația cu valoarea critică chi-pătrat(4) nu este validă?",
+                "title": "Cîte regimuri Markov?",
+                "text": "Pentru randamentele săptămînale Bitcoin, statistica raportului de verosimilitate pentru un regim vs două regimuri Markov este aproximativ 123. De ce comparația cu valoarea critică chi-pătrat(4) nu este validă?",
                 "options": [
                     "Pentru că eșantionul are prea multe observații",
-                    "Pentru că sub un singur regim mediile și dispersiile regimurilor coincid, deci probabilitățile de tranziție nu sunt identificate, iar matricea informațională este singulară; folosiți marginile de tip Hansen, testul Carrasco-Hu-Ploberger sau un bootstrap parametric",
+                    "Pentru că sub un singur regim mediile și dispersiile regimurilor coincid, deci probabilitățile de tranziție nu sînt identificate, iar matricea informațională este singulară; folosiți marginile de tip Hansen, testul Carrasco-Hu-Ploberger sau un bootstrap parametric",
                     "Pentru că raportul de verosimilitate trebuie să fie negativ",
                     "Pentru că testele chi-pătrat cer doar randamente din distribuția Normală"
                 ],
-                "correctExplanation": "Condițiile de regularitate din teorema lui Wilks nu sunt îndeplinite: parametrii de perturbare (probabilitățile de tranziție) apar doar sub ipoteza alternativă, iar unele scoruri sunt identic nule. Simularea din modelul estimat cu un regim și reestimarea ambelor modele dau distribuția nulă corectă.",
+                "correctExplanation": "Condițiile de regularitate din teorema lui Wilks nu sînt îndeplinite: parametrii de perturbare (probabilitățile de tranziție) apar doar sub ipoteza alternativă, iar unele scoruri sînt identic nule. Simularea din modelul estimat cu un regim și reestimarea ambelor modele dau distribuția nulă corectă.",
                 "incorrectExplanation": "Problema nu este mărimea eșantionului sau semnul statisticii: testul LR pentru numărul de regimuri este nestandard, deci valorile lui critice vin din margini, dintr-un test optim sau dintr-un bootstrap."
             }
         },
@@ -460,9 +460,9 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Probabilitatea netezită",
                     "Ambele la fel",
                     "Niciuna",
-                    "Probabilitatea filtrată, care folosește datele până la t, calculată cu parametri estimați pe datele până la t"
+                    "Probabilitatea filtrată, care folosește datele pînă la t, calculată cu parametri estimați pe datele pînă la t"
                 ],
-                "correctExplanation": "Probabilitatea filtrată P(s_t | datele până la t) este disponibilă la t dacă și parametrii sunt estimați cu datele până la t; cu parametrii din toată selecția este doar pseudo-timp real. Cea netezită condiționează pe toată selecția, inclusiv pe viitor.",
+                "correctExplanation": "Probabilitatea filtrată P(s_t | datele pînă la t) este disponibilă la t dacă și parametrii sînt estimați cu datele pînă la t; cu parametrii din toată selecția este doar pseudo-timp real. Cea netezită condiționează pe toată selecția, inclusiv pe viitor.",
                 "incorrectExplanation": "Probabilitățile netezite par mai clare fiindcă folosesc date din viitor; pentru decizii în timp real doar probabilitatea filtrată este legitimă."
             }
         },
@@ -482,15 +482,15 @@ window.MFM_DATA.quizzes['bubbles'] = {
             },
             "ro": {
                 "title": "Regimurile Bitcoin",
-                "text": "În modelul cu două regimuri pentru randamentele săptămânale Bitcoin din acest capitol, prin ce s-a deosebit regimul turbulent de cel pentru Nasdaq 100?",
+                "text": "În modelul cu două regimuri pentru randamentele săptămînale Bitcoin din acest capitol, prin ce s-a deosebit regimul turbulent de cel pentru Nasdaq 100?",
                 "options": [
                     "Avea o medie mai mică și era foarte persistent",
                     "Avea volatilitate zero",
                     "Nu a apărut niciodată",
-                    "Avea un randament mediu mai mare, pe lângă o volatilitate mai mare"
+                    "Avea un randament mediu mai mare, pe lîngă o volatilitate mai mare"
                 ],
-                "correctExplanation": "Pentru Nasdaq 100, regimul cu volatilitate mare are o medie negativă; pentru Bitcoin, regimul cu volatilitate mare are și randamentul mediu mai mare: și perioadele de creștere sunt turbulente.",
-                "incorrectExplanation": "La acțiuni, turbulența înseamnă de obicei prețuri în scădere; la Bitcoin, regimul volatil conține atât creșterile rapide, cât și crahurile."
+                "correctExplanation": "Pentru Nasdaq 100, regimul cu volatilitate mare are o medie negativă; pentru Bitcoin, regimul cu volatilitate mare are și randamentul mediu mai mare: și perioadele de creștere sînt turbulente.",
+                "incorrectExplanation": "La acțiuni, turbulența înseamnă de obicei prețuri în scădere; la Bitcoin, regimul volatil conține atît creșterile rapide, cît și crahurile."
             }
         },
         {
@@ -516,7 +516,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "O probabilitate mai mare a unei scăderi de 40%, dar nu un randament mediu semnificativ negativ",
                     "Nimic"
                 ],
-                "correctExplanation": "Creșterile de peste 100% ridică probabilitatea unui crah mult peste rata necondiționată, în timp ce randamentul mediu ulterior nu este semnificativ negativ: creșterile nu sunt singure un semnal de vânzare.",
+                "correctExplanation": "Creșterile de peste 100% ridică probabilitatea unui crah mult peste rata necondiționată, în timp ce randamentul mediu ulterior nu este semnificativ negativ: creșterile nu sînt singure un semnal de vînzare.",
                 "incorrectExplanation": "Dovezile privesc probabilitatea de crah, nu pierderi previzibile în medie; multe creșteri continuă."
             }
         },
@@ -568,10 +568,10 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Din creșterea rațională cu rata r",
                     "Din politica băncii centrale",
                     "Din impozitarea dividendelor",
-                    "De la investitori prea încrezători care nu sunt de acord între ei și nu pot vinde în lipsă, deci prețul include opțiunea de a revinde unui cumpărător mai optimist"
+                    "De la investitori prea încrezători care nu sînt de acord între ei și nu pot vinde în lipsă, deci prețul include opțiunea de a revinde unui cumpărător mai optimist"
                 ],
-                "correctExplanation": "Cu restricții la vânzarea în lipsă și convingeri diferite, deținătorii prețuiesc opțiunea de a vinde cuiva mai optimist; această opțiune de revânzare este bula și vine cu volume mari de tranzacționare.",
-                "incorrectExplanation": "Mecanismul este dezacordul plus restricțiile la vânzarea în lipsă, ceea ce explică și de ce bulele vin cu tranzacționare intensă."
+                "correctExplanation": "Cu restricții la vînzarea în lipsă și convingeri diferite, deținătorii prețuiesc opțiunea de a vinde cuiva mai optimist; această opțiune de revînzare este bula și vine cu volume mari de tranzacționare.",
+                "incorrectExplanation": "Mecanismul este dezacordul plus restricțiile la vînzarea în lipsă, ceea ce explică și de ce bulele vin cu tranzacționare intensă."
             }
         },
         {
@@ -593,12 +593,12 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "text": "Pentru Nasdaq 100 (2000), Bitcoin (2017) și GameStop (2021), ce a oferit datarea BSADF în timp real?",
                 "options": [
                     "O predicție exactă a datei crahului",
-                    "Un avertisment timpuriu că prețurile erau explozive, adesea cu luni înainte de vârf, dar nu momentul crahului",
+                    "Un avertisment timpuriu că prețurile erau explozive, adesea cu luni înainte de vîrf, dar nu momentul crahului",
                     "Niciun semnal înainte de crah",
                     "Un semnal doar după crah"
                 ],
-                "correctExplanation": "Chiar datat la confirmare (după L depășiri consecutive), avertismentul a venit înaintea vârfului, cu luni înainte pentru Nasdaq 100 și Bitcoin și cu zile înainte pentru GameStop; testele spun că piața este într-o fază explozivă, nu când se va termina.",
-                "incorrectExplanation": "Testele de explozivitate sunt instrumente de monitorizare: utile pentru gestiunea riscului, nu un mijloc de a anticipa momentul crahului."
+                "correctExplanation": "Chiar datat la confirmare (după L depășiri consecutive), avertismentul a venit înaintea vîrfului, cu luni înainte pentru Nasdaq 100 și Bitcoin și cu zile înainte pentru GameStop; testele spun că piața este într-o fază explozivă, nu cînd se va termina.",
+                "incorrectExplanation": "Testele de explozivitate sînt instrumente de monitorizare: utile pentru gestiunea riscului, nu un mijloc de a anticipa momentul crahului."
             }
         },
         {
@@ -620,11 +620,11 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "text": "Un asistent AI calculează SADF pe o serie de log-prețuri, obține SADF = 0,40, o compară cu valoarea critică de 5% întoarsă de adfuller din statsmodels (-2,86) și conchide: „SADF > -2,86, deci există o bulă”. Ce este greșit?",
                 "options": [
                     "Nimic: orice SADF peste -2,86 indică un comportament exploziv",
-                    "Folosește o valoare critică Dickey-Fuller pentru coada stângă la un test la dreapta; valoarea critică SADF este pozitivă și trebuie simulată (sau obținută prin bootstrap) pentru aceeași dimensiune a eșantionului și aceeași fereastră minimă",
+                    "Folosește o valoare critică Dickey-Fuller pentru coada stîngă la un test la dreapta; valoarea critică SADF este pozitivă și trebuie simulată (sau obținută prin bootstrap) pentru aceeași dimensiune a eșantionului și aceeași fereastră minimă",
                     "SADF trebuie comparat cu cuantila 1,645 a distribuției Normale",
                     "SADF trebuie aplicat pe randamente, nu pe log-prețuri"
                 ],
-                "correctExplanation": "Explozivitatea este coada dreaptă. Valoarea Dickey-Fuller -2,86 aparține testului pe coada stângă pentru staționaritate, deci cu ea aproape orice mers aleator este declarat bulă; valoarea critică SADF la dreapta este pozitivă (circa 1,4 pentru 300 de observații) și se obține prin simulare.",
+                "correctExplanation": "Explozivitatea este coada dreaptă. Valoarea Dickey-Fuller -2,86 aparține testului pe coada stîngă pentru staționaritate, deci cu ea aproape orice mers aleator este declarat bulă; valoarea critică SADF la dreapta este pozitivă (circa 1,4 pentru 300 de observații) și se obține prin simulare.",
                 "incorrectExplanation": "Testul este la dreapta, iar statistica SADF are o distribuție nestandard: valoarea ei critică se simulează sub un mers aleator cu aceeași dimensiune a eșantionului și aceeași fereastră minimă și este pozitivă, nu -2,86."
             }
         },
@@ -649,9 +649,9 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "LPPLS nu poate fi ajustat pe date lunare",
                     "Momentul critic trebuie raportat în zile, nu în luni",
                     "Ajustarea trebuie făcută pe prețuri, nu pe log-prețuri",
-                    "O singură fereastră dă o estimare fragilă: t_c trebuie raportat cu dispersia lui pe ferestre și cu indicatorul de încredere și marchează sfârșitul probabil al regimului, nu o dată sigură a crahului"
+                    "O singură fereastră dă o estimare fragilă: t_c trebuie raportat cu dispersia lui pe ferestre și cu indicatorul de încredere și marchează sfîrșitul probabil al regimului, nu o dată sigură a crahului"
                 ],
-                "correctExplanation": "Momentul critic LPPLS este foarte sensibil la fereastră și la filtru. Un răspuns credibil reajustează modelul pe multe ferestre, raportează dispersia lui t_c și ponderea ajustărilor valide (indicatorul de încredere) și tratează t_c ca sfârșit probabil al regimului.",
+                "correctExplanation": "Momentul critic LPPLS este foarte sensibil la fereastră și la filtru. Un răspuns credibil reajustează modelul pe multe ferestre, raportează dispersia lui t_c și ponderea ajustărilor valide (indicatorul de încredere) și tratează t_c ca sfîrșit probabil al regimului.",
                 "incorrectExplanation": "Problema nu este frecvența datelor sau unitatea de măsură: un t_c dintr-o singură fereastră nu este robust, iar LPPLS nu promite un crah la t_c; raportați dispersia lui pe ferestre și indicatorul de încredere."
             }
         }

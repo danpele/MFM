@@ -25,9 +25,9 @@ window.MFM_DATA.quizzes['garch'] = {
                 title: 'Gruparea volatilității',
                 text: 'Pentru S&P 500 (2000-2026), autocorelația de ordin 1 a randamentelor zilnice este circa -0,10, iar cea a pătratelor randamentelor circa 0,31. Ce înseamnă acest lucru?',
                 options: [
-                    'Randamentele sunt puternic predictibile ca direcție',
+                    'Randamentele sînt puternic predictibile ca direcție',
                     'Dispersia randamentelor este constantă în timp',
-                    'Mărimea mișcării de mâine este predictibilă, deși direcția ei aproape nu este',
+                    'Mărimea mișcării de mîine este predictibilă, deși direcția ei aproape nu este',
                     'Datele conțin o eroare de calcul, deoarece cele două trebuie să fie egale'
                 ],
                 correctExplanation: 'Pătratele randamentelor măsoară mărimea mișcărilor. Autocorelația lor puternică și persistentă este gruparea volatilității: mișcările mari urmează mișcărilor mari, de orice semn.',
@@ -160,13 +160,13 @@ window.MFM_DATA.quizzes['garch'] = {
                 title: "Test portmanteau cu parametri estimați",
                 text: "Aplicați Ljung-Box cu 10 decalaje pe pătratele reziduurilor standardizate ale unui GARCH(1,1) estimat și folosiți valorile critice chi2(10). Testul este:",
                 options: [
-                    "Exact, deoarece reziduurile standardizate sunt i.i.d. sub model",
+                    "Exact, deoarece reziduurile standardizate sînt i.i.d. sub model",
                     "Corect cu valorile critice chi2(10 - 3), ca la reziduurile ARMA",
                     "Invalid pentru orice model GARCH",
                     "Nu exact chi2(10): estimarea parametrilor dispersiei schimbă limita (Li și Mak), mai ales la decalaje mici"
                 ],
                 correctExplanation: "Reziduurile depind de parametrii estimați; covarianța limită a autocorelațiilor pătratelor reziduurilor este I - H'J^-1 H/(kappa_z - 1). Pentru GARCH-N pe S&P 500, Q(10) corectat este 19,1 (p = 0,038), față de 16,4 (p = 0,089) pentru testul naiv.",
-                incorrectExplanation: "Estimarea parametrilor face testul naiv chi2(10) conservator; regula ARMA de scădere a numărului de parametri nu se aplică pătratelor, iar Li și Mak dau limita corectă, care rămâne utilizabilă."
+                incorrectExplanation: "Estimarea parametrilor face testul naiv chi2(10) conservator; regula ARMA de scădere a numărului de parametri nu se aplică pătratelor, iar Li și Mak dau limita corectă, care rămîne utilizabilă."
             }
         },
         {
@@ -185,10 +185,10 @@ window.MFM_DATA.quizzes['garch'] = {
             },
             ro: {
                 title: 'Prognoze pe mai mulți pași',
-                text: 'Într-un GARCH(1,1) staționar în covarianță (alpha + beta < 1), cum se comportă prognoza dispersiei pe h pași când h crește?',
+                text: 'Într-un GARCH(1,1) staționar în covarianță (alpha + beta < 1), cum se comportă prognoza dispersiei pe h pași cînd h crește?',
                 options: [
-                    'Converge spre dispersia de termen lung, reducând distanța cu factorul alpha + beta în fiecare zi',
-                    'Rămâne egală pentru totdeauna cu dispersia de mâine',
+                    'Converge spre dispersia de termen lung, reducînd distanța cu factorul alpha + beta în fiecare zi',
+                    'Rămîne egală pentru totdeauna cu dispersia de mîine',
                     'Crește nelimitat',
                     'Oscilează între valori mari și mici'
                 ],
@@ -216,10 +216,10 @@ window.MFM_DATA.quizzes['garch'] = {
                 options: [
                     'Este un GARCH(1,1) staționar cu dispersie de termen lung finită',
                     'Parametrii săi trebuie estimați prin verosimilitate maximă',
-                    'Dă mai multă pondere observațiilor vechi decât celor recente',
+                    'Dă mai multă pondere observațiilor vechi decît celor recente',
                     'Este un IGARCH(1,1) cu omega = 0, alpha = 0,06, beta = 0,94, deci prognoza sa este constantă în orizont'
                 ],
-                correctExplanation: 'sigma_t^2 = 0,94 sigma_{t-1}^2 + 0,06 r_{t-1}^2 este un GARCH cu alpha + beta = 1 și omega = 0: fără revenire la medie, prognoza pentru orice orizont este dispersia de mâine.',
+                correctExplanation: 'sigma_t^2 = 0,94 sigma_{t-1}^2 + 0,06 r_{t-1}^2 este un GARCH cu alpha + beta = 1 și omega = 0: fără revenire la medie, prognoza pentru orice orizont este dispersia de mîine.',
                 incorrectExplanation: 'EWMA este cazul particular IGARCH cu omega = 0; nu are dispersie de termen lung și nici revenire la medie.'
             }
         },
@@ -266,15 +266,15 @@ window.MFM_DATA.quizzes['garch'] = {
             },
             ro: {
                 title: 'Cvasi-verosimilitate maximă',
-                text: 'Estimați un GARCH maximizând verosimilitatea Normală, dar inovațiile au cozi groase, cu moment de ordin patru finit. Ce trebuie să faceți?',
+                text: 'Estimați un GARCH maximizînd verosimilitatea Normală, dar inovațiile au cozi groase, cu moment de ordin patru finit. Ce trebuie să faceți?',
                 options: [
-                    'Nimic: erorile standard clasice rămân valide',
-                    'Renunțați la GARCH, deoarece estimările sunt inconsistente',
-                    'Păstrați estimările (consistente dacă ecuațiile mediei și dispersiei sunt corecte), dar folosiți erorile standard robuste Bollerslev-Wooldridge',
+                    'Nimic: erorile standard clasice rămîn valide',
+                    'Renunțați la GARCH, deoarece estimările sînt inconsistente',
+                    'Păstrați estimările (consistente dacă ecuațiile mediei și dispersiei sînt corecte), dar folosiți erorile standard robuste Bollerslev-Wooldridge',
                     'Înmulțiți erorile standard cu aplatizarea'
                 ],
-                correctExplanation: 'Cvasi-verosimilitatea maximă este consistentă dacă primele două momente condiționate sunt corecte; cu E z_t^4 < infinit, inferența folosește covarianța „sandviș” A^-1 B A^-1 (dacă E z_t^4 = infinit, inferența în sqrt(n) nu mai funcționează: Hall și Yao, 2003).',
-                incorrectExplanation: 'Estimările QML rămân consistente; doar erorile standard trebuie înlocuite cu forma robustă „sandviș”.'
+                correctExplanation: 'Cvasi-verosimilitatea maximă este consistentă dacă primele două momente condiționate sînt corecte; cu E z_t^4 < infinit, inferența folosește covarianța „sandviș” A^-1 B A^-1 (dacă E z_t^4 = infinit, inferența în sqrt(n) nu mai funcționează: Hall și Yao, 2003).',
+                incorrectExplanation: 'Estimările QML rămîn consistente; doar erorile standard trebuie înlocuite cu forma robustă „sandviș”.'
             }
         },
         {
@@ -296,7 +296,7 @@ window.MFM_DATA.quizzes['garch'] = {
                 text: 'Un GARCH(1,1)-t estimat pentru Bitcoin dă nu = 3,18. Ce implică acest lucru?',
                 options: [
                     'Inovațiile au cozi extrem de groase și nu au moment de ordin patru finit',
-                    'Inovațiile sunt apropiate de distribuția Normală',
+                    'Inovațiile sînt apropiate de distribuția Normală',
                     'Modelul este greșit specificat, deoarece parametrul ν trebuie să fie un număr întreg',
                     'Dispersia inovațiilor este infinită'
                 ],
@@ -322,13 +322,13 @@ window.MFM_DATA.quizzes['garch'] = {
                 title: 't asimetric',
                 text: 'În distribuția t asimetrică a lui Hansen (1994), ce indică un parametru de asimetrie lambda negativ?',
                 options: [
-                    'Cozi mai subțiri decât distribuția Normală',
-                    'O coadă dreaptă mai lungă: câștigurile mari mai probabile decât pierderile mari',
+                    'Cozi mai subțiri decît distribuția Normală',
+                    'O coadă dreaptă mai lungă: cîștigurile mari mai probabile decît pierderile mari',
                     'Că modelul nu este identificat',
-                    'O coadă stângă mai lungă: pierderile mari mai probabile decât câștigurile mari'
+                    'O coadă stîngă mai lungă: pierderile mari mai probabile decît cîștigurile mari'
                 ],
-                correctExplanation: 'lambda < 0 înclină densitatea spre stânga; pentru S&P 500, GJR-GARCH dă lambda de circa -0,15.',
-                incorrectExplanation: 'Un lambda negativ înseamnă asimetrie la stânga: coada pierderilor este mai lungă.'
+                correctExplanation: 'lambda < 0 înclină densitatea spre stînga; pentru S&P 500, GJR-GARCH dă lambda de circa -0,15.',
+                incorrectExplanation: 'Un lambda negativ înseamnă asimetrie la stînga: coada pierderilor este mai lungă.'
             }
         },
         {
@@ -381,7 +381,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'alpha + gamma/2 + beta',
                     'doar beta'
                 ],
-                correctExplanation: 'Jumătate din șocuri sunt negative, deci în medie panta pe eps^2 este alpha + gamma/2; persistența este alpha + gamma/2 + beta.',
+                correctExplanation: 'Jumătate din șocuri sînt negative, deci în medie panta pe eps^2 este alpha + gamma/2; persistența este alpha + gamma/2 + beta.',
                 incorrectExplanation: 'Termenul gamma este activ doar după șocuri negative, adică jumătate din timp cu inovații simetrice: alpha + gamma/2 + beta.'
             }
         },
@@ -436,7 +436,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     "Diebold-Mariano nu poate folosi erori standard HAC"
                 ],
                 correctExplanation: "Cu modele imbricate și parametri estimați pe o fereastră în expansiune, sub ipoteza nulă cele două prognoze converg spre aceeași, deci diferența dispare (West; Clark și McCracken). Giacomini și White testează metoda de prognoză cu o fereastră mobilă finită, unde zgomotul estimării persistă.",
-                incorrectExplanation: "Pierderile Normale nu sunt necesare, QLIKE este robustă în sensul lui Patton, iar erorile HAC sunt standard în Diebold-Mariano. Problema este diferența degenerată a modelelor imbricate cu parametri estimați, pe care Giacomini-White o evită cu o fereastră mobilă."
+                incorrectExplanation: "Pierderile Normale nu sînt necesare, QLIKE este robustă în sensul lui Patton, iar erorile HAC sînt standard în Diebold-Mariano. Problema este diferența degenerată a modelelor imbricate cu parametri estimați, pe care Giacomini-White o evită cu o fereastră mobilă."
             }
         },
         {
@@ -458,11 +458,11 @@ window.MFM_DATA.quizzes['garch'] = {
                 text: 'În capitol, GJR-GARCH-t dă un gamma puternic pozitiv pentru S&P 500, gamma aproape de 0 pentru Bitcoin și un gamma negativ pentru aur. Care interpretare este corectă?',
                 options: [
                     'Toate cele trei piețe arată efectul de levier clasic',
-                    'Efectul de levier este un fenomen al acțiunilor; la aur, creșterile de preț sunt direcția mai volatilă (comportament de activ de refugiu)',
+                    'Efectul de levier este un fenomen al acțiunilor; la aur, creșterile de preț sînt direcția mai volatilă (comportament de activ de refugiu)',
                     'Bitcoin are cel mai puternic efect de levier',
                     'Un gamma negativ înseamnă că modelul este greșit'
                 ],
-                correctExplanation: 'La aur, creșterile din perioadele agitate cresc volatilitatea mai mult decât scăderile: o asimetrie inversă, consistentă cu un activ de refugiu. Bitcoin nu are asimetrie semnificativă.',
+                correctExplanation: 'La aur, creșterile din perioadele agitate cresc volatilitatea mai mult decît scăderile: o asimetrie inversă, consistentă cu un activ de refugiu. Bitcoin nu are asimetrie semnificativă.',
                 incorrectExplanation: 'Efectul de levier clasic apare la acțiuni; aurul are asimetrie inversă, iar Bitcoin deloc.'
             }
         },
@@ -489,7 +489,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Ljung-Box pe pătratele reziduurilor standardizate z_t^2 și testul ARCH-LM pe z_t',
                     'Numărul de parametri'
                 ],
-                correctExplanation: 'Dacă ecuația dispersiei este adecvată, z_t^2 sunt necorelate în populație: o dependență semnificativă în Q(10) pe z_t^2 sau în testul LM este o dovadă împotriva modelului, iar nerespingerea înseamnă doar dovezi insuficiente împotriva lui.',
+                correctExplanation: 'Dacă ecuația dispersiei este adecvată, z_t^2 sînt necorelate în populație: o dependență semnificativă în Q(10) pe z_t^2 sau în testul LM este o dovadă împotriva modelului, iar nerespingerea înseamnă doar dovezi insuficiente împotriva lui.',
                 incorrectExplanation: 'Gruparea rămasă se testează pe pătratele reziduurilor standardizate, nu pe randamentele brute.'
             }
         },
@@ -540,11 +540,11 @@ window.MFM_DATA.quizzes['garch'] = {
                 options: [
                     'Testul LR este mereu greșit pentru modelele GARCH',
                     'BIC ignoră verosimilitatea',
-                    'Cele două modele nu sunt imbricate',
-                    'BIC penalizează fiecare parametru suplimentar cu ln n (circa 8,8 aici), mai mult decât câștigul de verosimilitate, iar testul LR folosește valoarea critică 3,84'
+                    'Cele două modele nu sînt imbricate',
+                    'BIC penalizează fiecare parametru suplimentar cu ln n (circa 8,8 aici), mai mult decît cîștigul de verosimilitate, iar testul LR folosește valoarea critică 3,84'
                 ],
-                correctExplanation: 'BIC = -2 log L + k ln n; cu n de circa 6.700, penalizarea pentru un parametru depășește câștigul LR de 4,93, deși testul LR respinge la 5%.',
-                incorrectExplanation: 'Modelele sunt imbricate; dezacordul vine din penalizarea mai mare ln n a BIC, comparată cu valoarea critică chi-pătrat.'
+                correctExplanation: 'BIC = -2 log L + k ln n; cu n de circa 6.700, penalizarea pentru un parametru depășește cîștigul LR de 4,93, deși testul LR respinge la 5%.',
+                incorrectExplanation: 'Modelele sînt imbricate; dezacordul vine din penalizarea mai mare ln n a BIC, comparată cu valoarea critică chi-pătrat.'
             }
         },
         {
@@ -566,11 +566,11 @@ window.MFM_DATA.quizzes['garch'] = {
                 text: 'De ce folosesc Patton (2011) și acest capitol pierderea QLIKE r_t^2 / h_t + ln h_t pentru a compara prognozele de volatilitate?',
                 options: [
                     'Pentru că ignoră erorile mari',
-                    'Pentru că ordonează corect prognozele chiar și când aproximarea r_t^2 este zgomotoasă',
+                    'Pentru că ordonează corect prognozele chiar și cînd aproximarea r_t^2 este zgomotoasă',
                     'Pentru că nu are nevoie de o aproximare a volatilității',
                     'Pentru că recompensează subestimarea riscului'
                 ],
-                correctExplanation: 'QLIKE și MSE sunt robuste la zgomotul aproximării: dacă r_t^2 este condiționat nedeplasat pentru dispersie, ordonarea după pierderea așteptată cu r_t^2 coincide cu cea după dispersia reală (ordonările din eșantion pot totuși diferi). QLIKE penalizează în plus mai mult subestimarea.',
+                correctExplanation: 'QLIKE și MSE sînt robuste la zgomotul aproximării: dacă r_t^2 este condiționat nedeplasat pentru dispersie, ordonarea după pierderea așteptată cu r_t^2 coincide cu cea după dispersia reală (ordonările din eșantion pot totuși diferi). QLIKE penalizează în plus mai mult subestimarea.',
                 incorrectExplanation: 'QLIKE este robustă la o aproximare zgomotoasă (Patton, 2011) și penalizează mai mult subestimarea, nu mai puțin.'
             }
         },
@@ -592,7 +592,7 @@ window.MFM_DATA.quizzes['garch'] = {
                 title: 'Mincer-Zarnowitz',
                 text: 'O regresie Mincer-Zarnowitz r_t^2 = a + b h_t pentru prognozele GARCH pe o zi dă a = 0,03, b = 0,97, un test Wald comun HAC pentru a = 0, b = 1 cu p = 0,99 și R^2 de doar circa 0,25. Care este concluzia corectă?',
                 options: [
-                    'Prognozele sunt inutile',
+                    'Prognozele sînt inutile',
                     'Modelul este deplasat',
                     'Nedeplasarea nu este respinsă; R^2 mic reflectă zgomotul lui r_t^2 ca aproximare',
                     'Regresia trebuie estimată fără termen liber'
@@ -624,7 +624,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     "Faptul că intervalul atinge 1 este în sine un test valid care respinge IGARCH",
                     "Intervalul pentru timpul de înjumătățire este simetric în jurul a 131 de zile"
                 ],
-                correctExplanation: "ln(0,5)/ln(x) explodează când x se apropie de 1, deci intervalul pentru timpul de înjumătățire este uriaș și asimetric. Intervalul percentile este trunchiat de restricția alpha + beta <= 1, deci întrebarea despre IGARCH cere un test simulat sub ipoteza nulă, care dă p = 0,17.",
+                correctExplanation: "ln(0,5)/ln(x) explodează cînd x se apropie de 1, deci intervalul pentru timpul de înjumătățire este uriaș și asimetric. Intervalul percentile este trunchiat de restricția alpha + beta <= 1, deci întrebarea despre IGARCH cere un test simulat sub ipoteza nulă, care dă p = 0,17.",
                 incorrectExplanation: "Un interval percentile trunchiat nu este un test (Andrews, 2000), o estimare punctuală sub 1 nu dovedește nimic, iar intervalul pentru timpul de înjumătățire este foarte asimetric; testul simulat sub IGARCH nu respinge."
             }
         },
@@ -652,7 +652,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Autocorelația pătratelor randamentelor scade geometric, în timp ce în date autocorelația randamentelor absolute scade lent, cu memorie lungă'
                 ],
                 correctExplanation: 'GARCH(1,1) are o singură scară de timp; FIGARCH (Baillie, Bollerslev și Mikkelsen, 1996) și modelele de volatilitate realizată (Capitolul 9) tratează memoria lungă. Rupturile structurale pot și ele umfla alpha + beta.',
-                incorrectExplanation: 'GARCH produce gruparea; limitele principale sunt memoria geometrică (scurtă), persistența falsă sub rupturi structurale și întârzierea reacției.'
+                incorrectExplanation: 'GARCH produce gruparea; limitele principale sînt memoria geometrică (scurtă), persistența falsă sub rupturi structurale și întîrzierea reacției.'
             }
         },
         {
@@ -671,7 +671,7 @@ window.MFM_DATA.quizzes['garch'] = {
             },
             ro: {
                 title: "Găsiți eroarea: timpul de înjumătățire GARCH",
-                text: "Un asistent AI scrie: „Estimările GARCH(1,1) sunt alpha = 0,10 și beta = 0,88, deci timpul de înjumătățire al unui șoc de volatilitate este ln(0,5)/ln(0,88), circa 5,4 zile.” Care este eroarea?",
+                text: "Un asistent AI scrie: „Estimările GARCH(1,1) sînt alpha = 0,10 și beta = 0,88, deci timpul de înjumătățire al unui șoc de volatilitate este ln(0,5)/ln(0,88), circa 5,4 zile.” Care este eroarea?",
                 options: [
                     "Timpul de înjumătățire depinde de persistența alpha + beta: ln(0,5)/ln(0,98), circa 34 de zile",
                     "Timpul de înjumătățire este ln(0,5)/ln(0,10), deoarece alpha măsoară reacția la știri",
@@ -706,7 +706,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     "O valoare p de 0,62 înseamnă că modelul explică 62% din dispersie"
                 ],
                 correctExplanation: "Ipoteza nulă a testului este absența autocorelației în pătratele reziduurilor standardizate. O valoare p de 0,62 este mult peste 5%, deci ipoteza nulă nu este respinsă: testul nu găsește dovezi de grupare a volatilității rămasă.",
-                incorrectExplanation: "Testul și statistica sunt corecte; valoarea p este citită greșit: 0,62 este mult peste 5%, deci nu există dovezi de efecte ARCH rămase."
+                incorrectExplanation: "Testul și statistica sînt corecte; valoarea p este citită greșit: 0,62 este mult peste 5%, deci nu există dovezi de efecte ARCH rămase."
             }
         }
     ]

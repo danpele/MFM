@@ -26,7 +26,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "text": "Estimarea Hill a indicelui de coadă pentru randamentele zilnice S&P 500 este aproximativ 3, iar statistica Jarque-Bera este aproximativ 45.800, cu p-valoarea chi-pătrat(2) sub 10^-10. Ce stabilește acest rezultat?",
                 "options": [
                     "Nimic: p-valoarea este invalidă pentru că momentul de ordin opt al randamentelor este infinit",
-                    "Că randamentele sunt corelate serial",
+                    "Că randamentele sînt corelate serial",
                     "Că ipoteza nulă comună ,,randamente i.i.d. din distribuția Normală'' este respinsă; testul singur nu spune dacă cade distribuția marginală sau independența",
                     "Că randamentele au varianță infinită"
                 ],
@@ -50,11 +50,11 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Banda autocorelației în prezența grupării",
-                "text": "Randamentele x_t sunt o diferență de martingală staționară, cu momente de ordin patru finite, ale cărei pătrate sunt autocorelate pozitiv (gruparea volatilității). Cum se compară varianța asimptotică a rădăcinii lui T înmulțite cu autocorelația de selecție de ordin 1 cu 1?",
+                "text": "Randamentele x_t sînt o diferență de martingală staționară, cu momente de ordin patru finite, ale cărei pătrate sînt autocorelate pozitiv (gruparea volatilității). Cum se compară varianța asimptotică a rădăcinii lui T înmulțite cu autocorelația de selecție de ordin 1 cu 1?",
                 "options": [
-                    "Este mai mare decât 1: este egală cu E[x_t^2 x_(t-1)^2]/sigma^4, care depășește 1 în prezența grupării",
-                    "Este egală cu 1, pentru că randamentele sunt necorelate",
-                    "Este mai mică decât 1, pentru că media de selecție este eliminată",
+                    "Este mai mare decît 1: este egală cu E[x_t^2 x_(t-1)^2]/sigma^4, care depășește 1 în prezența grupării",
+                    "Este egală cu 1, pentru că randamentele sînt necorelate",
+                    "Este mai mică decît 1, pentru că media de selecție este eliminată",
                     "Nu este definită pentru randamente necorelate"
                 ],
                 "correctExplanation": "Pentru o diferență de martingală, varianța asimptotică a lui sqrt(T) rho_hat_1 este E[x_t^2 x_(t-1)^2]/sigma^4. Gruparea face ca pătratele mari să urmeze pătratelor mari, deci ea depășește 1 și banda i.i.d. 1,96/sqrt(T) este prea îngustă (S&P 500: aproximativ 5).",
@@ -131,7 +131,7 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Coada randamentelor absolute",
-                "text": "La un prag comun, coada pierderilor are indicele 2,7, iar coada câștigurilor 3,6. Asimptotic, care este indicele de coadă al lui |r_t|?",
+                "text": "La un prag comun, coada pierderilor are indicele 2,7, iar coada cîștigurilor 3,6. Asimptotic, care este indicele de coadă al lui |r_t|?",
                 "options": [
                     "3,15, media celor doi",
                     "3,6, coada mai subțire",
@@ -187,9 +187,9 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "title": "Ljung-Box pe randamente vs pătrate",
                 "text": "Pentru S&P 500, Ljung-Box Q(10) este 91,6 pe randamente și 8.018 pe randamentele pătratice. Care este mesajul principal?",
                 "options": [
-                    "Randamentele sunt puternic predictibile ca direcție",
+                    "Randamentele sînt puternic predictibile ca direcție",
                     "Testul nu este fiabil, pentru că valorile diferă",
-                    "Mărimea randamentelor (volatilitatea) este mult mai predictibilă decât direcția lor",
+                    "Mărimea randamentelor (volatilitatea) este mult mai predictibilă decît direcția lor",
                     "Randamentele pătratice urmează distribuția Normală"
                 ],
                 "correctExplanation": "Autocorelația randamentelor pătratice reflectă gruparea volatilității; autocorelația liniară a randamentelor este mică, chiar dacă e semnificativă într-un eșantion mare.",
@@ -212,7 +212,7 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Mixtură de distribuții Normale",
-                "text": "Volatilitatea zilnică este 1% în 90% din zile și 3% în 10% din zile; condiționat de volatilitate, randamentele urmează distribuția Normală cu media zero. Cât este kurtosisul?",
+                "text": "Volatilitatea zilnică este 1% în 90% din zile și 3% în 10% din zile; condiționat de volatilitate, randamentele urmează distribuția Normală cu media zero. Cît este kurtosisul?",
                 "options": [
                     "3, pentru că fiecare regim urmează distribuția Normală",
                     "1,8",
@@ -239,7 +239,7 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Raportul Sharpe pe randamente simple",
-                "text": "S&P 500, 1990-2026: randament log mediu 8,3% pe an, volatilitate 18,0%. Cât este aproximativ raportul Sharpe (r_f = 0) pe randamente simple, definiția din curs?",
+                "text": "S&P 500, 1990-2026: randament log mediu 8,3% pe an, volatilitate 18,0%. Cît este aproximativ raportul Sharpe (r_f = 0) pe randamente simple, definiția din curs?",
                 "options": [
                     "0,55, pentru că randamentul simplu mediu este aproximativ 8,3% + sigma^2/2 = 9,9%",
                     "0,46, randamentul log mediu împărțit la volatilitate",
@@ -266,14 +266,14 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Indicele de coadă (estimatorul Hill)",
-                "text": "Estimările Hill ale indicelui de coadă pentru randamentele zilnice absolute sunt în mare parte între 2 și 4 pe cele cinci piețe. Ce implică acest lucru?",
+                "text": "Estimările Hill ale indicelui de coadă pentru randamentele zilnice absolute sînt în mare parte între 2 și 4 pe cele cinci piețe. Ce implică acest lucru?",
                 "options": [
                     "Randamentele urmează distribuția Normală",
                     "Varianța există, dar kurtosisul populației foarte probabil nu (cere alpha > 4), deci kurtosisul de selecție este instabil",
                     "Randamentele nu au deloc varianță",
-                    "Cozile sunt mai subțiri decât cele ale distribuției Normale"
+                    "Cozile sînt mai subțiri decît cele ale distribuției Normale"
                 ],
-                "correctExplanation": "Cu cozi de tip lege de putere, momentele există doar până la un ordin mai mic decât alpha: varianța cere alpha > 2, kurtosisul alpha > 4. Kurtosisul de selecție depinde atunci mult de câteva zile extreme. (O distribuție Student-t estimată dă un indice de coadă bazat pe model, valid doar dacă Student-t potrivește împreună centrul și cozile.)",
+                "correctExplanation": "Cu cozi de tip lege de putere, momentele există doar pînă la un ordin mai mic decît alpha: varianța cere alpha > 2, kurtosisul alpha > 4. Kurtosisul de selecție depinde atunci mult de cîteva zile extreme. (O distribuție Student-t estimată dă un indice de coadă bazat pe model, valid doar dacă Student-t potrivește împreună centrul și cozile.)",
                 "incorrectExplanation": "Un indice de coadă între 2 și 4 înseamnă varianță finită, dar un moment de ordin patru foarte probabil inexistent."
             }
         },
@@ -292,15 +292,15 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "incorrectExplanation": "The asymmetry is market-specific: equities crash, the leu depreciates in jumps."
             },
             "ro": {
-                "title": "Asimetria câștig/pierdere",
-                "text": "Pentru S&P 500, VaR 1% (minus cuantila de 1% a randamentelor) este 3,15%, iar cuantila de 99% a randamentelor este 2,97%. Pentru EUR/RON valorile sunt 0,76% și 0,94%. Care este interpretarea corectă?",
+                "title": "Asimetria cîștig/pierdere",
+                "text": "Pentru S&P 500, VaR 1% (minus cuantila de 1% a randamentelor) este 3,15%, iar cuantila de 99% a randamentelor este 2,97%. Pentru EUR/RON valorile sînt 0,76% și 0,94%. Care este interpretarea corectă?",
                 "options": [
-                    "Ambele piețe au pierderi mai mari decât câștigurile",
+                    "Ambele piețe au pierderi mai mari decît cîștigurile",
                     "EUR/RON este o eroare de date",
-                    "Acțiunile au pierderi mai mari decât câștigurile; la EUR/RON variațiile mai mari sunt creșterile cursului, adică deprecierile leului",
+                    "Acțiunile au pierderi mai mari decît cîștigurile; la EUR/RON variațiile mai mari sînt creșterile cursului, adică deprecierile leului",
                     "Cuantilele nu pot măsura asimetria"
                 ],
-                "correctExplanation": "Asimetria câștig/pierdere este tipică acțiunilor; la un curs valutar direcția „pierderii” depinde de punctul de vedere, iar aici deprecierile leului sunt variațiile mai mari.",
+                "correctExplanation": "Asimetria cîștig/pierdere este tipică acțiunilor; la un curs valutar direcția „pierderii” depinde de punctul de vedere, iar aici deprecierile leului sînt variațiile mai mari.",
                 "incorrectExplanation": "Asimetria este specifică pieței: acțiunile se prăbușesc, leul se depreciază în salturi."
             }
         },
@@ -347,14 +347,14 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Ferestre nesuprapuse",
-                "text": "De ce se construiesc randamentele pe h zile din ferestre nesuprapuse atunci când kurtosisul lor este comparat cu eroarea standard sqrt(24/N)?",
+                "text": "De ce se construiesc randamentele pe h zile din ferestre nesuprapuse atunci cînd kurtosisul lor este comparat cu eroarea standard sqrt(24/N)?",
                 "options": [
-                    "Ferestrele suprapuse au observații comune, deci randamentele consecutive pe h zile sunt dependente, iar eșantionul efectiv este mult mai mic decât N",
+                    "Ferestrele suprapuse au observații comune, deci randamentele consecutive pe h zile sînt dependente, iar eșantionul efectiv este mult mai mic decît N",
                     "Ferestrele suprapuse produc randamente negative",
                     "Ferestrele nesuprapuse dau întotdeauna mai multe observații",
-                    "Kurtosisul este definit doar pentru date săptămânale"
+                    "Kurtosisul este definit doar pentru date săptămînale"
                 ],
-                "correctExplanation": "Sumele suprapuse estimează aceleași momente, dar refolosesc aceleași randamente zilnice: observațiile consecutive sunt puternic dependente, iar formulele care presupun N observații independente subestimează eroarea de eșantionare.",
+                "correctExplanation": "Sumele suprapuse estimează aceleași momente, dar refolosesc aceleași randamente zilnice: observațiile consecutive sînt puternic dependente, iar formulele care presupun N observații independente subestimează eroarea de eșantionare.",
                 "incorrectExplanation": "Problema ferestrelor suprapuse este dependența indusă și un eșantion efectiv mai mic, nu momentul estimat."
             }
         },
@@ -377,11 +377,11 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "text": "ACF a randamentelor absolute S&P 500 este 0,27 la lagul 1 și încă 0,09 la lagul 100. Ce se poate concluziona?",
                 "options": [
                     "Demonstrează că direcția randamentelor este predictibilă",
-                    "Volatilitatea este foarte persistentă; memoria lungă, un model cu memorie scurtă cu persistență aproape de 1 și rupturile structurale pot produce toate acest lucru, deci sunt necesare diagnostice suplimentare (estimări ale lui d, teste de ruptură, simulări de model)",
+                    "Volatilitatea este foarte persistentă; memoria lungă, un model cu memorie scurtă cu persistență aproape de 1 și rupturile structurale pot produce toate acest lucru, deci sînt necesare diagnostice suplimentare (estimări ale lui d, teste de ruptură, simulări de model)",
                     "Arată că volatilitatea este constantă",
                     "Este un artefact al folosirii randamentelor log"
                 ],
-                "correctExplanation": "Cele două valori ACF sunt reproduse de o descreștere exponențială cu phi de circa 0,989, iar un GARCH(1,1)-t cu persistența 0,994 le reproduce în Seminarul B14. Separarea memoriei lungi de memoria scurtă persistentă sau de rupturi cere estimări ale lui d, teste de ruptură și verificări prin simulare.",
+                "correctExplanation": "Cele două valori ACF sînt reproduse de o descreștere exponențială cu phi de circa 0,989, iar un GARCH(1,1)-t cu persistența 0,994 le reproduce în Seminarul B14. Separarea memoriei lungi de memoria scurtă persistentă sau de rupturi cere estimări ale lui d, teste de ruptură și verificări prin simulare.",
                 "incorrectExplanation": "Descreșterea lentă arată volatilitate persistentă; ea singură nu identifică memoria lungă."
             }
         },
@@ -403,12 +403,12 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "title": "Efectul Taylor",
                 "text": "Pentru S&P 500, autocorelația lui |r_t|^delta este maximă la delta = 1,75 (lagul 1), 1,5 (lagul 5) și 1,25 (lagul 20). Ce sugerează acest lucru?",
                 "options": [
-                    "Randamentele pătratice sunt mereu cea mai bună aproximare a volatilității",
+                    "Randamentele pătratice sînt mereu cea mai bună aproximare a volatilității",
                     "Randamentele urmează distribuția Normală",
-                    "La laguri mari, puterile apropiate de 1 sunt mai persistente decât pătratele; motivează măsuri robuste ale volatilității și modele power-GARCH",
+                    "La laguri mari, puterile apropiate de 1 sînt mai persistente decît pătratele; motivează măsuri robuste ale volatilității și modele power-GARCH",
                     "Efectul Taylor implică absența grupării volatilității"
                 ],
-                "correctExplanation": "Puterea optimă se deplasează spre delta = 1 când lagul crește; randamentele pătratice (delta = 2) sunt clar mai puțin persistente la laguri mari.",
+                "correctExplanation": "Puterea optimă se deplasează spre delta = 1 cînd lagul crește; randamentele pătratice (delta = 2) sînt clar mai puțin persistente la laguri mari.",
                 "incorrectExplanation": "Efectul Taylor favorizează puterile apropiate de 1 în locul pătratelor pentru măsurarea volatilității persistente."
             }
         },
@@ -430,10 +430,10 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "title": "Efectul de levier",
                 "text": "Pentru S&P 500, corr(r_t, |r_{t+k}|) este -0,12 la k = 1 și aproape zero pentru k negativ. Ce înseamnă acest lucru?",
                 "options": [
-                    "Volatilitatea mare de azi prezice scăderi de preț mâine",
-                    "Randamentele sunt autocorelate",
+                    "Volatilitatea mare de azi prezice scăderi de preț mîine",
+                    "Randamentele sînt autocorelate",
                     "Volumul prezice randamentele",
-                    "Scăderile de preț de azi sunt urmate de volatilitate mai mare în zilele următoare"
+                    "Scăderile de preț de azi sînt urmate de volatilitate mai mare în zilele următoare"
                 ],
                 "correctExplanation": "O corelație negativă între randamentul de azi și randamentele absolute viitoare este efectul de levier; este specific piețelor de acțiuni.",
                 "incorrectExplanation": "Semnul și momentul (k > 0) arată că pierderile cresc volatilitatea viitoare."
@@ -485,7 +485,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "text": "Volumul anormal și randamentele absolute au corelația Spearman 0,25 (S&P 500) și 0,39 (Bitcoin). Ce teorie explică acest lucru?",
                 "options": [
                     "Ipoteza pieței eficiente în forma tare",
-                    "Ipoteza mixturii de distribuții: fluxul de informație determină atât volumul, cât și volatilitatea (Clark, 1973)",
+                    "Ipoteza mixturii de distribuții: fluxul de informație determină atît volumul, cît și volatilitatea (Clark, 1973)",
                     "Efectul de levier",
                     "Gaussianitatea prin agregare"
                 ],
@@ -544,7 +544,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Tratarea lor ca erori de cotare și folosirea cursului oficial de referință (sau curățarea explicită a cotațiilor)"
                 ],
                 "correctExplanation": "Salturile izolate care se inversează a doua zi creează autocorelație negativă falsă și umflă kurtosisul; cursurile oficiale de referință evită problema.",
-                "incorrectExplanation": "Salturile care se inversează imediat sunt erori de date, nu comportament al pieței."
+                "incorrectExplanation": "Salturile care se inversează imediat sînt erori de date, nu comportament al pieței."
             }
         },
         {
@@ -565,12 +565,12 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "title": "Piețe nelichide",
                 "text": "BET-TR are o autocorelație de ordin 1 pozitivă (0,06), iar S&P 500 are -0,08. Care este o explicație standard?",
                 "options": [
-                    "Tranzacționarea nesincronă a componentelor mai puțin lichide ale indicelui, astfel încât prețurile încorporează știrile în mai multe zile",
+                    "Tranzacționarea nesincronă a componentelor mai puțin lichide ale indicelui, astfel încît prețurile încorporează știrile în mai multe zile",
                     "Indicele BET-TR este calculat cu erori",
-                    "Investitorii români sunt iraționali",
-                    "Dividendele sunt reinvestite"
+                    "Investitorii români sînt iraționali",
+                    "Dividendele sînt reinvestite"
                 ],
-                "correctExplanation": "Când unele componente se tranzacționează rar, randamentele indicelui se ajustează cu întârziere, ceea ce induce autocorelație pozitivă (Campbell, Lo și MacKinlay, 1997, cap. 3).",
+                "correctExplanation": "Cînd unele componente se tranzacționează rar, randamentele indicelui se ajustează cu întîrziere, ceea ce induce autocorelație pozitivă (Campbell, Lo și MacKinlay, 1997, cap. 3).",
                 "incorrectExplanation": "Tranzacționarea rară și prețurile nesincrone explică autocorelația pozitivă a indicelui."
             }
         },
@@ -617,14 +617,14 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Tranzacționare nesincronă",
-                "text": "Randamentele log zilnice BET-TR și S&P 500 au corelația 0,31 în aceeași zi, 0,12 cu S&P 500 din ziua precedentă și 0,03 cu cel din ziua următoare (Bucureștiul închide înaintea New York-ului). Ce corelație ar trebui folosită pentru un portofoliu deținut o săptămână?",
+                "text": "Randamentele log zilnice BET-TR și S&P 500 au corelația 0,31 în aceeași zi, 0,12 cu S&P 500 din ziua precedentă și 0,03 cu cel din ziua următoare (Bucureștiul închide înaintea New York-ului). Ce corelație ar trebui folosită pentru un portofoliu deținut o săptămînă?",
                 "options": [
                     "0,31, corelația din aceeași zi",
                     "0,12, corelația cu decalaj",
                     "0,43, suma corelațiilor din aceeași zi și cu decalaj",
-                    "Corelația randamentelor săptămânale sincronizate (0,46), apropiată de 0,31 + 0,12 + 0,03, pentru că covarianța săptămânală adună covarianțele zilnice cu decalaj și avans"
+                    "Corelația randamentelor săptămînale sincronizate (0,46), apropiată de 0,31 + 0,12 + 0,03, pentru că covarianța săptămînală adună covarianțele zilnice cu decalaj și avans"
                 ],
-                "correctExplanation": "Știrile americane de după închiderea bursei din București ajung în BET-TR abia a doua zi, deci o parte din mișcarea comună apare la decalajul 1. O sumă de corelații zilnice nu este ea însăși o corelație (poate depăși 1); randamentele săptămânale sincronizate dau o corelație propriu-zisă, 0,46.",
+                "correctExplanation": "Știrile americane de după închiderea bursei din București ajung în BET-TR abia a doua zi, deci o parte din mișcarea comună apare la decalajul 1. O sumă de corelații zilnice nu este ea însăși o corelație (poate depăși 1); randamentele săptămînale sincronizate dau o corelație propriu-zisă, 0,46.",
                 "incorrectExplanation": "Închiderile nesincrone împart reacția comună pe mai multe zile; folosiți randamente sincronizate la orizontul portofoliului."
             }
         },
@@ -698,11 +698,11 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Găsiți eroarea AI: Ljung–Box pe randamentele la pătrat",
-                "text": "Un asistent AI scrie: „Testul Ljung–Box pe randamentele zilnice la pătrat dă Q(10) = 714, p < 0,001: randamentele sunt autocorelate, deci indicele este predictibil.” Ce este greșit?",
+                "text": "Un asistent AI scrie: „Testul Ljung–Box pe randamentele zilnice la pătrat dă Q(10) = 714, p < 0,001: randamentele sînt autocorelate, deci indicele este predictibil.” Ce este greșit?",
                 "options": [
                     "Ljung–Box are nevoie de cel puțin 50 de laguri ca să fie valid",
                     "Un p-value sub 0,001 înseamnă că ipoteza nulă este adevărată",
-                    "Randamentele la pătrat nu pot fi folosite în niciun test, pentru că sunt mereu pozitive",
+                    "Randamentele la pătrat nu pot fi folosite în niciun test, pentru că sînt mereu pozitive",
                     "Testul pe r² detectează gruparea volatilității; autocorelația randamentelor se testează pe r, cu versiunea robustă"
                 ],
                 "correctExplanation": "Dependența în r² înseamnă volatilitate grupată: randamentele pot fi necorelate, iar pătratele lor nu. Predictibilitatea randamentelor se testează cu Ljung–Box pe r, în versiunea robustă la heteroscedasticitate.",
