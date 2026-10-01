@@ -741,7 +741,7 @@ def fig_market_history(lang='en'):
           (1792, 'Panic\n1792' if not ro else 'Panica\n1792', 1), (1873, '1873', 0), (1929, '1929', 1),
           (1987, '1987', 0), (2008, '2008', 1), (2020, '2020', 2)]
     rows = [('Exchanges and traded securities' if not ro else 'Burse și titluri tranzacționate', MainBlue, ex),
-            ('Bubbles, panics and crashes' if not ro else 'Bule, panici și prăbușiri', IDAred, cr)]
+            ('Bubbles, panics and crashes' if not ro else 'Bule, panici și crahuri', IDAred, cr)]
     fig, ax = plt.subplots(figsize=(5.5, 2.2))
     _timeline(ax, rows, 1250, 2035, levels=(0.18, -0.18, 0.42, -0.42), fs=7)
     ax.set_ylim(-1.6, 0.85)
