@@ -160,13 +160,13 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "title": "Critica lui Evans",
                 "text": "Ce a arătat Evans (1991) despre bulele care se prăbușesc periodic?",
                 "options": [
-                    "Un test de rădăcină unitară pe toată selecția adesea nu le detectează, pentru că prăbușirile fac seria să pară că revine la medie",
+                    "Un test de rădăcină unitară pe toată selecția adesea nu le detectează, pentru că colapsurile fac seria să pară că revine la medie",
                     "Fac prețurile staționare în nivel",
                     "Pot apărea doar la criptomonede",
                     "Sunt mereu detectate de testul Jarque-Bera"
                 ],
-                "correctExplanation": "Prăbușirile readuc prețul în jos de mai multe ori, așa că un singur test pe toată selecția caută o singură rădăcină explozivă și le ratează pe cele scurte.",
-                "incorrectExplanation": "Problema este puterea testului: o regresie pe toată selecția amestecă fazele explozive cu prăbușirile, ceea ce motivează ferestrele recursive și mobile."
+                "correctExplanation": "Colapsurile readuc prețul în jos de mai multe ori, așa că un singur test pe toată selecția caută o singură rădăcină explozivă și le ratează pe cele scurte.",
+                "incorrectExplanation": "Problema este puterea testului: o regresie pe toată selecția amestecă fazele explozive cu colapsurile, ceea ce motivează ferestrele recursive și mobile."
             }
         },
         {
@@ -192,7 +192,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "SADF fixează începutul ferestrei la prima observație; GSADF mută și începutul, și sfârșitul",
                     "SADF permite lag-uri, GSADF nu"
                 ],
-                "correctExplanation": "SADF ia supremul pe ferestre care cresc de la observația 1; GSADF mută și începutul, ceea ce îi dă putere împotriva unei a doua bule după o prăbușire.",
+                "correctExplanation": "SADF ia supremul pe ferestre care cresc de la observația 1; GSADF mută și începutul, ceea ce îi dă putere împotriva unei a doua bule după un colaps.",
                 "incorrectExplanation": "Ambele sunt supremuri ale statisticii ADF la dreapta; diferă prin mulțimea ferestrelor: doar ferestre care cresc (SADF) sau toate ferestrele mai lungi decât minimul (GSADF)."
             }
         },
@@ -271,7 +271,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Pentru că elimină nevoia de date",
                     "Pentru că schimbările de volatilitate distorsionează rata efectivă de respingere a ipotezei nule, iar wild bootstrap păstrează heteroscedasticitatea datelor",
                     "Pentru că face testul bilateral",
-                    "Pentru că estimează momentul critic al prăbușirii"
+                    "Pentru că estimează momentul critic al crahului"
                 ],
                 "correctExplanation": "Valorile critice Monte Carlo presupun șocuri homoscedastice; wild bootstrap înmulțește variațiile observate cu semne aleatoare, deci ipoteza nulă păstrează tiparul de volatilitate al datelor.",
                 "incorrectExplanation": "Schimbările de volatilitate, frecvente la cripto și în crize, pot produce respingeri false; reeșantionarea cu semne aleatoare le păstrează sub ipoteza nulă."
@@ -351,7 +351,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "options": [
                     "Elimină oscilațiile",
                     "Face patru parametri liniari, astfel încât doar tc, m și omega se caută neliniar",
-                    "Garantează data prăbușirii",
+                    "Garantează data crahului",
                     "Transformă modelul într-un GARCH"
                 ],
                 "correctExplanation": "Scriind C cos(...) ca C1 cos(omega ln(tc - t)) + C2 sin(omega ln(tc - t)), A, B, C1, C2 devin liniari; pentru (tc, m, omega) dați se obțin prin metoda celor mai mici pătrate.",
@@ -405,7 +405,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "options": [
                     "R-pătrat-ul unei ajustări LPPLS",
                     "Ponderea ferestrelor de estimare care se termină la t2 a căror ajustare trece filtrul de calificare",
-                    "Probabilitatea unei prăbușiri mâine",
+                    "Probabilitatea unui crah mâine",
                     "Valoarea p a testului GSADF"
                 ],
                 "correctExplanation": "Se ajustează multe ferestre [t2 - L, t2]; indicatorul este fracția celor ai căror parametri sunt în intervalele admise, o măsură a robusteții semnalului de bulă.",
@@ -490,7 +490,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Avea un randament mediu mai mare, pe lângă o volatilitate mai mare"
                 ],
                 "correctExplanation": "Pentru Nasdaq 100, regimul cu volatilitate mare are o medie negativă; pentru Bitcoin, regimul cu volatilitate mare are și randamentul mediu mai mare: și perioadele de creștere sunt turbulente.",
-                "incorrectExplanation": "La acțiuni, turbulența înseamnă de obicei prețuri în scădere; la Bitcoin, regimul volatil conține atât creșterile rapide, cât și prăbușirile."
+                "incorrectExplanation": "La acțiuni, turbulența înseamnă de obicei prețuri în scădere; la Bitcoin, regimul volatil conține atât creșterile rapide, cât și crahurile."
             }
         },
         {
@@ -511,13 +511,13 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "title": "Bubbles for Fama",
                 "text": "Ce prezic creșterile bruște ale unei industrii, după Greenwood, Shleifer și You și după replicarea din acest capitol pe cele 48 de industrii ale lor?",
                 "options": [
-                    "O prăbușire sigură în doi ani",
+                    "Un crah sigur în doi ani",
                     "O volatilitate mai mică",
                     "O probabilitate mai mare a unei scăderi de 40%, dar nu un randament mediu semnificativ negativ",
                     "Nimic"
                 ],
-                "correctExplanation": "Creșterile de peste 100% ridică probabilitatea unei prăbușiri mult peste rata necondiționată, în timp ce randamentul mediu ulterior nu este semnificativ negativ: creșterile nu sunt singure un semnal de vânzare.",
-                "incorrectExplanation": "Dovezile privesc probabilitatea de prăbușire, nu pierderi previzibile în medie; multe creșteri continuă."
+                "correctExplanation": "Creșterile de peste 100% ridică probabilitatea unui crah mult peste rata necondiționată, în timp ce randamentul mediu ulterior nu este semnificativ negativ: creșterile nu sunt singure un semnal de vânzare.",
+                "incorrectExplanation": "Dovezile privesc probabilitatea de crah, nu pierderi previzibile în medie; multe creșteri continuă."
             }
         },
         {
@@ -592,13 +592,13 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "title": "Lecția timpului real",
                 "text": "Pentru Nasdaq 100 (2000), Bitcoin (2017) și GameStop (2021), ce a oferit datarea BSADF în timp real?",
                 "options": [
-                    "O predicție exactă a datei prăbușirii",
-                    "Un avertisment timpuriu că prețurile erau explozive, adesea cu luni înainte de vârf, dar nu momentul prăbușirii",
-                    "Niciun semnal înainte de prăbușire",
-                    "Un semnal doar după prăbușire"
+                    "O predicție exactă a datei crahului",
+                    "Un avertisment timpuriu că prețurile erau explozive, adesea cu luni înainte de vârf, dar nu momentul crahului",
+                    "Niciun semnal înainte de crah",
+                    "Un semnal doar după crah"
                 ],
                 "correctExplanation": "Chiar datat la confirmare (după L depășiri consecutive), avertismentul a venit înaintea vârfului, cu luni înainte pentru Nasdaq 100 și Bitcoin și cu zile înainte pentru GameStop; testele spun că piața este într-o fază explozivă, nu când se va termina.",
-                "incorrectExplanation": "Testele de explozivitate sunt instrumente de monitorizare: utile pentru gestiunea riscului, nu un mijloc de a anticipa momentul prăbușirii."
+                "incorrectExplanation": "Testele de explozivitate sunt instrumente de monitorizare: utile pentru gestiunea riscului, nu un mijloc de a anticipa momentul crahului."
             }
         },
         {

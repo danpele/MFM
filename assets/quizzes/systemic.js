@@ -679,7 +679,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "MES trebuie raportat ca număr negativ"
                 ],
                 "correctExplanation": "Deficitul marginal așteptat măsoară pierderea așteptată a băncii în cele mai proaste zile ale pieței: MES = beta x ES_5%(X_m) = rho x sigma_i x phi(1,645)/0,05 = 2,58%. O verificare rapidă: cu rho = 0 MES trebuie să fie 0, dar formula AI-ului nu îl conține pe rho.",
-                "incorrectExplanation": "Evenimentul de condiționare este o prăbușire a pieței, nu o zi proastă a băncii: MES = -E[X_i | X_m <= q_5%(X_m)], care depinde de corelație și aici este 2,58%."
+                "incorrectExplanation": "Evenimentul de condiționare este un crah al pieței, nu o zi proastă a băncii: MES = -E[X_i | X_m <= q_5%(X_m)], care depinde de corelație și aici este 2,58%."
             }
         },
         {

@@ -437,7 +437,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "GARCH nu poate fi estimat pe 26 de ani"
                 ],
                 "correctExplanation": "În cazul BET, parametrii din tot eșantionul au dat 1,31% depășiri, față de 1,47% pentru varianta în timp real.",
-                "incorrectExplanation": "Orice prognoză pentru ziua t trebuie să folosească doar datele până la t-1; estimările pe tot eșantionul au văzut deja prăbușirile."
+                "incorrectExplanation": "Orice prognoză pentru ziua t trebuie să folosească doar datele până la t-1; estimările pe tot eșantionul au văzut deja crahurile."
             }
         },
         {
@@ -572,7 +572,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Varianța implicită minus varianța realizată ulterior; pozitivă în cele mai multe zile"
                 ],
                 "correctExplanation": "Prima propriu-zisă este E_Q[RV_{t,t+21}] - E_P[RV_{t,t+21}]; măsura ei ex post este VRP_t = VIX_t^2 - RV_{t,t+21}, cu ambele varianțe pe același orizont de 21 de zile și în aceleași unități (anualizate, în %^2). Ea include și eroarea de prognoză a RV; pentru S&P 500 a fost pozitivă în 86% din zile.",
-                "incorrectExplanation": "Cumpărătorii de opțiuni plătesc pentru protecție, deci varianța implicită depășește de obicei varianța care urmează, cu excepția prăbușirilor."
+                "incorrectExplanation": "Cumpărătorii de opțiuni plătesc pentru protecție, deci varianța implicită depășește de obicei varianța care urmează, cu excepția crahurilor."
             }
         },
         {

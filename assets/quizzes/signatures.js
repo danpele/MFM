@@ -645,7 +645,7 @@ window.MFM_DATA.quizzes['signatures'] = {
             },
             "ro": {
                 "title": "De ce nu au ajutat ponderile nucleului",
-                "text": "În prăbușirea COVID-19, ponderile nucleului au rămas aproape plate și chiar au redus ponderea ferestrelor de stres trecute. Care este motivul principal?",
+                "text": "În crahul COVID-19, ponderile nucleului au rămas aproape plate și chiar au redus ponderea ferestrelor de stres trecute. Care este motivul principal?",
                 "options": [
                     "Fereastra mobilă era prea scurtă pentru a conține vreo perioadă de stres",
                     "Nucleul a fost calculat cu semnul greșit",

@@ -131,7 +131,7 @@
         'ml': { src: 'charts/ch13_deflated_sharpe.png', en: 'Deflated Sharpe ratio and the number of trials', ro: 'Deflated Sharpe Ratio și numărul de încercări' },
         'tsfm': { src: 'charts/ch14_fan_chart.png', en: 'Chronos-2 zero-shot volatility forecast', ro: 'Prognoza zero-shot a volatilității cu Chronos-2' },
         'llm': { src: 'charts/ch15_event_study.png', en: 'News sentiment: event study around headlines', ro: 'Sentimentul știrilor: studiu de eveniment în jurul titlurilor' },
-        'digital-assets': { src: 'charts/ch16_ust_collapse.png', en: 'The collapse of TerraUSD, May 2022', ro: 'Prăbușirea TerraUSD, mai 2022' },
+        'digital-assets': { src: 'charts/ch16_ust_collapse.png', en: 'The collapse of TerraUSD, May 2022', ro: 'Colapsul TerraUSD, mai 2022' },
         'bubbles': { src: 'charts/ch17_lppls_btc2017.png', en: 'LPPLS on the 2017 Bitcoin bubble', ro: 'LPPLS pe bula Bitcoin din 2017' },
         'systemic': { src: 'charts/ch18_spill_network.png', en: 'Volatility spillover network of US, European and Romanian banks', ro: 'Rețeaua de contagiune a volatilității: bănci din SUA, Europa și România' },
         'signatures': { src: 'charts/ch20_qlike_ratio.png', en: 'Out-of-sample QLIKE relative to HAR across 50 VOLARE assets', ro: 'QLIKE în afara eșantionului față de HAR pe 50 de active VOLARE' },

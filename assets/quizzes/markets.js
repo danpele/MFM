@@ -459,11 +459,11 @@ window.MFM_DATA.quizzes['markets'] = {
                 "options": [
                     "Stablecoin-urile au fost interzise la nivel mondial",
                     "Fed a emis un dolar digital",
-                    "Oferta s-a contractat după prăbușirea stablecoin-ului algoritmic TerraUSD și în timpul declinului cripto din 2022",
+                    "Oferta s-a contractat după colapsul stablecoin-ului algoritmic TerraUSD și în timpul declinului cripto din 2022",
                     "Nimic: cifrele se referă la monede diferite"
                 ],
-                "correctExplanation": "Scăderea din 2022 a urmat prăbușirii TerraUSD și declinului general al pieței cripto; oferta a revenit apoi la circa 308 mld. USD în septembrie 2026.",
-                "incorrectExplanation": "Oferta s-a redus după prăbușirea TerraUSD și declinul cripto din 2022, apoi și-a revenit."
+                "correctExplanation": "Scăderea din 2022 a urmat colapsului TerraUSD și declinului general al pieței cripto; oferta a revenit apoi la circa 308 mld. USD în septembrie 2026.",
+                "incorrectExplanation": "Oferta s-a redus după colapsul TerraUSD și declinul cripto din 2022, apoi și-a revenit."
             }
         },
         {

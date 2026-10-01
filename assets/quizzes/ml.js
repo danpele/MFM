@@ -490,7 +490,7 @@ window.MFM_DATA.quizzes['ml'] = {
                     'Mai multe configurații ar fi rezolvat problema'
                 ],
                 correctExplanation: 'Sharpe-urile in-sample și out-of-sample sunt slab legate (corelație Spearman 0,18), deci ierarhizarea după backtest este în mare parte ierarhizare după noroc.',
-                incorrectExplanation: 'Prăbușirea de la 1,89 la 0,02 este semnătura clasică a overfitting-ului de backtest în condiții de testare multiplă.'
+                incorrectExplanation: 'Scăderea bruscă de la 1,89 la 0,02 este semnătura clasică a overfitting-ului de backtest în condiții de testare multiplă.'
             }
         },
         {

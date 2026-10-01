@@ -30,7 +30,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Pătratul volatilității implicite la bani",
                     "E^P[RV]/T, varianța realizată așteptată anualizată sub probabilitatea reală"
                 ],
-                "correctExplanation": "(VIX/100)^2 = E^Q[-2 ln(S_T/F)]/T pentru un continuum de prețuri de exercitare (indicele VIX este de 100 de ori rădăcina ei pătrată). Lema lui Itô face contractul logaritmic egal cu varianța integrată doar pentru traiectorii continue; cu salturi J diferența este 2E^Q[sum(e^J - 1 - J - J^2/2)], aproximativ E^Q[sum J^3]/3, negativă pentru prăbușiri (-2,0% din varianță în exemplul Merton din curs).",
+                "correctExplanation": "(VIX/100)^2 = E^Q[-2 ln(S_T/F)]/T pentru un continuum de prețuri de exercitare (indicele VIX este de 100 de ori rădăcina ei pătrată). Lema lui Itô face contractul logaritmic egal cu varianța integrată doar pentru traiectorii continue; cu salturi J diferența este 2E^Q[sum(e^J - 1 - J - J^2/2)], aproximativ E^Q[sum J^3]/3, negativă pentru crahuri (-2,0% din varianță în exemplul Merton din curs).",
                 "incorrectExplanation": "Banda evaluează contractul logaritmic. Acesta este egal cu variația pătratică așteptată doar fără salturi și este o speranță sub măsura de evaluare Q, nu sub măsura reală."
             }
         },
@@ -295,12 +295,12 @@ window.MFM_DATA.quizzes['options'] = {
                 "title": "Asimetria acțiunilor",
                 "text": "De ce put-urile cu preț de exercitare mic pe indici bursieri sunt mai scumpe, în volatilitate implicită, decât opțiunile la bani?",
                 "options": [
-                    "Cozi stângi groase, volatilitate care crește când prețurile scad și cererea de asigurare împotriva prăbușirilor",
+                    "Cozi stângi groase, volatilitate care crește când prețurile scad și cererea de asigurare împotriva crahurilor",
                     "Pentru că put-urile costă întotdeauna mai mult decât call-urile",
                     "Din cauza ratei dobânzii",
                     "Pentru că Black-Scholes presupune asimetrie negativă"
                 ],
-                "correctExplanation": "Cozile stângi grele, efectul de levier și prima pentru riscul de prăbușire ridică toate prețul put-urilor cu preț de exercitare mic.",
+                "correctExplanation": "Cozile stângi grele, efectul de levier și prima pentru riscul de crah ridică toate prețul put-urilor cu preț de exercitare mic.",
                 "incorrectExplanation": "Asimetria nu este o proprietate a modelului Black-Scholes, care implică un zâmbet plat; ea vine din distribuția randamentelor și din primele de risc."
             }
         },
@@ -427,15 +427,15 @@ window.MFM_DATA.quizzes['options'] = {
                 "incorrectExplanation": "Risk-neutral probabilities are prices of insurance, not forecasts; the comparison shows how much heavier the priced tail is than the log-normal one."
             },
             "ro": {
-                "title": "Coada de prăbușire Bitcoin",
+                "title": "Coada de crah Bitcoin",
                 "text": "Pentru scadența Bitcoin cea mai apropiată de 30 de zile, probabilitatea neutră la risc SVI a unei scăderi de peste 30% a fost 1,2% față de 0,1% sub densitatea log-normală. Ce arată acest lucru?",
                 "options": [
-                    "Că densitatea log-normală supraestimează riscul de prăbușire",
-                    "Că piața evaluează asigurarea împotriva prăbușirii mult peste ce implică Black-Scholes cu o singură volatilitate",
-                    "Că o prăbușire va avea loc cu probabilitatea 1,2%",
+                    "Că densitatea log-normală supraestimează riscul de crah",
+                    "Că piața evaluează asigurarea împotriva crahului mult peste ce implică Black-Scholes cu o singură volatilitate",
+                    "Că un crah va avea loc cu probabilitatea 1,2%",
                     "Că estimarea SVI este greșită"
                 ],
-                "correctExplanation": "Coada densității neutre la risc este de câteva ori mai grea decât cea log-normală: coada prăbușirilor este locul unde Black-Scholes greșește cel mai mult.",
+                "correctExplanation": "Coada densității neutre la risc este de câteva ori mai grea decât cea log-normală: coada crahurilor este locul unde Black-Scholes greșește cel mai mult.",
                 "incorrectExplanation": "Probabilitățile neutre la risc sunt prețuri ale asigurării, nu prognoze; comparația arată cât de grea este coada evaluată față de cea log-normală."
             }
         },
@@ -511,12 +511,12 @@ window.MFM_DATA.quizzes['options'] = {
                 "title": "Prima de risc a varianței",
                 "text": "În 1990-2026 media VIX a fost 19,4, iar media volatilității realizate în următoarele 21 de zile 15,3. Ce este prima de risc a varianței?",
                 "options": [
-                    "Varianța implicită minus varianța realizată ulterior; pozitivă în medie, negativă în prăbușiri",
+                    "Varianța implicită minus varianța realizată ulterior; pozitivă în medie, negativă în crahuri",
                     "Varianța realizată minus varianța implicită; mereu pozitivă",
                     "Diferența dintre VIX și VVIX",
                     "Prima unui call la bani"
                 ],
-                "correctExplanation": "VRP = VIX^2 - RV: pozitivă în 86% din zile, în medie aproximativ 4,1 puncte de volatilitate, cu valori negative mari în prăbușiri.",
+                "correctExplanation": "VRP = VIX^2 - RV: pozitivă în 86% din zile, în medie aproximativ 4,1 puncte de volatilitate, cu valori negative mari în crahuri.",
                 "incorrectExplanation": "Prima este varianța implicită minus cea realizată: cumpărătorii de varianță o plătesc ca asigurare împotriva turbulențelor."
             }
         },
@@ -647,11 +647,11 @@ window.MFM_DATA.quizzes['options'] = {
                 "text": "Ce încasează și ce plătește vânzătorul unui swap de varianță?",
                 "options": [
                     "Încasează varianța realizată, plătește un preț de exercitare fix",
-                    "Încasează un preț de exercitare fix (varianța implicită), plătește varianța realizată: câștiguri mici în majoritatea lunilor, pierderi mari în prăbușiri",
+                    "Încasează un preț de exercitare fix (varianța implicită), plătește varianța realizată: câștiguri mici în majoritatea lunilor, pierderi mari în crahuri",
                     "Încasează nivelul VIX în puncte, nu plătește nimic",
                     "Încasează dividendele indicelui"
                 ],
-                "correctExplanation": "Plata pentru vânzător este notional înmulțit cu (prețul de exercitare minus varianța realizată); varianța realizată explodează în prăbușiri, deci pierderile sunt convexe.",
+                "correctExplanation": "Plata pentru vânzător este notional înmulțit cu (prețul de exercitare minus varianța realizată); varianța realizată explodează în crahuri, deci pierderile sunt convexe.",
                 "incorrectExplanation": "Vânzătorul de varianță a vândut o asigurare împotriva volatilității: prețul de exercitare se fixează la început, varianța realizată se plătește la final."
             }
         },

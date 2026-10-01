@@ -13,7 +13,7 @@ inference17.py -- inferenta pentru afirmatiile in timp real din Capitolul 17 (MF
   4. regimes_test()   -- numarul de regimuri Markov: LR 1 vs 2 regimuri (Bitcoin, Nasdaq 100) si 2 vs 3 regimuri
                          (Bitcoin), cu distributia nula prin bootstrap parametric (Hansen 1992; Carrasco, Hu &
                          Ploberger 2014: testul LR nu are distributie chi-patrat).
-  5. gsy_ess()        -- marimea efectiva a esantionului pentru probabilitatea de prabusire dupa cresteri > 100%.
+  5. gsy_ess()        -- marimea efectiva a esantionului pentru probabilitatea de crah dupa cresteri > 100%.
 Rezultate: inference17.json; grafice: ch17_fwer_btc, ch17_ms_lr.
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """

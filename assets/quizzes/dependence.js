@@ -324,7 +324,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                 text: 'Corelația DCC medie dintre Bitcoin și SPY a fost 0,04 înainte de 2020 și 0,31 după. Ce implică acest lucru?',
                 options: [
                     'Bitcoin și-a pierdut mare parte din valoarea de diversificare pentru investitorii în acțiuni după 2020',
-                    'Bitcoin a devenit un hedge împotriva prăbușirilor bursiere',
+                    'Bitcoin a devenit un hedge împotriva crahurilor bursiere',
                     'Corelația este constantă, deci nu s-a schimbat nimic',
                     'Bitcoin și acțiunile au devenit perfect corelate'
                 ],
@@ -566,13 +566,13 @@ window.MFM_DATA.quizzes['dependence'] = {
                 title: 'Pierderi comune',
                 text: 'Pentru pierderile zilnice BET și Euro Stoxx 50 (L = −randamente), Gumbel nu este respinsă (p = 0,23), iar Clayton este (p = 0,005). De ce?',
                 options: [
-                    'Prăbușirile comune se află în colțul superior al copulei pierderilor, unde Gumbel are dependență în cozi, iar Clayton nu',
+                    'Crahurile comune se află în colțul superior al copulei pierderilor, unde Gumbel are dependență în cozi, iar Clayton nu',
                     'Clayton nu poate fi estimată pe pierderi',
                     'Gumbel este întotdeauna mai bună decât Clayton',
                     'Pierderile sunt independente'
                 ],
-                correctExplanation: 'Gumbel pe pierderi surprinde prăbușirile comune (λU = 0,26); Clayton pune dependența în colțul câștigurilor comune.',
-                incorrectExplanation: 'Coada superioară a pierderilor conține prăbușirile comune; doar Gumbel pune dependența acolo.'
+                correctExplanation: 'Gumbel pe pierderi surprinde crahurile comune (λU = 0,26); Clayton pune dependența în colțul câștigurilor comune.',
+                incorrectExplanation: 'Coada superioară a pierderilor conține crahurile comune; doar Gumbel pune dependența acolo.'
             }
         },
         {
@@ -652,7 +652,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     'Dovezi modeste și fragile: intervalul conține zero, iar creșterea este concentrată în anii de criză',
                     'Corelația nu s-a schimbat deloc'
                 ],
-                correctExplanation: 'Estimarea punctuală crește, dar intervalul conține zero, excluderea săptămânilor prăbușirii din 2020 o reduce, iar dependența în coada inferioară nu a crescut.',
+                correctExplanation: 'Estimarea punctuală crește, dar intervalul conține zero, excluderea săptămânilor crahului din 2020 o reduce, iar dependența în coada inferioară nu a crescut.',
                 incorrectExplanation: 'Schimbarea nu este semnificativă la 5% și depinde de săptămânile de criză.'
             }
         },
@@ -672,7 +672,7 @@ window.MFM_DATA.quizzes['dependence'] = {
             },
             ro: {
                 title: "Găsiți eroarea: cozile copulei Gaussiene",
-                text: "Un asistent AI scrie: „O copulă Gaussiană cu corelația rho = 0,7 are dependența în coada inferioară lambda_L = rho^2 = 0,49, deci surprinde bine prăbușirile comune.” Care este eroarea?",
+                text: "Un asistent AI scrie: „O copulă Gaussiană cu corelația rho = 0,7 are dependența în coada inferioară lambda_L = rho^2 = 0,49, deci surprinde bine crahurile comune.” Care este eroarea?",
                 options: [
                     "Dependența în coada inferioară a copulei Gaussiene este rho, nu rho^2",
                     "Copula Gaussiană are dependență în coada superioară, dar nu și în cea inferioară",
@@ -680,7 +680,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     "Dependența în cozi se poate calcula doar pentru copulele arhimediene"
                 ],
                 correctExplanation: "Copula Gaussiană este asimptotic independentă în ambele cozi: lambda_L = lambda_U = 0 pentru rho < 1. Extremele comune la un prag fixat apar totuși (pentru rho = 0,7, P(V ≤ 0,01 | U ≤ 0,01) ≈ 0,27), dar o dependență în cozi pozitivă la limită cere de exemplu o copulă t (simetrică) sau o copulă Clayton (coada inferioară).",
-                incorrectExplanation: "Nicio formulă pozitivă în rho nu este corectă aici: copula Gaussiană are lambda_L = lambda_U = 0 pentru orice rho < 1, deci prăbușirile comune devin asimptotic independente."
+                incorrectExplanation: "Nicio formulă pozitivă în rho nu este corectă aici: copula Gaussiană are lambda_L = lambda_U = 0 pentru orice rho < 1, deci crahurile comune devin asimptotic independente."
             }
         },
         {

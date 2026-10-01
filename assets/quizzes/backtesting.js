@@ -624,7 +624,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "HS presupune distribuția Normală",
                     "FHS ignoră cele mai mari pierderi"
                 ],
-                "correctExplanation": "HS se actualizează pe măsură ce zilele intră și ies din fereastra de 1000 de zile, dar nu are scalare cu volatilitatea curentă, deci se adaptează lent; FHS înmulțește cuantilele empirice standardizate cu volatilitatea prognozată azi, deci se adaptează aproape imediat la prăbușire.",
+                "correctExplanation": "HS se actualizează pe măsură ce zilele intră și ies din fereastra de 1000 de zile, dar nu are scalare cu volatilitatea curentă, deci se adaptează lent; FHS înmulțește cuantilele empirice standardizate cu volatilitatea prognozată azi, deci se adaptează aproape imediat la crah.",
                 "incorrectExplanation": "Condiționarea pe volatilitatea curentă, nu forma cozii, a făcut diferența."
             }
         },
