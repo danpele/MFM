@@ -77,7 +77,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
             },
             "ro": {
                 "title": "Lambda ca pantă de regresie",
-                "text": "Într-o economie Kyle cu sigma_v = 2 și sigma_u = 10.000, regresați p - p_0 pe fluxul de ordine cu semn y, pe multe licitații independente. Panta în populație este...",
+                "text": "În modelul Kyle cu sigma_v = 2 și sigma_u = 10.000, regresați p - p_0 pe fluxul de ordine cu semn y, pe multe licitații independente. Panta în populație este...",
                 "options": [
                     "beta = 5.000",
                     "sigma_v/sigma_u = 0,0002",
@@ -211,7 +211,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "incorrectExplanation": "The formula 2 sqrt(-Cov) needs a non-positive sample covariance for a real-valued result. Positive sample values can arise from sampling error even when the Roll model holds, or from departures from its assumptions (trends, stale prices)."
             },
             "ro": {
-                "title": "Cînd Roll eșuează",
+                "title": "Cînd estimatorul Roll nu funcționează",
                 "text": "Ce dă estimatorul Roll cînd autocovarianța de selecție a variațiilor de preț este pozitivă?",
                 "options": [
                     "Un spread negativ",
@@ -220,7 +220,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Nicio estimare: rădăcina pătrată a unui număr negativ nu există"
                 ],
                 "correctExplanation": "Cu autocovarianță pozitivă, -Cov este negativă și estimatorul nu este definit.",
-                "incorrectExplanation": "Formula 2 sqrt(-Cov) cere o covarianță de selecție nepozitivă pentru un rezultat real. Valorile de selecție pozitive pot apărea din eroarea de selecție chiar cînd modelul Roll este adevărat sau din abateri de la ipotezele lui (tendințe, prețuri vechi)."
+                "incorrectExplanation": "Formula 2 sqrt(-Cov) cere o covarianță de selecție nepozitivă pentru un rezultat real. Valorile de selecție pozitive pot apărea din eroarea de selecție chiar cînd modelul Roll este adevărat sau din abateri de la ipotezele lui (tendințe, prețuri învechite)."
             }
         },
         {
@@ -347,7 +347,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
             },
             "ro": {
                 "title": "Estimarea PIN",
-                "text": "Estimările PIN prin verosimilitate maximă pentru acțiuni foarte lichide (mii de tranzacții pe zi) se adună adesea la valori de frontieră. Motivul numeric principal este...",
+                "text": "Estimările PIN prin verosimilitate maximă pentru acțiuni foarte lichide (mii de tranzacții pe zi) ajung adesea la limitele domeniului parametrilor. Motivul numeric principal este...",
                 "options": [
                     "PIN nu este identificată pentru nicio acțiune",
                     "Tranzacționarea informată lipsește la acțiunile lichide",
@@ -597,7 +597,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "egal cu prețul de mijloc, fiindcă spread-ul este simetric",
                     "independent de volatilitatea sigma"
                 ],
-                "correctExplanation": "Cu q > 0, r < s: deținerea a mai mult activ riscant îi scade valoarea pentru ea, deci ambele cotații coboară, ca să atragă cumpărători și să descurajeze vînzătorii.",
+                "correctExplanation": "Cu q > 0, r < s: cu cît deține mai mult din activul riscant, cu atît îl evaluează mai jos, deci ambele cotații coboară, ca să atragă cumpărători și să descurajeze vînzătorii.",
                 "incorrectExplanation": "Termenul de stoc q gamma sigma^2 (T - t) se scade din prețul de mijloc și crește cu volatilitatea și cu timpul rămas."
             }
         },

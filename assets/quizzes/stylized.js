@@ -27,7 +27,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "options": [
                     "Nimic: p-valoarea este invalidă pentru că momentul de ordin opt al randamentelor este infinit",
                     "Că randamentele sînt corelate serial",
-                    "Că ipoteza nulă comună ,,randamente i.i.d. din distribuția Normală'' este respinsă; testul singur nu spune dacă cade distribuția marginală sau independența",
+                    "Că ipoteza nulă comună ,,randamente i.i.d. din distribuția Normală'' este respinsă; testul singur nu arată dacă este încălcată ipoteza despre distribuția marginală sau cea de independență",
                     "Că randamentele au varianță infinită"
                 ],
                 "correctExplanation": "Limita chi-pătrat(2) este derivată sub ipoteza nulă a randamentelor i.i.d. din distribuția Normală, în care toate momentele există, deci p-valoarea este validă pentru această ipoteză. Cozile groase din alternativă fac ca JB să crească cu T: aceasta este puterea testului. Dependența (GARCH) este un alt motiv de respingere; pentru a testa distribuția marginală a unei serii de timp folosiți teste studentizate HAC (Bai și Ng, 2005) și raportați măsuri bazate pe cuantile și indicele de coadă.",
@@ -273,7 +273,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Randamentele nu au deloc varianță",
                     "Cozile sînt mai subțiri decît cele ale distribuției Normale"
                 ],
-                "correctExplanation": "Cu cozi de tip lege de putere, momentele există doar pînă la un ordin mai mic decît alpha: varianța cere alpha > 2, kurtosisul alpha > 4. Kurtosisul de selecție depinde atunci mult de cîteva zile extreme. (O distribuție Student-t estimată dă un indice de coadă bazat pe model, valid doar dacă Student-t potrivește împreună centrul și cozile.)",
+                "correctExplanation": "Cu cozi de tip lege de putere, momentele există doar pînă la un ordin mai mic decît alpha: varianța cere alpha > 2, kurtosisul alpha > 4. Kurtosisul de selecție depinde atunci mult de cîteva zile extreme. (O distribuție Student-t estimată dă un indice de coadă bazat pe model, valid doar dacă Student-t descrie bine atît partea centrală, cît și cozile.)",
                 "incorrectExplanation": "Un indice de coadă între 2 și 4 înseamnă varianță finită, dar un moment de ordin patru foarte probabil inexistent."
             }
         },
@@ -301,7 +301,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Cuantilele nu pot măsura asimetria"
                 ],
                 "correctExplanation": "Asimetria cîștig/pierdere este tipică acțiunilor; la un curs valutar direcția „pierderii” depinde de punctul de vedere, iar aici deprecierile leului sînt variațiile mai mari.",
-                "incorrectExplanation": "Asimetria este specifică pieței: acțiunile se prăbușesc, leul se depreciază în salturi."
+                "incorrectExplanation": "Asimetria este specifică pieței: acțiunile au scăderi bruște, leul se depreciază în salturi."
             }
         },
         {
@@ -489,7 +489,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Efectul de levier",
                     "Gaussianitatea prin agregare"
                 ],
-                "correctExplanation": "Într-un proces subordonat, randamentele evoluează într-un timp de afaceri aleator, determinat de sosirea informației, care crește și volumul tranzacționat.",
+                "correctExplanation": "Într-un proces subordonat, randamentele evoluează într-un timp operațional aleator, determinat de sosirea informației, care crește și volumul tranzacționat.",
                 "incorrectExplanation": "Volumul aproximează fluxul de informație care determină volatilitatea."
             }
         },
@@ -597,7 +597,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "S&P 500 nu are volatilitate intraday",
                     "Estimatorul închidere-închidere folosește o fereastră mai lungă"
                 ],
-                "correctExplanation": "Range-ul zilnic surprinde doar variația din timpul zilei; salturile de peste noapte fac parte din randamentele închidere-închidere, dar nu din range. Yang-Zhang le readaugă, dar pe indice ajunge doar la 13,9%, pentru că deschiderea indicelui este parțial veche (16,8% pe ETF-ul SPY).",
+                "correctExplanation": "Range-ul zilnic surprinde doar variația din timpul zilei; salturile de peste noapte fac parte din randamentele închidere-închidere, dar nu din range. Yang-Zhang le readaugă, dar pe indice ajunge doar la 13,9%, pentru că deschiderea indicelui este parțial învechită (16,8% pe ETF-ul SPY).",
                 "incorrectExplanation": "Estimatorii bazați doar pe range ignoră componenta de peste noapte a volatilității."
             }
         },
@@ -652,7 +652,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "BET-TR include dividendele reinvestite, iar indicele de preț S&P 500 nu, iar monedele diferă (RON vs USD)"
                 ],
                 "correctExplanation": "Comparațiile cer aceeași definiție a randamentului (preț vs randament total), aceeași monedă și aceeași perioadă.",
-                "incorrectExplanation": "Indicii de preț vs de randament total și monedele diferite deplasează comparația."
+                "incorrectExplanation": "Indicii de preț vs de randament total și monedele diferite distorsionează comparația."
             }
         },
         {

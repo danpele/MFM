@@ -55,10 +55,10 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Pentru că 25 de portofolii sînt prea multe active de test",
                     "Pentru că un R² credibil trebuie să depășească 95%",
                     "Pentru că R² OLS este mereu 80% pe aceste portofolii",
-                    "Pentru că aceste portofolii au o structură factorială puternică, deci orice factori corelați cu SMB și HML le potrivesc; adăugați alte active de test și raportați R² GLS cu intervale de încredere"
+                    "Pentru că aceste portofolii au o structură factorială puternică, deci orice factori corelați cu SMB și HML le explică mediile; adăugați alte active de test și raportați R² GLS cu intervale de încredere"
                 ],
                 correctExplanation: "În curs, FF3 are R² OLS 0,66 pe cele 25 de portofolii, dar 0,21 după adăugarea a 30 de industrii, iar R² GLS este cel mult 0,20.",
-                incorrectExplanation: "Un R² OLS mare pe cele 25 de portofolii mărime × B/M este un prag jos: activele sînt acoperite de trei factori și multe seturi de factori fără legătură le potrivesc."
+                incorrectExplanation: "Un R² OLS mare pe cele 25 de portofolii mărime × B/M este un criteriu puțin exigent: activele sînt explicate de trei factori, iar multe seturi de factori fără legătură le pot explica mediile."
             }
         },
         {
@@ -165,7 +165,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Nedeplasate, pentru că OLS este nedeplasat",
                     "Nedefinite cînd o acțiune nu se tranzacționează"
                 ],
-                correctExplanation: "Prețurile vechi împrăștie reacția la știrile pieței pe mai multe zile. În seminar, beta Dimson al Nuclearelectrica crește de la 0,80 la 0,94, iar al Digi de la 0,67 la 0,75.",
+                correctExplanation: "Prețurile învechite distribuie reacția la știrile pieței pe mai multe zile. În seminar, beta Dimson al Nuclearelectrica crește de la 0,80 la 0,94, iar al Digi de la 0,67 la 0,75.",
                 incorrectExplanation: "O acțiune care se tranzacționează cu întîrziere reacționează mîine la mișcarea de azi a pieței, deci covarianța contemporană subestimează beta; adunați pantele anticipate și întîrziate."
             }
         },
@@ -243,10 +243,10 @@ window.MFM_DATA.quizzes['factors'] = {
                 options: [
                     "ETF-urile sectoriale sînt mai eficiente decît portofoliile",
                     "CAPM este adevărat pentru sectoare",
-                    "Sectoarele nu împrăștie mărimea și valoarea, deci au puțină dispersie în valorile alfa care contează: testul are putere mică",
+                    "Sectoarele nu creează dispersie în mărime și valoare, deci au puțină dispersie în valorile alfa care contează: testul are putere mică",
                     "Eșantionul sectorial este mai lung"
                 ],
-                correctExplanation: "Activele de test trebuie să împrăștie caracteristicile remunerate; sectoarele amestecă firme mici și mari, value și growth. Nerespingerea este o dovadă slabă.",
+                correctExplanation: "Activele de test trebuie să aibă dispersie mare în caracteristicile remunerate; sectoarele amestecă firme mici și mari, value și growth. Nerespingerea este o dovadă slabă.",
                 incorrectExplanation: "Nerespingerea nu este o dovadă că CAPM este adevărat; testul pe sectoare nu are putere."
             }
         },
@@ -354,7 +354,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "O regresie transversală a randamentelor pe valorile beta estimate, pentru fiecare perioadă; primele sînt mediile acestor pante",
                     "Statistica GRS"
                 ],
-                correctExplanation: "Etapa 1 estimează beta; etapa 2 face T regresii transversale și mediază pantele λ̂_t; eroarea standard este abaterea lor standard împărțită la √T (Newey–West dacă pantele sînt autocorelate).",
+                correctExplanation: "Etapa 1 estimează beta; etapa 2 face T regresii transversale și calculează media pantelor λ̂_t; eroarea standard este abaterea lor standard împărțită la √T (Newey–West dacă pantele sînt autocorelate).",
                 incorrectExplanation: "Beta din serii de timp provine din prima etapă; a doua etapă este transversală, perioadă cu perioadă."
             }
         },
@@ -462,7 +462,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "A devenit cea mai mare primă",
                     "A scăzut de la aproximativ 10,7% la 2,5% pe an, iar statistica t de la 5,5 la 0,75"
                 ],
-                correctExplanation: "Momentum a fost puternic în 1963–1999, dar slab în 2000–2026, inclusiv crash-ul din 2009; McLean și Pontiff documentează astfel de scăderi după publicare.",
+                correctExplanation: "Momentum a fost puternic în 1963–1999, dar slab în 2000–2026, inclusiv crahul din 2009; McLean și Pontiff documentează astfel de scăderi după publicare.",
                 incorrectExplanation: "Datele arată o scădere puternică a primei de momentum după 2000."
             }
         },
@@ -570,7 +570,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Cu aproximativ 50%",
                     "Cu aproximativ 1,2%"
                 ],
-                correctExplanation: "c = (0,005/0,045)² = 0,012: pentru factori tranzacționați lunari corecția este mică; cursul găsește c = 0,03 pentru FF3, iar eroarea standard a HML abia se schimbă.",
+                correctExplanation: "c = (0,005/0,045)² = 0,012: pentru factori tranzacționați lunari corecția este mică; cursul găsește c = 0,03 pentru FF3, iar eroarea standard a HML aproape nu se schimbă.",
                 incorrectExplanation: "c este pătratul raportului Sharpe al primei pe perioadă, nu raportul Sharpe însuși; rapoartele Sharpe lunare sînt mici, deci c este mic."
             }
         },

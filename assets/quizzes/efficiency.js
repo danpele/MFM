@@ -31,7 +31,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Nu, pentru că BDS se aplică doar prețurilor"
                 ],
                 "correctExplanation": "BDS testează independența și distribuția identică. Un proces GARCH cu medie imprevizibilă respinge BDS, dar satisface RW3 și ipoteza diferenței de martingală.",
-                "incorrectExplanation": "BDS este un test al ipotezei i.i.d. (RW1). Ipoteza diferenței de martingală restricționează doar media condiționată, iar RW3 doar autocorelațiile, deci volatilitatea predictibilă ajunge pentru o respingere BDS fără nicio ineficiență."
+                "incorrectExplanation": "BDS este un test al ipotezei i.i.d. (RW1). Ipoteza diferenței de martingală restricționează doar media condiționată, iar RW3 doar autocorelațiile, deci volatilitatea predictibilă este suficientă pentru o respingere BDS fără nicio ineficiență."
             }
         },
         {
@@ -324,7 +324,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "options": [
                     "Pentru a elimina randamentul mediu",
                     "Pentru că panta bazată pe R/S (estimarea Hurst) este deplasată în sus pe ferestre mici, chiar pentru randamente i.i.d.",
-                    "Pentru a face estimarea robustă la cozi grele",
+                    "Pentru a face estimarea robustă la cozi groase",
                     "Pentru a anualiza estimarea"
                 ],
                 "correctExplanation": "Pentru S&P 500 estimarea brută este 0,530, iar cea corectată 0,486: panta necorectată supraestimează memoria.",
@@ -381,7 +381,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Pentru că amestecarea distruge toată dependența, inclusiv gruparea volatilității, care crește și ea exponentul",
                     "Pentru că BET nu se tranzacționează zilnic"
                 ],
-                "correctExplanation": "Banda din amestecare reprezintă randamente i.i.d.; orice dependență, inclusiv în volatilitate, poate împinge exponentul peste ea. V al lui Lo este o verificare complementară.",
+                "correctExplanation": "Banda obținută prin amestecare reprezintă randamente i.i.d.; orice dependență, inclusiv în volatilitate, poate împinge exponentul peste ea. V al lui Lo este o verificare complementară.",
                 "incorrectExplanation": "Amestecarea elimină orice tip de dependență, deci o valoare peste bandă poate reflecta gruparea volatilității, nu memoria lungă în randamente."
             }
         },
@@ -462,7 +462,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Bitcoin a fost întotdeauna perfect eficient",
                     "Testele anuale sînt mai puternice decît cele pe întreaga selecție"
                 ],
-                "correctExplanation": "Baterii de teste diferite, surse de prețuri diferite și erori clasice versus robuste duc la concluzii diferite; un singur an de date are și putere mică.",
+                "correctExplanation": "Seturi de teste diferite, surse de prețuri diferite și erori clasice versus robuste duc la concluzii diferite; un singur an de date are și putere mică.",
                 "incorrectExplanation": "Contrastul arată că rezultatele privind eficiența depind de test și de inferență, nu că un studiu este greșit."
             }
         },
@@ -625,7 +625,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Un tipar semnificativ statistic nu adaugă neapărat valoare economică față de un reper simplu"
                 ],
                 "correctExplanation": "O mare parte din randamentul momentum este prima de risc a acțiunilor cîștigată pe pozițiile lungi; semnificația față de zero nu este semnificație față de cumpără-și-păstrează.",
-                "incorrectExplanation": "Respingerea statistică nu este același lucru cu o îmbunătățire exploatabilă: comparați cu reperul relevant și cu costurile."
+                "incorrectExplanation": "Respingerea statistică nu este același lucru cu o îmbunătățire exploatabilă: comparați cu reperul potrivit și cu costurile."
             }
         },
         {

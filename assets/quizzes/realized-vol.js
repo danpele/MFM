@@ -103,7 +103,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "incorrectExplanation": "An estimate from a noisy proxy is not a proof, the bias from measurement error goes towards smaller H, and H drives both option skews and forecast weights."
             },
             "ro": {
-                "title": "Asprimea: cum citim estimarea",
+                "title": "Asprimea: cum interpretăm estimarea",
                 "text": "Estimatorul de scalare aplicat volatilității realizate zilnice dă Ĥ = 0,11 pentru SPY. Ce afirmație este cea mai ușor de susținut?",
                 "options": [
                     "H = 0,11 este demonstrat pentru volatilitatea SPY",
@@ -184,8 +184,8 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "incorrectExplanation": "The signature plot puts the sampling interval on the horizontal axis and mean RV on the vertical axis."
             },
             "ro": {
-                "title": "Graficul semnăturii",
-                "text": "Ce arată graficul semnăturii volatilității?",
+                "title": "Signature plot-ul",
+                "text": "Ce arată signature plot-ul volatilității?",
                 "options": [
                     "RV în funcție de ora din zi",
                     "Autocorelația RV pe întîrzieri",
@@ -193,7 +193,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "Volatilitatea implicită în funcție de prețul de exercitare"
                 ],
                 "correctExplanation": "Fără zgomot RV nu depinde de intervalul de eșantionare; o creștere la intervale scurte este amprenta zgomotului.",
-                "incorrectExplanation": "Graficul semnăturii pune intervalul de eșantionare pe axa orizontală și RV medie pe axa verticală."
+                "incorrectExplanation": "Signature plot-ul are intervalul de eșantionare pe axa orizontală și RV medie pe axa verticală."
             }
         },
         {
@@ -212,7 +212,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             },
             "ro": {
                 "title": "SPY la 5 minute",
-                "text": "Ce au arătat graficul semnăturii și autocorelația randamentelor SPY de 5 minute?",
+                "text": "Ce au arătat signature plot-ul și autocorelația randamentelor SPY de 5 minute?",
                 "options": [
                     "RV la 5 minute este dublul RV la 30 de minute",
                     "Randamentele au autocorelație -0,5, deci zgomotul domină",
@@ -220,7 +220,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "Graficul este plat, iar autocorelația de ordinul 1 este aproximativ -0,01: zgomotul este neglijabil la 5 minute"
                 ],
                 "correctExplanation": "Volatilitatea anualizată din RV medie rămîne între 12,6% și 13,1% de la 5 la 130 de minute; corecțiile de zgomot schimbă puțin la această frecvență.",
-                "incorrectExplanation": "Pentru un ETF lichid la 5 minute zgomotul este invizibil: graficul semnăturii este plat, iar autocorelația randamentelor este aproape zero."
+                "incorrectExplanation": "Pentru un ETF lichid la 5 minute zgomotul este invizibil: signature plot-ul este plat, iar autocorelația randamentelor este aproape zero."
             }
         },
         {
@@ -354,7 +354,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "21, toate întîrzierile după prima",
                     "Niciuna: HAR este un AR(22) nerestricționat"
                 ],
-                "correctExplanation": "Scara fixează φ2 = … = φ5 și φ6 = … = φ22; pentru SPY testul Wald al celor 19 restricții dă p = 0,51.",
+                "correctExplanation": "Structura în trepte impune φ2 = … = φ5 și φ6 = … = φ22; pentru SPY testul Wald al celor 19 restricții dă p = 0,51.",
                 "incorrectExplanation": "HAR are 3 pante libere din 22 de coeficienți ai întîrzierilor, deci 22 − 3 = 19 restricții: egalități în blocurile săptămînal și lunar, nu întîrzieri nule."
             }
         },
@@ -404,7 +404,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "text": "Autocorelația log RV pentru SPY este 0,64 la întîrzierea 1 și 0,24 la 22 de zile. Ce indică acest lucru?",
                 "options": [
                     "Lipsa memoriei: RV este i.i.d.",
-                    "Memorie scurtă: un AR(1) se potrivește perfect",
+                    "Memorie scurtă: un AR(1) descrie perfect datele",
                     "Memorie lungă: autocorelațiile scad mult mai lent decît la un AR(1)",
                     "O tendință negativă a volatilității"
                 ],
@@ -535,7 +535,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "incorrectExplanation": "Losses on volatility or absolute errors are minimised by a forecast other than the conditional variance (by Jensen, (E sqrt(RV))² is below E RV), so proxy noise distorts the ranking."
             },
             "ro": {
-                "title": "Ce funcție de pierdere rezistă unui proxy zgomotos",
+                "title": "Ce funcție de pierdere rămîne robustă la un proxy zgomotos",
                 "text": "Prognozele sînt evaluate față de RV, un proxy zgomotos al varianței adevărate, nedeplasat condiționat: E[RV_t | trecut] = E[IV_t | trecut]. Ce funcție de pierdere ordonează prognozele la fel ca varianța adevărată?",
                 "options": [
                     "MSE pe volatilitate, (sqrt(RV) − sqrt(F))²",
@@ -598,7 +598,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "Fiecare model rămas a trecut 21 de teste Diebold–Mariano separate la 5%"
                 ],
                 "correctExplanation": "Hansen, Lunde și Nason (2011): modelele sînt eliminate succesiv pînă cînd egalitatea capacității predictive nu mai este respinsă; cele rămase formează o mulțime de încredere pentru cel mai bun model.",
-                "incorrectExplanation": "MCS este o afirmație despre o mulțime, cu controlul multiplicității, nu un clasament între modelele rămase și nici un șir de teste pe perechi neajustate."
+                "incorrectExplanation": "MCS este o afirmație despre o mulțime, cu corecție pentru testarea multiplă, nu un clasament între modelele rămase și nici un șir de teste pe perechi neajustate."
             }
         },
         {
@@ -678,7 +678,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "RV zilnică trebuie mai întîi împărțită la 252",
                     "Volatilitatea crește cu rădăcina pătrată a timpului: sqrt(252 x 1,0e-4) = 15,9%"
                 ],
-                "correctExplanation": "Varianța crește proporțional cu timpul, iar volatilitatea cu rădăcina lui pătrată, deci volatilitatea anuală este sqrt(252 x RV) = 15,9%. Cifra de 252% ar trebui să pice și testul de plauzibilitate: VIX este de obicei între 12 și 30.",
+                "correctExplanation": "Varianța crește proporțional cu timpul, iar volatilitatea cu rădăcina lui pătrată, deci volatilitatea anuală este sqrt(252 x RV) = 15,9%. Cifra de 252% nu trece nici testul de plauzibilitate: VIX este de obicei între 12 și 30.",
                 "incorrectExplanation": "Înmulțirea unei volatilități zilnice cu 252 tratează volatilitatea ca și cum ar crește liniar cu timpul; doar varianța crește astfel."
             }
         },
@@ -705,7 +705,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "Datele pe tranzacții sînt prea puține pentru a estima o varianță zilnică",
                     "Pătratele randamentelor trebuie calculate din randamente simple, niciodată din randamente log"
                 ],
-                "correctExplanation": "Oscilația bid-ask și discretizarea prețului adaugă zgomot fiecărui preț observat. Contribuția lui, 2n omega^2, crește cu frecvența de eșantionare, de aceea graficul semnăturii urcă la intervale scurte (Bandi și Russell, 2008; Zhang, Mykland și Ait-Sahalia, 2005).",
+                "correctExplanation": "Oscilația bid-ask și discretizarea prețului adaugă zgomot fiecărui preț observat. Contribuția lui, 2n omega^2, crește cu frecvența de eșantionare, de aceea signature plot-ul urcă la intervale scurte (Bandi și Russell, 2008; Zhang, Mykland și Ait-Sahalia, 2005).",
                 "incorrectExplanation": "Mai multe randamente reduc eroarea doar pentru un preț fără zgomot; cu zgomot de microstructură, deplasarea RV crește cu numărul de randamente."
             }
         }

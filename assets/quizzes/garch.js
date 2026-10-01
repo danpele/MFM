@@ -84,7 +84,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Pentru a elimina nevoia estimării prin verosimilitate maximă',
                     'Pentru a modela media randamentelor în locul dispersiei'
                 ],
-                correctExplanation: 'Prin substituție înapoi, GARCH(1,1) este un ARCH(infinit) cu ponderi alpha * beta^(j-1): o dinamică persistentă a dispersiei, cu memorie scurtă, cu doar trei parametri.',
+                correctExplanation: 'Prin substituții succesive, GARCH(1,1) este un ARCH(infinit) cu ponderi alpha * beta^(j-1): o dinamică persistentă a dispersiei, cu memorie scurtă, cu doar trei parametri.',
                 incorrectExplanation: 'Dispersia decalată dă un ARCH de ordin infinit cu ponderi descrescătoare geometric, deci gruparea persistentă cere doar trei parametri.'
             }
         },
@@ -409,7 +409,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Elimină nevoia inovațiilor'
                 ],
                 correctExplanation: 'Forma logaritmică garantează sigma_t^2 > 0; termenul gamma z_{t-1} surprinde efectul de semn (gamma < 0: știrile proaste cresc volatilitatea).',
-                incorrectExplanation: 'EGARCH lucrează cu logaritmul dispersiei, ceea ce păstrează dispersia pozitivă și permite intrarea semnului știrilor prin gamma.'
+                incorrectExplanation: 'EGARCH lucrează cu logaritmul dispersiei, ceea ce păstrează dispersia pozitivă și permite ca semnul știrilor să intervină prin gamma.'
             }
         },
         {
@@ -462,7 +462,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Bitcoin are cel mai puternic efect de levier',
                     'Un gamma negativ înseamnă că modelul este greșit'
                 ],
-                correctExplanation: 'La aur, creșterile din perioadele agitate cresc volatilitatea mai mult decît scăderile: o asimetrie inversă, consistentă cu un activ de refugiu. Bitcoin nu are asimetrie semnificativă.',
+                correctExplanation: 'La aur, creșterile din perioadele agitate cresc volatilitatea mai mult decît scăderile: o asimetrie inversă, compatibilă cu comportamentul unui activ de refugiu. Bitcoin nu are asimetrie semnificativă.',
                 incorrectExplanation: 'Efectul de levier clasic apare la acțiuni; aurul are asimetrie inversă, iar Bitcoin deloc.'
             }
         },
@@ -624,8 +624,8 @@ window.MFM_DATA.quizzes['garch'] = {
                     "Faptul că intervalul atinge 1 este în sine un test valid care respinge IGARCH",
                     "Intervalul pentru timpul de înjumătățire este simetric în jurul a 131 de zile"
                 ],
-                correctExplanation: "ln(0,5)/ln(x) explodează cînd x se apropie de 1, deci intervalul pentru timpul de înjumătățire este uriaș și asimetric. Intervalul percentile este trunchiat de restricția alpha + beta <= 1, deci întrebarea despre IGARCH cere un test simulat sub ipoteza nulă, care dă p = 0,17.",
-                incorrectExplanation: "Un interval percentile trunchiat nu este un test (Andrews, 2000), o estimare punctuală sub 1 nu dovedește nimic, iar intervalul pentru timpul de înjumătățire este foarte asimetric; testul simulat sub IGARCH nu respinge."
+                correctExplanation: "ln(0,5)/ln(x) explodează cînd x se apropie de 1, deci intervalul pentru timpul de înjumătățire este uriaș și asimetric. Intervalul percentil este trunchiat de restricția alpha + beta <= 1, deci întrebarea despre IGARCH cere un test simulat sub ipoteza nulă, care dă p = 0,17.",
+                incorrectExplanation: "Un interval percentil trunchiat nu este un test (Andrews, 2000), o estimare punctuală sub 1 nu dovedește nimic, iar intervalul pentru timpul de înjumătățire este foarte asimetric; testul simulat sub IGARCH nu respinge."
             }
         },
         {
@@ -697,7 +697,7 @@ window.MFM_DATA.quizzes['garch'] = {
                 incorrectExplanation: "The test and the statistic are fine; the p-value is misread: 0.62 is far above 5%, so there is no evidence of remaining ARCH effects."
             },
             ro: {
-                title: "Găsiți eroarea: citirea unui test de diagnostic",
+                title: "Găsiți eroarea: interpretarea unui test de diagnostic",
                 text: "Un asistent AI scrie: „Testul Ljung-Box pe pătratele reziduurilor standardizate ale modelului GARCH-t dă Q(10) = 8,1 cu p = 0,62. Respingem ipoteza nulă de absență a efectelor ARCH rămase, deci modelul este inadecvat.” Care este eroarea?",
                 options: [
                     "Testul Ljung-Box nu se poate aplica reziduurilor standardizate",
@@ -706,7 +706,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     "O valoare p de 0,62 înseamnă că modelul explică 62% din dispersie"
                 ],
                 correctExplanation: "Ipoteza nulă a testului este absența autocorelației în pătratele reziduurilor standardizate. O valoare p de 0,62 este mult peste 5%, deci ipoteza nulă nu este respinsă: testul nu găsește dovezi de grupare a volatilității rămasă.",
-                incorrectExplanation: "Testul și statistica sînt corecte; valoarea p este citită greșit: 0,62 este mult peste 5%, deci nu există dovezi de efecte ARCH rămase."
+                incorrectExplanation: "Testul și statistica sînt corecte; valoarea p este interpretată greșit: 0,62 este mult peste 5%, deci nu există dovezi de efecte ARCH rămase."
             }
         }
     ]

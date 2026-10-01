@@ -26,9 +26,9 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "title": "Nivelul 1 al semnăturii",
                 "text": "Pentru o traiectorie X de la momentul a la momentul b, ce este nivelul 1 al semnăturii ei (semnătura traiectoriei, engl. path signature)?",
                 "options": [
-                    "Creșterea totală X_b - X_a a fiecărui canal",
+                    "Incrementul total X_b - X_a al fiecărui canal",
                     "Valoarea medie a fiecărui canal pe fereastră",
-                    "Varianța creșterilor fiecărui canal",
+                    "Varianța incrementelor fiecărui canal",
                     "Maximul fiecărui canal pe fereastră"
                 ],
                 "correctExplanation": "S^i = integrala lui dX^i = X^i_b - X^i_a: nivelul 1 păstrează doar schimbarea netă a fiecărui canal.",
@@ -51,7 +51,7 @@ window.MFM_DATA.quizzes['signatures'] = {
             },
             "ro": {
                 "title": "Semnătura unui segment liniar",
-                "text": "Care este semnătura unui segment drept cu creșterea D?",
+                "text": "Care este semnătura unui segment drept cu incrementul D?",
                 "options": [
                     "(1, D, 0, 0, ...), pentru că o dreaptă nu are curbură",
                     "(1, D, D, D, ...)",
@@ -59,7 +59,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Nu este definită pentru o dreaptă"
                 ],
                 "correctExplanation": "Pe o dreaptă toate integralele iterate se factorizează: nivelul k este D⊗...⊗D / k!, exponențiala tensorială a lui D.",
-                "incorrectExplanation": "Nivelurile superioare ale unui segment drept nu sînt zero: sînt puterile tensoriale simetrice ale creșterii împărțite la k!."
+                "incorrectExplanation": "Nivelurile superioare ale unui segment drept nu sînt zero: sînt puterile tensoriale simetrice ale incrementului împărțite la k!."
             }
         },
         {
@@ -86,7 +86,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Semnătura este invariantă la adăugarea unui canal de timp"
                 ],
                 "correctExplanation": "Chen (1957): Sig(X * Y) = Sig(X) ⊗ Sig(Y); pentru o traiectorie liniară pe porțiuni dă tot algoritmul: se înmulțesc exponențialele segmentelor.",
-                "incorrectExplanation": "Identitatea se referă la concatenare: semnătura traiectoriei unite este produsul tensorial al celor două semnături; inversarea dă inversa, nu aceeași semnătură."
+                "incorrectExplanation": "Identitatea se referă la concatenare: semnătura traiectoriei concatenate este produsul tensorial al celor două semnături; inversarea dă inversa, nu aceeași semnătură."
             }
         },
         {
@@ -107,13 +107,13 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "title": "Aria Lévy",
                 "text": "Pentru o traiectorie cu două canale, ce este aria Lévy A^{12} = (S^{12} - S^{21})/2?",
                 "options": [
-                    "Produsul celor două creșteri totale",
+                    "Produsul celor două incremente totale",
                     "Variația pătratică a primului canal",
                     "Corelația celor două canale",
                     "Aria cu semn închisă între traiectorie și coarda care îi unește capetele"
                 ],
                 "correctExplanation": "Partea antisimetrică a nivelului 2 este aria cu semn dintre traiectorie și coarda ei: înregistrează care canal s-a mișcat primul.",
-                "incorrectExplanation": "Partea simetrică a nivelului 2 este jumătate din produsul creșterilor; partea antisimetrică, aria Lévy, măsoară ordinea mișcărilor ca arie cu semn."
+                "incorrectExplanation": "Partea simetrică a nivelului 2 este jumătate din produsul incrementelor; partea antisimetrică, aria Lévy, măsoară ordinea mișcărilor ca arie cu semn."
             }
         },
         {
@@ -139,7 +139,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "S^{ij} = S^{ji} pentru orice traiectorie",
                     "S^i S^j = 0 pentru i ≠ j"
                 ],
-                "correctExplanation": "Produsele termenilor semnăturii sînt combinații liniare de termeni superiori; de aceea un model liniar în semnătură conține deja polinoame în creșteri.",
+                "correctExplanation": "Produsele termenilor semnăturii sînt combinații liniare de termeni superiori; de aceea un model liniar în semnătură conține deja polinoame în incremente.",
                 "incorrectExplanation": "Produsul shuffle transformă produsul a doi termeni într-o sumă pe intercalările cuvintelor lor; S^{ij} și S^{ji} diferă în general (diferența lor este de două ori aria Lévy)."
             }
         },
@@ -193,7 +193,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "27",
                     "12"
                 ],
-                "correctExplanation": "d + d^2 + d^3 = 3 + 9 + 27 = 39; numărul crește ca d^N, de aceea este nevoie de raritate (LASSO).",
+                "correctExplanation": "d + d^2 + d^3 = 3 + 9 + 27 = 39; numărul crește ca d^N, de aceea este nevoie de o soluție cu puțini coeficienți nenuli (LASSO).",
                 "incorrectExplanation": "Numărați toate cuvintele de lungime 1, 2 și 3 peste 3 litere: 3 + 9 + 27."
             }
         },
@@ -216,12 +216,12 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "text": "Ce afirmă proprietatea de aproximare universală (liniarizare) a semnăturilor?",
                 "options": [
                     "Orice traiectorie are o semnătură finită",
-                    "Semnătura unei traiectorii este întotdeauna rară",
+                    "Semnătura unei traiectorii are întotdeauna puțini termeni nenuli",
                     "Semnăturile nu depind de traiectorie",
                     "Pe o mulțime compactă de traiectorii augmentate cu timpul, cu un punct de start comun, orice funcție continuă este aproximată uniform de o funcțională liniară a semnăturii"
                 ],
                 "correctExplanation": "Prin Stone-Weierstrass și identitatea shuffle, funcționalele liniare ale semnăturii sînt dense în funcțiile continue pe mulțimi compacte de traiectorii augmentate cu timpul, cu un punct de start comun; fără el, (t, 0) și (t, 10) au aceeași semnătură, iar nivelul lor de start nu poate fi aproximat.",
-                "incorrectExplanation": "Proprietatea se referă la aproximarea funcțiilor traiectoriei prin aplicații liniare ale semnăturii; nu spune nimic despre raritate sau despre finitudinea semnăturii infinite."
+                "incorrectExplanation": "Proprietatea se referă la aproximarea funcțiilor traiectoriei prin aplicații liniare ale semnăturii; nu spune nimic despre numărul termenilor nenuli sau despre finitudinea semnăturii infinite."
             }
         },
         {
@@ -247,7 +247,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Semnătura trebuie calculată doar pe randamente",
                     "Log RV nu poate fi folosit ca un canal"
                 ],
-                "correctExplanation": "Doar creșterile intră în semnătură; cursul adaugă log RV_t și mediile lui săptămînale și lunare, așa cum Gu et al. adaugă factorii externi x_tau.",
+                "correctExplanation": "Doar incrementele intră în semnătură; cursul adaugă log RV_t și mediile lui săptămînale și lunare, așa cum Gu et al. adaugă factorii externi x_tau.",
                 "incorrectExplanation": "Invarianța la translație elimină complet nivelul; nu favorizează nivelurile mari, iar log RV poate fi un canal atît timp cît nivelul lui este furnizat separat."
             }
         },
@@ -302,7 +302,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Regresia nu mai este identificată"
                 ],
                 "correctExplanation": "exp(-gamma d) tinde la 1 pentru fiecare fereastră, deci w = 1/n: modelul cu ponderi de nucleu devine versiunea cu ponderi egale (Sig-L).",
-                "incorrectExplanation": "Limita gamma la infinit concentrează ponderea pe fereastra cea mai apropiată; gamma la 0 aplatizează ponderile."
+                "incorrectExplanation": "Limita gamma la infinit concentrează ponderea pe fereastra cea mai apropiată; gamma la 0 face ponderile egale."
             }
         },
         {
@@ -355,7 +355,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "LASSO nu poate folosi ponderi",
                     "OLS face modelul robust la cozi groase"
                 ],
-                "correctExplanation": "Cele mai mici pătrate după selecție (Belloni și Chernozhukov, 2013) păstrează raritatea LASSO, dar nu și biasul lui de shrinkage.",
+                "correctExplanation": "Cele mai mici pătrate după selecție (Belloni și Chernozhukov, 2013) păstrează selecția făcută de LASSO, dar nu și biasul lui de shrinkage.",
                 "incorrectExplanation": "Reestimarea este restrînsă la suportul selectat, deci nu adaugă variabile; ponderile pot fi folosite în ambii pași."
             }
         },
@@ -679,7 +679,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Semnăturile nu pot fi calculate pe logaritmi",
                     "Log RV trebuie întîi diferențiat"
                 ],
-                "correctExplanation": "Fără un al doilea canal, toate integralele iterate sînt puteri ale creșterii totale; augmentarea cu timpul (și un canal al randamentelor) aduce informația despre formă și despre avans-întîrziere.",
+                "correctExplanation": "Fără un al doilea canal, toate integralele iterate sînt puteri ale incrementului total; augmentarea cu timpul (și un canal al randamentelor) aduce informația despre formă și despre avans-întîrziere.",
                 "incorrectExplanation": "Adîncimea nu este problema: într-o dimensiune, fiecare nivel este o funcție de schimbarea netă, indiferent de adîncime."
             }
         },

@@ -107,7 +107,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "text": "De ce testele de acoperire au putere redusă pe un an de VaR 1%?",
                 "options": [
                     "Pentru că randamentele zilnice sînt Normale",
-                    "Pentru că se așteaptă doar circa 2,5 depășiri, deci modelele greșite produc des numărări acceptabile",
+                    "Pentru că se așteaptă doar circa 2,5 depășiri, deci modelele greșite produc des un număr acceptabil de depășiri",
                     "Pentru că aproximarea hi-pătrat este exactă",
                     "Pentru că depășirile sînt mereu independente"
                 ],
@@ -211,7 +211,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "incorrectExplanation": "Coverage counts and the traffic light ignore timing, and the Markov test looks only one day back, so a pattern at lag 5 escapes all three."
             },
             "ro": {
-                "title": "DQ versus Christoffersen",
+                "title": "DQ față de Christoffersen",
                 "text": "Depășirile unui model tind să apară la cinci zile după o depășire anterioară, iar probabilitatea de depășire în ziua de după o depășire este normală. Ce test este construit să detecteze aceasta?",
                 "options": [
                     "Testul de independență Christoffersen, cu lanț Markov de ordinul întîi",
@@ -220,7 +220,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "Testul DQ cu depășiri întîrziate pînă la decalajul 5 (sau testul de durată)"
                 ],
                 "correctExplanation": "Regresia DQ a lui Hit_t pe depășirile întîrziate și pe nivelul VaR detectează previzibilitatea la orice decalaj inclus; testul de durată vede și el distanțele neobișnuite. Un lanț de ordinul întîi compară doar ziua de ieri cu cea de azi.",
-                "incorrectExplanation": "Numărările de acoperire și semaforul ignoră momentul depășirilor, iar testul Markov privește doar o zi înapoi, deci un tipar la decalajul 5 le scapă tuturor."
+                "incorrectExplanation": "Testele de numărare și semaforul ignoră momentul depășirilor, iar testul Markov privește doar o zi înapoi, deci un tipar la decalajul 5 le scapă tuturor."
             }
         },
         {
@@ -328,7 +328,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "este echivalentă cu clasificarea după Z1"
                 ],
                 "correctExplanation": "ES singur nu este elicitabil: mulțimile lui de nivel nu sînt convexe, deci niciun scor care depinde doar de ES nu recompensează valoarea adevărată; în plus, zilele cu depășire depind de prognoza VaR. Clasificarea consistentă cere un scor comun (VaR, ES), precum FZ0.",
-                "incorrectExplanation": "Un eșantion mai mare nu repară un scor inconsistent; ES este o medie condiționată doar dat fiind VaR, pe care eroarea pătratică nu îl punctează."
+                "incorrectExplanation": "Un eșantion mai mare nu corectează un scor inconsistent; ES este o medie condiționată doar dat fiind VaR, pe care eroarea pătratică nu îl evaluează."
             }
         },
         {
@@ -463,7 +463,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "O mulțime construită prin eliminări succesive astfel încît să conțină modelele cele mai bune cu o probabilitate asimptotică dată"
                 ],
                 "correctExplanation": "Modelele sînt eliminate unul cîte unul cît timp egalitatea abilității predictive este respinsă; cele rămase formează MCS. Pe Bitcoin rămîn toate cele șase modele: datele nu le pot separa.",
-                "incorrectExplanation": "MCS este o mulțime de modele pe care datele nu le pot separa de cel mai bun, nu un singur cîștigător; nerespingerea nu dovedește performanțe egale."
+                "incorrectExplanation": "MCS este o mulțime de modele pe care datele nu le pot separa de cel mai bun, nu un singur cîștigător; nerespingerea nu dovedește că modelele sînt la fel de bune."
             }
         },
         {
@@ -535,7 +535,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "incorrectExplanation": "The DM justification targets population model accuracy; with finite rolling windows the object compared is the method, and the i.i.d. variance also ignores autocorrelated losses."
             },
             "ro": {
-                "title": "Giacomini-White versus Diebold-Mariano",
+                "title": "Giacomini-White față de Diebold-Mariano",
                 "text": "Prognozele provin din ferestre mobile de 1000 de zile, cu parametri GARCH reestimați. Ce test de acuratețe predictivă egală are o justificare asimptotică validă pentru compararea lor?",
                 "options": [
                     "Testul Giacomini-White al abilității predictive (condiționate) a metodelor de prognoză",
@@ -589,7 +589,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "incorrectExplanation": "Dominance needs one curve below the other everywhere; crossing curves say nothing about calibration or about the validity of a test on a chosen score."
             },
             "ro": {
-                "title": "Citirea unei diagrame Murphy",
+                "title": "Interpretarea unei diagrame Murphy",
                 "text": "Pentru VaR 1% pe S&P 500, curbele scorurilor elementare medii ale GARCH-t și FHS se intersectează de mai multe ori. Ce rezultă?",
                 "options": [
                     "FHS domină GARCH-t sub orice scor consistent",
@@ -643,7 +643,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "incorrectExplanation": "Testing checks acceptability of one model; comparative backtesting ranks models with a scoring function."
             },
             "ro": {
-                "title": "A testa versus a clasifica",
+                "title": "A testa sau a clasifica",
                 "text": "Care este diferența dintre un backtest și backtesting-ul comparativ?",
                 "options": [
                     "Nu există nicio diferență",

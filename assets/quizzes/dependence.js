@@ -191,10 +191,10 @@ window.MFM_DATA.quizzes['dependence'] = {
                     'Nu poate surprinde gruparea volatilității',
                     'Presupune corelație constantă',
                     'Cere randamente cu distribuția Normală',
-                    'Numărul de parametri crește cu puterea a patra a lui N, iar pozitiv definirea nu este garantată'
+                    'Numărul de parametri crește cu puterea a patra a lui N, iar caracterul pozitiv definit nu este garantat'
                 ],
                 correctExplanation: 'Cu N(N+1)/2 elemente distincte, VEC are N(N+1)/2 [1 + N(N+1)] parametri: 21 pentru N = 2, dar peste 3 milioane pentru N = 50.',
-                incorrectExplanation: 'Problema este explozia numărului de parametri și lipsa garanției de pozitiv definire.'
+                incorrectExplanation: 'Problema este explozia numărului de parametri și lipsa garanției că matricea este pozitiv definită.'
             }
         },
         {
@@ -293,8 +293,8 @@ window.MFM_DATA.quizzes['dependence'] = {
                 incorrectExplanation: 'The nuisance parameter b is unidentified under the null, which breaks the standard chi-squared asymptotics.'
             },
             ro: {
-                title: 'Testul CCC contra DCC',
-                text: 'De ce distribuția hi-pătrat este doar orientativă pentru raportul de verosimilitate CCC (a = 0) contra DCC?',
+                title: 'Testul CCC față de DCC',
+                text: 'De ce distribuția hi-pătrat este doar orientativă pentru raportul de verosimilitate CCC (a = 0) față de DCC?',
                 options: [
                     'Pentru că verosimilitatea nu este Gaussiană',
                     'Pentru că eșantionul este prea mare',
@@ -302,7 +302,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     'Pentru că sub a = 0 parametrul b nu este identificat (o problemă de tip Davies)'
                 ],
                 correctExplanation: 'Cînd a = 0, b dispare din model; asimptotica standard nu mai funcționează, iar referința hi-pătrat este doar un ghid aproximativ.',
-                incorrectExplanation: 'Parametrul de perturbație b nu este identificat sub ipoteza nulă, ceea ce strică asimptotica hi-pătrat standard.'
+                incorrectExplanation: 'Parametrul perturbator b nu este identificat sub ipoteza nulă, ceea ce strică asimptotica hi-pătrat standard.'
             }
         },
         {
@@ -490,7 +490,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     "Cu nivel real prea mic, pentru că graficul netezește datele",
                     "Valid oricînd eșantionul este mare"
                 ],
-                correctExplanation: "O dată aleasă după ce am văzut datele este ea însăși aleatoare, deci distribuția statisticii sub ipoteza nulă depinde de regula de alegere, iar valorile critice Normale resping prea des; un test cu dată necunoscută, precum Wied, Krämer și Dehling (2012), este definit cu propria limită de tip punte browniană. Pe reziduurile SPY–TLT el pune ruptura în august 2020, nu în ianuarie 2022.",
+                correctExplanation: "O dată aleasă după ce am văzut datele este ea însăși aleatoare, deci distribuția statisticii sub ipoteza nulă depinde de regula de alegere, iar valorile critice Normale resping prea des; un test cu dată necunoscută, precum Wied, Krämer și Dehling (2012), este definit cu propria limită de tip punte browniană. Pe reziduurile SPY–TLT el plasează ruptura în august 2020, nu în ianuarie 2022.",
                 incorrectExplanation: "O dată aleasă din date face ca distribuția sub ipoteza nulă să depindă de modul de alegere a datei, deci valorile critice Normale resping prea des."
             }
         },
@@ -571,8 +571,8 @@ window.MFM_DATA.quizzes['dependence'] = {
                     'Gumbel este întotdeauna mai bună decît Clayton',
                     'Pierderile sînt independente'
                 ],
-                correctExplanation: 'Gumbel pe pierderi surprinde crahurile comune (λU = 0,26); Clayton pune dependența în colțul cîștigurilor comune.',
-                incorrectExplanation: 'Coada superioară a pierderilor conține crahurile comune; doar Gumbel pune dependența acolo.'
+                correctExplanation: 'Gumbel pe pierderi surprinde crahurile comune (λU = 0,26); Clayton plasează dependența în colțul cîștigurilor comune.',
+                incorrectExplanation: 'Coada superioară a pierderilor conține crahurile comune; doar Gumbel plasează dependența acolo.'
             }
         },
         {

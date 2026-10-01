@@ -135,7 +135,7 @@ window.MFM_DATA.quizzes['options'] = {
                 "options": [
                     "Scade la zero",
                     "Rămîne constantă",
-                    "Explodează: cu o zi înainte de scadență este de aproximativ sqrt(21) ori valoarea de cu o lună înainte",
+                    "Crește foarte mult: cu o zi înainte de scadență este de aproximativ sqrt(21) ori valoarea de cu o lună înainte",
                     "Devine negativă"
                 ],
                 "correctExplanation": "Gamma ATM este proporțională cu 1/(sigma sqrt(tau)): cu o zi în loc de 21 de zile de tranzacționare este de aproximativ 4,6 ori mai mare.",
@@ -354,7 +354,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Pentru că distribuția log-normală este densitatea adevărată",
                     "Pentru că derivarea de două ori a cotațiilor le amplifică zgomotul, iar fără convexitate în K densitatea estimată poate fi negativă"
                 ],
-                "correctExplanation": "q = e^{r tau} d^2C/dK^2 este o problemă inversă prost condiționată; în lanțul Deribit din curs 7 din 732 de fluturi de marcare sînt negativi, toți în interiorul spread-ului bid-ask.",
+                "correctExplanation": "q = e^{r tau} d^2C/dK^2 este o problemă inversă prost condiționată; în lanțul Deribit din curs 7 din 732 de butterfly-uri calculate din prețurile de referință (mark) sînt negative, toate în interiorul spread-ului bid-ask.",
                 "incorrectExplanation": "Problema este statistică: o derivată a doua a unor prețuri discrete și zgomotoase, care trebuie să fie convexe în prețul de exercitare pentru a da o densitate nenegativă."
             }
         },
@@ -408,7 +408,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Din distribuția istorică a randamentelor",
                     "Ca raportul dintre prețurile call și put"
                 ],
-                "correctExplanation": "q(K) = e^{r tau} d2C/dK2: un spread fluture îngust plătește ca un pariu pe S_T aproape de K.",
+                "correctExplanation": "q(K) = e^{r tau} d2C/dK2: un butterfly îngust plătește ca un pariu pe S_T aproape de K.",
                 "incorrectExplanation": "Densitatea vine din curbura prețurilor call în prețul de exercitare; distribuția istorică este cea fizică, nu cea neutră la risc."
             }
         },
@@ -427,7 +427,7 @@ window.MFM_DATA.quizzes['options'] = {
                 "incorrectExplanation": "Risk-neutral probabilities are prices of insurance, not forecasts; the comparison shows how much heavier the priced tail is than the log-normal one."
             },
             "ro": {
-                "title": "Coada de crah Bitcoin",
+                "title": "Coada stîngă Bitcoin și riscul de crah",
                 "text": "Pentru scadența Bitcoin cea mai apropiată de 30 de zile, probabilitatea neutră la risc SVI a unei scăderi de peste 30% a fost 1,2% față de 0,1% sub densitatea log-normală. Ce arată acest lucru?",
                 "options": [
                     "Că densitatea log-normală supraestimează riscul de crah",
@@ -598,7 +598,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Doar prima ex post poate fi testată cu erori Newey-West"
                 ],
                 "correctExplanation": "Un predictor trebuie să fie cunoscut la data prognozei; VIX_t^2 - RV_{t,t+21} este cunoscută abia la t+21 și măsoară ce a cîștigat vînzătorul unui swap de varianță, nu ce putea vedea un investitor. Varianța realizată trecută este doar o prognoză pentru E^P_t[RV], deci VIX_t^2 - RV_{t-21,t} este o aproximare a primei ex ante.",
-                "incorrectExplanation": "Cele două diferă prin moment: versiunea ex post scade varianța realizată după t, deci nu poate fi folosită ca predictor la t."
+                "incorrectExplanation": "Cele două diferă prin momentul la care sînt cunoscute: versiunea ex post scade varianța realizată după t, deci nu poate fi folosită ca predictor la t."
             }
         },
         {
@@ -651,7 +651,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Încasează nivelul VIX în puncte, nu plătește nimic",
                     "Încasează dividendele indicelui"
                 ],
-                "correctExplanation": "Plata pentru vînzător este notional înmulțit cu (prețul de exercitare minus varianța realizată); varianța realizată explodează în crahuri, deci pierderile sînt convexe.",
+                "correctExplanation": "Plata pentru vînzător este valoarea noțională înmulțită cu (prețul de exercitare minus varianța realizată); varianța realizată crește brusc în crahuri, deci pierderile sînt convexe.",
                 "incorrectExplanation": "Vînzătorul de varianță a vîndut o asigurare împotriva volatilității: prețul de exercitare se fixează la început, varianța realizată se plătește la final."
             }
         },
@@ -706,7 +706,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Cu r = 0, call-urile și put-urile au același preț, deci put-ul valorează 4"
                 ],
                 "correctExplanation": "Din C - P = S - K e^{-r tau}, put-ul este C - S + K e^{-r tau}; un preț negativ al unei opțiuni este imposibil, ceea ce semnalează imediat eroarea.",
-                "incorrectExplanation": "Scrieți C - P = S - K e^{-r tau} în funcție de P și verificați limita de non-arbitraj: un put nu poate avea niciodată preț negativ."
+                "incorrectExplanation": "Scrieți C - P = S - K e^{-r tau} în funcție de P și verificați limita de absență a arbitrajului: un put nu poate avea niciodată preț negativ."
             }
         }
     ]

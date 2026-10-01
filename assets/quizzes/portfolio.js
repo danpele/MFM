@@ -111,7 +111,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Pentru că aleg mereu ponderi egale",
                     "Pentru că supraponderează activele cu medii supraestimate și riscuri subestimate"
                 ],
-                "correctExplanation": "Optimizatorul tratează zgomotul din date drept informație și se încarcă pe cele mai mari erori.",
+                "correctExplanation": "Optimizatorul tratează zgomotul din date drept informație și pune ponderi mari exact pe activele cu cele mai mari erori.",
                 "incorrectExplanation": "Ideea este că optimizatorul urmărește activele care arată cel mai bine din cauza zgomotului de estimare."
             }
         },
@@ -219,7 +219,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Proiecția GLS a lui π care satisface exact Pμ_BL = q",
                     "Nu este definită, pentru că Ω⁻¹ nu există"
                 ],
-                "correctExplanation": "μ_BL = π + τΣP'(PτΣP' + Ω)⁻¹(q − Pπ); cu Ω = 0 opiniile sînt satisfăcute exact, iar π se mută cît mai puțin în metrica τΣ (cele mai mici pătrate cu restricții).",
+                "correctExplanation": "μ_BL = π + τΣP'(PτΣP' + Ω)⁻¹(q − Pπ); cu Ω = 0 opiniile sînt satisfăcute exact, iar π se modifică cît mai puțin în metrica τΣ (cele mai mici pătrate cu restricții).",
                 "incorrectExplanation": "Opiniile fixează Pμ_BL la q; mediile activelor din afara opiniilor se pot și ele modifica prin covarianța cu combinațiile din opinii, iar limita există sub forma π + τΣP'(PτΣP')⁻¹(q − Pπ)."
             }
         },
@@ -346,7 +346,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                 "incorrectExplanation": "The deviation from the benchmark lies in the span of the view portfolio."
             },
             "ro": {
-                "title": "Ce ponderi se mișcă",
+                "title": "Ce ponderi se schimbă",
                 "text": "Cu Ω = diag(PτΣP') și o singură opinie asupra XLK minus XLU, ce ponderi Black–Litterman se schimbă față de referință?",
                 "options": [
                     "Doar XLK și XLU",
@@ -354,7 +354,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Niciuna",
                     "Doar sectoarele cele mai corelate cu XLK"
                 ],
-                "correctExplanation": "În forma He–Litterman schimbarea ponderilor este P'λ: se mișcă doar activele din opinie (XLK 11,1% → 14,4%, XLU 11,1% → 7,8%).",
+                "correctExplanation": "În forma He–Litterman schimbarea ponderilor este P'λ: se schimbă doar ponderile activelor din opinie (XLK 11,1% → 14,4%, XLU 11,1% → 7,8%).",
                 "incorrectExplanation": "Abaterea de la referință se află în direcția portofoliului opiniei."
             }
         },
@@ -648,7 +648,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                 "options": [
                     "Au deținut mai ales acțiuni",
                     "Turnover-ul lor a fost zero",
-                    "S-au încărcat pe titluri de stat, ale căror randamente în exces au fost ușor negative după 2012",
+                    "Au pus ponderi mari pe titlurile de stat, ale căror randamente în exces au fost ușor negative după 2012",
                     "Au folosit medii de selecție"
                 ],
                 "correctExplanation": "GMV minimizează riscul, nu riscul pe unitatea de randament: IEF și TLT au dominat ponderile, iar randamentele lor în exces au fost −0,2% și −0,5% pe an.",
@@ -678,7 +678,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Ponderile GMV sînt proporționale cu inversa matricei de covarianță înmulțită cu randamentele așteptate, nu cu un vector de unu",
                     "Ponderile GMV nu pot fi reechilibrate lunar, deoarece nu însumează unu"
                 ],
-                "correctExplanation": "În afara eșantionului înseamnă că ponderile lunii t folosesc doar date pînă în luna t-1, de exemplu o fereastră rulantă de 60 de luni. O matrice de covarianță din tot eșantionul introduce look-ahead bias; sqrt(12) este factorul corect pentru randamente lunare necorelate serial.",
+                "correctExplanation": "În afara eșantionului înseamnă că ponderile lunii t folosesc doar date pînă în luna t-1, de exemplu o fereastră mobilă de 60 de luni. O matrice de covarianță din tot eșantionul introduce look-ahead bias; sqrt(12) este factorul corect pentru randamente lunare necorelate serial.",
                 "incorrectExplanation": "Anualizarea cu sqrt(12) (randamente lunare necorelate serial) și formula GMV sînt corecte; problema este că matricea de covarianță conține deja lunile evaluate (look-ahead bias)."
             }
         },

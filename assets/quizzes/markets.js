@@ -111,7 +111,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "Diferența dintre prețurile a două burse",
                     "Cea mai bună ofertă de vînzare minus cea mai bună ofertă de cumpărare: prețul execuției imediate"
                 ],
-                "correctExplanation": "Spread-ul este diferența dintre cel mai mic preț la care cineva vinde și cel mai mare preț la care cineva cumpără: costul imediateței.",
+                "correctExplanation": "Spread-ul este diferența dintre cel mai mic preț la care cineva vinde și cel mai mare preț la care cineva cumpără: costul execuției imediate.",
                 "incorrectExplanation": "Spread-ul bid-ask este cea mai bună ofertă de vînzare minus cea mai bună ofertă de cumpărare, costul tranzacționării imediate."
             }
         },
@@ -327,7 +327,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "ETF-urile nu mai replică indicele",
                     "Fondul ponderat după capitalizare l-a depășit pe cel cu ponderi egale: acțiunile cu ponderile cele mai mari au avut randamente mai bune decît acțiunea medie"
                 ],
-                "correctExplanation": "Fondul ponderat după capitalizare dă o pondere mai mare celor mai mari companii; performanța sa superioară înseamnă că acțiunile cu ponderi mari au condus randamentul indicelui. Dacă a crescut concentrarea se verifică din ponderile componentelor (de exemplu numărul efectiv de acțiuni).",
+                "correctExplanation": "Fondul ponderat după capitalizare dă o pondere mai mare celor mai mari companii; randamentul său mai mare înseamnă că acțiunile cu ponderi mari au determinat randamentul indicelui. Dacă a crescut concentrarea se verifică din ponderile componentelor (de exemplu numărul efectiv de acțiuni).",
                 "incorrectExplanation": "Un raport SPY/RSP în creștere înseamnă că acțiunile cu ponderi mari au depășit acțiunea tipică; ponderile componentelor arată dacă a crescut și concentrarea."
             }
         },
@@ -651,8 +651,8 @@ window.MFM_DATA.quizzes['markets'] = {
                     "Randamentele Bitcoin devin zero în zilele lucrătoare",
                     "S&P 500 cîștigă zile de tranzacționare în plus"
                 ],
-                "correctExplanation": "Diferențierea peste o valoare lipsă dă un randament lipsă, deci toate randamentele de luni dispar pe tăcute; pentru o singură serie, calculați randamentele pe calendarul ei; pentru o analiză comună (corelație, portofoliu), întîi join pe prețuri în zilele comune, apoi randamente, ca ambele să acopere același interval (vineri - luni).",
-                "incorrectExplanation": "Pe un calendar reunit, golul de duminică elimină fiecare randament de luni al acțiunilor. Pentru o analiză comună, faceți întîi join pe prețuri în zilele comune, apoi calculați randamentele."
+                "correctExplanation": "Diferențierea peste o valoare lipsă dă un randament lipsă, deci toate randamentele de luni dispar fără niciun avertisment; pentru o singură serie, calculați randamentele pe calendarul ei; pentru o analiză comună (corelație, portofoliu), aliniați întîi prețurile pe zilele comune, apoi calculați randamentele, ca ambele să acopere același interval (vineri - luni).",
+                "incorrectExplanation": "Pe un calendar reunit, golul de duminică elimină fiecare randament de luni al acțiunilor. Pentru o analiză comună, aliniați întîi prețurile pe zilele comune, apoi calculați randamentele."
             }
         },
         {

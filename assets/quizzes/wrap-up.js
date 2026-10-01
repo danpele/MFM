@@ -77,7 +77,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                 "incorrectExplanation": "Computing returns first and then joining gives the two assets different holding periods on Mondays and drops Bitcoin's weekend moves, which distorts variances, correlations and cumulative returns; the direction of the error depends on the sample (in the course's 2015-2026 data the cumulative return was understated)."
             },
             "ro": {
-                "title": "Unirea a două active",
+                "title": "Alinierea a două active",
                 "text": "Bitcoin se tranzacționează zilnic, SPY doar în zilele lucrătoare. Cum construiți o serie comună de randamente?",
                 "options": [
                     "Calculăm randamentele pe fiecare calendar, apoi păstrăm zilele comune",
@@ -86,7 +86,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Păstrăm zilele comune ale prețurilor, apoi calculăm randamentele"
                 ],
                 "correctExplanation": "Alinierea întîi a prețurilor face ca randamentul de luni să acopere intervalul vineri--luni pentru ambele active.",
-                "incorrectExplanation": "Calculul randamentelor înainte de join dă celor două active perioade de deținere diferite lunea și elimină mișcările Bitcoin din weekend, ceea ce distorsionează dispersiile, corelațiile și randamentele cumulate; direcția erorii depinde de eșantion (în datele cursului, 2015-2026, randamentul cumulat a fost subestimat)."
+                "incorrectExplanation": "Calculul randamentelor înainte de aliniere dă celor două active perioade de deținere diferite lunea și elimină mișcările Bitcoin din weekend, ceea ce distorsionează dispersiile, corelațiile și randamentele cumulate; direcția erorii depinde de eșantion (în datele cursului, 2015-2026, randamentul cumulat a fost subestimat)."
             }
         },
         {
@@ -193,7 +193,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Medie-varianță ignoră varianțele",
                     "Datele din afara eșantionului sînt mereu mai calme"
                 ],
-                "correctExplanation": "Optimizatorul se încarcă pe activele cu media supraestimată; cu 60 de luni, un Sharpe de 1,57 în eșantion a devenit un Sharpe adevărat de 0,30.",
+                "correctExplanation": "Optimizatorul pune ponderi mari pe activele cu media supraestimată; cu 60 de luni, un Sharpe de 1,57 în eșantion a devenit un Sharpe adevărat de 0,30.",
                 "incorrectExplanation": "Teoria este corectă, dar intrările sînt zgomotoase: erorile randamentelor așteptate sînt amplificate de inversa matricei de covarianță."
             }
         },
@@ -598,7 +598,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Subestimează mereu acuratețea",
                     "Nu poate fi folosită cu rețele neuronale"
                 ],
-                "correctExplanation": "Pe zgomot pur, K-fold amestecat a raportat o acuratețe de 69,4%; purjarea și embargoul elimină leakage-ul.",
+                "correctExplanation": "Pe zgomot pur, K-fold amestecat a raportat o acuratețe de 69,4%; purging-ul și embargoul elimină leakage-ul.",
                 "incorrectExplanation": "Observațiile vecine au informație comună; amestecarea lor între fold-uri îi arată modelului perioada de test."
             }
         },
@@ -680,7 +680,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Depășirile trebuie numărate pe randamente, nu pe pierderi"
                 ],
                 "correctExplanation": "Cuantila pe fereastra mobilă de la momentul t include r_t, deci o pierdere poate depăși doar dacă este dincolo de cuantila 1% a unui eșantion care o conține: depășirile sînt subnumărate. Prognoza pentru ziua t trebuie să folosească datele pînă la t - 1. În plus, comparațiile cu VaR-ul lipsă din primele 500 de zile dau False, deci hit.mean() pe toate zilele subestimează rata: păstrați doar rîndurile în care var.shift(1) nu lipsește.",
-                "incorrectExplanation": "Lungimea ferestrei și convenția de semn (pierderea = -r, VaR pozitiv) sînt corecte; eroarea este de moment: VaR-ul folosit în ziua t cunoaște deja randamentul zilei t."
+                "incorrectExplanation": "Lungimea ferestrei și convenția de semn (pierderea = -r, VaR pozitiv) sînt corecte; eroarea ține de momentul informației: VaR-ul folosit în ziua t cunoaște deja randamentul zilei t."
             }
         },
         {

@@ -30,7 +30,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "Cere doar T > N, oricare ar fi cozile",
                     "Cozile grele îl fac conservator, deci respingerile lui sînt mereu sigure"
                 ],
-                "correctExplanation": "Distribuția F(N, T - N - K) a statisticii GRS este derivată pentru erori i.i.d. cu distribuția Normală; cu cozi grele și grupare a volatilității folosim un test Wald GMM/HAC sau un bootstrap sălbatic sub ipoteza nulă.",
+                "correctExplanation": "Distribuția F(N, T - N - K) a statisticii GRS este derivată pentru erori i.i.d. cu distribuția Normală; cu cozi grele și grupare a volatilității folosim un test Wald GMM/HAC sau un bootstrap wild sub ipoteza nulă.",
                 "incorrectExplanation": "GRS este exact F doar pentru erori i.i.d. cu distribuția Normală; cozile grele pot deplasa nivelul testului în orice direcție, deci este nevoie de o versiune robustă sau bootstrap."
             }
         },
@@ -322,8 +322,8 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "title": "Martie 2023",
                 "text": "De ce a scăzut USD Coin sub paritate pe 11 martie 2023?",
                 "options": [
-                    "O parte din rezerve era expusă la Silicon Valley Bank, falimentată, iar răscumpărarea nu se putea deconta în weekend",
-                    "Contractul inteligent a fost spart",
+                    "O parte din rezerve era expusă la Silicon Valley Bank, intrată în faliment, iar răscumpărarea nu se putea deconta în weekend",
+                    "Contractul inteligent a fost atacat informatic (hack)",
                     "Blockchain-ul Terra s-a oprit",
                     "Rezerva Federală a crescut dobînda în acea zi"
                 ],
@@ -347,15 +347,15 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "De unde vine LVR",
-                "text": "Ce proprietate a valorii fondului cu produs constant V(P) = 2 sqrt(kP) produce pierderea față de reechilibrare?",
+                "text": "Ce proprietate a valorii pool-ului cu produs constant V(P) = 2 sqrt(kP) produce pierderea față de reechilibrare?",
                 "options": [
                     "Comisionul perceput la fiecare schimb",
                     "Concavitatea în P (gamma negativă): rata LVR este -V''(P) sigma^2 P^2 / (2V) = sigma^2 / 8",
                     "Pierderea impermanentă de la sfîrșitul perioadei de deținere",
                     "Liniaritatea în P"
                 ],
-                "correctExplanation": "Prin Itô, portofoliul de reechilibrare minus fondul crește cu -0,5 V'' sigma^2 P^2 dt; cu V'' = -0,5 sqrt(k) P^(-3/2) aceasta este (sigma^2/8) V dt.",
-                "incorrectExplanation": "LVR este un efect de ordinul doi (gamma) al unei funcții de valoare concave; comisioanele îl reduc, iar pierderea impermanentă este o mărime de capăt, independentă de traiectorie."
+                "correctExplanation": "Prin Itô, portofoliul de reechilibrare minus pool-ul crește cu -0,5 V'' sigma^2 P^2 dt; cu V'' = -0,5 sqrt(k) P^(-3/2) aceasta este (sigma^2/8) V dt.",
+                "incorrectExplanation": "LVR este un efect de ordinul doi (gamma) al unei funcții de valoare concave; comisioanele îl reduc, iar pierderea impermanentă se calculează doar la sfîrșitul perioadei și nu depinde de traiectorie."
             }
         },
         {
@@ -381,7 +381,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "Autoritățile i-au înghețat conturile",
                     "Răscumpărarea a creat mai mult din al doilea token (LUNA), împingîndu-i prețul în jos, fără garanții externe"
                 ],
-                "correctExplanation": "Fără rezerve, răscumpărările în LUNA au diluat LUNA și au slăbit și mai mult paritatea: o spirală a morții.",
+                "correctExplanation": "Fără rezerve, răscumpărările în LUNA au diluat LUNA și au slăbit și mai mult paritatea: o spirală descendentă autoîntreținută (death spiral).",
                 "incorrectExplanation": "TerraUSD nu avea garanții externe; paritatea se sprijinea pe încredere și pe valoarea LUNA."
             }
         },
@@ -455,7 +455,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "Pierderea față de reechilibrare",
-                "text": "Pentru un fond cu produs constant și volatilitatea prețului sigma, cu ce rată crește pierderea față de reechilibrare?",
+                "text": "Pentru un pool cu produs constant și volatilitatea prețului sigma, cu ce rată crește pierderea față de reechilibrare?",
                 "options": [
                     "sigma",
                     "sigma / 2",
@@ -463,7 +463,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "sigma^2 / 8"
                 ],
                 "correctExplanation": "Milionis et al. (2022): LVR / V = sigma^2 / 8 pe unitatea de timp; cu sigma = 68% înseamnă aproximativ 5,8% pe an.",
-                "incorrectExplanation": "Rata este pătratică în volatilitate, cu factorul o optime."
+                "incorrectExplanation": "Rata este pătratică în volatilitate, cu factorul 1/8."
             }
         },
         {
@@ -490,7 +490,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "Exclude stablecoin-urile"
                 ],
                 "correctExplanation": "Variațiile lunare ale TVL depind de randamentele Ether cu o pantă de aproximativ 0,8 și R^2 de aproximativ 0,6; regresia nu separă evaluarea de depunerile nete.",
-                "incorrectExplanation": "TVL este o valoare de piață: o scădere a prețului o reduce chiar dacă nimeni nu retrage."
+                "incorrectExplanation": "TVL este o valoare de piață: o scădere a prețului o reduce chiar dacă nimeni nu își retrage fondurile."
             }
         },
         {
@@ -516,7 +516,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "IBIT se tranzacționează în weekend",
                     "Bitcoin este mai puțin volatil săptămînal"
                 ],
-                "correctExplanation": "Randamentele zilnice compară prețuri din momente diferite; randamentele săptămînale reduc zgomotul de moment.",
+                "correctExplanation": "Randamentele zilnice compară prețuri din momente diferite; randamentele săptămînale reduc zgomotul de sincronizare.",
                 "incorrectExplanation": "Fondul deține Bitcoin spot; R^2 zilnic scăzut este un artefact de măsurare."
             }
         },
@@ -571,7 +571,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "O poziție în Bitcoin cu efect de levier, plus riscul pieței de acțiuni"
                 ],
                 "correctExplanation": "Un beta peste 1 față de Bitcoin plus un beta de acțiune: mai mult decît expunerea la Bitcoin, plus riscul bursei.",
-                "incorrectExplanation": "Ambii beta sînt importanți, deci acțiunea nu este nici un instrument pur, nici defensivă."
+                "incorrectExplanation": "Ambii coeficienți beta sînt importanți, deci acțiunea nu este nici un instrument pur, nici defensivă."
             }
         },
         {

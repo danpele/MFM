@@ -57,7 +57,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Pentru că sub ipoteza nulă a rădăcinii unitare statistica tinde la o funcțională a mișcării browniene standard care depinde doar de r0 și de termenii determiniști",
                     "Pentru că întîrzierile ADF elimină orice dependență din date"
                 ],
-                "correctExplanation": "Sub un mers aleator cu drift asimptotic neglijabilă, fiecare ADF pe fereastră tinde la un raport de funcționale browniene în care sigma se simplifică; SADF și GSADF sînt supremuri ale acestei funcționale, deci cuantilele lor depind doar de r0 (și de specificarea termenului liber/drift-ului).",
+                "correctExplanation": "Sub un mers aleator cu drift asimptotic neglijabil, fiecare ADF pe fereastră tinde la un raport de funcționale browniene în care sigma se simplifică; SADF și GSADF sînt supremuri ale acestei funcționale, deci cuantilele lor depind doar de r0 (și de specificarea termenului liber/drift-ului).",
                 "incorrectExplanation": "Limita este pivotală, dar nestandard: sigma și drift-ul dispar, iar supremul pe ferestre nu urmează distribuția Normală. Argumentul este asimptotic și presupune dispersie constantă; la schimbări de volatilitate nivelul în eșantioane finite este distorsionat și este nevoie de wild bootstrap."
             }
         },
@@ -109,9 +109,9 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Pentru că dividendele sînt mereu pozitive",
                     "Pentru că autoritățile o interzic",
                     "Pentru că volatilitatea este mereu pozitivă",
-                    "Pentru că o bulă negativă care crește cu rata r ar împinge în cele din urmă prețul sub zero, ceea ce libera renunțare exclude"
+                    "Pentru că o bulă negativă care crește cu rata r ar împinge în cele din urmă prețul sub zero, ceea ce exclude posibilitatea de a renunța gratuit la activ (free disposal)"
                 ],
-                "correctExplanation": "O bulă negativă ar crește în valoare absolută cu rata r și ar duce prețul așteptat sub zero; răspunderea limitată și libera renunțare fac acest lucru imposibil.",
+                "correctExplanation": "O bulă negativă ar crește în valoare absolută cu rata r și ar duce prețul așteptat sub zero; răspunderea limitată și posibilitatea de a renunța gratuit la activ (free disposal) fac acest lucru imposibil.",
                 "incorrectExplanation": "Argumentul folosește creșterea explozivă a bulei: o bulă negativă ar implica în cele din urmă un preț negativ, care nu poate fi un echilibru."
             }
         },
@@ -301,7 +301,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Pentru că raportul nu are sezonalitate"
                 ],
                 "correctExplanation": "Fundamentele pot crește rapid; împărțirea la dividende elimină această creștere, deci un raport exploziv este o dovadă împotriva explicației doar prin valoarea fundamentală.",
-                "incorrectExplanation": "Un preț exploziv poate reflecta fundamente explozive; raportul controlează evoluția dividendelor, acesta este motivul pentru care îl folosim."
+                "incorrectExplanation": "Un preț exploziv poate reflecta fundamente explozive; raportul ține cont de evoluția dividendelor și de aceea îl folosim."
             }
         },
         {
@@ -327,7 +327,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Pentru că ferestrele rezultatului se suprapun și semnalele vin în serii, deci observațiile sînt dependente; folosiți un bootstrap pe blocuri sau o regresie cu erori standard HAC",
                     "Pentru că scăderile de preț urmează distribuția Normală"
                 ],
-                "correctExplanation": "Datele consecutive au în comun pînă la 85 din cele 90 de zile ale rezultatului, iar indicatorul este persistent, deci numărul efectiv de observații independente este mult mai mic; un bootstrap pe blocuri circulare de 90 de zile sau erorile standard Newey-West dau un interval onest.",
+                "correctExplanation": "Datele consecutive au în comun pînă la 85 din cele 90 de zile ale rezultatului, iar indicatorul este persistent, deci numărul efectiv de observații independente este mult mai mic; un bootstrap pe blocuri circulare de 90 de zile sau erorile standard Newey-West dau un interval valid.",
                 "incorrectExplanation": "Testul z presupune date independente. Rezultatele suprapuse și semnalele grupate îi fac eroarea standard prea mică, ceea ce exagerează semnificația."
             }
         },
@@ -378,11 +378,11 @@ window.MFM_DATA.quizzes['bubbles'] = {
                 "options": [
                     "Este stabil de la o dată de estimare la alta",
                     "Coincide mereu cu vîrful real",
-                    "Se mută pe măsură ce fereastra se termină mai tîrziu, variază cu luni de la o fereastră la alta și, fiind constrîns să fie ulterior sfîrșitului ferestrei, se mută mereu înaintea datei curente",
+                    "Se mută pe măsură ce fereastra se termină mai tîrziu, variază cu luni de la o fereastră la alta și, fiind constrîns să fie ulterior sfîrșitului ferestrei, rămîne mereu după data curentă",
                     "Este mereu în trecut"
                 ],
-                "correctExplanation": "Pentru Bitcoin în 2017 și Nasdaq 100 în 2000, tc s-a deplasat odată cu sfîrșitul ferestrei și a variat pe mai multe luni înaintea vîrfului; spațiul de căutare impune tc ulterior datei t2, deci faptul că rămîne înaintea datei curente este o constrîngere, nu o dovadă.",
-                "incorrectExplanation": "O singură ajustare poate impresiona, dar estimarea depinde de fereastră; o evaluare onestă privește întreaga succesiune de ajustări în timp real."
+                "correctExplanation": "Pentru Bitcoin în 2017 și Nasdaq 100 în 2000, tc s-a deplasat odată cu sfîrșitul ferestrei și a variat pe mai multe luni înaintea vîrfului; spațiul de căutare impune tc ulterior datei t2, deci faptul că rămîne după data curentă este o constrîngere, nu o dovadă.",
+                "incorrectExplanation": "O singură ajustare poate impresiona, dar estimarea depinde de fereastră; o evaluare corectă privește întreaga succesiune de ajustări în timp real."
             }
         },
         {
@@ -408,7 +408,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Probabilitatea unui crah mîine",
                     "Valoarea p a testului GSADF"
                 ],
-                "correctExplanation": "Se ajustează multe ferestre [t2 - L, t2]; indicatorul este fracția celor ai căror parametri sînt în intervalele admise, o măsură a robusteții semnalului de bulă.",
+                "correctExplanation": "Se ajustează multe ferestre [t2 - L, t2]; indicatorul este fracția celor ale căror parametri sînt în intervalele admise, o măsură a robusteții semnalului de bulă.",
                 "incorrectExplanation": "Agregă multe ajustări în loc să se bazeze pe una singură și se calculează doar cu datele pînă la t2."
             }
         },
@@ -516,7 +516,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "O probabilitate mai mare a unei scăderi de 40%, dar nu un randament mediu semnificativ negativ",
                     "Nimic"
                 ],
-                "correctExplanation": "Creșterile de peste 100% ridică probabilitatea unui crah mult peste rata necondiționată, în timp ce randamentul mediu ulterior nu este semnificativ negativ: creșterile nu sînt singure un semnal de vînzare.",
+                "correctExplanation": "Creșterile de peste 100% ridică probabilitatea unui crah mult peste rata necondiționată, în timp ce randamentul mediu ulterior nu este semnificativ negativ: creșterile singure nu sînt un semnal de vînzare.",
                 "incorrectExplanation": "Dovezile privesc probabilitatea de crah, nu pierderi previzibile în medie; multe creșteri continuă."
             }
         },

@@ -30,7 +30,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Atît driftul, cît și volatilitatea",
                     "Nimic, deoarece măsurile echivalente dau aceleași valori așteptate"
                 ],
-                "correctExplanation": "Sub Q, W devine W~ plus o deplasare de drift, deci dX = (a - b theta) dt + b dW~: driftul se mută, b și variația pătratică nu. Sub GBM cu volatilitate constantă, varianța realizată măsoară deci sigma care evaluează opțiunile; cu volatilitate stochastică, P și Q pot pondera totuși diferit traiectoriile viitoare ale varianței.",
+                "correctExplanation": "Sub Q, W devine W~ plus o deplasare de drift, deci dX = (a - b theta) dt + b dW~: driftul se schimbă, b și variația pătratică nu. Sub GBM cu volatilitate constantă, varianța realizată măsoară deci sigma care evaluează opțiunile; cu volatilitate stochastică, P și Q pot pondera totuși diferit traiectoriile viitoare ale varianței.",
                 "incorrectExplanation": "Variația pătratică este o proprietate a traiectoriei, identică sub măsuri echivalente, deci volatilitatea nu se poate schimba; măsurile echivalente au aceleași evenimente de probabilitate zero, nu aceleași valori așteptate, deci driftul se schimbă."
             }
         },
@@ -135,7 +135,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "options": [
                     "Este singura integrală cu o formă închisă",
                     "Regula punctului de mijloc nu converge",
-                    "Poziția trebuie aleasă înainte de a cunoaște următoarea mișcare a prețului, deci integrandul nu poate privi în viitor",
+                    "Poziția trebuie aleasă înainte de a cunoaște următoarea mișcare a prețului, deci integrandul nu poate folosi informații din viitor",
                     "Face mișcarea browniană derivabilă"
                 ],
                 "correctExplanation": "Evaluarea în capătul stîng păstrează integrandul adaptat: o strategie de tranzacționare decisă cu informația de azi.",
@@ -355,7 +355,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "O mixtură Poisson de distribuții Normale"
                 ],
                 "correctExplanation": "2c r_{t + Delta} condiționat de r_t este chi-pătrat necentral cu 4 kappa theta / sigma^2 grade de libertate și parametrul de necentralitate 2c r_t exp(-kappa Delta), c = 2 kappa / (sigma^2 (1 - exp(-kappa Delta))): verosimilitatea exactă este disponibilă, iar condiția Feller este îndeplinită cînd gradele de libertate sînt cel puțin 2.",
-                "incorrectExplanation": "Difuzia de tip rădăcină pătrată menține rata nenegativă și face legea asimetrică la dreapta; legea Normală este cea Vasicek, iar mixtura Poisson aparține modelului Merton cu salturi."
+                "incorrectExplanation": "Volatilitatea sigma sqrt(r) scade spre zero cînd rata se apropie de zero, deci rata nu devine negativă, iar legea este asimetrică la dreapta; legea Normală este cea Vasicek, iar mixtura Poisson aparține modelului Merton cu salturi."
             }
         },
         {
@@ -482,7 +482,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
             },
             "ro": {
                 "title": "Merton estimat prin MLE",
-                "text": "Estimat prin verosimilitate maximă pe randamentele zilnice ale S&P 500, modelul Merton dă circa 100 de salturi mici pe an. Cum trebuie citit acest rezultat?",
+                "text": "Estimat prin verosimilitate maximă pe randamentele zilnice ale S&P 500, modelul Merton dă circa 100 de salturi mici pe an. Cum trebuie interpretat acest rezultat?",
                 "options": [
                     "Modelul i.i.d. folosește salturile pentru a imita volatilitatea variabilă",
                     "S&P 500 sare la fiecare două-trei zile",
@@ -651,8 +651,8 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Merton reproduce gruparea volatilității",
                     "Heston reproduce excesul de aplatizare de 10,9"
                 ],
-                "correctExplanation": "Statistica Hill Merton (2,70) este aproape de date (2,56), dar ACF a lui |r| este zero; ACF Heston se potrivește, dar ambele dau un exces de aplatizare de circa 3,5 față de 10,9.",
-                "incorrectExplanation": "GBM eșuează la toate statisticile, salturile i.i.d. nu pot crea grupare și niciun model estimat nu atinge aplatizarea: rezultatele susțin combinarea salturilor cu volatilitatea stochastică."
+                "correctExplanation": "Statistica Hill Merton (2,70) este aproape de date (2,56), dar ACF a lui |r| este zero; ACF Heston este apropiată de cea din date, dar ambele dau un exces de aplatizare de circa 3,5 față de 10,9.",
+                "incorrectExplanation": "GBM nu reproduce niciuna dintre statistici, salturile i.i.d. nu pot crea grupare și niciun model estimat nu atinge aplatizarea: rezultatele susțin combinarea salturilor cu volatilitatea stochastică."
             }
         },
         {

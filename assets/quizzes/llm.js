@@ -27,7 +27,7 @@ window.MFM_DATA.quizzes['llm'] = {
                 "options": [
                     "Este atenuată: limita ei în probabilitate este de circa 0,45 ori efectul adevărat, deci efectul adevărat este de circa 2,2 ori mai mare în valoare absolută",
                     "Este nedistorsionată, dar mai puțin precisă, pentru că erorile de clasificare se compensează",
-                    "Este distorsionată departe de zero, pentru că falsele negative exagerează contrastul",
+                    "Este amplificată (îndepărtată de zero), pentru că falsele negative exagerează contrastul",
                     "Nu este afectată, pentru că clasificarea greșită schimbă doar termenul liber"
                 ],
                 "correctExplanation": "Cu un regresor binar clasificat greșit (Aigner, 1973), plim b = β·π(1 − π)(1 − α0 − α1)/[p(1 − p)] = β·0,449 aici. Semnul se păstrează cît timp α0 + α1 < 1, dar mărimea scade.",
@@ -219,7 +219,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "FinBERT are mai mulți parametri decît Qwen2.5-7B și face overfitting pe textele scurte",
                     "FinBERT a fost ajustat fin pe cea mai mare parte din Financial PhraseBank, deci o parte din avantajul său acolo provine probabil din suprapunerea cu datele de antrenare"
                 ],
-                "correctExplanation": "Și Qwen2.5-7B scade, cu 7,2 puncte, pentru că titlurile Twitter sînt mai grele. Dacă ambele modele ar pierde la fel fără suprapunerea cu datele de antrenare (o ipoteză de identificare, netestabilă aici), diferența diferențelor, 9,2 puncte (CI bootstrap [6,7; 11,9]), se datorează suprapunerii; CI acoperă doar zgomotul de eșantionare. Evaluați un model de limbaj doar pe texte pe care nu le-a văzut niciodată.",
+                "correctExplanation": "Și Qwen2.5-7B scade, cu 7,2 puncte, pentru că titlurile Twitter sînt mai greu de clasificat. Dacă ambele modele ar pierde la fel fără suprapunerea cu datele de antrenare (o ipoteză de identificare, netestabilă aici), diferența diferențelor, 9,2 puncte (CI bootstrap [6,7; 11,9]), se datorează suprapunerii; CI acoperă doar zgomotul de eșantionare. Evaluați un model de limbaj doar pe texte pe care nu le-a văzut niciodată.",
                 "incorrectExplanation": "FinBERT-ul public (ProsusAI/finbert) a fost ajustat fin pe o parte de antrenare din Financial PhraseBank (3 101 din 4 845 de propoziții la Araci, 2019); scorul lui acolo este în mare parte în eșantion, deci comparația nu este corectă."
             }
         },
@@ -328,7 +328,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "Alegerea prompt-ului după ce ați văzut rezultatele pe test este data snooping; prompt-ul trebuie fixat dinainte sau ales pe un set de validare separat"
                 ],
                 "correctExplanation": "Prompt-ul este un parametru de ajustare ca oricare altul. Alegerea lui pe setul de test umflă acuratețea raportată: același data snooping discutat în Capitolul 13.",
-                "incorrectExplanation": "Raportarea celui mai bun dintre mai multe prompt-uri pe setul de test supraestimează performanța; prompt-ul trebuie fixat înainte de test sau selectat pe date de validare."
+                "incorrectExplanation": "Raportarea celui mai bun dintre mai multe prompt-uri pe setul de test supraestimează acuratețea; prompt-ul trebuie fixat înainte de test sau selectat pe date de validare."
             }
         },
         {
@@ -433,7 +433,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "Modelul prognozează bine lunile viitoare, deci este un bun instrument de prognoză",
                     "Ambele rezultate sînt compatibile cu lipsa oricărei cunoașteri",
                     "Modelul își amintește zilele individuale mai bine decît lunile",
-                    "Își amintește parțial direcția lunară (regimuri, luni celebre), dar nu mișcările zilnice: look-ahead bias este un pericol la orizontul evenimentelor cunoscute"
+                    "Își amintește parțial direcția lunară (regimuri, luni celebre), dar nu mișcările zilnice: look-ahead bias-ul este un pericol pentru evenimentele bine cunoscute"
                 ],
                 "correctExplanation": "Un AUC de 0,5 înseamnă nicio cunoaștere. Un AUC lunar mult peste 0,5 înainte de publicare este memoria istoriei pieței (de exemplu octombrie 2008, martie 2020); zgomotul zilnic nu este memorat.",
                 "incorrectExplanation": "Sînt luni trecute despre care modelul a citit la antrenare, nu prognoze; 0,69 pentru luni față de circa 0,5 pentru zile înseamnă doar o memorie grosieră a regimurilor și a episoadelor celebre."
@@ -509,7 +509,7 @@ window.MFM_DATA.quizzes['llm'] = {
             },
             "ro": {
                 "title": "Erori standard grupate",
-                "text": "Regresia pe date cumulate a randamentelor în exces pe scorul zilnic standardizat de sentiment folosește toate zilele-acțiune cu știri. De ce sînt erorile standard grupate pe zile de tranzacționare (Petersen, 2009)?",
+                "text": "Regresia pe panelul agregat (pooled) a randamentelor în exces pe scorul zilnic standardizat de sentiment folosește toate zilele-acțiune cu știri. De ce sînt erorile standard grupate pe zile de tranzacționare (Petersen, 2009)?",
                 "options": [
                     "Pentru că scorurile de sentiment nu urmează distribuția Normală",
                     "Pentru că fiecare acțiune are un număr diferit de titluri",
@@ -644,15 +644,15 @@ window.MFM_DATA.quizzes['llm'] = {
             },
             "ro": {
                 "title": "Curba specificațiilor",
-                "text": "Din 36 de variante ale strategiei pe titluri (3 scoruri × 3 praguri × 4 zile ale cîștigului), 3 au t > 1,96. Schimbînd aleator semnul pozițiilor în blocuri de 10 zile de semnal, aceleași schimbări pentru toate variantele, 3 sau mai multe astfel de valori t apar cu probabilitatea 0,113. Ce este corect să raportați?",
+                "text": "Din 36 de variante ale strategiei pe titluri (3 scoruri × 3 praguri × 4 zile de randament), 3 au t > 1,96. Schimbînd aleator semnul pozițiilor în blocuri de 10 zile de semnal, aceleași schimbări pentru toate variantele, 3 sau mai multe astfel de valori t apar cu probabilitatea 0,113. Ce este corect să raportați?",
                 "options": [
                     "Cea mai bună variantă, pentru că are t > 1,96",
                     "Cele trei variante semnificative, pentru că se confirmă reciproc",
                     "Media celor 36 de statistici t, pentru că media elimină zgomotul",
                     "Întreaga curbă, cu testul comun: dovezile sînt compatibile cu lipsa predictibilității la 5%"
                 ],
-                "correctExplanation": "O curbă a specificațiilor (Simonsohn, Simmons & Nelson, 2020) raportează toate alegerile rezonabile și le testează împreună. Schimbările comune, pe blocuri, păstrează dependența dintre variante și dependența serială pe termen scurt; testul presupune randamente cu semn simetrice sub nul și blocuri aproximativ independente. Aici valoarea p comună este 0,113, iar t median este 0,50.",
-                "incorrectExplanation": "Variantele folosesc aceleași zile și acțiuni, deci statisticile lor t sînt dependente; selecția sau media lor ignoră căutarea. Este nevoie de un test comun sub un nul comun."
+                "correctExplanation": "O curbă a specificațiilor (Simonsohn, Simmons & Nelson, 2020) raportează toate alegerile rezonabile și le testează împreună. Schimbările comune, pe blocuri, păstrează dependența dintre variante și dependența serială pe termen scurt; testul presupune, sub ipoteza nulă, randamente cu semn simetrice și blocuri aproximativ independente. Aici valoarea p comună este 0,113, iar t median este 0,50.",
+                "incorrectExplanation": "Variantele folosesc aceleași zile și acțiuni, deci statisticile lor t sînt dependente; selecția sau media lor ignoră căutarea. Este nevoie de un test comun, sub o ipoteză nulă comună."
             }
         },
         {
@@ -705,7 +705,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "Rezultatul este invalid doar pentru că modelul are mai puțini parametri decît GPT-4",
                     "Nu este nicio eroare: faptul că modelul nu a fost estimat pe randamente este suficient pentru a fi în afara eșantionului"
                 ],
-                "correctExplanation": "Look-ahead bias: un LLM publicat în 2024 poate conține informații despre ce a urmat titlurilor anterioare, deci nu este dovedit că testul folosește doar informația disponibilă la momentul respectiv. Testele curate folosesc titluri de după data-limită sau modele point-in-time (textul anonimizat atenuează problema, fără a o elimina dovedit); în plus, cei 5,64 bp dispar după costuri.",
+                "correctExplanation": "Look-ahead bias: un LLM publicat în 2024 poate conține informații despre ce a urmat titlurilor anterioare, deci nu este dovedit că testul folosește doar informația disponibilă la momentul respectiv. Testele curate folosesc titluri de după data-limită sau modele point-in-time (textul anonimizat atenuează problema, fără a o elimina cu certitudine); în plus, cei 5,64 bp dispar după costuri.",
                 "incorrectExplanation": "În afara eșantionului înseamnă că modelul nu a avut acces la informația din perioada de test; un model antrenat pe texte pînă în 2024 poate să o fi avut, chiar dacă nu a văzut direct seria de randamente."
             }
         }

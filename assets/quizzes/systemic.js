@@ -57,7 +57,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Pentru că banca este inclusă în portofoliul sistemului",
                     "Pentru că eșantionul efectiv din coadă (alpha înmulțit cu n) este mic, deci aproximarea Normală pentru cuantile centrale poate fi slabă; inferența pentru cuantile extreme sau subeșantionarea este alternativa construită pentru acest caz"
                 ],
-                "correctExplanation": "Asimptotica regresiei cuantile cere multe observații în jurul cuantilei; cu alpha n de cîteva zeci, estimarea rarefierii este zgomotoasă, iar teoria cuantilelor extreme este construită pentru acest caz; cît de slabă este aproximarea Normală depinde și de regresori și de coadă.",
+                "correctExplanation": "Asimptotica regresiei cuantile cere multe observații în jurul cuantilei; cu alpha n de cîteva zeci, estimarea inversei densității este zgomotoasă, iar teoria cuantilelor extreme este construită pentru acest caz; cît de slabă este aproximarea Normală depinde și de regresori și de coadă.",
                 "incorrectExplanation": "Erorile standard există, iar sistemul exclude banca; problema este numărul mic de observații din coadă, care poate face inexactă aproximarea Normală pentru cuantile centrale."
             }
         },
@@ -300,7 +300,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Pentru că zilele din coadă se grupează în crize, iar blocurile păstrează aceste grupări",
                     "Pentru că regresia cuantilă are nevoie de exact 20 de observații"
                 ],
-                "correctExplanation": "Gruparea volatilității face zilele din coadă dependente; blocurile păstrează dependența și dau intervale mai largi și mai oneste.",
+                "correctExplanation": "Gruparea volatilității face zilele din coadă dependente; blocurile păstrează dependența și dau intervale mai largi și mai realiste.",
                 "incorrectExplanation": "Motivul este dependența: bootstrap-ul i.i.d. desparte grupările din crize și subestimează incertitudinea."
             }
         },
@@ -350,12 +350,12 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "text": "În curs, de ce s-a mișcat Delta-CoVaR al celor șase bănci aproape împreună în timp?",
                 "options": [
                     "Pentru că cele șase bănci sînt aceeași companie",
-                    "Pentru că variabilele de stare întîrziate comune conduc cuantilele condiționate ale băncilor",
+                    "Pentru că variabilele de stare întîrziate comune determină cuantilele condiționate ale băncilor",
                     "Pentru că nu s-a folosit bootstrap-ul",
                     "Pentru că panta b se schimbă în fiecare zi"
                 ],
                 "correctExplanation": "Cu variabile de stare precum VIX, variația în timp vine din stare; panta b este constantă.",
-                "incorrectExplanation": "Panta se estimează o singură dată; variabilele de stare comune mișcă împreună toate cuantilele condiționate."
+                "incorrectExplanation": "Panta se estimează o singură dată; variabilele de stare comune deplasează împreună toate cuantilele condiționate."
             }
         },
         {
@@ -489,7 +489,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Ca transmițători către băncile americane",
                     "Ca receptori neți, cu o pondere proprie mare a dispersiei"
                 ],
-                "correctExplanation": "Ponderile lor proprii au fost peste 70%, iar spillover-urile nete negative: sînt conduse mai ales de șocuri interne și primesc mai mult decît trimit.",
+                "correctExplanation": "Ponderile lor proprii au fost peste 70%, iar spillover-urile nete negative: sînt determinate mai ales de șocuri interne și primesc mai mult decît trimit.",
                 "incorrectExplanation": "Băncile românești primesc puțin de la băncile americane și europene și nu trimit aproape nimic înapoi."
             }
         },
@@ -617,15 +617,15 @@ window.MFM_DATA.quizzes['systemic'] = {
             },
             "ro": {
                 "title": "Riscul climatic",
-                "text": "Ce afirmație despre testul de stres climatic al ECB din 2022 este corectă?",
+                "text": "Ce afirmație despre testul de stres climatic al BCE din 2022 este corectă?",
                 "options": [
                     "Aproximativ 60% dintre bănci nu aveau un cadru de testare la stres pentru riscul climatic",
                     "Toate băncile includeau riscul climatic în modelele de credit",
                     "Pierderile au fost zero în toate scenariile",
                     "A fost un exercițiu de adecvare a capitalului care a stabilit cerințe de capital"
                 ],
-                "correctExplanation": "ECB a raportat că aproximativ 60% dintre bănci nu aveau încă un cadru de testare la stres pentru riscul climatic; testul a fost un exercițiu de învățare.",
-                "incorrectExplanation": "Exercițiul nu a fost un test de adecvare a capitalului; a găsit lipsuri de date și a proiectat pierderi de aproximativ 70 de miliarde EUR pentru 41 de bănci, pe care ECB le-a considerat subestimate."
+                "correctExplanation": "BCE a raportat că aproximativ 60% dintre bănci nu aveau încă un cadru de testare la stres pentru riscul climatic; testul a fost un exercițiu de învățare.",
+                "incorrectExplanation": "Exercițiul nu a fost un test de adecvare a capitalului; a găsit lipsuri de date și a proiectat pierderi de aproximativ 70 de miliarde EUR pentru 41 de bănci, pe care BCE le-a considerat subestimate."
             }
         },
         {
@@ -678,7 +678,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Acesta este ES 5% al băncii; MES condiționează pe coada pieței, -E[X_i | X_m <= q_5%(X_m)], care aici este 0,5 x 2,5 x phi(1,645)/0,05 = 2,58%",
                     "MES trebuie raportat ca număr negativ"
                 ],
-                "correctExplanation": "Deficitul marginal așteptat măsoară pierderea așteptată a băncii în cele mai proaste zile ale pieței: MES = beta x ES_5%(X_m) = rho x sigma_i x phi(1,645)/0,05 = 2,58%. O verificare rapidă: cu rho = 0 MES trebuie să fie 0, dar formula AI-ului nu îl conține pe rho.",
+                "correctExplanation": "MES (pierderea marginală așteptată în coadă) măsoară pierderea așteptată a băncii în cele mai proaste zile ale pieței: MES = beta x ES_5%(X_m) = rho x sigma_i x phi(1,645)/0,05 = 2,58%. O verificare rapidă: cu rho = 0 MES trebuie să fie 0, dar formula AI-ului nu îl conține pe rho.",
                 "incorrectExplanation": "Evenimentul de condiționare este un crah al pieței, nu o zi proastă a băncii: MES = -E[X_i | X_m <= q_5%(X_m)], care depinde de corelație și aici este 2,58%."
             }
         },

@@ -22,7 +22,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "incorrectExplanation": "The cause is the repeated product of Jacobians across time steps, not the optimiser or the shape of the loss."
                 },
                 "ro": {
-                    "title": "Gradientul care dispare",
+                    "title": "Dispariția gradientului",
                     "text": "De ce dispar gradienții cînd o rețea recurentă simplă (RNN) este antrenată pe secvențe lungi?",
                     "options": [
                         "Gradientul față de o intrare aflată cu k pași în urmă este un produs de k matrice jacobiene; cînd normele lor sînt sub 1, produsul scade geometric",
@@ -53,7 +53,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "text": "Într-un LSTM, starea celulei evoluează după c_t = f_t ⊙ c_{t-1} + i_t ⊙ g_t. Ce implică acest lucru pentru învățarea memoriei lungi?",
                     "options": [
                         "Doar poarta de ieșire decide cît de departe în urmă poate ajunge gradientul",
-                        "Pe drumul direct al stării celulei (cu porțile și candidatul fixate), derivata lui c_T în raport cu c_{T-k} este produsul porților de uitare, deci memoria supraviețuiește cînd poarta de uitare rămîne aproape de 1",
+                        "Pe drumul direct al stării celulei (cu porțile și candidatul fixate), derivata lui c_T în raport cu c_{T-k} este produsul porților de uitare, deci memoria se păstrează cînd poarta de uitare rămîne aproape de 1",
                         "Candidatul g_t trebuie să fie zero pentru ca rețeaua să-și amintească",
                         "Starea celulei este resetată la zero la fiecare pas, deci nu există memorie lungă"
                     ],
@@ -76,7 +76,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "incorrectExplanation": "Raise each forget-gate value to the power 50: 0.953^50 ≈ 0.09 and 0.5^50 ≈ 10^-15."
                 },
                 "ro": {
-                    "title": "Deplasarea porții de uitare",
+                    "title": "Termenul liber al porții de uitare",
                     "text": "O poartă de uitare constantă f = σ(3) ≈ 0,953 este comparată cu f = σ(0) = 0,5. Ce fracțiune din semnal rămîne după 50 de pași în fiecare caz?",
                     "options": [
                         "Circa 50% în ambele cazuri",
@@ -166,7 +166,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Folosiți un test unilateral ca să înjumătățiți valoarea p și problema dispare"
                     ],
                     "correctExplanation": "Șansa ca cea mai mică dintre 18 valori p să cadă sub 0,05 din noroc este mare. În familia BET de șase modele, Romano–Wolf dă p ≈ 0,017 și SPA p ≈ 0,02; pe toate cele 18 teste, Holm dă circa 0,14.",
-                    "incorrectExplanation": "Cu multe teste, cea mai mică valoare p este deplasată în jos; controlați eroarea pe familie (Holm, Romano–Wolf, SPA) pentru familia declarată înainte de a privi."
+                    "incorrectExplanation": "Cu multe teste, cea mai mică valoare p este deplasată în jos; controlați eroarea pe familie (Holm, Romano–Wolf, SPA) pentru familia declarată înainte de a vedea rezultatele."
                 }
             },
             {
@@ -301,7 +301,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "ES devine negativ"
                     ],
                     "correctExplanation": "Păstrarea cuantilei la valoarea de 1% sub nivelul de 1% taie partea cea mai extremă a cozii, deci pierderea medie din coadă iese prea mică; interpolarea între nivelurile grilei ar adăuga o eroare de orice semn.",
-                    "incorrectExplanation": "Coada tăiată sub cel mai mic nivel face ca ES calculat să fie prea mic."
+                    "incorrectExplanation": "Coada trunchiată sub cel mai mic nivel face ca ES calculat să fie prea mic."
                 }
             },
             {
@@ -405,10 +405,10 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "options": [
                         "Este întotdeauna mai mică decît MSE",
                         "Nu cere ca prognozele să fie pozitive",
-                        "La fel ca MSE, ierarhizează corect prognozele cînd varianța realizată este o aproximare condiționat nedeplasată, dar depinde de raportul dintre realizare și prognoză și este mai puțin dominată de cîteva zile extreme",
+                        "La fel ca MSE, ordonează corect prognozele cînd varianța realizată este o aproximare condiționat nedeplasată, dar depinde de raportul dintre realizare și prognoză și este mai puțin dominată de cîteva zile extreme",
                         "Ignoră subestimarea volatilității"
                     ],
-                    "correctExplanation": "Patton (2011): atît MSE, cît și QLIKE păstrează ierarhia varianței adevărate cînd E[RV | F] = σ²; QLIKE = y/f − log(y/f) − 1 penalizează erorile relative y/f, astfel încît cîteva zile cu varianță mare nu domină comparația.",
+                    "correctExplanation": "Patton (2011): atît MSE, cît și QLIKE păstrează ordinea dată de varianța adevărată cînd E[RV | F] = σ²; QLIKE = y/f − log(y/f) − 1 penalizează erorile relative y/f, astfel încît cîteva zile cu varianță mare nu domină comparația.",
                     "incorrectExplanation": "Robustețea la aproximare este comună cu MSE; motivul pentru QLIKE este scala erorilor relative; QLIKE cere prognoze pozitive și penalizează puternic subestimarea."
                 }
             },
@@ -535,16 +535,16 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "incorrectExplanation": "Selecting the best seed after seeing test results overstates performance; report all seeds or an ensemble."
                 },
                 "ro": {
-                    "title": "Semințele aleatoare",
-                    "text": "Cinci LSTM-uri cu aceleași date și aceeași arhitectură, dar cu semințe aleatoare diferite, dau valori diferite ale R² în afara eșantionului. Care este practica corectă de raportare?",
+                    "title": "Seed-urile aleatoare",
+                    "text": "Cinci LSTM-uri cu aceleași date și aceeași arhitectură, dar cu seed-uri aleatoare diferite, dau valori diferite ale R² în afara eșantionului. Care este practica corectă de raportare?",
                     "options": [
-                        "Raportați doar cea mai bună sămînță, pentru că arată potențialul metodei",
-                        "Raportați doar prima sămînță, pentru că alegerea este arbitrară",
-                        "Creșteți numărul de epoci pînă cînd toate semințele dau același R²",
-                        "Raportați întreaga distribuție pe semințe (sau media ansamblului), nu cea mai bună rulare"
+                        "Raportați doar cel mai bun seed, pentru că arată potențialul metodei",
+                        "Raportați doar primul seed, pentru că alegerea este arbitrară",
+                        "Creșteți numărul de epoci pînă cînd toate seed-urile dau același R²",
+                        "Raportați întreaga distribuție pe seed-uri (sau media ansamblului), nu cea mai bună rulare"
                     ],
-                    "correctExplanation": "Cînd semnalul este slab, variația de la o sămînță la alta are aceeași mărime ca efectul; alegerea celei mai bune semințe este o formă de overfitting al backtestului.",
-                    "incorrectExplanation": "Alegerea celei mai bune semințe după ce ați văzut rezultatele de test supraestimează performanța; raportați toate semințele sau un ansamblu."
+                    "correctExplanation": "Cînd semnalul este slab, variația de la un seed la altul are aceeași mărime ca efectul; alegerea celui mai bun seed este o formă de overfitting al backtestului.",
+                    "incorrectExplanation": "Alegerea celui mai bun seed după ce ați văzut rezultatele de test supraestimează rezultatele metodei; raportați toate seed-urile sau un ansamblu."
                 }
             },
             {
@@ -562,10 +562,10 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "incorrectExplanation": "ES alone has no strictly consistent scoring function; the pair with the VaR at the same level does."
                 },
                 "ro": {
-                    "title": "Scorarea comună a VaR și ES",
+                    "title": "Funcții de scor comune pentru VaR și ES",
                     "text": "De ce este pierderea FZ0 evaluată pe perechea (VaR 2,5%, ES 2,5%), și nu doar pe ES 2,5%?",
                     "options": [
-                        "ES nu este elicitabil singur, dar perechea (VaR, ES) la același nivel este elicitabilă în comun, deci FZ0 clasifică prognozele perechii consecvent",
+                        "ES nu este elicitabil singur, dar perechea (VaR, ES) la același nivel este elicitabilă în comun, deci FZ0 ordonează consecvent prognozele perechii",
                         "Pentru că FZ0 este definită doar pentru VaR",
                         "Pentru că ES 2,5% este mereu mai mic decît VaR 2,5%",
                         "Pentru că regulile Basel interzic funcțiile de scor pentru ES"
@@ -678,7 +678,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Contextul trebuie mai întîi standardizat la varianță unitară",
                         "Fragmentul se termină cu r_t, valoarea prognozată: contextul trebuie să se oprească la r_{t-1}, adică r[t-512 : t]"
                     ],
-                    "correctExplanation": "Un fragment Python a:b include a și exclude b, deci r[t-511 : t+1] se termină la r_t; prognoza folosește atunci răspunsul (look-ahead bias), iar backtestul arată mult prea bine.",
+                    "correctExplanation": "Un fragment Python a:b include a și exclude b, deci r[t-511 : t+1] se termină la r_t; prognoza folosește atunci răspunsul (look-ahead bias), iar rezultatele backtestului par mult prea bune.",
                     "incorrectExplanation": "Scrieți primul și ultimul indice al fragmentului și comparați-l pe ultimul cu ziua prognozată."
                 }
             },

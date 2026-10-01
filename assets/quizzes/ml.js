@@ -54,10 +54,10 @@ window.MFM_DATA.quizzes['ml'] = {
                 options: [
                     'Testul Diebold-Mariano cere erori de prognoză din distribuția Normală',
                     'Erorile pătratice nu pot fi folosite pentru prognoze de probabilitate',
-                    'Modelele sînt imbricate: sub ipoteza nulă modelul mare estimează cu zgomot coeficienți nuli, deci statistica DM nu este asimptotic N(0,1) și are mărime prea mică; folosiți corecția Clark-West',
+                    'Modelele sînt imbricate: sub ipoteza nulă modelul mare estimează cu zgomot coeficienți nuli, deci statistica DM nu este asimptotic N(0,1), iar testul are un nivel efectiv prea mic; folosiți corecția Clark-West',
                     'Nimic: testul Diebold-Mariano este valid pentru orice pereche de modele'
                 ],
-                correctExplanation: 'Clark și West (2007) adaugă înapoi termenul $(\\hat p_0 - \\hat p_1)^2$ la diferența pierderilor, ceea ce elimină zgomotul pe care îl plătește un model imbricat corect cînd estimează coeficienți nuli.',
+                correctExplanation: 'Clark și West (2007) adaugă înapoi termenul $(\\hat p_0 - \\hat p_1)^2$ la diferența pierderilor, ceea ce elimină zgomotul de estimare care penalizează un model imbricat corect specificat cînd estimează coeficienți nuli.',
                 incorrectExplanation: 'Gîndiți-vă ce face modelul mare sub ipoteza nulă că nu adaugă nimic: estimează totuși 14 coeficienți, iar zgomotul lor îi mărește pierderea.'
             }
         },
@@ -77,7 +77,7 @@ window.MFM_DATA.quizzes['ml'] = {
             },
             ro: {
                 title: 'Testarea acurateței direcționale',
-                text: 'Pe 6.269 de zile, un model prezice „sus” în 98,3% din zile și are dreptate în 57,6% din cazuri, iar 58,1% dintre zile sînt „sus”. Ce test unilateral răspunde dacă semnele lui conțin informație pozitivă?',
+                text: 'Pe 6.269 de zile, un model prezice „sus” în 98,3% din zile și are dreptate în 57,6% din cazuri, iar 58,1% dintre zile sînt „sus”. Ce test unilateral arată dacă semnele lui conțin informație pozitivă?',
                 options: [
                     'Testul Pesaran-Timmermann, care compară rata de succes cu rata așteptată sub independență, date fiind ambele frecvențe marginale (aici 57,8%, peste rata de succes, deci nu poate respinge)',
                     'Un test binomial al ratei de succes față de 50%',
@@ -184,16 +184,16 @@ window.MFM_DATA.quizzes['ml'] = {
                 incorrectExplanation: 'Meta-labelling = a secondary model that filters and sizes the signals of a primary model.'
             },
             ro: {
-                title: 'Meta-labelling',
-                text: 'Ce face meta-labelling-ul?',
+                title: 'Meta-etichetarea',
+                text: 'Ce face meta-etichetarea?',
                 options: [
                     'Reetichetează datele cu zgomot aleator pentru a testa robustețea',
                     'Înlocuiește modelul primar cu o rețea neuronală mai mare',
                     'Un model primar (sau o regulă) decide direcția pariului; un model ML secundar prezice dacă semnalul trebuie urmat și cît de mare să fie poziția',
                     'Etichetează observațiile după luna calendaristică'
                 ],
-                correctExplanation: 'Meta-labelling-ul separă direcția (modelul primar) de mărimea poziției (modelul secundar), crește precizia și permite dimensionarea pozițiilor pe baza probabilităților estimate.',
-                incorrectExplanation: 'Meta-labelling = un model secundar care filtrează și dimensionează semnalele unui model primar.'
+                correctExplanation: 'Meta-etichetarea separă direcția (modelul primar) de mărimea poziției (modelul secundar), crește precizia și permite dimensionarea pozițiilor pe baza probabilităților estimate.',
+                incorrectExplanation: 'Meta-etichetarea = un model secundar care filtrează și dimensionează semnalele unui model primar.'
             }
         },
         {
@@ -355,7 +355,7 @@ window.MFM_DATA.quizzes['ml'] = {
                     'Un test t al randamentului mediu al celei mai bune reguli'
                 ],
                 correctExplanation: 'Reeșantionarea unor zile întregi păstrează corelația dintre reguli, deci bootstrap-ul estimează distribuția maximului sub ipoteza nulă pentru această grilă; aici SPA dă $p = 0,70$ față de buy-and-hold.',
-                incorrectExplanation: 'Bonferroni cu N = 1.279 rămîne valid la orice dependență, dar ignoră corelația și este foarte conservator; DSR cere alegerea lui N și a varianței rapoartelor Sharpe; un bootstrap al întregii matrice de randamente ia dependența din date.'
+                incorrectExplanation: 'Bonferroni cu N = 1.279 rămîne valid la orice dependență, dar ignoră corelația și este foarte conservator; DSR cere alegerea lui N și a varianței rapoartelor Sharpe; un bootstrap al întregii matrice de randamente preia dependența din date.'
             }
         },
         {
@@ -484,13 +484,13 @@ window.MFM_DATA.quizzes['ml'] = {
                 title: 'Căutare exhaustivă pe Bitcoin',
                 text: 'O căutare pe 1.279 de configurații de încrucișare a mediilor mobile pe BTC găsește un Sharpe in-sample maxim de 1,89 (mai 2015-2020). Sharpe-ul său out-of-sample (2021-2026) este 0,02. Care este lecția principală?',
                 options: [
-                    'Alegerea cîștigătorului in-sample dintre multe încercări captează zgomot; Sharpe-ul out-of-sample se prăbușește (overfitting de backtest)',
+                    'Alegerea cîștigătorului in-sample dintre multe încercări captează zgomot; Sharpe-ul out-of-sample scade drastic (overfitting de backtest)',
                     'Mediile mobile nu funcționează niciodată, pe niciun activ',
                     'Perioada out-of-sample a fost probabil măsurată greșit',
                     'Mai multe configurații ar fi rezolvat problema'
                 ],
-                correctExplanation: 'Sharpe-urile in-sample și out-of-sample sînt slab legate (corelație Spearman 0,18), deci ierarhizarea după backtest este în mare parte ierarhizare după noroc.',
-                incorrectExplanation: 'Scăderea bruscă de la 1,89 la 0,02 este semnătura clasică a overfitting-ului de backtest în condiții de testare multiplă.'
+                correctExplanation: 'Sharpe-urile in-sample și out-of-sample sînt slab legate (corelație Spearman 0,18), deci clasamentul după backtest este în mare parte un clasament după noroc.',
+                incorrectExplanation: 'Scăderea bruscă de la 1,89 la 0,02 este simptomul clasic al overfitting-ului de backtest în condiții de testare multiplă.'
             }
         },
         {
@@ -563,7 +563,7 @@ window.MFM_DATA.quizzes['ml'] = {
             },
             ro: {
                 title: 'Probabilitatea de overfitting a backtest-ului',
-                text: 'Probabilitatea de overfitting a backtest-ului (PBO), estimată prin validare încrucișată combinatorial simetrică (CSCV), este:',
+                text: 'Probabilitatea de overfitting a backtest-ului (PBO), estimată prin validare încrucișată combinatorică simetrică (CSCV), este:',
                 options: [
                     'Probabilitatea ca o strategie să piardă bani în anul următor',
                     'Ponderea tranzacțiilor cu pierdere',
@@ -595,10 +595,10 @@ window.MFM_DATA.quizzes['ml'] = {
                     'Verificați dacă cele două intervale de încredere de 95%, separate, se suprapun',
                     'Aplicați un test t doar pe diferența randamentelor medii',
                     'Aplicați un test F al egalității varianțelor',
-                    'Testați diferența rapoartelor Sharpe pe seriile de randamente pereche, cu metoda delta HAC sau cu un bootstrap pe blocuri studentizat (Ledoit și Wolf, 2008)'
+                    'Testați diferența rapoartelor Sharpe pe perechile de randamente zilnice, cu metoda delta HAC sau cu un bootstrap pe blocuri studentizat (Ledoit și Wolf, 2008)'
                 ],
                 correctExplanation: 'Cele două rapoarte Sharpe sînt estimate pe aceleași zile și sînt puternic corelate; testul pe perechi dă o diferență de -0,17 cu $p = 0,073$, în timp ce fiecare raport Sharpe singur are o eroare standard de circa 0,25.',
-                incorrectExplanation: 'Intervalele separate ignoră corelația dintre cele două estimații, iar un test al mediilor sau al varianțelor răspunde la o altă întrebare.'
+                incorrectExplanation: 'Intervalele separate ignoră corelația dintre cele două estimări, iar un test al mediilor sau al varianțelor răspunde la o altă întrebare.'
             }
         },
         {
@@ -624,7 +624,7 @@ window.MFM_DATA.quizzes['ml'] = {
                     'Rezultatul dovedește că rețelele adînci bat întotdeauna modelele liniare',
                     'Rezultatul este valabil doar pentru criptomonede'
                 ],
-                correctExplanation: 'Nagel arată că pentru $P \\gg T$ prognoza cu caracteristici aleatoare ponderează randamentele trecute după similaritate, care în ferestre scurte înseamnă mai ales apropiere în timp și scade cu volatilitatea; pe date cu reversii aceeași metodă pierde.',
+                correctExplanation: 'Nagel arată că pentru $P \\gg T$ prognoza cu caracteristici aleatoare ponderează randamentele trecute după similaritate, care în ferestre scurte înseamnă mai ales apropiere în timp și scade cu volatilitatea; pe date cu reveniri la medie aceeași metodă pierde.',
                 incorrectExplanation: 'Întrebați-vă ce poate face o regresie ridge fără penalizare, cu mii de caracteristici și 12 observații, cu datele ei de antrenare.'
             }
         },
@@ -643,15 +643,15 @@ window.MFM_DATA.quizzes['ml'] = {
                 incorrectExplanation: 'The main evaluation risk is look-ahead leakage through the pre-training data.'
             },
             ro: {
-                title: 'Modele fundamentale (foundation models)',
-                text: 'Modelele fundamentale pentru serii de timp (de exemplu Chronos, TimesFM) fac prognoze „zero-shot” după pre-antrenarea pe colecții uriașe de serii. Care este un risc specific la evaluarea lor pe date financiare?',
+                title: 'Modele fundaționale (foundation models)',
+                text: 'Modelele fundaționale pentru serii de timp (de exemplu Chronos, TimesFM) fac prognoze „zero-shot” după pre-antrenarea pe colecții uriașe de serii. Care este un risc specific la evaluarea lor pe date financiare?',
                 options: [
                     'Nu pot produce prognoze probabilistice',
                     'Corpusul de pre-antrenare poate conține deja perioada de evaluare, ceea ce introduce look-ahead bias în testul „out-of-sample”',
                     'Funcționează doar pe date lunare',
                     'Depășesc întotdeauna modelele GARCH'
                 ],
-                correctExplanation: 'Un model pre-antrenat pe date care includ anii de test a „văzut” deja răspunsurile. Perioada de test trebuie să fie ulterioară datei limită a pre-antrenării.',
+                correctExplanation: 'Un model pre-antrenat pe date care includ anii de test a „văzut” deja răspunsurile. Perioada de test trebuie să fie ulterioară datei-limită a pre-antrenării.',
                 incorrectExplanation: 'Principalul risc de evaluare este leakage-ul (look-ahead bias) prin datele de pre-antrenare.'
             }
         },
@@ -678,7 +678,7 @@ window.MFM_DATA.quizzes['ml'] = {
                     'Amestecarea pune în antrenare zilele vecine fiecărei zile de test; caracteristicile și etichetele suprapuse produc atunci leakage, deci folosiți purged K-fold cu embargo sau validare walk-forward',
                     'Amestecarea este o problemă doar pentru regresie, nu pentru clasificare'
                 ],
-                correctExplanation: 'Într-o serie de timp, observațiile vecine au informație comună (caracteristici mobile, etichete suprapuse); o împărțire amestecată i-o arată modelului, ceea ce umflă scorul.',
+                correctExplanation: 'Într-o serie de timp, observațiile vecine au informație comună (caracteristici mobile, etichete suprapuse); o împărțire amestecată pune această informație la dispoziția modelului, ceea ce umflă scorul.',
                 incorrectExplanation: 'Întrebați-vă ce zile vecine cu o zi de test se află în setul de antrenare și ce informație au în comun cu ea.'
             }
         },

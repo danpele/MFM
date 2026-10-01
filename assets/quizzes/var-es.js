@@ -193,7 +193,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Cînd probabilitatea cozii este 10%"
                 ],
                 "correctExplanation": "Dezvoltarea corectează cuantila Normală pentru abateri mici; cu o aplatizare în jur de 10, termenul de aplatizare depășește ținta, de ex. 6,08% față de 3,45% pentru S&P 500.",
-                "incorrectExplanation": "Cornish-Fisher este exactă pentru distribuția Normală și funcționează pentru abateri mici; asimetria și aplatizarea mari o strică."
+                "incorrectExplanation": "Cornish-Fisher este exactă pentru distribuția Normală și funcționează pentru abateri mici; asimetria și aplatizarea mari o fac nesigură."
             }
         },
         {
@@ -244,7 +244,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Doar a cuantilei empirice a reziduurilor standardizate",
                     "Doar a prognozei volatilității sigma_{t+1}",
                     "Atît a parametrilor GARCH estimați (prin sigma_{t+1}), cît și a cuantilei empirice a reziduurilor",
-                    "A nimic: o prognoză nu este o estimare"
+                    "Nicio eroare de selecție: o prognoză nu este o estimare"
                 ],
                 "correctExplanation": "VaR FHS este -mu_{t+1} + sigma_{t+1} înmulțit cu o cuantilă a reziduurilor; ambii factori sînt estimați, deci un bootstrap pe reziduuri care re-estimează modelul GARCH pe fiecare traiectorie surprinde ambele surse.",
                 "incorrectExplanation": "Prognoza volatilității depinde de parametrii GARCH estimați, iar cuantila reziduurilor de un eșantion finit; ignorarea oricăreia dintre surse dă intervale prea înguste."
@@ -274,7 +274,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Datele conțin erori"
                 ],
                 "correctExplanation": "O prognoză VaR zilnică bună produce depășiri împrăștiate în timp; grupurile arată că fereastra reacționează prea tîrziu la șocurile de volatilitate.",
-                "incorrectExplanation": "Depășirile grupate sînt semnătura unei măsuri necondiționate pe o piață cu grupare a volatilității."
+                "incorrectExplanation": "Depășirile grupate sînt tipice pentru o măsură necondiționată pe o piață cu grupare a volatilității."
             }
         },
         {
@@ -381,7 +381,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "38%",
                     "60%"
                 ],
-                "correctExplanation": "Volatilitatea zilnică a Bitcoin este de aproape patru ori cea a SPY și este corelat pozitiv cu acțiunile, deci 10% din bani poartă aproximativ 38% din VaR.",
+                "correctExplanation": "Volatilitatea zilnică a Bitcoin este de aproape patru ori cea a SPY și este corelat pozitiv cu acțiunile, deci 10% din bani generează aproximativ 38% din VaR.",
                 "incorrectExplanation": "Cotele de risc depind de volatilitate și corelație, nu de ponderile în bani: poziția cripto mică contribuie cu peste o treime din risc."
             }
         },
@@ -598,7 +598,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Ambele sînt elicitabile cu eroarea pătratică"
                 ],
                 "correctExplanation": "Cuantila minimizează funcția de pierdere pinball; Gneiting (2011) a arătat că ES singur nu este elicitabil, iar Fissler și Ziegel (2016) au arătat elicitabilitatea comună.",
-                "incorrectExplanation": "VaR este elicitabil, ES doar împreună cu VaR; de aceea backtesting-ul ES este mai dificilă (Capitolul 8)."
+                "incorrectExplanation": "VaR este elicitabil, ES doar împreună cu VaR; de aceea backtesting-ul ES este mai dificil (Capitolul 8)."
             }
         },
         {
@@ -652,7 +652,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Jumătate din spread-ul relativ, folosind media lui plus un multiplu al abaterii standard"
                 ],
                 "correctExplanation": "Ieșirea dintr-o poziție costă jumătate din spread; LVaR = VaR + 0,5 (mu_S + a sigma_S) acoperă lărgirea spread-ului în condiții de stres.",
-                "incorrectExplanation": "Ajustarea de lichiditate este costul exogen al traversării a jumătate din spread-ul bid-ask pe o piață aflată în stres."
+                "incorrectExplanation": "Ajustarea de lichiditate este costul exogen al plății a jumătate din spread-ul bid-ask pe o piață aflată în stres."
             }
         },
         {
