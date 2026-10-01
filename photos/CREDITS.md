@@ -182,3 +182,11 @@
 | ch20_terry_lyons_2024.jpg | https://commons.wikimedia.org/wiki/File:Terence_J._Lyons,_Xue-Mei_Li_Oberwolfach_2024.jpg | Katrin Schmid | CC BY-SA 2.0 DE | 2024 |
 | ch20_paul_levy.jpg | https://commons.wikimedia.org/wiki/File:Paul_Pierre_Levy_1886-1971.jpg | Konrad Jacobs | CC BY-SA 2.0 DE | undated |
 | ch20_freight_truck.jpg | https://commons.wikimedia.org/wiki/File:NB_Amazon_Prime_Container_Truck_@_WPB_Service_Plaza.jpg | DanTD | CC BY 4.0 | 2025-03-04 |
+
+## Chapter 0 (history of exchanges and financial models; licences checked via the Commons API)
+
+| File | Source (Wikimedia Commons) | Author | Licence | Date |
+|---|---|---|---|---|
+| ch0_amsterdam_beurs_1612.jpg | https://commons.wikimedia.org/wiki/File:Bird%27s-eye_view_of_the_Beurs_van_Hendrick_de_Keyser_by_Claes_Jansz._Visscher_(II)_1612_Stadsarchief_Amsterdam_010001000620.jpg | Claes Jansz. Visscher (Stadsarchief Amsterdam) | Public domain | 1612 |
+| ch0_tulip_satire_1640.jpg | https://commons.wikimedia.org/wiki/File:Jan_Brueghel_the_Younger,_Satire_on_Tulip_Mania,_c._1640.jpg | Jan Brueghel the Younger | Public domain | c. 1640 |
+| ch0_ibm_q_system.jpg | https://commons.wikimedia.org/wiki/File:IBM_Q_system_(Fraunhofer_2).jpg | IBM Research | CC BY 2.0 | 2021 |
