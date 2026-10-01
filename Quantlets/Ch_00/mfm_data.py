@@ -46,6 +46,7 @@ SERIES = {
     'Gold':               ('market', 'XAUUSD.FOREX', 'close'),
     'EUR/USD':            ('market', 'EURUSD.FOREX', 'close'),
     'EUR/RON (EODHD)':    ('market', 'EURRON.FOREX', 'close'),
+    'EUR/RON (market)':   ('market', 'EURRON.FOREX', 'close'),   # aceeasi serie (nume folosit in Seminarul 0)
     'Bitcoin':            ('market', 'BTC-USD.CC', 'close'),
     'Ethereum':           ('market', 'ETH-USD.CC', 'close'),
     'Tether (USDT)':      ('market', 'USDT-USD.CC', 'close'),
