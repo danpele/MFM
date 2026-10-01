@@ -700,6 +700,86 @@ def fig_hhl_elasticity():
     save_fig('ch0_hhl_elasticity')
     return {chi: round(0.70 * (1 + chi) / (1 + chi * 0.70), 3) for chi in (0, HHL['chi'], 10)}
 
+
+# =============================================================================
+# ISTORIE: burse, crize si modele financiare (cronologii, fara date de piata)
+# =============================================================================
+def _timeline(ax, rows, x0, x1, levels=(0.22, -0.22, 0.40, -0.40), fs=6.3):
+    """rows: list of (label, colour, [(year, text, level_index[, dx]), ...]); one horizontal lane per row."""
+    for r, (lab, col, events) in enumerate(rows):
+        y = -r
+        ax.plot([x0, x1], [y, y], color=col, lw=0.6, alpha=0.5, zorder=1)
+        ax.plot([], [], 'o', color=col, ms=5, label=lab)
+        for ev in events:
+            if len(ev) == 4 and isinstance(ev[1], (int, float)):   # interval (start, end, text, level)
+                a, b, txt, lv = ev
+                ax.plot([a, b], [y, y], color=col, lw=4, solid_capstyle='butt', zorder=2)
+                xm = (a + b) / 2
+            else:
+                xm, txt, lv = ev[:3]
+                ax.plot(xm, y, 'o', color=col, ms=4.5, zorder=3)
+            dx = ev[3] if len(ev) == 4 and not isinstance(ev[1], (int, float)) else 0
+            dy = levels[lv]
+            ax.annotate(txt, xy=(xm, y), xytext=(xm + dx, y + dy), ha='center', va='bottom' if dy > 0 else 'top',
+                        fontsize=fs, color='black', arrowprops=dict(arrowstyle='-', color=col, lw=0.5))
+    ax.set_xlim(x0, x1)
+    ax.set_ylim(-len(rows) + 0.4, 0.62)
+    ax.set_yticks([])
+    ax.spines['left'].set_visible(False)
+
+
+def fig_market_history(lang='en'):
+    """Exchanges (top lane) and bubbles/crashes (bottom lane), 1250-2026."""
+    ro = lang == 'ro'
+    ex = [(1270, 1500, 'Bruges, Ter Beurze\n(13th-15th c.)' if not ro else 'Bruges, Ter Beurze\n(sec. XIII-XV)', 0),
+          (1531, 'Antwerp\n1531' if not ro else 'Anvers\n1531', 1), (1602, 'VOC shares\n1602' if not ro else 'acțiuni VOC\n1602', 0),
+          (1698, 'London,\nJonathan\'s\n1698' if not ro else 'Londra,\nJonathan\'s\n1698', 2, -14),
+          (1773, 'London\n"Stock Exchange"\n1773' if not ro else 'Londra\n"Stock Exchange"\n1773', 0),
+          (1792, 'Buttonwood\n1792', 1), (1882, 'Bucharest\n1882' if not ro else 'București\n1882', 0)]
+    cr = [(1637, 'Tulips\n1637' if not ro else 'Lalele\n1637', 1),
+          (1720, 'Mississippi,\nSouth Sea\n1720' if not ro else 'Mississippi,\nMarea Sudului\n1720', 0),
+          (1792, 'Panic\n1792' if not ro else 'Panica\n1792', 1), (1873, '1873', 0), (1929, '1929', 1),
+          (1987, '1987', 0), (2008, '2008', 1), (2020, '2020', 2)]
+    rows = [('Exchanges and traded securities' if not ro else 'Burse și titluri tranzacționate', MainBlue, ex),
+            ('Bubbles, panics and crashes' if not ro else 'Bule, panici și prăbușiri', IDAred, cr)]
+    fig, ax = plt.subplots(figsize=(5.5, 2.2))
+    _timeline(ax, rows, 1250, 2035, levels=(0.18, -0.18, 0.42, -0.42), fs=7)
+    ax.set_ylim(-1.6, 0.85)
+    ax.set_xticks(range(1300, 2001, 100))
+    bottom_legend(fig, ncol=2)
+    save_fig('ch0_market_history' + ('_ro' if ro else ''))
+
+
+def fig_model_history(lang='en'):
+    """Milestones of financial modelling, 1900-2026, one lane per family."""
+    ro = lang == 'ro'
+    T = (lambda en, r: r) if ro else (lambda en, r: en)
+    rows = [
+        (T('Random walk and efficiency', 'Mers aleator și eficiență'), MainBlue,
+         [(1900, 'Bachelier', 0), (1963, 'Mandelbrot', 1, -3), (1965, 'Samuelson', 0), (1970, 'Fama', 1, 2)]),
+        (T('Portfolio and equilibrium', 'Portofoliu și echilibru'), Forest,
+         [(1952, 'Markowitz', 0), (1958, 'Tobin', 1), (1964, 'CAPM', 0), (1976, 'APT', 1), (1993, 'Fama-French', 0)]),
+        (T('Derivatives, continuous time', 'Derivate, timp continuu'), Purple,
+         [(1973, 'Black-Scholes-Merton', 0, -5), (1977, 'Vasicek', 1), (1985, 'CIR', 0), (1992, 'HJM', 1),
+          (1993, 'Heston', 2), (2018, T('rough vol.', 'rough vol.'), 0)]),
+        (T('Volatility and risk', 'Volatilitate și risc'), IDAred,
+         [(1982, 'ARCH', 0, -3), (1986, 'GARCH', 1, -2), (1994, 'RiskMetrics', 0, -2), (1999, T('coherent', 'coerență'), 1, -4),
+          (2000, T('copula', 'copula'), 2, 2), (2003, T('realised vol.', 'vol. realizată'), 3, 4), (2019, 'FRTB: ES', 1, 4)]),
+        (T('Machine learning', 'Machine learning'), Orange,
+         [(1994, T('neural nets', 'rețele neuronale'), 0), (2019, 'deep hedging', 1, -3), (2020, T('ML asset pricing', 'ML în evaluare'), 0, 2)]),
+        (T('Generative AI', 'AI generativ'), Amber,
+         [(2017, 'Transformer', 0, -4), (2023, 'BloombergGPT', 1), (2024, 'Chronos', 0, 3)]),
+        (T('Quantum computing', 'Calcul cuantic'), Teal,
+         [(2015, T('quantum MC', 'MC cuantic'), 1, -8), (2018, T('option pricing', 'evaluare opțiuni'), 0), (2021, T('advantage threshold', 'pragul avantajului'), 3, 3)]),
+    ]
+    fig, ax = plt.subplots(figsize=(6.2, 3.4))
+    _timeline(ax, rows, 1895, 2033, levels=(0.17, -0.17, 0.34, -0.34), fs=7)
+    ax.set_ylim(-len(rows) + 0.35, 0.5)
+    ax.set_xticks(range(1900, 2021, 20))
+    ax.tick_params(axis='x', labelsize=8)
+    bottom_legend(fig, ncol=4, fontsize=7.5)
+    save_fig('ch0_model_history' + ('_ro' if ro else ''))
+
 # =============================================================================
 # MAIN
 # =============================================================================
@@ -722,3 +802,6 @@ if __name__ == '__main__':
     print(fig_bad_ticks())
     print(fig_hhl_passive())
     print(fig_hhl_elasticity())
+    for lang in ('en', 'ro'):
+        fig_market_history(lang)
+        fig_model_history(lang)
