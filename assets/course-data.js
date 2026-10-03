@@ -871,7 +871,7 @@
                 '<strong>Răspundeți pentru fiecare rînd.</strong> „L-a scris AI-ul” nu este o explicație la susținerea orală.',
                 '<strong>Notați erorile găsite</strong> în <code>AI_ERRORS.md</code>: cel puțin trei locuri în care asistentul a greșit (o formulă greșită, look-ahead bias, semnul VaR, date inventate sau o referință care nu există) și cum v-ați dat seama.',
                 '<strong>Verificați fiecare referință.</strong> Fiecare citare are nevoie de un DOI sau link funcțional. O referință care nu există este tratată ca date fabricate.',
-                '<strong>Ce notăm:</strong> întrebarea, verificările, interpretarea și răspunsurile de la susținere, nu cantitatea de cod.',
+                '<strong>Criterii de evaluare:</strong> întrebarea, verificările, interpretarea și răspunsurile de la susținere, nu cantitatea de cod.',
                 '<strong>Fără AI la susținerea orală.</strong> Răspundeți singuri, pe baza propriei înțelegeri a proiectului.'
             ]
         },
