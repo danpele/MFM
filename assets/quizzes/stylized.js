@@ -517,7 +517,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Leul este un criptoactiv"
                 ],
                 "correctExplanation": "Administrarea de către banca centrală și procedura de fixing netezesc ajustările cursului, ceea ce creează autocorelație pozitivă.",
-                "incorrectExplanation": "Cadrul instituțional (flotare controlată, fixing) explică autocorelația pozitivă."
+                "incorrectExplanation": "Cadrul instituțional (managed float, fixing) explică autocorelația pozitivă."
             }
         },
         {
