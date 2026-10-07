@@ -217,10 +217,10 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "Testul de independență Christoffersen, cu lanț Markov de ordinul întîi",
                     "Testul POF Kupiec",
                     "Semaforul Basel",
-                    "Testul DQ cu depășiri întîrziate pînă la decalajul 5 (sau testul de durată)"
+                    "Testul DQ cu depășiri întîrziate pînă la lagul 5 (sau testul de durată)"
                 ],
-                "correctExplanation": "Regresia DQ a lui Hit_t pe depășirile întîrziate și pe nivelul VaR detectează previzibilitatea la orice decalaj inclus; testul de durată vede și el distanțele neobișnuite. Un lanț de ordinul întîi compară doar ziua de ieri cu cea de azi.",
-                "incorrectExplanation": "Testele de numărare și semaforul ignoră momentul depășirilor, iar testul Markov privește doar o zi înapoi, deci un tipar la decalajul 5 le scapă tuturor."
+                "correctExplanation": "Regresia DQ a lui Hit_t pe depășirile întîrziate și pe nivelul VaR detectează previzibilitatea la orice lag inclus; testul de durată vede și el distanțele neobișnuite. Un lanț de ordinul întîi compară doar ziua de ieri cu cea de azi.",
+                "incorrectExplanation": "Testele de numărare și semaforul ignoră momentul depășirilor, iar testul Markov privește doar o zi înapoi, deci un tipar la lagul 5 le scapă tuturor."
             }
         },
         {

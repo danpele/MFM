@@ -401,15 +401,15 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Testarea multiplă",
-                "text": "Testați 21 de reguli față de 1/N; cea mai mică valoare p este 0,03. Ce conclude procedura Holm la un nivel de 5% pentru familie?",
+                "text": "Testați 21 de reguli față de 1/N; cel mai mic p-value este 0,03. Ce conclude procedura Holm la un nivel de 5% pentru familie?",
                 "options": [
                     "Semnificativ, pentru că 0,03 < 0,05",
                     "Semnificativ, pentru că testele corelate nu necesită ajustare",
                     "Holm nu se poate folosi, pentru că cere teste independente",
                     "Nesemnificativ, pentru că 21 × 0,03 = 0,63 > 0,05"
                 ],
-                "correctExplanation": "Holm compară cea mai mică valoare p cu 0,05/21 ≈ 0,0024; valoarea ajustată 0,63 este mult peste 5%, iar Holm este valid sub orice dependență.",
-                "incorrectExplanation": "O valoare p sub 0,05 este de așteptat din întîmplare printre 21 de teste; Holm controlează probabilitatea de cel puțin o eroare în familie sub orice dependență, deci corelația nici nu elimină ajustarea, nici nu o interzice."
+                "correctExplanation": "Holm compară cel mai mic p-value cu 0,05/21 ≈ 0,0024; valoarea ajustată 0,63 este mult peste 5%, iar Holm este valid sub orice dependență.",
+                "incorrectExplanation": "Un p-value sub 0,05 este de așteptat din întîmplare printre 21 de teste; Holm controlează probabilitatea de cel puțin o eroare în familie sub orice dependență, deci corelația nici nu elimină ajustarea, nici nu o interzice."
             }
         },
         {

@@ -700,13 +700,13 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "title": "Găsiți eroarea: rețea Granger pe prețuri",
                 "text": "Un asistent AI construiește o rețea de cauzalitate Granger pentru zece bănci, estimînd VAR-uri pe perechi pe nivelurile zilnice ale prețurilor, și raportează că aproape toate perechile sînt semnificative la 1%. Care este cea mai probabilă problemă?",
                 "options": [
-                    "VAR-urile au nevoie de mai multe întîrzieri",
+                    "VAR-urile au nevoie de mai multe laguri",
                     "Prețurile sînt nestaționare: testele Granger pe niveluri dau o semnificație falsă; folosiți randamente (sau o metodă construită pentru serii integrate)",
                     "Zece bănci sînt prea puține pentru o rețea",
                     "Rețeaua trebuie construită cu o ordonare Cholesky a băncilor"
                 ],
                 "correctExplanation": "Cu prețuri cu rădăcină unitară, testul Wald obișnuit nu are distribuția standard și apar legături false. Rețelele de cauzalitate Granger se construiesc pe randamente (staționare) sau cu proceduri concepute pentru serii integrate.",
-                "incorrectExplanation": "Problema este intrarea, nu numărul de întîrzieri sau de bănci: prețurile băncilor au rădăcină unitară, deci testele pe niveluri resping prea des; aplicați testele pe randamente."
+                "incorrectExplanation": "Problema este intrarea, nu numărul de laguri sau de bănci: prețurile băncilor au rădăcină unitară, deci testele pe niveluri resping prea des; aplicați testele pe randamente."
             }
         }
     ]

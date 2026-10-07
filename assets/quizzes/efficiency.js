@@ -26,7 +26,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "text": "Testul BDS respinge ipoteza i.i.d. pentru randamentele zilnice S&P 500. Respinge aceasta eficiența slabă, testată prin RW3 sau prin ipoteza diferenței de martingală?",
                 "options": [
                     "Da, pentru că BDS testează proprietatea de martingală",
-                    "Da, dacă valoarea p este sub 0,01",
+                    "Da, dacă p-value-ul este sub 0,01",
                     "Nu: volatility clustering singur (de ex. GARCH) face BDS să respingă, iar RW3 o permite",
                     "Nu, pentru că BDS se aplică doar prețurilor"
                 ],

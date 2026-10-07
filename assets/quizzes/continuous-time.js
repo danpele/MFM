@@ -625,7 +625,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Regresia CIR supraestimează kappa"
                 ],
                 "correctExplanation": "Cumpărătorii de opțiuni plătesc pentru protecția împotriva volatilității, deci varianța implicită depășește în medie varianța realizată.",
-                "incorrectExplanation": "VIX provine din opțiuni pe S&P 500; decalajul reflectă o primă, nu o eroare de estimare."
+                "incorrectExplanation": "VIX provine din opțiuni pe S&P 500; lagul reflectă o primă, nu o eroare de estimare."
             }
         },
         {

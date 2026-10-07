@@ -564,7 +564,7 @@ window.MFM_DATA.quizzes['signatures'] = {
             },
             "ro": {
                 "title": "Holm față de BH",
-                "text": "Pe 50 de active, cîte un test DM pentru fiecare, cu valori p valide, independente sau pozitiv dependente (PRDS): ce controlează corecțiile Holm și Benjamini-Hochberg?",
+                "text": "Pe 50 de active, cîte un test DM pentru fiecare, cu p-value-uri valide, independente sau pozitiv dependente (PRDS): ce controlează corecțiile Holm și Benjamini-Hochberg?",
                 "options": [
                     "Holm: probabilitatea a cel puțin unei descoperiri false (FWER); BH: proporția așteptată de descoperiri false printre cele declarate (FDR)",
                     "Ambele controlează FWER",

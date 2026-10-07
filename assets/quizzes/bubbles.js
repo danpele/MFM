@@ -50,12 +50,12 @@ window.MFM_DATA.quizzes['bubbles'] = {
             },
             "ro": {
                 "title": "Limita SADF sub ipoteza nulă",
-                "text": "Sub aceeași ipoteză nulă de mers aleator homoscedastic, aceeași specificare a întîrzierilor și aceiași termeni determiniști, de ce valorile critice SADF simulate pentru o mărime a eșantionului T și o fereastră minimă r0 pot fi refolosite pentru serii cu dispersii diferite ale șocurilor?",
+                "text": "Sub aceeași ipoteză nulă de mers aleator homoscedastic, aceeași specificare a lagurilor și aceiași termeni determiniști, de ce valorile critice SADF simulate pentru o mărime a eșantionului T și o fereastră minimă r0 pot fi refolosite pentru serii cu dispersii diferite ale șocurilor?",
                 "options": [
                     "Pentru că SADF are asimptotic distribuția Normală",
                     "Pentru că valorile critice depind de dispersia datelor, pe care simularea o reproduce",
                     "Pentru că sub ipoteza nulă a rădăcinii unitare statistica tinde la o funcțională a mișcării browniene standard care depinde doar de r0 și de termenii determiniști",
-                    "Pentru că întîrzierile ADF elimină orice dependență din date"
+                    "Pentru că lagurile ADF elimină orice dependență din date"
                 ],
                 "correctExplanation": "Sub un mers aleator cu drift asimptotic neglijabil, fiecare ADF pe fereastră tinde la un raport de funcționale browniene în care sigma se simplifică; SADF și GSADF sînt supremuri ale acestei funcționale, deci cuantilele lor depind doar de r0 (și de specificarea termenului liber/drift-ului).",
                 "incorrectExplanation": "Limita este pivotală, dar nestandard: sigma și drift-ul dispar, iar supremul pe ferestre nu urmează distribuția Normală. Argumentul este asimptotic și presupune dispersie constantă; la schimbări de volatilitate nivelul în eșantioane finite este distorsionat și este nevoie de wild bootstrap."
@@ -190,7 +190,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "SADF folosește date săptămînale, GSADF date zilnice",
                     "GSADF nu folosește valori critice",
                     "SADF fixează începutul ferestrei la prima observație; GSADF mută și începutul, și sfîrșitul",
-                    "SADF permite întîrzieri, GSADF nu"
+                    "SADF permite laguri, GSADF nu"
                 ],
                 "correctExplanation": "SADF ia supremul pe ferestre care cresc de la observația 1; GSADF mută și începutul, ceea ce îi dă putere împotriva unei a doua bule după un colaps.",
                 "incorrectExplanation": "Ambele sînt supremuri ale statisticii ADF pentru coada dreaptă; diferă prin mulțimea ferestrelor: doar ferestre care cresc (SADF) sau toate ferestrele mai lungi decît minimul (GSADF)."

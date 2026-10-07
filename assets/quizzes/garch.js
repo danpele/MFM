@@ -158,12 +158,12 @@ window.MFM_DATA.quizzes['garch'] = {
             },
             ro: {
                 title: "Test portmanteau cu parametri estimați",
-                text: "Aplicați Ljung-Box cu 10 decalaje pe pătratele reziduurilor standardizate ale unui GARCH(1,1) estimat și folosiți valorile critice chi2(10). Testul este:",
+                text: "Aplicați Ljung-Box cu 10 laguri pe pătratele reziduurilor standardizate ale unui GARCH(1,1) estimat și folosiți valorile critice chi2(10). Testul este:",
                 options: [
                     "Exact, deoarece reziduurile standardizate sînt i.i.d. sub model",
                     "Corect cu valorile critice chi2(10 - 3), ca la reziduurile ARMA",
                     "Invalid pentru orice model GARCH",
-                    "Nu exact chi2(10): estimarea parametrilor dispersiei schimbă limita (Li și Mak), mai ales la decalaje mici"
+                    "Nu exact chi2(10): estimarea parametrilor dispersiei schimbă limita (Li și Mak), mai ales la laguri mici"
                 ],
                 correctExplanation: "Reziduurile depind de parametrii estimați; covarianța limită a autocorelațiilor pătratelor reziduurilor este I - H'J^-1 H/(kappa_z - 1). Pentru GARCH-N pe S&P 500, Q(10) corectat este 19,1 (p = 0,038), față de 16,4 (p = 0,089) pentru testul naiv.",
                 incorrectExplanation: "Estimarea parametrilor face testul naiv chi2(10) conservator; regula ARMA de scădere a numărului de parametri nu se aplică pătratelor, iar Li și Mak dau limita corectă, care rămîne utilizabilă."
@@ -354,8 +354,8 @@ window.MFM_DATA.quizzes['garch'] = {
                     "alpha",
                     "beta"
                 ],
-                correctExplanation: "eps_t^2 este un ARMA(1,1) cu phi = alpha + beta și theta = -beta; formula ARMA(1,1) dă expresia, iar decalajele următoare scad ca rho_k = rho_1 (alpha + beta)^(k-1). Pentru GARCH-N pe S&P 500 rezultă 0,356.",
-                incorrectExplanation: "alpha + beta este rata de scădere a autocorelațiilor, nu nivelul lor la decalajul 1; înlocuind phi = alpha + beta și theta = -beta în autocorelația ARMA(1,1) obținem alpha (1 - beta^2 - alpha beta) / (1 - beta^2 - 2 alpha beta)."
+                correctExplanation: "eps_t^2 este un ARMA(1,1) cu phi = alpha + beta și theta = -beta; formula ARMA(1,1) dă expresia, iar lagurile următoare scad ca rho_k = rho_1 (alpha + beta)^(k-1). Pentru GARCH-N pe S&P 500 rezultă 0,356.",
+                incorrectExplanation: "alpha + beta este rata de scădere a autocorelațiilor, nu nivelul lor la lagul 1; înlocuind phi = alpha + beta și theta = -beta în autocorelația ARMA(1,1) obținem alpha (1 - beta^2 - alpha beta) / (1 - beta^2 - 2 alpha beta)."
             }
         },
         {
@@ -512,12 +512,12 @@ window.MFM_DATA.quizzes['garch'] = {
                 text: 'Testul comun de asimetrie Engle-Ng respinge pentru un GARCH simetric pe S&P 500. Care este pasul următor firesc?',
                 options: [
                     'Încercați o ecuație a dispersiei asimetrică, de exemplu GJR-GARCH sau EGARCH',
-                    'Creșteți numărul de decalaje ARCH într-un model simetric',
+                    'Creșteți numărul de laguri ARCH într-un model simetric',
                     'Treceți la randamente în zecimale',
                     'Eliminați constanta din ecuația mediei'
                 ],
                 correctExplanation: 'Asimetria de semn înseamnă că semnul șocurilor trecute încă prezice pătratele reziduurilor, ceea ce un model simetric nu poate surprinde.',
-                incorrectExplanation: 'Respingerea testului de asimetrie indică lipsa asimetriei din model; decalajele simetrice nu o pot corecta.'
+                incorrectExplanation: 'Respingerea testului de asimetrie indică lipsa asimetriei din model; lagurile simetrice nu o pot corecta.'
             }
         },
         {
@@ -701,12 +701,12 @@ window.MFM_DATA.quizzes['garch'] = {
                 text: "Un asistent AI scrie: „Testul Ljung-Box pe pătratele reziduurilor standardizate ale modelului GARCH-t dă Q(10) = 8,1 cu p = 0,62. Respingem ipoteza nulă de absență a efectelor ARCH rămase, deci modelul este inadecvat.” Care este eroarea?",
                 options: [
                     "Testul Ljung-Box nu se poate aplica reziduurilor standardizate",
-                    "Q(10) = 8,1 este prea mare; cu 10 decalaje trebuie să fie sub 1",
-                    "O valoare p de 0,62 înseamnă că ipoteza nulă nu este respinsă: nu există dovezi de efecte ARCH rămase",
-                    "O valoare p de 0,62 înseamnă că modelul explică 62% din dispersie"
+                    "Q(10) = 8,1 este prea mare; cu 10 laguri trebuie să fie sub 1",
+                    "Un p-value de 0,62 înseamnă că ipoteza nulă nu este respinsă: nu există dovezi de efecte ARCH rămase",
+                    "Un p-value de 0,62 înseamnă că modelul explică 62% din dispersie"
                 ],
-                correctExplanation: "Ipoteza nulă a testului este absența autocorelației în pătratele reziduurilor standardizate. O valoare p de 0,62 este mult peste 5%, deci ipoteza nulă nu este respinsă: testul nu găsește dovezi de volatility clustering rămas.",
-                incorrectExplanation: "Testul și statistica sînt corecte; valoarea p este interpretată greșit: 0,62 este mult peste 5%, deci nu există dovezi de efecte ARCH rămase."
+                correctExplanation: "Ipoteza nulă a testului este absența autocorelației în pătratele reziduurilor standardizate. Un p-value de 0,62 este mult peste 5%, deci ipoteza nulă nu este respinsă: testul nu găsește dovezi de volatility clustering rămas.",
+                incorrectExplanation: "Testul și statistica sînt corecte; p-value-ul este interpretat greșit: 0,62 este mult peste 5%, deci nu există dovezi de efecte ARCH rămase."
             }
         }
     ]

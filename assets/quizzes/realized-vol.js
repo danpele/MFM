@@ -188,7 +188,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "text": "Ce arată signature plot-ul volatilității?",
                 "options": [
                     "RV în funcție de ora din zi",
-                    "Autocorelația RV pe întîrzieri",
+                    "Autocorelația RV pe laguri",
                     "RV medie în funcție de intervalul de eșantionare; o creștere la frecvențe mari semnalează zgomot",
                     "Volatilitatea implicită în funcție de prețul de exercitare"
                 ],
@@ -347,15 +347,15 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             },
             "ro": {
                 "title": "HAR ca AR(22) restricționat",
-                "text": "Privit ca un AR(22) pentru log RV, cîte restricții liniare impune modelul HAR asupra coeficienților întîrzierilor?",
+                "text": "Privit ca un AR(22) pentru log RV, cîte restricții liniare impune modelul HAR asupra coeficienților lagurilor?",
                 "options": [
-                    "19: coeficienți egali pe întîrzierile 2–5 (3 restricții) și pe întîrzierile 6–22 (16 restricții)",
+                    "19: coeficienți egali pe lagurile 2–5 (3 restricții) și pe lagurile 6–22 (16 restricții)",
                     "3, cîte una pentru fiecare componentă",
-                    "21, toate întîrzierile după prima",
+                    "21, toate lagurile după prima",
                     "Niciuna: HAR este un AR(22) nerestricționat"
                 ],
                 "correctExplanation": "Structura în trepte impune φ2 = … = φ5 și φ6 = … = φ22; pentru SPY testul Wald al celor 19 restricții dă p = 0,51.",
-                "incorrectExplanation": "HAR are 3 pante libere din 22 de coeficienți ai întîrzierilor, deci 22 − 3 = 19 restricții: egalități în blocurile săptămînal și lunar, nu întîrzieri nule."
+                "incorrectExplanation": "HAR are 3 pante libere din 22 de coeficienți ai lagurilor, deci 22 − 3 = 19 restricții: egalități în blocurile săptămînal și lunar, nu laguri nule."
             }
         },
         {
@@ -401,14 +401,14 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             },
             "ro": {
                 "title": "Memoria lungă",
-                "text": "Autocorelația log RV pentru SPY este 0,64 la întîrzierea 1 și 0,24 la 22 de zile. Ce indică acest lucru?",
+                "text": "Autocorelația log RV pentru SPY este 0,64 la lagul 1 și 0,24 la 22 de zile. Ce indică acest lucru?",
                 "options": [
                     "Lipsa memoriei: RV este i.i.d.",
                     "Memorie scurtă: un AR(1) descrie perfect datele",
                     "Memorie lungă: autocorelațiile scad mult mai lent decît la un AR(1)",
                     "O tendință negativă a volatilității"
                 ],
-                "correctExplanation": "Un AR(1) cu 0,64 ar da aproximativ 0,00005 la întîrzierea 22; valoarea observată 0,24 arată o scădere lentă.",
+                "correctExplanation": "Un AR(1) cu 0,64 ar da aproximativ 0,00005 la lagul 22; valoarea observată 0,24 arată o scădere lentă.",
                 "incorrectExplanation": "Șocurile de volatilitate persistă luni de zile; autocorelația la o lună este încă departe de zero."
             }
         },
@@ -508,16 +508,16 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "incorrectExplanation": "Lag 1 gets all three terms, lags 2-5 get the weekly and monthly terms, lags 6-22 only the monthly term."
             },
             "ro": {
-                "title": "Ponderile HAR pe întîrzieri",
-                "text": "Într-un HAR cu coeficienții beta_d, beta_w, beta_m, ce pondere primește întîrzierea 10?",
+                "title": "Ponderile HAR pe laguri",
+                "text": "Într-un HAR cu coeficienții beta_d, beta_w, beta_m, ce pondere primește lagul 10?",
                 "options": [
                     "beta_d + beta_w/5 + beta_m/22",
                     "beta_w/5 + beta_m/22",
                     "beta_m / 22",
                     "Zero"
                 ],
-                "correctExplanation": "Întîrzierea 10 este în afara săptămînii, dar în interiorul lunii, deci contribuie doar media lunară: beta_m/22.",
-                "incorrectExplanation": "Întîrzierea 1 primește toți cei trei termeni, întîrzierile 2-5 termenii săptămînal și lunar, întîrzierile 6-22 doar termenul lunar."
+                "correctExplanation": "Lagul 10 este în afara săptămînii, dar în interiorul lunii, deci contribuie doar media lunară: beta_m/22.",
+                "incorrectExplanation": "Lagul 1 primește toți cei trei termeni, lagurile 2-5 termenii săptămînal și lunar, lagurile 6-22 doar termenul lunar."
             }
         },
         {

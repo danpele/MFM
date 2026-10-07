@@ -645,14 +645,14 @@ window.MFM_DATA.quizzes['wrap-up'] = {
             },
             "ro": {
                 "title": "O căutare printre specificații",
-                "text": "O echipă încearcă 48 de combinații de fereastră, întîrziere și nivel și raportează cea mai bună valoare p = 0,01. Ce ar trebui să raporteze în schimb?",
+                "text": "O echipă încearcă 48 de combinații de fereastră, lag și nivel și raportează cel mai bun p-value = 0,01. Ce ar trebui să raporteze în schimb?",
                 "options": [
                     "Doar cea mai bună specificație",
-                    "Valoarea p mediană, fără ajustare",
-                    "Întreaga curbă a specificațiilor și o valoare p ajustată pentru testele multiple (Holm, Benjamini-Hochberg sau un bootstrap de tip reality check)",
+                    "P-value-ul median, fără ajustare",
+                    "Întreaga curbă a specificațiilor și un p-value ajustat pentru testele multiple (Holm, Benjamini-Hochberg sau un bootstrap de tip reality check)",
                     "Doar specificațiile cu p < 0,05, celelalte fiind greșit specificate"
                 ],
-                "correctExplanation": "Din 48 de încercări, o valoare p de 0,01 apare ușor doar prin hazard; curba specificațiilor arată întreaga distribuție, iar corecția ține cont de căutare.",
+                "correctExplanation": "Din 48 de încercări, un p-value de 0,01 apare ușor doar prin hazard; curba specificațiilor arată întreaga distribuție, iar corecția ține cont de căutare.",
                 "incorrectExplanation": "Raportarea celei mai bune celule, a unui rezumat neajustat sau doar a celulelor semnificative ascunde căutarea și exagerează dovezile."
             }
         },

@@ -620,11 +620,11 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "text": "Randamentele log zilnice BET-TR și S&P 500 au corelația 0,31 în aceeași zi, 0,12 cu S&P 500 din ziua precedentă și 0,03 cu cel din ziua următoare (bursa din București se închide înaintea celei din New York). Ce corelație ar trebui folosită pentru un portofoliu deținut o săptămînă?",
                 "options": [
                     "0,31, corelația din aceeași zi",
-                    "0,12, corelația cu decalaj",
-                    "0,43, suma corelațiilor din aceeași zi și cu decalaj",
-                    "Corelația randamentelor săptămînale sincronizate (0,46), apropiată de 0,31 + 0,12 + 0,03, deoarece covarianța săptămînală include covarianțele zilnice încrucișate, cu decalaj și cu avans"
+                    "0,12, corelația cu lag",
+                    "0,43, suma corelațiilor din aceeași zi și cu lag",
+                    "Corelația randamentelor săptămînale sincronizate (0,46), apropiată de 0,31 + 0,12 + 0,03, deoarece covarianța săptămînală include covarianțele zilnice încrucișate, cu lag și cu avans"
                 ],
-                "correctExplanation": "Știrile americane de după închiderea bursei din București ajung în BET-TR abia a doua zi, deci o parte din variația comună apare la decalajul 1. O sumă de corelații zilnice nu este ea însăși o corelație (poate depăși 1); randamentele săptămînale sincronizate dau o corelație propriu-zisă, 0,46.",
+                "correctExplanation": "Știrile americane de după închiderea bursei din București ajung în BET-TR abia a doua zi, deci o parte din variația comună apare la lagul 1. O sumă de corelații zilnice nu este ea însăși o corelație (poate depăși 1); randamentele săptămînale sincronizate dau o corelație propriu-zisă, 0,46.",
                 "incorrectExplanation": "Închiderile nesincrone împart reacția comună pe mai multe zile; folosiți randamente sincronizate la orizontul portofoliului."
             }
         },
