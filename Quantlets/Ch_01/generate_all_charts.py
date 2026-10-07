@@ -49,8 +49,9 @@ Amber    = '#B5853F'
 Orange   = '#E67E22'
 Purple   = '#8E44AD'
 Crimson  = '#DC3545'
-Gray     = '#7F7F7F'
-LightGray = '#DADADA'
+Navy     = '#1F2A44'   # reference lines (no grey in charts)
+BandBlue = '#C5D2E8'   # light MainBlue tint for confidence / reference bands
+Gray, LightGray = Navy, BandBlue   # legacy names kept for importing scripts
 Teal     = '#17A2B8'
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -142,9 +143,9 @@ def risk_table():
 def fig_simple_vs_log():
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.9))
     R = np.linspace(-0.5, 0.5, 400)
-    axes[0].plot(R, R, color=Gray, ls='--', lw=0.8, label='$r = R$')
+    axes[0].plot(R, R, color=Navy, ls='--', lw=0.8, label='$r = R$')
     axes[0].plot(R, np.log1p(R), color=MainBlue, label='$r = \\ln(1+R)$')
-    axes[0].axhline(0, color=LightGray, lw=0.5); axes[0].axvline(0, color=LightGray, lw=0.5)
+    axes[0].axhline(0, color=BandBlue, lw=0.5); axes[0].axvline(0, color=BandBlue, lw=0.5)
     axes[0].set_xlabel('Simple return $R$'); axes[0].set_ylabel('Log return $r$')
     axes[0].set_title('$r \\approx R$ only for small returns', fontsize=8.5, loc='left')
     axes[0].legend(loc='upper center', bbox_to_anchor=(0.5, -0.26), ncol=2, frameon=False)
@@ -245,7 +246,7 @@ def fig_aggregation():
     fig, ax = plt.subplots(figsize=(6.8, 3.0))
     for a in ASSETS:
         ax.plot(HORIZONS, k[a], marker='o', ms=3.5, color=COLORS[a], label=LABELS[a])
-    ax.axhline(0, color=Gray, ls='--', lw=0.8)
+    ax.axhline(0, color=Navy, ls='--', lw=0.8)
     ax.text(1.05, 0.5, 'Normal distribution', color='black', fontsize=7.5, ha='left')
     ax.set_xscale('log'); ax.set_xticks(HORIZONS, [str(h) for h in HORIZONS])
     ax.set_xlabel('Aggregation horizon (trading days, non-overlapping)')
@@ -270,8 +271,8 @@ def fig_acf_sp500(nlags=100):
     for ax, (s, t, c) in zip(axes, series):
         a = acf(s, nlags=nlags, fft=True)[1:]
         ax.bar(range(1, nlags + 1), a, color=c, width=0.8)
-        ax.axhspan(-band, band, color=LightGray, alpha=0.7, lw=0, label='i.i.d. reference band $\\pm1.96/\\sqrt{T}$')
-        ax.axhline(0, color=Gray, lw=0.4)
+        ax.axhspan(-band, band, color=BandBlue, alpha=0.7, lw=0, label='i.i.d. reference band $\\pm1.96/\\sqrt{T}$')
+        ax.axhline(0, color=Navy, lw=0.4)
         ax.set_title(t, fontsize=8.5, loc='left')
         ax.set_xlabel('Lag (days)')
     axes[0].set_ylabel('Autocorrelation')
@@ -292,7 +293,7 @@ def fig_acf_abs_assets(nlags=250):
         out[a] = ac
         ax.plot(range(1, nlags + 1), ac, color=COLORS[a], lw=1.0, label=LABELS[a])
     ax.set_xscale('log')
-    ax.axhline(0, color=Gray, lw=0.4)
+    ax.axhline(0, color=Navy, lw=0.4)
     ax.set_xlabel('Lag (days, log scale)')
     ax.set_ylabel('ACF of $|r_t|$')
     ax.set_title('Volatility clustering and long memory: slow, hyperbolic-like decay', fontsize=9, loc='left')
@@ -319,8 +320,8 @@ def fig_leverage():
         out[a] = pd.Series(c, index=ks)
         ax.bar(ks, c, color=np.where(c < 0, IDAred, Forest), width=0.8)
         band = 1.96 / np.sqrt(len(rets[a]))
-        ax.axhspan(-band, band, color=LightGray, alpha=0.7, lw=0, label='i.i.d. reference band $\\pm1.96/\\sqrt{T}$')
-        ax.axhline(0, color=Gray, lw=0.4)
+        ax.axhspan(-band, band, color=BandBlue, alpha=0.7, lw=0, label='i.i.d. reference band $\\pm1.96/\\sqrt{T}$')
+        ax.axhline(0, color=Navy, lw=0.4)
         ax.set_xlabel('Lag $k$ (days)')
         ax.set_title(f'{LABELS[a]}: corr$(r_t, |r_{{t+k}}|)$', fontsize=8.5, loc='left')
     axes[0].set_ylabel('Correlation')
@@ -368,7 +369,7 @@ def fig_taylor():
         out[lag] = vals
         ax.plot(deltas, vals, marker='o', ms=3, color=c, label=f'lag {lag}')
         ax.plot(deltas[np.argmax(vals)], max(vals), marker='*', ms=10, color=c)
-    ax.axvline(1, color=Gray, ls=':', lw=0.8)
+    ax.axvline(1, color=Navy, ls=':', lw=0.8)
     ax.set_xlabel('Power $\\delta$')
     ax.set_ylabel('corr$(|r_t|^\\delta, |r_{t-k}|^\\delta)$')
     ax.set_title('Taylor effect, S&P 500: the peak (stars) shifts towards $\\delta = 1$ as the lag grows',
@@ -436,7 +437,7 @@ def fig_vol_estimators():
     noise = est.diff().std()
     eff = (noise['Close-to-close'] / noise) ** 2
     axes[1].barh(eff.index, eff.values, color=cols, alpha=0.85)
-    axes[1].axvline(1, color=Gray, ls=':', lw=0.8)
+    axes[1].axvline(1, color=Navy, ls=':', lw=0.8)
     axes[1].set_xlabel('Relative smoothness vs close-to-close')
     axes[1].set_title('Noise of daily updates', fontsize=8.5, loc='left')
     axes[1].tick_params(axis='y', labelsize=7.5)
@@ -480,7 +481,7 @@ def fig_risk_return(t):
     ax.set_xlabel('Annualised volatility (%, log scale)')
     ax.set_ylabel('CAGR (%)')
     ax.set_xlim(3, 120)
-    ax.axhline(0, color=Gray, lw=0.4)
+    ax.axhline(0, color=Navy, lw=0.4)
     ax.set_title('Risk and return across markets (full samples; Sharpe SE for i.i.d. Normal returns)', fontsize=9, loc='left')
     plt.tight_layout()
     save_fig('ch1_risk_return')
@@ -542,9 +543,9 @@ def fig_hill():
         r = np.abs(rets[a].values)
         al = [hill_estimator(r, max(int(f * len(r)), 5)) for f in HILL_FRACS]
         ax.plot(100 * HILL_FRACS, al, color=COLORS[a], lw=1.1, label=LABELS[a])
-    ax.axhspan(2, 4, color=LightGray, alpha=0.5, lw=0)
-    ax.axhline(4, color=Gray, ls='--', lw=0.8)
-    ax.axhline(2, color=Gray, ls=':', lw=0.8)
+    ax.axhspan(2, 4, color=BandBlue, alpha=0.5, lw=0)
+    ax.axhline(4, color=Navy, ls='--', lw=0.8)
+    ax.axhline(2, color=Navy, ls=':', lw=0.8)
     ax.text(9.9, 4.05, r'$\alpha = 4$: kurtosis exists above', fontsize=7, color='black', ha='right', va='bottom')
     ax.text(0.6, 1.95, r'$\alpha = 2$: variance exists above', fontsize=7, color='black', ha='left', va='top')
     ax.set_xlabel('Tail fraction $k/n$ used by the estimator (%)')
@@ -780,10 +781,10 @@ def fig_cs_pdv_vix(vix, fit, scores):
     ax.plot(f.index, f, color=IDAred, lw=0.7, label='Fitted from past S&P 500 returns (path-dependent volatility model)')
     ratio = vix.loc[PDV_TRAIN[0]:] / fit.loc[PDV_TRAIN[0]:]
     ax2.plot(ratio.index, ratio, color=Forest, lw=0.6, label='Ratio observed / fitted VIX')
-    ax2.axhline(1, color=Gray, lw=0.6, ls='--')
+    ax2.axhline(1, color=Navy, lw=0.6, ls='--')
     for a in (ax, ax2):
         a.axvspan(pd.Timestamp(PDV_TEST[0]), pd.Timestamp(PDV_TEST[1]), color=Amber, alpha=0.15, lw=0)
-        a.axvline(pd.Timestamp(PDV_TEST[1]), color=Gray, lw=0.6, ls=':')
+        a.axvline(pd.Timestamp(PDV_TEST[1]), color=Navy, lw=0.6, ls=':')
     top = 0.97
     for (a, b), key, lab in [(PDV_TRAIN, 'train', 'Training 2000-2018'), (PDV_TEST, 'test', 'Test'),
                              (('2022-05-16', str(vix.index[-1].date())), 'after test', 'After test')]:
