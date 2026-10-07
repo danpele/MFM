@@ -30,7 +30,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "Circa 2,5-3%",
                     "Orice rată peste 1%, pentru că testul LR este consistent"
                 ],
-                "correctExplanation": "Puterea Binomială exactă atinge prima dată 50% în jurul unei rate reale de 2,7%; aproximarea locală folosește lambda = T(pi - alpha)^2/(alpha(1 - alpha)), iar cu alpha T = 2,5 caracterul discret al lui x ține puterea jos.",
+                "correctExplanation": "Puterea Binomială exactă atinge prima dată 50% în jurul unei rate reale de 2,7%; aproximarea locală folosește lambda = T(pi - alpha)^2/(alpha(1 - alpha)), iar cu alpha T = 2,5 caracterul discret al lui x menține puterea scăzută.",
                 "incorrectExplanation": "Consistența este o proprietate asimptotică; cu doar 2,5 depășiri așteptate într-un an, rata reală trebuie să fie aproape de trei ori ținta pentru ca testul să respingă în jumătate din cazuri."
             }
         },
@@ -131,7 +131,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
             },
             "ro": {
                 "title": "Riscul de estimare în backtesting",
-                "text": "Valorile p Kupiec din curs folosesc limite hi-pătrat(1), cu fereastra de estimare R = 1000 și aproximativ P = 5000 de zile în afara eșantionului. Care afirmație este corectă?",
+                "text": "p-value-urile Kupiec din curs folosesc limite hi-pătrat(1), cu fereastra de estimare R = 1000 și aproximativ P = 5000 de zile în afara eșantionului. Care afirmație este corectă?",
                 "options": [
                     "Limita hi-pătrat ignoră incertitudinea parametrilor, care nu dispare pentru că P/R nu tinde la 0; mărimea poate fi puternic distorsionată",
                     "Limita hi-pătrat este exactă pentru date Bernoulli, deci estimarea nu contează",
@@ -190,7 +190,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "Prea puține depășiri",
                     "Depășiri perfect independente",
                     "O distribuție Normală a pierderilor",
-                    "Prea multe durate scurte: depășirile vin grupate"
+                    "Prea multe durate scurte: depășirile apar grupat"
                 ],
                 "correctExplanation": "b = 1 este cazul fără memorie (exponențial); b < 1 înseamnă că intervalele scurte dintre depășiri sînt prea frecvente, semnul grupării. Pe S&P 500, HS are b = 0,52.",
                 "incorrectExplanation": "O formă sub unu înseamnă depășiri grupate: duratele scurte sînt suprareprezentate."
@@ -265,7 +265,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "incorrectExplanation": "The difficulty is information: ES is a tail average estimated from very few observations."
             },
             "ro": {
-                "title": "De ce ES este dificil",
+                "title": "Dificultatea testării ES",
                 "text": "De ce ES este mai greu de testat decît VaR?",
                 "options": [
                     "Depinde de mărimea pierderilor de dincolo de VaR, iar doar circa alpha T zile din coadă aduc informație",
@@ -292,7 +292,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "incorrectExplanation": "The coverage identity alone says nothing about the size of tail losses; the proof needs E[L_t I_t | F_{t-1}] = alpha ES_t, i.e. the mean loss on breach days equal to ES_t, multiplied by the breach probability alpha."
             },
             "ro": {
-                "title": "De ce E[Z2] = 0",
+                "title": "Justificarea relației E[Z2] = 0",
                 "text": "Pentru o distribuție prognozată corectă, ce identitate dă E[Z2] = 0 pentru statistica Acerbi-Szekely Z2 = 1 - (1/(T alpha)) sum L_t I_t / ES_t?",
                 "options": [
                     "E[I_t] = alpha, singură",
@@ -346,7 +346,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "incorrectExplanation": "Set the derivative to zero: P(L > v) = alpha, which is the definition of the VaR, not of the mean or of ES."
             },
             "ro": {
-                "title": "De ce este consistentă pierderea pinball",
+                "title": "Consistența pierderii pinball",
                 "text": "Fie L cu densitatea f > 0 în jurul cuantilei sale unice de ordin 1 - alpha. Derivînd E[(1{L > v} - alpha)(L - v)] în raport cu v obținem F(v) - (1 - alpha). Ce rezultă?",
                 "options": [
                     "Punctul de minim este media lui L",
@@ -509,7 +509,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
             },
             "ro": {
                 "title": "Schimbabilitate",
-                "text": "De ce garanția conformală split nu poate fi invocată pur și simplu pentru VaR pe randamente financiare și de ce nu spune nimic despre zilele de criză?",
+                "text": "De ce garanția conformală split nu poate fi invocată direct pentru VaR pe randamente financiare și de ce nu spune nimic despre zilele de criză?",
                 "options": [
                     "Pentru că randamentele au media zero",
                     "Pentru că metoda cere date Normale",
@@ -562,7 +562,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "incorrectExplanation": "The guarantee was bought with infinite VaR forecasts on many days."
             },
             "ro": {
-                "title": "Prețul ACI",
+                "title": "Costul garanției ACI",
                 "text": "Pentru VaR 1% pe S&P 500, cum și-a menținut ACI rata de depășire pe termen lung aproape de 1%?",
                 "options": [
                     "Folosind un model GARCH",
@@ -643,7 +643,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "incorrectExplanation": "Testing checks acceptability of one model; comparative backtesting ranks models with a scoring function."
             },
             "ro": {
-                "title": "A testa sau a clasifica",
+                "title": "Testare și clasificare",
                 "text": "Care este diferența dintre un backtest și backtesting-ul comparativ?",
                 "options": [
                     "Nu există nicio diferență",
@@ -651,7 +651,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "Backtest-urile folosesc doar ES, cel comparativ doar VaR",
                     "Un backtest întreabă dacă un model este acceptabil; backtesting-ul comparativ întreabă care dintre mai multe modele este mai bun, cu un scor consistent"
                 ],
-                "correctExplanation": "Mai multe modele pot trece (sau toate pot eșua) un backtest; clasificarea cere o funcție de scor consistentă, cum este FZ0, și teste precum Diebold-Mariano (Nolde și Ziegel, 2017).",
+                "correctExplanation": "Un backtest poate accepta mai multe modele (sau le poate respinge pe toate); clasificarea cere o funcție de scor consistentă, cum este FZ0, și teste precum Diebold-Mariano (Nolde și Ziegel, 2017).",
                 "incorrectExplanation": "Testarea verifică acceptabilitatea unui model; backtesting-ul comparativ clasifică modelele cu o funcție de scor."
             }
         },

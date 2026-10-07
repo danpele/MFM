@@ -31,7 +31,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "1,1 pp: sigma împărțit la sqrt(252)"
                 ],
                 "correctExplanation": "SE = q sigma_d / sqrt(T) = sigma_a / sqrt(Y) = 17,5% / sqrt(11,7) = 5,1 pp (Merton, 1980): contează doar lungimea perioadei, nu frecvența eșantionării.",
-                "incorrectExplanation": "Eroarea standard a unei medii anualizate este sigma_a / sqrt(Y) = 5,1 pp; observațiile mai dese în aceiași 11,7 ani nu ajută."
+                "incorrectExplanation": "Eroarea standard a unei medii anualizate este sigma_a / sqrt(Y) = 5,1 pp; observațiile mai dese în aceiași 11,7 ani nu reduc eroarea standard."
             }
         },
         {
@@ -293,14 +293,14 @@ window.MFM_DATA.quizzes['markets'] = {
             },
             "ro": {
                 "title": "Corelație mobilă sau pe toată perioada?",
-                "text": "Bitcoin vs S&P 500, log-randamente zilnice pe zilele comune, 2022-2026: corelația pe toată perioada 0,42; media corelațiilor mobile pe 252 de zile 0,38 (primele ferestre încep în 2021). Ce cifră răspunde la întrebarea „care a fost corelația în 2022-2026”?",
+                "text": "Bitcoin și S&P 500, log-randamente zilnice pe zilele comune, 2022-2026: corelația pe toată perioada 0,42; media corelațiilor mobile pe 252 de zile 0,38 (primele ferestre încep în 2021). Ce cifră răspunde la întrebarea „care a fost corelația în 2022-2026”?",
                 "options": [
                     "0,38: corelațiile mobile sînt întotdeauna mai precise",
                     "Media lor, 0,40",
-                    "0,42: media corelațiilor mobile face media unor ferestre de un an, parțial din 2021, adică altă mărime estimată",
+                    "0,42: media corelațiilor mobile agregă ferestre de un an, parțial din 2021, adică o altă mărime estimată",
                     "Niciuna: corelațiile nu se pot estima pe mai mulți ani"
                 ],
-                "correctExplanation": "Corelația pe toată perioada, pe zilele comune, estimează corelația din 2022-2026; media corelațiilor mobile face media unor ferestre de un an, unele începute în 2021, adică altă mărime.",
+                "correctExplanation": "Corelația pe toată perioada, pe zilele comune, estimează corelația din 2022-2026; media corelațiilor mobile agregă ferestre de un an, unele începute în 2021, adică o altă mărime.",
                 "incorrectExplanation": "Întrebarea cere o singură corelație pentru 2022-2026: estimația pe toată perioada, pe zilele comune, 0,42. Media corelațiilor mobile pe 252 de zile este media unor corelații anuale, măsurate parțial în 2021."
             }
         },
@@ -327,7 +327,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "ETF-urile nu mai replică indicele",
                     "Fondul ponderat după capitalizare l-a depășit pe cel cu ponderi egale: acțiunile cu ponderile cele mai mari au avut randamente mai bune decît acțiunea medie"
                 ],
-                "correctExplanation": "Fondul ponderat după capitalizare dă o pondere mai mare celor mai mari companii; randamentul său mai mare înseamnă că acțiunile cu ponderi mari au determinat randamentul indicelui. Dacă a crescut concentrarea se verifică din ponderile componentelor (de exemplu numărul efectiv de acțiuni).",
+                "correctExplanation": "Fondul ponderat după capitalizare dă o pondere mai mare celor mai mari companii; randamentul său mai mare înseamnă că acțiunile cu ponderi mari au determinat randamentul indicelui. Creșterea concentrării se verifică din ponderile componentelor (de exemplu numărul efectiv de acțiuni).",
                 "incorrectExplanation": "Un raport SPY/RSP în creștere înseamnă că acțiunile cu ponderi mari au depășit acțiunea tipică; ponderile componentelor arată dacă a crescut și concentrarea."
             }
         },
@@ -355,7 +355,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "ETF-urile nu se pot tranzacționa în timpul zilei"
                 ],
                 "correctExplanation": "Crearea și răscumpărarea de către participanții autorizați este un mecanism de arbitraj: dacă ETF-ul se tranzacționează peste NAV, ei creează unități; dacă este sub, le răscumpără.",
-                "incorrectExplanation": "Mecanismul de creare/răscumpărare derulat de participanții autorizați ține prețul aproape de NAV."
+                "incorrectExplanation": "Mecanismul de creare/răscumpărare derulat de participanții autorizați menține prețul aproape de NAV."
             }
         },
         {
@@ -381,7 +381,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "Acțiunile cu deținere ETF mai mare sînt mai volatile",
                     "ETF-urile elimină spread-ul bid-ask"
                 ],
-                "correctExplanation": "Rezultatul lor este că o deținere ETF mai mare este asociată cu o volatilitate mai mare a acțiunilor suport, prin tranzacții de arbitraj care propagă șocurile de lichiditate.",
+                "correctExplanation": "Autorii arată că o deținere ETF mai mare este asociată cu o volatilitate mai mare a acțiunilor suport, prin tranzacții de arbitraj care propagă șocurile de lichiditate.",
                 "incorrectExplanation": "Articolul arată că o deținere ETF mai mare crește volatilitatea acțiunilor suport."
             }
         },
@@ -401,7 +401,7 @@ window.MFM_DATA.quizzes['markets'] = {
             },
             "ro": {
                 "title": "Un interval pentru o schimbare de corelație",
-                "text": "Corelația S&P 500 - TLT a trecut de la -0,47 (2010-2020) la +0,11 (2022-2026). Intervalul iid de 95% pentru schimbare este [0,52; 0,65] (Fisher, perechi iid dintr-o distribuție Normală bivariată). Ce puteți conclude?",
+                "text": "Corelația S&P 500 - TLT a trecut de la -0,47 (2010-2020) la +0,11 (2022-2026). Intervalul iid de 95% pentru schimbare este [0,52; 0,65] (Fisher, perechi iid dintr-o distribuție Normală bivariată). Ce puteți concluziona?",
                 "options": [
                     "Șocul inflaționist din 2022 a cauzat schimbarea",
                     "Schimbarea depășește cu mult eroarea de eșantionare iid, dar intervalul nu îi identifică cauza și presupune randamente iid",
@@ -487,9 +487,9 @@ window.MFM_DATA.quizzes['markets'] = {
                     "Nimic: completarea doar umple valorile lipsă",
                     "S&P 500 primește două randamente reale în plus pe săptămînă",
                     "Randamentele Bitcoin din weekend dispar",
-                    "Fiecare weekend creează două randamente nule ale S&P 500, puse lîngă mișcările Bitcoin din weekend, ceea ce deformează corelația"
+                    "Fiecare weekend creează două randamente nule ale S&P 500, asociate cu mișcările Bitcoin din weekend, ceea ce deformează corelația"
                 ],
-                "correctExplanation": "Prețurile completate în weekend dau randamente S&P 500 exact nule sîmbăta și duminica, puse lîngă mișcările reale ale Bitcoin; în 2022-2026 corelația scade de la 0,42 (zile comune) la 0,39. Aliniați întîi prețurile pe zilele comune, apoi calculați randamentele.",
+                "correctExplanation": "Prețurile completate în weekend dau randamente S&P 500 exact nule sîmbăta și duminica, asociate cu mișcările reale ale Bitcoin; în 2022-2026 corelația scade de la 0,42 (zile comune) la 0,39. Aliniați întîi prețurile pe zilele comune, apoi calculați randamentele.",
                 "incorrectExplanation": "Prețurile completate repetă închiderea de vineri, deci randamentul S&P 500 este zero sîmbăta și duminica, în timp ce Bitcoin se mișcă: perechi artificiale care schimbă corelația. Aliniați întîi prețurile pe zilele comune."
             }
         },
@@ -511,7 +511,7 @@ window.MFM_DATA.quizzes['markets'] = {
                 "title": "Clasarea a două rapoarte Sharpe",
                 "text": "2015-2026, 11,7 ani: raportul Sharpe al SPY 0,82, al aurului 0,77. Un interval bootstrap staționar de 95%, pe perechi, pentru diferența SPY minus aur este [-0,65; +0,88]. Ce rezultă?",
                 "options": [
-                    "Eșantionul nu plasează SPY deasupra aurului: intervalul îl conține pe zero",
+                    "Eșantionul nu permite clasarea SPY peste aur: intervalul îl conține pe zero",
                     "SPY este semnificativ mai bun, pentru că 0,82 > 0,77",
                     "Aurul este semnificativ mai bun, pentru că intervalul ajunge la -0,65",
                     "Bootstrap-ul nu este valid, pentru că rapoartele Sharpe nu sînt medii"
@@ -644,7 +644,7 @@ window.MFM_DATA.quizzes['markets'] = {
             },
             "ro": {
                 "title": "Calendare",
-                "text": "Uniți prețurile zilnice S&P 500 și Bitcoin pe un singur calendar (inclusiv weekendul) și apoi calculați log-diferențele coloanei S&P 500. Ce nu funcționează?",
+                "text": "Uniți prețurile zilnice S&P 500 și Bitcoin pe un singur calendar (inclusiv weekendul) și apoi calculați log-diferențele coloanei S&P 500. Ce problemă apare?",
                 "options": [
                     "Fiecare randament de luni devine lipsă, pentru că prețul de duminică lipsește",
                     "Nimic: rezultatul este identic",
@@ -705,8 +705,8 @@ window.MFM_DATA.quizzes['markets'] = {
                     "În martie 2021, la aproximativ 13,6 ani după maxim",
                     "Nu a mai recuperat niciodată maximul din 2007"
                 ],
-                "correctExplanation": "BET a închis din nou peste 10.813,59 abia pe 16 martie 2021: o scădere de -82,5% cere o creștere de aproximativ +473% pentru recuperare, ceea ce a durat 13,6 ani.",
-                "incorrectExplanation": "După o scădere de -82,5%, indicele are nevoie de aproximativ +473% doar ca să revină la maxim; BET a închis prima dată peste nivelul din iulie 2007 pe 16 martie 2021."
+                "correctExplanation": "BET a închis din nou peste 10.813,59 abia pe 16 martie 2021: o scădere de -82,5% necesită o creștere de aproximativ +473% pentru recuperare, ceea ce a durat 13,6 ani.",
+                "incorrectExplanation": "După o scădere de -82,5%, indicele are nevoie de aproximativ +473% doar pentru a reveni la maxim; BET a închis prima dată peste nivelul din iulie 2007 pe 16 martie 2021."
             }
         },
         {
@@ -751,16 +751,16 @@ window.MFM_DATA.quizzes['markets'] = {
                 "incorrectExplanation": "The close does not include dividends: for stocks and ETFs the course uses the adjusted close, which corrects for dividends and splits; SPY does pay dividends."
             },
             "ro": {
-                "title": "Găsiți eroarea AI: close vs adjusted close",
+                "title": "Găsiți eroarea AI: close față de adjusted close",
                 "text": "Un asistent AI scrie: „Pentru raportul Sharpe al SPY folosiți coloana close: ea include deja dividendele plătite de ETF.” Ce este greșit?",
                 "options": [
                     "Raportul Sharpe se calculează din prețuri, nu din randamente",
                     "ETF-urile nu plătesc dividende, deci cele două coloane sînt identice",
-                    "Close este prețul tranzacționat fără dividende; pentru acțiuni și ETF-uri, adjusted close este cel corectat pentru dividende și splituri",
-                    "Adjusted close corectează doar pentru splituri, niciodată pentru dividende"
+                    "Close este prețul tranzacționat fără dividende; pentru acțiuni și ETF-uri, adjusted close este cel corectat pentru dividende și split-uri",
+                    "Adjusted close corectează doar pentru split-uri, niciodată pentru dividende"
                 ],
-                "correctExplanation": "Close este prețul brut de tranzacționare; adjusted close adaugă înapoi dividendele și spliturile. Folosirea lui close pentru SPY subestimează randamentul mediu cu aproximativ randamentul dividendelor.",
-                "incorrectExplanation": "Close nu include dividendele: pentru acțiuni și ETF-uri cursul folosește adjusted close, corectat pentru dividende și splituri; SPY plătește dividende."
+                "correctExplanation": "Close este prețul brut de tranzacționare; adjusted close adaugă înapoi dividendele și split-urile. Folosirea lui close pentru SPY subestimează randamentul mediu cu aproximativ randamentul dividendelor.",
+                "incorrectExplanation": "Close nu include dividendele: pentru acțiuni și ETF-uri cursul folosește adjusted close, corectat pentru dividende și split-uri; SPY plătește dividende."
             }
         }
     ]

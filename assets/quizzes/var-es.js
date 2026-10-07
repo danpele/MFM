@@ -58,7 +58,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "ES_alpha(L) = maximul după v al { v + E[(L - v)+] / alpha }"
                 ],
                 "correctExplanation": "Funcția obiectiv v + E[(L - v)+]/alpha este convexă în v, cu derivata la dreapta 1 - P(L > v)/alpha și derivata la stînga 1 - P(L >= v)/alpha; v o minimizează cînd P(L > v) <= alpha <= P(L >= v), condiție îndeplinită în VaR_alpha (derivată obișnuită nulă doar pentru L continuă). Valoarea minimă este ES_alpha, inclusiv cînd L are atomi.",
-                "incorrectExplanation": "Reprezentarea este un minim, nu un maxim (funcția obiectiv este convexă și nemărginită superior); media condiționată dincolo de VaR eșuează cînd distribuția are atomi, iar nu apare niciun adaos de volatilitate."
+                "incorrectExplanation": "Reprezentarea este un minim, nu un maxim (funcția obiectiv este convexă și nemărginită superior); formula mediei condiționate dincolo de VaR nu mai este valabilă cînd distribuția are atomi, iar reprezentarea nu conține niciun termen de volatilitate."
             }
         },
         {
@@ -112,7 +112,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "0 și 100"
                 ],
                 "correctExplanation": "Singură, probabilitatea de neplată 0,9% este sub 1%, deci VaR este 0; împreună, șansa a cel puțin unei neplăți este 1,79%, peste 1%, deci VaR este 100.",
-                "incorrectExplanation": "P(X <= -100) este 0,9% pentru o obligațiune, nu peste 1%, dar 1,79% pentru pereche, deci VaR al portofoliului sare la 100, iar fiecare VaR individual este 0."
+                "incorrectExplanation": "P(X <= -100) este 0,9% pentru o obligațiune, nu peste 1%, dar 1,79% pentru pereche, deci VaR-ul portofoliului crește brusc la 100, iar fiecare VaR individual este 0."
             }
         },
         {
@@ -165,8 +165,8 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Pierderile zilnice au cozi mai grele decît distribuția Normală",
                     "Simularea istorică supraestimează mereu VaR"
                 ],
-                "correctExplanation": "Un exces de aplatizare peste 10 pune mai multă probabilitate departe de centru decît permite distribuția Normală, deci cuantila empirică este mai mare.",
-                "incorrectExplanation": "Diferența vine din cozile grele: distribuția Normală cu aceeași abatere standard este prea subțire în coadă."
+                "correctExplanation": "Un exces de kurtosis peste 10 pune mai multă probabilitate departe de centru decît permite distribuția Normală, deci cuantila empirică este mai mare.",
+                "incorrectExplanation": "Diferența vine din cozile grele: distribuția Normală cu aceeași abatere standard are cozi prea subțiri."
             }
         },
         {
@@ -187,13 +187,13 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "title": "Cornish-Fisher",
                 "text": "Cînd dă dezvoltarea Cornish-Fisher estimări VaR nesigure?",
                 "options": [
-                    "Cînd asimetria și excesul de aplatizare sînt mari, ca la randamentele zilnice cu aplatizare în jur de 10",
+                    "Cînd asimetria și excesul de kurtosis sînt mari, ca la randamentele zilnice cu un exces de kurtosis în jur de 10",
                     "Cînd distribuția este exact Normală",
                     "Cînd selecția este foarte lungă",
                     "Cînd probabilitatea cozii este 10%"
                 ],
-                "correctExplanation": "Dezvoltarea corectează cuantila Normală pentru abateri mici; cu o aplatizare în jur de 10, termenul de aplatizare depășește ținta, de ex. 6,08% față de 3,45% pentru S&P 500.",
-                "incorrectExplanation": "Cornish-Fisher este exactă pentru distribuția Normală și funcționează pentru abateri mici; asimetria și aplatizarea mari o fac nesigură."
+                "correctExplanation": "Dezvoltarea corectează cuantila Normală pentru abateri mici; cu un exces de kurtosis în jur de 10, termenul de kurtosis supraestimează puternic VaR, de ex. 6,08% față de 3,45% pentru S&P 500.",
+                "incorrectExplanation": "Cornish-Fisher este exactă pentru distribuția Normală și funcționează pentru abateri mici; asimetria și kurtosis-ul mari o fac nesigură."
             }
         },
         {
@@ -219,7 +219,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Amîndoi, pentru că ambii se calculează din distribuția empirică",
                     "Niciunul, pentru că ambii depind de coadă"
                 ],
-                "correctExplanation": "O mică schimbare a distribuției datelor schimbă puțin VaR istoric, dar o singură pierdere extremă poate muta arbitrar ES istoric: coerența și robustețea trag în direcții opuse.",
+                "correctExplanation": "O mică schimbare a distribuției datelor schimbă puțin VaR istoric, dar o singură pierdere extremă poate modifica oricît de mult ES istoric: coerența și robustețea sînt în conflict.",
                 "incorrectExplanation": "Coerența și robustețea sînt proprietăți diferite: ES este coerent, dar reacționează nemărginit la o singură observație extremă, în timp ce o cuantilă nu depinde de cît de departe se află observațiile extreme."
             }
         },
@@ -239,7 +239,7 @@ window.MFM_DATA.quizzes['var-es'] = {
             },
             "ro": {
                 "title": "Riscul de estimare în VaR FHS",
-                "text": "Un interval de încredere de 90% pentru VaR 1% de mîine din simularea istorică filtrată trebuie să includă eroarea de selecție a cui?",
+                "text": "Un interval de încredere de 90% pentru VaR 1% de mîine din simularea istorică filtrată ce surse de eroare de selecție trebuie să includă?",
                 "options": [
                     "Doar a cuantilei empirice a reziduurilor standardizate",
                     "Doar a prognozei volatilității sigma_{t+1}",
@@ -266,14 +266,14 @@ window.MFM_DATA.quizzes['var-es'] = {
             },
             "ro": {
                 "title": "Gruparea depășirilor",
-                "text": "Depășirile VaR istoric pentru S&P 500 vin în grupuri (2008, 2020). Ce arată acest lucru?",
+                "text": "Depășirile VaR istoric pentru S&P 500 apar grupat (2008, 2020). Ce arată acest lucru?",
                 "options": [
                     "Probabilitatea cozii este prea mare",
                     "Distribuția Normală este corectă",
                     "Măsura de risc nu se adaptează la volatility clustering",
                     "Datele conțin erori"
                 ],
-                "correctExplanation": "O prognoză VaR zilnică bună produce depășiri împrăștiate în timp; grupurile arată că fereastra reacționează prea tîrziu la șocurile de volatilitate.",
+                "correctExplanation": "O prognoză VaR zilnică bună produce depășiri dispersate în timp; grupurile arată că fereastra reacționează prea tîrziu la șocurile de volatilitate.",
                 "incorrectExplanation": "Depășirile grupate sînt tipice pentru o măsură necondiționată pe o piață cu volatility clustering."
             }
         },
@@ -327,7 +327,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "O tendință descrescătoare a volatilității",
                     "Autocorelația pozitivă a randamentelor zilnice (autocorelația de ordin 1 egală cu 0,109)"
                 ],
-                "correctExplanation": "Autocorelația pozitivă ridică dispersia sumelor pe mai multe zile peste h sigma^2 (raportul dispersiilor peste 1), deci radical(h) subestimează.",
+                "correctExplanation": "Autocorelația pozitivă ridică dispersia sumelor pe mai multe zile peste h sigma^2 (raportul dispersiilor peste 1), deci regula radical(h) subestimează riscul.",
                 "incorrectExplanation": "Cheia este persistența: randamentele autocorelate pozitiv se acumulează, iar coada pe mai multe zile devine mai largă decît sugerează radical(h)."
             }
         },
@@ -381,8 +381,8 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "38%",
                     "60%"
                 ],
-                "correctExplanation": "Volatilitatea zilnică a Bitcoin este de aproape patru ori cea a SPY și este corelat pozitiv cu acțiunile, deci 10% din bani generează aproximativ 38% din VaR.",
-                "incorrectExplanation": "Cotele de risc depind de volatilitate și corelație, nu de ponderile în bani: poziția cripto mică contribuie cu peste o treime din risc."
+                "correctExplanation": "Volatilitatea zilnică a Bitcoin este de aproape patru ori cea a SPY și este corelat pozitiv cu acțiunile, deci 10% din capital generează aproximativ 38% din VaR.",
+                "incorrectExplanation": "Cotele de risc depind de volatilitate și corelație, nu de ponderile în capital: poziția cripto mică contribuie cu peste o treime din risc."
             }
         },
         {
@@ -517,7 +517,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "Probabilitatea cozii a fost 2,5%"
                 ],
                 "correctExplanation": "Reziduurile standardizate rămîn cu cozi grele (minus cuantila lor de 1% este aproximativ 2,8 față de 2,33), deci cuantila Normală este prea mică.",
-                "incorrectExplanation": "GARCH prinde corect momentul; nivelul este greșit pentru că distribuția șocurilor are cozi mai grele decît distribuția Normală."
+                "incorrectExplanation": "GARCH surprinde corect momentul; nivelul este greșit pentru că distribuția șocurilor are cozi mai grele decît distribuția Normală."
             }
         },
         {
@@ -535,7 +535,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "incorrectExplanation": "For VaR the comonotone sum need not be the worst case: the worst case is found by rearranging the tails and is often above it, far above independence or a Gaussian copula. The comonotone sum is the worst case for ES, which is subadditive and comonotone additive."
             },
             "ro": {
-                "title": "VaR sub incertitudinea dependenței",
+                "title": "VaR în condiții de incertitudine privind dependența",
                 "text": "Marginalele lui L1 și L2 sînt cunoscute, dar copula lor nu. Ce se poate spune despre VaR 1% maxim al lui L1 + L2?",
                 "options": [
                     "Este egal cu VaR(L1) + VaR(L2), valoarea comonotonă",
@@ -562,7 +562,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "incorrectExplanation": "The choice keeps capital comparable in the Normal case while making it sensitive to the tail beyond the quantile."
             },
             "ro": {
-                "title": "De ce ES 2,5%",
+                "title": "Alegerea nivelului ES 2,5%",
                 "text": "De ce ES a fost stabilit la 2,5% și nu la 1%, vechiul nivel al VaR?",
                 "options": [
                     "Sub distribuția Normală, ES 2,5% este aproape egal cu VaR 1%, deci capitalul rămîne similar pentru cozi subțiri, dar crește pentru cozi grele",
@@ -621,10 +621,10 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "options": [
                     "500",
                     "50",
-                    "Aproximativ 12,5 (n alfa)",
+                    "Aproximativ 12,5 (n alpha)",
                     "Aproximativ 2"
                 ],
-                "correctExplanation": "n alfa = 500 x 0,025 = 12,5 (media din coadă folosită în curs mediază cele 13 pierderi mai mari sau egale cu VaR interpolat): estimarea este foarte zgomotoasă, așa cum arată intervalele bootstrap largi de aproximativ 2 puncte procentuale.",
+                "correctExplanation": "n alpha = 500 x 0,025 = 12,5 (media din coadă folosită în curs se calculează pe cele 13 pierderi mai mari sau egale cu VaR interpolat): estimarea este foarte zgomotoasă, așa cum arată intervalele bootstrap largi de aproximativ 2 puncte procentuale.",
                 "incorrectExplanation": "În medie intră doar cele mai rele 2,5% dintre zile: 2,5% din 500 de zile."
             }
         },
@@ -705,7 +705,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "ES istoric nu se poate calcula din 1.000 de observații",
                     "Coada de 2,5% a 1.000 de pierderi conține cele mai mari 25; media celor mai mari 10 este ES 1%"
                 ],
-                "correctExplanation": "ES_alpha mediază pierderile dincolo de VaR_alpha, adică cea mai rea parte alpha a eșantionului: 2,5% din 1.000 = 25 de pierderi. Media doar a celor mai mari 10 dă ES 1%, o cifră mai extremă și mai zgomotoasă.",
+                "correctExplanation": "ES_alpha este media pierderilor dincolo de VaR_alpha, adică cea mai rea parte alpha a eșantionului: 2,5% din 1.000 = 25 de pierderi. Media doar a celor mai mari 10 dă ES 1%, o cifră mai extremă și mai zgomotoasă.",
                 "incorrectExplanation": "ES este o medie în coadă, dar a celor mai rele 2,5% dintre pierderi, adică 25 din 1.000; 10 pierderi corespund cozii de 1%."
             }
         }

@@ -103,7 +103,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "incorrectExplanation": "An estimate from a noisy proxy is not a proof, the bias from measurement error goes towards smaller H, and H drives both option skews and forecast weights."
             },
             "ro": {
-                "title": "Asprimea: cum interpretăm estimarea",
+                "title": "Asprimea: interpretarea estimării",
                 "text": "Estimatorul de scalare aplicat volatilității realizate zilnice dă Ĥ = 0,11 pentru SPY. Ce afirmație este cea mai ușor de susținut?",
                 "options": [
                     "H = 0,11 este demonstrat pentru volatilitatea SPY",
@@ -111,7 +111,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "Exponentul Hurst este irelevant pentru prognoza volatilității",
                     "Eroarea de măsurare din RV coboară Ĥ, iar estimatorul este inconsistent pe indicatori zgomotoși, deci 0,11 poate exagera asprimea"
                 ],
-                "correctExplanation": "Zgomotul adaugă o constantă la momentele incrementelor și aplatizează panta de scalare; Fukasawa, Takabatake și Westphal arată că pentru consistență e nevoie de asimptotica de înaltă frecvență.",
+                "correctExplanation": "Zgomotul adaugă o constantă la momentele incrementelor și aplatizează panta de scalare; Fukasawa, Takabatake și Westphal arată că pentru consistență este necesară asimptotica de înaltă frecvență.",
                 "incorrectExplanation": "O estimare dintr-un indicator zgomotos nu este o demonstrație, deplasarea din eroarea de măsurare merge spre un H mai mic, iar H influențează atît panta zîmbetului, cît și ponderile prognozei."
             }
         },
@@ -220,7 +220,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "Graficul este plat, iar autocorelația de ordinul 1 este aproximativ -0,01: zgomotul este neglijabil la 5 minute"
                 ],
                 "correctExplanation": "Volatilitatea anualizată din RV medie rămîne între 12,6% și 13,1% de la 5 la 130 de minute; corecțiile de zgomot schimbă puțin la această frecvență.",
-                "incorrectExplanation": "Pentru un ETF lichid la 5 minute zgomotul este invizibil: signature plot-ul este plat, iar autocorelația randamentelor este aproape zero."
+                "incorrectExplanation": "Pentru un ETF lichid la 5 minute zgomotul nu este detectabil: signature plot-ul este plat, iar autocorelația randamentelor este aproape zero."
             }
         },
         {
@@ -293,7 +293,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             },
             "ro": {
                 "title": "Rata descoperirilor false pentru zilele cu salt",
-                "text": "Testul zilnic de salturi pe 1.489 de zile SPY la 5% dă 235 de respingeri. Ce procedură ordonează cele N valori p zilnice și respinge cele mai mici k, cu k cel mai mare indice pentru care p_(k) ≤ k × 0,05/N, astfel încît ponderea așteptată a zilelor cu salt false printre zilele respinse să rămînă cel mult 5%?",
+                "text": "Testul zilnic de salturi pe 1.489 de zile SPY la 5% dă 235 de respingeri. Ce procedură ordonează cele N p-value-uri zilnice și respinge cele mai mici k, cu k cel mai mare indice pentru care p_(k) ≤ k × 0,05/N, astfel încît ponderea așteptată a zilelor cu salt false printre zilele respinse să rămînă cel mult 5%?",
                 "options": [
                     "Bonferroni la 5%",
                     "Creșterea numărului de randamente intraday M",
@@ -301,7 +301,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                     "Înlocuirea lui RV cu BV la numărătorul statisticii"
                 ],
                 "correctExplanation": "Benjamini–Hochberg controlează FDR, proporția așteptată a respingerilor false; în capitol lasă 42 de zile SPY cu salt (17 după corecția de periodicitate).",
-                "incorrectExplanation": "Bonferroni compară fiecare valoare p cu pragul unic 0,05/N: controlează probabilitatea oricărei respingeri false (FWER), deci și FDR, dar respinge mult mai puține zile; un M mai mare schimbă puterea, dar nu multiplicitatea, iar numărătorul trebuie să compare RV cu BV."
+                "incorrectExplanation": "Bonferroni compară fiecare p-value cu pragul unic 0,05/N: controlează probabilitatea oricărei respingeri false (FWER), deci și FDR, dar respinge mult mai puține zile; un M mai mare schimbă puterea, dar nu multiplicitatea, iar numărătorul trebuie să compare RV cu BV."
             }
         },
         {
@@ -535,7 +535,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "incorrectExplanation": "Losses on volatility or absolute errors are minimised by a forecast other than the conditional variance (by Jensen, (E sqrt(RV))² is below E RV), so proxy noise distorts the ranking."
             },
             "ro": {
-                "title": "Ce funcție de pierdere rămîne robustă la un proxy zgomotos",
+                "title": "Funcții de pierdere robuste la un proxy zgomotos",
                 "text": "Prognozele sînt evaluate față de RV, un proxy zgomotos al varianței adevărate, nedeplasat condiționat: E[RV_t | trecut] = E[IV_t | trecut]. Ce funcție de pierdere ordonează prognozele la fel ca varianța adevărată?",
                 "options": [
                     "MSE pe volatilitate, (sqrt(RV) − sqrt(F))²",
@@ -617,11 +617,11 @@ window.MFM_DATA.quizzes['realized-vol'] = {
             },
             "ro": {
                 "title": "Testul comun în Mincer–Zarnowitz",
-                "text": "În regresia MZ pentru GARCH, î = 0,2418 (SE 0,2310), b̂ = 0,7046 (SE 0,2382) și corr(î, b̂) = −0,9750. Cum trebuie testată nedeplasarea, (a, b) = (0, 1)?",
+                "text": "În regresia MZ pentru GARCH, â = 0,2418 (SE 0,2310), b̂ = 0,7046 (SE 0,2382) și corr(â, b̂) = −0,9750. Cum trebuie testată nedeplasarea, (a, b) = (0, 1)?",
                 "options": [
                     "Două teste t separate, respingînd dacă oricare respinge",
                     "Doar testul b = 1, deoarece termenul liber este irelevant",
-                    "Un test Wald comun, cu matricea de covarianță HAC completă a lui (î, b̂)",
+                    "Un test Wald comun, cu matricea de covarianță HAC completă a lui (â, b̂)",
                     "Comparînd R² al regresiei cu 1"
                 ],
                 "correctExplanation": "Cu estimări puternic corelate doar statistica Wald comună are mărimea corectă; aici W = 2,07, p = 0,35.",
@@ -643,7 +643,7 @@ window.MFM_DATA.quizzes['realized-vol'] = {
                 "incorrectExplanation": "Roughness means H well below 0.5; the chapter finds 0.11 for SPY and 0.08 for Bitcoin, with a caution about measurement error."
             },
             "ro": {
-                "title": "Volatilitatea aspră",
+                "title": "Rough volatility",
                 "text": "Capitolul estimează exponentul Hurst H al log-volatilității la aproximativ 0,1. Ce înseamnă H < 0,5?",
                 "options": [
                     "Volatilitatea este mai netedă decît o mișcare browniană și are tendință",

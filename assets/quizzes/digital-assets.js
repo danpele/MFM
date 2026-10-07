@@ -49,8 +49,8 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "incorrectExplanation": "The issue is free float: the published supply is not the supply in circulation."
             },
             "ro": {
-                "title": "Partea liberă la tranzacționare",
-                "text": "De ce au fost lăsate XRP și Chainlink în afara universului indicelui în acest capitol?",
+                "title": "Free float",
+                "text": "De ce au fost excluse XRP și Chainlink din universul indicelui în acest capitol?",
                 "options": [
                     "Prețurile lor nu sînt disponibile",
                     "Sînt stablecoin-uri",
@@ -58,7 +58,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "Se tranzacționează doar în zilele lucrătoare"
                 ],
                 "correctExplanation": "Oferta raportată include tokenurile deținute de emitent, deci prețul x oferta ar supraestima valoarea tranzacționabilă.",
-                "incorrectExplanation": "Problema este partea liberă la tranzacționare: oferta publicată nu este oferta în circulație."
+                "incorrectExplanation": "Problema este free float-ul: oferta publicată nu este oferta aflată efectiv în circulație."
             }
         },
         {
@@ -77,7 +77,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "Concentrarea",
-                "text": "Ponderile valorii de piață pentru cinci monede dau HHI = 0,71. Care este numărul efectiv de monede?",
+                "text": "Ponderile în valoarea de piață ale celor cinci monede dau HHI = 0,71. Care este numărul efectiv de monede?",
                 "options": [
                     "0,71",
                     "Aproximativ 1,4",
@@ -139,7 +139,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "În weekend nu se tranzacționează"
                 ],
                 "correctExplanation": "Raportul dispersiilor weekend / zile lucrătoare a fost aproximativ 0,45 înainte și 0,39 după ianuarie 2024; modificarea nu este semnificativă.",
-                "incorrectExplanation": "Bitcoin se tranzacționează în weekend, dar randamentele de weekend sînt mult mai calme, iar acest lucru era adevărat și înainte de ETF-uri."
+                "incorrectExplanation": "Bitcoin se tranzacționează în weekend, dar randamentele de weekend sînt mult mai puțin volatile, fenomen prezent și înainte de ETF-uri."
             }
         },
         {
@@ -165,8 +165,8 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "În jurul lui martie 2020",
                     "Niciodată"
                 ],
-                "correctExplanation": "Corelația mobilă a sărit în martie 2020 și a rămas în jur de 0,4 de atunci.",
-                "incorrectExplanation": "Ruptura a venit odată cu pandemia din 2020, nu cu ETF-urile."
+                "correctExplanation": "Corelația pe fereastră mobilă a crescut brusc în martie 2020 și a rămas în jur de 0,4 de atunci.",
+                "incorrectExplanation": "Ruptura a avut loc odată cu pandemia din 2020, nu la lansarea ETF-urilor."
             }
         },
         {
@@ -184,16 +184,16 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "incorrectExplanation": "When alpha < 4 the population kurtosis is infinite, so no standard error or rescaling rescues the sample kurtosis; the Hill index is the right summary of the tail."
             },
             "ro": {
-                "title": "Aplatizarea cînd tail index-ul este sub 4",
-                "text": "Tail index-ul Hill al Bitcoin este 2,7, iar excesul de aplatizare de selecție 14,8. Ce rezultă?",
+                "title": "Kurtosis-ul cînd tail index-ul este sub 4",
+                "text": "Tail index-ul Hill al Bitcoin este 2,7, iar excesul de kurtosis de selecție este 14,8. Ce rezultă?",
                 "options": [
-                    "Momentul de ordinul patru al populației este probabil infinit, deci aplatizarea de selecție nu este un estimator consistent, iar CI bootstrap pentru ea nu este de încredere",
-                    "Aplatizarea este 14,8 plus sau minus 1,96 erori standard",
-                    "Indicele Hill și aplatizarea măsoară același lucru",
-                    "Rescalarea randamentelor la varianță unitară face aplatizarea finită"
+                    "Momentul de ordinul patru al populației este probabil infinit, deci kurtosis-ul de selecție nu este un estimator consistent, iar CI bootstrap pentru ea nu este de încredere",
+                    "Kurtosis-ul este 14,8 plus sau minus 1,96 erori standard",
+                    "Indicele Hill și kurtosis-ul măsoară același lucru",
+                    "Rescalarea randamentelor la varianță unitară face kurtosis-ul finit"
                 ],
-                "correctExplanation": "Cu alpha < 4 momentul de ordinul patru nu există; aplatizarea de selecție crește odată cu eșantionul și este dominată de cele mai mari zile, iar bootstrap-ul eșuează la momente infinite (Athreya, 1987): raportăm tail index-ul cu CI.",
-                "incorrectExplanation": "Cînd alpha < 4, aplatizarea populației este infinită, deci nicio eroare standard și nicio rescalare nu salvează aplatizarea de selecție; indicele Hill este rezumatul potrivit al cozii."
+                "correctExplanation": "Cu alpha < 4 momentul de ordinul patru nu există; kurtosis-ul de selecție crește odată cu eșantionul și este dominată de cele mai mari zile, iar bootstrap-ul eșuează la momente infinite (Athreya, 1987): raportăm tail index-ul cu CI.",
+                "incorrectExplanation": "Cînd alpha < 4, kurtosis-ul populației este infinit, deci nicio eroare standard și nicio rescalare nu fac kurtosis-ul de selecție informativ; indicele Hill este rezumatul potrivit al cozii."
             }
         },
         {
@@ -239,7 +239,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "Penalizarea AIC",
-                "text": "În forma gaussiană a criteriului CRIX, AIC = T ln(s_k^2) + 2s, cu s numărul de monede adăugate, cînd este admis încă un constituent?",
+                "text": "Pentru erori cu distribuția Normală, criteriul CRIX devine AIC = T ln(s_k^2) + 2s, cu s numărul de monede adăugate, cînd este admis încă un constituent?",
                 "options": [
                     "Cînd prețul lui crește",
                     "Cînd are cea mai mică volatilitate",
@@ -270,10 +270,10 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "options": [
                     "Sînt prea puține observații în afara benzii",
                     "Coeficientul AR din afara benzii este negativ",
-                    "Pragul nu este identificat sub ipoteza nulă (problema Davies), deci statistica sup-Wald cere p-valori bootstrap",
+                    "Pragul nu este identificat sub ipoteza nulă (problema Davies), deci statistica sup-Wald cere p-value-uri bootstrap",
                     "Abaterile sînt măsurate în puncte de bază"
                 ],
-                "correctExplanation": "Sub ipoteza nulă liniară, pragul c nu apare în model, deci supremul după c al lui W(c) nu are distribuția chi-pătrat; Hansen (1996) obține p-valorile dintr-un bootstrap cu regresori ficși.",
+                "correctExplanation": "Sub ipoteza nulă liniară, pragul c nu apare în model, deci supremul după c al lui W(c) nu are distribuția chi-pătrat; Hansen (1996) obține p-value-urile dintr-un bootstrap cu regresori ficși.",
                 "incorrectExplanation": "Problema este un parametru de perturbare neidentificat sub ipoteza nulă: supremul după praguri are o distribuție nestandard."
             }
         },
@@ -293,7 +293,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "Banda de arbitraj",
-                "text": "Un stablecoin poate fi răscumpărat la 1 USD cu un cost c_r. Unde menține arbitrajul prețul de piață dinspre jos?",
+                "text": "Un stablecoin poate fi răscumpărat la 1 USD cu un cost c_r. La ce nivel limitează arbitrajul prețul de piață dinspre jos?",
                 "options": [
                     "La 0",
                     "Aproape de 1 - c_r",
@@ -346,7 +346,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "incorrectExplanation": "LVR is a second-order (gamma) effect of a concave value function; fees reduce it and impermanent loss is a path-independent endpoint quantity."
             },
             "ro": {
-                "title": "De unde vine LVR",
+                "title": "Originea LVR",
                 "text": "Ce proprietate a valorii pool-ului cu produs constant V(P) = 2 sqrt(kP) produce pierderea față de reechilibrare?",
                 "options": [
                     "Comisionul perceput la fiecare schimb",
@@ -374,7 +374,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "TerraUSD",
-                "text": "Ce a făcut ca panica din jurul TerraUSD să se autoîmplinească?",
+                "text": "Ce a făcut ca retragerea masivă (run) din TerraUSD să se autoîntrețină?",
                 "options": [
                     "Comisioanele mari de tranzacționare",
                     "Rezervele în titluri de stat și-au pierdut valoarea",
@@ -485,7 +485,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "text": "De ce este valoarea totală blocată (TVL) în DeFi o măsură slabă a adoptării?",
                 "options": [
                     "Numără doar Bitcoin",
-                    "Depozitele sînt evaluate la prețul pieței, deci TVL amestecă schimbările de preț cu depunerile și se mișcă strîns cu Ether",
+                    "Depozitele sînt evaluate la prețul pieței, deci TVL amestecă variațiile de preț cu depunerile și evoluează strîns legat de prețul Ether",
                     "Se publică doar o dată pe an",
                     "Exclude stablecoin-urile"
                 ],
@@ -570,7 +570,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "O acțiune necorelată cu cripto",
                     "O poziție în Bitcoin cu efect de levier, plus riscul pieței de acțiuni"
                 ],
-                "correctExplanation": "Un beta peste 1 față de Bitcoin plus un beta de acțiune: mai mult decît expunerea la Bitcoin, plus riscul bursei.",
+                "correctExplanation": "Un beta peste 1 față de Bitcoin și un beta important față de S&P 500: o expunere amplificată la Bitcoin, la care se adaugă riscul pieței de acțiuni.",
                 "incorrectExplanation": "Ambii coeficienți beta sînt importanți, deci acțiunea nu este nici un instrument pur, nici defensivă."
             }
         },
@@ -589,7 +589,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "incorrectExplanation": "The definition is about behaviour on the worst market days, not about average returns or volatility."
             },
             "ro": {
-                "title": "Refugiu",
+                "title": "Refugiu (safe haven)",
                 "text": "Conform Baur și Lucey (2010), ce face dintr-un activ un refugiu?",
                 "options": [
                     "Un randament mediu pozitiv",

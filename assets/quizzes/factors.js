@@ -111,7 +111,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Pentru că Newey–West schimbă estimația lui beta",
                     "Pentru că varianța reziduurilor se schimbă odată cu volatilitatea pieței (heteroscedasticitate), iar erorile clasice o ignoră"
                 ],
-                correctExplanation: "Newey–West păstrează estimația OLS și îi corectează varianța pentru heteroscedasticitate și autocorelare; volatility clustering face erorile clasice prea mici.",
+                correctExplanation: "Newey–West păstrează estimația OLS și îi corectează varianța pentru heteroscedasticitate și autocorelație; volatility clustering face erorile clasice prea mici.",
                 incorrectExplanation: "Estimația punctuală este aceeași; se schimbă doar eroarea standard, pentru că reziduurile sînt heteroscedastice."
             }
         },
@@ -246,8 +246,8 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Sectoarele nu creează dispersie în mărime și valoare, deci au puțină dispersie în valorile alfa care contează: testul are putere mică",
                     "Eșantionul sectorial este mai lung"
                 ],
-                correctExplanation: "Activele de test trebuie să aibă dispersie mare în caracteristicile remunerate; sectoarele amestecă firme mici și mari, value și growth. Nerespingerea este o dovadă slabă.",
-                incorrectExplanation: "Nerespingerea nu este o dovadă că CAPM este adevărat; testul pe sectoare nu are putere."
+                correctExplanation: "Activele de test trebuie să aibă dispersie mare în caracteristicile remunerate; sectoarele combină firme mici și mari, de valoare și de creștere. Nerespingerea este o dovadă slabă.",
+                incorrectExplanation: "Nerespingerea nu este o dovadă că CAPM este adevărat; testul pe sectoare are putere mică."
             }
         },
         {
@@ -376,9 +376,9 @@ window.MFM_DATA.quizzes['factors'] = {
                 title: "Corecția Shanken",
                 text: "De ce se aplică erorilor standard Fama–MacBeth corecția Shanken?",
                 options: [
-                    "Pentru a corecta autocorelarea randamentelor",
+                    "Pentru a corecta autocorelația randamentelor",
                     "Pentru a face primele pozitive",
-                    "Pentru a corecta distribuțiile non-Normale ale randamentelor",
+                    "Pentru a corecta abaterile randamentelor de la distribuția Normală",
                     "Pentru că valorile beta sînt estimate, nu cunoscute (erori în variabile), ceea ce face erorile obișnuite prea mici"
                 ],
                 correctExplanation: "Var_Sh = (1 + c)(Var_FM − Σ_f/T) + Σ_f/T, cu c = λ′Σ_f⁻¹λ: doar partea datorată erorilor în variabile este scalată. Pentru factori tranzacționați lunari c este mic (0,03 pentru FF3), deci HML păstrează t ≈ 2,99.",
@@ -406,7 +406,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Regula Kaiser",
                     "Criteriul informațional Bai–Ng",
                     "Raportul valorilor proprii Ahn–Horenstein",
-                    "Cotul graficului scree, judecat din ochi"
+                    "Cotul graficului scree, apreciat vizual"
                 ],
                 correctExplanation: "Ahn și Horenstein (2013) maximizează μ_k/μ_(k+1); Bai și Ng (2002) minimizează o varianță reziduală penalizată; Kaiser păstrează valorile proprii peste 1 și nu este consistent.",
                 incorrectExplanation: "Estimatorul prin raportul valorilor proprii nu are nevoie de penalizare; criteriul informațional și regula Kaiser folosesc alte principii."
@@ -543,7 +543,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Pentru că sute de factori au fost testați, deci pragul obișnuit de 1,96 produce multe descoperiri false",
                     "Pentru că erorile Fama–MacBeth sînt prea mari"
                 ],
-                correctExplanation: "Testarea multiplă ridică ștacheta: cu 300 de factori inutili, cel mai bun are un |t| median de aproximativ 3,06.",
+                correctExplanation: "Testarea multiplă impune un prag mai ridicat: cu 300 de factori inutili, cel mai bun are un |t| median de aproximativ 3,06.",
                 incorrectExplanation: "Pragul mai mare este o corecție pentru testarea multiplă din factor zoo."
             }
         },
@@ -594,11 +594,11 @@ window.MFM_DATA.quizzes['factors'] = {
                 options: [
                     "Ca factor de piață: toate încărcările sînt pozitive, iar corelația cu SPY este 0,95",
                     "Ca factor de valoare",
-                    "Ca factor defensiv versus creștere",
+                    "Ca factor defensiv față de creștere",
                     "Ca zgomot pur"
                 ],
-                correctExplanation: "PC1 explică 66% din varianță, cu încărcări de același semn; contrastul defensiv versus creștere apare în PC2.",
-                incorrectExplanation: "Primul factor latent este piața; factorul defensiv versus creștere este a doua componentă."
+                correctExplanation: "PC1 explică 66% din varianță, cu încărcări de același semn; contrastul dintre sectoarele defensive și cele de creștere apare în PC2.",
+                incorrectExplanation: "Primul factor latent este piața; factorul sectoare defensive față de sectoare de creștere este a doua componentă."
             }
         },
         {
@@ -705,7 +705,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Beta ajustat trebuie să fie egal cu beta OLS cînd β̂ > 1",
                     "Ponderile sînt inversate: β_B = 0,33 + 0,67 β̂, deci β_B = 1,335"
                 ],
-                correctExplanation: "Blume (1971): β_B = 0,33 + 0,67 β̂, care apropie estimarea de 1: 0,33 + 0,67 × 1,5 = 1,335. Ponderile inversate micșorează mult prea mult.",
+                correctExplanation: "Blume (1971): β_B = 0,33 + 0,67 β̂, care apropie estimația de 1: 0,33 + 0,67 × 1,5 = 1,335. Ponderile inversate aplică un shrinkage mult prea puternic.",
                 incorrectExplanation: "În regula lui Blume beta estimat primește ponderea 0,67, iar constanta este 0,33: pentru β̂ = 1,5 beta ajustat este 1,335."
             }
         }

@@ -84,7 +84,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Circa 9% cu f ≈ 0,953 și circa 10^-15 cu f = 0,5",
                         "Circa 95% cu f ≈ 0,953 și 50% cu f = 0,5"
                     ],
-                    "correctExplanation": "0,953^50 ≈ 0,09, iar 0,5^50 ≈ 8,9 × 10^-16: deschiderea porții de uitare îi dă LSTM-ului memoria lungă.",
+                    "correctExplanation": "0,953^50 ≈ 0,09, iar 0,5^50 ≈ 8,9 × 10^-16: o poartă de uitare apropiată de 1 îi asigură LSTM-ului o memorie mult mai persistentă.",
                     "incorrectExplanation": "Ridicați fiecare valoare a porții de uitare la puterea 50: 0,953^50 ≈ 0,09 și 0,5^50 ≈ 10^-15."
                 }
             },
@@ -158,15 +158,15 @@ window.MFM_DATA.quizzes['tsfm'] = {
                 },
                 "ro": {
                     "title": "Multe modele, o singură perioadă de test",
-                    "text": "Șase modele sînt testate față de prognoza zero pe trei piețe (18 teste). Cea mai mică valoare p DM unilaterală este 0,008, pentru LSTM pe BET. Ce concluzionați?",
+                    "text": "Șase modele sînt testate față de prognoza zero pe trei piețe (18 teste). Cel mai mic p-value DM unilateral este 0,008, pentru LSTM pe BET. Ce concluzionați?",
                     "options": [
                         "Semnalul LSTM pe BET este real, pentru că 0,008 este sub 0,05",
                         "Pentru familia de 18 teste nu este semnificativ (pragul Bonferroni 0,05/18 ≈ 0,0028; p ajustat Holm ≈ 0,14); trebuie aplicată o metodă pentru familia de teste, precum Romano–Wolf sau SPA, familiei declarate",
-                        "O valoare p sub 0,05 nu poate fi un fals pozitiv",
-                        "Folosiți un test unilateral ca să înjumătățiți valoarea p și problema dispare"
+                        "Un p-value sub 0,05 nu poate fi un fals pozitiv",
+                        "Folosiți un test unilateral ca să înjumătățiți p-value-ul și problema dispare"
                     ],
-                    "correctExplanation": "Șansa ca cea mai mică dintre 18 valori p să cadă sub 0,05 din noroc este mare. În familia BET de șase modele, Romano–Wolf dă p ≈ 0,017 și SPA p ≈ 0,02; pe toate cele 18 teste, Holm dă circa 0,14.",
-                    "incorrectExplanation": "Cu multe teste, cea mai mică valoare p este deplasată în jos; controlați eroarea pe familie (Holm, Romano–Wolf, SPA) pentru familia declarată înainte de a vedea rezultatele."
+                    "correctExplanation": "Probabilitatea ca cel mai mic dintre 18 p-value-uri să cadă sub 0,05 din noroc este mare. În familia BET de șase modele, Romano–Wolf dă p ≈ 0,017 și SPA p ≈ 0,02; pe toate cele 18 teste, Holm dă circa 0,14.",
+                    "incorrectExplanation": "Cu multe teste, cel mai mic p-value este deplasat în jos; controlați eroarea pe familie (Holm, Romano–Wolf, SPA) pentru familia declarată înainte de a vedea rezultatele."
                 }
             },
             {
@@ -238,8 +238,8 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "incorrectExplanation": "A correct unconditional rate does not imply correct conditional coverage; independence and DQ tests detect breaches that arrive in clusters."
                 },
                 "ro": {
-                    "title": "Acoperire versus independență",
-                    "text": "Un model VaR 1% are numărul corect de depășiri (p Kupiec = 0,70), dar valoarea p a testului de independență Christoffersen este 0,02, iar a testului DQ 0,001. Ce concluzionați?",
+                    "title": "Acoperire și independență",
+                    "text": "Un model VaR 1% are numărul corect de depășiri (p Kupiec = 0,70), dar p-value-ul testului de independență Christoffersen este 0,02, iar al testului DQ 0,001. Ce concluzionați?",
                     "options": [
                         "Acoperirea este corectă în medie, dar depășirile se grupează: VaR reacționează prea încet după salturile volatilității, deci acoperirea condiționată este respinsă",
                         "Modelul trece, pentru că testul Kupiec este testul de reglementare",
@@ -247,7 +247,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Depășirile grupate înseamnă că VaR este prea mare în medie"
                     ],
                     "correctExplanation": "Este hibridul Chronos-2 pe S&P 500: rata de depășire 0,93%, dar depășirile urmează depășirilor. Testul DQ (Engle–Manganelli) regresează depășirile pe depășirile întîrziate și pe VaR și respinge și el.",
-                    "incorrectExplanation": "O rată necondiționată corectă nu implică o acoperire condiționată corectă; testele de independență și DQ detectează depășirile care vin grupate."
+                    "incorrectExplanation": "O rată necondiționată corectă nu implică o acoperire condiționată corectă; testele de independență și DQ detectează depășirile grupate."
                 }
             },
             {
@@ -270,7 +270,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "options": [
                         "Modelul extrapolează exact coada cu o distribuție Pareto generalizată",
                         "Cuantila de 1% cerută este înlocuită cu cuantila de 10%, deci rata depășirilor este în jur de 10% sau mai mult, nu 1%",
-                        "Modelul întoarce cuantila de 1% a distribuției Normale cu aceeași varianță",
+                        "Modelul returnează cuantila de 1% a distribuției Normale cu aceeași varianță",
                         "Cererea eșuează și nu se produce nicio prognoză"
                     ],
                     "correctExplanation": "În afara nivelurilor de antrenare, Chronos-Bolt se limitează la cel mai apropiat nivel disponibil, deci un „VaR 1%” este de fapt o cuantilă de 10%.",
@@ -300,7 +300,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "ES este subestimat, pentru că adevăratele cuantile sub 1% sînt mai negative decît cuantila de 1%",
                         "ES devine negativ"
                     ],
-                    "correctExplanation": "Păstrarea cuantilei la valoarea de 1% sub nivelul de 1% taie partea cea mai extremă a cozii, deci pierderea medie din coadă iese prea mică; interpolarea între nivelurile grilei ar adăuga o eroare de orice semn.",
+                    "correctExplanation": "Păstrarea cuantilei la valoarea de 1% sub nivelul de 1% elimină partea cea mai extremă a cozii, deci pierderea medie din coadă rezultă prea mică; interpolarea între nivelurile grilei ar adăuga o eroare de orice semn.",
                     "incorrectExplanation": "Coada trunchiată sub cel mai mic nivel face ca ES calculat să fie prea mic."
                 }
             },
@@ -427,7 +427,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "incorrectExplanation": "The issue is skewness: the median of RV is below its mean, and QLIKE is minimised by the conditional mean."
                 },
                 "ro": {
-                    "title": "Mediana versus media",
+                    "title": "Mediana față de medie",
                     "text": "Un model fundațional dă cuantile ale logaritmului varianței realizate. De ce este exp(mediana) o prognoză slabă de volatilitate sub QLIKE?",
                     "options": [
                         "Pentru că exponențiala unei cuantile nu este o cuantilă",
@@ -459,11 +459,11 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "options": [
                         "Datele nu le pot distinge: niciunul nu este semnificativ mai slab decît cel mai bun la pragul de 10%",
                         "Toate au exact aceeași pierdere medie",
-                        "Fiecare bate modelul random walk cu probabilitatea 90%",
+                        "Fiecare depășește modelul random walk cu probabilitatea 90%",
                         "Sînt cele trei modele cu cei mai puțini parametri"
                     ],
                     "correctExplanation": "MCS păstrează orice model a cărui eliminare nu este susținută de date la pragul ales (Hansen, Lunde & Nason, 2011).",
-                    "incorrectExplanation": "Apartenența înseamnă „nerespins ca fiind mai slab”, nu pierderi egale sau o probabilitate de a bate un reper."
+                    "incorrectExplanation": "Apartenența înseamnă „nerespins ca fiind mai slab”, nu pierderi egale sau o probabilitate de a depăși un reper."
                 }
             },
             {
@@ -543,7 +543,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Creșteți numărul de epoci pînă cînd toate seed-urile dau același R²",
                         "Raportați întreaga distribuție pe seed-uri (sau media ansamblului), nu cea mai bună rulare"
                     ],
-                    "correctExplanation": "Cînd semnalul este slab, variația de la un seed la altul are aceeași mărime ca efectul; alegerea celui mai bun seed este o formă de overfitting al backtestului.",
+                    "correctExplanation": "Cînd semnalul este slab, variația de la un seed la altul are aceeași mărime ca efectul; alegerea celui mai bun seed este o formă de overfitting a backtest-ului.",
                     "incorrectExplanation": "Alegerea celui mai bun seed după ce ați văzut rezultatele de test supraestimează rezultatele metodei; raportați toate seed-urile sau un ansamblu."
                 }
             },
@@ -597,7 +597,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Modelul a fost antrenat doar pe serii de 512 zile",
                         "Un context mai lung elimină nevoia de scalare"
                     ],
-                    "correctExplanation": "Memoria lungă a volatilității înseamnă că informația de acum cîteva luni încă ajută; un context de 32 de zile ratează componenta lentă.",
+                    "correctExplanation": "Memoria lungă a volatilității înseamnă că informația de acum cîteva luni încă ajută; un context de 32 de zile nu surprinde componenta lentă.",
                     "incorrectExplanation": "Cîștigul reflectă memoria lungă a volatilității, nu o regulă generală că mai lung înseamnă mereu mai bine."
                 }
             },
@@ -643,7 +643,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "incorrectExplanation": "The purpose is to rule out pretraining leakage; the price is fewer observations and lower power."
                 },
                 "ro": {
-                    "title": "De ce o fereastră de după publicare",
+                    "title": "Rolul ferestrei de după publicare",
                     "text": "În acest capitol, prognozele sînt evaluate și de la 3 noiembrie 2025 încolo. De ce?",
                     "options": [
                         "Pentru că piețele au fost mai calme după această dată",
@@ -678,7 +678,7 @@ window.MFM_DATA.quizzes['tsfm'] = {
                         "Contextul trebuie mai întîi standardizat la varianță unitară",
                         "Fragmentul se termină cu r_t, valoarea prognozată: contextul trebuie să se oprească la r_{t-1}, adică r[t-512 : t]"
                     ],
-                    "correctExplanation": "Un fragment Python a:b include a și exclude b, deci r[t-511 : t+1] se termină la r_t; prognoza folosește atunci răspunsul (look-ahead bias), iar rezultatele backtestului par mult prea bune.",
+                    "correctExplanation": "Un fragment Python a:b include a și exclude b, deci r[t-511 : t+1] se termină la r_t; prognoza folosește atunci răspunsul (look-ahead bias), iar rezultatele backtest-ului par mult prea bune.",
                     "incorrectExplanation": "Scrieți primul și ultimul indice al fragmentului și comparați-l pe ultimul cu ziua prognozată."
                 }
             },
@@ -701,12 +701,12 @@ window.MFM_DATA.quizzes['tsfm'] = {
                     "text": "Un asistent AI scrie: „Pe 1.500 de zile, VaR 1% al Chronos a avut doar 5 depășiri față de 15 așteptate: modelul este prudent, deci trece ușor testul Kupiec.” Ce este greșit?",
                     "options": [
                         "Testul Kupiec verifică doar dacă depășirile sînt independente",
-                        "Testul Kupiec este bilateral: 5 depășiri în 1.500 de zile dau LR = 9,1 și o valoare p de aproximativ 0,003, deci acoperirea corectă este respinsă",
+                        "Testul Kupiec este bilateral: 5 depășiri în 1.500 de zile dau LR = 9,1 și un p-value de aproximativ 0,003, deci acoperirea corectă este respinsă",
                         "Numărul așteptat de depășiri este 1,5, nu 15",
                         "5 depășiri sînt prea multe, deci VaR este prea mic"
                     ],
                     "correctExplanation": "Testul de acoperire necondiționată respinge atît prea multe, cît și prea puține depășiri; prea puține înseamnă un VaR prea mare și, într-un backtest, sînt adesea simptomul unui look-ahead bias.",
-                    "incorrectExplanation": "Calculați statistica raportului de verosimilitate a testului de acoperire necondiționată în loc să comparați 5 cu 15 din ochi."
+                    "incorrectExplanation": "Calculați statistica raportului de verosimilitate a testului de acoperire necondiționată în loc să comparați 5 cu 15 doar vizual."
                 }
             }
         ]

@@ -84,7 +84,7 @@ window.MFM_DATA.quizzes['ml'] = {
                     'Un test t al acurateței față de 0,5, cu erori standard i.i.d.',
                     'Un test McNemar față de aruncarea unei monede'
                 ],
-                correctExplanation: 'Sub independență rata așteptată este $\\hat p_y\\hat p_x + (1-\\hat p_y)(1-\\hat p_x) = 0,578$; valoarea observată 0,576 este sub ea, deci statistica este negativă pentru orice $n$ (aici $PT = -1,28$ pe 6.269 de zile). Cu etichete suprapuse, varianța trebuie ajustată și HAC.',
+                correctExplanation: 'Sub independență rata așteptată este $\\hat p_y\\hat p_x + (1-\\hat p_y)(1-\\hat p_x) = 0,578$; valoarea observată 0,576 este sub ea, deci statistica este negativă pentru orice $n$ (aici $PT = -1,28$ pe 6.269 de zile). Cu etichete suprapuse, varianța trebuie estimată robust (HAC).',
                 incorrectExplanation: 'Un reper de 50% ignoră faptul că piața crește în 58% dintre zile și că modelul spune aproape mereu „sus”; ipoteza nulă corectă ține cont de ambele frecvențe.'
             }
         },
@@ -157,7 +157,7 @@ window.MFM_DATA.quizzes['ml'] = {
                 incorrectExplanation: 'Compare the $R^2$ with the squared monthly Sharpe ratio of the market, not with 1.'
             },
             ro: {
-                title: 'Cît de mic este un R² mic?',
+                title: 'Valoarea economică a unui R² mic',
                 text: 'Un predictor al randamentelor lunare ale pieței are un $R^2$ în afara eșantionului de 0,5%. Potrivit lui Campbell și Thompson (2008), ce înseamnă asta pentru un investitor medie-varianță?',
                 options: [
                     'Este neglijabil, pentru că orice $R^2$ sub 1% nu are valoare economică',
@@ -165,7 +165,7 @@ window.MFM_DATA.quizzes['ml'] = {
                     'Măsura se aplică doar modelelor de clasificare',
                     'Un $R^2$ atît de mic trebuie să provină din leakage'
                 ],
-                correctExplanation: 'Pentru că rapoartele Sharpe lunare sînt mici, un $R^2$ mic înseamnă un cîștig relativ mare: $SR^{*2} = (SR_0^2 + R^2)/(1 - R^2)$. Welch și Goyal (2008) arată că majoritatea predictorilor pică acest test față de media istorică.',
+                correctExplanation: 'Pentru că rapoartele Sharpe lunare sînt mici, un $R^2$ mic înseamnă un cîștig relativ mare: $SR^{*2} = (SR_0^2 + R^2)/(1 - R^2)$. Welch și Goyal (2008) arată că majoritatea predictorilor nu trec acest test față de media istorică.',
                 incorrectExplanation: 'Comparați $R^2$ cu pătratul raportului Sharpe lunar al pieței, nu cu 1.'
             }
         },
@@ -238,7 +238,7 @@ window.MFM_DATA.quizzes['ml'] = {
                 incorrectExplanation: 'Ask whether the errors of neighbouring observations are correlated; that, not the time ordering itself, is what breaks K-fold.'
             },
             ro: {
-                title: 'Cînd este valid K-fold?',
+                title: 'Validitatea K-fold',
                 text: 'Bergmeir, Hyndman și Koo (2018) studiază validarea încrucișată K-fold standard pentru serii de timp. Cînd este validă?',
                 options: [
                     'Niciodată: seriile de timp se validează întotdeauna walk-forward',
@@ -247,7 +247,7 @@ window.MFM_DATA.quizzes['ml'] = {
                     'Doar cînd seria urmează distribuția Normală'
                 ],
                 correctExplanation: 'Dacă erorile sînt necorelate, erorile din pliul de test nu conțin informație despre erorile de antrenare; etichetele suprapuse pe $h$ zile fac erorile corelate, de aceea cursul are nevoie de purjare.',
-                incorrectExplanation: 'Întrebați-vă dacă erorile observațiilor vecine sînt corelate; asta, nu ordinea în timp în sine, strică K-fold.'
+                incorrectExplanation: 'Întrebați-vă dacă erorile observațiilor vecine sînt corelate; aceasta, nu ordinea temporală în sine, invalidează K-fold.'
             }
         },
         {
@@ -266,7 +266,7 @@ window.MFM_DATA.quizzes['ml'] = {
             },
             ro: {
                 title: 'Embargoul',
-                text: 'De ce se aplică un embargo după fiecare fold de test, pe lîngă purjare?',
+                text: 'De ce se aplică un embargo după fiecare pliu de test, pe lîngă purjare?',
                 options: [
                     'Pentru că variabilele construite pe ferestre mobile și seriile autocorelate pot transporta informație din perioada de test în observațiile imediat următoare',
                     'Pentru a mări setul de antrenare',
@@ -300,7 +300,7 @@ window.MFM_DATA.quizzes['ml'] = {
                     'Leakage: amestecarea pune în antrenare vecini aproape identici ai fiecărei observații de test, pe care modelul îi „recunoaște”',
                     'Purged K-Fold irosește prea multe date'
                 ],
-                correctExplanation: 'Valoarea de 69,4% este leakage pur. Cu purjare și embargo, acuratețea revine la nivelul aruncării monedei, cum trebuie să fie cînd nu există semnal.',
+                correctExplanation: 'Valoarea de 69,4% se datorează exclusiv leakage-ului. Cu purjare și embargo, acuratețea revine la nivelul aruncării monedei, cum trebuie să fie cînd nu există semnal.',
                 incorrectExplanation: 'Într-un mers aleator nu există semnal; acuratețea supraestimată vine din leakage prin etichete suprapuse și amestecare.'
             }
         },
@@ -347,7 +347,7 @@ window.MFM_DATA.quizzes['ml'] = {
             },
             ro: {
                 title: 'Teste de data snooping',
-                text: 'Faceți backtesting pentru 1.279 de reguli de medii mobile, puternic corelate, pe Bitcoin. Ce procedură testează dacă cea mai bună regulă bate buy-and-hold estimînd din date distribuția sub ipoteza nulă a statisticii celei mai bune reguli, inclusiv corelația dintre reguli?',
+                text: 'Faceți backtesting pentru 1.279 de reguli de medii mobile, puternic corelate, pe Bitcoin. Ce procedură testează dacă cea mai bună regulă depășește buy-and-hold, estimînd din date distribuția sub ipoteza nulă a statisticii celei mai bune reguli, inclusiv corelația dintre reguli?',
                 options: [
                     'Testul SPA al lui Hansen (sau Reality Check al lui White) cu bootstrap staționar al întregii matrice a randamentelor regulilor',
                     'O corecție Bonferroni cu N = 1.279',
@@ -405,7 +405,7 @@ window.MFM_DATA.quizzes['ml'] = {
                 options: [
                     'MDA este greșit ori de cîte ori contrazice MDI',
                     'vol_20 este cea mai utilă variabilă',
-                    'Out-of-sample, permutarea lui vol_20 îmbunătățește ușor scorul: modelul se bazează pe ea in-sample, dar ea nu ajută (și poate chiar strica) generalizarea',
+                    'Out-of-sample, permutarea lui vol_20 îmbunătățește ușor scorul: modelul se bazează pe ea in-sample, dar ea nu ajută (și poate chiar afecta negativ) generalizarea',
                     'Un MDA negativ înseamnă că variabila este perfect corelată cu eticheta'
                 ],
                 correctExplanation: 'MDA măsoară scăderea performanței out-of-sample atunci cînd o variabilă este permutată; o valoare negativă este un semnal de alarmă. Valorile SHAP oferă atribuiri locale, aditive, complementare.',
@@ -513,7 +513,7 @@ window.MFM_DATA.quizzes['ml'] = {
                 options: [
                     'A, pentru că cozile groase cresc randamentul așteptat',
                     'Au întotdeauna același PSR',
-                    'B, pentru că asimetria negativă și excesul de aplatizare cresc eroarea standard a raportului Sharpe și scad PSR',
+                    'B, pentru că asimetria negativă și excesul de kurtosis cresc eroarea standard a raportului Sharpe și scad PSR',
                     'PSR nu depinde de distribuția randamentelor'
                 ],
                 correctExplanation: 'Pentru $SR > 0$ numitorul $\\sqrt{1 - \\gamma_3 SR + \\frac{\\gamma_4 - 1}{4}SR^2}$ crește cînd $\\gamma_3 < 0$ și $\\gamma_4 > 3$, deci același avans pozitiv față de $SR^*$ este mai puțin convingător.',
@@ -539,7 +539,7 @@ window.MFM_DATA.quizzes['ml'] = {
                 text: 'Pentru ce corectează Deflated Sharpe Ratio (DSR), față de un test naiv al ipotezei $SR > 0$?',
                 options: [
                     'Doar pentru costurile de tranzacționare',
-                    'Pentru numărul de încercări (eroarea de selecție), randamentele care se abat de la distribuția Normală (asimetrie, aplatizare) și lungimea istoricului',
+                    'Pentru numărul de încercări (eroarea de selecție), randamentele care se abat de la distribuția Normală (asimetrie, kurtosis) și lungimea istoricului',
                     'Pentru corelația strategiei cu indicele pieței',
                     'Pentru moneda în care sînt măsurate randamentele'
                 ],
@@ -567,7 +567,7 @@ window.MFM_DATA.quizzes['ml'] = {
                 options: [
                     'Probabilitatea ca o strategie să piardă bani în anul următor',
                     'Ponderea tranzacțiilor cu pierdere',
-                    'Valoarea p a raportului Sharpe al celei mai bune strategii',
+                    'P-value-ul raportului Sharpe al celei mai bune strategii',
                     'Probabilitatea ca în afara eșantionului configurația cea mai bună in-sample să se claseze sub mediana tuturor configurațiilor'
                 ],
                 correctExplanation: 'CSCV împarte datele în numeroase combinații in-sample / out-of-sample și numără cît de des cîștigătorul in-sample are rezultate sub mediana out-of-sample.',
@@ -621,7 +621,7 @@ window.MFM_DATA.quizzes['ml'] = {
                 options: [
                     'Rezultatul încalcă compromisul bias-varianță, deci trebuie să fie o eroare de cod',
                     'Cu o fereastră scurtă, prognoza este o medie a randamentelor recente ponderată după similaritate, adică o strategie de momentum ajustat la volatilitate, deci cîștigul nu are nevoie de complexitate',
-                    'Rezultatul dovedește că rețelele adînci bat întotdeauna modelele liniare',
+                    'Rezultatul dovedește că rețelele adînci depășesc întotdeauna modelele liniare',
                     'Rezultatul este valabil doar pentru criptomonede'
                 ],
                 correctExplanation: 'Nagel arată că pentru $P \\gg T$ prognoza cu caracteristici aleatoare ponderează randamentele trecute după similaritate, care în ferestre scurte înseamnă mai ales apropiere în timp și scade cu volatilitatea; pe date cu reveniri la medie aceeași metodă pierde.',
@@ -644,7 +644,7 @@ window.MFM_DATA.quizzes['ml'] = {
             },
             ro: {
                 title: 'Modele fundaționale (foundation models)',
-                text: 'Modelele fundaționale pentru serii de timp (de exemplu Chronos, TimesFM) fac prognoze „zero-shot” după pre-antrenarea pe colecții uriașe de serii. Care este un risc specific la evaluarea lor pe date financiare?',
+                text: 'Modelele fundaționale pentru serii de timp (de exemplu Chronos, TimesFM) fac prognoze „zero-shot” după pre-antrenarea pe colecții foarte mari de serii. Care este un risc specific la evaluarea lor pe date financiare?',
                 options: [
                     'Nu pot produce prognoze probabilistice',
                     'Corpusul de pre-antrenare poate conține deja perioada de evaluare, ceea ce introduce look-ahead bias în testul „out-of-sample”',

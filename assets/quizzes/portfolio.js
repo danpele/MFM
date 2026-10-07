@@ -31,7 +31,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Deplasarea este proporțională cu 1/T și nu depinde de N"
                 ],
                 "correctExplanation": "E[Σ̂⁻¹] = T/(T−N−2)·Σ⁻¹ și E[μ̂'Σ⁻¹μ̂] = θ² + N/T; cu μ̂ și Σ̂ independente rezultă (Tθ² + N)/(T − N − 2), care crește cu N/T.",
-                "incorrectExplanation": "Estimatori nedeplasați nu dau o funcție neliniară nedeplasată; momentul Wishart invers mărește Σ̂⁻¹, iar deplasarea crește cu numărul de active N."
+                "incorrectExplanation": "O funcție neliniară de estimatori nedeplasați nu este, în general, nedeplasată; momentul Wishart invers deplasează în sus pe Σ̂⁻¹, iar deplasarea crește cu numărul de active N."
             }
         },
         {
@@ -84,8 +84,8 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Aproape de σ²(1 + 0,25) = 1,25σ²",
                     "Aproape de σ²(1 + √0,25)² = 2,25σ²"
                 ],
-                "correctExplanation": "Cu c = N/T = 0,25, valorile proprii de selecție umplu [σ²(1 − √c)², σ²(1 + √c)²] = [0,25σ², 2,25σ²]: zgomotul singur le împrăștie de nouă ori.",
-                "incorrectExplanation": "Zgomotul de eșantionare împrăștie valorile proprii în jurul lui σ² chiar cînd cele adevărate sînt egale; marginea conține rădăcina pătrată a lui c = N/T, iar urma este suma, nu cea mai mare valoare proprie."
+                "correctExplanation": "Cu c = N/T = 0,25, valorile proprii de selecție acoperă intervalul [σ²(1 − √c)², σ²(1 + √c)²] = [0,25σ², 2,25σ²]: numai zgomotul produce un raport de nouă între extreme.",
+                "incorrectExplanation": "Zgomotul de eșantionare dispersează valorile proprii în jurul lui σ² chiar cînd cele adevărate sînt egale; limita superioară conține rădăcina pătrată a lui c = N/T, iar urma este suma, nu cea mai mare valoare proprie."
             }
         },
         {
@@ -111,8 +111,8 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Pentru că aleg mereu ponderi egale",
                     "Pentru că supraponderează activele cu medii supraestimate și riscuri subestimate"
                 ],
-                "correctExplanation": "Optimizatorul tratează zgomotul din date drept informație și pune ponderi mari exact pe activele cu cele mai mari erori.",
-                "incorrectExplanation": "Ideea este că optimizatorul urmărește activele care arată cel mai bine din cauza zgomotului de estimare."
+                "correctExplanation": "Optimizatorul tratează zgomotul din date drept informație și atribuie ponderi mari exact activelor cu cele mai mari erori.",
+                "incorrectExplanation": "Ideea este că optimizatorul favorizează activele care par cele mai bune doar din cauza zgomotului de estimare."
             }
         },
         {
@@ -160,13 +160,13 @@ window.MFM_DATA.quizzes['portfolio'] = {
                 "title": "Reperul 1/N",
                 "text": "Ce au găsit DeMiguel, Garlappi și Uppal (2009)?",
                 "options": [
-                    "Niciunul dintre 14 modele de optimizare nu a bătut consecvent 1/N în afara eșantionului",
-                    "Medie–varianță de selecție bate 1/N cu cinci ani de date",
+                    "Niciunul dintre 14 modele de optimizare nu a depășit consecvent 1/N în afara eșantionului",
+                    "Portofoliul medie–varianță de selecție depășește 1/N cu cinci ani de date",
                     "1/N are cea mai mică varianță dintre toate regulile",
-                    "Doar shrinkage-ul bate 1/N"
+                    "Doar shrinkage-ul depășește 1/N"
                 ],
                 "correctExplanation": "Eroarea de estimare anulează cîștigul optimizării; cu 25 de active, MV de selecție are nevoie de circa 3000 de luni de date.",
-                "incorrectExplanation": "Rezultatul lor este că niciun model nu a bătut consecvent ponderile egale în raport Sharpe, echivalent cert sau turnover."
+                "incorrectExplanation": "Rezultatul lor este că niciun model nu a depășit consecvent ponderile egale în raport Sharpe, echivalent cert sau turnover."
             }
         },
         {
@@ -192,7 +192,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Rămîne constantă, pentru că κ nu depinde de T",
                     "Tinde la 0 cu viteza 1/√T, viteza covarianței de selecție"
                 ],
-                "correctExplanation": "Cu o țintă greșit specificată, κ converge la o constantă, deci δ* = κ/T scade ca 1/T: în eșantioane lungi cîștigă matricea de selecție, consistentă (dacă ținta ar fi corectă, deplasarea ei ar dispărea și δ* nu ar tinde neapărat la zero).",
+                "correctExplanation": "Cu o țintă greșit specificată, κ converge la o constantă, deci δ* = κ/T scade ca 1/T: în eșantioane lungi devine preferabilă matricea de selecție, consistentă (dacă ținta ar fi corectă, deplasarea ei ar dispărea și δ* nu ar tinde neapărat la zero).",
                 "incorrectExplanation": "Eroarea de estimare a lui S scade cu T, dar deplasarea țintei nu, deci ponderea țintei trebuie să dispară; viteza este cea a lui δ* = κ/T, nu viteza √T a estimatorului."
             }
         },
@@ -273,7 +273,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Sînt echivalente cu adăugarea unui activ fără risc",
                     "Acționează ca un shrinkage al matricei de covarianță și pot reduce riscul în afara eșantionului"
                 ],
-                "correctExplanation": "GMV doar long este GMV fără restricții al unei matrice de covarianță modificate: restricția „greșită” ajută.",
+                "correctExplanation": "GMV long-only este GMV fără restricții al unei matrice de covarianță modificate: restricția „greșită” poate reduce riscul în afara eșantionului.",
                 "incorrectExplanation": "Ideea lor este că restricția aplică implicit shrinkage covarianțelor activelor pe care este activă."
             }
         },
@@ -346,15 +346,15 @@ window.MFM_DATA.quizzes['portfolio'] = {
                 "incorrectExplanation": "The deviation from the benchmark lies in the span of the view portfolio."
             },
             "ro": {
-                "title": "Ce ponderi se schimbă",
-                "text": "Cu Ω = diag(PτΣP') și o singură opinie asupra XLK minus XLU, ce ponderi Black–Litterman se schimbă față de referință?",
+                "title": "Ponderile modificate de o opinie",
+                "text": "Cu Ω = diag(PτΣP') și o singură opinie asupra XLK minus XLU, ce ponderi Black–Litterman se modifică față de referință?",
                 "options": [
                     "Doar XLK și XLU",
                     "Toate cele nouă sectoare",
                     "Niciuna",
                     "Doar sectoarele cele mai corelate cu XLK"
                 ],
-                "correctExplanation": "În forma He–Litterman schimbarea ponderilor este P'λ: se schimbă doar ponderile activelor din opinie (XLK 11,1% → 14,4%, XLU 11,1% → 7,8%).",
+                "correctExplanation": "În forma He–Litterman modificarea ponderilor este P'λ: se modifică doar ponderile activelor din opinie (XLK 11,1% → 14,4%, XLU 11,1% → 7,8%).",
                 "incorrectExplanation": "Abaterea de la referință se află în direcția portofoliului opiniei."
             }
         },
@@ -401,7 +401,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Testarea multiplă",
-                "text": "Testați 21 de reguli contra 1/N; cea mai mică valoare p este 0,03. Ce conclude procedura Holm la un nivel de 5% pentru familie?",
+                "text": "Testați 21 de reguli față de 1/N; cea mai mică valoare p este 0,03. Ce conclude procedura Holm la un nivel de 5% pentru familie?",
                 "options": [
                     "Semnificativ, pentru că 0,03 < 0,05",
                     "Semnificativ, pentru că testele corelate nu necesită ajustare",
@@ -455,7 +455,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Riscul în 60/40",
-                "text": "Într-un portofoliu 60% SPY, 40% IEF (2002–2026), ce parte din risc a venit de la SPY?",
+                "text": "Într-un portofoliu 60% SPY, 40% IEF (2002–2026), ce parte din risc a provenit de la SPY?",
                 "options": [
                     "Circa 94%",
                     "60%",
@@ -516,7 +516,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Anulează corelațiile activului i",
                     "Lasă matricea de covarianță neschimbată"
                 ],
-                "correctExplanation": "s̃_ij = s_ij − λ_i − λ_j: activele pe care GMV le-ar vinde în lipsă au de obicei covarianțe supraestimate, iar restricția le coboară, ceea ce acționează ca un shrinkage.",
+                "correctExplanation": "s̃_ij = s_ij − λ_i − λ_j: activele pe care GMV le-ar vinde în lipsă au de obicei covarianțe supraestimate, iar restricția le reduce, ceea ce acționează ca un shrinkage.",
                 "incorrectExplanation": "Modificarea scade multiplicatori nenegativi din fiecare covarianță a activului restricționat, deci le micșorează, nu le crește, nu le anulează și nu le ignoră."
             }
         },
@@ -539,11 +539,11 @@ window.MFM_DATA.quizzes['portfolio'] = {
                 "text": "Care a fost principalul rezultat în afara eșantionului din capitol, pe cele trei universuri din SUA?",
                 "options": [
                     "MV de selecție a avut cel mai mare Sharpe peste tot",
-                    "GMV a bătut semnificativ 1/N peste tot",
-                    "Nicio regulă nu a bătut semnificativ 1/N; MV de selecție a eșuat în toate universurile",
-                    "HRP a bătut toate regulile după costuri"
+                    "GMV a depășit semnificativ 1/N peste tot",
+                    "Nicio regulă nu a depășit semnificativ 1/N; MV de selecție a eșuat în toate universurile",
+                    "HRP a depășit toate regulile după costuri"
                 ],
-                "correctExplanation": "Cel mai mare cîștig față de 1/N (MV-LO pe setul multi-active, +0,29) a avut p = 0,12; diferențele semnificative au fost pierderi.",
+                "correctExplanation": "Cel mai mare cîștig față de 1/N (MV-LO pe setul multi-active, +0,29) a avut p = 0,12; diferențele semnificative au fost negative.",
                 "incorrectExplanation": "Diferențele față de 1/N au fost fie nesemnificative, fie negative."
             }
         },
@@ -617,7 +617,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
             },
             "ro": {
                 "title": "Costurile de tranzacționare",
-                "text": "În universul cu 16 ETF-uri, sub ce cost aproximativ pe unitatea de turnover și-a păstrat MV doar long avantajul față de 1/N?",
+                "text": "În universul cu 16 ETF-uri, sub ce cost aproximativ pe unitatea de turnover și-a păstrat MV long-only (MV-LO) avantajul față de 1/N?",
                 "options": [
                     "2 bp",
                     "Circa 22 bp",
@@ -706,7 +706,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Formula ignoră corelațiile: RC_i = w_i (Sigma w)_i / sigma_p, iar cu ea acțiunile poartă mult mai mult de 60% din risc"
                 ],
                 "correctExplanation": "Contribuțiile Euler folosesc riscul marginal (Sigma w)_i / sigma_p, care include covarianțele; ele însumează sigma_p. Deoarece acțiunile sînt mult mai volatile decît obligațiunile, ele poartă de regulă 90% sau mai mult din riscul unui portofoliu 60/40.",
-                "incorrectExplanation": "Contribuțiile însumează într-adevăr volatilitatea portofoliului, dar numai cu RC_i = w_i (Sigma w)_i / sigma_p; cu această formulă acțiunile, mai volatile, poartă mult mai mult decît ponderea lor de 60% în bani."
+                "incorrectExplanation": "Contribuțiile însumează într-adevăr volatilitatea portofoliului, dar numai cu RC_i = w_i (Sigma w)_i / sigma_p; cu această formulă acțiunile, mai volatile, poartă mult mai mult decît ponderea lor de 60% în capital."
             }
         }
     ]

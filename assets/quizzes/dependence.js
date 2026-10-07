@@ -112,7 +112,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     "Atît ρ, cît și ν",
                     "De niciunul: τ este întotdeauna 0,5"
                 ],
-                correctExplanation: "Tau Kendall este același pentru toate copulele eliptice cu același ρ, deci τ identifică ρ, dar niciodată ν; ν vine din verosimilitate sau din cozi.",
+                correctExplanation: "Tau Kendall este același pentru toate copulele eliptice cu același ρ, deci τ identifică ρ, dar niciodată ν; ν se estimează din verosimilitate sau din comportamentul în cozi.",
                 incorrectExplanation: "Pentru copulele eliptice τ = (2/π) arcsin ρ oricare ar fi ν, deci ν nu poate fi recuperat din τ."
             }
         },
@@ -139,8 +139,8 @@ window.MFM_DATA.quizzes['dependence'] = {
                     'Europa se închide înaintea New York-ului, deci știrile americane ajung în prețurile europene cu o zi întîrziere, iar corelația zilnică este deplasată spre zero',
                     'Randamentele săptămînale elimină media'
                 ],
-                correctExplanation: 'Închiderile nesincrone împart un șoc comun pe două zile europene; corelația zilnică decalată (0,20) arată partea lipsă.',
-                incorrectExplanation: 'Cauza este tranzacționarea nesincronă între fusuri orare; frecvențele mai mici sau termenii decalați recuperează mișcarea comună.'
+                correctExplanation: 'Închiderile nesincrone repartizează un șoc comun pe două zile de tranzacționare europene; corelația zilnică decalată (0,20) arată partea lipsă.',
+                incorrectExplanation: 'Cauza este tranzacționarea nesincronă între fusuri orare; frecvențele mai mici sau termenii decalați recuperează co-mișcarea.'
             }
         },
         {
@@ -302,7 +302,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     'Pentru că sub a = 0 parametrul b nu este identificat (o problemă de tip Davies)'
                 ],
                 correctExplanation: 'Cînd a = 0, b dispare din model; asimptotica standard nu mai funcționează, iar referința hi-pătrat este doar un ghid aproximativ.',
-                incorrectExplanation: 'Parametrul perturbator b nu este identificat sub ipoteza nulă, ceea ce strică asimptotica hi-pătrat standard.'
+                incorrectExplanation: 'Parametrul perturbator b nu este identificat sub ipoteza nulă, ceea ce invalidează asimptotica hi-pătrat standard.'
             }
         },
         {
@@ -356,7 +356,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     "Devine negativă prin construcție"
                 ],
                 correctExplanation: "Corecția presupune o varianță idiosincratică constantă; un șoc comun exagerează raportul varianțelor și elimină prea mult din creșterea corelației, deci contagiunea reală poate fi ascunsă.",
-                incorrectExplanation: "Cu un șoc comun, ipoteza „niciun factor omis” cade, iar corecția elimină prea mult din creșterea corelației."
+                incorrectExplanation: "Cu un șoc comun, ipoteza „niciun factor omis” nu mai este îndeplinită, iar corecția elimină prea mult din creșterea corelației."
             }
         },
         {
@@ -482,16 +482,16 @@ window.MFM_DATA.quizzes['dependence'] = {
                 incorrectExplanation: "A date selected from the data makes the null distribution depend on how the date was chosen, so Normal critical values reject too often."
             },
             ro: {
-                title: "O dată de ruptură aleasă din ochi",
+                title: "O dată de ruptură aleasă vizual",
                 text: "Alegeți ianuarie 2022 de pe graficul corelației mobile și apoi testați o schimbare a corelației la acea dată cu un test Fisher z. Testul este:",
                 options: [
-                    "Cu nivel real prea mare: data a fost aleasă din date; folosiți un test cu dată necunoscută, precum Wied, Krämer și Dehling (2012)",
+                    "Cu nivel real prea mare: data a fost aleasă pe baza datelor; folosiți un test cu dată necunoscută, precum Wied, Krämer și Dehling (2012)",
                     "Cu nivel exact, pentru că data este fixată înainte de calculul statisticii",
                     "Cu nivel real prea mic, pentru că graficul netezește datele",
                     "Valid oricînd eșantionul este mare"
                 ],
                 correctExplanation: "O dată aleasă după ce am văzut datele este ea însăși aleatoare, deci distribuția statisticii sub ipoteza nulă depinde de regula de alegere, iar valorile critice Normale resping prea des; un test cu dată necunoscută, precum Wied, Krämer și Dehling (2012), este definit cu propria limită de tip punte browniană. Pe reziduurile SPY–TLT el plasează ruptura în august 2020, nu în ianuarie 2022.",
-                incorrectExplanation: "O dată aleasă din date face ca distribuția sub ipoteza nulă să depindă de modul de alegere a datei, deci valorile critice Normale resping prea des."
+                incorrectExplanation: "O dată aleasă pe baza datelor face ca distribuția sub ipoteza nulă să depindă de modul de alegere a datei, deci valorile critice Normale resping prea des."
             }
         },
         {
@@ -509,13 +509,13 @@ window.MFM_DATA.quizzes['dependence'] = {
                 incorrectExplanation: 'The t copula has positive tail dependence; the Gaussian copula has none.'
             },
             ro: {
-                title: 'Gaussiană vs t',
-                text: 'Două copule au același ρ = 0,5: Gaussiana și Student t cu ν = 4. Care afirmație este corectă?',
+                title: 'Copula Gaussiană față de copula t',
+                text: 'Două copule au același ρ = 0,5: copula Gaussiană și copula Student t cu ν = 4. Care afirmație este corectă?',
                 options: [
                     'Ambele au dependență zero în cozi',
                     'Ambele au aceeași dependență în cozi, 0,5',
-                    'Gaussiana are mai multă dependență în cozi',
-                    'Copula t are dependență în cozi de circa 0,25, Gaussiana nu are'
+                    'Copula Gaussiană are mai multă dependență în cozi',
+                    'Copula t are dependență în cozi de circa 0,25, copula Gaussiană nu are'
                 ],
                 correctExplanation: 'λ = 2 t5(−sqrt(5 × 0,5/1,5)) ≈ 0,253 pentru copula t; copula Gaussiană are λ = 0 pentru |ρ| < 1.',
                 incorrectExplanation: 'Copula t are dependență pozitivă în cozi; copula Gaussiană nu are.'
@@ -541,10 +541,10 @@ window.MFM_DATA.quizzes['dependence'] = {
                 options: [
                     'Copula t este inutilă',
                     'Testul este greșit',
-                    'Cu mii de observații sînt detectate și abateri mici; o copulă statică poate rata și dependența variabilă în timp',
+                    'Cu mii de observații sînt detectate și abateri mici; o copulă statică nu poate surprinde nici dependența variabilă în timp',
                     'AIC și testele de adecvare coincid întotdeauna'
                 ],
-                correctExplanation: 'Eșantioanele mari dau putere mare împotriva abaterilor mici; dependența variabilă în timp este o explicație posibilă (o copulă t dinamică se potrivește mult mai bine pentru JPM–BAC). AIC ordonează modelele, testul verifică adecvarea absolută.',
+                correctExplanation: 'Eșantioanele mari dau putere mare împotriva abaterilor mici; dependența variabilă în timp este o explicație posibilă (o copulă t dinamică are o adecvare mult mai bună pentru JPM–BAC). AIC ordonează modelele, testul verifică adecvarea absolută.',
                 incorrectExplanation: 'Respingerea reflectă puterea mare împotriva unei abateri, nu faptul că cel mai bun model ar fi inutil.'
             }
         },
@@ -572,7 +572,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     'Pierderile sînt independente'
                 ],
                 correctExplanation: 'Gumbel pe pierderi surprinde crahurile comune (λU = 0,26); Clayton plasează dependența în coada cîștigurilor comune.',
-                incorrectExplanation: 'Coada superioară a pierderilor conține crahurile comune; doar Gumbel plasează dependența acolo.'
+                incorrectExplanation: 'Upper tail-ul copulei pierderilor conține crahurile simultane; doar Gumbel plasează dependența acolo.'
             }
         },
         {
@@ -652,7 +652,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     'Dovezi modeste și fragile: intervalul conține zero, iar creșterea este concentrată în anii de criză',
                     'Corelația nu s-a schimbat deloc'
                 ],
-                correctExplanation: 'Estimarea punctuală crește, dar intervalul conține zero, excluderea săptămînilor crahului din 2020 o reduce, iar dependența în coada inferioară nu a crescut.',
+                correctExplanation: 'Estimarea punctuală crește, dar intervalul conține zero, excluderea săptămînilor crahului din 2020 o reduce, iar dependența în lower tail nu a crescut.',
                 incorrectExplanation: 'Schimbarea nu este semnificativă la 5% și depinde de săptămînile de criză.'
             }
         },
@@ -672,14 +672,14 @@ window.MFM_DATA.quizzes['dependence'] = {
             },
             ro: {
                 title: "Găsiți eroarea: cozile copulei Gaussiene",
-                text: "Un asistent AI scrie: „O copulă Gaussiană cu corelația rho = 0,7 are dependența în coada inferioară lambda_L = rho^2 = 0,49, deci surprinde bine crahurile comune.” Care este eroarea?",
+                text: "Un asistent AI scrie: „O copulă Gaussiană cu corelația rho = 0,7 are dependența în lower tail lambda_L = rho^2 = 0,49, deci surprinde bine crahurile comune.” Care este eroarea?",
                 options: [
-                    "Dependența în coada inferioară a copulei Gaussiene este rho, nu rho^2",
-                    "Copula Gaussiană are dependență în coada superioară, dar nu și în cea inferioară",
+                    "Dependența în lower tail a copulei Gaussiene este rho, nu rho^2",
+                    "Copula Gaussiană are dependență în upper tail, dar nu și în lower tail",
                     "Pentru orice rho < 1 copula Gaussiană are dependență (asimptotică) zero în cozi, deci lambda_L = rho^2 este greșit",
                     "Dependența în cozi se poate calcula doar pentru copulele arhimediene"
                 ],
-                correctExplanation: "Copula Gaussiană este asimptotic independentă în ambele cozi: lambda_L = lambda_U = 0 pentru rho < 1. Extremele comune la un prag fixat apar totuși (pentru rho = 0,7, P(V ≤ 0,01 | U ≤ 0,01) ≈ 0,27), dar o dependență în cozi pozitivă la limită cere de exemplu o copulă t (simetrică) sau o copulă Clayton (coada inferioară).",
+                correctExplanation: "Copula Gaussiană este asimptotic independentă în ambele cozi: lambda_L = lambda_U = 0 pentru rho < 1. Extremele comune la un prag fixat apar totuși (pentru rho = 0,7, P(V ≤ 0,01 | U ≤ 0,01) ≈ 0,27), dar o dependență în cozi pozitivă la limită cere de exemplu o copulă t (simetrică) sau o copulă Clayton (lower tail).",
                 incorrectExplanation: "Nicio formulă pozitivă în rho nu este corectă aici: copula Gaussiană are lambda_L = lambda_U = 0 pentru orice rho < 1, deci crahurile comune devin asimptotic independente."
             }
         },

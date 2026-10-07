@@ -76,7 +76,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "incorrectExplanation": "Drift parameters (kappa, theta) are identified by the calendar span T, not by the number of observations: Var(kappa-hat) is about (exp(2 kappa Delta) - 1) / (T Delta), which tends to 2 kappa / T, not to zero, as the step Delta shrinks with T fixed."
             },
             "ro": {
-                "title": "Infill versus orizont lung",
+                "title": "Infill față de orizont lung",
                 "text": "Un proces OU este observat din ce în ce mai des pe o fereastră fixă de 5 ani: intervalul de eșantionare tinde la zero, deci n crește nelimitat, iar T = 5 rămîne fix. Ce parametru se estimează consistent?",
                 "options": [
                     "Viteza de revenire la medie kappa",
@@ -166,7 +166,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "0"
                 ],
                 "correctExplanation": "Sumînd identitatea pentru fiecare creștere se obține W_T^2/2 minus jumătate din variația pătratică, T/2.",
-                "incorrectExplanation": "Calculul obișnuit ar da W_T^2/2; termenul suplimentar -T/2 vine din variația pătratică, iar rezultatul este aleator, nu 0."
+                "incorrectExplanation": "Calculul clasic ar da W_T^2/2; termenul suplimentar -T/2 provine din variația pătratică, iar rezultatul este aleator, nu 0."
             }
         },
         {
@@ -193,7 +193,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "(1/2) b^2 f''(X) dt"
                 ],
                 "correctExplanation": "Deoarece (dW)^2 = dt, termenul Taylor de ordinul doi (1/2) b^2 f'' dt nu dispare.",
-                "incorrectExplanation": "Termenii a f' dt și b f' dW apar și în regula obișnuită; noutatea este termenul de ordinul doi."
+                "incorrectExplanation": "Termenii a f' dt și b f' dW apar și în regula obișnuită; diferența constă în termenul de ordinul doi."
             }
         },
         {
@@ -269,11 +269,11 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "text": "Cum poate fi îmbunătățită precizia driftului logaritmic estimat m = mu - sigma^2/2 al GBM?",
                 "options": [
                     "Prin eșantionare zilnică în loc de lunară",
-                    "Prin folosirea datelor intraday",
+                    "Prin folosirea datelor intrazilnice",
                     "Doar printr-o durată calendaristică mai lungă a datelor",
-                    "Prin randamente log în loc de randamente simple"
+                    "Prin randamente logaritmice în loc de randamente simple"
                 ],
-                "correctExplanation": "Eroarea standard a driftului logaritmic estimat este sigma/sqrt(T): depinde doar de durata calendaristică, deoarece suma randamentelor log folosește doar primul și ultimul preț.",
+                "correctExplanation": "Eroarea standard a driftului logaritmic estimat este sigma/sqrt(T): depinde doar de durata calendaristică, deoarece suma randamentelor logaritmice folosește doar primul și ultimul preț.",
                 "incorrectExplanation": "Eșantionarea mai deasă îmbunătățește estimarea volatilității, nu a driftului."
             }
         },
@@ -381,7 +381,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Nu este validă: lambda = 0 se află pe frontieră, iar mu_J, sigma_J nu sînt identificați sub ipoteza nulă; folosiți un bootstrap parametric",
                     "Este validă dacă eșantionul depășește zece ani"
                 ],
-                "correctExplanation": "Teorema lui Wilks cere o ipoteză nulă interioară și parametri identificați; ambele condiții lipsesc aici, deci distribuția sub ipoteza nulă se obține simulînd eșantioane GBM și reestimînd ambele modele (Seminarul B6).",
+                "correctExplanation": "Teorema lui Wilks necesită o ipoteză nulă interioară și parametri identificați; ambele condiții lipsesc aici, deci distribuția sub ipoteza nulă se obține simulînd eșantioane GBM și reestimînd ambele modele (Seminarul B6).",
                 "incorrectExplanation": "Nici numărarea parametrilor, nici un eșantion mai lung nu repară o ipoteză nulă pe frontieră cu parametri de perturbare neidentificați: distribuția chi-pătrat de referință nu se aplică."
             }
         },
@@ -485,11 +485,11 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "text": "Estimat prin verosimilitate maximă pe randamentele zilnice ale S&P 500, modelul Merton dă circa 100 de salturi mici pe an. Cum trebuie interpretat acest rezultat?",
                 "options": [
                     "Modelul i.i.d. folosește salturile pentru a imita volatilitatea variabilă",
-                    "S&P 500 sare la fiecare două-trei zile",
+                    "S&P 500 are un salt la fiecare două-trei zile",
                     "Estimarea este o eroare numerică",
                     "Salturile explică volatility clustering"
                 ],
-                "correctExplanation": "Un model i.i.d. nu poate separa un salt de o perioadă volatilă, așa că folosește salturi mici și frecvente pentru a îngroșa cozile; testul Lee-Mykland marchează sub un salt candidat pe an.",
+                "correctExplanation": "Un model i.i.d. nu poate separa un salt de o perioadă volatilă, așa că folosește salturi mici și frecvente pentru a îngroșa cozile; testul Lee-Mykland marchează mai puțin de un salt candidat pe an.",
                 "incorrectExplanation": "Randamentele Merton rămîn independente în timp, deci nu pot produce volatility clustering; salturile detectate în datele zilnice sînt rare."
             }
         },
@@ -514,7 +514,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Testul detectează doar salturile pozitive",
                     "Testul folosește date săptămînale",
                     "Randamentele mari sînt eliminate înainte de test",
-                    "Au apărut în perioade agitate, deci nu erau mari în raport cu volatilitatea locală"
+                    "Au apărut în perioade de volatilitate ridicată, deci nu erau mari în raport cu volatilitatea locală"
                 ],
                 "correctExplanation": "Statistica împarte fiecare randament la o volatilitate locală bipower; în 2008 și 2020 volatilitatea era deja ridicată.",
                 "incorrectExplanation": "Testul este simetric, folosește chiar randamentele zilnice și nu elimină nimic; măsoară mărimea în raport cu volatilitatea locală."
@@ -536,15 +536,15 @@ window.MFM_DATA.quizzes['continuous-time'] = {
             },
             "ro": {
                 "title": "Salturile și orizontul",
-                "text": "Cum se modifică excesul de aplatizare al randamentelor Merton cu orizontul Delta t?",
+                "text": "Cum se modifică excesul de kurtosis al randamentelor Merton cu orizontul Delta t?",
                 "options": [
                     "Crește ca Delta t",
                     "Rămîne constant",
                     "Scade ca 1/Delta t",
                     "Scade ca 1/sqrt(Delta t)"
                 ],
-                "correctExplanation": "Cumulantul de ordinul patru crește ca Delta t, iar pătratul dispersiei ca Delta t^2, deci excesul de aplatizare scade ca 1/Delta t: salturile contează cel mai mult pe orizonturi scurte.",
-                "incorrectExplanation": "Excesul de aplatizare este cumulantul de ordinul patru împărțit la pătratul dispersiei, iar cele două se scalează diferit cu Delta t."
+                "correctExplanation": "Cumulantul de ordinul patru crește ca Delta t, iar pătratul dispersiei ca Delta t^2, deci excesul de kurtosis scade ca 1/Delta t: salturile au cel mai mare efect pe orizonturi scurte.",
+                "incorrectExplanation": "Excesul de kurtosis este cumulantul de ordinul patru împărțit la pătratul dispersiei, iar cele două se scalează diferit cu Delta t."
             }
         },
         {
@@ -562,16 +562,16 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "incorrectExplanation": "A flat line is the Black-Scholes case; a symmetric smile appears with rho = 0 and a rising curve with rho > 0."
             },
             "ro": {
-                "title": "Efectul de levier și panta",
+                "title": "Efectul de levier și skew-ul",
                 "text": "În modelul Heston cu rho = -0,69, cum variază volatilitățile implicite pe trei luni cu prețul de exercitare?",
                 "options": [
                     "Sînt constante",
                     "Cresc odată cu prețul de exercitare",
-                    "Scad odată cu prețul de exercitare: o pantă descendentă, ca la opțiunile pe indici bursieri",
-                    "Formează un zîmbet simetric în jurul prețului la bani"
+                    "Scad odată cu prețul de exercitare: un skew descendent, ca la opțiunile pe indici bursieri",
+                    "Formează un smile simetric în jurul nivelului ATM"
                 ],
                 "correctExplanation": "Corelația negativă dintre randamente și varianță îngroașă coada stîngă, deci prețurile de exercitare mici au volatilități implicite mai mari.",
-                "incorrectExplanation": "O linie orizontală este cazul Black-Scholes; un zîmbet simetric apare cu rho = 0, iar o curbă crescătoare cu rho > 0."
+                "incorrectExplanation": "O linie orizontală este cazul Black-Scholes; un smile simetric apare cu rho = 0, iar o curbă crescătoare cu rho > 0."
             }
         },
         {
@@ -643,16 +643,16 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "incorrectExplanation": "GBM fails on every statistic, i.i.d. jumps cannot create clustering, and no fitted model reaches the kurtosis: the evidence favours combining jumps and stochastic volatility."
             },
             "ro": {
-                "title": "Ce model?",
+                "title": "Comparația modelelor",
                 "text": "Simulate și comparate cu S&P 500, ce afirmație corespunde rezultatelor din curs?",
                 "options": [
                     "GBM reproduce toate faptele stilizate",
-                    "Merton reproduce statistica Hill, Heston volatility clustering și niciunul excesul de aplatizare",
+                    "Merton reproduce statistica Hill, Heston volatility clustering și niciunul excesul de kurtosis",
                     "Merton reproduce volatility clustering",
-                    "Heston reproduce excesul de aplatizare de 10,9"
+                    "Heston reproduce excesul de kurtosis de 10,9"
                 ],
-                "correctExplanation": "Statistica Hill Merton (2,70) este aproape de date (2,56), dar ACF a lui |r| este zero; ACF Heston este apropiată de cea din date, dar ambele dau un exces de aplatizare de circa 3,5 față de 10,9.",
-                "incorrectExplanation": "GBM nu reproduce niciuna dintre statistici, salturile i.i.d. nu pot crea volatility clustering și niciun model estimat nu atinge aplatizarea: rezultatele susțin combinarea salturilor cu volatilitatea stochastică."
+                "correctExplanation": "Statistica Hill Merton (2,70) este aproape de date (2,56), dar ACF a lui |r| este zero; ACF Heston este apropiată de cea din date, dar ambele dau un exces de kurtosis de circa 3,5 față de 10,9.",
+                "incorrectExplanation": "GBM nu reproduce niciuna dintre statistici, salturile i.i.d. nu pot crea volatility clustering și niciun model estimat nu atinge excesul de kurtosis din date: rezultatele susțin combinarea salturilor cu volatilitatea stochastică."
             }
         },
         {
@@ -675,7 +675,7 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "options": [
                     "Ecuația GBM ar trebui să aibă sigma dW fără factorul S",
                     "Mediana lui S_T este egală cu media, S_0 exp(mu T / 2)",
-                    "S-a folosit calculul obișnuit în loc de calculul Itô: d ln S = (mu - sigma^2/2) dt + sigma dW, deci mediana este S_0 exp((mu - sigma^2/2) T)",
+                    "S-a folosit calculul diferențial clasic în loc de calculul Itô: d ln S = (mu - sigma^2/2) dt + sigma dW, deci mediana este S_0 exp((mu - sigma^2/2) T)",
                     "ln S_T are o distribuție Student-t, deci nu are mediană"
                 ],
                 "correctExplanation": "Pentru f(S) = ln S, lema lui Itô adaugă (1/2) f''(S) sigma^2 S^2 = -sigma^2/2, deoarece (dW)^2 = dt. Media rămîne S_0 exp(mu T); mediana este mai mică, S_0 exp((mu - sigma^2/2) T).",

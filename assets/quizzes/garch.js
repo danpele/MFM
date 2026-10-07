@@ -27,11 +27,11 @@ window.MFM_DATA.quizzes['garch'] = {
                 options: [
                     'Randamentele sînt puternic predictibile ca direcție',
                     'Dispersia randamentelor este constantă în timp',
-                    'Mărimea mișcării de mîine este predictibilă, deși direcția ei aproape nu este',
+                    'Mărimea variației de mîine este predictibilă, deși direcția ei aproape nu este',
                     'Datele conțin o eroare de calcul, deoarece cele două trebuie să fie egale'
                 ],
-                correctExplanation: 'Pătratele randamentelor măsoară mărimea mișcărilor. Autocorelația lor puternică și persistentă este volatility clustering: mișcările mari urmează mișcărilor mari, de orice semn.',
-                incorrectExplanation: 'Direcția este aproape imprevizibilă; ceea ce persistă este mărimea mișcărilor (volatility clustering).'
+                correctExplanation: 'Pătratele randamentelor măsoară mărimea variațiilor. Autocorelația lor puternică și persistentă este volatility clustering: variațiile mari sînt urmate de variații mari, de orice semn.',
+                incorrectExplanation: 'Direcția este aproape imprevizibilă; ceea ce persistă este mărimea variațiilor (volatility clustering).'
             }
         },
         {
@@ -84,7 +84,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Pentru a elimina nevoia estimării prin verosimilitate maximă',
                     'Pentru a modela media randamentelor în locul dispersiei'
                 ],
-                correctExplanation: 'Prin substituții succesive, GARCH(1,1) este un ARCH(infinit) cu ponderi alpha * beta^(j-1): o dinamică persistentă a dispersiei, cu memorie scurtă, cu doar trei parametri.',
+                correctExplanation: 'Prin substituții succesive, GARCH(1,1) este un ARCH(infinit) cu ponderi alpha * beta^(j-1): o dinamică persistentă a dispersiei, cu ponderi descrescătoare geometric și doar trei parametri.',
                 incorrectExplanation: 'Dispersia decalată dă un ARCH de ordin infinit cu ponderi descrescătoare geometric, deci volatility clustering persistent cere doar trei parametri.'
             }
         },
@@ -111,7 +111,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     "5,99, din chi2(2)",
                     "Niciuna: cu nu = infinit se pot folosi doar AIC sau BIC"
                 ],
-                correctExplanation: "Deoarece 1/nu >= 0, ipoteza nulă este pe frontieră. Jumătate din timp estimarea nerestricționată stă la limită și LR = 0, deci limita este 0,5 chi2(0) + 0,5 chi2(1), a cărei valoare critică la 5% este valoarea de 10% a lui chi2(1), 2,71.",
+                correctExplanation: "Deoarece 1/nu >= 0, ipoteza nulă este pe frontieră. În jumătate din cazuri estimarea nerestricționată se află la limită și LR = 0, deci limita este 0,5 chi2(0) + 0,5 chi2(1), a cărei valoare critică la 5% este valoarea de 10% a lui chi2(1), 2,71.",
                 incorrectExplanation: "Restricția 1/nu = 0 este pe frontiera lui 1/nu >= 0, deci statistica LR are limita de tip amestec 0,5 chi2(0) + 0,5 chi2(1) (Self și Liang), cu valoarea critică 2,71; un test valid există."
             }
         },
@@ -130,15 +130,15 @@ window.MFM_DATA.quizzes['garch'] = {
                 incorrectExplanation: "Consistency does not make the classical formula right. The score variance is proportional to kappa_z - 1 and the Hessian to 2, so the variance ratio is (kappa_z - 1)/2 = 2 and the standard error ratio is 1.41."
             },
             ro: {
-                title: "Factorul „sandviș”",
-                text: "Într-un QMLE Gaussian al unui ARCH(1) cu omega cunoscut, inovațiile au aplatizarea kappa_z = 5. Raportul dintre eroarea standard robustă („sandviș”) și cea clasică a lui alpha-hat este circa:",
+                title: "Factorul sandwich",
+                text: "Într-un QMLE Gaussian al unui ARCH(1) cu omega cunoscut, inovațiile au kurtosis-ul kappa_z = 5. Raportul dintre eroarea standard robustă (sandwich) și cea clasică a lui alpha-hat este circa:",
                 options: [
                     "1, deoarece QMLE este consistent",
                     "sqrt(5) = 2,24",
                     "sqrt((5 - 1)/2) = 1,41",
                     "5/3 = 1,67"
                 ],
-                correctExplanation: "Cu A = 0,5 E x_t^2 și B = 0,25 (kappa_z - 1) E x_t^2, sandvișul A^-1 B A^-1 este de (kappa_z - 1)/2 ori inversa hessianei A^-1, deci erorile standard diferă prin factorul sqrt((kappa_z - 1)/2) = 1,41.",
+                correctExplanation: "Cu A = 0,5 E x_t^2 și B = 0,25 (kappa_z - 1) E x_t^2, estimatorul sandwich A^-1 B A^-1 este de (kappa_z - 1)/2 ori inversa hessianei A^-1, deci erorile standard diferă prin factorul sqrt((kappa_z - 1)/2) = 1,41.",
                 incorrectExplanation: "Consistența nu face corectă formula clasică. Dispersia scorului este proporțională cu kappa_z - 1, iar hessiana cu 2, deci raportul dispersiilor este (kappa_z - 1)/2 = 2, iar cel al erorilor standard 1,41."
             }
         },
@@ -239,14 +239,14 @@ window.MFM_DATA.quizzes['garch'] = {
             },
             ro: {
                 title: 'Cozi groase din volatility clustering',
-                text: 'Un GARCH(1,1) cu inovații z_t Normale, alpha > 0 și moment de ordin patru finit ((alpha + beta)^2 + 2 alpha^2 < 1) generează randamente cu aplatizarea...',
+                text: 'Un GARCH(1,1) cu inovații z_t Normale, alpha > 0 și moment de ordin patru finit ((alpha + beta)^2 + 2 alpha^2 < 1) generează randamente cu kurtosis-ul...',
                 options: [
                     'exact 3, deoarece z_t este Normal',
                     'peste 3, deoarece amestecul perioadelor cu dispersie mică și mare produce cozi groase',
                     'sub 3, deoarece dispersia este mărginită',
                     'care nu poate fi calculată'
                 ],
-                correctExplanation: 'Aplatizarea este 3[1 - (alpha+beta)^2] / [1 - (alpha+beta)^2 - 2 alpha^2] > 3 pentru alpha > 0: volatility clustering singur creează cozi groase.',
+                correctExplanation: 'Kurtosis-ul este 3[1 - (alpha+beta)^2] / [1 - (alpha+beta)^2 - 2 alpha^2] > 3 pentru alpha > 0: volatility clustering generează singur cozi groase.',
                 incorrectExplanation: 'Chiar și cu inovații Normale, o dispersie variabilă în timp face distribuția necondiționată leptocurtică.'
             }
         },
@@ -271,10 +271,10 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Nimic: erorile standard clasice rămîn valide',
                     'Renunțați la GARCH, deoarece estimările sînt inconsistente',
                     'Păstrați estimările (consistente dacă ecuațiile mediei și dispersiei sînt corecte), dar folosiți erorile standard robuste Bollerslev-Wooldridge',
-                    'Înmulțiți erorile standard cu aplatizarea'
+                    'Înmulțiți erorile standard cu kurtosis-ul'
                 ],
-                correctExplanation: 'Cvasi-verosimilitatea maximă este consistentă dacă primele două momente condiționate sînt corecte; cu E z_t^4 < infinit, inferența folosește covarianța „sandviș” A^-1 B A^-1 (dacă E z_t^4 = infinit, inferența în sqrt(n) nu mai funcționează: Hall și Yao, 2003).',
-                incorrectExplanation: 'Estimările QML rămîn consistente; doar erorile standard trebuie înlocuite cu forma robustă „sandviș”.'
+                correctExplanation: 'Cvasi-verosimilitatea maximă este consistentă dacă primele două momente condiționate sînt corecte; cu E z_t^4 < infinit, inferența folosește covarianța sandwich A^-1 B A^-1 (dacă E z_t^4 = infinit, inferența în sqrt(n) nu mai funcționează: Hall și Yao, 2003).',
+                incorrectExplanation: 'Estimările QML rămîn consistente; doar erorile standard trebuie înlocuite cu forma robustă sandwich.'
             }
         },
         {
@@ -300,7 +300,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Modelul este greșit specificat, deoarece parametrul ν trebuie să fie un număr întreg',
                     'Dispersia inovațiilor este infinită'
                 ],
-                correctExplanation: 'La o Student-t, momentul de ordin patru există doar dacă nu > 4; cu nu = 3,18 aplatizarea este infinită, deși dispersia (nu > 2) este finită.',
+                correctExplanation: 'La o Student-t, momentul de ordin patru există doar dacă nu > 4; cu nu = 3,18 kurtosis-ul este infinit, deși dispersia (nu > 2) este finită.',
                 incorrectExplanation: 'Un nu mic înseamnă cozi groase; momentul de ordin patru cere nu > 4, dispersia doar nu > 2.'
             }
         },
@@ -327,7 +327,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Că modelul nu este identificat',
                     'O coadă stîngă mai lungă: pierderile mari mai probabile decît cîștigurile mari'
                 ],
-                correctExplanation: 'lambda < 0 înclină densitatea spre stînga; pentru S&P 500, GJR-GARCH dă lambda de circa -0,15.',
+                correctExplanation: 'lambda < 0 produce asimetrie la stînga; pentru S&P 500, GJR-GARCH dă lambda de circa -0,15.',
                 incorrectExplanation: 'Un lambda negativ înseamnă asimetrie la stînga: coada pierderilor este mai lungă.'
             }
         },
@@ -462,8 +462,8 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Bitcoin are cel mai puternic efect de levier',
                     'Un gamma negativ înseamnă că modelul este greșit'
                 ],
-                correctExplanation: 'La aur, creșterile din perioadele agitate cresc volatilitatea mai mult decît scăderile: o asimetrie inversă, compatibilă cu comportamentul unui activ de refugiu. Bitcoin nu are asimetrie semnificativă.',
-                incorrectExplanation: 'Efectul de levier clasic apare la acțiuni; aurul are asimetrie inversă, iar Bitcoin deloc.'
+                correctExplanation: 'La aur, creșterile de preț din perioadele de volatilitate ridicată cresc volatilitatea mai mult decît scăderile: o asimetrie inversă, compatibilă cu comportamentul unui activ de refugiu. Bitcoin nu are asimetrie semnificativă.',
+                incorrectExplanation: 'Efectul de levier clasic apare la acțiuni; aurul are asimetrie inversă, iar Bitcoin nu prezintă asimetrie semnificativă.'
             }
         },
         {
@@ -517,7 +517,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Eliminați constanta din ecuația mediei'
                 ],
                 correctExplanation: 'Asimetria de semn înseamnă că semnul șocurilor trecute încă prezice pătratele reziduurilor, ceea ce un model simetric nu poate surprinde.',
-                incorrectExplanation: 'Un test de asimetrie respins indică lipsa asimetriei din model; decalajele simetrice nu o pot corecta.'
+                incorrectExplanation: 'Respingerea testului de asimetrie indică lipsa asimetriei din model; decalajele simetrice nu o pot corecta.'
             }
         },
         {
@@ -624,7 +624,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     "Faptul că intervalul atinge 1 este în sine un test valid care respinge IGARCH",
                     "Intervalul pentru timpul de înjumătățire este simetric în jurul a 131 de zile"
                 ],
-                correctExplanation: "ln(0,5)/ln(x) explodează cînd x se apropie de 1, deci intervalul pentru timpul de înjumătățire este uriaș și asimetric. Intervalul percentil este trunchiat de restricția alpha + beta <= 1, deci întrebarea despre IGARCH cere un test simulat sub ipoteza nulă, care dă p = 0,17.",
+                correctExplanation: "ln(0,5)/ln(x) tinde la infinit cînd x se apropie de 1, deci intervalul pentru timpul de înjumătățire este foarte larg și asimetric. Intervalul percentil este trunchiat de restricția alpha + beta <= 1, deci întrebarea despre IGARCH cere un test simulat sub ipoteza nulă, care dă p = 0,17.",
                 incorrectExplanation: "Un interval percentil trunchiat nu este un test (Andrews, 2000), o estimare punctuală sub 1 nu dovedește nimic, iar intervalul pentru timpul de înjumătățire este foarte asimetric; testul simulat sub IGARCH nu respinge."
             }
         },
@@ -652,7 +652,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Autocorelația pătratelor randamentelor scade geometric, în timp ce în date autocorelația randamentelor absolute scade lent, cu memorie lungă'
                 ],
                 correctExplanation: 'GARCH(1,1) are o singură scară de timp; FIGARCH (Baillie, Bollerslev și Mikkelsen, 1996) și modelele de volatilitate realizată (Capitolul 9) tratează memoria lungă. Rupturile structurale pot și ele crește artificial alpha + beta.',
-                incorrectExplanation: 'GARCH produce volatility clustering; limitele principale sînt memoria geometrică (scurtă), persistența falsă sub rupturi structurale și întîrzierea reacției.'
+                incorrectExplanation: 'GARCH produce volatility clustering; limitele principale sînt memoria geometrică (scurtă), persistența aparentă generată de rupturi structurale și întîrzierea reacției.'
             }
         },
         {

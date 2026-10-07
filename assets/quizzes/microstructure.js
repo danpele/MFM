@@ -30,8 +30,8 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "...subestimează c: converge la c(1 - 0,5) = 0,5c",
                     "...nu este definit, fiindcă covarianța devine pozitivă"
                 ],
-                "correctExplanation": "Cu Corr(q_t, q_{t-k}) = rho^k, Cov(dp_t, dp_{t-1}) = c^2 Cov(q_t - q_{t-1}, q_{t-1} - q_{t-2}) = -c^2 (1 - rho)^2, deci estimatorul dă c(1 - rho).",
-                "incorrectExplanation": "Semnele persistente fac mai puțin probabilă inversarea lui q_t, ceea ce micșorează oscilația: Cov = -c^2 (1 - rho)^2, tot negativă, dar mai mică."
+                "correctExplanation": "Cu Corr(q_t, q_{t-k}) = rho^k, Cov(dp_t, dp_{t-1}) = c^2 Cov(q_t - q_{t-1}, q_{t-1} - q_{t-2}) = -c^2 (1 - rho)^2, deci estimatorul converge la c(1 - rho).",
+                "incorrectExplanation": "Semnele persistente fac mai puțin probabilă inversarea lui q_t, ceea ce reduce bid-ask bounce-ul: Cov = -c^2 (1 - rho)^2, tot negativă, dar mai mică."
             }
         },
         {
@@ -112,7 +112,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Prețurile sînt nestaționare, deci ponderea nu este identificată"
                 ],
                 "correctExplanation": "Ponderea informațională folosește un factor Cholesky al covarianței inovațiilor; cu inovații corelate, cele două ordonări dau ponderi diferite, raportate ca limite.",
-                "incorrectExplanation": "Intervalul vine din identificare, nu din selecție: corelația contemporană a inovațiilor este atribuită uneia sau alteia dintre platforme, după ordonare."
+                "incorrectExplanation": "Intervalul provine din problema de identificare, nu din eroarea de selecție: corelația contemporană a inovațiilor este atribuită uneia sau alteia dintre platforme, după ordonare."
             }
         },
         {
@@ -138,7 +138,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "50%",
                     "3%"
                 ],
-                "correctExplanation": "Jumătatea de spread implicată este phi + theta = 0,04; ponderea selecției adverse este theta/(phi + theta) = 0,03/0,04 = 75%.",
+                "correctExplanation": "Jumătatea de spread implicită este phi + theta = 0,04; ponderea selecției adverse este theta/(phi + theta) = 0,03/0,04 = 75%.",
                 "incorrectExplanation": "Selecția adversă este partea permanentă theta; împărțiți-o la întreaga jumătate de spread phi + theta."
             }
         },
@@ -165,7 +165,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "-c^2",
                     "-2c^2"
                 ],
-                "correctExplanation": "Oscilația bid-ask dă Cov(dp_t, dp_{t-1}) = -c^2, deci spread-ul este 2 sqrt(-Cov).",
+                "correctExplanation": "Bid-ask bounce-ul implică Cov(dp_t, dp_{t-1}) = -c^2, deci spread-ul este 2 sqrt(-Cov).",
                 "incorrectExplanation": "Prețurile tranzacțiilor alternează între bid și ask, ceea ce creează o autocovarianță negativă egală cu minus pătratul jumătății de spread."
             }
         },
@@ -211,16 +211,16 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "incorrectExplanation": "The formula 2 sqrt(-Cov) needs a non-positive sample covariance for a real-valued result. Positive sample values can arise from sampling error even when the Roll model holds, or from departures from its assumptions (trends, stale prices)."
             },
             "ro": {
-                "title": "Cînd estimatorul Roll nu funcționează",
-                "text": "Ce dă estimatorul Roll cînd autocovarianța de selecție a variațiilor de preț este pozitivă?",
+                "title": "Estimatorul Roll cu autocovarianță pozitivă",
+                "text": "Ce rezultat produce estimatorul Roll cînd autocovarianța de selecție a variațiilor de preț este pozitivă?",
                 "options": [
                     "Un spread negativ",
                     "Un spread zero",
                     "Dublul volatilității",
-                    "Nicio estimare: rădăcina pătrată a unui număr negativ nu există"
+                    "Nicio estimare: rădăcina pătrată a unui număr negativ nu este definită în numere reale"
                 ],
                 "correctExplanation": "Cu autocovarianță pozitivă, -Cov este negativă și estimatorul nu este definit.",
-                "incorrectExplanation": "Formula 2 sqrt(-Cov) cere o covarianță de selecție nepozitivă pentru un rezultat real. Valorile de selecție pozitive pot apărea din eroarea de selecție chiar cînd modelul Roll este adevărat sau din abateri de la ipotezele lui (tendințe, prețuri stale (neactualizate))."
+                "incorrectExplanation": "Formula 2 sqrt(-Cov) necesită o covarianță de selecție nepozitivă pentru un rezultat real. Valorile de selecție pozitive pot apărea din eroarea de selecție chiar cînd modelul Roll este adevărat sau din abateri de la ipotezele lui (tendințe, prețuri stale (neactualizate))."
             }
         },
         {
@@ -265,7 +265,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "incorrectExplanation": "The estimator mistakes volatility for spread when the interval is long relative to the spread."
             },
             "ro": {
-                "title": "Frecvența contează",
+                "title": "Rolul frecvenței de eșantionare",
                 "text": "Pentru SPY, Corwin-Schultz zilnic dă circa 27 pb, iar un pas de cotare este circa 0,2 pb. Ce explică diferența?",
                 "options": [
                     "Spread-ul SPY este chiar de 27 pb",
@@ -273,7 +273,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Pe date zilnice, intervalul maxim-minim este dominat de volatilitate",
                     "Estimatorul funcționează doar pentru cripto-active"
                 ],
-                "correctExplanation": "Cu o volatilitate zilnică de circa 1%, intervalul este aproape numai mișcare de preț; barele de 5 minute coboară estimarea la circa 3 pb.",
+                "correctExplanation": "Cu o volatilitate zilnică de circa 1%, intervalul este aproape numai mișcare de preț; barele de 5 minute reduc estimarea la circa 3 pb.",
                 "incorrectExplanation": "Estimatorul confundă volatilitatea cu spread-ul cînd intervalul este lung în raport cu spread-ul."
             }
         },
@@ -295,13 +295,13 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "title": "Raportul Amihud",
                 "text": "Ce măsoară raportul de ilichiditate Amihud?",
                 "options": [
-                    "Randamentul absolut mediu per unitate de bani tranzacționați",
+                    "Randamentul absolut mediu per unitate monetară tranzacționată",
                     "Spread-ul cotat împărțit la preț",
                     "Numărul de tranzacții pe zi",
                     "Volatilitatea volumului"
                 ],
-                "correctExplanation": "ILLIQ este media rapoartelor zilnice |r_d| / valoarea tranzacționată_d: o aproximare a ilichidității, randamentul absolut per unitate de bani tranzacționați, nu un impact cauzal identificat.",
-                "incorrectExplanation": "Amihud împarte randamentul zilnic absolut la valoarea tranzacționată, obținînd impactul per unitate de bani."
+                "correctExplanation": "ILLIQ este media rapoartelor zilnice |r_d| / valoarea tranzacționată_d: o aproximare a ilichidității, randamentul absolut per unitate monetară tranzacționată, nu un impact cauzal identificat.",
+                "incorrectExplanation": "Amihud împarte randamentul zilnic absolut la valoarea tranzacționată, obținînd impactul per unitate monetară."
             }
         },
         {
@@ -320,12 +320,12 @@ window.MFM_DATA.quizzes['microstructure'] = {
             },
             "ro": {
                 "title": "Lichiditatea BVB",
-                "text": "Comparativ cu marile companii americane, ce spune raportul Amihud despre acțiunile blue-chip BVB (2024-2026)?",
+                "text": "Comparativ cu marile companii americane, ce indică raportul Amihud despre acțiunile blue-chip BVB (2024-2026)?",
                 "options": [
                     "Sînt aproape la fel de lichide",
                     "Sînt de două ori mai nelichide",
                     "Sînt mai lichide",
-                    "Cer de mii de ori mai multă mișcare de preț per dolar tranzacționat"
+                    "Prezintă o mișcare de preț de mii de ori mai mare per dolar tranzacționat"
                 ],
                 "correctExplanation": "Banca Transilvania, cea mai lichidă acțiune BVB, are un raport Amihud de circa cincisprezece mii de ori mai mare decît SPY.",
                 "incorrectExplanation": "Raportul Amihud separă BVB de marile companii americane prin mai multe ordine de mărime, spre deosebire de aproximările zilnice ale spread-ului."
@@ -351,10 +351,10 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "options": [
                     "PIN nu este identificată pentru nicio acțiune",
                     "Tranzacționarea informată lipsește la acțiunile lichide",
-                    "Termeni precum exp(-eps) eps^B / B! depășesc domeniul numeric pentru B mare; verosimilitatea trebuie factorizată și evaluată cu log-sum-exp",
+                    "Termeni precum exp(-eps) eps^B / B! depășesc domeniul de reprezentare numerică pentru B mare; verosimilitatea trebuie factorizată și evaluată cu log-sum-exp",
                     "Prea puține zile de tranzacționare într-un an"
                 ],
-                "correctExplanation": "Lin și Ke (2011) arată o deplasare de calcul: cu numere zilnice mari, termenii Poisson ies din domeniul virgulei mobile; scoaterea factorilor comuni și lucrul în logaritmi o elimină.",
+                "correctExplanation": "Lin și Ke (2011) arată o deplasare de natură numerică: cu numere zilnice mari, termenii Poisson depășesc domeniul de reprezentare în virgulă mobilă; scoaterea factorilor comuni și lucrul în logaritmi o elimină.",
                 "incorrectExplanation": "Problema apare doar la numere mari și este numerică: exp(-1000) este 0, iar 1000^1450 este infinit în dublă precizie."
             }
         },
@@ -408,7 +408,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Nu are legătură cu VIX",
                     "Depinde doar de ziua săptămînii"
                 ],
-                "correctExplanation": "Elasticitatea logaritmului ilichidității în raport cu logaritmul VIX este circa 0,95: lichiditatea dispare cînd volatilitatea crește.",
+                "correctExplanation": "Elasticitatea logaritmului ilichidității în raport cu logaritmul VIX este circa 0,95: lichiditatea scade cînd volatilitatea crește.",
                 "incorrectExplanation": "Formatorii de piață lărgesc cotațiile și reduc adîncimea cînd riscul crește, deci ilichiditatea și VIX evoluează împreună."
             }
         },
@@ -543,7 +543,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Vinde totul la sfîrșit",
                     "Așteaptă un preț mai bun"
                 ],
-                "correctExplanation": "Cu lambda = 0, kappa = 0 și deținerea scade liniar: programul ponderat în timp.",
+                "correctExplanation": "Cu lambda = 0, kappa = 0 și deținerea scade liniar: programul uniform în timp (TWAP).",
                 "incorrectExplanation": "Doar riscul de preț împinge tranzacționarea spre început; fără aversiune la risc, împărțirea uniformă a ordinului minimizează impactul temporar."
             }
         },
@@ -619,13 +619,13 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "title": "Roll în eșantioane mici",
                 "text": "Pentru barele SPY de 5 minute (77 de randamente pe zi), covarianța Roll din cursul zilei este pozitivă în circa 41% din zile. Sub modelul Roll cu un spread de un pas, o simulare Monte Carlo dă circa 45% (banda 95%: între 43% și 48%). Ce rezultă?",
                 "options": [
-                    "Modelul Roll este respins, fiindcă o oscilație adevărată dă covarianțe negative",
+                    "Modelul Roll este respins, fiindcă un bid-ask bounce real implică covarianțe negative",
                     "Piața este ineficientă în 41% din zile",
-                    "Zilele pozitive nu sînt, singure, o dovadă împotriva Roll: cu c/sigma aproape de 0,01, apar în aproape jumătate din zile; ponderea observată este chiar sub bandă, adică o autocorelație mai negativă decît o oscilație de un pas",
+                    "Zilele pozitive nu sînt, singure, o dovadă împotriva Roll: cu c/sigma aproape de 0,01, apar în aproape jumătate din zile; ponderea observată este chiar sub bandă, adică o autocorelație mai negativă decît bid-ask bounce-ul de un pas",
                     "Spread-ul SPY este circa 41% dintr-un pas"
                 ],
-                "correctExplanation": "Harris (1990): cînd c^2 este mic față de sigma^2 / sqrt(T), P(Cov-estimat > 0) este aproape de o jumătate chiar dacă modelul este adevărat. Cei 41% observați sînt sub banda pentru un pas, deci datele sînt mai negativ autocorelate, nu mai puțin, decît o oscilație de un pas.",
-                "incorrectExplanation": "Comparați ponderea observată cu distribuția de selecție sub ipoteza nulă: o oscilație minusculă față de volatilitate dă putere mică în 77 de observații."
+                "correctExplanation": "Harris (1990): cînd c^2 este mic față de sigma^2 / sqrt(T), P(Cov-estimat > 0) este aproape de o jumătate chiar dacă modelul este adevărat. Cei 41% observați sînt sub banda pentru un pas, deci datele sînt mai negativ autocorelate, nu mai puțin, decît bid-ask bounce-ul de un pas.",
+                "incorrectExplanation": "Comparați ponderea observată cu distribuția de selecție sub ipoteza nulă: un bid-ask bounce foarte mic față de volatilitate conduce la o putere mică în 77 de observații."
             }
         },
         {
@@ -644,7 +644,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
             },
             "ro": {
                 "title": "Șocurile de ilichiditate",
-                "text": "La seminar, cum reacționează randamentele lunare ale pieței la o creștere neașteptată a ilichidității?",
+                "text": "În seminar, cum reacționează randamentele lunare ale pieței la o creștere neașteptată a ilichidității?",
                 "options": [
                     "Cresc, pe toate cele trei piețe",
                     "Scad, pe BVB, în SUA și pe piața cripto",
@@ -676,7 +676,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Factorul ar trebui să fie 1, nu 2",
                     "Estimatorul Roll folosește varianța variațiilor de preț, nu autocovarianța lor",
                     "Autocovarianța ar trebui calculată din prețuri, nu din variațiile lor",
-                    "O autocovarianță de selecție pozitivă face ca estimatorul Roll nemodificat să nu fie definit în numere reale, deși poate apărea din eroarea de selecție; raportați-l ca lipsă sau folosiți alt estimator, de exemplu unul maxim-minim"
+                    "O autocovarianță de selecție pozitivă face ca estimatorul Roll nemodificat să nu fie definit în numere reale, deși poate apărea din eroarea de selecție; raportați-l ca valoare lipsă sau folosiți alt estimator, de exemplu unul maxim-minim"
                 ],
                 "correctExplanation": "Modelul Roll implică o autocovarianță negativă în populație, -c^2. O valoare de selecție poate fi totuși pozitivă, din eroarea de selecție sau din abateri de la model (tendințe, prețuri stale (neactualizate)); în ambele cazuri rădăcina nu este definită, iar valoarea absolută produce un spread fără nicio bază în model (Roll, 1984; Hasbrouck, 2007).",
                 "incorrectExplanation": "Formula s = 2 sqrt(-Cov) este corectă; greșeala este forțarea unei autocovarianțe pozitive în formulă prin valoarea absolută."
@@ -701,9 +701,9 @@ window.MFM_DATA.quizzes['microstructure'] = {
                 "text": "Un asistent AI scrie: „Ilichiditatea Amihud a unei acțiuni este media pe zile a lui |r_d| împărțit la numărul de acțiuni tranzacționate în ziua d.” Ce este greșit?",
                 "options": [
                     "Numărătorul ar trebui să fie pătratul randamentului, nu randamentul absolut",
-                    "Numitorul trebuie să fie valoarea tranzacționată (preț ori număr de acțiuni, în bani), nu numărul de acțiuni",
+                    "Numitorul trebuie să fie valoarea tranzacționată (prețul înmulțit cu numărul de acțiuni, în unități monetare), nu numărul de acțiuni",
                     "Raportul ar trebui să fie o mediană, nu o medie",
-                    "Amihud folosește randamente intraday, nu randamente zilnice"
+                    "Amihud folosește randamente intrazilnice, nu randamente zilnice"
                 ],
                 "correctExplanation": "Amihud (2002) definește ILLIQ ca media lui |r_d| / DVOL_d, cu DVOL_d valoarea tranzacționată în monedă. Cu numărul de acțiuni, raportul depinde de nivelul prețului, face un salt la o divizare a acțiunilor și nu poate fi comparat între acțiuni.",
                 "incorrectExplanation": "Randamentul zilnic absolut și media pe zile sînt corecte; numitorul trebuie măsurat în bani, nu în număr de acțiuni."

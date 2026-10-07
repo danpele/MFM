@@ -55,9 +55,9 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Regresia cuantilă nu are erori standard",
                     "Doar pentru că reziduurile sînt heteroscedastice",
                     "Pentru că banca este inclusă în portofoliul sistemului",
-                    "Pentru că eșantionul efectiv din coadă (alpha înmulțit cu n) este mic, deci aproximarea Normală pentru cuantile centrale poate fi slabă; inferența pentru cuantile extreme sau subeșantionarea este alternativa construită pentru acest caz"
+                    "Pentru că eșantionul efectiv din coadă (alpha înmulțit cu n) este mic, deci aproximarea Normală pentru cuantile centrale poate fi imprecisă; inferența pentru cuantile extreme sau subeșantionarea este alternativa construită pentru acest caz"
                 ],
-                "correctExplanation": "Asimptotica regresiei cuantile cere multe observații în jurul cuantilei; cu alpha n de cîteva zeci, estimarea inversei densității este zgomotoasă, iar teoria cuantilelor extreme este construită pentru acest caz; cît de slabă este aproximarea Normală depinde și de regresori și de coadă.",
+                "correctExplanation": "Asimptotica regresiei cuantile cere multe observații în jurul cuantilei; cu alpha n de cîteva zeci, estimarea inversei densității este zgomotoasă, iar teoria cuantilelor extreme este construită pentru acest caz; cît de imprecisă este aproximarea Normală depinde și de regresori și de coadă.",
                 "incorrectExplanation": "Erorile standard există, iar sistemul exclude banca; problema este numărul mic de observații din coadă, care poate face inexactă aproximarea Normală pentru cuantile centrale."
             }
         },
@@ -239,7 +239,7 @@ window.MFM_DATA.quizzes['systemic'] = {
             },
             "ro": {
                 "title": "Delta-CoVaR sub distribuția Normală",
-                "text": "Sub normalitate bivariată cu medii zero, Delta-CoVaR la nivelul alpha este -rho x sigma_sys x z_alpha. De ce NU depinde?",
+                "text": "Sub distribuția Normală bivariată cu medii zero, Delta-CoVaR la nivelul alpha este -rho x sigma_sys x z_alpha. De care dintre mărimile de mai jos NU depinde?",
                 "options": [
                     "De abaterea standard a băncii",
                     "De corelația dintre bancă și sistem",
@@ -320,14 +320,14 @@ window.MFM_DATA.quizzes['systemic'] = {
             },
             "ro": {
                 "title": "Portofoliul sistemului",
-                "text": "De ce este banca i lăsată în afara propriului portofoliu al sistemului la estimarea CoVaR?",
+                "text": "De ce este banca i exclusă din propriul portofoliu al sistemului la estimarea CoVaR?",
                 "options": [
                     "Pentru a reduce timpul de calcul",
                     "Pentru că banca nu are date",
                     "Pentru că o cer autoritățile",
-                    "Pentru că propriul randament ar apărea de ambele părți ale regresiei, introducînd o contribuție mecanică proprie"
+                    "Pentru că propriul randament ar apărea de ambele părți ale regresiei, introducînd o autocontribuție mecanică"
                 ],
-                "correctExplanation": "Cu banca i în sistem, X_i intră atît în variabila dependentă, cît și în cea explicativă, ceea ce adaugă o contribuție mecanică proprie la legătura estimată (nu neapărat o pantă mai mare).",
+                "correctExplanation": "Cu banca i în sistem, X_i intră atît în variabila dependentă, cît și în cea explicativă, ceea ce adaugă o autocontribuție mecanică la legătura estimată (nu neapărat o pantă mai mare).",
                 "incorrectExplanation": "Motivul este statistic: includerea băncii creează o corelație mecanică între sistem și bancă."
             }
         },
@@ -347,7 +347,7 @@ window.MFM_DATA.quizzes['systemic'] = {
             },
             "ro": {
                 "title": "Delta-CoVaR variabil în timp",
-                "text": "În curs, de ce s-a mișcat Delta-CoVaR al celor șase bănci aproape împreună în timp?",
+                "text": "În curs, de ce au evoluat aproape sincron în timp valorile Delta-CoVaR ale celor șase bănci?",
                 "options": [
                     "Pentru că cele șase bănci sînt aceeași companie",
                     "Pentru că variabilele de stare întîrziate comune determină cuantilele condiționate ale băncilor",
@@ -489,8 +489,8 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Ca transmițători către băncile americane",
                     "Ca receptori neți, cu o pondere proprie mare a dispersiei"
                 ],
-                "correctExplanation": "Ponderile lor proprii au fost peste 70%, iar spillover-urile nete negative: sînt determinate mai ales de șocuri interne și primesc mai mult decît trimit.",
-                "incorrectExplanation": "Băncile românești primesc puțin de la băncile americane și europene și nu trimit aproape nimic înapoi."
+                "correctExplanation": "Ponderile lor proprii au fost peste 70%, iar spillover-urile nete negative: sînt determinate mai ales de șocuri interne și primesc mai mult decît transmit.",
+                "incorrectExplanation": "Băncile românești primesc puțin de la băncile americane și europene și nu transmit aproape nimic."
             }
         },
         {
@@ -646,7 +646,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                 "title": "Scenarii istorice de stres",
                 "text": "În scenariile istorice din curs, ce a arătat episodul taxei bancare din România din decembrie 2018?",
                 "options": [
-                    "A lovit toate băncile la fel",
+                    "A afectat toate băncile la fel",
                     "Băncile românești au scăzut cel mai mult (aproximativ 26% în 10 zile): un șoc politic intern pe care scenariile globale l-ar rata",
                     "Băncile românești au crescut",
                     "Au fost afectate doar băncile americane"
@@ -678,8 +678,8 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Acesta este ES 5% al băncii; MES condiționează pe coada pieței, -E[X_i | X_m <= q_5%(X_m)], care aici este 0,5 x 2,5 x phi(1,645)/0,05 = 2,58%",
                     "MES trebuie raportat ca număr negativ"
                 ],
-                "correctExplanation": "MES (pierderea marginală așteptată în coadă) măsoară pierderea așteptată a băncii în cele mai proaste zile ale pieței: MES = beta x ES_5%(X_m) = rho x sigma_i x phi(1,645)/0,05 = 2,58%. O verificare rapidă: cu rho = 0 MES trebuie să fie 0, dar formula AI-ului nu îl conține pe rho.",
-                "incorrectExplanation": "Evenimentul de condiționare este un crah al pieței, nu o zi proastă a băncii: MES = -E[X_i | X_m <= q_5%(X_m)], care depinde de corelație și aici este 2,58%."
+                "correctExplanation": "MES (pierderea marginală așteptată în coadă) măsoară pierderea așteptată a băncii în zilele cele mai nefavorabile pentru piață: MES = beta x ES_5%(X_m) = rho x sigma_i x phi(1,645)/0,05 = 2,58%. O verificare rapidă: cu rho = 0 MES trebuie să fie 0, dar formula AI-ului nu îl conține pe rho.",
+                "incorrectExplanation": "Evenimentul de condiționare este un crah al pieței, nu o zi nefavorabilă pentru bancă: MES = -E[X_i | X_m <= q_5%(X_m)], care depinde de corelație și aici este 2,58%."
             }
         },
         {
@@ -705,7 +705,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Zece bănci sînt prea puține pentru o rețea",
                     "Rețeaua trebuie construită cu o ordonare Cholesky a băncilor"
                 ],
-                "correctExplanation": "Cu prețuri cu rădăcină unitară, testul Wald obișnuit nu are distribuția standard și apar legături false. Rețelele de cauzalitate Granger se construiesc pe randamente (staționare) sau cu proceduri gîndite pentru serii integrate.",
+                "correctExplanation": "Cu prețuri cu rădăcină unitară, testul Wald obișnuit nu are distribuția standard și apar legături false. Rețelele de cauzalitate Granger se construiesc pe randamente (staționare) sau cu proceduri concepute pentru serii integrate.",
                 "incorrectExplanation": "Problema este intrarea, nu numărul de întîrzieri sau de bănci: prețurile băncilor au rădăcină unitară, deci testele pe niveluri resping prea des; aplicați testele pe randamente."
             }
         }

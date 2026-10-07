@@ -112,7 +112,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Erorile standard sînt prea mari din cauza inovațiilor Student-t",
                     "Nimic: intervalul este exact"
                 ],
-                "correctExplanation": "Lîngă alpha + beta = 1 aproximarea Normală nu funcționează (Andrews, 1999); intervalul profil pentru BET este [0,975; 1), un timp de înjumătățire de cel puțin 27 de zile, fără limită superioară finită.",
+                "correctExplanation": "Lîngă alpha + beta = 1 aproximarea asimptotică Normală nu mai este validă (Andrews, 1999); intervalul profil pentru BET este [0,975; 1), un timp de înjumătățire de cel puțin 27 de zile, fără limită superioară finită.",
                 "incorrectExplanation": "Un interval care iese din spațiul parametrilor arată că aproximarea Normală nu este valabilă acolo; nu dovedește IGARCH și nici nu este exact."
             }
         },
@@ -132,9 +132,9 @@ window.MFM_DATA.quizzes['wrap-up'] = {
             },
             "ro": {
                 "title": "Testare multiplă",
-                "text": "300 de factori fără valoare, cu statistici t aproximativ independente și Normale standard sub ipoteza nulă, sînt testați fiecare la |t| > 1,96. Ce se întîmplă?",
+                "text": "300 de factori fără putere explicativă, cu statistici t aproximativ independente și Normale standard sub ipoteza nulă, sînt testați fiecare la |t| > 1,96. Ce se întîmplă?",
                 "options": [
-                    "Circa 15 sînt de așteptat să pară semnificativi din întîmplare, iar cel mai bun ajunge de regulă la |t| aproape de 3",
+                    "Aproximativ 15 vor părea semnificativi doar prin hazard, iar cel mai bun ajunge de regulă la |t| aproape de 3",
                     "Niciunul nu pare semnificativ",
                     "Toți par semnificativi",
                     "Exact unul pare semnificativ"
@@ -186,7 +186,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
             },
             "ro": {
                 "title": "Eroarea de estimare",
-                "text": "De ce pierde adesea portofoliul medie-varianță estimat în fața 1/N în afara eșantionului?",
+                "text": "De ce are adesea portofoliul medie-varianță estimat performanțe inferioare portofoliului 1/N în afara eșantionului?",
                 "options": [
                     "1/N are mereu cel mai mare raport Sharpe în teorie",
                     "Eroarea de estimare a randamentelor așteptate domină, iar optimizarea o amplifică",
@@ -301,7 +301,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "ES este pierderea medie dincolo de cuantilă și este subaditiv; VaR este doar cuantila",
                     "VaR este subaditiv pentru orice distribuție"
                 ],
-                "correctExplanation": "ES face media cozii, deci vede cît de rele sînt zilele rele, și este coerent.",
+                "correctExplanation": "ES este media pierderilor din coadă, deci măsoară mărimea pierderilor extreme, și este coerent.",
                 "incorrectExplanation": "VaR poate încălca subaditivitatea (exemplul cu două obligațiuni); ES la același nivel este mereu cel puțin cît VaR."
             }
         },
@@ -382,7 +382,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Depășirile grupate arată că modelul reacționează prea lent la volatilitate, chiar dacă totalul este corect",
                     "Testele de independență înlocuiesc testele de acoperire"
                 ],
-                "correctExplanation": "Un model poate avea numărul corect de depășiri și totuși să le grupeze în crize, lucru pe care doar un test de independență îl detectează. În studiul de caz BET, HS a picat ambele teste: 79 de depășiri față de aproximativ 54 așteptate (Kupiec p = 0,002) și depășiri grupate (Christoffersen p < 0,001).",
+                "correctExplanation": "Un model poate avea numărul corect de depășiri și totuși să le grupeze în crize, lucru pe care doar un test de independență îl detectează. În studiul de caz BET, HS a fost respins de ambele teste: 79 de depășiri față de aproximativ 54 așteptate (Kupiec p = 0,002) și depășiri grupate (Christoffersen p < 0,001).",
                 "incorrectExplanation": "Acoperirea și independența testează eșecuri diferite; testul Christoffersen îl adaugă pe al doilea."
             }
         },
@@ -401,16 +401,16 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                 "incorrectExplanation": "No scoring function ranks ES alone consistently; compare (VaR, ES) pairs with FZ0 and Diebold--Mariano tests."
             },
             "ro": {
-                "title": "Clasificarea prognozelor ES",
-                "text": "Cum pot fi clasificate prognozele de Expected Shortfall?",
+                "title": "Ierarhizarea prognozelor ES",
+                "text": "Cum pot fi ierarhizate prognozele de Expected Shortfall?",
                 "options": [
                     "Singure, cu eroarea medie pătratică",
                     "Singure, cu orice funcție de pierdere",
                     "Nu pot fi comparate deloc",
                     "Împreună cu VaR, cu o funcție de scor consistentă precum FZ0"
                 ],
-                "correctExplanation": "ES singur nu este elicitabil, dar perechea (VaR, ES) este; FZ0 o clasifică în mod consistent.",
-                "incorrectExplanation": "Nicio funcție de scor nu clasifică singur ES în mod consistent; comparați perechi (VaR, ES) cu FZ0 și teste Diebold--Mariano."
+                "correctExplanation": "ES singur nu este elicitabil, dar perechea (VaR, ES) este; FZ0 o ierarhizează în mod consistent.",
+                "incorrectExplanation": "Nicio funcție de scor nu ierarhizează singur ES în mod consistent; comparați perechi (VaR, ES) cu FZ0 și teste Diebold--Mariano."
             }
         },
         {
@@ -432,7 +432,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                 "text": "Un model VaR cu parametri estimați pe 2000-2026 este supus backtesting-ului pe 2005-2026. Ce este greșit?",
                 "options": [
                     "Nimic: mai multe date îmbunătățesc mereu backtest-ul",
-                    "Folosește informație care nu era disponibilă la data prognozei, deci backtest-ul arată mai bine decît realitatea",
+                    "Folosește informație care nu era disponibilă la data prognozei, deci rezultatele backtest-ului par mai bune decît ar fi fost în realitate",
                     "Perioada de backtest este prea lungă",
                     "GARCH nu poate fi estimat pe 26 de ani"
                 ],
@@ -485,13 +485,13 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                 "title": "QLIKE",
                 "text": "De ce este preferat QLIKE în locul MSE pentru compararea prognozelor de varianță?",
                 "options": [
-                    "Cu o aproximare condiționat nedeplasată ierarhizează prognozele la fel ca varianța adevărată și este mai puțin dominat de zilele extreme",
+                    "Cu un proxy condiționat nedeplasat ierarhizează prognozele la fel ca varianța adevărată și este mai puțin dominat de zilele extreme",
                     "Ignoră mărimea erorilor",
                     "Dă mereu numere mai mici",
-                    "Nu are nevoie de o aproximare a varianței adevărate"
+                    "Nu are nevoie de un proxy al varianței adevărate"
                 ],
-                "correctExplanation": "Dacă aproximarea (de exemplu RV) este condiționat nedeplasată pentru varianța adevărată, atît MSE, cît și QLIKE ierarhizează prognozele după pierderea așteptată la fel ca varianța adevărată (Patton, 2011); MSE este dominat de cîteva zile extreme, iar QLIKE depinde doar de raportul RV/h. O aproximare deplasată strică ierarhia pentru ambele.",
-                "incorrectExplanation": "QLIKE = RV/h - ln(RV/h) - 1 penalizează erorile relative, deci zilele de criză nu domină comparația; robustețea lui la zgomotul aproximării cere totuși o aproximare condiționat nedeplasată."
+                "correctExplanation": "Dacă proxy-ul (de exemplu RV) este condiționat nedeplasată pentru varianța adevărată, atît MSE, cît și QLIKE ierarhizează prognozele după pierderea așteptată la fel ca varianța adevărată (Patton, 2011); MSE este dominat de cîteva zile extreme, iar QLIKE depinde doar de raportul RV/h. Un proxy deplasat distorsionează ierarhizarea pentru ambele.",
+                "incorrectExplanation": "QLIKE = RV/h - ln(RV/h) - 1 penalizează erorile relative, deci zilele de criză nu domină comparația; robustețea lui la zgomotul proxy-ului cere totuși un proxy condiționat nedeplasat."
             }
         },
         {
@@ -515,9 +515,9 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Alegem cea mai mică pierdere medie",
                     "Rulăm un test Kupiec pentru fiecare model",
                     "Comparăm R-pătrat al prognozelor",
-                    "Un set de modele de încredere pe o funcție de pierdere consistentă pentru (VaR, ES), de exemplu FZ0"
+                    "O mulțime de încredere a modelelor pe o funcție de pierdere consistentă pentru (VaR, ES), de exemplu FZ0"
                 ],
-                "correctExplanation": "Setul de modele de încredere (Hansen, Lunde și Nason, 2011) păstrează toate modelele care nu sînt semnificativ mai slabe decît cel mai bun, controlînd eroarea la nivel de familie; FZ0 este consistent pentru perechea (VaR, ES).",
+                "correctExplanation": "Mulțimea de încredere a modelelor (Hansen, Lunde și Nason, 2011) păstrează toate modelele care nu sînt semnificativ mai slabe decît cel mai bun, controlînd eroarea la nivel de familie; FZ0 este consistent pentru perechea (VaR, ES).",
                 "incorrectExplanation": "Cea mai mică pierdere medie ignoră eroarea de eșantionare, Kupiec verifică doar acoperirea unui model, iar R-pătrat nu este un scor consistent pentru tail risk."
             }
         },
@@ -598,8 +598,8 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Subestimează mereu acuratețea",
                     "Nu poate fi folosită cu rețele neuronale"
                 ],
-                "correctExplanation": "Pe zgomot pur, K-fold amestecat a raportat o acuratețe de 69,4%; purging-ul și embargoul elimină leakage-ul.",
-                "incorrectExplanation": "Observațiile vecine au informație comună; amestecarea lor între fold-uri îi arată modelului perioada de test."
+                "correctExplanation": "Pe zgomot pur, validarea K-fold cu amestecare a raportat o acuratețe de 69,4%; purging-ul și embargoul elimină leakage-ul.",
+                "incorrectExplanation": "Observațiile vecine au informație comună; amestecarea lor între fold-uri expune modelul la informația din perioada de test."
             }
         },
         {
@@ -620,13 +620,13 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                 "title": "Modele fundaționale",
                 "text": "Ce a arătat Capitolul 14 pentru modelele fundaționale zero-shot pe volatilitatea realizată SPY?",
                 "options": [
-                    "Au bătut toate reperele cu mult",
+                    "Au depășit cu mult toate reperele",
                     "Nu s-a detectat o diferență QLIKE semnificativă statistic față de log-HAR",
                     "Au fost mai slabe decît un mers aleator",
                     "Nu au putut produce prognoze de volatilitate"
                 ],
                 "correctExplanation": "Chronos-2 a avut QLIKE 0,231 față de 0,234 pentru log-HAR; testul Diebold--Mariano nu a respins acuratețea egală. Aceasta nu dovedește echivalența, care ar cere o toleranță stabilită dinainte.",
-                "incorrectExplanation": "Modelele noi trebuie judecate față de repere puternice, cu testele din Capitolul 8; aici nu s-a detectat o diferență semnificativă față de log-HAR, deci nu l-au bătut."
+                "incorrectExplanation": "Modelele noi trebuie judecate față de repere puternice, cu testele din Capitolul 8; aici nu s-a detectat o diferență semnificativă față de log-HAR, deci nu l-au depășit."
             }
         },
         {
@@ -652,7 +652,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Întreaga curbă a specificațiilor și o valoare p ajustată pentru testele multiple (Holm, Benjamini-Hochberg sau un bootstrap de tip reality check)",
                     "Doar specificațiile cu p < 0,05, celelalte fiind greșit specificate"
                 ],
-                "correctExplanation": "Din 48 de încercări, o valoare p de 0,01 apare din întîmplare; curba specificațiilor arată întreaga distribuție, iar corecția ține cont de căutare.",
+                "correctExplanation": "Din 48 de încercări, o valoare p de 0,01 apare ușor doar prin hazard; curba specificațiilor arată întreaga distribuție, iar corecția ține cont de căutare.",
                 "incorrectExplanation": "Raportarea celei mai bune celule, a unui rezumat neajustat sau doar a celulelor semnificative ascunde căutarea și exagerează dovezile."
             }
         },
@@ -679,7 +679,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "O fereastră de 500 de zile este prea lungă pentru simularea istorică",
                     "Depășirile trebuie numărate pe randamente, nu pe pierderi"
                 ],
-                "correctExplanation": "Cuantila pe fereastra mobilă de la momentul t include r_t, deci o pierdere poate depăși doar dacă este dincolo de cuantila 1% a unui eșantion care o conține: depășirile sînt subnumărate. Prognoza pentru ziua t trebuie să folosească datele pînă la t - 1. În plus, comparațiile cu VaR-ul lipsă din primele 500 de zile dau False, deci hit.mean() pe toate zilele subestimează rata: păstrați doar rîndurile în care var.shift(1) nu lipsește.",
+                "correctExplanation": "Cuantila pe fereastra mobilă de la momentul t include r_t, deci o pierdere poate depăși doar dacă este dincolo de cuantila 1% a unui eșantion care o conține: numărul depășirilor este subestimat. Prognoza pentru ziua t trebuie să folosească datele pînă la t - 1. În plus, comparațiile cu VaR-ul lipsă din primele 500 de zile dau False, deci hit.mean() pe toate zilele subestimează rata: păstrați doar rîndurile în care var.shift(1) nu lipsește.",
                 "incorrectExplanation": "Lungimea ferestrei și convenția de semn (pierderea = -r, VaR pozitiv) sînt corecte; eroarea ține de momentul informației: VaR-ul folosit în ziua t cunoaște deja randamentul zilei t."
             }
         },
@@ -703,10 +703,10 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                 "options": [
                     "Folosirea unui asistent AI pentru cod fără a o declara, atîta timp cît codul rulează",
                     "Păstrarea unei referințe sugerate de AI dacă titlul și revista par plauzibile",
-                    "Declararea fiecărui instrument AI în AI_USE.md, notarea a cel puțin trei erori AI prinse în AI_ERRORS.md și verificarea că fiecare referință are un DOI sau link funcțional",
+                    "Declararea fiecărui instrument AI în AI_USE.md, notarea a cel puțin trei erori AI detectate în AI_ERRORS.md și verificarea că fiecare referință are un DOI sau link funcțional",
                     "Cererea de ajutor unui asistent AI în timpul susținerii orale, cînd o întrebare este grea"
                 ],
-                "correctExplanation": "AI-ul este permis, dar se declară în AI_USE.md; cel puțin trei erori prinse se notează în AI_ERRORS.md; fiecare referință trebuie să existe și să aibă un DOI sau link funcțional; la susținerea orală se răspunde fără AI.",
+                "correctExplanation": "AI-ul este permis, dar se declară în AI_USE.md; cel puțin trei erori detectate se notează în AI_ERRORS.md; fiecare referință trebuie să existe și să aibă un DOI sau link funcțional; la susținerea orală se răspunde fără AI.",
                 "incorrectExplanation": "Utilizarea nedeclarată a AI este tratată ca plagiat; fiecare referință trebuie verificată, iar o referință inexistentă este tratată ca date fabricate; la susținerea orală AI-ul nu este permis."
             }
         }

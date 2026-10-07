@@ -85,7 +85,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Nivelul 2 al semnăturii este întotdeauna simetric",
                     "Semnătura este invariantă la adăugarea unui canal de timp"
                 ],
-                "correctExplanation": "Chen (1957): Sig(X * Y) = Sig(X) ⊗ Sig(Y); pentru o traiectorie liniară pe porțiuni dă tot algoritmul: se înmulțesc exponențialele segmentelor.",
+                "correctExplanation": "Chen (1957): Sig(X * Y) = Sig(X) ⊗ Sig(Y); pentru o traiectorie liniară pe porțiuni, ea constituie întregul algoritm: se înmulțesc exponențialele segmentelor.",
                 "incorrectExplanation": "Identitatea se referă la concatenare: semnătura traiectoriei concatenate este produsul tensorial al celor două semnături; inversarea dă inversa, nu aceeași semnătură."
             }
         },
@@ -158,15 +158,15 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "incorrectExplanation": "Time augmentation adds terms rather than removing them, and it breaks, not creates, invariance to speed; truncation is still needed."
             },
             "ro": {
-                "title": "De ce augmentăm cu timpul",
+                "title": "Rolul augmentării cu timpul",
                 "text": "De ce se adaugă traiectoriei un canal de timp strict crescător înainte de calculul semnăturilor?",
                 "options": [
                     "Face semnătura invariantă la viteza de parcurgere a traiectoriei",
                     "Reduce numărul de termeni ai semnăturii",
-                    "Face ca întreaga semnătură să determine traiectoria pînă la punctul de start și să vadă cînd au avut loc mișcările",
+                    "Face ca întreaga semnătură să determine traiectoria pînă la punctul de start și să rețină momentul mișcărilor",
                     "Elimină nevoia unei adîncimi de trunchiere"
                 ],
-                "correctExplanation": "Fără timp, semnătura este invariantă la reparametrizare și la bucățile de tip arbore; un canal strict crescător le elimină pe amîndouă, deci întreaga semnătură determină traiectoria pînă la o translație (Hambly și Lyons, 2010). Punctul de start trebuie fixat sau furnizat separat, iar o trunchiere finită nu determină traiectoria.",
+                "correctExplanation": "Fără timp, semnătura este invariantă la reparametrizare și la segmentele de tip arbore; un canal strict crescător le elimină pe amîndouă, deci întreaga semnătură determină traiectoria pînă la o translație (Hambly și Lyons, 2010). Punctul de start trebuie fixat sau furnizat separat, iar o trunchiere finită nu determină traiectoria.",
                 "incorrectExplanation": "Augmentarea cu timpul adaugă termeni, nu îi reduce, și elimină, nu creează, invarianța la viteză; trunchierea rămîne necesară."
             }
         },
@@ -242,7 +242,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "title": "Invarianța la translație",
                 "text": "Semnătura satisface Sig(X + c) = Sig(X). Care este consecința pentru prognoza volatilității?",
                 "options": [
-                    "Semnătura nu vede nivelul volatilității, deci nivelul trebuie să intre prin alți regresori, de exemplu termenii log-HAR",
+                    "Semnătura nu reflectă nivelul volatilității, deci nivelul trebuie să intre prin alți regresori, de exemplu termenii log-HAR",
                     "Semnătura supraponderează zilele cu volatilitate mare",
                     "Semnătura trebuie calculată doar pe randamente",
                     "Log RV nu poate fi folosit ca un canal"
@@ -460,11 +460,11 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "options": [
                     "Varianța din randamentele intraday negative este mai persistentă decît cea din randamentele pozitive",
                     "Randamentele pozitive sînt mai volatile",
-                    "Semivarianțele nu se adună la RV",
+                    "Suma semivarianțelor nu este RV",
                     "Modelul HAR ar trebui să folosească doar randamentele pozitive"
                 ],
-                "correctExplanation": "Volatilitatea rea prezice mai puternic volatilitatea viitoare: o versiune intraday a efectului de levier.",
-                "incorrectExplanation": "RV+ și RV- se adună la RV; rezultatul se referă la persistența lor diferită, partea negativă fiind mai persistentă."
+                "correctExplanation": "Volatilitatea „rea” are o putere predictivă mai mare pentru volatilitatea viitoare: o versiune intraday a efectului de levier.",
+                "incorrectExplanation": "Suma RV+ și RV- este RV; rezultatul se referă la persistența lor diferită, partea negativă fiind mai persistentă."
             }
         },
         {
@@ -490,7 +490,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Media condiționată E[RV]",
                     "Modul condiționat al RV"
                 ],
-                "correctExplanation": "Anulînd derivata -E[RV]/F^2 + 1/F obținem F = E[RV]; cu o aproximare condiționat nedeplasată față de informația prognozelor, ordinea pierderilor așteptate este aceeași ca cu varianța adevărată (Patton, 2011).",
+                "correctExplanation": "Anulînd derivata -E[RV]/F^2 + 1/F obținem F = E[RV]; cu un proxy condiționat nedeplasat față de informația prognozelor, ordinea pierderilor așteptate este aceeași ca cu varianța adevărată (Patton, 2011).",
                 "incorrectExplanation": "Media armonică minimizează QLIKE cu argumentele inversate; QLIKE corectă este minimizată de media condiționată."
             }
         },
@@ -551,7 +551,7 @@ window.MFM_DATA.quizzes['signatures'] = {
         {
             "correct": 0,
             "en": {
-                "title": "Holm versus BH",
+                "title": "Holm față de BH",
                 "text": "Over 50 assets, one DM test each, with valid p-values that are independent or positively dependent (PRDS): what do the Holm and Benjamini-Hochberg corrections control?",
                 "options": [
                     "Holm: the probability of at least one false win (FWER); BH: the expected share of false wins among the declared wins (FDR)",
@@ -563,10 +563,10 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "incorrectExplanation": "FWER and FDR are different error rates; neither correction controls power."
             },
             "ro": {
-                "title": "Holm versus BH",
+                "title": "Holm față de BH",
                 "text": "Pe 50 de active, cîte un test DM pentru fiecare, cu valori p valide, independente sau pozitiv dependente (PRDS): ce controlează corecțiile Holm și Benjamini-Hochberg?",
                 "options": [
-                    "Holm: probabilitatea a cel puțin unei victorii false (FWER); BH: proporția așteptată de victorii false printre cele declarate (FDR)",
+                    "Holm: probabilitatea a cel puțin unei descoperiri false (FWER); BH: proporția așteptată de descoperiri false printre cele declarate (FDR)",
                     "Ambele controlează FWER",
                     "Holm controlează FDR, iar BH controlează FWER",
                     "Ambele controlează puterea testelor"
@@ -620,13 +620,13 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "title": "Rezultatul principal al studiului de caz",
                 "text": "Pe 50 de active VOLARE, la o zi, cum s-a comparat LASSO-ul pe semnături cu ponderi de nucleu (Sig-LK) cu log-HAR?",
                 "options": [
-                    "A bătut log-HAR pe majoritatea activelor după corecția Holm",
-                    "Nu a bătut log-HAR: o QLIKE medie puțin mai mare și nicio victorie semnificativă după corecție",
-                    "A pierdut în fața HAR în nivel pe fiecare activ",
+                    "A fost superior log-HAR pe majoritatea activelor după corecția Holm",
+                    "Nu a fost superior log-HAR: o QLIKE medie puțin mai mare și niciun activ cu rezultat semnificativ mai bun după corecție",
+                    "A fost inferior HAR în nivel pe fiecare activ",
                     "A reprodus cîștigul de cinci ori raportat de Gu et al."
                 ],
-                "correctExplanation": "QLIKE medie relativ la log-HAR a fost aproximativ 1,05 la h = 1, împinsă în sus de petrol, cu două victorii necorectate (ES, TSLA) și nicio victorie semnificativă după Holm din 50; la 5 și 22 de zile modelele cu semnături au fost mai slabe.",
-                "incorrectExplanation": "Victoria față de HAR în nivel a venit din ținta logaritmică, nu din semnături; față de log-HAR nu a existat niciun cîștig și nimic apropiat de o îmbunătățire de cinci ori."
+                "correctExplanation": "QLIKE medie relativ la log-HAR a fost aproximativ 1,05 la h = 1, ridicată de petrol, cu două rezultate semnificative necorectate (ES, TSLA) și niciunul după Holm, din 50; la 5 și 22 de zile modelele cu semnături au fost mai slabe.",
+                "incorrectExplanation": "Superioritatea față de HAR în nivel provine din ținta logaritmică, nu din semnături; față de log-HAR nu a existat niciun cîștig și nimic apropiat de o îmbunătățire de cinci ori."
             }
         },
         {
@@ -644,7 +644,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "incorrectExplanation": "The training window contained the late-2018 sell-off; the weights enter the LASSO objective and cannot be removed by it."
             },
             "ro": {
-                "title": "De ce nu au ajutat ponderile nucleului",
+                "title": "Ineficiența ponderilor nucleului",
                 "text": "În crahul COVID-19, ponderile nucleului au rămas aproape plate și chiar au redus ponderea ferestrelor de stres trecute. Care este motivul principal?",
                 "options": [
                     "Fereastra mobilă era prea scurtă pentru a conține vreo perioadă de stres",
@@ -679,7 +679,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Semnăturile nu pot fi calculate pe logaritmi",
                     "Log RV trebuie întîi diferențiat"
                 ],
-                "correctExplanation": "Fără un al doilea canal, toate integralele iterate sînt puteri ale incrementului total; augmentarea cu timpul (și un canal al randamentelor) aduce informația despre formă și despre avans-întîrziere.",
+                "correctExplanation": "Fără un al doilea canal, toate integralele iterate sînt puteri ale incrementului total; augmentarea cu timpul (și un canal al randamentelor) aduce informația despre formă și despre relațiile lead-lag.",
                 "incorrectExplanation": "Adîncimea nu este problema: într-o dimensiune, fiecare nivel este o funcție de schimbarea netă, indiferent de adîncime."
             }
         },

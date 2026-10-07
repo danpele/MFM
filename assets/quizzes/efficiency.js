@@ -107,11 +107,11 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "text": "Ce implică paradoxul Grossman–Stiglitz?",
                 "options": [
                     "Piețele sînt întotdeauna perfect eficiente",
-                    "Trebuie să rămînă o anumită ineficiență, suficientă cît să plătească traderii informați pentru informația costisitoare",
+                    "Trebuie să rămînă o anumită ineficiență, suficientă pentru a remunera traderii informați pentru informația costisitoare",
                     "Prețurile nu reflectă niciodată informația privată",
                     "Arbitrajul este gratuit și fără risc"
                 ],
-                "correctExplanation": "Dacă prețurile ar reflecta toată informația, nimeni nu ar plăti pentru a o colecta; un grad de ineficiență de echilibru răsplătește colectarea informației.",
+                "correctExplanation": "Dacă prețurile ar reflecta toată informația, nimeni nu ar plăti pentru a o colecta; un grad de ineficiență de echilibru remunerează colectarea informației.",
                 "incorrectExplanation": "Informația costisitoare implică un grad de ineficiență de echilibru, nu eficiență perfectă."
             }
         },
@@ -211,7 +211,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "incorrectExplanation": "The difference comes from volatility clustering: only z* is valid under RW3."
             },
             "ro": {
-                "title": "z versus z*",
+                "title": "z față de z*",
                 "text": "Pentru S&P 500, VR(2) dă z = −8,12 sub omoscedasticitate, dar z* = −3,64 cu statistica robustă. Ce explică diferența?",
                 "options": [
                     "O eroare de programare",
@@ -220,7 +220,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Statistica robustă presupune normalitate"
                 ],
                 "correctExplanation": "Statistica z* a lui Lo și MacKinlay folosește dispersia autocorelațiilor consistentă la heteroscedasticitate; cu volatility clustering, z omoscedastic este prea mare.",
-                "incorrectExplanation": "Diferența vine din volatility clustering: doar z* este valid sub RW3."
+                "incorrectExplanation": "Diferența provine din volatility clustering: doar z* este valid sub RW3."
             }
         },
         {
@@ -373,16 +373,16 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "incorrectExplanation": "Shuffling removes every kind of dependence, so a value above the band may reflect volatility clustering rather than long memory in returns."
             },
             "ro": {
-                "title": "DFA și amestecarea",
-                "text": "Exponentul DFA al BET (0,58) se află peste banda seriilor amestecate. De ce nu este aceasta încă o dovadă de memorie lungă în randamente?",
+                "title": "DFA și permutarea aleatoare",
+                "text": "Exponentul DFA al BET (0,58) se află peste banda seriilor permutate aleator. De ce nu este aceasta încă o dovadă de memorie lungă în randamente?",
                 "options": [
                     "Pentru că DFA funcționează doar pentru prețuri",
                     "Pentru că banda este mereu prea largă",
-                    "Pentru că amestecarea distruge toată dependența, inclusiv volatility clustering, care crește și ea exponentul",
+                    "Pentru că permutarea aleatoare distruge toată dependența, inclusiv volatility clustering, care crește și ea exponentul",
                     "Pentru că BET nu se tranzacționează zilnic"
                 ],
-                "correctExplanation": "Banda obținută prin amestecare reprezintă randamente i.i.d.; orice dependență, inclusiv în volatilitate, poate împinge exponentul peste ea. V al lui Lo este o verificare complementară.",
-                "incorrectExplanation": "Amestecarea elimină orice tip de dependență, deci o valoare peste bandă poate reflecta volatility clustering, nu memoria lungă în randamente."
+                "correctExplanation": "Banda obținută prin permutare aleatoare reprezintă randamente i.i.d.; orice dependență, inclusiv în volatilitate, poate ridica exponentul peste ea. V al lui Lo este o verificare complementară.",
+                "incorrectExplanation": "Permutarea aleatoare elimină orice tip de dependență, deci o valoare peste bandă poate reflecta volatility clustering, nu memoria lungă în randamente."
             }
         },
         {
@@ -408,8 +408,8 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Randamentele sînt imprevizibile chiar și în selecție",
                     "Un R² negativ poate proveni doar dintr-o eroare de cod"
                 ],
-                "correctExplanation": "R²_OS = 1 − Σ(r − r̂)²/Σ(r − r̄)² este negativ cînd prognozele modelului pierd în fața mediei istorice în afara selecției, ca la majoritatea predictorilor din Welch și Goyal (2008).",
-                "incorrectExplanation": "R²_OS compară erorile de prognoză cu cele ale mediei istorice; poate fi negativ și adesea este, cînd eroarea de estimare și instabilitatea depășesc potrivirea din selecție."
+                "correctExplanation": "R²_OS = 1 − Σ(r − r̂)²/Σ(r − r̄)² este negativ cînd prognozele modelului au erori mai mari decît media istorică în afara selecției, ca la majoritatea predictorilor din Welch și Goyal (2008).",
+                "incorrectExplanation": "R²_OS compară erorile de prognoză cu cele ale mediei istorice; poate fi negativ și adesea este, cînd eroarea de estimare și instabilitatea depășesc cîștigul de ajustare din selecție."
             }
         },
         {
@@ -428,7 +428,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
             },
             "ro": {
                 "title": "Citirea testelor pe ferestre mobile",
-                "text": "Pe ferestre mobile, S&P 500 respinge mersul aleator (|z*(5)| > 1,96) în 6,4% din ferestre. Cum trebuie citit acest rezultat?",
+                "text": "Pe ferestre mobile, S&P 500 respinge mersul aleator (|z*(5)| > 1,96) în 6,4% din ferestre. Cum trebuie interpretat acest rezultat?",
                 "options": [
                     "Ca dovadă puternică de ineficiență în 6,4% din ani",
                     "Ca fiind aproape de cei 5% așteptați din întîmplare, ținînd cont că ferestrele suprapuse sînt corelate",
@@ -455,14 +455,14 @@ window.MFM_DATA.quizzes['efficiency'] = {
             },
             "ro": {
                 "title": "Eficiența Bitcoin",
-                "text": "În curs, testele robuste anuale pe Bitcoin și Ethereum găsesc doar 1 din 27 autocorelații de ordinul 1 cu |t| > 1,96, în timp ce Urquhart (2016) a găsit Bitcoin ineficient în primii ani. Care este lecția?",
+                "text": "În curs, testele robuste anuale pe Bitcoin și Ethereum găsesc doar 1 din 27 de autocorelații de ordinul 1 cu |t| > 1,96, în timp ce Urquhart (2016) a găsit Bitcoin ineficient în primii ani. Care este lecția?",
                 "options": [
                     "Concluziile despre eficiența cripto depind de test, de selecție și de inferența folosită",
                     "Urquhart a făcut o greșeală de calcul",
                     "Bitcoin a fost întotdeauna perfect eficient",
                     "Testele anuale sînt mai puternice decît cele pe întreaga selecție"
                 ],
-                "correctExplanation": "Seturi de teste diferite, surse de prețuri diferite și erori clasice versus robuste duc la concluzii diferite; un singur an de date are și putere mică.",
+                "correctExplanation": "Seturi de teste diferite, surse de prețuri diferite și erori clasice față de robuste duc la concluzii diferite; un singur an de date are și putere mică.",
                 "incorrectExplanation": "Contrastul arată că rezultatele privind eficiența depind de test și de inferență, nu că un studiu este greșit."
             }
         },
@@ -490,7 +490,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Pentru că băncile au beta peste unu"
                 ],
                 "correctExplanation": "Cu o dată comună a evenimentului reziduurile sînt corelate (r̄ > 0); dispersia randamentului anormal mediu este mai mare decît σ²/N. Kolari și Pynnönen (2010) corectează pentru aceasta; un test pe portofoliu o face automat.",
-                "incorrectExplanation": "Corelația transversală a randamentelor anormale într-o zi comună exagerează dispersia mediei lor cu (1 + (N − 1)r̄); ignorată, face t prea mare."
+                "incorrectExplanation": "Corelația transversală a randamentelor anormale într-o zi comună mărește dispersia mediei lor de (1 + (N − 1)r̄) ori; dacă este ignorată, statistica t devine prea mare."
             }
         },
         {
@@ -539,11 +539,11 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "text": "De ce testul Diebold–Mariano nu este potrivit pentru a compara o regresie predictivă cu media istorică (modele imbricate)?",
                 "options": [
                     "Pentru că cere erori de prognoză din distribuția Normală",
-                    "Pentru că sub ipoteza nulă modelul mai mare estimează o pantă nulă, ceea ce îi exagerează MSPE, deci testul respinge prea rar; Clark–West corectează acest lucru",
+                    "Pentru că sub ipoteza nulă modelul mai mare estimează o pantă nulă, ceea ce îi mărește artificial MSPE, deci testul respinge prea rar; Clark–West corectează acest lucru",
                     "Pentru că cere selecții care nu se suprapun",
                     "Pentru că modelele imbricate dau mereu prognoze identice"
                 ],
-                "correctExplanation": "Sub H0 parametrul suplimentar este doar zgomot de estimare, care adaugă (r̄ − r̂)² la MSPE a modelului mai mare; Clark și West (2007) adaugă înapoi acest termen și obțin o statistică aproximativ Normală.",
+                "correctExplanation": "Sub H0 parametrul suplimentar este doar zgomot de estimare, care adaugă (r̄ − r̂)² la MSPE a modelului mai mare; Clark și West (2007) corectează diferența de MSPE cu acest termen și obțin o statistică aproximativ Normală.",
                 "incorrectExplanation": "La modelele imbricate MSPE a modelului mai mare este mărită de zgomotul de estimare sub ipoteza nulă, deci Diebold–Mariano respinge prea rar; ajustarea Clark–West elimină această deplasare."
             }
         },
@@ -563,9 +563,9 @@ window.MFM_DATA.quizzes['efficiency'] = {
             },
             "ro": {
                 "title": "Anomalii din întîmplare",
-                "text": "În curs au fost testate 2000 de reguli aleatoare fără sens pe S&P 500. Aproximativ cîte au fost „semnificative” la 5%?",
+                "text": "În curs au fost testate 2 000 de reguli arbitrare, generate aleator, pe S&P 500. Aproximativ cîte au fost „semnificative” la 5%?",
                 "options": [
-                    "Aproximativ 5%, cît promite testul sub ipoteza nulă",
+                    "Aproximativ 5%, cît este nivelul nominal al testului sub ipoteza nulă",
                     "Niciuna, pentru că regulile sînt aleatoare",
                     "Aproximativ 50%",
                     "Toate, pentru că S&P 500 este ineficient"
@@ -598,7 +598,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Deplasată în sus"
                 ],
                 "correctExplanation": "E[β̂ − β] ≈ −(σ_uv/σ_v²)(1 + 3ρ)/T; cu σ_uv < 0 deplasarea este pozitivă, deci predictibilitatea pare mai puternică decît este (Stambaugh, 1999).",
-                "incorrectExplanation": "Regresorul este predeterminat, nu strict exogen, deci OLS este deplasat: deplasarea în jos a lui ρ̂ trece în β̂ prin corelația negativă a inovațiilor și îl împinge în sus."
+                "incorrectExplanation": "Regresorul este predeterminat, nu strict exogen, deci OLS este deplasat: deplasarea în jos a lui ρ̂ trece în β̂ prin corelația negativă a inovațiilor și îl deplasează în sus."
             }
         },
         {
@@ -616,12 +616,12 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "incorrectExplanation": "Statistical rejection is not the same as an exploitable improvement: compare with the relevant benchmark and costs."
             },
             "ro": {
-                "title": "Semnificație statistică versus economică",
+                "title": "Semnificație statistică și semnificație economică",
                 "text": "Momentum-ul pe serii de timp pe BET are statistica t HAC egală cu 2,68, dar raportul Sharpe este 0,65 față de 0,75 pentru cumpără-și-păstrează. Ce arată acest lucru?",
                 "options": [
                     "BET este extrem de ineficient",
                     "Statistica t este greșită",
-                    "Momentum-ul bate întotdeauna strategia cumpără-și-păstrează",
+                    "Momentum-ul depășește întotdeauna strategia cumpără-și-păstrează",
                     "Un tipar semnificativ statistic nu adaugă neapărat valoare economică față de un reper simplu"
                 ],
                 "correctExplanation": "O mare parte din randamentul momentum este prima de risc a acțiunilor cîștigată pe pozițiile lungi; semnificația față de zero nu este semnificație față de cumpără-și-păstrează.",

@@ -31,7 +31,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "E^P[RV]/T, varianța realizată așteptată anualizată sub probabilitatea reală"
                 ],
                 "correctExplanation": "(VIX/100)^2 = E^Q[-2 ln(S_T/F)]/T pentru un continuum de prețuri de exercitare (indicele VIX este de 100 de ori rădăcina ei pătrată). Lema lui Itô face contractul logaritmic egal cu varianța integrată doar pentru traiectorii continue; cu salturi J diferența este 2E^Q[sum(e^J - 1 - J - J^2/2)], aproximativ E^Q[sum J^3]/3, negativă pentru crahuri (-2,0% din varianță în exemplul Merton din curs).",
-                "incorrectExplanation": "Banda evaluează contractul logaritmic. Acesta este egal cu variația pătratică așteptată doar fără salturi și este o speranță sub măsura de evaluare Q, nu sub măsura reală."
+                "incorrectExplanation": "Banda evaluează contractul logaritmic. Acesta este egal cu variația pătratică așteptată doar fără salturi și este o valoare așteptată sub măsura de evaluare Q, nu sub măsura reală."
             }
         },
         {
@@ -107,12 +107,12 @@ window.MFM_DATA.quizzes['options'] = {
                 "text": "Regresia Mincer-Zarnowitz a varianței realizate pe 21 de zile pe VIX^2: termenul liber -51,9 (e.s. 34,4), panta 0,86 (e.s. 0,10), statistica Wald comună 41,7 cu 2 grade de libertate. Ce concluzionați?",
                 "options": [
                     "Prognoza nedeplasată nu este respinsă, pentru că ambele statistici t sînt sub 2",
-                    "Prognoza nedeplasată este respinsă împreună, deși niciun coeficient luat separat nu diferă semnificativ de (0, 1): cele două estimări sînt puternic corelate negativ",
+                    "Ipoteza de prognoză nedeplasată este respinsă de testul comun, deși niciun coeficient luat separat nu diferă semnificativ de (0, 1): cele două estimări sînt puternic corelate negativ",
                     "Prognoza nedeplasată este respinsă pentru că R^2 este sub 1",
                     "VIX este nedeplasat pentru că panta este aproape de 1"
                 ],
                 "correctExplanation": "Statisticile t sînt -1,50 și -1,34, dar estimările sînt corelate -0,90, deci elipsa de încredere este îngustă și înclinată, iar (0, 1) este mult în afara ei (p sub 10^-9).",
-                "incorrectExplanation": "O ipoteză asupra a doi parametri cere testul comun, care folosește covarianța lor; două teste t separate o ignoră, iar R^2 nu spune nimic despre deplasare."
+                "incorrectExplanation": "O ipoteză asupra a doi parametri necesită testul comun, care folosește covarianța lor; două teste t separate o ignoră, iar R^2 nu oferă informații despre deplasare."
             }
         },
         {
@@ -219,7 +219,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Zero, pentru că poziția are delta hedging",
                     "Un profit egal cu theta înmulțită cu numărul de zile"
                 ],
-                "correctExplanation": "O opțiune cu delta hedging cîștigă varianța implicită minus cea realizată, ponderată cu gamma: cu realizata peste implicită, vînzătorul pierde aproximativ vega x 5 puncte.",
+                "correctExplanation": "O opțiune cu delta hedging cîștigă varianța implicită minus cea realizată, ponderată cu gamma: cu volatilitatea realizată peste cea implicită, vînzătorul pierde aproximativ vega x 5 puncte.",
                 "incorrectExplanation": "Delta hedging-ul elimină expunerea la direcție, nu expunerea la volatilitate: vînzătorul pierde cînd volatilitatea realizată o depășește pe cea implicită."
             }
         },
@@ -274,7 +274,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Reziduurile care nu urmează distribuția Normală deplasează panta OLS"
                 ],
                 "correctExplanation": "Eroarea clasică de măsurare într-un regresor deplasează OLS spre 0 (Christensen și Prabhala, 1998); o valoare întîrziată este un instrument valid dacă eroarea ei este necorelată cu cea de azi. În datele cursului corecția este mică: 1,06 (OLS) și 1,02 (instrumente), în logaritmi.",
-                "incorrectExplanation": "Heteroscedasticitatea, suprapunerea și abaterile de la distribuția Normală afectează erorile standard, nu consistența OLS; atenuarea vine din eroarea din regresor."
+                "incorrectExplanation": "Heteroscedasticitatea, suprapunerea și abaterile de la distribuția Normală afectează erorile standard, nu consistența OLS; atenuarea provine din eroarea din regresor."
             }
         },
         {
@@ -301,7 +301,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Pentru că Black-Scholes presupune asimetrie negativă"
                 ],
                 "correctExplanation": "Cozile stîngi grele, efectul de levier și prima pentru riscul de crah ridică toate prețul put-urilor cu preț de exercitare mic.",
-                "incorrectExplanation": "Asimetria nu este o proprietate a modelului Black-Scholes, care implică un zîmbet plat; ea vine din distribuția randamentelor și din primele de risc."
+                "incorrectExplanation": "Asimetria nu este o proprietate a modelului Black-Scholes, care implică un zîmbet plat; ea provine din distribuția randamentelor și din primele de risc."
             }
         },
         {
@@ -319,7 +319,7 @@ window.MFM_DATA.quizzes['options'] = {
                 "incorrectExplanation": "The drift drops out of the hedged P&L; what remains is the variance gap weighted by gamma along the path."
             },
             "ro": {
-                "title": "De unde vine rezultatul hedging-ului",
+                "title": "Sursa rezultatului hedging-ului",
                 "text": "O opțiune cumpărată, cu delta hedging, cîștigă (1/2) Gamma S^2 (sigma_real^2 - sigma_imp^2) dt. Unde se concentrează rezultatul?",
                 "options": [
                     "Aproape de prețul de exercitare și de scadență, unde gamma este mare, deci contează traiectoria prețului, nu doar varianța realizată totală",
@@ -409,7 +409,7 @@ window.MFM_DATA.quizzes['options'] = {
                     "Ca raportul dintre prețurile call și put"
                 ],
                 "correctExplanation": "q(K) = e^{r tau} d2C/dK2: un butterfly îngust plătește ca un pariu pe S_T aproape de K.",
-                "incorrectExplanation": "Densitatea vine din curbura prețurilor call în prețul de exercitare; distribuția istorică este cea fizică, nu cea neutră la risc."
+                "incorrectExplanation": "Densitatea rezultă din curbura prețurilor call în prețul de exercitare; distribuția istorică este cea fizică, nu cea neutră la risc."
             }
         },
         {
@@ -428,14 +428,14 @@ window.MFM_DATA.quizzes['options'] = {
             },
             "ro": {
                 "title": "Coada stîngă Bitcoin și riscul de crah",
-                "text": "Pentru scadența Bitcoin cea mai apropiată de 30 de zile, probabilitatea neutră la risc SVI a unei scăderi de peste 30% a fost 1,2% față de 0,1% sub densitatea log-normală. Ce arată acest lucru?",
+                "text": "Pentru scadența Bitcoin cea mai apropiată de 30 de zile, probabilitatea neutră la risc SVI a unei scăderi de peste 30% a fost 1,2% față de 0,1% sub densitatea log-normală. Ce indică acest rezultat?",
                 "options": [
                     "Că densitatea log-normală supraestimează riscul de crah",
                     "Că piața evaluează asigurarea împotriva crahului mult peste ce implică Black-Scholes cu o singură volatilitate",
                     "Că un crah va avea loc cu probabilitatea 1,2%",
                     "Că estimarea SVI este greșită"
                 ],
-                "correctExplanation": "Coada densității neutre la risc este de cîteva ori mai grea decît cea log-normală: coada crahurilor este locul unde Black-Scholes greșește cel mai mult.",
+                "correctExplanation": "Coada densității neutre la risc este de cîteva ori mai grea decît cea log-normală: în coada crahurilor erorile modelului Black-Scholes sînt cele mai mari.",
                 "incorrectExplanation": "Probabilitățile neutre la risc sînt prețuri ale asigurării, nu prognoze; comparația arată cît de grea este coada evaluată față de cea log-normală."
             }
         },
@@ -562,15 +562,15 @@ window.MFM_DATA.quizzes['options'] = {
                 "incorrectExplanation": "The regression shows an upward bias from the risk premium, but the VIX remains informative about future volatility."
             },
             "ro": {
-                "title": "Este VIX nedeplasat?",
-                "text": "Regresia varianței realizate pe 21 de zile pe VIX^2 a dat o pantă de 0,86 și un termen liber negativ. Ce spune acest lucru?",
+                "title": "Deplasarea VIX ca prognoză",
+                "text": "Regresia varianței realizate pe 21 de zile pe VIX^2 a dat o pantă de 0,86 și un termen liber negativ. Ce indică acest rezultat?",
                 "options": [
                     "VIX este o prognoză nedeplasată",
                     "VIX subestimează volatilitatea viitoare",
                     "VIX este prea mare în medie, cel mai mult cînd este mare: conține o primă de risc",
                     "VIX nu conține informație despre volatilitatea viitoare"
                 ],
-                "correctExplanation": "O prognoză nedeplasată cere termen liber 0 și pantă 1; nicio statistică t separată nu respinge, dar testul Wald comun respinge (41,7, p sub 10^-9): VIX supraestimează varianța realizată, dar explică mai mult (R^2 0,37) decît varianța trecută (0,29).",
+                "correctExplanation": "O prognoză nedeplasată necesită termen liber 0 și pantă 1; nicio statistică t separată nu respinge, dar testul Wald comun respinge (41,7, p sub 10^-9): VIX supraestimează varianța realizată, dar explică mai mult (R^2 0,37) decît varianța trecută (0,29).",
                 "incorrectExplanation": "Regresia arată o deplasare în sus dată de prima de risc, dar VIX rămîne informativ pentru volatilitatea viitoare."
             }
         },
