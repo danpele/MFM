@@ -55,8 +55,9 @@ Amber    = '#B5853F'
 Orange   = '#E67E22'
 Purple   = '#8E44AD'
 Crimson  = '#DC3545'
-Gray     = '#7F7F7F'
-LightGray = '#DADADA'
+Navy     = '#1F2A44'   # reference lines (no grey in charts)
+BandBlue = '#C5D2E8'   # light MainBlue tint for confidence / reference bands
+Gray, LightGray = Navy, BandBlue   # legacy names kept for importing scripts
 FAM_COL = {'gaussian': MainBlue, 't': IDAred, 'clayton': Forest, 'gumbel': Amber, 'frank': Purple}
 
 SIDE = (5.6, 3.5)   # size of the charts placed next to text
@@ -81,9 +82,9 @@ def legend_outside_bottom(ax, ncol=2, y=-0.22):
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False)
 
 
-def shade_crises(ax, alpha=0.12):
+def shade_crises(ax, alpha=0.5):
     for a, b in (('2008-09-15', '2009-03-31'), ('2020-02-20', '2020-04-30'), ('2022-01-03', '2022-10-31')):
-        ax.axvspan(pd.Timestamp(a), pd.Timestamp(b), color=Gray, alpha=alpha, lw=0)
+        ax.axvspan(pd.Timestamp(a), pd.Timestamp(b), color=BandBlue, alpha=alpha, lw=0)
 
 
 # =============================================================================
@@ -125,7 +126,7 @@ def fig_spy_tlt_rolling():
     ax.plot(rc.index, rc, color=MainBlue, label='252-day rolling correlation')
     ax.axhline(0, color='black', lw=0.6)
     ax.set_ylabel('Correlation SPY-TLT')
-    ax.plot([], [], color=Gray, alpha=0.35, lw=6, label='2008-09, 2020 and 2022 stress windows')
+    ax.plot([], [], color=LightGray, alpha=0.5, lw=6, label='2008-09, 2020 and 2022 stress windows')
     legend_outside_bottom(ax, ncol=2, y=-0.1)
     save_fig('ch6_spy_tlt_rolling')
     NUM.update(roll_min=rc.min(), roll_min_date=str(rc.idxmin().date()), roll_max=rc.max(),

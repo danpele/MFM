@@ -54,7 +54,9 @@ Orange   = '#E67E22'
 Purple   = '#8E44AD'
 Crimson  = '#DC3545'
 Teal     = '#17A2B8'
-Gray     = '#7F7F7F'   # reference lines only
+Navy     = '#1F2A44'   # reference lines (no grey in charts)
+BandBlue = '#C5D2E8'   # light MainBlue tint for confidence / reference bands
+Gray, LightGray = Navy, BandBlue   # legacy names kept for importing scripts
 GROUP_COL = {'US': MainBlue, 'BVB': IDAred, 'Crypto': Amber}
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -199,7 +201,7 @@ def fig_roll():
     ax.bar(lags - 0.18, acf_p, 0.36, color=IDAred, label='Trade price changes')
     ax.bar(lags + 0.18, acf_m, 0.36, color=MainBlue, label='Efficient price changes')
     b = 1.96 / np.sqrt(len(dp))
-    ax.axhspan(-b, b, color='#DADADA', alpha=0.6, lw=0, zorder=0)
+    ax.axhspan(-b, b, color=BandBlue, alpha=0.6, lw=0, zorder=0)
     ax.axhline(out['rho1_theory'], color=Gray, ls='--', lw=0.8)
     ax.set_xlabel('Lag')
     ax.set_ylabel('Autocorrelation')
@@ -267,7 +269,7 @@ def fig_btc_hours(b):
     fig, ax = plt.subplots(figsize=(7.4, 3.2))
     ax.plot(h.index, h['weekday'], color=Amber, marker='o', ms=3, label='Monday to Friday')
     ax.plot(h.index, h['weekend'], color=Purple, marker='s', ms=3, label='Saturday and Sunday')
-    ax.axvspan(13.5, 20, color='#DADADA', alpha=0.5, lw=0, label='US equity session (13:30-20:00 UTC in summer)')
+    ax.axvspan(13.5, 20, color=BandBlue, alpha=0.5, lw=0, label='US equity session (13:30-20:00 UTC in summer)')
     ax.set_xticks(range(0, 24, 2))
     ax.set_xlabel('Hour of the day (UTC)')
     ax.set_ylabel('Mean |5-minute return| (bp)')

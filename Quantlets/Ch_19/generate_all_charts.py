@@ -51,7 +51,9 @@ Forest   = '#2E7D32'
 Amber    = '#B5853F'
 Orange   = '#E67E22'
 Purple   = '#8E44AD'
-Gray     = '#7F7F7F'   # reference lines, bands and grid only
+Navy     = '#1F2A44'   # reference lines (no grey in charts)
+BandBlue = '#C5D2E8'   # light MainBlue tint for confidence / reference bands
+Gray, LightGray = Navy, BandBlue   # legacy names kept for importing scripts
 Teal     = '#17A2B8'
 MODEL_COL = {'HS': MainBlue, 'Normal': Orange, 'GARCH-t': Forest, 'FHS': IDAred}
 
@@ -119,7 +121,7 @@ def part_facts():
     ax = axes[1]
     ax.bar(lags - 0.2, a_r, width=0.4, color=MainBlue, label='ACF of returns $r_t$')
     ax.bar(lags + 0.2, a_abs, width=0.4, color=IDAred, label='ACF of absolute returns $|r_t|$')
-    ax.axhspan(-band, band, color=Gray, alpha=0.25, lw=0, label='95% band under i.i.d.')
+    ax.axhspan(-band, band, color=BandBlue, alpha=0.7, lw=0, label='95% band under i.i.d.')
     ax.axhline(0, color=Gray, lw=0.5)
     ax.set_xlabel('Lag (trading days)')
     ax.set_ylabel('Autocorrelation')
@@ -205,7 +207,7 @@ def part_var(full_res):
     x = np.arange(len(MODELS))
     rates = [100 * bt[m]['rate'] for m in MODELS]
     ax.bar(x, rates, width=0.55, color=[MODEL_COL[m] for m in MODELS])
-    ax.axhspan(100 * lo, 100 * hi, color=Gray, alpha=0.25, lw=0, label='95% binomial band if the rate is 1%')
+    ax.axhspan(100 * lo, 100 * hi, color=BandBlue, alpha=0.7, lw=0, label='95% binomial band if the rate is 1%')
     ax.axhline(1.0, color='black', lw=0.8, ls='--', label='Target: 1%')
     for i, v in enumerate(rates):
         ax.text(i, v + 0.04, f'{v:.2f}%', ha='center', va='bottom', fontsize=8, color='black')

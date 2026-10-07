@@ -45,7 +45,7 @@ plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.framealpha'] = 0
 plt.rcParams['legend.fontsize'] = 8
 
-# Course colours (grey only for reference lines and the grid)
+# Course colours (no grey: navy reference lines, light-blue bands)
 MainBlue = '#1A3A6E'
 IDAred   = '#CD0000'
 Forest   = '#2E7D32'
@@ -56,7 +56,9 @@ Crimson  = '#DC3545'
 Teal     = '#17A2B8'
 Magenta  = '#D63384'
 Brown    = '#795548'
-Gray     = '#7F7F7F'
+Navy     = '#1F2A44'   # reference lines (no grey in charts)
+BandBlue = '#C5D2E8'   # light MainBlue tint for confidence / reference bands
+Gray, LightGray = Navy, BandBlue   # legacy names kept for importing scripts
 COL = {'BTC': Orange, 'ETH': Purple, 'XRP': MainBlue, 'ADA': Forest, 'DOGE': Amber, 'LTC': Teal, 'LINK': IDAred,
        'SOL': Magenta, 'BNB': Brown, 'SPX': MainBlue, 'GOLD': Amber, 'QQQ': Teal, 'USDT': Forest, 'USDC': MainBlue,
        'DAI': Orange, 'IBIT': MainBlue, 'ETHA': Purple, 'COIN': MainBlue, 'MSTR': IDAred, 'TLT': Forest}

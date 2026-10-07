@@ -167,7 +167,7 @@ def fig_qsd_gap(t):
     pos = np.arange(len(t))
     gap = t.xi - t.zeta
     sig = t.p_xi_zeta < 0.05
-    ax.axhline(0, color='#7F7F7F', lw=0.6)
+    ax.axhline(0, color='#1F2A44', lw=0.6)
     ax.vlines(pos, 0, gap, color=MainBlue, lw=1.0)
     ax.scatter(pos[sig], gap[sig], s=46, color=MainBlue, zorder=3,
                label=r'$\hat\xi - \hat\zeta$, LR test of $\xi = \zeta$ significant at 5%')

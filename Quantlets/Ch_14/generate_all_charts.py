@@ -53,8 +53,9 @@ Crimson = '#DC3545'
 Teal = '#17A2B8'
 Magenta = '#D63384'
 Brown = '#795548'
-Gray = '#7F7F7F'          # reference lines only
-LightGray = '#DADADA'     # bands only
+Navy     = '#1F2A44'   # reference lines (no grey in charts)
+BandBlue = '#C5D2E8'   # light MainBlue tint for confidence / reference bands
+Gray, LightGray = Navy, BandBlue   # legacy names kept for importing scripts
 PV_CMAP = LinearSegmentedColormap.from_list('pv', [IDAred, '#F4B6B6', '#FFFFFF', '#BFD8BF', Forest])
 
 RET_MODELS = {'hist': 'Historical mean', 'ar1': 'AR(1)', 'lstm': 'LSTM (5 seeds)',

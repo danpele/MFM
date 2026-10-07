@@ -54,8 +54,9 @@ Forest   = '#2E7D32'
 Amber    = '#B5853F'
 Orange   = '#E67E22'
 Purple   = '#8E44AD'
-Gray     = '#7F7F7F'
-LightGray = '#DADADA'
+Navy     = '#1F2A44'   # reference lines (no grey in charts)
+BandBlue = '#C5D2E8'   # light MainBlue tint for confidence / reference bands
+Gray, LightGray = Navy, BandBlue   # legacy names kept for importing scripts
 Teal     = '#17A2B8'
 COL = {'sp500': MainBlue, 'bet': IDAred, 'bettr': Orange, 'btc': Amber, 'eurron': Forest, 'gold': Purple}
 

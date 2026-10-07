@@ -85,7 +85,7 @@ for i, (lab, k, c) in enumerate(rows):
     ax.plot([m - 1.96 * se, m + 1.96 * se], [y, y], color=c, lw=2.4, solid_capstyle='butt')
     ax.plot([m], [y], 'o', color=c, ms=4.5)
     ax.text(m + 1.96 * se + 0.012, y, f"t = {res[k]['t']:.2f}", va='center', fontsize=7.5, color='black')
-ax.axvline(0, color='#7F7F7F', lw=0.7, ls='--')
+ax.axvline(0, color='#1F2A44', lw=0.7, ls='--')
 ax.set_yticks(range(len(rows)))
 ax.set_yticklabels([r[0] for r in rows][::-1], fontsize=8)
 ax.set_xlabel('Mean FZ0 score difference (negative favours the first model)')

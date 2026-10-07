@@ -52,7 +52,9 @@ Purple   = '#8E44AD'
 Crimson  = '#DC3545'
 Teal     = '#17A2B8'
 Black    = '#000000'
-LightGray = '#DADADA'
+Navy     = '#1F2A44'   # reference lines (no grey in charts)
+BandBlue = '#C5D2E8'   # light MainBlue tint for confidence / reference bands
+LightGray = BandBlue   # legacy name kept for importing scripts
 MODEL_COL = {'logHAR': IDAred, 'HAR': Orange, 'GARCH-t': MainBlue, 'EWMA': Purple, 'RW': Forest}
 MODEL_LABEL = {'logHAR': 'log-HAR', 'HAR': 'HAR', 'GARCH-t': 'GARCH(1,1)-t', 'EWMA': 'EWMA', 'RW': "Yesterday's RV"}
 
