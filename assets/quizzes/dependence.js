@@ -566,12 +566,12 @@ window.MFM_DATA.quizzes['dependence'] = {
                 title: 'Pierderi comune',
                 text: 'Pentru pierderile zilnice BET și Euro Stoxx 50 (L = −randamente), Gumbel nu este respinsă (p = 0,23), iar Clayton este (p = 0,005). De ce?',
                 options: [
-                    'Crahurile comune se află în colțul superior al copulei pierderilor, unde Gumbel are dependență în cozi, iar Clayton nu',
+                    'Crahurile comune se află în upper tail-ul copulei pierderilor, unde Gumbel are dependență în cozi, iar Clayton nu',
                     'Clayton nu poate fi estimată pe pierderi',
                     'Gumbel este întotdeauna mai bună decît Clayton',
                     'Pierderile sînt independente'
                 ],
-                correctExplanation: 'Gumbel pe pierderi surprinde crahurile comune (λU = 0,26); Clayton plasează dependența în colțul cîștigurilor comune.',
+                correctExplanation: 'Gumbel pe pierderi surprinde crahurile comune (λU = 0,26); Clayton plasează dependența în coada cîștigurilor comune.',
                 incorrectExplanation: 'Coada superioară a pierderilor conține crahurile comune; doar Gumbel plasează dependența acolo.'
             }
         },

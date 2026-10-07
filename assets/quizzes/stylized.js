@@ -23,14 +23,14 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Ce înseamnă o respingere Jarque-Bera",
-                "text": "Estimarea Hill a indicelui de coadă pentru randamentele zilnice S&P 500 este aproximativ 3, iar statistica Jarque-Bera este aproximativ 45.800, cu p-valoarea chi-pătrat(2) sub 10^-10. Ce stabilește acest rezultat?",
+                "text": "Estimarea Hill a tail index-ului pentru randamentele zilnice S&P 500 este aproximativ 3, iar statistica Jarque-Bera este aproximativ 45.800, cu p-valoarea chi-pătrat(2) sub 10^-10. Ce stabilește acest rezultat?",
                 "options": [
                     "Nimic: p-valoarea este invalidă pentru că momentul de ordin opt al randamentelor este infinit",
                     "Că randamentele sînt corelate serial",
                     "Că ipoteza nulă comună ,,randamente i.i.d. din distribuția Normală'' este respinsă; testul singur nu arată dacă este încălcată ipoteza despre distribuția marginală sau cea de independență",
                     "Că randamentele au varianță infinită"
                 ],
-                "correctExplanation": "Limita chi-pătrat(2) este derivată sub ipoteza nulă a randamentelor i.i.d. din distribuția Normală, în care toate momentele există, deci p-valoarea este validă pentru această ipoteză. Cozile groase din alternativă fac ca JB să crească cu T: aceasta este puterea testului. Dependența (GARCH) este un alt motiv de respingere; pentru a testa distribuția marginală a unei serii de timp folosiți teste studentizate HAC (Bai și Ng, 2005) și raportați măsuri bazate pe cuantile și indicele de coadă.",
+                "correctExplanation": "Limita chi-pătrat(2) este derivată sub ipoteza nulă a randamentelor i.i.d. din distribuția Normală, în care toate momentele există, deci p-valoarea este validă pentru această ipoteză. Cozile groase din alternativă fac ca JB să crească cu T: aceasta este puterea testului. Dependența (GARCH) este un alt motiv de respingere; pentru a testa distribuția marginală a unei serii de timp folosiți teste studentizate HAC (Bai și Ng, 2005) și raportați măsuri bazate pe cuantile și tail index-ul.",
                 "incorrectExplanation": "Calibrarea sub ipoteza nulă nu depinde de momentele alternativei; o respingere JB privește ipoteza nulă comună a randamentelor i.i.d. din distribuția Normală."
             }
         },
@@ -104,7 +104,7 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Eroarea standard a estimatorului Hill",
-                "text": "Estimatorul Hill dă un indice de coadă de 3,0 din cele mai mari k = 225 randamente absolute. Care este aproximativ intervalul de încredere de 95% pentru date i.i.d.?",
+                "text": "Estimatorul Hill dă un tail index de 3,0 din cele mai mari k = 225 randamente absolute. Care este aproximativ intervalul de încredere de 95% pentru date i.i.d.?",
                 "options": [
                     "[2,96; 3,04], cu o eroare standard de 3/sqrt(n) pe tot eșantionul",
                     "[2,6; 3,4], cu o eroare standard de alpha/sqrt(k) = 0,2",
@@ -131,14 +131,14 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Coada randamentelor absolute",
-                "text": "La un prag comun, coada pierderilor are indicele 2,7, iar coada cîștigurilor 3,6. Asimptotic, care este indicele de coadă al lui |r_t|?",
+                "text": "La un prag comun, coada pierderilor are indicele 2,7, iar coada cîștigurilor 3,6. Asimptotic, care este tail index-ul al lui |r_t|?",
                 "options": [
                     "3,15, media celor doi",
                     "3,6, coada mai subțire",
                     "6,3, suma celor doi",
                     "2,7, coada mai groasă"
                 ],
-                "correctExplanation": "P(|X| > x) = P(X > x) + P(X < -x): pentru x mare domină termenul cu indicele mai mic, deci indicele de coadă al lui |X| este min(2,7; 3,6) = 2,7.",
+                "correctExplanation": "P(|X| > x) = P(X > x) + P(X < -x): pentru x mare domină termenul cu indicele mai mic, deci tail index-ul al lui |X| este min(2,7; 3,6) = 2,7.",
                 "incorrectExplanation": "Probabilitatea unui |r| mare este suma celor două probabilități de coadă, iar termenul care scade mai lent domină departe în coadă."
             }
         },
@@ -265,16 +265,16 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "incorrectExplanation": "A tail index between 2 and 4 means finite variance but a fourth moment that very likely does not exist."
             },
             "ro": {
-                "title": "Indicele de coadă (estimatorul Hill)",
-                "text": "Estimările Hill ale indicelui de coadă pentru randamentele zilnice absolute sînt în mare parte între 2 și 4 pe cele cinci piețe. Ce implică acest lucru?",
+                "title": "Tail index-ul (estimatorul Hill)",
+                "text": "Estimările Hill ale tail index-ului pentru randamentele zilnice absolute sînt în mare parte între 2 și 4 pe cele cinci piețe. Ce implică acest lucru?",
                 "options": [
                     "Randamentele urmează distribuția Normală",
                     "Varianța există, dar kurtosisul populației foarte probabil nu (cere alpha > 4), deci kurtosisul de selecție este instabil",
                     "Randamentele nu au deloc varianță",
                     "Cozile sînt mai subțiri decît cele ale distribuției Normale"
                 ],
-                "correctExplanation": "Cu cozi de tip lege de putere, momentele există doar pînă la un ordin mai mic decît alpha: varianța cere alpha > 2, kurtosisul alpha > 4. Kurtosisul de selecție depinde atunci mult de cîteva zile extreme. (O distribuție Student-t estimată dă un indice de coadă bazat pe model, valid doar dacă Student-t descrie bine atît partea centrală, cît și cozile.)",
-                "incorrectExplanation": "Un indice de coadă între 2 și 4 înseamnă varianță finită, dar un moment de ordin patru foarte probabil inexistent."
+                "correctExplanation": "Cu cozi de tip lege de putere, momentele există doar pînă la un ordin mai mic decît alpha: varianța cere alpha > 2, kurtosisul alpha > 4. Kurtosisul de selecție depinde atunci mult de cîteva zile extreme. (O distribuție Student-t estimată dă un tail index bazat pe model, valid doar dacă Student-t descrie bine atît partea centrală, cît și cozile.)",
+                "incorrectExplanation": "Un tail index între 2 și 4 înseamnă varianță finită, dar un moment de ordin patru foarte probabil inexistent."
             }
         },
         {

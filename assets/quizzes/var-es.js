@@ -432,7 +432,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "options": [
                     "Coada este mărginită",
                     "Coada este exponențială, ca la distribuția Normală",
-                    "O coadă de tip putere (Frechet) cu indicele de coadă aproximativ 1/0,19 = 5,3",
+                    "O coadă de tip putere (Frechet) cu tail index-ul aproximativ 1/0,19 = 5,3",
                     "Dispersia este infinită"
                 ],
                 "correctExplanation": "xi > 0 înseamnă o coadă grea de tip putere; momentele există pînă la un ordin sub 1/xi, aici aproximativ 5.",

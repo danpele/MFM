@@ -23,7 +23,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
             },
             "ro": {
                 "title": "GRS cu cozi grele",
-                "text": "Randamentele săptămînale ale activelor cripto de test au un indice de coadă Hill de aproximativ 2,7. Ce afirmație despre testul F GRS pentru alfa nule este corectă?",
+                "text": "Randamentele săptămînale ale activelor cripto de test au un tail index Hill de aproximativ 2,7. Ce afirmație despre testul F GRS pentru alfa nule este corectă?",
                 "options": [
                     "Este exact pentru orice distribuție a erorilor, fiindcă este o statistică F",
                     "Distribuția F exactă cere erori i.i.d. cu distribuția Normală; este nevoie de un test Wald HAC sau de o versiune bootstrap",
@@ -184,15 +184,15 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                 "incorrectExplanation": "When alpha < 4 the population kurtosis is infinite, so no standard error or rescaling rescues the sample kurtosis; the Hill index is the right summary of the tail."
             },
             "ro": {
-                "title": "Aplatizarea cînd indicele de coadă este sub 4",
-                "text": "Indicele de coadă Hill al Bitcoin este 2,7, iar excesul de aplatizare de selecție 14,8. Ce rezultă?",
+                "title": "Aplatizarea cînd tail index-ul este sub 4",
+                "text": "Tail index-ul Hill al Bitcoin este 2,7, iar excesul de aplatizare de selecție 14,8. Ce rezultă?",
                 "options": [
                     "Momentul de ordinul patru al populației este probabil infinit, deci aplatizarea de selecție nu este un estimator consistent, iar CI bootstrap pentru ea nu este de încredere",
                     "Aplatizarea este 14,8 plus sau minus 1,96 erori standard",
                     "Indicele Hill și aplatizarea măsoară același lucru",
                     "Rescalarea randamentelor la varianță unitară face aplatizarea finită"
                 ],
-                "correctExplanation": "Cu alpha < 4 momentul de ordinul patru nu există; aplatizarea de selecție crește odată cu eșantionul și este dominată de cele mai mari zile, iar bootstrap-ul eșuează la momente infinite (Athreya, 1987): raportăm indicele de coadă cu CI.",
+                "correctExplanation": "Cu alpha < 4 momentul de ordinul patru nu există; aplatizarea de selecție crește odată cu eșantionul și este dominată de cele mai mari zile, iar bootstrap-ul eșuează la momente infinite (Athreya, 1987): raportăm tail index-ul cu CI.",
                 "incorrectExplanation": "Cînd alpha < 4, aplatizarea populației este infinită, deci nicio eroare standard și nicio rescalare nu salvează aplatizarea de selecție; indicele Hill este rezumatul potrivit al cozii."
             }
         },
