@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily closes from the course data: S&P 500, BET, Bitcoin; EUR/RON: BNR reference rate'
 
-Output: 'ch8_sem_b1_results.pdf, ch8_sem_b1_timing.pdf, ch8_sem_traffic_bet.pdf'
+Output: 'ch8_sem_b1_results.pdf, ch8_sem_b1_timing.pdf'
