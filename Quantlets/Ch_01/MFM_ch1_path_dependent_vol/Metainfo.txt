@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch1_path_dependent_vol'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Case study, Guyon and Lekeufack (2023), Volatility is (mostly) path-dependent: the VIX as a linear function of a kernel-weighted trend and a kernel-weighted volatility of past S&P 500 returns, eq. (3.7), with normalised time-shifted power-law kernels, eq. (3.9), 1000 past returns, estimated by nonlinear least squares on 2000-2018 from the VIX row of Table 3; r2 and RMSE on the training set, the test set 2019 - 15 May 2022 and after the test set with frozen parameters; observed versus fitted VIX, their ratio, and the fitted kernels.'
+Description: 'Case study, Guyon and Lekeufack (2023), Volatility is (mostly) path-dependent: the VIX as a linear function of a kernel-weighted trend and a kernel-weighted volatility of past S&P 500 returns, eq. (3.7), with normalised time-shifted power-law kernels, eq. (3.9), 1000 past returns, estimated by nonlinear least squares on 2000-2018 from the VIX row of Table 3; R2 and RMSE on the training set, the test set 2019 - 15 May 2022 and after the test set with frozen parameters; observed versus fitted VIX, their ratio, and the fitted kernels.'
 
 Keywords: 'path-dependent volatility, VIX, implied volatility, leverage effect, volatility clustering, long memory, power-law kernel, nonlinear least squares, out-of-sample r2'
 

@@ -789,7 +789,7 @@ def fig_cs_pdv_vix(vix, fit, scores):
     for (a, b), key, lab in [(PDV_TRAIN, 'train', 'Training 2000-2018'), (PDV_TEST, 'test', 'Test'),
                              (('2022-05-16', str(vix.index[-1].date())), 'after test', 'After test')]:
         mid = pd.Timestamp(a) + (pd.Timestamp(b) - pd.Timestamp(a)) / 2
-        ax.text(mid, 99, f"{lab}\n$r^2$ = {scores.loc[key, 'r2']:.3f}", ha='center', va='top', fontsize=8, color='black')
+        ax.text(mid, 99, f"{lab}\n$R^2$ = {scores.loc[key, 'r2']:.3f}", ha='center', va='top', fontsize=8, color='black')
     ax.set_ylim(0, 100)
     ax.set_ylabel('Volatility (%)')
     ax2.set_ylabel('Ratio')
