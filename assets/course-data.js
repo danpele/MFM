@@ -640,7 +640,7 @@
                 title: { en: 'Stylized Facts and Returns', ro: 'Fapte stilizate și randamente' },
                 topics: {
                     en: ['Simple vs log returns, aggregation', 'Heavy tails and non-normality', 'Volatility clustering', 'Leverage effect', 'S&P 500, BET and Bitcoin compared'],
-                    ro: ['Randamente simple vs logaritmice, agregare', 'Cozi groase și non-normalitate', 'Grupări de volatilitate', 'Efectul de levier', 'Comparație S&P 500, BET și Bitcoin']
+                    ro: ['Randamente simple vs logaritmice, agregare', 'Cozi groase și non-normalitate', 'Volatility clustering', 'Efectul de levier', 'Comparație S&P 500, BET și Bitcoin']
                 },
                 links: stylizedLinks,
                 quantinar: q('sfm', 'tukeyGH')

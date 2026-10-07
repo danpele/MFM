@@ -27,7 +27,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "options": [
                     "Da, pentru că BDS testează proprietatea de martingală",
                     "Da, dacă valoarea p este sub 0,01",
-                    "Nu: gruparea volatilității singură (de ex. GARCH) face BDS să respingă, iar RW3 o permite",
+                    "Nu: volatility clustering singur (de ex. GARCH) face BDS să respingă, iar RW3 o permite",
                     "Nu, pentru că BDS se aplică doar prețurilor"
                 ],
                 "correctExplanation": "BDS testează independența și distribuția identică. Un proces GARCH cu medie imprevizibilă respinge BDS, dar satisface RW3 și ipoteza diferenței de martingală.",
@@ -84,7 +84,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Pătratele randamentelor trebuie să fie necorelate",
                     "Volatilitatea trebuie să fie constantă în timp"
                 ],
-                "correctExplanation": "Martingala restricționează doar media condiționată; gruparea volatilității (dispersie predictibilă) este compatibilă cu eficiența.",
+                "correctExplanation": "Martingala restricționează doar media condiționată; volatility clustering (dispersie predictibilă) este compatibil cu eficiența.",
                 "incorrectExplanation": "Proprietatea de joc echitabil restricționează doar media condiționată; cu dispersie finită implică autocorelații nule (RW3), dar RW3 nu o implică. Volatilitatea poate fi totuși predictibilă."
             }
         },
@@ -135,11 +135,11 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "options": [
                     "Pentru că selecția este prea scurtă",
                     "Pentru că randamentul mediu este pozitiv",
-                    "Pentru că mișcările mari se grupează în timp, ceea ce mărește dispersia de selecție a autocorelației",
+                    "Pentru că există volatility clustering, ceea ce mărește dispersia de selecție a autocorelației",
                     "Pentru că S&P 500 este un indice de preț"
                 ],
-                "correctExplanation": "Cu grupare a volatilității, dispersia autocorelației de selecție este suma lui e_t² e_{t-1}² împărțită la pătratul sumei pătratelor, care depășește 1/T.",
-                "incorrectExplanation": "Gruparea volatilității, nu lungimea selecției sau media, face ca eroarea standard robustă să fie mai mare decît 1/√T."
+                "correctExplanation": "Cu volatility clustering, dispersia autocorelației de selecție este suma lui e_t² e_{t-1}² împărțită la pătratul sumei pătratelor, care depășește 1/T.",
+                "incorrectExplanation": "Volatility clustering, nu lungimea selecției sau media, face ca eroarea standard robustă să fie mai mare decît 1/√T."
             }
         },
         {
@@ -215,12 +215,12 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "text": "Pentru S&P 500, VR(2) dă z = −8,12 sub omoscedasticitate, dar z* = −3,64 cu statistica robustă. Ce explică diferența?",
                 "options": [
                     "O eroare de programare",
-                    "Statistica omoscedastică ignoră gruparea volatilității și exagerează dovezile",
+                    "Statistica omoscedastică ignoră volatility clustering și exagerează dovezile",
                     "Statistica robustă folosește mai puține observații",
                     "Statistica robustă presupune normalitate"
                 ],
-                "correctExplanation": "Statistica z* a lui Lo și MacKinlay folosește dispersia autocorelațiilor consistentă la heteroscedasticitate; cu grupare, z omoscedastic este prea mare.",
-                "incorrectExplanation": "Diferența vine din gruparea volatilității: doar z* este valid sub RW3."
+                "correctExplanation": "Statistica z* a lui Lo și MacKinlay folosește dispersia autocorelațiilor consistentă la heteroscedasticitate; cu volatility clustering, z omoscedastic este prea mare.",
+                "incorrectExplanation": "Diferența vine din volatility clustering: doar z* este valid sub RW3."
             }
         },
         {
@@ -244,7 +244,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Este mai puternic împotriva oricărei alternative",
                     "Nu are nevoie de randamente",
                     "Controlează pragul global cînd se testează mai multe orizonturi; valoarea critică de 5% devine 2,49",
-                    "Elimină gruparea volatilității"
+                    "Elimină volatility clustering"
                 ],
                 "correctExplanation": "Testarea mai multor orizonturi mărește șansa unei respingeri false; maximul |z*| se compară cu valoarea critică a modulului maxim studentizat.",
                 "incorrectExplanation": "Scopul este controlul pragului pe mai multe orizonturi, care crește valoarea critică de la 1,96 la circa 2,49 pentru patru orizonturi."
@@ -378,11 +378,11 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "options": [
                     "Pentru că DFA funcționează doar pentru prețuri",
                     "Pentru că banda este mereu prea largă",
-                    "Pentru că amestecarea distruge toată dependența, inclusiv gruparea volatilității, care crește și ea exponentul",
+                    "Pentru că amestecarea distruge toată dependența, inclusiv volatility clustering, care crește și ea exponentul",
                     "Pentru că BET nu se tranzacționează zilnic"
                 ],
                 "correctExplanation": "Banda obținută prin amestecare reprezintă randamente i.i.d.; orice dependență, inclusiv în volatilitate, poate împinge exponentul peste ea. V al lui Lo este o verificare complementară.",
-                "incorrectExplanation": "Amestecarea elimină orice tip de dependență, deci o valoare peste bandă poate reflecta gruparea volatilității, nu memoria lungă în randamente."
+                "incorrectExplanation": "Amestecarea elimină orice tip de dependență, deci o valoare peste bandă poate reflecta volatility clustering, nu memoria lungă în randamente."
             }
         },
         {

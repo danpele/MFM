@@ -513,10 +513,10 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "options": [
                     "Pentru că randamentele au media zero",
                     "Pentru că metoda cere date Normale",
-                    "Pentru că gruparea volatilității face scorurile neschimbabile, iar chiar sub schimbabilitate garanția este doar marginală",
+                    "Pentru că volatility clustering face scorurile neschimbabile, iar chiar sub schimbabilitate garanția este doar marginală",
                     "Pentru că mulțimea de calibrare este prea mare"
                 ],
-                "correctExplanation": "Garanția în eșantion finit cere scoruri schimbabile, iar gruparea volatilității distruge această proprietate; chiar cu scoruri schimbabile, garanția este marginală, nu condiționată de zilele de criză. După perioade agitate, VaR conformal split 5% pe S&P 500 este depășit în circa 7% dintre zile, iar depășirile se grupează.",
+                "correctExplanation": "Garanția în eșantion finit cere scoruri schimbabile, iar volatility clustering distruge această proprietate; chiar cu scoruri schimbabile, garanția este marginală, nu condiționată de zilele de criză. După perioade agitate, VaR conformal split 5% pe S&P 500 este depășit în circa 7% dintre zile, iar depășirile se grupează.",
                 "incorrectExplanation": "Ipoteza care cade este schimbabilitatea, iar acoperirea condiționată nu a fost niciodată garantată: conformal split controlează doar acoperirea medie."
             }
         },

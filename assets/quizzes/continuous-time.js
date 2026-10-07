@@ -487,10 +487,10 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                     "Modelul i.i.d. folosește salturile pentru a imita volatilitatea variabilă",
                     "S&P 500 sare la fiecare două-trei zile",
                     "Estimarea este o eroare numerică",
-                    "Salturile explică gruparea volatilității"
+                    "Salturile explică volatility clustering"
                 ],
                 "correctExplanation": "Un model i.i.d. nu poate separa un salt de o perioadă volatilă, așa că folosește salturi mici și frecvente pentru a îngroșa cozile; testul Lee-Mykland marchează sub un salt candidat pe an.",
-                "incorrectExplanation": "Randamentele Merton rămîn independente în timp, deci nu pot produce grupare; salturile detectate în datele zilnice sînt rare."
+                "incorrectExplanation": "Randamentele Merton rămîn independente în timp, deci nu pot produce volatility clustering; salturile detectate în datele zilnice sînt rare."
             }
         },
         {
@@ -647,12 +647,12 @@ window.MFM_DATA.quizzes['continuous-time'] = {
                 "text": "Simulate și comparate cu S&P 500, ce afirmație corespunde rezultatelor din curs?",
                 "options": [
                     "GBM reproduce toate faptele stilizate",
-                    "Merton reproduce statistica Hill, Heston gruparea volatilității și niciunul excesul de aplatizare",
-                    "Merton reproduce gruparea volatilității",
+                    "Merton reproduce statistica Hill, Heston volatility clustering și niciunul excesul de aplatizare",
+                    "Merton reproduce volatility clustering",
                     "Heston reproduce excesul de aplatizare de 10,9"
                 ],
                 "correctExplanation": "Statistica Hill Merton (2,70) este aproape de date (2,56), dar ACF a lui |r| este zero; ACF Heston este apropiată de cea din date, dar ambele dau un exces de aplatizare de circa 3,5 față de 10,9.",
-                "incorrectExplanation": "GBM nu reproduce niciuna dintre statistici, salturile i.i.d. nu pot crea grupare și niciun model estimat nu atinge aplatizarea: rezultatele susțin combinarea salturilor cu volatilitatea stochastică."
+                "incorrectExplanation": "GBM nu reproduce niciuna dintre statistici, salturile i.i.d. nu pot crea volatility clustering și niciun model estimat nu atinge aplatizarea: rezultatele susțin combinarea salturilor cu volatilitatea stochastică."
             }
         },
         {

@@ -300,7 +300,7 @@ window.MFM_DATA.quizzes['systemic'] = {
                     "Pentru că zilele din coadă se grupează în crize, iar blocurile păstrează aceste grupări",
                     "Pentru că regresia cuantilă are nevoie de exact 20 de observații"
                 ],
-                "correctExplanation": "Gruparea volatilității face zilele din coadă dependente; blocurile păstrează dependența și dau intervale mai largi și mai realiste.",
+                "correctExplanation": "Volatility clustering face zilele din coadă dependente; blocurile păstrează dependența și dau intervale mai largi și mai realiste.",
                 "incorrectExplanation": "Motivul este dependența: bootstrap-ul i.i.d. desparte grupările din crize și subestimează incertitudinea."
             }
         },

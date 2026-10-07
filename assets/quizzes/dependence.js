@@ -28,7 +28,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                 options: [
                     "Mai mare, pentru că parametrii GARCH sînt estimați într-un prim pas",
                     "Neschimbată: estimarea GARCH din primul pas nu afectează distribuția limită (Chen și Fan, 2006)",
-                    "Mai mică, pentru că filtrarea elimină gruparea volatilității",
+                    "Mai mică, pentru că filtrarea elimină volatility clustering",
                     "Nedefinită, pentru că rangurile reziduurilor nu sînt independente"
                 ],
                 correctExplanation: "Chen și Fan (2006) arată că CML pe rangurile reziduurilor GARCH estimate are aceeași limită ca pe inovațiile adevărate; în simularea Monte Carlo din curs abaterile standard au fost 0,0081 și 0,0082.",
@@ -188,7 +188,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                 title: 'Blestemul dimensionalității',
                 text: 'De ce modelul GARCH multivariat VEC complet este rar folosit pentru multe active?',
                 options: [
-                    'Nu poate surprinde gruparea volatilității',
+                    'Nu poate surprinde volatility clustering',
                     'Presupune corelație constantă',
                     'Cere randamente cu distribuția Normală',
                     'Numărul de parametri crește cu puterea a patra a lui N, iar caracterul pozitiv definit nu este garantat'
@@ -456,7 +456,7 @@ window.MFM_DATA.quizzes['dependence'] = {
             },
             ro: {
                 title: "Eroarea standard a unei corelații",
-                text: "Pentru randamente zilnice cu cozi groase și volatilitate grupată, intervalul Fisher tanh(z ± 1,96/sqrt(T − 3)) pentru o corelație este de regulă:",
+                text: "Pentru randamente zilnice cu cozi groase și volatility clustering, intervalul Fisher tanh(z ± 1,96/sqrt(T − 3)) pentru o corelație este de regulă:",
                 options: [
                     "Exact pentru orice T",
                     "Prea larg, deci conservator",

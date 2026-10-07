@@ -56,10 +56,10 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Aproape nicio autocorelație a randamentelor, autocorelație puternică a randamentelor absolute, cozi groase",
                     "Autocorelație puternică a randamentelor, niciuna a randamentelor absolute",
                     "Distribuția Normală cu varianță constantă",
-                    "Cozi groase, dar fără grupări de volatilitate"
+                    "Cozi groase, dar fără volatility clustering"
                 ],
                 "correctExplanation": "Randamentele sînt aproape necorelate, dar mărimea lor (|r_t|, r_t^2) este puternic autocorelată, iar cozile sînt groase.",
-                "incorrectExplanation": "Semnul randamentelor este aproape imprevizibil, mărimea lor nu; modelul Normal cu varianță constantă greșește atît la cozi, cît și la grupări."
+                "incorrectExplanation": "Semnul randamentelor este aproape imprevizibil, mărimea lor nu; modelul Normal cu varianță constantă greșește atît la cozi, cît și la volatility clustering."
             }
         },
         {

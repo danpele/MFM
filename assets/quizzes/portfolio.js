@@ -565,7 +565,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                 "title": "Testarea diferențelor de Sharpe",
                 "text": "De ce sînt preferate testele HAC sau bootstrap pe blocuri formulei i.i.d. pentru diferențele de raport Sharpe?",
                 "options": [
-                    "Randamentele au cozi groase și grupări de volatilitate, pe care formula i.i.d. Normală le ignoră",
+                    "Randamentele au cozi groase și volatility clustering, pe care formula i.i.d. Normală le ignoră",
                     "Formula i.i.d. nu poate trata strategii corelate",
                     "Testele HAC nu au nevoie de un eșantion",
                     "Bootstrap-ul respinge întotdeauna ipoteza nulă"

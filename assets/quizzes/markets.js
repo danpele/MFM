@@ -408,7 +408,7 @@ window.MFM_DATA.quizzes['markets'] = {
                     "Schimbarea nu este semnificativă, pentru că corelația din 2022-2026 este aproape de zero",
                     "Intervalul dovedește că corelația va rămîne pozitivă"
                 ],
-                "correctExplanation": "Intervalul exclude zero cu mult, deci schimbarea de semn nu este zgomot de eșantionare iid; este o asociere între două perioade, nu o cauză, iar ipoteza iid ignoră gruparea volatilității (un interval bootstrap este mai larg, dar exclude tot zero).",
+                "correctExplanation": "Intervalul exclude zero cu mult, deci schimbarea de semn nu este zgomot de eșantionare iid; este o asociere între două perioade, nu o cauză, iar ipoteza iid ignoră volatility clustering (un interval bootstrap este mai larg, dar exclude tot zero).",
                 "incorrectExplanation": "Un interval de încredere pentru o schimbare măsoară incertitudinea de eșantionare a diferenței dintre cele două corelații din populație; nu spune nimic despre cauze sau despre viitor, iar ipoteza iid trebuie verificată."
             }
         },

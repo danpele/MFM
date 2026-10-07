@@ -270,11 +270,11 @@ window.MFM_DATA.quizzes['var-es'] = {
                 "options": [
                     "Probabilitatea cozii este prea mare",
                     "Distribuția Normală este corectă",
-                    "Măsura de risc nu se adaptează la gruparea volatilității",
+                    "Măsura de risc nu se adaptează la volatility clustering",
                     "Datele conțin erori"
                 ],
                 "correctExplanation": "O prognoză VaR zilnică bună produce depășiri împrăștiate în timp; grupurile arată că fereastra reacționează prea tîrziu la șocurile de volatilitate.",
-                "incorrectExplanation": "Depășirile grupate sînt tipice pentru o măsură necondiționată pe o piață cu grupare a volatilității."
+                "incorrectExplanation": "Depășirile grupate sînt tipice pentru o măsură necondiționată pe o piață cu volatility clustering."
             }
         },
         {

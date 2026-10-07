@@ -22,7 +22,7 @@ window.MFM_DATA.quizzes['garch'] = {
                 incorrectExplanation: 'The direction is almost unpredictable; what persists is the size of the moves (volatility clustering).'
             },
             ro: {
-                title: 'Gruparea volatilității',
+                title: 'Volatility clustering',
                 text: 'Pentru S&P 500 (2000-2026), autocorelația de ordin 1 a randamentelor zilnice este circa -0,10, iar cea a pătratelor randamentelor circa 0,31. Ce înseamnă acest lucru?',
                 options: [
                     'Randamentele sînt puternic predictibile ca direcție',
@@ -30,8 +30,8 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Mărimea mișcării de mîine este predictibilă, deși direcția ei aproape nu este',
                     'Datele conțin o eroare de calcul, deoarece cele două trebuie să fie egale'
                 ],
-                correctExplanation: 'Pătratele randamentelor măsoară mărimea mișcărilor. Autocorelația lor puternică și persistentă este gruparea volatilității: mișcările mari urmează mișcărilor mari, de orice semn.',
-                incorrectExplanation: 'Direcția este aproape imprevizibilă; ceea ce persistă este mărimea mișcărilor (gruparea volatilității).'
+                correctExplanation: 'Pătratele randamentelor măsoară mărimea mișcărilor. Autocorelația lor puternică și persistentă este volatility clustering: mișcările mari urmează mișcărilor mari, de orice semn.',
+                incorrectExplanation: 'Direcția este aproape imprevizibilă; ceea ce persistă este mărimea mișcărilor (volatility clustering).'
             }
         },
         {
@@ -80,12 +80,12 @@ window.MFM_DATA.quizzes['garch'] = {
                 text: 'De ce a adăugat Bollerslev (1986) dispersia decalată beta * sigma_{t-1}^2 la modelul ARCH al lui Engle (1982)?',
                 options: [
                     'Pentru ca dispersia să devină negativă după știri bune',
-                    'Pentru a surprinde o grupare de durată cu puțini parametri: GARCH(1,1) este un ARCH de ordin infinit cu ponderi geometrice',
+                    'Pentru a surprinde volatility clustering de durată cu puțini parametri: GARCH(1,1) este un ARCH de ordin infinit cu ponderi geometrice',
                     'Pentru a elimina nevoia estimării prin verosimilitate maximă',
                     'Pentru a modela media randamentelor în locul dispersiei'
                 ],
                 correctExplanation: 'Prin substituții succesive, GARCH(1,1) este un ARCH(infinit) cu ponderi alpha * beta^(j-1): o dinamică persistentă a dispersiei, cu memorie scurtă, cu doar trei parametri.',
-                incorrectExplanation: 'Dispersia decalată dă un ARCH de ordin infinit cu ponderi descrescătoare geometric, deci gruparea persistentă cere doar trei parametri.'
+                incorrectExplanation: 'Dispersia decalată dă un ARCH de ordin infinit cu ponderi descrescătoare geometric, deci volatility clustering persistent cere doar trei parametri.'
             }
         },
         {
@@ -238,7 +238,7 @@ window.MFM_DATA.quizzes['garch'] = {
                 incorrectExplanation: 'Even with Normal innovations, a time-varying variance makes the unconditional distribution leptokurtic.'
             },
             ro: {
-                title: 'Cozi groase din grupare',
+                title: 'Cozi groase din volatility clustering',
                 text: 'Un GARCH(1,1) cu inovații z_t Normale, alpha > 0 și moment de ordin patru finit ((alpha + beta)^2 + 2 alpha^2 < 1) generează randamente cu aplatizarea...',
                 options: [
                     'exact 3, deoarece z_t este Normal',
@@ -246,7 +246,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'sub 3, deoarece dispersia este mărginită',
                     'care nu poate fi calculată'
                 ],
-                correctExplanation: 'Aplatizarea este 3[1 - (alpha+beta)^2] / [1 - (alpha+beta)^2 - 2 alpha^2] > 3 pentru alpha > 0: gruparea singură creează cozi groase.',
+                correctExplanation: 'Aplatizarea este 3[1 - (alpha+beta)^2] / [1 - (alpha+beta)^2 - 2 alpha^2] > 3 pentru alpha > 0: volatility clustering singur creează cozi groase.',
                 incorrectExplanation: 'Chiar și cu inovații Normale, o dispersie variabilă în timp face distribuția necondiționată leptocurtică.'
             }
         },
@@ -482,7 +482,7 @@ window.MFM_DATA.quizzes['garch'] = {
             },
             ro: {
                 title: 'Diagnostic',
-                text: 'După estimarea unui model GARCH, ce verificare testează dacă a rămas grupare a volatilității în reziduuri?',
+                text: 'După estimarea unui model GARCH, ce verificare testează dacă a rămas volatility clustering în reziduuri?',
                 options: [
                     'Testul Ljung-Box pe randamentele brute',
                     'R^2 al ecuației mediei',
@@ -490,7 +490,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Numărul de parametri'
                 ],
                 correctExplanation: 'Dacă ecuația dispersiei este adecvată, z_t^2 sînt necorelate în populație: o dependență semnificativă în Q(10) pe z_t^2 sau în testul LM este o dovadă împotriva modelului, iar nerespingerea înseamnă doar dovezi insuficiente împotriva lui.',
-                incorrectExplanation: 'Gruparea rămasă se testează pe pătratele reziduurilor standardizate, nu pe randamentele brute.'
+                incorrectExplanation: 'Volatility clustering rămas se testează pe pătratele reziduurilor standardizate, nu pe randamentele brute.'
             }
         },
         {
@@ -646,13 +646,13 @@ window.MFM_DATA.quizzes['garch'] = {
                 title: 'Limitele GARCH',
                 text: 'Care dintre următoarele este o limită documentată a GARCH(1,1), discutată în capitol?',
                 options: [
-                    'Nu poate produce gruparea volatilității',
+                    'Nu poate produce volatility clustering',
                     'Nu poate fi estimat pe date zilnice',
                     'Dă mereu dispersii negative',
                     'Autocorelația pătratelor randamentelor scade geometric, în timp ce în date autocorelația randamentelor absolute scade lent, cu memorie lungă'
                 ],
                 correctExplanation: 'GARCH(1,1) are o singură scară de timp; FIGARCH (Baillie, Bollerslev și Mikkelsen, 1996) și modelele de volatilitate realizată (Capitolul 9) tratează memoria lungă. Rupturile structurale pot și ele umfla alpha + beta.',
-                incorrectExplanation: 'GARCH produce gruparea; limitele principale sînt memoria geometrică (scurtă), persistența falsă sub rupturi structurale și întîrzierea reacției.'
+                incorrectExplanation: 'GARCH produce volatility clustering; limitele principale sînt memoria geometrică (scurtă), persistența falsă sub rupturi structurale și întîrzierea reacției.'
             }
         },
         {
@@ -705,7 +705,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     "O valoare p de 0,62 înseamnă că ipoteza nulă nu este respinsă: nu există dovezi de efecte ARCH rămase",
                     "O valoare p de 0,62 înseamnă că modelul explică 62% din dispersie"
                 ],
-                correctExplanation: "Ipoteza nulă a testului este absența autocorelației în pătratele reziduurilor standardizate. O valoare p de 0,62 este mult peste 5%, deci ipoteza nulă nu este respinsă: testul nu găsește dovezi de grupare a volatilității rămasă.",
+                correctExplanation: "Ipoteza nulă a testului este absența autocorelației în pătratele reziduurilor standardizate. O valoare p de 0,62 este mult peste 5%, deci ipoteza nulă nu este respinsă: testul nu găsește dovezi de volatility clustering rămas.",
                 incorrectExplanation: "Testul și statistica sînt corecte; valoarea p este interpretată greșit: 0,62 este mult peste 5%, deci nu există dovezi de efecte ARCH rămase."
             }
         }

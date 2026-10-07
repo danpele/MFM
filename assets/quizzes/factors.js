@@ -111,7 +111,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Pentru că Newey–West schimbă estimația lui beta",
                     "Pentru că varianța reziduurilor se schimbă odată cu volatilitatea pieței (heteroscedasticitate), iar erorile clasice o ignoră"
                 ],
-                correctExplanation: "Newey–West păstrează estimația OLS și îi corectează varianța pentru heteroscedasticitate și autocorelare; gruparea volatilității face erorile clasice prea mici.",
+                correctExplanation: "Newey–West păstrează estimația OLS și îi corectează varianța pentru heteroscedasticitate și autocorelare; volatility clustering face erorile clasice prea mici.",
                 incorrectExplanation: "Estimația punctuală este aceeași; se schimbă doar eroarea standard, pentru că reziduurile sînt heteroscedastice."
             }
         },

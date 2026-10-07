@@ -30,7 +30,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "Cere doar T > N, oricare ar fi cozile",
                     "Cozile grele îl fac conservator, deci respingerile lui sînt mereu sigure"
                 ],
-                "correctExplanation": "Distribuția F(N, T - N - K) a statisticii GRS este derivată pentru erori i.i.d. cu distribuția Normală; cu cozi grele și grupare a volatilității folosim un test Wald GMM/HAC sau un bootstrap wild sub ipoteza nulă.",
+                "correctExplanation": "Distribuția F(N, T - N - K) a statisticii GRS este derivată pentru erori i.i.d. cu distribuția Normală; cu cozi grele și volatility clustering folosim un test Wald GMM/HAC sau un bootstrap wild sub ipoteza nulă.",
                 "incorrectExplanation": "GRS este exact F doar pentru erori i.i.d. cu distribuția Normală; cozile grele pot deplasa nivelul testului în orice direcție, deci este nevoie de o versiune robustă sau bootstrap."
             }
         },

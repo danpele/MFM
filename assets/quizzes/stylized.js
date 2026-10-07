@@ -49,16 +49,16 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "incorrectExplanation": "Zero correlation fixes the mean of the autocorrelation, not its variance: clustering inflates the variance above the i.i.d. value 1."
             },
             "ro": {
-                "title": "Banda autocorelației în prezența grupării",
-                "text": "Randamentele x_t sînt o diferență de martingală staționară, cu momente de ordin patru finite, ale cărei pătrate sînt autocorelate pozitiv (gruparea volatilității). Cum se compară varianța asimptotică a rădăcinii lui T înmulțite cu autocorelația de selecție de ordin 1 cu 1?",
+                "title": "Banda autocorelației în prezența volatility clustering",
+                "text": "Randamentele x_t sînt o diferență de martingală staționară, cu momente de ordin patru finite, ale cărei pătrate sînt autocorelate pozitiv (volatility clustering). Cum se compară varianța asimptotică a rădăcinii lui T înmulțite cu autocorelația de selecție de ordin 1 cu 1?",
                 "options": [
-                    "Este mai mare decît 1: este egală cu E[x_t^2 x_(t-1)^2]/sigma^4, care depășește 1 în prezența grupării",
+                    "Este mai mare decît 1: este egală cu E[x_t^2 x_(t-1)^2]/sigma^4, care depășește 1 în prezența volatility clustering",
                     "Este egală cu 1, pentru că randamentele sînt necorelate",
                     "Este mai mică decît 1, pentru că media de selecție este eliminată",
                     "Nu este definită pentru randamente necorelate"
                 ],
-                "correctExplanation": "Pentru o diferență de martingală, varianța asimptotică a lui sqrt(T) rho_hat_1 este E[x_t^2 x_(t-1)^2]/sigma^4. Gruparea face ca pătratele mari să urmeze pătratelor mari, deci ea depășește 1 și banda i.i.d. 1,96/sqrt(T) este prea îngustă (S&P 500: aproximativ 5).",
-                "incorrectExplanation": "Corelația zero fixează media autocorelației, nu varianța ei: gruparea crește varianța peste valoarea i.i.d. 1."
+                "correctExplanation": "Pentru o diferență de martingală, varianța asimptotică a lui sqrt(T) rho_hat_1 este E[x_t^2 x_(t-1)^2]/sigma^4. Volatility clustering face ca pătratele mari să urmeze pătratelor mari, deci ea depășește 1 și banda i.i.d. 1,96/sqrt(T) este prea îngustă (S&P 500: aproximativ 5).",
+                "incorrectExplanation": "Corelația zero fixează media autocorelației, nu varianța ei: volatility clustering crește varianța peste valoarea i.i.d. 1."
             }
         },
         {
@@ -111,7 +111,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "[1,0; 5,0], cu o eroare standard de 1",
                     "[2,87; 3,13], cu o eroare standard de 1/sqrt(k)"
                 ],
-                "correctExplanation": "Asimptotic, sqrt(k)(alpha_hat - alpha) urmează distribuția Normală cu varianța alpha^2, deci eroarea standard este 3/15 = 0,2, iar intervalul este 3,0 plus/minus 0,39. Cu grupare, un bootstrap pe blocuri dă un interval mai larg.",
+                "correctExplanation": "Asimptotic, sqrt(k)(alpha_hat - alpha) urmează distribuția Normală cu varianța alpha^2, deci eroarea standard este 3/15 = 0,2, iar intervalul este 3,0 plus/minus 0,39. Cu volatility clustering, un bootstrap pe blocuri dă un interval mai larg.",
                 "incorrectExplanation": "Doar cele k observații din coadă aduc informație despre coadă, iar informația Fisher a verosimilității Pareto este k/alpha^2."
             }
         },
@@ -192,8 +192,8 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Mărimea randamentelor (volatilitatea) este mult mai predictibilă decît direcția lor",
                     "Randamentele pătratice urmează distribuția Normală"
                 ],
-                "correctExplanation": "Autocorelația randamentelor pătratice reflectă gruparea volatilității; autocorelația liniară a randamentelor este mică, chiar dacă e semnificativă într-un eșantion mare.",
-                "incorrectExplanation": "Valoarea uriașă a lui Q pe pătrate semnalează gruparea volatilității, nu o direcție predictibilă."
+                "correctExplanation": "Autocorelația randamentelor pătratice reflectă volatility clustering; autocorelația liniară a randamentelor este mică, chiar dacă e semnificativă într-un eșantion mare.",
+                "incorrectExplanation": "Valoarea uriașă a lui Q pe pătrate semnalează volatility clustering, nu o direcție predictibilă."
             }
         },
         {
@@ -406,7 +406,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Randamentele pătratice sînt mereu cea mai bună aproximare a volatilității",
                     "Randamentele urmează distribuția Normală",
                     "La laguri mari, puterile apropiate de 1 sînt mai persistente decît pătratele; motivează măsuri robuste ale volatilității și modele power-GARCH",
-                    "Efectul Taylor implică absența grupării volatilității"
+                    "Efectul Taylor implică absența volatility clustering"
                 ],
                 "correctExplanation": "Puterea optimă se deplasează spre delta = 1 cînd lagul crește; randamentele pătratice (delta = 2) sînt clar mai puțin persistente la laguri mari.",
                 "incorrectExplanation": "Efectul Taylor favorizează puterile apropiate de 1 în locul pătratelor pentru măsurarea volatilității persistente."
@@ -703,10 +703,10 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Ljung–Box are nevoie de cel puțin 50 de laguri ca să fie valid",
                     "Un p-value sub 0,001 înseamnă că ipoteza nulă este adevărată",
                     "Randamentele la pătrat nu pot fi folosite în niciun test, pentru că sînt mereu pozitive",
-                    "Testul pe r² detectează gruparea volatilității; autocorelația randamentelor se testează pe r, cu versiunea robustă"
+                    "Testul pe r² detectează volatility clustering; autocorelația randamentelor se testează pe r, cu versiunea robustă"
                 ],
-                "correctExplanation": "Dependența în r² înseamnă volatilitate grupată: randamentele pot fi necorelate, iar pătratele lor nu. Predictibilitatea randamentelor se testează cu Ljung–Box pe r, în versiunea robustă la heteroscedasticitate.",
-                "incorrectExplanation": "Un Ljung–Box semnificativ pe randamentele la pătrat arată gruparea volatilității, nu randamente predictibile; testați chiar r, cu statistica robustă."
+                "correctExplanation": "Dependența în r² înseamnă volatility clustering: randamentele pot fi necorelate, iar pătratele lor nu. Predictibilitatea randamentelor se testează cu Ljung–Box pe r, în versiunea robustă la heteroscedasticitate.",
+                "incorrectExplanation": "Un Ljung–Box semnificativ pe randamentele la pătrat arată volatility clustering, nu randamente predictibile; testați chiar r, cu statistica robustă."
             }
         }
     ]
