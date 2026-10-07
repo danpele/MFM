@@ -597,8 +597,8 @@ window.MFM_DATA.quizzes['markets'] = {
                     "EUR/RON este mai volatil dimineața",
                     "Cele două serii folosesc monede diferite"
                 ],
-                "correctExplanation": "Cîteva vîrfuri inversate a doua zi umflă abaterea standard de peste cinci ori; eliminînd rîndurile de weekend și valorile aberante se obține circa 2,6%.",
-                "incorrectExplanation": "Cotațiile eronate izolate, inversate a doua zi, umflă volatilitatea măsurată."
+                "correctExplanation": "Cîteva vîrfuri inversate a doua zi exagerează abaterea standard de peste cinci ori; eliminînd rîndurile de weekend și valorile aberante se obține circa 2,6%.",
+                "incorrectExplanation": "Cotațiile eronate izolate, inversate a doua zi, exagerează volatilitatea măsurată."
             }
         },
         {

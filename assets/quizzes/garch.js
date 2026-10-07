@@ -651,7 +651,7 @@ window.MFM_DATA.quizzes['garch'] = {
                     'Dă mereu dispersii negative',
                     'Autocorelația pătratelor randamentelor scade geometric, în timp ce în date autocorelația randamentelor absolute scade lent, cu memorie lungă'
                 ],
-                correctExplanation: 'GARCH(1,1) are o singură scară de timp; FIGARCH (Baillie, Bollerslev și Mikkelsen, 1996) și modelele de volatilitate realizată (Capitolul 9) tratează memoria lungă. Rupturile structurale pot și ele umfla alpha + beta.',
+                correctExplanation: 'GARCH(1,1) are o singură scară de timp; FIGARCH (Baillie, Bollerslev și Mikkelsen, 1996) și modelele de volatilitate realizată (Capitolul 9) tratează memoria lungă. Rupturile structurale pot și ele crește artificial alpha + beta.',
                 incorrectExplanation: 'GARCH produce volatility clustering; limitele principale sînt memoria geometrică (scurtă), persistența falsă sub rupturi structurale și întîrzierea reacției.'
             }
         },

@@ -327,7 +327,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "Prompt-ul contează doar la modelele mici, deci la un model 7B nu este nicio problemă",
                     "Alegerea prompt-ului după ce ați văzut rezultatele pe test este data snooping; prompt-ul trebuie fixat dinainte sau ales pe un set de validare separat"
                 ],
-                "correctExplanation": "Prompt-ul este un parametru de ajustare ca oricare altul. Alegerea lui pe setul de test umflă acuratețea raportată: același data snooping discutat în Capitolul 13.",
+                "correctExplanation": "Prompt-ul este un parametru de ajustare ca oricare altul. Alegerea lui pe setul de test exagerează acuratețea raportată: același data snooping discutat în Capitolul 13.",
                 "incorrectExplanation": "Raportarea celui mai bun dintre mai multe prompt-uri pe setul de test supraestimează acuratețea; prompt-ul trebuie fixat înainte de test sau selectat pe date de validare."
             }
         },

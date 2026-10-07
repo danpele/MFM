@@ -301,7 +301,7 @@ window.MFM_DATA.quizzes['ml'] = {
                     'Purged K-Fold irosește prea multe date'
                 ],
                 correctExplanation: 'Valoarea de 69,4% este leakage pur. Cu purjare și embargo, acuratețea revine la nivelul aruncării monedei, cum trebuie să fie cînd nu există semnal.',
-                incorrectExplanation: 'Într-un mers aleator nu există semnal; acuratețea umflată vine din leakage prin etichete suprapuse și amestecare.'
+                incorrectExplanation: 'Într-un mers aleator nu există semnal; acuratețea supraestimată vine din leakage prin etichete suprapuse și amestecare.'
             }
         },
         {
@@ -678,7 +678,7 @@ window.MFM_DATA.quizzes['ml'] = {
                     'Amestecarea pune în antrenare zilele vecine fiecărei zile de test; caracteristicile și etichetele suprapuse produc atunci leakage, deci folosiți purged K-fold cu embargo sau validare walk-forward',
                     'Amestecarea este o problemă doar pentru regresie, nu pentru clasificare'
                 ],
-                correctExplanation: 'Într-o serie de timp, observațiile vecine au informație comună (caracteristici mobile, etichete suprapuse); o împărțire amestecată pune această informație la dispoziția modelului, ceea ce umflă scorul.',
+                correctExplanation: 'Într-o serie de timp, observațiile vecine au informație comună (caracteristici mobile, etichete suprapuse); o împărțire amestecată pune această informație la dispoziția modelului, ceea ce exagerează scorul.',
                 incorrectExplanation: 'Întrebați-vă ce zile vecine cu o zi de test se află în setul de antrenare și ce informație au în comun cu ea.'
             }
         },

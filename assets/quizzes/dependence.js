@@ -355,7 +355,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                     "Corectează insuficient, deplasînd testul spre contagiune",
                     "Devine negativă prin construcție"
                 ],
-                correctExplanation: "Corecția presupune o varianță idiosincratică constantă; un șoc comun umflă raportul varianțelor și elimină prea mult din creșterea corelației, deci contagiunea reală poate fi ascunsă.",
+                correctExplanation: "Corecția presupune o varianță idiosincratică constantă; un șoc comun exagerează raportul varianțelor și elimină prea mult din creșterea corelației, deci contagiunea reală poate fi ascunsă.",
                 incorrectExplanation: "Cu un șoc comun, ipoteza „niciun factor omis” cade, iar corecția elimină prea mult din creșterea corelației."
             }
         },

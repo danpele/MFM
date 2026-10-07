@@ -22,15 +22,15 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "incorrectExplanation": "The null calibration is not affected by the moments of the alternative; a JB rejection concerns the joint null of i.i.d. Normal returns."
             },
             "ro": {
-                "title": "Ce înseamnă o respingere Jarque-Bera",
-                "text": "Estimarea Hill a tail index-ului pentru randamentele zilnice S&P 500 este aproximativ 3, iar statistica Jarque-Bera este aproximativ 45.800, cu p-valoarea chi-pătrat(2) sub 10^-10. Ce stabilește acest rezultat?",
+                "title": "Interpretarea unei respingeri Jarque-Bera",
+                "text": "Estimarea Hill a tail index-ului pentru randamentele zilnice S&P 500 este aproximativ 3, iar statistica Jarque-Bera este aproximativ 45.800, cu p-value-ul chi-pătrat(2) sub 10^-10. Ce stabilește acest rezultat?",
                 "options": [
-                    "Nimic: p-valoarea este invalidă pentru că momentul de ordin opt al randamentelor este infinit",
+                    "Nimic: p-value-ul este invalid, deoarece momentul de ordinul opt al randamentelor este infinit",
                     "Că randamentele sînt corelate serial",
-                    "Că ipoteza nulă comună ,,randamente i.i.d. din distribuția Normală'' este respinsă; testul singur nu arată dacă este încălcată ipoteza despre distribuția marginală sau cea de independență",
+                    "Că ipoteza nulă comună „randamente i.i.d. din distribuția Normală” este respinsă; testul, singur, nu arată dacă este încălcată ipoteza despre distribuția marginală sau cea de independență",
                     "Că randamentele au varianță infinită"
                 ],
-                "correctExplanation": "Limita chi-pătrat(2) este derivată sub ipoteza nulă a randamentelor i.i.d. din distribuția Normală, în care toate momentele există, deci p-valoarea este validă pentru această ipoteză. Cozile groase din alternativă fac ca JB să crească cu T: aceasta este puterea testului. Dependența (GARCH) este un alt motiv de respingere; pentru a testa distribuția marginală a unei serii de timp folosiți teste studentizate HAC (Bai și Ng, 2005) și raportați măsuri bazate pe cuantile și tail index-ul.",
+                "correctExplanation": "Limita chi-pătrat(2) este derivată sub ipoteza nulă a randamentelor i.i.d. din distribuția Normală, în care toate momentele există, deci p-value-ul este valid pentru această ipoteză. Sub alternativa cu cozi groase, JB crește odată cu T: acesta este un efect al puterii testului. Dependența (GARCH) este un alt motiv de respingere; pentru a testa distribuția marginală a unei serii de timp folosiți teste studentizate HAC (Bai și Ng, 2005) și raportați măsuri bazate pe cuantile și tail index-ul.",
                 "incorrectExplanation": "Calibrarea sub ipoteza nulă nu depinde de momentele alternativei; o respingere JB privește ipoteza nulă comună a randamentelor i.i.d. din distribuția Normală."
             }
         },
@@ -50,15 +50,15 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Banda autocorelației în prezența volatility clustering",
-                "text": "Randamentele x_t sînt o diferență de martingală staționară, cu momente de ordin patru finite, ale cărei pătrate sînt autocorelate pozitiv (volatility clustering). Cum se compară varianța asimptotică a rădăcinii lui T înmulțite cu autocorelația de selecție de ordin 1 cu 1?",
+                "text": "Randamentele x_t sînt o diferență de martingală staționară, cu momente de ordinul patru finite, ale cărei pătrate sînt autocorelate pozitiv (volatility clustering). Cum se compară cu 1 varianța asimptotică a lui sqrt(T) înmulțit cu autocorelația de selecție de lag 1?",
                 "options": [
                     "Este mai mare decît 1: este egală cu E[x_t^2 x_(t-1)^2]/sigma^4, care depășește 1 în prezența volatility clustering",
                     "Este egală cu 1, pentru că randamentele sînt necorelate",
                     "Este mai mică decît 1, pentru că media de selecție este eliminată",
                     "Nu este definită pentru randamente necorelate"
                 ],
-                "correctExplanation": "Pentru o diferență de martingală, varianța asimptotică a lui sqrt(T) rho_hat_1 este E[x_t^2 x_(t-1)^2]/sigma^4. Volatility clustering face ca pătratele mari să urmeze pătratelor mari, deci ea depășește 1 și banda i.i.d. 1,96/sqrt(T) este prea îngustă (S&P 500: aproximativ 5).",
-                "incorrectExplanation": "Corelația zero fixează media autocorelației, nu varianța ei: volatility clustering crește varianța peste valoarea i.i.d. 1."
+                "correctExplanation": "Pentru o diferență de martingală, varianța asimptotică a lui sqrt(T) rho_hat_1 este E[x_t^2 x_(t-1)^2]/sigma^4. Volatility clustering face ca pătratele mari să fie urmate de pătrate mari, deci această varianță depășește 1 și banda i.i.d. 1,96/sqrt(T) este prea îngustă (S&P 500: aproximativ 5).",
+                "incorrectExplanation": "Corelația nulă determină media autocorelației, nu varianța ei: volatility clustering mărește varianța peste valoarea i.i.d. 1."
             }
         },
         {
@@ -84,7 +84,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Volatility drag: rata medie de creștere logaritmică este aproximativ media aritmetică minus jumătate din varianță",
                     "Bitcoin nu plătește dividende"
                 ],
-                "correctExplanation": "Randamentul log mediu anualizat este aproximativ P medie(R) - P Var(R)/2 = 65,2% - 0,66^2/2, circa 43,3%, iar CAGR = exp(43,3%) - 1, circa 54%. La o volatilitate de circa 66% pe an, volatility drag este mare.",
+                "correctExplanation": "Randamentul logaritmic mediu anualizat este aproximativ P medie(R) - P Var(R)/2 = 65,2% - 0,66^2/2, circa 43,3%, iar CAGR = exp(43,3%) - 1, circa 54%. La o volatilitate de circa 66% pe an, volatility drag este mare.",
                 "incorrectExplanation": "Diferența este volatility drag dintre media aritmetică și cea geometrică."
             }
         },
@@ -104,7 +104,7 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Eroarea standard a estimatorului Hill",
-                "text": "Estimatorul Hill dă un tail index de 3,0 din cele mai mari k = 225 randamente absolute. Care este aproximativ intervalul de încredere de 95% pentru date i.i.d.?",
+                "text": "Estimatorul Hill dă un tail index de 3,0 din cele mai mari k = 225 de randamente absolute. Care este aproximativ intervalul de încredere de 95% pentru date i.i.d.?",
                 "options": [
                     "[2,96; 3,04], cu o eroare standard de 3/sqrt(n) pe tot eșantionul",
                     "[2,6; 3,4], cu o eroare standard de alpha/sqrt(k) = 0,2",
@@ -131,14 +131,14 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Coada randamentelor absolute",
-                "text": "La un prag comun, coada pierderilor are indicele 2,7, iar coada cîștigurilor 3,6. Asimptotic, care este tail index-ul al lui |r_t|?",
+                "text": "La un prag comun, coada pierderilor are tail index-ul 2,7, iar coada cîștigurilor 3,6. Asimptotic, care este tail index-ul lui |r_t|?",
                 "options": [
-                    "3,15, media celor doi",
+                    "3,15, media celor două valori",
                     "3,6, coada mai subțire",
-                    "6,3, suma celor doi",
+                    "6,3, suma celor două valori",
                     "2,7, coada mai groasă"
                 ],
-                "correctExplanation": "P(|X| > x) = P(X > x) + P(X < -x): pentru x mare domină termenul cu indicele mai mic, deci tail index-ul al lui |X| este min(2,7; 3,6) = 2,7.",
+                "correctExplanation": "P(|X| > x) = P(X > x) + P(X < -x): pentru x mare domină termenul cu tail index-ul mai mic, deci tail index-ul lui |X| este min(2,7; 3,6) = 2,7.",
                 "incorrectExplanation": "Probabilitatea unui |r| mare este suma celor două probabilități de coadă, iar termenul care scade mai lent domină departe în coadă."
             }
         },
@@ -166,7 +166,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Efectul bid-ask în prețurile de închidere zilnice"
                 ],
                 "correctExplanation": "Schimbările rare de regim ale volatilității creează o ACF a lui |r_t| care scade lent și un d estimat pozitiv (Diebold și Inoue, 2001); reestimarea lui d de o parte și de alta a unei rupturi de varianță este o primă verificare.",
-                "incorrectExplanation": "Un GARCH(1,1) cu persistența 0,9 are scădere exponențială, randamentele i.i.d. nu au autocorelație în |r_t|, iar efectul bid-ask afectează semnul randamentelor, nu mărimea lor."
+                "incorrectExplanation": "Un GARCH(1,1) cu persistența 0,9 are o ACF cu scădere exponențială, randamentele i.i.d. nu au autocorelație în |r_t|, iar efectul bid-ask afectează semnul randamentelor, nu mărimea lor."
             }
         },
         {
@@ -184,16 +184,16 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "incorrectExplanation": "The huge Q on squared returns signals volatility clustering, not predictable direction."
             },
             "ro": {
-                "title": "Ljung-Box pe randamente vs pătrate",
-                "text": "Pentru S&P 500, Ljung-Box Q(10) este 91,6 pe randamente și 8.018 pe randamentele pătratice. Care este mesajul principal?",
+                "title": "Ljung-Box pe randamente și pe randamentele pătratice",
+                "text": "Pentru S&P 500, Ljung-Box Q(10) este 91,6 pe randamente și 8.018 pe randamentele pătratice. Care este concluzia principală?",
                 "options": [
                     "Randamentele sînt puternic predictibile ca direcție",
                     "Testul nu este fiabil, pentru că valorile diferă",
                     "Mărimea randamentelor (volatilitatea) este mult mai predictibilă decît direcția lor",
                     "Randamentele pătratice urmează distribuția Normală"
                 ],
-                "correctExplanation": "Autocorelația randamentelor pătratice reflectă volatility clustering; autocorelația liniară a randamentelor este mică, chiar dacă e semnificativă într-un eșantion mare.",
-                "incorrectExplanation": "Valoarea uriașă a lui Q pe pătrate semnalează volatility clustering, nu o direcție predictibilă."
+                "correctExplanation": "Autocorelația randamentelor pătratice reflectă volatility clustering; autocorelația liniară a randamentelor este mică, chiar dacă este semnificativă într-un eșantion mare.",
+                "incorrectExplanation": "Valoarea foarte mare a lui Q pe pătrate semnalează volatility clustering, nu o direcție predictibilă."
             }
         },
         {
@@ -239,15 +239,15 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Raportul Sharpe pe randamente simple",
-                "text": "S&P 500, 1990-2026: randament log mediu 8,3% pe an, volatilitate 18,0%. Cît este aproximativ raportul Sharpe (r_f = 0) pe randamente simple, definiția din curs?",
+                "text": "S&P 500, 1990-2026: randament logaritmic mediu 8,3% pe an, volatilitate 18,0%. Cît este aproximativ raportul Sharpe (r_f = 0) pe randamente simple, definiția din curs?",
                 "options": [
                     "0,55, pentru că randamentul simplu mediu este aproximativ 8,3% + sigma^2/2 = 9,9%",
-                    "0,46, randamentul log mediu împărțit la volatilitate",
+                    "0,46, randamentul logaritmic mediu împărțit la volatilitate",
                     "0,37, după ce se scade încă o dată volatility drag",
-                    "0,18, chiar volatilitatea"
+                    "0,18, adică volatilitatea însăși"
                 ],
-                "correctExplanation": "Raportul Sharpe folosește media aritmetică a randamentelor simple: aproximativ 8,3% + 0,18^2/2 = 9,9%, iar 9,9/18,0 = 0,55. Media randamentelor log (0,46) îl subestimează, mult pentru active volatile precum Bitcoin (0,65 în loc de 0,98).",
-                "incorrectExplanation": "Randamentul log mediu este media aritmetică a randamentelor simple minus aproximativ sigma^2/2; raportul Sharpe se definește pe media aritmetică."
+                "correctExplanation": "Raportul Sharpe folosește media aritmetică a randamentelor simple: aproximativ 8,3% + 0,18^2/2 = 9,9%, iar 9,9/18,0 = 0,55. Folosirea mediei randamentelor logaritmice (0,46) îl subestimează, mai ales pentru active volatile precum Bitcoin (0,65 în loc de 0,98).",
+                "incorrectExplanation": "Randamentul logaritmic mediu este media aritmetică a randamentelor simple minus aproximativ sigma^2/2; raportul Sharpe se definește pe media aritmetică."
             }
         },
         {
@@ -269,12 +269,12 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "text": "Estimările Hill ale tail index-ului pentru randamentele zilnice absolute sînt în mare parte între 2 și 4 pe cele cinci piețe. Ce implică acest lucru?",
                 "options": [
                     "Randamentele urmează distribuția Normală",
-                    "Varianța există, dar kurtosisul populației foarte probabil nu (cere alpha > 4), deci kurtosisul de selecție este instabil",
+                    "Varianța există, dar kurtosisul populației, cel mai probabil, nu (necesită alpha > 4), deci kurtosisul de selecție este instabil",
                     "Randamentele nu au deloc varianță",
                     "Cozile sînt mai subțiri decît cele ale distribuției Normale"
                 ],
-                "correctExplanation": "Cu cozi de tip lege de putere, momentele există doar pînă la un ordin mai mic decît alpha: varianța cere alpha > 2, kurtosisul alpha > 4. Kurtosisul de selecție depinde atunci mult de cîteva zile extreme. (O distribuție Student-t estimată dă un tail index bazat pe model, valid doar dacă Student-t descrie bine atît partea centrală, cît și cozile.)",
-                "incorrectExplanation": "Un tail index între 2 și 4 înseamnă varianță finită, dar un moment de ordin patru foarte probabil inexistent."
+                "correctExplanation": "Cu cozi de tip lege de putere, momentele există doar pînă la un ordin mai mic decît alpha: varianța cere alpha > 2, kurtosisul alpha > 4. Kurtosisul de selecție depinde atunci puternic de cîteva zile extreme. (O distribuție Student-t estimată dă un tail index bazat pe model, valid doar dacă Student-t descrie bine atît partea centrală, cît și cozile.)",
+                "incorrectExplanation": "Un tail index între 2 și 4 înseamnă varianță finită, dar un moment de ordinul patru, cel mai probabil, infinit."
             }
         },
         {
@@ -327,7 +327,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "0,09, adică SR/sqrt(Y)",
                     "0,55, chiar raportul Sharpe"
                 ],
-                "correctExplanation": "Pentru randamente i.i.d. din distribuția Normală, metoda delta dă Var(SR_zilnic) aproximativ (1 + SR_zilnic^2/2)/T; anualizarea înmulțește eroarea standard cu sqrt(P), deci aproximativ sqrt(P/T) = 1/sqrt(Y) = 0,17. Pentru alte distribuții i.i.d. intră asimetria și kurtosisul (Opdyke, 2007). Contează durata eșantionului, nu frecvența.",
+                "correctExplanation": "Pentru randamente i.i.d. din distribuția Normală, metoda delta dă Var(SR_zilnic) aproximativ (1 + SR_zilnic^2/2)/T; anualizarea înmulțește eroarea standard cu sqrt(P), deci aproximativ sqrt(P/T) = 1/sqrt(Y) = 0,17. Pentru alte distribuții i.i.d., în formulă intervin și asimetria și kurtosisul (Opdyke, 2007). Precizia depinde de durata eșantionului, nu de frecvența observațiilor.",
                 "incorrectExplanation": "Eroarea standard zilnică trebuie anualizată cu sqrt(P); rezultatul depinde de numărul de ani, nu de numărul de zile."
             }
         },
@@ -377,11 +377,11 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "text": "ACF a randamentelor absolute S&P 500 este 0,27 la lagul 1 și încă 0,09 la lagul 100. Ce se poate concluziona?",
                 "options": [
                     "Demonstrează că direcția randamentelor este predictibilă",
-                    "Volatilitatea este foarte persistentă; memoria lungă, un model cu memorie scurtă cu persistență aproape de 1 și rupturile structurale pot produce toate acest lucru, deci sînt necesare diagnostice suplimentare (estimări ale lui d, teste de ruptură, simulări de model)",
+                    "Volatilitatea este foarte persistentă; memoria lungă, un model cu memorie scurtă cu persistență aproape de 1 și rupturile structurale pot produce toate acest tipar, deci sînt necesare diagnostice suplimentare (estimări ale lui d, teste de ruptură, simulări de model)",
                     "Arată că volatilitatea este constantă",
                     "Este un artefact al folosirii randamentelor log"
                 ],
-                "correctExplanation": "Cele două valori ACF sînt reproduse de o descreștere exponențială cu phi de circa 0,989, iar un GARCH(1,1)-t cu persistența 0,994 le reproduce în Seminarul B14. Separarea memoriei lungi de memoria scurtă persistentă sau de rupturi cere estimări ale lui d, teste de ruptură și verificări prin simulare.",
+                "correctExplanation": "Cele două valori ACF sînt reproduse de o descreștere exponențială cu phi de circa 0,989, iar un GARCH(1,1)-t cu persistența 0,994 le reproduce în Seminarul B14. Separarea memoriei lungi de memoria scurtă persistentă sau de rupturi necesită estimări ale lui d, teste de ruptură și verificări prin simulare.",
                 "incorrectExplanation": "Descreșterea lentă arată volatilitate persistentă; ea singură nu identifică memoria lungă."
             }
         },
@@ -405,7 +405,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "options": [
                     "Randamentele pătratice sînt mereu cea mai bună aproximare a volatilității",
                     "Randamentele urmează distribuția Normală",
-                    "La laguri mari, puterile apropiate de 1 sînt mai persistente decît pătratele; motivează măsuri robuste ale volatilității și modele power-GARCH",
+                    "La laguri mari, puterile apropiate de 1 sînt mai persistente decît pătratele, ceea ce motivează măsuri robuste ale volatilității și modele power-GARCH",
                     "Efectul Taylor implică absența volatility clustering"
                 ],
                 "correctExplanation": "Puterea optimă se deplasează spre delta = 1 cînd lagul crește; randamentele pătratice (delta = 2) sînt clar mai puțin persistente la laguri mari.",
@@ -435,8 +435,8 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Volumul prezice randamentele",
                     "Scăderile de preț de azi sînt urmate de volatilitate mai mare în zilele următoare"
                 ],
-                "correctExplanation": "O corelație negativă între randamentul de azi și randamentele absolute viitoare este efectul de levier; este specific piețelor de acțiuni.",
-                "incorrectExplanation": "Semnul și momentul (k > 0) arată că pierderile cresc volatilitatea viitoare."
+                "correctExplanation": "O corelație negativă între randamentul de azi și randamentele absolute viitoare este efectul de levier, specific piețelor de acțiuni.",
+                "incorrectExplanation": "Semnul și orientarea în timp (k > 0) arată că pierderile cresc volatilitatea viitoare."
             }
         },
         {
@@ -454,7 +454,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "incorrectExplanation": "Stylised facts such as leverage depend on the market: equity-like for BET-TR, reversed for EUR/RON."
             },
             "ro": {
-                "title": "Levierul pe piețe",
+                "title": "Efectul de levier pe diferite piețe",
                 "text": "La k = 1, corelația de levier este -0,12 pentru BET-TR, -0,07 pentru Bitcoin, -0,02 pentru aur și +0,10 pentru EUR/RON. Care interpretare este corectă?",
                 "options": [
                     "Efectul este specific acțiunilor; la EUR/RON este inversat, deoarece creșterile cursului (deprecierile leului) cresc volatilitatea",
@@ -462,8 +462,8 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "Efectul este cel mai puternic la aur",
                     "Bitcoin are cel mai puternic efect de levier"
                 ],
-                "correctExplanation": "Acțiunile românești și americane au efectul, cripto o versiune slabă, aurul deloc, iar leul semnul opus.",
-                "incorrectExplanation": "Fapte stilizate precum levierul depind de piață: de tip acțiuni la BET-TR, inversat la EUR/RON."
+                "correctExplanation": "Efectul este prezent pe acțiunile românești și americane, slab pentru Bitcoin, absent pentru aur și de semn opus pentru EUR/RON.",
+                "incorrectExplanation": "Fapte stilizate precum efectul de levier depind de piață: tipic acțiunilor la BET-TR, inversat la EUR/RON."
             }
         },
         {
@@ -509,14 +509,14 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Autocorelația EUR/RON",
-                "text": "Cursul oficial de referință EUR/RON are o autocorelație de ordin 1 pozitivă, de 0,17, spre deosebire de acțiuni. Care este explicația cea mai plauzibilă?",
+                "text": "Cursul oficial de referință EUR/RON are o autocorelație pozitivă de lag 1, de 0,17, spre deosebire de acțiuni. Care este explicația cea mai plauzibilă?",
                 "options": [
                     "Investitorii pot obține ușor profituri din arbitraj",
                     "O greșeală în calculul randamentelor log",
-                    "O flotare controlată: un fixing zilnic, cu ajustări netezite pe mai multe zile",
+                    "Regimul de managed float: un curs de referință zilnic, cu ajustări distribuite pe mai multe zile",
                     "Leul este un criptoactiv"
                 ],
-                "correctExplanation": "Administrarea de către banca centrală și procedura de fixing netezesc ajustările cursului, ceea ce creează autocorelație pozitivă.",
+                "correctExplanation": "Intervențiile băncii centrale și procedura de fixing distribuie ajustările cursului pe mai multe zile, ceea ce creează autocorelație pozitivă.",
                 "incorrectExplanation": "Cadrul instituțional (managed float, fixing) explică autocorelația pozitivă."
             }
         },
@@ -536,14 +536,14 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Calitatea datelor",
-                "text": "O serie gratuită de cotații EUR/RON are autocorelație de ordin 1 în jur de -0,5 în mai mulți ani și variații izolate de +/-15% inversate a doua zi. Ce trebuie făcut?",
+                "text": "O serie gratuită de cotații EUR/RON are o autocorelație de lag 1 în jur de -0,5 în mai mulți ani și variații izolate de +/-15% inversate a doua zi. Ce trebuie făcut?",
                 "options": [
                     "Raportarea unui nou fapt stilizat al leului",
                     "Ștergerea tuturor randamentelor mai mari de 1%",
                     "Folosirea unui eșantion mai lung din aceeași serie",
                     "Tratarea lor ca erori de cotare și folosirea cursului oficial de referință (sau curățarea explicită a cotațiilor)"
                 ],
-                "correctExplanation": "Salturile izolate care se inversează a doua zi creează autocorelație negativă falsă și umflă kurtosisul; cursurile oficiale de referință evită problema.",
+                "correctExplanation": "Salturile izolate care se inversează a doua zi creează autocorelație negativă artificială și supraestimează kurtosisul; cursurile oficiale de referință evită problema.",
                 "incorrectExplanation": "Salturile care se inversează imediat sînt erori de date, nu comportament al pieței."
             }
         },
@@ -562,8 +562,8 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "incorrectExplanation": "Thin trading and non-synchronous prices explain positive index autocorrelation."
             },
             "ro": {
-                "title": "Piețe nelichide",
-                "text": "BET-TR are o autocorelație de ordin 1 pozitivă (0,06), iar S&P 500 are -0,08. Care este o explicație standard?",
+                "title": "Piețe cu lichiditate redusă",
+                "text": "BET-TR are o autocorelație pozitivă de lag 1 (0,06), iar S&P 500 are -0,08. Care este o explicație standard?",
                 "options": [
                     "Tranzacționarea nesincronă a componentelor mai puțin lichide ale indicelui, astfel încît prețurile încorporează știrile în mai multe zile",
                     "Indicele BET-TR este calculat cu erori",
@@ -589,15 +589,15 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "incorrectExplanation": "Pure range estimators ignore the overnight component of volatility."
             },
             "ro": {
-                "title": "Estimatori de range volatility",
-                "text": "Pe S&P 500 (2008-2026), volatilitatea închidere-închidere are media 16,4%, iar Parkinson dă 13,0%. De ce este Parkinson mai mic?",
+                "title": "Estimatori ai volatilității bazați pe range",
+                "text": "Pe S&P 500 (2008-2026), volatilitatea close-to-close are media 16,4%, iar Parkinson dă 13,0%. De ce este Parkinson mai mic?",
                 "options": [
                     "Parkinson este deplasat în sus",
-                    "Folosește doar range-ul maxim-minim din timpul zilei și ratează salturile de peste noapte (închidere-deschidere)",
+                    "Folosește doar range-ul maxim-minim din timpul zilei și nu surprinde salturile de peste noapte (închidere-deschidere)",
                     "S&P 500 nu are volatilitate intraday",
-                    "Estimatorul închidere-închidere folosește o fereastră mai lungă"
+                    "Estimatorul close-to-close folosește o fereastră mai lungă"
                 ],
-                "correctExplanation": "Range-ul zilnic surprinde doar variația din timpul zilei; salturile de peste noapte fac parte din randamentele închidere-închidere, dar nu din range. Yang-Zhang le readaugă, dar pe indice ajunge doar la 13,9%, pentru că deschiderea indicelui este parțial un stale open, calculată din prețuri ale componentelor încă netranzacționate (16,8% pe ETF-ul SPY).",
+                "correctExplanation": "Range-ul zilnic surprinde doar variația din timpul zilei; salturile de peste noapte fac parte din randamentele close-to-close, dar nu din range. Yang-Zhang le include, dar pe indice dă doar 13,9%, deoarece deschiderea indicelui este parțial un stale open, calculat din prețurile anterioare ale componentelor încă netranzacționate (16,8% pe ETF-ul SPY).",
                 "incorrectExplanation": "Estimatorii bazați doar pe range ignoră componenta de peste noapte a volatilității."
             }
         },
@@ -617,14 +617,14 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Tranzacționare nesincronă",
-                "text": "Randamentele log zilnice BET-TR și S&P 500 au corelația 0,31 în aceeași zi, 0,12 cu S&P 500 din ziua precedentă și 0,03 cu cel din ziua următoare (Bucureștiul închide înaintea New York-ului). Ce corelație ar trebui folosită pentru un portofoliu deținut o săptămînă?",
+                "text": "Randamentele log zilnice BET-TR și S&P 500 au corelația 0,31 în aceeași zi, 0,12 cu S&P 500 din ziua precedentă și 0,03 cu cel din ziua următoare (bursa din București se închide înaintea celei din New York). Ce corelație ar trebui folosită pentru un portofoliu deținut o săptămînă?",
                 "options": [
                     "0,31, corelația din aceeași zi",
                     "0,12, corelația cu decalaj",
                     "0,43, suma corelațiilor din aceeași zi și cu decalaj",
-                    "Corelația randamentelor săptămînale sincronizate (0,46), apropiată de 0,31 + 0,12 + 0,03, pentru că covarianța săptămînală adună covarianțele zilnice cu decalaj și avans"
+                    "Corelația randamentelor săptămînale sincronizate (0,46), apropiată de 0,31 + 0,12 + 0,03, deoarece covarianța săptămînală include covarianțele zilnice încrucișate, cu decalaj și cu avans"
                 ],
-                "correctExplanation": "Știrile americane de după închiderea bursei din București ajung în BET-TR abia a doua zi, deci o parte din mișcarea comună apare la decalajul 1. O sumă de corelații zilnice nu este ea însăși o corelație (poate depăși 1); randamentele săptămînale sincronizate dau o corelație propriu-zisă, 0,46.",
+                "correctExplanation": "Știrile americane de după închiderea bursei din București ajung în BET-TR abia a doua zi, deci o parte din variația comună apare la decalajul 1. O sumă de corelații zilnice nu este ea însăși o corelație (poate depăși 1); randamentele săptămînale sincronizate dau o corelație propriu-zisă, 0,46.",
                 "incorrectExplanation": "Închiderile nesincrone împart reacția comună pe mai multe zile; folosiți randamente sincronizate la orizontul portofoliului."
             }
         },
@@ -644,15 +644,15 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Comparații corecte",
-                "text": "Pe datele comune 2014-2026, BET-TR are raportul Sharpe 1,36, iar S&P 500 are 0,75. De ce nu este comparația pe deplin corectă?",
+                "text": "Pe perioada comună 2014-2026, BET-TR are raportul Sharpe 1,36, iar S&P 500 are 0,75. De ce nu este comparația pe deplin corectă?",
                 "options": [
                     "Raportul Sharpe nu poate fi calculat pentru indici",
                     "S&P 500 are mai multe observații",
                     "BET-TR este mai volatil",
-                    "BET-TR include dividendele reinvestite, iar indicele de preț S&P 500 nu, iar monedele diferă (RON vs USD)"
+                    "BET-TR include dividendele reinvestite, iar indicele de preț S&P 500 nu, iar monedele diferă (RON față de USD)"
                 ],
-                "correctExplanation": "Comparațiile cer aceeași definiție a randamentului (preț vs randament total), aceeași monedă și aceeași perioadă.",
-                "incorrectExplanation": "Indicii de preț vs de randament total și monedele diferite distorsionează comparația."
+                "correctExplanation": "Comparațiile cer aceeași definiție a randamentului (indice de preț sau de randament total), aceeași monedă și aceeași perioadă.",
+                "incorrectExplanation": "Combinarea unui indice de preț cu unul de randament total și monedele diferite distorsionează comparația."
             }
         },
         {
@@ -671,14 +671,14 @@ window.MFM_DATA.quizzes['stylized'] = {
             },
             "ro": {
                 "title": "Găsiți eroarea AI: excesul de kurtosis în SciPy",
-                "text": "Un asistent AI scrie: „scipy.stats.kurtosis(r) întoarce 5,2 pentru aceste randamente zilnice, deci excesul de kurtosis este 5,2 − 3 = 2,2.” Ce este greșit?",
+                "text": "Un asistent AI scrie: „scipy.stats.kurtosis(r) returnează 5,2 pentru aceste randamente zilnice, deci excesul de kurtosis este 5,2 − 3 = 2,2.” Ce este greșit?",
                 "options": [
                     "Kurtosisul se calculează pe prețuri, nu pe randamente",
-                    "Implicit (fisher=True) SciPy întoarce deja excesul de kurtosis: acesta este 5,2, iar kurtosisul este 8,2",
+                    "Implicit (fisher=True), SciPy returnează deja excesul de kurtosis: acesta este 5,2, iar kurtosisul este 8,2",
                     "Distribuția randamentelor zilnice are kurtosis 0, deci nu se scade și nu se adună nimic",
                     "Excesul de kurtosis este kurtosisul împărțit la 3, deci 1,73"
                 ],
-                "correctExplanation": "scipy.stats.kurtosis folosește implicit fisher=True și întoarce kurtosis − 3; scăderea încă o dată a lui 3 subestimează cozile. Verificați documentația sau o selecție simulată din distribuția Normală, care dă aproximativ 0.",
+                "correctExplanation": "scipy.stats.kurtosis folosește implicit fisher=True și returnează kurtosis − 3; scăderea încă o dată a lui 3 subestimează cozile. Verificați documentația sau o selecție simulată din distribuția Normală, care dă aproximativ 0.",
                 "incorrectExplanation": "Setarea implicită din SciPy scade deja 3 (fisher=True): excesul de kurtosis este 5,2; o selecție simulată din distribuția Normală dă aproximativ 0, nu 3."
             }
         },
@@ -700,13 +700,13 @@ window.MFM_DATA.quizzes['stylized'] = {
                 "title": "Găsiți eroarea AI: Ljung–Box pe randamentele la pătrat",
                 "text": "Un asistent AI scrie: „Testul Ljung–Box pe randamentele zilnice la pătrat dă Q(10) = 714, p < 0,001: randamentele sînt autocorelate, deci indicele este predictibil.” Ce este greșit?",
                 "options": [
-                    "Ljung–Box are nevoie de cel puțin 50 de laguri ca să fie valid",
+                    "Ljung–Box necesită cel puțin 50 de laguri pentru a fi valid",
                     "Un p-value sub 0,001 înseamnă că ipoteza nulă este adevărată",
                     "Randamentele la pătrat nu pot fi folosite în niciun test, pentru că sînt mereu pozitive",
                     "Testul pe r² detectează volatility clustering; autocorelația randamentelor se testează pe r, cu versiunea robustă"
                 ],
                 "correctExplanation": "Dependența în r² înseamnă volatility clustering: randamentele pot fi necorelate, iar pătratele lor nu. Predictibilitatea randamentelor se testează cu Ljung–Box pe r, în versiunea robustă la heteroscedasticitate.",
-                "incorrectExplanation": "Un Ljung–Box semnificativ pe randamentele la pătrat arată volatility clustering, nu randamente predictibile; testați chiar r, cu statistica robustă."
+                "incorrectExplanation": "Un Ljung–Box semnificativ pe randamentele la pătrat arată volatility clustering, nu randamente predictibile; testați direct r, cu statistica robustă."
             }
         }
     ]

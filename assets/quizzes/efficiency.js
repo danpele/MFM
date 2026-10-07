@@ -490,7 +490,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Pentru că băncile au beta peste unu"
                 ],
                 "correctExplanation": "Cu o dată comună a evenimentului reziduurile sînt corelate (r̄ > 0); dispersia randamentului anormal mediu este mai mare decît σ²/N. Kolari și Pynnönen (2010) corectează pentru aceasta; un test pe portofoliu o face automat.",
-                "incorrectExplanation": "Corelația transversală a randamentelor anormale într-o zi comună umflă dispersia mediei lor cu (1 + (N − 1)r̄); ignorată, face t prea mare."
+                "incorrectExplanation": "Corelația transversală a randamentelor anormale într-o zi comună exagerează dispersia mediei lor cu (1 + (N − 1)r̄); ignorată, face t prea mare."
             }
         },
         {
@@ -539,12 +539,12 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "text": "De ce testul Diebold–Mariano nu este potrivit pentru a compara o regresie predictivă cu media istorică (modele imbricate)?",
                 "options": [
                     "Pentru că cere erori de prognoză din distribuția Normală",
-                    "Pentru că sub ipoteza nulă modelul mai mare estimează o pantă nulă, ceea ce îi umflă MSPE, deci testul respinge prea rar; Clark–West corectează acest lucru",
+                    "Pentru că sub ipoteza nulă modelul mai mare estimează o pantă nulă, ceea ce îi exagerează MSPE, deci testul respinge prea rar; Clark–West corectează acest lucru",
                     "Pentru că cere selecții care nu se suprapun",
                     "Pentru că modelele imbricate dau mereu prognoze identice"
                 ],
                 "correctExplanation": "Sub H0 parametrul suplimentar este doar zgomot de estimare, care adaugă (r̄ − r̂)² la MSPE a modelului mai mare; Clark și West (2007) adaugă înapoi acest termen și obțin o statistică aproximativ Normală.",
-                "incorrectExplanation": "La modelele imbricate MSPE a modelului mai mare este umflată de zgomotul de estimare sub ipoteza nulă, deci Diebold–Mariano respinge prea rar; ajustarea Clark–West elimină această deplasare."
+                "incorrectExplanation": "La modelele imbricate MSPE a modelului mai mare este mărită de zgomotul de estimare sub ipoteza nulă, deci Diebold–Mariano respinge prea rar; ajustarea Clark–West elimină această deplasare."
             }
         },
         {

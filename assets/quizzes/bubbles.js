@@ -246,7 +246,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Nivelul rămîne exact 5%",
                     "Schimbarea scade doar puterea; nivelul nu este afectat"
                 ],
-                "correctExplanation": "Dispersia mare din ferestrele recente umflă supremul statisticilor ADF pe ferestre; în simularea Monte Carlo din acest capitol rata de respingere a fost de aproximativ 32% în loc de 5% și de circa 4% cu wild bootstrap (Harvey, Leybourne, Sollis și Taylor).",
+                "correctExplanation": "Dispersia mare din ferestrele recente exagerează supremul statisticilor ADF pe ferestre; în simularea Monte Carlo din acest capitol rata de respingere a fost de aproximativ 32% în loc de 5% și de circa 4% cu wild bootstrap (Harvey, Leybourne, Sollis și Taylor).",
                 "incorrectExplanation": "Distribuția nulă sub dispersie constantă este referința greșită cînd volatilitatea crește tîrziu în eșantion: șocurile recente mari par accelerare, deci respingerile false se înmulțesc; bootstrap-ul variațiilor observate cu semne aleatoare corectează asta."
             }
         },

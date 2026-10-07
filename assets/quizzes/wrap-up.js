@@ -275,7 +275,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Corelația crește mecanic cînd crește volatilitatea pieței-sursă; trebuie ajustată"
                 ],
                 "correctExplanation": "Ajustarea Forbes--Rigobon elimină efectul volatilității; în 2008 creșterile ajustate nu au fost semnificative.",
-                "incorrectExplanation": "Volatilitatea mai mare a pieței de condiționare umflă corelația măsurată chiar dacă dependența nu s-a schimbat."
+                "incorrectExplanation": "Volatilitatea mai mare a pieței de condiționare exagerează corelația măsurată chiar dacă dependența nu s-a schimbat."
             }
         },
         {
@@ -653,7 +653,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "Doar specificațiile cu p < 0,05, celelalte fiind greșit specificate"
                 ],
                 "correctExplanation": "Din 48 de încercări, o valoare p de 0,01 apare din întîmplare; curba specificațiilor arată întreaga distribuție, iar corecția ține cont de căutare.",
-                "incorrectExplanation": "Raportarea celei mai bune celule, a unui rezumat neajustat sau doar a celulelor semnificative ascunde căutarea și umflă dovezile."
+                "incorrectExplanation": "Raportarea celei mai bune celule, a unui rezumat neajustat sau doar a celulelor semnificative ascunde căutarea și exagerează dovezile."
             }
         },
         {
