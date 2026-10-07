@@ -165,7 +165,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Nedeplasate, pentru că OLS este nedeplasat",
                     "Nedefinite cînd o acțiune nu se tranzacționează"
                 ],
-                correctExplanation: "Prețurile învechite distribuie reacția la știrile pieței pe mai multe zile. În seminar, beta Dimson al Nuclearelectrica crește de la 0,80 la 0,94, iar al Digi de la 0,67 la 0,75.",
+                correctExplanation: "Prețurile stale (neactualizate) distribuie reacția la știrile pieței pe mai multe zile. În seminar, beta Dimson al Nuclearelectrica crește de la 0,80 la 0,94, iar al Digi de la 0,67 la 0,75.",
                 incorrectExplanation: "O acțiune care se tranzacționează cu întîrziere reacționează mîine la mișcarea de azi a pieței, deci covarianța contemporană subestimează beta; adunați pantele anticipate și întîrziate."
             }
         },

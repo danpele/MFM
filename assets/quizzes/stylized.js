@@ -597,7 +597,7 @@ window.MFM_DATA.quizzes['stylized'] = {
                     "S&P 500 nu are volatilitate intraday",
                     "Estimatorul închidere-închidere folosește o fereastră mai lungă"
                 ],
-                "correctExplanation": "Range-ul zilnic surprinde doar variația din timpul zilei; salturile de peste noapte fac parte din randamentele închidere-închidere, dar nu din range. Yang-Zhang le readaugă, dar pe indice ajunge doar la 13,9%, pentru că deschiderea indicelui este parțial învechită (16,8% pe ETF-ul SPY).",
+                "correctExplanation": "Range-ul zilnic surprinde doar variația din timpul zilei; salturile de peste noapte fac parte din randamentele închidere-închidere, dar nu din range. Yang-Zhang le readaugă, dar pe indice ajunge doar la 13,9%, pentru că deschiderea indicelui este parțial un stale open, calculată din prețuri ale componentelor încă netranzacționate (16,8% pe ETF-ul SPY).",
                 "incorrectExplanation": "Estimatorii bazați doar pe range ignoră componenta de peste noapte a volatilității."
             }
         },

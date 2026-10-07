@@ -220,7 +220,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Nicio estimare: rădăcina pătrată a unui număr negativ nu există"
                 ],
                 "correctExplanation": "Cu autocovarianță pozitivă, -Cov este negativă și estimatorul nu este definit.",
-                "incorrectExplanation": "Formula 2 sqrt(-Cov) cere o covarianță de selecție nepozitivă pentru un rezultat real. Valorile de selecție pozitive pot apărea din eroarea de selecție chiar cînd modelul Roll este adevărat sau din abateri de la ipotezele lui (tendințe, prețuri învechite)."
+                "incorrectExplanation": "Formula 2 sqrt(-Cov) cere o covarianță de selecție nepozitivă pentru un rezultat real. Valorile de selecție pozitive pot apărea din eroarea de selecție chiar cînd modelul Roll este adevărat sau din abateri de la ipotezele lui (tendințe, prețuri stale (neactualizate))."
             }
         },
         {
@@ -678,7 +678,7 @@ window.MFM_DATA.quizzes['microstructure'] = {
                     "Autocovarianța ar trebui calculată din prețuri, nu din variațiile lor",
                     "O autocovarianță de selecție pozitivă face ca estimatorul Roll nemodificat să nu fie definit în numere reale, deși poate apărea din eroarea de selecție; raportați-l ca lipsă sau folosiți alt estimator, de exemplu unul maxim-minim"
                 ],
-                "correctExplanation": "Modelul Roll implică o autocovarianță negativă în populație, -c^2. O valoare de selecție poate fi totuși pozitivă, din eroarea de selecție sau din abateri de la model (tendințe, prețuri învechite); în ambele cazuri rădăcina nu este definită, iar valoarea absolută produce un spread fără nicio bază în model (Roll, 1984; Hasbrouck, 2007).",
+                "correctExplanation": "Modelul Roll implică o autocovarianță negativă în populație, -c^2. O valoare de selecție poate fi totuși pozitivă, din eroarea de selecție sau din abateri de la model (tendințe, prețuri stale (neactualizate)); în ambele cazuri rădăcina nu este definită, iar valoarea absolută produce un spread fără nicio bază în model (Roll, 1984; Hasbrouck, 2007).",
                 "incorrectExplanation": "Formula s = 2 sqrt(-Cov) este corectă; greșeala este forțarea unei autocovarianțe pozitive în formulă prin valoarea absolută."
             }
         },
