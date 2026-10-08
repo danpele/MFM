@@ -54,7 +54,7 @@ TW, TH = 409.72 * PT, 212.40 * PT
 BOX = {'brownian': (TW, 0.56 * TH), 'drawdown': (0.50 * TW, 0.80 * TH), 'fourth_power': (TW, 0.56 * TH),
        'var_density': (0.49 * TW, 0.80 * TH), 'normal_t': (TW, 0.56 * TH), 'acf_clustering': (TW, 0.62 * TH),
        'mixture': (TW, 0.56 * TH), 'aggregation': (TW, 0.52 * TH), 'qq': (TW, 0.47 * TH),
-       'ohlc': (0.49 * TW, 0.80 * TH)}
+       'ohlc': (0.49 * TW, 0.80 * TH), 'normal_std': (0.46 * TW, 0.80 * TH)}
 
 
 def new_fig(key, nrows=1, ncols=1, **kw):
@@ -477,8 +477,32 @@ def fig_ohlc(seed=4, n=390, sigma_day=0.012):
     return dict(open=x[0], high=x[ih], low=x[il], close=x[-1], range=x[ih] - x[il])
 
 
+
+# =============================================================================
+# (0) the standard Normal distribution: density phi with the 68% / 95% areas, and the CDF Phi
+# =============================================================================
+def fig_normal_std():
+    x = np.linspace(-4, 4, 801)
+    phi, Phi = stats.norm.pdf(x), stats.norm.cdf(x)
+    fig, (ax, bx) = new_fig('normal_std', nrows=2, ncols=1, sharex=True)
+    m2, m1 = np.abs(x) <= 1.96, np.abs(x) <= 1.0
+    ax.fill_between(x[m2], 0, phi[m2], color=BandBlue, lw=0, label=r'$P(|Z|\leq 1.96)$ = 95%')
+    ax.fill_between(x[m1], 0, phi[m1], color=MainBlue, alpha=0.35, lw=0, label=r'$P(|Z|\leq 1)$ = 68%')
+    ax.plot(x, phi, color=MainBlue, lw=0.9, label=r'density $\varphi(x)$')
+    ax.set_ylim(0, 0.45); ax.set_ylabel(r'$\varphi(x)$')
+    bx.plot(x, Phi, color=IDAred, lw=0.9, label=r'CDF $\Phi(x) = P(Z \leq x)$')
+    bx.axhline(0.975, color=Navy, lw=0.5, ls=':'); bx.axvline(1.96, color=Navy, lw=0.5, ls=':')
+    bx.text(-3.9, 0.80, r'$\Phi(1.96) = 0.975$', fontsize=6.8, color=Navy)
+    bx.set_ylim(0, 1.05); bx.set_ylabel(r'$\Phi(x)$'); bx.set_xlabel(r'$x$ (standard deviations)')
+    bx.set_xlim(-4, 4)
+    h1, l1 = ax.get_legend_handles_labels(); h2, l2 = bx.get_legend_handles_labels()
+    bottom_legend(fig, [ax, bx], ncol=2, handles=h1 + h2, labels=l1 + l2)
+    save_fig(fig, 'ch1_sem_primer_normal_std')
+    return dict(p68=float(stats.norm.cdf(1) - stats.norm.cdf(-1)))
+
 def run_all():
     res = {}
+    res['normal_std'] = fig_normal_std()
     res['brownian'] = fig_brownian()
     res['drawdown'] = fig_drawdown()
     res['fourth_power'] = fig_fourth_power()
