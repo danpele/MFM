@@ -483,10 +483,7 @@
         renderStatic();
         renderOverview();
         initLightbox();
-        if (isConfigured(CFG.ATTENDANCE_FORM_URL)) {
-            $('attendance-btn').href = CFG.ATTENDANCE_FORM_URL;
-            $('attendance-btn').hidden = false;
-        }
+        // attendance: students reach the Google Form only by scanning the QR code shown in the room (no public button)
         if (isConfigured(CFG.ATTENDANCE_QR_URL)) {
             $('qr-lecture').href = CFG.ATTENDANCE_QR_URL + '?t=curs';
             $('qr-seminar').href = CFG.ATTENDANCE_QR_URL + '?t=seminar';

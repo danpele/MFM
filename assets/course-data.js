@@ -450,7 +450,7 @@
                 qrTeachers: 'For instructors: attendance QR code',
                 qrLecture: 'lecture',
                 qrSeminar: 'seminar',
-                teacherBtn: 'Instructor access',
+                teacherBtn: 'Attendance',
                 teacherPrompt: 'Sign in with the instructor Google account to see the attendance QR code.',
                 teacherDenied: 'This account has no instructor access.',
                 stats: { chapters: 'chapters', slides: 'lecture slides', seminar: 'seminar pages', quantlets: 'Quantlets', quiz: 'quiz questions', charts: 'charts' },
@@ -521,7 +521,7 @@
                 qrTeachers: 'Pentru cadre didactice: cod QR de prezență',
                 qrLecture: 'curs',
                 qrSeminar: 'seminar',
-                teacherBtn: 'Acces cadre didactice',
+                teacherBtn: 'Prezență',
                 teacherPrompt: 'Autentificați-vă cu contul Google de cadru didactic pentru a vedea codul QR de prezență.',
                 teacherDenied: 'Acest cont nu are acces de cadru didactic.',
                 stats: { chapters: 'capitole', slides: 'slide-uri de curs', seminar: 'pagini de seminar', quantlets: 'Quantlets', quiz: 'întrebări de quiz', charts: 'grafice' },
@@ -924,7 +924,7 @@
             email: 'danpele@ase.ro',
             en: ['Bucharest University of Economic Studies', 'Department of Statistics and Econometrics', 'Faculty of Cybernetics, Statistics and Economic Informatics'],
             ro: ['Academia de Studii Economice din București', 'Departamentul de Statistică și Econometrie', 'Facultatea de Cibernetică, Statistică și Informatică Economică'],
-            seminar: { name: 'Drd. Antoaneta Amza', email: 'antoaneta.amza@csie.ase.ro' }
+            seminar: { name: 'Prof. dr. Daniel Traian Pele &amp; Drd. Antoaneta Amza', email: 'danpele@ase.ro, antoaneta.amza@csie.ase.ro' }
         },
 
         footerLogos: [
