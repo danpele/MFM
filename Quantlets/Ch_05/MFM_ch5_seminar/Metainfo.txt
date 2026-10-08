@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch5_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 5 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, B1, B2, B5, B5 Extended, B7 with code and output. The proposed exercises A2, A4, A5, A6, B3, B4, B6, B8, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Seminar 5 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, B1, B2, B4, B5, B5 Extended with code and output. The proposed exercises A3, A4, A5, A6, B3, B6, B7, B8, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'GARCH, GJR-GARCH, likelihood ratio, skewed-t, QLIKE, Diebold-Mariano, Giacomini-White, Model Confidence Set, Mincer-Zarnowitz, parametric bootstrap, IGARCH test, half-life, delta method, volatility spillover, PIT, BET, S&P 500, Bitcoin'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily market data (course data): S&P 500, BET, BET-TR, Bitcoin, gold (XAU/USD), VIX; EUR/RON official reference rate (BNR)'
 
-Output: 'ch5_sem_a1_forecast.pdf, ch5_sem_a1_recursion.pdf, ch5_sem_a3_halflife.pdf, ch5_sem_b1_diag.pdf, ch5_sem_b1_fit.pdf, ch5_sem_b2_nic.pdf, ch5_sem_b56_gwmcs.pdf, ch5_sem_b5_losses.pdf, ch5_sem_b5_mz.pdf, ch5_sem_b5_timeline.pdf, ch5_sem_b7_lr.pdf, ch5_sem_b7_persistence.pdf, ch5_sem_c1_alignment.pdf'
+Output: 'ch5_sem_a1_forecast.pdf, ch5_sem_a1_recursion.pdf, ch5_sem_a2_halflife.pdf, ch5_sem_b1_diag.pdf, ch5_sem_b1_fit.pdf, ch5_sem_b2_nic.pdf, ch5_sem_b4_lr.pdf, ch5_sem_b4_persistence.pdf, ch5_sem_b57_gwmcs.pdf, ch5_sem_b5_losses.pdf, ch5_sem_b5_mz.pdf, ch5_sem_b5_timeline.pdf, ch5_sem_c2_alignment.pdf'

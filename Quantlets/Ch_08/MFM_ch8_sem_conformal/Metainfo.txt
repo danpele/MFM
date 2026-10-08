@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch8_sem_conformal'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 8 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A1 Extended, A3, A5, A6, A7, A8, B1, B3, B5, B7 with code and output. The proposed exercises A2, A4, A9, A10, B2, B4, B6, B8, B9, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Seminar 8 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A1 Extended, A2, A3, A4, A7, A10, B1, B2, B3, B4 with code and output. The proposed exercises A5, A6, A8, A9, B5, B6, B7, B8, B9, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'conformal prediction, ACI, exchangeability, coverage, BET, Bitcoin'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily closes from the course data: S&P 500, BET, Bitcoin; EUR/RON: BNR reference rate'
 
-Output: 'ch8_sem_a8_aci.pdf, ch8_sem_b7_conformal.pdf, ch8_sem_conformal.pdf'
+Output: 'ch8_sem_a10_aci.pdf, ch8_sem_b4_conformal.pdf, ch8_sem_conformal.pdf'

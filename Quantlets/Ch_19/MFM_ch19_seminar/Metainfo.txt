@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch19_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 19 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A5, A7, A9, A11, B1, B3, B5, B7 with code and output. The proposed exercises A2, A4, A6, A8, A10, A12, B2, B4, B6, B8, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Seminar 19 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, A3, A5, A7, A11, B1, B2, B3, B4 with code and output. The proposed exercises A4, A6, A8, A9, A10, A12, B5, B6, B7, B8, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'Hill estimator, GARCH, profile likelihood, value-at-risk, expected shortfall, DQ test, model confidence set, Bitcoin, difference-in-differences, structural break, FTSE reclassification, BET'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily market data (course data): BET index (official closing values), Bitcoin, SPY'
 
-Output: 'ch19_sem_a11_kurtosis.pdf, ch19_sem_a3_forecast.pdf, ch19_sem_a7_power.pdf, ch19_sem_a9_pvalues.pdf, ch19_sem_b1_hill.pdf, ch19_sem_b3_profile.pdf, ch19_sem_b5_breaches.pdf, ch19_sem_b7_lookahead.pdf'
+Output: 'ch19_sem_a11_kurtosis.pdf, ch19_sem_a1_power.pdf, ch19_sem_a2_pvalues.pdf, ch19_sem_a5_forecast.pdf, ch19_sem_b1_hill.pdf, ch19_sem_b2_profile.pdf, ch19_sem_b3_breaches.pdf, ch19_sem_b4_lookahead.pdf'

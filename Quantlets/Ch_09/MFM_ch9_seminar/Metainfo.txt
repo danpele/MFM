@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch9_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 9 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A3 Extended, A5, A5 Extended, A6, A6 Extended, B1, B1 Extended, B3, B3 Extended, B5, B5 Extended with code and output. The proposed exercises A2, A2 Extended, A4, A7, A8, B2, B4, B6, B6 Extended, B7, B8, B9, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Seminar 9 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, A2 Extended, A4, A4 Extended, A5, A5 Extended, B1, B1 Extended, B2, B2 Extended, B3, B3 Extended with code and output. The proposed exercises A3, A3 Extended, A6, A7, A8, B4, B5, B6, B7, B7 Extended, B8, B9, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'realised variance, bipower variation, jumps, false discovery rate, microstructure noise, HAR-RV, HARQ, model confidence set, GARCH, block bootstrap, rough volatility, SPY, Bitcoin'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Course data: SPY and Bitcoin 5-minute bars; daily prices of SPY, Bitcoin and the CBOE VIX index'
 
-Output: 'ch9_sem_a1.pdf, ch9_sem_a3.pdf, ch9_sem_a5.pdf, ch9_sem_a6.pdf, ch9_sem_b1.pdf, ch9_sem_b3.pdf, ch9_sem_b5.pdf, ch9_sem_day.pdf, ch9_sem_frequency.pdf, ch9_sem_jump_times.pdf'
+Output: 'ch9_sem_a1.pdf, ch9_sem_a2.pdf, ch9_sem_a4.pdf, ch9_sem_a5.pdf, ch9_sem_b1.pdf, ch9_sem_b2.pdf, ch9_sem_b3.pdf, ch9_sem_day.pdf, ch9_sem_frequency.pdf, ch9_sem_jump_times.pdf'

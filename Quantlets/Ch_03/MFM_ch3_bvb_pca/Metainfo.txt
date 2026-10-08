@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch3_bvb_pca'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 3, B8: principal component analysis of ten Bucharest Stock Exchange blue chips (daily log returns from 2017) and the correlation of the first component with BET.'
+Description: 'Seminar 3, B10: principal component analysis of ten Bucharest Stock Exchange blue chips (daily log returns from 2017) and the correlation of the first component with BET.'
 
 Keywords: 'PCA, Bucharest Stock Exchange, BET, latent factors, Romania'
 

@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch11_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 11 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A4, A5, A7, A9, B1, B2, B4, B4 Extended, B6, B6 Extended with code and output. The proposed exercises A2, A6, A8, B3, B5, B7, B8, B8 Extended, B9, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Seminar 11 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, A3, A4, A6, A7, B1, B2, B2 Extended, B4, B5, B5 Extended with code and output. The proposed exercises A5, A8, A9, B3, B6, B7, B8, B8 Extended, B9, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'Ito's lemma, Vasicek, Merton, Heston, bootstrap, likelihood-ratio test, bias correction, BET, Bitcoin'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily market data (data/market): S&P 500, BET, Bitcoin, CBOE VIX; 3-month US Treasury bill rate (FRED series DTB3, Federal Reserve Bank of St. Louis)'
 
-Output: 'ch11_sem_a1_pq.pdf, ch11_sem_a3_yield.pdf, ch11_sem_a5_cir.pdf, ch11_sem_a78_jumps.pdf, ch11_sem_a9_freq.pdf, ch11_sem_b2_intervals.pdf, ch11_sem_b4_null.pdf, ch11_sem_b4x_fits.pdf, ch11_sem_b6_profile.pdf, ch11_sem_kappa_bias.pdf, ch11_sem_lr_boot.pdf'
+Output: 'ch11_sem_a1_freq.pdf, ch11_sem_a39_jumps.pdf, ch11_sem_a4_pq.pdf, ch11_sem_a6_yield.pdf, ch11_sem_a7_cir.pdf, ch11_sem_b1_intervals.pdf, ch11_sem_b2_null.pdf, ch11_sem_b2x_fits.pdf, ch11_sem_b5x_profile.pdf, ch11_sem_kappa_bias.pdf, ch11_sem_lr_boot.pdf'

@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch7_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 7 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, A2 Extended, A3, A5, A5 Extended, B1, B1 Extended, B2, B2 Extended with code and output. The proposed exercises A4, A4 Extended, A6, A7, A8, B3, B3 Extended, B4, B5, B5 Extended, B6, B7, C2 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Seminar 7 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, A2 Extended, A3, A5, A5 Extended, B1, B1 Extended, B4, B4 Extended with code and output. The proposed exercises A4, A4 Extended, A6, A7, A8, B2, B3, B3 Extended, B5, B5 Extended, B6, B7, C1 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'value-at-risk, expected shortfall, bootstrap, block bootstrap, generalized Pareto distribution, filtered historical simulation, Euler allocation, FRTB, BET, Bucharest Stock Exchange, Bitcoin'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily market data of the course: S&P 500, BET, Bitcoin, gold (USD per troy ounce), SPY, TLT, GLD and eight Bucharest Stock Exchange blue chips; EUR/RON official reference rate of the National Bank of Romania'
 
-Output: 'ch7_sem_a1a2_tails.pdf, ch7_sem_a3_mass.pdf, ch7_sem_a5_shares.pdf, ch7_sem_b1_ci.pdf, ch7_sem_b2_clusters.pdf, ch7_sem_bet_data.pdf, ch7_sem_bet_gpd.pdf, ch7_sem_bet_hs.pdf'
+Output: 'ch7_sem_a1a2_tails.pdf, ch7_sem_a3_mass.pdf, ch7_sem_a5_shares.pdf, ch7_sem_b1_ci.pdf, ch7_sem_b4_clusters.pdf, ch7_sem_bet_data.pdf, ch7_sem_bet_gpd.pdf, ch7_sem_bet_hs.pdf'

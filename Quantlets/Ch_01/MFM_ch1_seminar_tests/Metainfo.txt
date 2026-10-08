@@ -12,4 +12,4 @@ Submitted: 'Monday, 21 September 2026'
 
 Datafile: 'Daily market data of the course: S&P 500, SPY, BET-TR, Bitcoin, BVB blue chips; EUR/RON official reference rate'
 
-Output: 'ch1_sem_a1_path.pdf, ch1_sem_a3_chi2.pdf, ch1_sem_a4_mixture.pdf, ch1_sem_a5_hill.pdf, ch1_sem_a8_ohlc.pdf, ch1_sem_b1_sensitivity.pdf, ch1_sem_b3_acf.pdf, ch1_sem_first_look.pdf, ch1_sem_hill_tails.pdf, ch1_sem_robust_acf.pdf'
+Output: 'ch1_sem_a1_path.pdf, ch1_sem_a3_chi2.pdf, ch1_sem_a4_mixture.pdf, ch1_sem_a5_hill.pdf, ch1_sem_a8_ohlc.pdf, ch1_sem_b1_sensitivity.pdf, ch1_sem_b3_acf.pdf, ch1_sem_hill_tails.pdf, ch1_sem_robust_acf.pdf'

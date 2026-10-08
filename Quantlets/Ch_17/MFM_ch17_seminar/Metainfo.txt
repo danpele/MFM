@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch17_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 17 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A5, A7, B1, B3, B5, B7, B9 with code and output. The proposed exercises A2, A4, A6, A8, B2, B4, B6, B8, B10, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Seminar 17 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, A3, A7, B1, B2, B3, B4, B8 with code and output. The proposed exercises A4, A5, A6, A8, B5, B6, B7, B9, B10, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'bubbles, GSADF, wild bootstrap, LPPLS, Markov switching, BET, BET-FI, Bitcoin, NVIDIA, Cisco, AI bubble'
 
@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily market data (data/market): Nasdaq 100, S&P 500, BET, BET-FI, Bitcoin, Ethereum, Dogecoin, NVIDIA, Cisco, Tesla, GameStop, Strategy; S&P Composite monthly since 1871 (Robert J. Shiller); 49 US industry portfolios (Kenneth French Data Library)'
 
-Output: 'ch17_sem_a1.pdf, ch17_sem_a3.pdf, ch17_sem_a5.pdf, ch17_sem_a7.pdf, ch17_sem_b1.pdf, ch17_sem_b9.pdf, ch17_sem_btc_wild.pdf, ch17_sem_data.pdf, ch17_sem_ms_sp.pdf, ch17_sem_tc_windows.pdf'
+Output: 'ch17_sem_a1.pdf, ch17_sem_a2.pdf, ch17_sem_a3.pdf, ch17_sem_a7.pdf, ch17_sem_b1.pdf, ch17_sem_b8.pdf, ch17_sem_btc_wild.pdf, ch17_sem_data.pdf, ch17_sem_ms_sp.pdf, ch17_sem_tc_windows.pdf'

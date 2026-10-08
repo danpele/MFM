@@ -67,103 +67,103 @@
 408.2,
 160.5
 ],
-"ch0_sem_a2_drawdown": [
+"ch0_sem_a4_drawdown": [
 408.2,
 161.9
 ],
-"ch0_sem_a5_drag": [
+"ch0_sem_a8_drag": [
 408.2,
 160.2
 ],
-"ch0_sem_a6_acf": [
+"ch0_sem_a9_acf": [
 408.2,
 160.2
 ],
-"ch0_sem_a7_weekly": [
+"ch0_sem_a11_weekly": [
 408.2,
 160.2
 ],
-"ch0_sem_a8_se_span": [
+"ch0_sem_a10_se_span": [
 408.2,
 160.2
 ],
-"ch0_sem_a9_leadlag": [
+"ch0_sem_a12_leadlag": [
 408.2,
 160.2
 ],
-"ch0_sem_b10_growth": [
+"ch0_sem_b4_growth": [
 236.7,
 124.3
 ],
-"ch0_sem_b10_underwater": [
+"ch0_sem_b4_underwater": [
 269.4,
 132.3
 ],
-"ch0_sem_b1_growth": [
+"ch0_sem_b2_growth": [
 408.2,
 138.5
 ],
-"ch0_sem_b1_growth3": [
+"ch0_sem_b2_growth3": [
 408.2,
 139.2
 ],
-"ch0_sem_b1_underwater3": [
+"ch0_sem_b2_underwater3": [
 408.2,
 139.2
 ],
-"ch0_sem_b1_vol": [
+"ch0_sem_b2_vol": [
 408.2,
 147.7
 ],
-"ch0_sem_b1x_diff": [
+"ch0_sem_b2x_diff": [
 408.2,
 160.2
 ],
-"ch0_sem_b1x_sharpe": [
+"ch0_sem_b2x_sharpe": [
 302.1,
 131.0
 ],
-"ch0_sem_b2_underwater": [
+"ch0_sem_b5_underwater": [
 408.2,
 162.0
 ],
-"ch0_sem_b2x_distributions": [
+"ch0_sem_b5x_distributions": [
 408.2,
 160.2
 ],
-"ch0_sem_b3_rolling": [
+"ch0_sem_b6_rolling": [
 408.2,
 147.7
 ],
-"ch0_sem_b3x_change": [
+"ch0_sem_b6x_change": [
 408.2,
 160.2
 ],
-"ch0_sem_b4_supply": [
+"ch0_sem_b10_supply": [
 244.9,
 104.8
 ],
-"ch0_sem_b4x_break": [
+"ch0_sem_b10x_break": [
 408.2,
 160.2
 ],
-"ch0_sem_b5_currency": [
+"ch0_sem_b9_currency": [
 285.7,
 123.6
 ],
-"ch0_sem_b6_audit": [
+"ch0_sem_b1_audit": [
 408.2,
 160.2
 ],
-"ch0_sem_b6_raw": [
+"ch0_sem_b1_raw": [
 408.2,
 161.9
 ],
-"ch0_sem_b6_spike": [
+"ch0_sem_b1_spike": [
 269.4,
 122.4
 ],
-"ch0_sem_b6x_calibration": [
+"ch0_sem_b1x_calibration": [
 408.2,
 160.2
 ],
@@ -175,7 +175,7 @@
 195.9,
 131.9
 ],
-"ch0_sem_b9_quotes": [
+"ch0_sem_b3_quotes": [
 204.1,
 143.9
 ],
@@ -183,11 +183,11 @@
 408.2,
 160.2
 ],
-"ch0_sem_c1_correlation": [
+"ch0_sem_c2_correlation": [
 408.2,
 160.2
 ],
-"ch0_sem_c2_correction": [
+"ch0_sem_c1_correction": [
 212.3,
 142.2
 ],
@@ -327,11 +327,11 @@
 408.2,
 160.2
 ],
-"ch10_sem_c1": [
+"ch10_sem_c2": [
 408.2,
 160.2
 ],
-"ch10_sem_c2_roundtrip": [
+"ch10_sem_c1_roundtrip": [
 405.7,
 76.3
 ],
@@ -451,31 +451,31 @@
 408.2,
 160.5
 ],
-"ch11_sem_a1_pq": [
+"ch11_sem_a4_pq": [
 200.0,
 144.7
 ],
-"ch11_sem_a3_yield": [
+"ch11_sem_a6_yield": [
 408.2,
 116.6
 ],
-"ch11_sem_a5_cir": [
+"ch11_sem_a7_cir": [
 408.2,
 160.2
 ],
-"ch11_sem_a6_affine": [
+"ch11_sem_a8_affine": [
 408.2,
 160.2
 ],
-"ch11_sem_a78_jumps": [
+"ch11_sem_a39_jumps": [
 408.2,
 160.2
 ],
-"ch11_sem_a9_freq": [
+"ch11_sem_a1_freq": [
 408.2,
 161.9
 ],
-"ch11_sem_b2_intervals": [
+"ch11_sem_b1_intervals": [
 408.2,
 160.5
 ],
@@ -483,15 +483,15 @@
 408.2,
 162.0
 ],
-"ch11_sem_b4_null": [
+"ch11_sem_b2_null": [
 408.2,
 160.5
 ],
-"ch11_sem_b4x_fits": [
+"ch11_sem_b2x_fits": [
 408.2,
 160.2
 ],
-"ch11_sem_b6_profile": [
+"ch11_sem_b5x_profile": [
 408.2,
 160.2
 ],
@@ -507,11 +507,11 @@
 408.2,
 160.2
 ],
-"ch11_sem_c1_q": [
+"ch11_sem_c2_q": [
 408.2,
 160.2
 ],
-"ch11_sem_c2_ai": [
+"ch11_sem_c1_ai": [
 408.2,
 160.8
 ],
@@ -583,19 +583,19 @@
 204.1,
 155.0
 ],
-"ch12_sem_a1_butterfly": [
+"ch12_sem_a3_butterfly": [
 195.9,
 150.2
 ],
-"ch12_sem_a4_crr": [
+"ch12_sem_a6_crr": [
 187.8,
 143.2
 ],
-"ch12_sem_a5_greeks": [
+"ch12_sem_a1_greeks": [
 375.5,
 120.6
 ],
-"ch12_sem_a7_newton": [
+"ch12_sem_a2_newton": [
 408.2,
 160.5
 ],
@@ -603,19 +603,19 @@
 195.9,
 147.6
 ],
-"ch12_sem_b2_cum": [
+"ch12_sem_b5_cum": [
 204.1,
 144.4
 ],
-"ch12_sem_b4_strip": [
+"ch12_sem_b6_strip": [
 195.9,
 149.9
 ],
-"ch12_sem_b5_vrp": [
+"ch12_sem_b2_vrp": [
 408.2,
 160.5
 ],
-"ch12_sem_b6_ellipse": [
+"ch12_sem_b3_ellipse": [
 408.2,
 162.0
 ],
@@ -735,7 +735,7 @@
 408.2,
 161.9
 ],
-"ch13_sem_a10_delong": [
+"ch13_sem_a9_delong": [
 408.2,
 115.1
 ],
@@ -743,59 +743,59 @@
 408.2,
 160.5
 ],
-"ch13_sem_a2_adf": [
+"ch13_sem_a5_adf": [
 220.4,
 148.7
 ],
-"ch13_sem_a3_paths": [
+"ch13_sem_a2_paths": [
 220.4,
 146.0
 ],
-"ch13_sem_a3_task": [
+"ch13_sem_a2_task": [
 208.2,
 142.4
 ],
-"ch13_sem_a4_paths": [
+"ch13_sem_a6_paths": [
 212.3,
 140.7
 ],
-"ch13_sem_a5_dsr": [
+"ch13_sem_a4_dsr": [
 408.2,
 160.5
 ],
-"ch13_sem_a6_dsr": [
+"ch13_sem_a10_dsr": [
 408.2,
 160.2
 ],
-"ch13_sem_a6_gumbel": [
+"ch13_sem_a10_gumbel": [
 408.2,
 160.2
 ],
-"ch13_sem_a7_purge": [
+"ch13_sem_a3_purge": [
 408.2,
 161.9
 ],
-"ch13_sem_a7_task": [
+"ch13_sem_a3_task": [
 187.8,
 150.7
 ],
-"ch13_sem_a8_purge": [
+"ch13_sem_a7_purge": [
 408.2,
 160.2
 ],
-"ch13_sem_a9_auc": [
+"ch13_sem_a8_auc": [
 408.2,
 160.2
 ],
-"ch13_sem_b10_grid": [
+"ch13_sem_b6_grid": [
 408.2,
 160.8
 ],
-"ch13_sem_b11_pbo": [
+"ch13_sem_b12_pbo": [
 408.2,
 160.2
 ],
-"ch13_sem_b12_pt": [
+"ch13_sem_b10_pt": [
 408.2,
 160.2
 ],
@@ -807,51 +807,51 @@
 408.2,
 160.2
 ],
-"ch13_sem_b1_memory": [
+"ch13_sem_b5_memory": [
 408.2,
 160.8
 ],
-"ch13_sem_b2_eth": [
+"ch13_sem_b7_eth": [
 408.2,
 160.2
 ],
-"ch13_sem_b3_barriers": [
+"ch13_sem_b1_barriers": [
 408.2,
 161.9
 ],
-"ch13_sem_b4_asym": [
+"ch13_sem_b8_asym": [
 212.3,
 147.7
 ],
-"ch13_sem_b5_cv": [
+"ch13_sem_b2_cv": [
 408.2,
 161.9
 ],
-"ch13_sem_b6_leak": [
+"ch13_sem_b9_leak": [
 408.2,
 160.2
 ],
-"ch13_sem_b7_auc": [
+"ch13_sem_b3_auc": [
 408.2,
 160.5
 ],
-"ch13_sem_b7_importance": [
+"ch13_sem_b3_importance": [
 408.2,
 160.2
 ],
-"ch13_sem_b7_models": [
+"ch13_sem_b3_models": [
 408.2,
 160.5
 ],
-"ch13_sem_b8_dm": [
+"ch13_sem_b4_dm": [
 408.2,
 160.5
 ],
-"ch13_sem_b9_meta": [
+"ch13_sem_b11_meta": [
 408.2,
 160.2
 ],
-"ch13_sem_c2_fix": [
+"ch13_sem_c1_fix": [
 408.2,
 160.7
 ],
@@ -947,7 +947,7 @@
 228.6,
 143.8
 ],
-"ch14_sem_a1_norms": [
+"ch14_sem_a4_norms": [
 179.6,
 132.2
 ],
@@ -955,11 +955,11 @@
 179.6,
 132.2
 ],
-"ch14_sem_a5_grid": [
+"ch14_sem_a1_grid": [
 179.6,
 132.2
 ],
-"ch14_sem_a8_binom": [
+"ch14_sem_a2_binom": [
 179.6,
 132.2
 ],
@@ -967,11 +967,11 @@
 179.6,
 130.8
 ],
-"ch14_sem_b10_conformal": [
+"ch14_sem_b7_conformal": [
 220.4,
 130.8
 ],
-"ch14_sem_b11_prepost": [
+"ch14_sem_b8_prepost": [
 405.7,
 97.1
 ],
@@ -979,27 +979,27 @@
 212.3,
 131.1
 ],
-"ch14_sem_b2_r2": [
+"ch14_sem_b4_r2": [
 408.2,
 162.0
 ],
-"ch14_sem_b3_qlike": [
+"ch14_sem_b2_qlike": [
 408.2,
 160.5
 ],
-"ch14_sem_b4_context": [
+"ch14_sem_b9_context": [
 408.2,
 160.2
 ],
-"ch14_sem_b5_breaches": [
+"ch14_sem_b3_breaches": [
 220.4,
 131.1
 ],
-"ch14_sem_b6_var10": [
+"ch14_sem_b5_var10": [
 220.4,
 130.8
 ],
-"ch14_sem_b7_seeds": [
+"ch14_sem_b11_seeds": [
 220.4,
 130.8
 ],
@@ -1103,19 +1103,19 @@
 408.2,
 160.7
 ],
-"ch15_sem_a2_attenuation": [
+"ch15_sem_a4_attenuation": [
 408.2,
 160.2
 ],
-"ch15_sem_a3_power": [
+"ch15_sem_a2_power": [
 195.9,
 150.0
 ],
-"ch15_sem_a4_power": [
+"ch15_sem_a6_power": [
 408.2,
 160.2
 ],
-"ch15_sem_a7_cost": [
+"ch15_sem_a3_cost": [
 408.2,
 160.7
 ],
@@ -1123,7 +1123,7 @@
 408.2,
 160.2
 ],
-"ch15_sem_b10_pvalues": [
+"ch15_sem_b9_pvalues": [
 408.2,
 160.2
 ],
@@ -1131,23 +1131,23 @@
 326.6,
 110.9
 ],
-"ch15_sem_b2_pairs": [
+"ch15_sem_b4_pairs": [
 408.2,
 162.0
 ],
-"ch15_sem_b3_leakage": [
+"ch15_sem_b5_leakage": [
 204.1,
 106.3
 ],
-"ch15_sem_b6_event": [
+"ch15_sem_b11_event": [
 408.2,
 160.2
 ],
-"ch15_sem_b7_perm": [
+"ch15_sem_b3_perm": [
 212.3,
 146.3
 ],
-"ch15_sem_b8_prompts": [
+"ch15_sem_b7_prompts": [
 408.2,
 160.2
 ],
@@ -1251,43 +1251,43 @@
 212.3,
 150.7
 ],
-"ch16_sem_a3_profit": [
+"ch16_sem_a2_profit": [
 212.3,
 157.9
 ],
-"ch16_sem_a5_il": [
+"ch16_sem_a6_il": [
 212.3,
 152.8
 ],
-"ch16_sem_a7_path": [
+"ch16_sem_a3_path": [
 212.3,
 150.4
 ],
-"ch16_sem_b2_vol": [
+"ch16_sem_b7_vol": [
 285.7,
 124.3
 ],
-"ch16_sem_b4_tar": [
+"ch16_sem_b6_tar": [
 236.8,
 160.0
 ],
-"ch16_sem_b5_ratio": [
+"ch16_sem_b2_ratio": [
 408.2,
 160.5
 ],
-"ch16_sem_b6_ratio": [
+"ch16_sem_b8_ratio": [
 408.2,
 160.2
 ],
-"ch16_sem_b7_break": [
+"ch16_sem_b3_break": [
 212.3,
 116.4
 ],
-"ch16_sem_b8_break": [
+"ch16_sem_b4_break": [
 244.9,
 134.4
 ],
-"ch16_sem_c2_correction": [
+"ch16_sem_c1_correction": [
 408.2,
 160.8
 ],
@@ -1395,7 +1395,7 @@
 408.2,
 160.7
 ],
-"ch17_sem_a2": [
+"ch17_sem_a4": [
 408.2,
 160.2
 ],
@@ -1403,11 +1403,11 @@
 236.8,
 122.4
 ],
-"ch17_sem_a4": [
+"ch17_sem_a5": [
 228.6,
 122.4
 ],
-"ch17_sem_a5": [
+"ch17_sem_a2": [
 408.2,
 109.1
 ],
@@ -1431,15 +1431,15 @@
 402.2,
 148.0
 ],
+"ch17_sem_b9": [
+408.2,
+160.2
+],
 "ch17_sem_b10": [
 408.2,
 160.2
 ],
-"ch17_sem_b2": [
-408.2,
-160.2
-],
-"ch17_sem_b9": [
+"ch17_sem_b8": [
 405.7,
 97.1
 ],
@@ -1547,23 +1547,11 @@
 408.2,
 160.5
 ],
-"ch18_sem_b10": [
-408.2,
-160.2
-],
-"ch18_sem_b2": [
-408.2,
-160.5
-],
-"ch18_sem_b3": [
+"ch18_sem_b5": [
 408.2,
 160.2
 ],
 "ch18_sem_b4": [
-408.2,
-160.2
-],
-"ch18_sem_b5": [
 408.2,
 160.5
 ],
@@ -1575,11 +1563,23 @@
 408.2,
 160.2
 ],
+"ch18_sem_b2": [
+408.2,
+160.5
+],
 "ch18_sem_b8": [
 408.2,
 160.2
 ],
-"ch18_sem_c1": [
+"ch18_sem_b9": [
+408.2,
+160.2
+],
+"ch18_sem_b10": [
+408.2,
+160.2
+],
+"ch18_sem_c3": [
 408.2,
 160.2
 ],
@@ -1655,15 +1655,15 @@
 191.8,
 154.2
 ],
-"ch19_sem_a3_forecast": [
+"ch19_sem_a5_forecast": [
 408.2,
 160.2
 ],
-"ch19_sem_a7_power": [
+"ch19_sem_a1_power": [
 191.8,
 155.5
 ],
-"ch19_sem_a9_pvalues": [
+"ch19_sem_a2_pvalues": [
 191.8,
 157.8
 ],
@@ -1671,23 +1671,23 @@
 408.2,
 160.9
 ],
-"ch19_sem_b2_hill": [
+"ch19_sem_b7_hill": [
 191.8,
 150.4
 ],
-"ch19_sem_b3_profile": [
+"ch19_sem_b2_profile": [
 191.8,
 162.3
 ],
-"ch19_sem_b4_nic": [
+"ch19_sem_b5_nic": [
 191.8,
 157.6
 ],
-"ch19_sem_b5_breaches": [
+"ch19_sem_b3_breaches": [
 191.8,
 150.4
 ],
-"ch19_sem_b7_lookahead": [
+"ch19_sem_b4_lookahead": [
 191.8,
 152.1
 ],
@@ -1695,7 +1695,7 @@
 191.8,
 149.3
 ],
-"ch19_sem_c1_did": [
+"ch19_sem_c2_did": [
 191.8,
 151.2
 ],
@@ -1763,7 +1763,7 @@
 408.2,
 160.5
 ],
-"ch1_sem_a2_vr": [
+"ch1_sem_a7_vr": [
 204.1,
 148.3
 ],
@@ -1771,47 +1771,47 @@
 375.5,
 135.3
 ],
-"ch1_sem_a4_brownian": [
+"ch1_sem_a2_brownian": [
 212.3,
 155.3
 ],
-"ch1_sem_a4_drawdown": [
+"ch1_sem_a2_drawdown": [
 236.8,
 163.0
 ],
-"ch1_sem_a5_ohlc": [
+"ch1_sem_a8_ohlc": [
 408.2,
 160.2
 ],
-"ch1_sem_a6_mixture": [
+"ch1_sem_a4_mixture": [
 375.5,
 135.3
 ],
-"ch1_sem_a7_hill": [
+"ch1_sem_a5_hill": [
 375.5,
 122.7
 ],
-"ch1_sem_a8_regimes": [
+"ch1_sem_a9_regimes": [
 391.9,
 164.6
 ],
-"ch1_sem_a9_garch": [
+"ch1_sem_a10_garch": [
 391.9,
 164.6
 ],
-"ch1_sem_b12_response": [
+"ch1_sem_b10_response": [
 391.9,
 164.6
 ],
-"ch1_sem_b13_bootstrap": [
+"ch1_sem_b14_bootstrap": [
 302.1,
 135.0
 ],
-"ch1_sem_b14_facts": [
+"ch1_sem_b8_facts": [
 302.1,
 107.2
 ],
-"ch1_sem_b15_memory": [
+"ch1_sem_b12_memory": [
 391.9,
 164.6
 ],
@@ -1827,19 +1827,19 @@
 405.2,
 152.3
 ],
-"ch1_sem_b4_qq": [
+"ch1_sem_b5_qq": [
 391.9,
 164.9
 ],
-"ch1_sem_b6_regimes": [
+"ch1_sem_b11_regimes": [
 391.9,
 164.6
 ],
-"ch1_sem_b7_wealth": [
+"ch1_sem_b13_wealth": [
 408.2,
 160.2
 ],
-"ch1_sem_b8_index_spy": [
+"ch1_sem_b15_index_spy": [
 220.4,
 142.2
 ],
@@ -1847,7 +1847,7 @@
 408.2,
 121.3
 ],
-"ch1_sem_c2_acf": [
+"ch1_sem_c1_acf": [
 375.5,
 122.9
 ],
@@ -1927,15 +1927,15 @@
 175.5,
 139.6
 ],
-"ch20_sem_a5_phi": [
+"ch20_sem_a7_phi": [
 212.3,
 139.3
 ],
-"ch20_sem_a7_qlike": [
+"ch20_sem_a2_qlike": [
 187.8,
 139.6
 ],
-"ch20_sem_a9_weights": [
+"ch20_sem_a3_weights": [
 187.8,
 139.6
 ],
@@ -1943,23 +1943,23 @@
 236.8,
 139.6
 ],
-"ch20_sem_b2_levy": [
+"ch20_sem_b5_levy": [
 220.4,
 139.3
 ],
-"ch20_sem_b3_coef": [
+"ch20_sem_b2_coef": [
 408.2,
 160.5
 ],
-"ch20_sem_b4_coef": [
+"ch20_sem_b6_coef": [
 408.2,
 160.2
 ],
-"ch20_sem_b6_cumloss": [
+"ch20_sem_b7_cumloss": [
 220.4,
 139.3
 ],
-"ch20_sem_b7_pvalues": [
+"ch20_sem_b4_pvalues": [
 236.8,
 139.6
 ],
@@ -2051,19 +2051,19 @@
 408.2,
 160.5
 ],
-"ch2_sem_a2": [
-408.2,
-160.2
-],
-"ch2_sem_a3": [
-408.2,
-160.2
-],
 "ch2_sem_a4": [
 408.2,
 160.2
 ],
-"ch2_sem_a56": [
+"ch2_sem_a5": [
+408.2,
+160.2
+],
+"ch2_sem_a6": [
+408.2,
+160.2
+],
+"ch2_sem_a23": [
 408.2,
 160.5
 ],
@@ -2075,27 +2075,27 @@
 408.2,
 126.7
 ],
-"ch2_sem_b2": [
+"ch2_sem_b7": [
 408.2,
 160.2
 ],
-"ch2_sem_b3_rolling": [
+"ch2_sem_b5_rolling": [
 408.2,
 160.7
 ],
-"ch2_sem_b3_window": [
+"ch2_sem_b5_window": [
 408.2,
 127.0
 ],
-"ch2_sem_b5": [
+"ch2_sem_b3": [
 408.2,
 127.8
 ],
-"ch2_sem_b6": [
+"ch2_sem_b4": [
 408.2,
 161.9
 ],
-"ch2_sem_b7": [
+"ch2_sem_b2": [
 408.2,
 110.0
 ],
@@ -2107,7 +2107,7 @@
 408.2,
 160.2
 ],
-"ch2_sem_c1": [
+"ch2_sem_c2": [
 408.2,
 160.2
 ],
@@ -2179,11 +2179,11 @@
 404.0,
 114.5
 ],
-"ch3_sem_a1_sml": [
+"ch3_sem_a2_sml": [
 408.2,
 161.9
 ],
-"ch3_sem_a2_grs": [
+"ch3_sem_a4_grs": [
 408.2,
 160.2
 ],
@@ -2191,19 +2191,19 @@
 408.2,
 160.5
 ],
-"ch3_sem_a4_blume": [
+"ch3_sem_a5_blume": [
 408.2,
 160.2
 ],
-"ch3_sem_a5_pvalues": [
+"ch3_sem_a1_pvalues": [
 236.8,
 127.8
 ],
-"ch3_sem_a6_useless": [
+"ch3_sem_a7_useless": [
 408.2,
 160.2
 ],
-"ch3_sem_a7_eiv": [
+"ch3_sem_a6_eiv": [
 212.3,
 144.9
 ],
@@ -2211,11 +2211,11 @@
 195.9,
 145.6
 ],
-"ch3_sem_b10_sharpe": [
+"ch3_sem_b8_sharpe": [
 408.2,
 160.2
 ],
-"ch3_sem_b11_boot": [
+"ch3_sem_b7_boot": [
 408.2,
 160.2
 ],
@@ -2239,19 +2239,19 @@
 408.2,
 160.2
 ],
-"ch3_sem_b6_alpha": [
+"ch3_sem_b11_alpha": [
 408.2,
 160.2
 ],
-"ch3_sem_b7_alphas": [
+"ch3_sem_b9_alphas": [
 408.2,
 160.2
 ],
-"ch3_sem_b8_bvb_pca": [
+"ch3_sem_b10_bvb_pca": [
 408.2,
 160.2
 ],
-"ch3_sem_b9_lns": [
+"ch3_sem_b6_lns": [
 408.2,
 160.2
 ],
@@ -2259,7 +2259,7 @@
 408.2,
 160.2
 ],
-"ch3_sem_c2_correction": [
+"ch3_sem_c1_correction": [
 408.2,
 160.8
 ],
@@ -2323,31 +2323,31 @@
 408.2,
 161.9
 ],
-"ch4_sem_a3_erc": [
+"ch4_sem_a2_erc": [
 408.2,
 140.8
 ],
-"ch4_sem_a4_6040": [
+"ch4_sem_a3_6040": [
 228.6,
 153.7
 ],
-"ch4_sem_a5_bl": [
+"ch4_sem_a6_bl": [
 408.2,
 160.2
 ],
-"ch4_sem_a6_bl_sectors": [
+"ch4_sem_a7_bl_sectors": [
 228.6,
 147.2
 ],
-"ch4_sem_a7_normal": [
+"ch4_sem_a4_normal": [
 204.1,
 149.6
 ],
-"ch4_sem_a8_intervals": [
+"ch4_sem_a5_intervals": [
 408.2,
 160.5
 ],
-"ch4_sem_a9_bias": [
+"ch4_sem_a8_bias": [
 408.2,
 160.2
 ],
@@ -2363,43 +2363,43 @@
 408.2,
 143.8
 ],
-"ch4_sem_b2_varratio": [
+"ch4_sem_b3_varratio": [
 408.2,
 160.5
 ],
-"ch4_sem_b2x_eigen": [
+"ch4_sem_b3x_eigen": [
 228.6,
 155.8
 ],
-"ch4_sem_b3_sectors": [
+"ch4_sem_b4_sectors": [
 408.2,
 160.5
 ],
-"ch4_sem_b3_worked": [
+"ch4_sem_b4_worked": [
 408.2,
 160.5
 ],
-"ch4_sem_b4_shrink": [
+"ch4_sem_b7_shrink": [
 408.2,
 160.2
 ],
-"ch4_sem_b5_btc": [
+"ch4_sem_b8_btc": [
 228.6,
 151.8
 ],
-"ch4_sem_b6_hrp_gmv": [
+"ch4_sem_b9_hrp_gmv": [
 408.2,
 160.2
 ],
-"ch4_sem_b7_bl_multi": [
+"ch4_sem_b5_bl_multi": [
 228.6,
 149.6
 ],
-"ch4_sem_b8_breakeven": [
+"ch4_sem_b2_breakeven": [
 228.6,
 153.2
 ],
-"ch4_sem_b9_bj": [
+"ch4_sem_b6_bj": [
 408.2,
 160.2
 ],
@@ -2407,11 +2407,11 @@
 408.2,
 160.2
 ],
-"ch4_sem_c1_tests": [
+"ch4_sem_c2_tests": [
 228.6,
 150.7
 ],
-"ch4_sem_c2_correction": [
+"ch4_sem_c1_correction": [
 408.2,
 160.8
 ],
@@ -2495,11 +2495,11 @@
 391.9,
 131.3
 ],
-"ch5_sem_a2_skewt": [
+"ch5_sem_a3_skewt": [
 408.2,
 160.2
 ],
-"ch5_sem_a3_halflife": [
+"ch5_sem_a2_halflife": [
 408.2,
 160.2
 ],
@@ -2531,11 +2531,11 @@
 408.2,
 160.5
 ],
-"ch5_sem_b4_btc": [
+"ch5_sem_b6_btc": [
 408.2,
 160.2
 ],
-"ch5_sem_b56_gwmcs": [
+"ch5_sem_b57_gwmcs": [
 391.9,
 130.8
 ],
@@ -2551,19 +2551,19 @@
 408.2,
 160.2
 ],
-"ch5_sem_b6_losses": [
+"ch5_sem_b7_losses": [
 408.2,
 160.2
 ],
-"ch5_sem_b6_mz": [
+"ch5_sem_b7_mz": [
 408.2,
 160.2
 ],
-"ch5_sem_b7_lr": [
+"ch5_sem_b4_lr": [
 408.2,
 160.2
 ],
-"ch5_sem_b7_persistence": [
+"ch5_sem_b4_persistence": [
 244.9,
 158.3
 ],
@@ -2571,11 +2571,11 @@
 408.2,
 160.2
 ],
-"ch5_sem_c1_alignment": [
+"ch5_sem_c2_alignment": [
 391.9,
 130.8
 ],
-"ch5_sem_c1_decomp": [
+"ch5_sem_c2_decomp": [
 408.2,
 160.2
 ],
@@ -2683,11 +2683,11 @@
 183.7,
 147.7
 ],
-"ch6_sem_a3_curve": [
+"ch6_sem_a1_curve": [
 408.2,
 160.5
 ],
-"ch6_sem_a3_se": [
+"ch6_sem_a1_se": [
 171.4,
 147.7
 ],
@@ -2723,11 +2723,11 @@
 212.3,
 148.0
 ],
-"ch6_sem_b3_tails": [
+"ch6_sem_b4_tails": [
 212.3,
 149.4
 ],
-"ch6_sem_b4_windows": [
+"ch6_sem_b3_windows": [
 408.2,
 160.5
 ],
@@ -2739,7 +2739,7 @@
 224.5,
 147.7
 ],
-"ch6_sem_c1_change": [
+"ch6_sem_c2_change": [
 408.2,
 162.0
 ],
@@ -2863,7 +2863,7 @@
 383.7,
 105.7
 ],
-"ch7_sem_b2_clusters": [
+"ch7_sem_b4_clusters": [
 408.2,
 160.2
 ],
@@ -2871,7 +2871,7 @@
 383.7,
 139.3
 ],
-"ch7_sem_b4_methods": [
+"ch7_sem_b6_methods": [
 408.2,
 160.2
 ],
@@ -2883,7 +2883,7 @@
 383.7,
 139.8
 ],
-"ch7_sem_b6_ci": [
+"ch7_sem_b2_ci": [
 383.7,
 139.6
 ],
@@ -2907,11 +2907,11 @@
 408.2,
 160.5
 ],
-"ch7_sem_c1_stress": [
+"ch7_sem_c2_stress": [
 383.7,
 139.3
 ],
-"ch7_sem_c2_horizon": [
+"ch7_sem_c1_horizon": [
 383.7,
 139.8
 ],
@@ -3003,7 +3003,7 @@
 236.8,
 162.4
 ],
-"ch8_sem_a10_h": [
+"ch8_sem_a9_h": [
 302.1,
 130.3
 ],
@@ -3011,35 +3011,35 @@
 408.2,
 160.5
 ],
-"ch8_sem_a2_power": [
+"ch8_sem_a5_power": [
 236.8,
 159.3
 ],
-"ch8_sem_a3_bet": [
+"ch8_sem_a2_bet": [
 408.2,
 160.5
 ],
-"ch8_sem_a4_dq": [
+"ch8_sem_a6_dq": [
 236.8,
 162.2
 ],
-"ch8_sem_a5_zones": [
+"ch8_sem_a3_zones": [
 212.3,
 146.5
 ],
-"ch8_sem_a6_scores": [
+"ch8_sem_a7_scores": [
 310.2,
 133.7
 ],
-"ch8_sem_a7_z2": [
+"ch8_sem_a4_z2": [
 408.2,
 160.5
 ],
-"ch8_sem_a8_aci": [
+"ch8_sem_a10_aci": [
 408.2,
 160.2
 ],
-"ch8_sem_a9_mass": [
+"ch8_sem_a8_mass": [
 408.2,
 160.2
 ],
@@ -3055,19 +3055,19 @@
 310.2,
 122.6
 ],
-"ch8_sem_b4_null": [
+"ch8_sem_b7_null": [
 408.2,
 160.2
 ],
-"ch8_sem_b5_dm": [
+"ch8_sem_b2_dm": [
 408.2,
 160.7
 ],
-"ch8_sem_b6_mcs": [
+"ch8_sem_b8_mcs": [
 408.2,
 160.2
 ],
-"ch8_sem_b7_conformal": [
+"ch8_sem_b4_conformal": [
 408.2,
 160.6
 ],
@@ -3075,7 +3075,7 @@
 204.1,
 149.6
 ],
-"ch8_sem_c2_lookahead": [
+"ch8_sem_c1_lookahead": [
 236.8,
 157.2
 ],
@@ -3175,23 +3175,11 @@
 408.2,
 160.5
 ],
-"ch9_sem_a2": [
+"ch9_sem_a3": [
 408.2,
 127.0
 ],
-"ch9_sem_a3": [
-408.2,
-160.5
-],
-"ch9_sem_a4": [
-408.2,
-160.2
-],
-"ch9_sem_a5": [
-408.2,
-160.5
-],
-"ch9_sem_a6": [
+"ch9_sem_a2": [
 408.2,
 160.5
 ],
@@ -3199,15 +3187,35 @@
 408.2,
 160.2
 ],
-"ch9_sem_a8": [
+"ch9_sem_a4": [
 408.2,
 160.5
 ],
-"ch9_sem_b1": [
+"ch9_sem_a5": [
+408.2,
+160.5
+],
+"ch9_sem_a8": [
 408.2,
 160.2
 ],
+"ch9_sem_a6": [
+408.2,
+160.5
+],
 "ch9_sem_b2": [
+408.2,
+160.2
+],
+"ch9_sem_b4": [
+408.2,
+160.2
+],
+"ch9_sem_b1": [
+408.2,
+160.5
+],
+"ch9_sem_b5": [
 408.2,
 160.2
 ],
@@ -3215,23 +3223,11 @@
 408.2,
 160.5
 ],
-"ch9_sem_b4": [
-408.2,
-160.2
-],
-"ch9_sem_b5": [
-408.2,
-160.5
-],
-"ch9_sem_b6": [
-408.2,
-160.2
-],
 "ch9_sem_b7": [
 408.2,
 160.2
 ],
-"ch9_sem_b8": [
+"ch9_sem_b6": [
 408.2,
 160.2
 ],
@@ -3239,11 +3235,15 @@
 408.2,
 160.2
 ],
-"ch9_sem_c1": [
+"ch9_sem_b8": [
+408.2,
+160.2
+],
+"ch9_sem_c2": [
 405.7,
 105.5
 ],
-"ch9_sem_c1_boot": [
+"ch9_sem_c2_boot": [
 408.2,
 160.2
 ],

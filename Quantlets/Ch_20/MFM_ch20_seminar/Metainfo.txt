@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch20_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 20 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A5, A7, A9, B1, B3, B5, B7 with code and output. The proposed exercises A2, A4, A6, A8, A10, B2, B4, B6, B8, C1, C2 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Seminar 20 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, A3, A5, A7, B1, B2, B3, B4 with code and output. The proposed exercises A4, A6, A8, A9, A10, B5, B6, B7, B8, C1, C2 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'path signature, Levy area, HAR, SHAR, HARQ, HAC, Diebold-Mariano, Giacomini-White, bootstrap, multiple testing, signature kernel, VOLARE'
 
@@ -12,4 +12,4 @@ Submitted: 'Monday, 28 September 2026'
 
 Datafile: 'VOLARE realised measures (Cipollini et al., 2026, arXiv:2602.19732), free for research at http://volare.unime.it: realized_variance_stocks.csv, realized_variance_futures.csv, realized_variance_forex.csv (not redistributed)'
 
-Output: 'ch20_sem_a1_path.pdf, ch20_sem_a5_phi.pdf, ch20_sem_a7_qlike.pdf, ch20_sem_a9_weights.pdf, ch20_sem_b1_levy.pdf, ch20_sem_b3_coef.pdf, ch20_sem_b7_pvalues.pdf, ch20_sem_cumloss.pdf'
+Output: 'ch20_sem_a1_path.pdf, ch20_sem_a2_qlike.pdf, ch20_sem_a3_weights.pdf, ch20_sem_a7_phi.pdf, ch20_sem_b1_levy.pdf, ch20_sem_b2_coef.pdf, ch20_sem_b4_pvalues.pdf, ch20_sem_cumloss.pdf'

@@ -74,7 +74,7 @@ def main():
         d['nls_H_lo'] = float(np.percentile(boot, 2.5))
         d['nls_H_hi'] = float(np.percentile(boot, 97.5))
         out[col] = d
-    # verificarea puterii: mișcare browniană (H = 0,5) plus zgomot i.i.d., același design ca Seminarul 9 (B8)
+    # verificarea puterii: mișcare browniană (H = 0,5) plus zgomot i.i.d., același design ca Seminarul 9 (B9)
     rng = np.random.default_rng(SEED)
     n = len(rv)
     x = np.cumsum(0.1 * rng.standard_normal(n))

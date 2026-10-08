@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch2_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 2 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A5, B1, B3, B5 with code and output. The proposed exercises A2, A4, A6, B2, B4, B6, B7, B8, B9, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Seminar 2 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, A5, B1, B3, B5 with code and output. The proposed exercises A3, A4, A6, B2, B4, B6, B7, B8, B9, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'variance ratio, runs test, Hurst, DFA, wild bootstrap, block bootstrap, adaptive market hypothesis, Bonferroni, Holm, HAC, FTSE reclassification, Bitcoin, BET'
 
@@ -12,4 +12,4 @@ Submitted: 'Monday, 21 September 2026'
 
 Datafile: 'Daily market data provided with the course: S&P 500, Euro Stoxx 50, Nikkei 225, Hang Seng, BET, WIG20, BUX, PX, BIST 100, Bovespa, IPC, Nifty 50, Shanghai, Bitcoin, Ethereum; EUR/RON official reference rate'
 
-Output: 'ch2_sem_a1.pdf, ch2_sem_a3.pdf, ch2_sem_a56.pdf, ch2_sem_b1.pdf, ch2_sem_b3_rolling.pdf, ch2_sem_b3_window.pdf, ch2_sem_b5.pdf, ch2_sem_data.pdf'
+Output: 'ch2_sem_a1.pdf, ch2_sem_a23.pdf, ch2_sem_a5.pdf, ch2_sem_b1.pdf, ch2_sem_b3.pdf, ch2_sem_b5_rolling.pdf, ch2_sem_b5_window.pdf, ch2_sem_data.pdf'

@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch0_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 0 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, A3, A5, A10, B1, B1 Extended, B3, B6, B7 with code and output. The proposed exercises A6, A7, A8, A9, A11, A12, B2, B2 Extended, B3 Extended, B4, B4 Extended, B5, B5 Extended, B6 Extended, B8, B9, B10, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Seminar 0 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, A4, A7, A8, B1, B2, B2 Extended, B6, B7 with code and output. The proposed exercises A5, A6, A9, A10, A11, A12, B1 Extended, B3, B4, B5, B5 Extended, B6 Extended, B8, B9, B9 Extended, B10, B10 Extended, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'data cleaning, Hampel filter, annualisation, Sharpe ratio, standard error, stationary bootstrap, correlation, Fisher z, drawdown, event study, structural break, stablecoins, EUR/RON, passive investing'
 
@@ -12,4 +12,4 @@ Submitted: 'Monday, 21 September 2026'
 
 Datafile: 'Daily market data from the MFM course repository; FRED exchange rates and Financial Accounts; BNR EUR/RON reference rate; DefiLlama stablecoin supply'
 
-Output: 'ch0_sem_a1_returns.pdf, ch0_sem_a2_drawdown.pdf, ch0_sem_a5_drag.pdf, ch0_sem_b1_dashboard.pdf, ch0_sem_b1_growth.pdf, ch0_sem_b1_growth3.pdf, ch0_sem_b1_underwater3.pdf, ch0_sem_b1_vol.pdf, ch0_sem_b1x_diff.pdf, ch0_sem_b1x_sharpe.pdf, ch0_sem_b3_correlations.pdf, ch0_sem_b3_rolling.pdf, ch0_sem_b6_audit.pdf, ch0_sem_b6_raw.pdf, ch0_sem_b6_spike.pdf, ch0_sem_b7_event.pdf, ch0_sem_bootstrap_demo.pdf, ch0_sem_logscale.pdf'
+Output: 'ch0_sem_a1_returns.pdf, ch0_sem_a4_drawdown.pdf, ch0_sem_a8_drag.pdf, ch0_sem_b1_audit.pdf, ch0_sem_b1_raw.pdf, ch0_sem_b1_spike.pdf, ch0_sem_b2_dashboard.pdf, ch0_sem_b2_growth.pdf, ch0_sem_b2_growth3.pdf, ch0_sem_b2_underwater3.pdf, ch0_sem_b2_vol.pdf, ch0_sem_b2x_diff.pdf, ch0_sem_b2x_sharpe.pdf, ch0_sem_b6_correlations.pdf, ch0_sem_b6_rolling.pdf, ch0_sem_b7_event.pdf, ch0_sem_bootstrap_demo.pdf, ch0_sem_logscale.pdf'

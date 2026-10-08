@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch14_sem_partB'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 14 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A5, A8, A10, B1, B3, B5, B7, B9 with code and output. The proposed exercises A2, A4, A6, A7, A9, B2, B4, B6, B8, B10, B11, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Seminar 14 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, A3, A4, A10, B1, B2, B3, B6, B11 with code and output. The proposed exercises A5, A6, A7, A8, A9, B4, B5, B7, B8, B9, B10, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'out-of-sample R-squared, QLIKE, model confidence set, VaR backtest, FZ0, LSTM seeds, exercises'
 
