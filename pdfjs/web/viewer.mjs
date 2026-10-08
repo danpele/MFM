@@ -12625,6 +12625,13 @@ class PDFHistory {
     if (!this._initialized || this._popStateInProgress) {
       return;
     }
+    // MFM patch: before following a link, always record the slide the reader is on, so that the in-slide
+    // "Back" button (GoBack) and the browser's back button return to the calling slide
+    const position = this._position;
+    if (position && !(this._destination && !this._destination.temporary && this._destination.hash === position.hash)) {
+      this.#pushOrReplaceState(position, !!(this._destination && this._destination.temporary));
+      return;
+    }
     this.#tryPushCurrentPosition();
   }
   back() {
