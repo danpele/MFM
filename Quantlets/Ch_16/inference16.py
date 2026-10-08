@@ -36,6 +36,8 @@ warnings.filterwarnings('ignore')
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import (ASSETS, CRIX_UNIVERSE, STABLE, CLASS_ASSETS, END, price, joint_prices, joint_returns,  # noqa: E402
                       market_values, read_market, symbol_returns, periods_per_year)
 from generate_all_charts import (plt, MainBlue, IDAred, Forest, Amber, Orange, Purple, Teal, Gray,  # noqa: E402

@@ -26,6 +26,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import read_market, drop_duplicate_records  # noqa: E402
 
 # Chart style: transparent background, legend below the plot

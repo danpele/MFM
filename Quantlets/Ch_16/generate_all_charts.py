@@ -22,6 +22,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import (ASSETS, LABELS, CRIX_UNIVERSE, STABLE, CLASS_ASSETS, END, price, log_returns,  # noqa: E402
                       joint_prices, joint_returns, periods_per_year, market_values, defi_tvl,
                       stablecoin_chart, stablecoin_list, chain_tvl, chain_tvl_at, symbol_returns, read_market)

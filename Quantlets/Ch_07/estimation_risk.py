@@ -24,6 +24,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import log_returns, joint_returns   # noqa: E402
 from risk_measures import hs_var_es, gpd_fit, gpd_se, gpd_var_es, garch_filter, garch_next, rolling_conditional  # noqa: E402
 from seminar7 import boot_ci   # noqa: E402

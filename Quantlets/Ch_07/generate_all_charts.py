@@ -20,6 +20,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import MARKETS, LABELS, log_returns, joint_returns, periods_per_year  # noqa: E402
 from risk_measures import (hs_var_es, normal_var_es, t_fit, t_var_es, cf_var_es, cf_quantile, gpd_fit,  # noqa: E402
                            gpd_var_es, gpd_se, mean_excess, garch_filter, garch_next, fhs_mc,

@@ -29,6 +29,8 @@ import matplotlib.pyplot as plt
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 import mfm_tsfm as M               # noqa: E402
 import generate_all_charts as g    # noqa: E402  (stil MFM, culori, save_fig)
 

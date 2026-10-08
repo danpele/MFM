@@ -24,6 +24,8 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from generate_all_charts import (plt, MainBlue, IDAred, Forest, Amber, Teal, Gray, save_fig,  # noqa: E402
                                  legend_outside_bottom, jsonable, HERE)
 

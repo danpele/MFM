@@ -27,6 +27,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
 warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 import generate_all_charts as g
 from mfm_ml import (load_data, ffd_weights, frac_diff_ffd, PurgedKFold, sharpe_ratio,
                     local_whittle, exact_local_whittle)

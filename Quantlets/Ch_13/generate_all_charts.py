@@ -26,6 +26,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_ml import (load_data, ffd_weights, frac_diff_ffd, get_daily_vol, triple_barrier,
                     PurgedKFold, build_features, sharpe_ratio, expected_max_sharpe,
                     deflated_sharpe_ratio, local_whittle, exact_local_whittle,

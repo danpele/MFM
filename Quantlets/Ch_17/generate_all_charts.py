@@ -22,6 +22,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import MARKETS, LABELS, price, shiller, industries, industry_firms   # noqa: E402
 from bubbles import (psy, psy_cv, wild_cv, episodes, adf_stat, min_window, blanchard_watson, evans_bubble,  # noqa: E402
                      lppls_fit, lppls_path, lppls_qualified, lppls_conditions, lomb_pvalue, lppls_confidence, drawdown,
@@ -636,7 +638,9 @@ def condition_shares(tab):
 
 
 def fig_lppls_ci(tab_btc, tab_ndx):
-    fig, axes = plt.subplots(2, 1, figsize=(7.4, 4.0), gridspec_kw=dict(height_ratios=[1.2, 1]))
+    # left: price and confidence indicator; right: share of windows passing each filter (horizontal bars, so
+    # that the filter names stay legible on a slide)
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.0), gridspec_kw=dict(width_ratios=[1.15, 1]))
     p = price('btc', 'D', '2015-01-01')
     ax = axes[0]
     ax.plot(p.index, p.values, color=MainBlue, lw=0.8, label='Bitcoin (USD, log scale)')
@@ -648,12 +652,14 @@ def fig_lppls_ci(tab_btc, tab_ndx):
     ax.set_title('Bitcoin: LPPLS confidence indicator, 141 windows of 50-750 days, every 5 days', fontsize=9, loc='left')
     keys = list(COND_LABELS)
     sb, sn = condition_shares(tab_btc), condition_shares(tab_ndx)
-    x = np.arange(len(keys))
-    axes[1].bar(x - 0.2, [100 * sb[k] for k in keys], 0.4, color=Amber, label='Bitcoin, all windows')
-    axes[1].bar(x + 0.2, [100 * sn[k] for k in keys], 0.4, color=Teal, label='Nasdaq 100, all windows')
-    axes[1].set_xticks(x)
-    axes[1].set_xticklabels([COND_LABELS[k] for k in keys], rotation=20, ha='right', fontsize=6.5)
-    axes[1].set_ylabel('% of windows passing')
+    y = np.arange(len(keys))[::-1]
+    axes[1].barh(y + 0.2, [100 * sb[k] for k in keys], 0.4, color=Amber, label='Bitcoin, all windows')
+    axes[1].barh(y - 0.2, [100 * sn[k] for k in keys], 0.4, color=Teal, label='Nasdaq 100, all windows')
+    axes[1].set_yticks(y)
+    axes[1].set_yticklabels([COND_LABELS[k] for k in keys], fontsize=8)
+    axes[1].set_xlabel('% of windows passing')
+    axes[1].set_xlim(0, 100)
+    axes[1].set_title('Filters of the confidence indicator', fontsize=9, loc='left')
     fig.tight_layout()
     h1, l1 = ax.get_legend_handles_labels()
     h2, l2 = ax2.get_legend_handles_labels()

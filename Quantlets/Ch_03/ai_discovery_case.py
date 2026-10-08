@@ -20,6 +20,8 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import factors, ols_hac  # noqa: E402
 
 F = factors('M').loc['1965-01-01':'2026-08-31']      # esantion fixat: ianuarie 1965 - august 2026

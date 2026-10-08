@@ -25,6 +25,8 @@ warnings.filterwarnings('ignore')
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 import sigvol as S   # noqa: E402
 
 if not os.path.isdir(S.VOLARE_DIR):
@@ -451,19 +453,31 @@ def chart_mcs(A):
 
 
 def chart_dm_heat(E):
-    fig, axes = plt.subplots(1, 2, figsize=(11, 5.6), gridspec_kw={'width_ratios': [1, 1]})
+    """DM t-statistics, 50 assets x 3 horizons; laid out at the size of its box on the slide (5.67 x 2.25 in):
+    the two comparisons stacked, one column per asset (symbols under the lower panel)."""
+    fig = plt.figure(figsize=(5.47, 2.05))
+    fig._sf_manual = True
+    gs = fig.add_gridspec(2, 2, width_ratios=[1, 0.018], left=0.075, right=0.90, top=0.92, bottom=0.21,
+                          hspace=0.42, wspace=0.03)
+    axes = [fig.add_subplot(gs[0, 0])]
+    axes.append(fig.add_subplot(gs[1, 0], sharex=axes[0]))
+    cax = fig.add_subplot(gs[:, 1])
+    order = [s for k, s in assets()]
     for ax, comp, ttl in [(axes[0], 'Sig-LK|logHAR', 'Sig-LK vs log-HAR'), (axes[1], 'Sig-LK|HAR', 'Sig-LK vs HAR')]:
         T = pd.DataFrame({h: {f'{r.sym}': r.dm[comp]['t_ql'] for _, r in E[E.h == h].iterrows()} for h in H})
-        order = [s for k, s in assets()]
         T = T.loc[order]
         im = ax.imshow(T.values.T, aspect='auto', cmap='RdBu_r', vmin=-4, vmax=4)
         ax.set_yticks(range(len(H)))
-        ax.set_yticklabels([f'h = {h}' for h in H])
-        ax.set_xticks(range(len(order)))
-        ax.set_xticklabels(order, rotation=90, fontsize=5.5)
-        ax.set_title(ttl + ' (DM t-statistic, QLIKE)', fontsize=9)
-    cb = fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.18)
-    cb.set_label('DM t-statistic: negative (blue) = signature model more accurate; |t| > 1.645 one-sided 5%')
+        ax.set_yticklabels([f'h = {h}' for h in H], fontsize=6.6)
+        ax.set_title(ttl + ' (DM t-statistic, QLIKE)', fontsize=7.2, loc='left', pad=2)
+        ax.tick_params(length=2)
+    axes[0].tick_params(axis='x', labelbottom=False, length=0)
+    axes[1].set_xticks(range(len(order)))
+    axes[1].set_xticklabels(order, rotation=90, fontsize=6.3)
+    cb = fig.colorbar(im, cax=cax)
+    cb.ax.tick_params(labelsize=6.6, length=2)
+    cb.set_label('DM t-statistic; negative (blue):\nsignature model more accurate;\n|t| > 1.645: one-sided 5%',
+                 fontsize=6.3)
     save_fig('ch20_dm_heat')
 
 

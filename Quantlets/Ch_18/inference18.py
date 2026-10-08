@@ -32,6 +32,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from generate_all_charts import (R, V, US, EU, RO, ALL, NAMES, REGION_INDEX, REGION_COL, region_of, system_ex,  # noqa
                                  save_fig, legend_outside_bottom, jsonable, MainBlue, IDAred, Forest, Orange, Purple,
                                  Teal, Amber, Gray, HERE)

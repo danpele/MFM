@@ -22,6 +22,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 import mfm_data as M   # noqa: E402
 
 # Chart style: transparent background, legend below the plot
@@ -83,7 +85,7 @@ def pv_heatmap(ax, P, fmt='{:.2f}', title=None):
     for i in range(P.shape[0]):
         for j in range(P.shape[1]):
             v = P.values[i, j]
-            txt = '<0.001' if v < 0.001 else (f'{v:.3f}' if v < 0.01 else fmt.format(v))
+            txt = '<.001' if v < 0.001 else (f'{v:.3f}' if v < 0.01 else fmt.format(v))
             ax.text(j, i, txt, ha='center', va='center', fontsize=7)
     ax.set_xticks(range(P.shape[1]), P.columns, fontsize=7.5)
     ax.set_yticks(range(P.shape[0]), P.index, fontsize=7.5)
@@ -240,7 +242,9 @@ def fig_var_pvalues(tab):
                                       ('p_dur', 'Duration (Weibull)'))):
         P = pd.DataFrame({M.LABELS[n]: [tab[(n, m)][key] for m in M.MODELS] for n in M.ASSETS}, index=M.MODELS)
         pv_heatmap(ax, P, title=title)
-        ax.tick_params(axis='x', rotation=30)
+        ax.label_outer()
+        if not ax.get_subplotspec().is_last_row():
+            ax.tick_params(axis='x', length=0)
     plt.tight_layout()
     save_fig('ch8_var_pvalues')
 
@@ -613,7 +617,9 @@ def dq_table(col='VaR1', a=0.01):
 
 def fig_var_pvalues4(tab, dq):
     """Heat map of p-values: Kupiec, CC, durations and DQ (VaR 1%)."""
-    fig, axs = plt.subplots(1, 4, figsize=(8.6, 2.7), sharey=True)
+    # 2 x 2 panels: cells wide enough for the p-values on a slide
+    fig, axs = plt.subplots(2, 2, figsize=(7.4, 3.8), sharex=True, sharey=True)
+    axs = axs.ravel()
     for ax, (key, title) in zip(axs, (('p_uc', 'Kupiec POF'), ('p_cc', 'Christoffersen CC'),
                                       ('p_dur', 'Duration (Weibull)'), ('dq', 'Dynamic Quantile'))):
         if key == 'dq':
@@ -622,7 +628,9 @@ def fig_var_pvalues4(tab, dq):
             P = pd.DataFrame({M.LABELS[n]: [(tab[f'{n}|{m}'] if f'{n}|{m}' in tab else tab[(n, m)])[key]
                                             for m in M.MODELS] for n in M.ASSETS}, index=M.MODELS)
         pv_heatmap(ax, P, title=title)
-        ax.tick_params(axis='x', rotation=30)
+        ax.label_outer()
+        if not ax.get_subplotspec().is_last_row():
+            ax.tick_params(axis='x', length=0)
     plt.tight_layout()
     save_fig('ch8_var_pvalues')
 

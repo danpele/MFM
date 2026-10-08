@@ -22,6 +22,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import (read_market, prices, price, log_returns, french_rf, monthly_returns, bnr_rate,
                       SECTORS, SECTOR_NAMES, MULTI, MULTI_NAMES, BVB, BVB_NAMES)
 
@@ -839,23 +841,24 @@ def fig_hrp():
     S = Rex.cov().values * 12
     Z = hrp_tree(S)
     w = w_hrp(S)
-    fig, axes = plt.subplots(1, 2, figsize=(7.8, 3.9), gridspec_kw={'width_ratios': [1.4, 1]})
+    # tree on top, weights below in the same leaf order (one column per asset: the tickers stay legible)
+    fig, axes = plt.subplots(2, 1, figsize=(7.4, 3.9), sharex=True, gridspec_kw={'height_ratios': [1.25, 1]})
     dn = dendrogram(Z, labels=COMBINED, ax=axes[0], color_threshold=0.6 * Z[:, 2].max(), above_threshold_color=Gray,
-                    leaf_font_size=7)
-    axes[0].set_ylabel('Euclidean distance between columns of D')
-    axes[0].set_title('Single-linkage tree', fontsize=9, loc='left')
+                    leaf_font_size=7, no_labels=True)
+    axes[0].set_ylabel('Distance\n(columns of D)')
+    axes[0].set_title('Single-linkage tree (top) and weights (bottom), same order of the assets', fontsize=9,
+                      loc='left')
     order = dn['ivl']
     wi = pd.Series(w, index=COMBINED)[order]
     wg = pd.Series(w_long_only(S), index=COMBINED)[order]
-    y = np.arange(len(order))
-    axes[1].barh(y + 0.2, wi.values, 0.4, color='#17A2B8', label='HRP')
-    axes[1].barh(y - 0.2, wg.values, 0.4, color=Purple, label='GMV long-only')
-    axes[1].set_yticks(y, order, fontsize=7)
-    axes[1].invert_yaxis()
-    axes[1].set_xlabel('Weight')
-    axes[1].set_title('Weights', fontsize=9, loc='left')
-    legend_outside_bottom(axes[1], ncol=2, y=-0.14)
+    x = 10 * np.arange(len(order)) + 5                     # leaf positions of the dendrogram
+    axes[1].bar(x - 2, wi.values, 4, color='#17A2B8', label='HRP')
+    axes[1].bar(x + 2, wg.values, 4, color=Purple, label='GMV long-only')
+    axes[1].set_xticks(x, order, fontsize=7)
+    axes[1].set_ylabel('Weight')
     plt.tight_layout()
+    fig.legend(*axes[1].get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=2,
+               frameon=False)
     save_fig('ch4_hrp')
     merges = [dict(a=[COMBINED[int(i)] for i in (Z[k, 0], Z[k, 1]) if i < len(COMBINED)], height=float(Z[k, 2]))
               for k in range(len(Z))]

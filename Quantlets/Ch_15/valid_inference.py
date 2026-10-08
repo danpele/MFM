@@ -30,6 +30,8 @@ from scipy.optimize import minimize_scalar
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 import mfm_text as M              # noqa: E402
 import generate_all_charts as g   # noqa: E402
 import ai_discovery_case as A     # noqa: E402

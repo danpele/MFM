@@ -16,6 +16,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import load, load_panel  # noqa: E402
 
 # Chart style: transparent background, legend below the plot
@@ -728,6 +730,53 @@ def _timeline(ax, rows, x0, x1, levels=(0.22, -0.22, 0.40, -0.40), fs=6.3):
     ax.spines['left'].set_visible(False)
 
 
+def _timeline_auto(axes, rows, spans, fs=6.4, levels=(0.03, 0.52), reserved=()):
+    """Lanes drawn across several axes (spans: one (x0, x1) per axes, e.g. a compressed early period and an
+    expanded recent one); every label above its point, at the first free slot among two heights and a few
+    horizontal shifts, checked against all the labels already placed (measured with the renderer)."""
+    fig = axes[0].figure
+    for ax, (x0, x1) in zip(axes, spans):
+        ax.set_xlim(x0, x1)
+        ax.set_ylim(-len(rows) + 0.7, 0.85)
+        for sp in ('left', 'right', 'top'):
+            ax.spines[sp].set_visible(False)
+    renderer = fig.canvas.get_renderer()
+    placed = list(reserved)
+    for r, (lab, col, events) in enumerate(rows):
+        y = -r
+        for ax, (x0, x1) in zip(axes, spans):
+            ax.plot([x0, x1], [y, y], color=col, lw=0.6, alpha=0.5, zorder=1)
+        for ev in events:
+            xm, txt = ev[0], ev[1]
+            k = next(i for i, (x0, x1) in enumerate(spans) if x0 <= xm <= x1)
+            ax = axes[k]
+            x0, x1 = spans[k]
+            step = 5.0 / (ax.get_window_extent(renderer).width * 72 / fig.dpi) * (x1 - x0)   # 5 pt
+            ax.plot(xm, y, 'o', color=col, ms=3.5, zorder=3)
+            best, cands = None, []
+            for j in (0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8):
+                for lv in levels:
+                    t = ax.text(xm + j * step, y + lv, txt, ha='center', va='bottom', fontsize=fs)
+                    bb = t.get_window_extent(renderer).expanded(1.08, 1.05)
+                    t.remove()
+                    out = max(0, fig.bbox.x0 - bb.x0) + max(0, bb.x1 - fig.bbox.x1)
+                    ov = sum(max(0, min(bb.x1, p.x1) - max(bb.x0, p.x0)) * max(0, min(bb.y1, p.y1) - max(bb.y0, p.y0))
+                             for p in placed)
+                    cands.append((ov + 1e3 * out, abs(j), j * step, lv, bb))
+                    if ov == 0 and out == 0:
+                        best = (j * step, lv, bb)
+                        break
+                if best:
+                    break
+            if best is None:
+                c = min(cands, key=lambda c: (c[0], c[1]))
+                best = (c[2], c[3], c[4])
+            dx, lv, bb = best
+            ax.annotate(txt, xy=(xm, y), xytext=(xm + dx, y + lv), ha='center', va='bottom', fontsize=fs,
+                        color='black', arrowprops=dict(arrowstyle='-', color=col, lw=0.5))
+            if bb is not None:
+                placed.append(bb)
+
 def fig_market_history():
     """Exchanges (top lane) and bubbles/crashes (bottom lane), 1250-2026."""
     ex = [(1270, 1500, 'Bruges, Ter Beurze\n(13th-15th c.)', 0), (1531, 'Antwerp\n1531', 1), (1602, 'VOC shares\n1602', 0),
@@ -764,12 +813,27 @@ def fig_model_history():
         ('Quantum computing', Teal,
          [(2015, 'quantum MC', 1, -8), (2018, 'option pricing', 0), (2021, 'advantage threshold', 3, 3)]),
     ]
-    fig, ax = plt.subplots(figsize=(7.6, 3.0))
-    _timeline(ax, rows, 1895, 2033, levels=(0.17, -0.17, 0.34, -0.34), fs=6.6)
-    ax.set_ylim(-len(rows) + 0.35, 0.5)
-    ax.set_xticks(range(1900, 2021, 20))
-    ax.tick_params(axis='x', labelsize=8)
-    bottom_legend(fig, ncol=4, fontsize=7.5)
+    # drawn at the size it has on the slide (5.67 x 2.0 in) with a compressed axis before 1985 and an expanded
+    # one after, so that the labels can be placed without overlaps
+    fig, axes = plt.subplots(1, 2, figsize=(5.47, 1.93), gridspec_kw={'width_ratios': [1, 1.75], 'wspace': 0.03})
+    fig._sf_manual = True
+    fig.subplots_adjust(left=0.235, right=0.985, top=0.99, bottom=0.11)
+    for ax in axes:
+        ax.tick_params(axis='x', labelsize=6.6)
+    # the family names on the left first, so that no label is placed over them
+    axes[0].set_yticks([-r for r in range(len(rows))])
+    axes[0].set_yticklabels([lab for lab, _, _ in rows], fontsize=6.8)
+    fig.canvas.draw()
+    names = [t.get_window_extent(fig.canvas.get_renderer()) for t in axes[0].get_yticklabels()]
+    axes[1].set_yticks([])
+    _timeline_auto(axes, rows, [(1895, 1985), (1985, 2036)], fs=6.4, reserved=names)
+    axes[0].set_xticks([1900, 1920, 1940, 1960, 1980])
+    axes[1].set_xticks([1990, 2000, 2010, 2020])
+    # the families named on the left of their lanes (no legend: more height for the labels)
+    for t, (_, col, _) in zip(axes[0].get_yticklabels(), rows):
+        t.set_color(col)
+    axes[0].tick_params(axis='y', length=0)
+    axes[1].spines['bottom'].set_linestyle((0, (2, 1)))
     save_fig('ch0_model_history')
 
 # =============================================================================

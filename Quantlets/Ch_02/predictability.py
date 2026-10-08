@@ -25,6 +25,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import log_returns, read_market, sp500_monthly, fred, complete_months   # noqa: E402
 from eff_tests import variance_ratio, rolling_stat                    # noqa: E402
 from generate_all_charts import plt, MainBlue, IDAred, Gray, save_fig   # noqa: E402  (stilul MFM)

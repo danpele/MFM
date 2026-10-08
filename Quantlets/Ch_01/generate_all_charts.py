@@ -19,6 +19,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import (load_data, load_close, read_market, LABELS, vol_close_to_close, vol_parkinson,
                       vol_garman_klass, vol_rogers_satchell, vol_yang_zhang, drawdown)
 
@@ -165,16 +167,21 @@ def fig_simple_vs_log():
 # FIG 2: Preturi si randamente pentru 5 piete
 # =============================================================================
 def fig_prices_returns():
-    fig, axes = plt.subplots(len(ASSETS), 2, figsize=(7.4, 6.4), sharex='row')
+    # one time axis for all the rows (dates only under the last row): more height for the five series
+    fig, axes = plt.subplots(len(ASSETS), 2, figsize=(7.4, 6.4), sharex=True)
+    from matplotlib.ticker import LogLocator, MaxNLocator
     for i, a in enumerate(ASSETS):
         c, r = closes[a], rets[a]
         axes[i, 0].plot(c.index, c.values, color=COLORS[a], lw=0.7)
         axes[i, 0].set_yscale('log')
+        axes[i, 0].yaxis.set_major_locator(LogLocator(numticks=3))
         axes[i, 0].yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f'{v:g}'))
         axes[i, 0].yaxis.set_minor_formatter(plt.NullFormatter())
+        axes[i, 1].yaxis.set_major_locator(MaxNLocator(3, symmetric=True))
         if a == 'eurron':
-            axes[i, 0].set_yticks([3.5, 4, 4.5, 5])
-        axes[i, 0].set_ylabel(LABELS[a].replace(' (Romania)', '').replace(' (BNR)', ''), fontsize=8)
+            axes[i, 0].set_yticks([4, 5])
+        axes[i, 0].set_ylabel(LABELS[a].replace(' (Romania)', '').replace(' (BNR)', ''), fontsize=8, rotation=0,
+                              ha='right', va='center')      # horizontal: the five rows are short
         axes[i, 1].plot(r.index, 100 * r.values, color=COLORS[a], lw=0.4)
         for ax in axes[i]:
             ax.tick_params(labelsize=7)
@@ -422,7 +429,7 @@ def fig_vol_estimators():
         'Garman-Klass': vol_garman_klass(d), 'Rogers-Satchell': vol_rogers_satchell(d),
         'Yang-Zhang': vol_yang_zhang(d)}).dropna()
     seg = est.loc['2019-07-01':'2021-06-30']
-    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.0), gridspec_kw={'width_ratios': [1.6, 1]})
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.0), gridspec_kw={'width_ratios': [2.4, 1]})
     cols = [Teal, MainBlue, Forest, Amber, IDAred]
     for c, col in zip(est.columns, cols):
         axes[0].plot(seg.index, 100 * seg[c], color=col, lw=0.9, label=c)
@@ -432,13 +439,14 @@ def fig_vol_estimators():
     axes[0].tick_params(axis='x', labelsize=7, rotation=30)
     axes[0].set_ylabel('Annualised volatility (%, 21-day)')
     axes[0].set_title('S&P 500 around the COVID-19 crash', fontsize=8.5, loc='left')
-    axes[0].legend(loc='upper center', bbox_to_anchor=(0.5, -0.28), ncol=3, frameon=False, fontsize=7)
+    fig.legend(*axes[0].get_legend_handles_labels(), loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=5,
+               frameon=False, fontsize=7)
     # relative efficiency: weekly variability of the estimator (noise) vs close-to-close
     noise = est.diff().std()
     eff = (noise['Close-to-close'] / noise) ** 2
     axes[1].barh(eff.index, eff.values, color=cols, alpha=0.85)
     axes[1].axvline(1, color=Navy, ls=':', lw=0.8)
-    axes[1].set_xlabel('Relative smoothness vs close-to-close')
+    axes[1].set_xlabel('Relative smoothness\nvs close-to-close')
     axes[1].set_title('Noise of daily updates', fontsize=8.5, loc='left')
     axes[1].tick_params(axis='y', labelsize=7.5)
     plt.tight_layout()

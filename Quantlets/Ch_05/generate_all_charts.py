@@ -21,6 +21,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import MARKETS, LABELS, pct_returns, periods_per_year, load_vix   # noqa: E402
 from garch_tools import (fit_garch, half_life, news_impact, sign_bias_test, ljung_box, arch_lm,  # noqa: E402
                          ewma_variance, qlike, mz_regression, dm_test, DISTS, VOL_SPEC)

@@ -17,6 +17,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import MARKETS, LABELS, GROUPS, load_close, log_returns, complete_months   # noqa: E402
 from eff_tests import (variance_ratio, chow_denning, runs_test, robust_ljung_box, rs_hurst,  # noqa: E402
                        lo_modified_rs, dfa_hurst, rolling_stat)
@@ -139,24 +141,34 @@ def fig_random_walk_game(seed=7):
 # =============================================================================
 # FIG 2: Autocorelatia de ordinul 1, cu benzi i.i.d. si robuste
 # =============================================================================
+def _two_columns(n, figsize=(7.4, 3.6)):
+    """Two panels side by side for a long list of markets (rows 0..h-1 left, h..n-1 right), shared x axis, so
+    that the market names stay legible on a slide."""
+    fig, axes = plt.subplots(1, 2, figsize=figsize, sharex=True)
+    h = (n + 1) // 2
+    return fig, axes, [range(0, h), range(h, n)], h
+
+
 def fig_acf_markets(t):
     t = t.sort_values('rho1')
-    y = np.arange(len(t))
-    fig, ax = plt.subplots(figsize=(6.8, 4.2))
-    for i, (k, row) in enumerate(t.iterrows()):
-        c = GROUP_COL[row['group']]
-        ax.errorbar(row['rho1'], i, xerr=1.96 * row['rho1_se_rob'], fmt='o', ms=4, color=c, capsize=2, lw=0.9)
-        ax.plot([row['rho1'] - 1.96 * row['rho1_se_iid'], row['rho1'] + 1.96 * row['rho1_se_iid']], [i + 0.25] * 2,
-                color=Gray, lw=0.8)
-    ax.axvline(0, color=Gray, lw=0.6)
-    ax.set_yticks(y, t['market'], fontsize=7.5)
-    ax.set_xlabel(r'Lag-1 autocorrelation of daily log returns $\hat\rho_1$')
+    fig, axes, parts, h = _two_columns(len(t))
+    for ax, idx in zip(axes, parts):
+        for j, i in enumerate(idx):
+            row = t.iloc[i]
+            c = GROUP_COL[row['group']]
+            ax.errorbar(row['rho1'], j, xerr=1.96 * row['rho1_se_rob'], fmt='o', ms=4, color=c, capsize=2, lw=0.9)
+            ax.plot([row['rho1'] - 1.96 * row['rho1_se_iid'], row['rho1'] + 1.96 * row['rho1_se_iid']], [j + 0.25] * 2,
+                    color=Gray, lw=0.8)
+        ax.axvline(0, color=Gray, lw=0.6)
+        ax.set_yticks(range(len(idx)), [t['market'].iloc[i] for i in idx], fontsize=7.5)
+        ax.set_ylim(-0.6, h - 0.4)
+        ax.set_xlabel(r'Lag-1 autocorrelation $\hat\rho_1$')
     handles = [plt.Line2D([], [], color=c, marker='o', ls='', label=g) for g, c in GROUP_COL.items()]
     handles += [plt.Line2D([], [], color=Gray, lw=0.8, label=r'i.i.d. 95% band $\pm 1.96/\sqrt{T}$'),
                 plt.Line2D([], [], color='k', lw=0.9, label='Robust 95% interval (bars)')]
-    ax.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=3, frameon=False)
-    ax.set_title('Lag-1 autocorrelation across markets (full samples)', fontsize=9, loc='left')
+    axes[0].set_title('Lag-1 autocorrelation of daily log returns across markets (full samples)', fontsize=9, loc='left')
     plt.tight_layout()
+    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=3, frameon=False)
     save_fig('ch2_acf_markets')
 
 
@@ -206,18 +218,22 @@ def fig_vr_profile():
 # =============================================================================
 def fig_vr_markets(t):
     t = t.sort_values('zstar5')
-    fig, ax = plt.subplots(figsize=(6.8, 4.2))
-    ax.barh(np.arange(len(t)), t['zstar5'], color=[GROUP_COL[g] for g in t['group']], alpha=0.85)
-    for x in (-1.96, 1.96):
-        ax.axvline(x, color=Gray, ls='--', lw=0.8)
-    ax.axvline(0, color=Gray, lw=0.5)
-    ax.set_yticks(np.arange(len(t)), t['market'], fontsize=7.5)
-    ax.set_xlabel(r'Heteroskedasticity-robust statistic $z^*(5)$ of the Lo-MacKinlay variance-ratio test')
+    fig, axes, parts, h = _two_columns(len(t))
+    for ax, idx in zip(axes, parts):
+        tt = t.iloc[list(idx)]
+        ax.barh(np.arange(len(tt)), tt['zstar5'], color=[GROUP_COL[g] for g in tt['group']], alpha=0.85)
+        for x in (-1.96, 1.96):
+            ax.axvline(x, color=Gray, ls='--', lw=0.8)
+        ax.axvline(0, color=Gray, lw=0.5)
+        ax.set_yticks(np.arange(len(tt)), tt['market'], fontsize=7.5)
+        ax.set_ylim(-0.6, h - 0.4)
+        ax.set_xlabel(r'Robust statistic $z^*(5)$')
     handles = [plt.Rectangle((0, 0), 1, 1, color=c, alpha=0.85, label=g) for g, c in GROUP_COL.items()]
     handles.append(plt.Line2D([], [], color=Gray, ls='--', label=r'$\pm 1.96$ (5% two-sided)'))
-    ax.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=5, frameon=False)
-    ax.set_title('Variance ratio at 5 days: who rejects the random walk?', fontsize=9, loc='left')
+    axes[0].set_title('Variance ratio at 5 days (Lo-MacKinlay, heteroskedasticity-robust): who rejects the random walk?',
+                      fontsize=9, loc='left')
     plt.tight_layout()
+    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=5, frameon=False)
     save_fig('ch2_vr_markets')
 
 
@@ -270,18 +286,21 @@ def fig_hurst_markets(t):
     band = {k: wild_band(rets[k], dfa, n_sim=199) for k in ORDER}
     t = t.assign(band_lo=[band[k][0] for k in t.index], band_hi=[band[k][1] for k in t.index],
                  shuf_lo=[shuf[k][0] for k in t.index], shuf_hi=[shuf[k][1] for k in t.index]).sort_values('H_dfa')
-    fig, ax = plt.subplots(figsize=(6.8, 4.2))
-    y = np.arange(len(t))
-    ax.hlines(y, t['band_lo'], t['band_hi'], color=LightGray, lw=6)
-    ax.scatter(t['H_dfa'], y, color=[GROUP_COL[g] for g in t['group']], zorder=3, s=22)
-    ax.axvline(0.5, color=Gray, ls='--', lw=0.8)
-    ax.set_yticks(y, t['market'], fontsize=7.5)
-    ax.set_xlabel(r'DFA exponent $\alpha_{DFA}$ of daily log returns (0.5 = no long memory)')
+    fig, axes, parts, h = _two_columns(len(t))
+    for ax, idx in zip(axes, parts):
+        tt = t.iloc[list(idx)]
+        y = np.arange(len(tt))
+        ax.hlines(y, tt['band_lo'], tt['band_hi'], color=LightGray, lw=6)
+        ax.scatter(tt['H_dfa'], y, color=[GROUP_COL[g] for g in tt['group']], zorder=3, s=22)
+        ax.axvline(0.5, color=Gray, ls='--', lw=0.8)
+        ax.set_yticks(y, tt['market'], fontsize=7.5)
+        ax.set_ylim(-0.6, h - 0.4)
+        ax.set_xlabel(r'DFA exponent $\alpha_{DFA}$ (0.5 = no long memory)')
     handles = [plt.Line2D([], [], color=c, marker='o', ls='', label=g) for g, c in GROUP_COL.items()]
     handles.append(plt.Line2D([], [], color=LightGray, lw=6, label='Wild-bootstrap 95% band (RW3 null)'))
-    ax.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=3, frameon=False)
-    ax.set_title('Long memory in returns? Detrended fluctuation analysis across markets', fontsize=9, loc='left')
+    axes[0].set_title('Long memory in returns? Detrended fluctuation analysis of daily log returns', fontsize=9, loc='left')
     plt.tight_layout()
+    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=3, frameon=False)
     save_fig('ch2_hurst_markets')
     return t[['H_dfa', 'band_lo', 'band_hi', 'shuf_lo', 'shuf_hi']]
 

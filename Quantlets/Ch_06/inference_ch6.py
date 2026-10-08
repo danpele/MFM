@@ -29,6 +29,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import joint_returns, weekly_returns   # noqa: E402
 from dep_tools import (garch_all, dcc_fit, dcc_path, fr_adjust, pseudo_obs, kendall_tau, spearman_rho,  # noqa: E402
                        simulate, fit_copula, log_density, empirical_tail_dep, fisher_ci, njit)

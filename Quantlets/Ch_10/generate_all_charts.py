@@ -21,6 +21,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import (ASSETS, GROUPS, LABELS, read_market, ohlc, returns, dollar_volume,  # noqa: E402
                       intraday_spy, intraday_btc)
 from micro import (roll_spread, cs_spread, ar_terms, amihud, walk_book, gm_quotes, gm_simulate,  # noqa: E402
@@ -344,23 +346,28 @@ def spread_table():
 
 
 def fig_spread_cross(T):
+    """Corwin-Schultz and Abdi-Ranaldo spreads, 25 assets in two panels (13 + 12) so that the names stay legible."""
     keys = [k for g in ('US', 'BVB', 'Crypto') for k in GROUPS[g]]
-    y = np.arange(len(keys))
-    fig, ax = plt.subplots(figsize=(7.2, 5.6))
-    ax.barh(y + 0.2, [T[k]['cs'] for k in keys], 0.38, color=[GROUP_COL[ASSETS[k][2]] for k in keys],
-            label='Corwin-Schultz')
-    ax.barh(y - 0.2, [T[k]['ar'] for k in keys], 0.38, color=[GROUP_COL[ASSETS[k][2]] for k in keys], alpha=0.6,
-            hatch='///', edgecolor='white', label='Abdi-Ranaldo')
-    ax.set_yticks(y)
-    ax.set_yticklabels([LABELS[k] for k in keys], fontsize=7.5)
-    for t, k in zip(ax.get_yticklabels(), keys):
-        t.set_color(GROUP_COL[ASSETS[k][2]])
-    ax.invert_yaxis()
-    ax.set_xlabel('Estimated relative spread from daily bars (bp), September 2024 - September 2026')
+    parts = [keys[:13], keys[13:]]
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.6), sharex=True)
+    for ax, ks in zip(axes, parts):
+        y = np.arange(len(ks))
+        ax.barh(y + 0.2, [T[k]['cs'] for k in ks], 0.38, color=[GROUP_COL[ASSETS[k][2]] for k in ks],
+                label='Corwin-Schultz')
+        ax.barh(y - 0.2, [T[k]['ar'] for k in ks], 0.38, color=[GROUP_COL[ASSETS[k][2]] for k in ks], alpha=0.6,
+                hatch='///', edgecolor='white', label='Abdi-Ranaldo')
+        ax.set_yticks(y)
+        ax.set_yticklabels([LABELS[k] for k in ks], fontsize=7.5)
+        for t, k in zip(ax.get_yticklabels(), ks):
+            t.set_color(GROUP_COL[ASSETS[k][2]])
+        ax.set_ylim(len(parts[0]) - 0.5, -0.6)
+        ax.set_xlabel('Relative spread (bp)')
+    axes[0].set_title('Estimated from daily bars, September 2024 - September 2026', fontsize=9, loc='left')
     from matplotlib.patches import Patch
     h = [Patch(color=MainBlue, label='US'), Patch(color=IDAred, label='BVB'), Patch(color=Amber, label='Crypto'),
          Patch(facecolor='white', edgecolor=MainBlue, hatch='///', label='Hatched: Abdi-Ranaldo; solid: Corwin-Schultz')]
-    ax.legend(handles=h, loc='upper center', bbox_to_anchor=(0.5, -0.09), ncol=4, frameon=False)
+    plt.tight_layout()
+    fig.legend(handles=h, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=4, frameon=False)
     save_fig('ch10_spread_estimators')
 
 
@@ -377,19 +384,25 @@ def amihud_table(start=START2):
 
 
 def fig_amihud(A):
+    """Amihud illiquidity of the 25 assets, sorted, in two panels (13 + 12) so that the names stay legible."""
     keys = sorted(ASSETS, key=lambda k: A[k]['illiq'])
-    y = np.arange(len(keys))
-    fig, ax = plt.subplots(figsize=(7.2, 5.4))
-    ax.barh(y, [A[k]['illiq'] for k in keys], color=[GROUP_COL[ASSETS[k][2]] for k in keys])
-    ax.set_xscale('log')
-    ax.set_yticks(y)
-    ax.set_yticklabels([LABELS[k] for k in keys], fontsize=7.5)
-    for t, k in zip(ax.get_yticklabels(), keys):
-        t.set_color(GROUP_COL[ASSETS[k][2]])
-    ax.set_xlabel('Amihud illiquidity: mean |daily return| (bp) per USD 1 million traded (log scale)')
+    parts = [keys[:13], keys[13:]]
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.6), sharex=True)
+    for ax, ks in zip(axes, parts):
+        y = np.arange(len(ks))
+        ax.barh(y, [A[k]['illiq'] for k in ks], color=[GROUP_COL[ASSETS[k][2]] for k in ks])
+        ax.set_xscale('log')
+        ax.set_yticks(y)
+        ax.set_yticklabels([LABELS[k] for k in ks], fontsize=7.5)
+        for t, k in zip(ax.get_yticklabels(), ks):
+            t.set_color(GROUP_COL[ASSETS[k][2]])
+        ax.set_ylim(-0.6, len(parts[0]) - 0.5)
+        ax.set_xlabel('bp per USD 1 million traded (log scale)')
+    axes[0].set_title('Amihud illiquidity: mean |daily return| per USD 1 million traded', fontsize=9, loc='left')
     from matplotlib.patches import Patch
-    ax.legend(handles=[Patch(color=c, label=g) for g, c in GROUP_COL.items()], loc='upper center',
-              bbox_to_anchor=(0.5, -0.1), ncol=3, frameon=False)
+    plt.tight_layout()
+    fig.legend(handles=[Patch(color=c, label=g) for g, c in GROUP_COL.items()], loc='upper center',
+               bbox_to_anchor=(0.5, 0.0), ncol=3, frameon=False)
     save_fig('ch10_amihud')
 
 

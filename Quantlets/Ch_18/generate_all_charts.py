@@ -20,6 +20,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import (BANKS, US, EU, RO, ALL, NAMES, REGION_INDEX, joint_returns, bank_range_vol,  # noqa: E402
                       index_close, prices)
 from systemic import (mes, mes_threshold, lrmes, srisk_ratio, breakeven_leverage, qreg, covar_static,  # noqa: E402
@@ -336,21 +338,30 @@ def spill_static(H=10):
 
 
 def fig_spill_table(st):
+    """Spillover table; laid out at the size of its box on the slide (5.67 x 2.22 in): full names on the rows,
+    tickers on the columns (same order), so that the 13 x 13 cells stay legible."""
     tab = st['table']
-    fig, ax = plt.subplots(figsize=(7.2, 5.0))
-    im = ax.imshow(tab.values, cmap='Blues', vmin=0, vmax=40)
+    fig = plt.figure(figsize=(5.47, 2.02))
+    fig._sf_manual = True
+    gs = fig.add_gridspec(1, 2, width_ratios=[1, 0.025], left=0.215, right=0.935, top=0.97, bottom=0.17,
+                          wspace=0.03)
+    ax = fig.add_subplot(gs[0])
+    cax = fig.add_subplot(gs[1])
+    im = ax.imshow(tab.values, cmap='Blues', vmin=0, vmax=40, aspect='auto')
     for i in range(len(ALL)):
         for j in range(len(ALL)):
             v = tab.values[i, j]
             ax.text(j, i, f'{v:.0f}', ha='center', va='center', fontsize=6.3, color='white' if v > 25 else 'black')
     ax.set_xticks(range(len(ALL)))
     ax.set_yticks(range(len(ALL)))
-    ax.set_xticklabels([NAMES[k] for k in ALL], rotation=45, ha='right', fontsize=7)
-    ax.set_yticklabels([NAMES[k] for k in ALL], fontsize=7)
-    ax.set_xlabel('Shock from (column)')
-    ax.set_ylabel('Forecast error variance of (row)')
-    cb = fig.colorbar(im, ax=ax, orientation='horizontal', fraction=0.04, pad=0.28)
-    cb.set_label('Share of the 10-day forecast error variance (%)', fontsize=8)
+    ax.set_xticklabels(ALL, fontsize=6.6)
+    ax.set_yticklabels([NAMES[k] for k in ALL], fontsize=6.6)
+    ax.tick_params(length=2)
+    ax.set_xlabel('Shock from (column, ticker)', fontsize=6.8, labelpad=2)
+    ax.set_ylabel('Forecast error variance of (row)', fontsize=6.8)
+    cb = fig.colorbar(im, cax=cax)
+    cb.ax.tick_params(labelsize=6.6, length=2)
+    cb.set_label('Share of the 10-day forecast\nerror variance (%)', fontsize=6.6)
     save_fig('ch18_spill_table')
 
 

@@ -20,6 +20,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 import mfm_data as M      # noqa: E402
 import rv_tools as T      # noqa: E402
 
@@ -693,21 +695,27 @@ def fig_csv_horizons():
 
 
 def fig_csv_ranking():
-    """Ranking of the 21 models, one month ahead, M_ALL (Table 7), coloured by family."""
-    s = csv_table().loc[('month', 'ALL')].sort_values(ascending=False)
+    """Ranking of the 21 models, one month ahead, M_ALL (Table 7), coloured by family; two panels (ranks 1-11 and
+    12-21) so that the 21 model names stay legible on a slide."""
+    s = csv_table().loc[('month', 'ALL')].sort_values(ascending=True)
     col = {m: c for _, c, ms in CSV_FAMILY for m in ms}
-    fig, ax = plt.subplots(figsize=(6.6, 4.8))
-    y = np.arange(len(s))
-    ax.barh(y, s.values - 1.0, left=1.0, color=[col[m] for m in s.index], height=0.7)
-    for yi, (m, v) in zip(y, s.items()):
-        ax.text(v + (0.012 if v >= 1 else -0.012), yi, f'{v:.3f}', va='center', ha='left' if v >= 1 else 'right',
-                fontsize=10, color='black')
-    ax.axvline(1.0, color=Black, lw=0.8, ls='--')
-    ax.set_yticks(y)
-    ax.set_yticklabels([csv_label(m) for m in s.index], fontsize=10.5)
-    ax.set_xlim(0.45, 1.78)
-    ax.set_xlabel('Out-of-sample MSE relative to HAR (below 1: more accurate)', fontsize=11)
-    ax.tick_params(axis='x', labelsize=10)
+    fig, axes = plt.subplots(1, 2, figsize=(9.0, 4.4), sharex=True)
+    parts = [s.iloc[:11], s.iloc[11:]]
+    for ax, part, k0 in zip(axes, parts, (1, 12)):
+        y = np.arange(len(part))[::-1]
+        ax.barh(y, part.values - 1.0, left=1.0, color=[col[m] for m in part.index], height=0.7)
+        for yi, (m, v) in zip(y, part.items()):
+            ax.text(v + (0.015 if v >= 1 else -0.015), yi, f'{v:.3f}', va='center', ha='left' if v >= 1 else 'right',
+                    fontsize=9.5, color='black')
+        ax.axvline(1.0, color=Black, lw=0.8, ls='--')
+        ax.set_yticks(y)
+        ax.set_yticklabels([f'{k0 + i}. {csv_label(m)}' for i, m in enumerate(part.index)], fontsize=10)
+        ax.set_ylim(-0.6, 10.6)
+        ax.set_xlim(0.30, 1.80)
+        ax.set_xlabel('Out-of-sample MSE relative to HAR', fontsize=10.5)
+        ax.tick_params(axis='x', labelsize=10)
+    axes[0].set_title('Ranks 1-11 (below 1: more accurate than HAR)', fontsize=10.5, loc='left')
+    axes[1].set_title('Ranks 12-21', fontsize=10.5, loc='left')
     handles = [plt.Rectangle((0, 0), 1, 1, color=c) for _, c, _ in CSV_FAMILY]
     fig.legend(handles, [f for f, _, _ in CSV_FAMILY], loc='upper center', bbox_to_anchor=(0.5, 0.01), ncol=4,
                frameon=False, fontsize=9.5, handlelength=1.2, columnspacing=1.0)

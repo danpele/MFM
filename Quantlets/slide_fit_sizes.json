@@ -1,0 +1,3270 @@
+{
+"ch0_ai_spread": [
+204.1,
+143.8
+],
+"ch0_bad_ticks": [
+408.2,
+160.5
+],
+"ch0_bvb_history": [
+408.2,
+160.6
+],
+"ch0_concentration": [
+326.6,
+125.6
+],
+"ch0_cross_asset_growth": [
+408.2,
+148.2
+],
+"ch0_eurron": [
+285.7,
+139.2
+],
+"ch0_hhl_elasticity": [
+408.2,
+160.5
+],
+"ch0_ibit": [
+408.2,
+148.2
+],
+"ch0_market_history": [
+408.2,
+160.5
+],
+"ch0_model_history": [
+408.2,
+144.5
+],
+"ch0_rates": [
+408.2,
+148.2
+],
+"ch0_risk_return": [
+212.3,
+148.0
+],
+"ch0_ro_yields": [
+244.9,
+119.9
+],
+"ch0_rolling_correlations": [
+293.9,
+108.4
+],
+"ch0_rolling_vol": [
+293.9,
+111.8
+],
+"ch0_romania_equities": [
+261.2,
+142.1
+],
+"ch0_sem_a1_returns": [
+408.2,
+160.5
+],
+"ch0_sem_a2_drawdown": [
+408.2,
+161.9
+],
+"ch0_sem_a5_drag": [
+408.2,
+160.2
+],
+"ch0_sem_a6_acf": [
+408.2,
+160.2
+],
+"ch0_sem_a7_weekly": [
+408.2,
+160.2
+],
+"ch0_sem_a8_se_span": [
+408.2,
+160.2
+],
+"ch0_sem_a9_leadlag": [
+408.2,
+160.2
+],
+"ch0_sem_b10_growth": [
+236.7,
+124.3
+],
+"ch0_sem_b10_underwater": [
+269.4,
+132.3
+],
+"ch0_sem_b1_growth": [
+408.2,
+138.5
+],
+"ch0_sem_b1_growth3": [
+408.2,
+139.2
+],
+"ch0_sem_b1_underwater3": [
+408.2,
+139.2
+],
+"ch0_sem_b1_vol": [
+408.2,
+147.7
+],
+"ch0_sem_b1x_diff": [
+408.2,
+160.2
+],
+"ch0_sem_b1x_sharpe": [
+302.1,
+131.0
+],
+"ch0_sem_b2_underwater": [
+408.2,
+162.0
+],
+"ch0_sem_b2x_distributions": [
+408.2,
+160.2
+],
+"ch0_sem_b3_rolling": [
+408.2,
+147.7
+],
+"ch0_sem_b3x_change": [
+408.2,
+160.2
+],
+"ch0_sem_b4_supply": [
+244.9,
+104.8
+],
+"ch0_sem_b4x_break": [
+408.2,
+160.2
+],
+"ch0_sem_b5_currency": [
+285.7,
+123.6
+],
+"ch0_sem_b6_audit": [
+408.2,
+160.2
+],
+"ch0_sem_b6_raw": [
+408.2,
+161.9
+],
+"ch0_sem_b6_spike": [
+269.4,
+122.4
+],
+"ch0_sem_b6x_calibration": [
+408.2,
+160.2
+],
+"ch0_sem_b7_event": [
+408.2,
+160.2
+],
+"ch0_sem_b8_car": [
+195.9,
+131.9
+],
+"ch0_sem_b9_quotes": [
+204.1,
+143.9
+],
+"ch0_sem_bootstrap_demo": [
+408.2,
+160.2
+],
+"ch0_sem_c1_correlation": [
+408.2,
+160.2
+],
+"ch0_sem_c2_correction": [
+212.3,
+142.2
+],
+"ch0_sem_c3_slopes": [
+408.2,
+160.2
+],
+"ch0_sem_logscale": [
+228.6,
+144.0
+],
+"ch0_sp500_drawdowns": [
+408.2,
+160.5
+],
+"ch0_stablecoins": [
+318.4,
+111.0
+],
+"ch0_usdt_peg": [
+408.2,
+160.5
+],
+"ch0_vix_regimes": [
+293.9,
+101.8
+],
+"ch0_vix_vrp": [
+408.2,
+148.2
+],
+"ch10_almgren_chriss": [
+408.2,
+160.5
+],
+"ch10_amihud": [
+408.2,
+160.5
+],
+"ch10_amihud_time": [
+405.2,
+101.5
+],
+"ch10_april2025": [
+408.2,
+160.5
+],
+"ch10_btc_hours": [
+220.4,
+118.4
+],
+"ch10_bvb_turnover": [
+405.2,
+101.5
+],
+"ch10_flash_crash": [
+220.4,
+110.0
+],
+"ch10_glosten_milgrom": [
+408.2,
+160.5
+],
+"ch10_kyle": [
+408.2,
+160.5
+],
+"ch10_lob_snapshot": [
+408.2,
+160.7
+],
+"ch10_race_prize": [
+408.2,
+160.5
+],
+"ch10_race_tax": [
+408.2,
+160.5
+],
+"ch10_roll_bounce": [
+408.2,
+160.7
+],
+"ch10_sem_a1_bounce": [
+408.2,
+160.7
+],
+"ch10_sem_a2_sampling": [
+408.2,
+160.7
+],
+"ch10_sem_a3_spread": [
+187.8,
+137.8
+],
+"ch10_sem_a4_learning": [
+408.2,
+160.2
+],
+"ch10_sem_a6_kyle": [
+408.2,
+160.2
+],
+"ch10_sem_ac": [
+408.2,
+160.2
+],
+"ch10_sem_b2_estimates": [
+408.2,
+160.5
+],
+"ch10_sem_b2_mc": [
+408.2,
+160.5
+],
+"ch10_sem_b4": [
+408.2,
+160.5
+],
+"ch10_sem_b5": [
+408.2,
+160.2
+],
+"ch10_sem_b6": [
+408.2,
+160.2
+],
+"ch10_sem_b7": [
+408.2,
+160.2
+],
+"ch10_sem_b8_prices": [
+405.7,
+105.5
+],
+"ch10_sem_b8_shares": [
+408.2,
+160.2
+],
+"ch10_sem_c1": [
+408.2,
+160.2
+],
+"ch10_sem_c2_roundtrip": [
+405.7,
+76.3
+],
+"ch10_sem_c3_tax": [
+408.2,
+160.2
+],
+"ch10_sem_cross": [
+408.2,
+160.5
+],
+"ch10_sem_pin": [
+408.2,
+160.2
+],
+"ch10_sem_premium": [
+408.2,
+160.2
+],
+"ch10_sem_ushape": [
+408.2,
+160.5
+],
+"ch10_spread_estimators": [
+408.2,
+160.7
+],
+"ch10_spread_frequency": [
+408.2,
+160.7
+],
+"ch10_spy_illiq_vix": [
+405.2,
+101.5
+],
+"ch10_spy_intraday": [
+405.2,
+110.0
+],
+"ch10_sqrt_law": [
+204.1,
+135.3
+],
+"ch10_walk_book": [
+212.3,
+139.7
+],
+"ch11_bm_paths": [
+408.2,
+160.5
+],
+"ch11_case_rough_paper": [
+408.2,
+160.5
+],
+"ch11_case_rough_spy": [
+408.2,
+160.2
+],
+"ch11_convergence": [
+408.2,
+160.5
+],
+"ch11_donsker": [
+408.2,
+160.5
+],
+"ch11_drift_precision": [
+408.2,
+160.5
+],
+"ch11_gbm_fan": [
+408.2,
+160.5
+],
+"ch11_gbm_vs_data": [
+408.2,
+160.5
+],
+"ch11_heston_paths": [
+408.2,
+160.9
+],
+"ch11_heston_smile": [
+408.2,
+160.9
+],
+"ch11_ito": [
+408.2,
+160.5
+],
+"ch11_jumps": [
+408.2,
+160.9
+],
+"ch11_lognormal": [
+408.2,
+160.5
+],
+"ch11_merton_density": [
+408.2,
+160.6
+],
+"ch11_models_vs_data": [
+408.2,
+160.9
+],
+"ch11_np_diffusion": [
+408.2,
+160.7
+],
+"ch11_ou_paths": [
+204.1,
+143.9
+],
+"ch11_quadratic_variation": [
+408.2,
+160.5
+],
+"ch11_sem_a1_pq": [
+200.0,
+144.7
+],
+"ch11_sem_a3_yield": [
+408.2,
+116.6
+],
+"ch11_sem_a5_cir": [
+408.2,
+160.2
+],
+"ch11_sem_a6_affine": [
+408.2,
+160.2
+],
+"ch11_sem_a78_jumps": [
+408.2,
+160.2
+],
+"ch11_sem_a9_freq": [
+408.2,
+161.9
+],
+"ch11_sem_b2_intervals": [
+408.2,
+160.5
+],
+"ch11_sem_b3_diag": [
+408.2,
+162.0
+],
+"ch11_sem_b4_null": [
+408.2,
+160.5
+],
+"ch11_sem_b4x_fits": [
+408.2,
+160.2
+],
+"ch11_sem_b6_profile": [
+408.2,
+160.2
+],
+"ch11_sem_b7_lm": [
+408.2,
+160.2
+],
+"ch11_sem_b8_proxies": [
+408.2,
+160.2
+],
+"ch11_sem_b9_bw": [
+408.2,
+160.2
+],
+"ch11_sem_c1_q": [
+408.2,
+160.2
+],
+"ch11_sem_c2_ai": [
+408.2,
+160.8
+],
+"ch11_sem_kappa_bias": [
+191.8,
+144.7
+],
+"ch11_sem_lr_boot": [
+191.8,
+144.7
+],
+"ch11_sem_partC": [
+408.2,
+160.2
+],
+"ch11_vasicek": [
+408.2,
+160.7
+],
+"ch11_vix_ou": [
+408.2,
+160.2
+],
+"ch12_0dte_gamma": [
+408.2,
+160.5
+],
+"ch12_0dte_straddle": [
+408.2,
+160.5
+],
+"ch12_bck_bound": [
+408.2,
+160.5
+],
+"ch12_bck_means": [
+408.2,
+160.5
+],
+"ch12_binomial": [
+408.2,
+161.9
+],
+"ch12_btc_rnd": [
+408.2,
+160.5
+],
+"ch12_btc_smile": [
+204.1,
+154.9
+],
+"ch12_btc_term": [
+408.2,
+160.5
+],
+"ch12_delta_hedged_sp500": [
+408.2,
+160.7
+],
+"ch12_greeks": [
+408.2,
+160.5
+],
+"ch12_hedge_error": [
+408.2,
+160.7
+],
+"ch12_leverage": [
+204.1,
+155.0
+],
+"ch12_sem_a1_butterfly": [
+195.9,
+150.2
+],
+"ch12_sem_a4_crr": [
+187.8,
+143.2
+],
+"ch12_sem_a5_greeks": [
+375.5,
+120.6
+],
+"ch12_sem_a7_newton": [
+408.2,
+160.5
+],
+"ch12_sem_a8_strip": [
+195.9,
+147.6
+],
+"ch12_sem_b2_cum": [
+204.1,
+144.4
+],
+"ch12_sem_b4_strip": [
+195.9,
+149.9
+],
+"ch12_sem_b5_vrp": [
+408.2,
+160.5
+],
+"ch12_sem_b6_ellipse": [
+408.2,
+162.0
+],
+"ch12_sem_b7_btc": [
+204.1,
+147.8
+],
+"ch12_sem_b8_density": [
+204.1,
+154.0
+],
+"ch12_sem_hedge": [
+204.1,
+130.3
+],
+"ch12_sem_svi": [
+220.4,
+166.7
+],
+"ch12_sem_vrp_signal": [
+351.0,
+115.0
+],
+"ch12_smile_models": [
+204.1,
+156.2
+],
+"ch12_vix_history": [
+402.2,
+105.7
+],
+"ch12_vix_rv_mz": [
+187.8,
+153.7
+],
+"ch12_vix_term": [
+408.2,
+160.5
+],
+"ch12_vol_mismatch": [
+204.1,
+150.2
+],
+"ch12_vrp": [
+408.2,
+160.5
+],
+"ch12_vrp_btc": [
+408.2,
+160.5
+],
+"ch12_vvix": [
+212.3,
+142.3
+],
+"ch13_ai_tstats": [
+408.2,
+160.5
+],
+"ch13_cpz_sharpe": [
+408.2,
+160.5
+],
+"ch13_cpz_tangency_oos": [
+408.2,
+160.5
+],
+"ch13_deflated_sharpe": [
+302.1,
+128.9
+],
+"ch13_expected_max_sharpe": [
+408.2,
+160.5
+],
+"ch13_feature_importance": [
+408.2,
+160.5
+],
+"ch13_ffd_adf": [
+408.2,
+160.5
+],
+"ch13_ffd_series": [
+408.2,
+160.5
+],
+"ch13_ffd_weights": [
+310.2,
+126.8
+],
+"ch13_is_vs_oos": [
+408.2,
+160.5
+],
+"ch13_label_comparison": [
+302.1,
+118.0
+],
+"ch13_lasso_path": [
+408.2,
+160.7
+],
+"ch13_leakage_experiment": [
+236.8,
+128.1
+],
+"ch13_memory_estimation": [
+408.2,
+160.5
+],
+"ch13_model_comparison": [
+408.2,
+160.5
+],
+"ch13_purged_cv_scheme": [
+408.2,
+161.9
+],
+"ch13_sem_a10_delong": [
+408.2,
+115.1
+],
+"ch13_sem_a1_weights": [
+408.2,
+160.5
+],
+"ch13_sem_a2_adf": [
+220.4,
+148.7
+],
+"ch13_sem_a3_paths": [
+220.4,
+146.0
+],
+"ch13_sem_a3_task": [
+208.2,
+142.4
+],
+"ch13_sem_a4_paths": [
+212.3,
+140.7
+],
+"ch13_sem_a5_dsr": [
+408.2,
+160.5
+],
+"ch13_sem_a6_dsr": [
+408.2,
+160.2
+],
+"ch13_sem_a6_gumbel": [
+408.2,
+160.2
+],
+"ch13_sem_a7_purge": [
+408.2,
+161.9
+],
+"ch13_sem_a7_task": [
+187.8,
+150.7
+],
+"ch13_sem_a8_purge": [
+408.2,
+160.2
+],
+"ch13_sem_a9_auc": [
+408.2,
+160.2
+],
+"ch13_sem_b10_grid": [
+408.2,
+160.8
+],
+"ch13_sem_b11_pbo": [
+408.2,
+160.2
+],
+"ch13_sem_b12_pt": [
+408.2,
+160.2
+],
+"ch13_sem_b13_spa": [
+408.2,
+160.2
+],
+"ch13_sem_b14_ds": [
+408.2,
+160.2
+],
+"ch13_sem_b1_memory": [
+408.2,
+160.8
+],
+"ch13_sem_b2_eth": [
+408.2,
+160.2
+],
+"ch13_sem_b3_barriers": [
+408.2,
+161.9
+],
+"ch13_sem_b4_asym": [
+212.3,
+147.7
+],
+"ch13_sem_b5_cv": [
+408.2,
+161.9
+],
+"ch13_sem_b6_leak": [
+408.2,
+160.2
+],
+"ch13_sem_b7_auc": [
+408.2,
+160.5
+],
+"ch13_sem_b7_importance": [
+408.2,
+160.2
+],
+"ch13_sem_b7_models": [
+408.2,
+160.5
+],
+"ch13_sem_b8_dm": [
+408.2,
+160.5
+],
+"ch13_sem_b9_meta": [
+408.2,
+160.2
+],
+"ch13_sem_c2_fix": [
+408.2,
+160.7
+],
+"ch13_sem_data": [
+408.2,
+160.6
+],
+"ch13_signal_to_noise": [
+408.2,
+160.5
+],
+"ch13_tree_complexity": [
+408.2,
+160.7
+],
+"ch13_triple_barrier": [
+310.2,
+131.4
+],
+"ch13_vix_inference": [
+408.2,
+160.5
+],
+"ch13_walk_forward_backtest": [
+269.4,
+111.6
+],
+"ch14_acf_signal": [
+228.6,
+143.8
+],
+"ch14_ai_prepost": [
+187.8,
+143.8
+],
+"ch14_breach_rates": [
+228.6,
+143.6
+],
+"ch14_conformal": [
+408.2,
+160.3
+],
+"ch14_context_length": [
+228.6,
+143.8
+],
+"ch14_cum_sse": [
+228.6,
+144.0
+],
+"ch14_fan_chart": [
+228.6,
+143.8
+],
+"ch14_kmz_complexity": [
+408.2,
+126.4
+],
+"ch14_kmz_positions": [
+405.2,
+97.3
+],
+"ch14_lstm_seeds": [
+228.6,
+144.0
+],
+"ch14_lstm_training": [
+195.9,
+144.0
+],
+"ch14_mcs": [
+402.8,
+97.1
+],
+"ch14_patching": [
+408.2,
+160.5
+],
+"ch14_pit": [
+408.2,
+160.2
+],
+"ch14_qlike": [
+408.2,
+160.5
+],
+"ch14_return_r2": [
+228.6,
+144.0
+],
+"ch14_rv_forecasts": [
+228.6,
+143.8
+],
+"ch14_sem_a1_norms": [
+179.6,
+132.2
+],
+"ch14_sem_a3_tokens": [
+179.6,
+132.2
+],
+"ch14_sem_a5_grid": [
+179.6,
+132.2
+],
+"ch14_sem_a8_binom": [
+179.6,
+132.2
+],
+"ch14_sem_a9_power": [
+179.6,
+130.8
+],
+"ch14_sem_b10_conformal": [
+220.4,
+130.8
+],
+"ch14_sem_b11_prepost": [
+405.7,
+97.1
+],
+"ch14_sem_b1_r2": [
+212.3,
+131.1
+],
+"ch14_sem_b2_r2": [
+408.2,
+162.0
+],
+"ch14_sem_b3_qlike": [
+408.2,
+160.5
+],
+"ch14_sem_b4_context": [
+408.2,
+160.2
+],
+"ch14_sem_b5_breaches": [
+220.4,
+131.1
+],
+"ch14_sem_b6_var10": [
+220.4,
+130.8
+],
+"ch14_sem_b7_seeds": [
+220.4,
+130.8
+],
+"ch14_sem_bet": [
+405.7,
+97.1
+],
+"ch14_sem_leakage": [
+179.6,
+130.8
+],
+"ch14_tokenization": [
+408.2,
+160.5
+],
+"ch14_vanishing_gradient": [
+228.6,
+143.8
+],
+"ch14_var10": [
+228.6,
+143.6
+],
+"ch14_var_path": [
+228.6,
+143.6
+],
+"ch15_accuracy": [
+408.2,
+160.5
+],
+"ch15_agreement": [
+224.5,
+157.8
+],
+"ch15_calibration": [
+408.2,
+160.2
+],
+"ch15_confusion": [
+326.6,
+118.4
+],
+"ch15_contemp_next": [
+224.5,
+155.0
+],
+"ch15_dict_words": [
+408.2,
+160.6
+],
+"ch15_embeddings": [
+195.9,
+157.7
+],
+"ch15_event_study": [
+224.5,
+155.2
+],
+"ch15_learning_curve": [
+408.2,
+160.2
+],
+"ch15_llm_size": [
+224.5,
+159.5
+],
+"ch15_llt_decay": [
+163.3,
+138.1
+],
+"ch15_llt_models": [
+408.2,
+160.5
+],
+"ch15_memory_auc": [
+408.2,
+160.5
+],
+"ch15_memory_timeline": [
+244.9,
+116.1
+],
+"ch15_news_coverage": [
+224.5,
+151.6
+],
+"ch15_news_hours": [
+224.5,
+154.7
+],
+"ch15_ppi": [
+408.2,
+160.2
+],
+"ch15_prompts": [
+224.5,
+156.4
+],
+"ch15_sem_a1_attenuation": [
+408.2,
+160.7
+],
+"ch15_sem_a2_attenuation": [
+408.2,
+160.2
+],
+"ch15_sem_a3_power": [
+195.9,
+150.0
+],
+"ch15_sem_a4_power": [
+408.2,
+160.2
+],
+"ch15_sem_a7_cost": [
+408.2,
+160.7
+],
+"ch15_sem_a8_cost": [
+408.2,
+160.2
+],
+"ch15_sem_b10_pvalues": [
+408.2,
+160.2
+],
+"ch15_sem_b1_pairs": [
+326.6,
+110.9
+],
+"ch15_sem_b2_pairs": [
+408.2,
+162.0
+],
+"ch15_sem_b3_leakage": [
+204.1,
+106.3
+],
+"ch15_sem_b6_event": [
+408.2,
+160.2
+],
+"ch15_sem_b7_perm": [
+212.3,
+146.3
+],
+"ch15_sem_b8_prompts": [
+408.2,
+160.2
+],
+"ch15_sem_cluster": [
+408.2,
+160.5
+],
+"ch15_sem_partc": [
+269.4,
+130.2
+],
+"ch15_spec_curve": [
+408.2,
+160.2
+],
+"ch15_strategy": [
+195.9,
+149.8
+],
+"ch15_subperiods": [
+224.5,
+153.4
+],
+"ch16_ai_zscan": [
+236.8,
+160.3
+],
+"ch16_alt_assets": [
+408.2,
+160.7
+],
+"ch16_amm_theory": [
+277.6,
+124.7
+],
+"ch16_crix_index": [
+204.1,
+104.4
+],
+"ch16_crix_rule": [
+277.6,
+127.0
+],
+"ch16_crix_weights": [
+277.6,
+132.0
+],
+"ch16_crypto_equities": [
+302.1,
+144.5
+],
+"ch16_defi_tvl": [
+236.8,
+146.4
+],
+"ch16_depeg_2023": [
+236.8,
+151.1
+],
+"ch16_drawdowns": [
+277.6,
+130.6
+],
+"ch16_etf_timing": [
+212.3,
+144.0
+],
+"ch16_etf_tracking": [
+405.2,
+101.5
+],
+"ch16_lp_vs_hodl": [
+236.8,
+152.9
+],
+"ch16_ltw_rolling_sd": [
+293.9,
+129.5
+],
+"ch16_ltw_table1": [
+236.8,
+146.0
+],
+"ch16_market_value": [
+408.2,
+160.5
+],
+"ch16_peg_deviation": [
+408.2,
+161.9
+],
+"ch16_rolling_corr": [
+408.2,
+160.7
+],
+"ch16_rolling_vol": [
+269.4,
+130.1
+],
+"ch16_sem_a1_index": [
+212.3,
+150.7
+],
+"ch16_sem_a3_profit": [
+212.3,
+157.9
+],
+"ch16_sem_a5_il": [
+212.3,
+152.8
+],
+"ch16_sem_a7_path": [
+212.3,
+150.4
+],
+"ch16_sem_b2_vol": [
+285.7,
+124.3
+],
+"ch16_sem_b4_tar": [
+236.8,
+160.0
+],
+"ch16_sem_b5_ratio": [
+408.2,
+160.5
+],
+"ch16_sem_b6_ratio": [
+408.2,
+160.2
+],
+"ch16_sem_b7_break": [
+212.3,
+116.4
+],
+"ch16_sem_b8_break": [
+244.9,
+134.4
+],
+"ch16_sem_c2_correction": [
+408.2,
+160.8
+],
+"ch16_sem_hedge": [
+212.3,
+145.2
+],
+"ch16_sem_usdc": [
+220.4,
+146.3
+],
+"ch16_sem_weekend": [
+212.3,
+148.6
+],
+"ch16_stablecoin_supply": [
+244.9,
+114.9
+],
+"ch16_tvl_chains": [
+293.9,
+141.4
+],
+"ch16_ust_collapse": [
+236.8,
+144.9
+],
+"ch16_weekday": [
+228.6,
+120.2
+],
+"ch17_ai_dotcom": [
+408.2,
+160.5
+],
+"ch17_bet": [
+408.2,
+160.7
+],
+"ch17_btc": [
+408.2,
+160.7
+],
+"ch17_dnz_cycle": [
+408.2,
+160.5
+],
+"ch17_dnz_leadlag": [
+408.2,
+160.2
+],
+"ch17_episodes": [
+408.2,
+160.5
+],
+"ch17_evans": [
+408.2,
+160.7
+],
+"ch17_fwer_btc": [
+408.2,
+160.7
+],
+"ch17_gme": [
+408.2,
+160.7
+],
+"ch17_gsy": [
+408.2,
+160.5
+],
+"ch17_lppls_btc2017": [
+408.2,
+160.2
+],
+"ch17_lppls_ci": [
+408.2,
+160.2
+],
+"ch17_ms_btc": [
+408.2,
+160.7
+],
+"ch17_ms_lr": [
+408.2,
+126.5
+],
+"ch17_ms_ndx": [
+408.2,
+160.7
+],
+"ch17_ndx": [
+408.2,
+160.7
+],
+"ch17_null": [
+408.2,
+160.7
+],
+"ch17_rational_bubble": [
+408.2,
+160.5
+],
+"ch17_sem_a1": [
+408.2,
+160.7
+],
+"ch17_sem_a2": [
+408.2,
+160.2
+],
+"ch17_sem_a3": [
+236.8,
+122.4
+],
+"ch17_sem_a4": [
+228.6,
+122.4
+],
+"ch17_sem_a5": [
+408.2,
+109.1
+],
+"ch17_sem_a6": [
+408.2,
+160.2
+],
+"ch17_sem_a7": [
+408.2,
+160.2
+],
+"ch17_sem_a8": [
+179.6,
+109.7
+],
+"ch17_sem_ai": [
+408.2,
+160.2
+],
+"ch17_sem_b1": [
+402.2,
+148.0
+],
+"ch17_sem_b10": [
+408.2,
+160.2
+],
+"ch17_sem_b2": [
+408.2,
+160.2
+],
+"ch17_sem_b9": [
+405.7,
+97.1
+],
+"ch17_sem_btc_wild": [
+408.2,
+160.5
+],
+"ch17_sem_bvb": [
+408.2,
+162.0
+],
+"ch17_sem_ci_ndx": [
+408.2,
+160.2
+],
+"ch17_sem_data": [
+408.2,
+160.6
+],
+"ch17_sem_ms_btc3": [
+408.2,
+160.2
+],
+"ch17_sem_ms_sp": [
+408.2,
+160.5
+],
+"ch17_sem_tc_windows": [
+408.2,
+160.5
+],
+"ch17_sp_pd": [
+408.2,
+160.7
+],
+"ch17_tc_instability": [
+408.2,
+160.2
+],
+"ch17_timeline": [
+408.2,
+160.5
+],
+"ch17_windows": [
+405.7,
+84.7
+],
+"ch18_bank_indices": [
+204.1,
+139.6
+],
+"ch18_case_quantile_index": [
+408.2,
+160.9
+],
+"ch18_case_tail_corr": [
+383.7,
+118.7
+],
+"ch18_covar_qr": [
+187.8,
+148.0
+],
+"ch18_dcovar": [
+408.2,
+160.5
+],
+"ch18_dcovar_dynamic": [
+195.9,
+148.0
+],
+"ch18_exposure": [
+408.2,
+160.5
+],
+"ch18_frm_gacv": [
+408.2,
+160.5
+],
+"ch18_frm_rolling": [
+408.2,
+160.5
+],
+"ch18_lrmes_models": [
+408.2,
+160.6
+],
+"ch18_mes": [
+408.2,
+160.6
+],
+"ch18_reverse_stress": [
+408.2,
+160.5
+],
+"ch18_sem_a1": [
+408.2,
+161.9
+],
+"ch18_sem_a7": [
+408.2,
+160.2
+],
+"ch18_sem_b1": [
+408.2,
+160.5
+],
+"ch18_sem_b10": [
+408.2,
+160.2
+],
+"ch18_sem_b2": [
+408.2,
+160.5
+],
+"ch18_sem_b3": [
+408.2,
+160.2
+],
+"ch18_sem_b4": [
+408.2,
+160.2
+],
+"ch18_sem_b5": [
+408.2,
+160.5
+],
+"ch18_sem_b6": [
+408.2,
+160.2
+],
+"ch18_sem_b7": [
+408.2,
+160.2
+],
+"ch18_sem_b8": [
+408.2,
+160.2
+],
+"ch18_sem_c1": [
+408.2,
+160.2
+],
+"ch18_spill_ci": [
+408.2,
+160.5
+],
+"ch18_spill_enet": [
+195.9,
+148.0
+],
+"ch18_spill_network": [
+408.2,
+160.5
+],
+"ch18_spill_rolling": [
+408.2,
+160.5
+],
+"ch18_spill_table": [
+408.2,
+160.5
+],
+"ch18_srisk": [
+408.2,
+160.6
+],
+"ch18_stress_hist": [
+408.2,
+160.5
+],
+"ch18_var_vs_dcovar": [
+408.2,
+160.5
+],
+"ch19_bet_facts": [
+244.9,
+163.7
+],
+"ch19_bet_garch": [
+244.9,
+160.0
+],
+"ch19_bet_var": [
+244.9,
+161.4
+],
+"ch19_breach_rates": [
+204.1,
+158.6
+],
+"ch19_kupiec_power": [
+212.3,
+161.2
+],
+"ch19_lookahead": [
+204.1,
+160.4
+],
+"ch19_nse_forks": [
+408.2,
+160.9
+],
+"ch19_nse_multiverse": [
+408.2,
+160.9
+],
+"ch19_rolling_breaches": [
+244.9,
+162.2
+],
+"ch19_sem_a11_kurtosis": [
+191.8,
+154.2
+],
+"ch19_sem_a3_forecast": [
+408.2,
+160.2
+],
+"ch19_sem_a7_power": [
+191.8,
+155.5
+],
+"ch19_sem_a9_pvalues": [
+191.8,
+157.8
+],
+"ch19_sem_b1_hill": [
+408.2,
+160.9
+],
+"ch19_sem_b2_hill": [
+191.8,
+150.4
+],
+"ch19_sem_b3_profile": [
+191.8,
+162.3
+],
+"ch19_sem_b4_nic": [
+191.8,
+157.6
+],
+"ch19_sem_b5_breaches": [
+191.8,
+150.4
+],
+"ch19_sem_b7_lookahead": [
+191.8,
+152.1
+],
+"ch19_sem_btc_var": [
+191.8,
+149.3
+],
+"ch19_sem_c1_did": [
+191.8,
+151.2
+],
+"ch19_sem_join": [
+191.8,
+147.3
+],
+"ch1_acf_abs_assets": [
+228.6,
+133.8
+],
+"ch1_acf_sp500": [
+408.2,
+160.5
+],
+"ch1_aggregation_kurtosis": [
+228.6,
+137.0
+],
+"ch1_cs_pdv_kernels": [
+408.2,
+160.2
+],
+"ch1_cs_pdv_vix": [
+408.2,
+160.2
+],
+"ch1_drawdowns": [
+236.8,
+135.2
+],
+"ch1_gain_loss": [
+408.2,
+160.5
+],
+"ch1_hill_plot": [
+236.8,
+138.6
+],
+"ch1_hist_qq": [
+408.2,
+160.5
+],
+"ch1_leverage": [
+408.2,
+127.0
+],
+"ch1_prices_returns": [
+408.2,
+160.5
+],
+"ch1_risk_return": [
+253.1,
+141.7
+],
+"ch1_rolling_vol": [
+318.4,
+127.6
+],
+"ch1_sem_a11_hill_sim": [
+212.3,
+153.5
+],
+"ch1_sem_a1_path": [
+408.2,
+160.5
+],
+"ch1_sem_a2_vr": [
+204.1,
+148.3
+],
+"ch1_sem_a3_chi2": [
+375.5,
+135.3
+],
+"ch1_sem_a4_brownian": [
+212.3,
+155.3
+],
+"ch1_sem_a4_drawdown": [
+236.8,
+163.0
+],
+"ch1_sem_a5_ohlc": [
+408.2,
+160.2
+],
+"ch1_sem_a6_mixture": [
+375.5,
+135.3
+],
+"ch1_sem_a7_hill": [
+375.5,
+122.7
+],
+"ch1_sem_a8_regimes": [
+391.9,
+164.6
+],
+"ch1_sem_a9_garch": [
+391.9,
+164.6
+],
+"ch1_sem_b12_response": [
+391.9,
+164.6
+],
+"ch1_sem_b13_bootstrap": [
+302.1,
+135.0
+],
+"ch1_sem_b14_facts": [
+302.1,
+107.2
+],
+"ch1_sem_b15_memory": [
+391.9,
+164.6
+],
+"ch1_sem_b1_sensitivity": [
+375.5,
+135.3
+],
+"ch1_sem_b2_var": [
+375.5,
+135.3
+],
+"ch1_sem_b3_acf": [
+405.2,
+152.3
+],
+"ch1_sem_b4_qq": [
+391.9,
+164.9
+],
+"ch1_sem_b6_regimes": [
+391.9,
+164.6
+],
+"ch1_sem_b7_wealth": [
+408.2,
+160.2
+],
+"ch1_sem_b8_index_spy": [
+220.4,
+142.2
+],
+"ch1_sem_bettr_rolling_acf": [
+408.2,
+121.3
+],
+"ch1_sem_c2_acf": [
+375.5,
+122.9
+],
+"ch1_sem_first_look": [
+408.2,
+160.6
+],
+"ch1_sem_garch_check": [
+269.4,
+123.3
+],
+"ch1_sem_hill_tails": [
+269.4,
+135.3
+],
+"ch1_sem_kurtosis_expanding": [
+408.2,
+160.2
+],
+"ch1_sem_leverage_ro_crypto": [
+261.2,
+135.0
+],
+"ch1_sem_robust_acf": [
+408.2,
+160.5
+],
+"ch1_simple_vs_log": [
+342.9,
+130.0
+],
+"ch1_taylor_effect": [
+228.6,
+132.5
+],
+"ch1_vol_estimators": [
+408.2,
+160.5
+],
+"ch1_volume_volatility": [
+367.4,
+105.7
+],
+"ch20_ablation": [
+395.9,
+101.5
+],
+"ch20_covid_forecasts": [
+395.9,
+115.2
+],
+"ch20_dm_heat": [
+408.2,
+161.9
+],
+"ch20_hv_share": [
+395.9,
+115.2
+],
+"ch20_mcs": [
+395.9,
+115.2
+],
+"ch20_qlike_ratio": [
+408.2,
+161.9
+],
+"ch20_robustness": [
+395.9,
+114.2
+],
+"ch20_selection": [
+395.9,
+115.2
+],
+"ch20_sem_a1_path": [
+175.5,
+139.6
+],
+"ch20_sem_a5_phi": [
+212.3,
+139.3
+],
+"ch20_sem_a7_qlike": [
+187.8,
+139.6
+],
+"ch20_sem_a9_weights": [
+187.8,
+139.6
+],
+"ch20_sem_b1_levy": [
+236.8,
+139.6
+],
+"ch20_sem_b2_levy": [
+220.4,
+139.3
+],
+"ch20_sem_b3_coef": [
+408.2,
+160.5
+],
+"ch20_sem_b4_coef": [
+408.2,
+160.2
+],
+"ch20_sem_b6_cumloss": [
+220.4,
+139.3
+],
+"ch20_sem_b7_pvalues": [
+236.8,
+139.6
+],
+"ch20_sem_b8_pvalues": [
+228.6,
+139.3
+],
+"ch20_sem_basepoint": [
+171.4,
+139.3
+],
+"ch20_sem_cumloss": [
+236.8,
+139.6
+],
+"ch20_sig_dimension": [
+187.8,
+139.9
+],
+"ch20_signature_demo": [
+395.9,
+114.5
+],
+"ch20_subperiod": [
+408.2,
+161.9
+],
+"ch20_volare_rv": [
+395.9,
+108.8
+],
+"ch20_weights_2020": [
+395.9,
+110.9
+],
+"ch2_acf_markets": [
+408.2,
+160.5
+],
+"ch2_ai_etf": [
+408.2,
+160.5
+],
+"ch2_calendar": [
+261.2,
+157.8
+],
+"ch2_crypto_yearly": [
+261.2,
+156.5
+],
+"ch2_hurst_markets": [
+408.2,
+160.2
+],
+"ch2_hurst_rs": [
+261.2,
+156.1
+],
+"ch2_mn_ridge": [
+408.2,
+159.4
+],
+"ch2_mn_rolling": [
+408.2,
+159.4
+],
+"ch2_multiple_testing": [
+408.2,
+161.9
+],
+"ch2_oos_dp": [
+261.2,
+156.7
+],
+"ch2_random_walk_game": [
+408.2,
+159.4
+],
+"ch2_rolling_hurst": [
+408.2,
+160.5
+],
+"ch2_rolling_vr": [
+261.2,
+156.5
+],
+"ch2_sem_a1": [
+408.2,
+160.5
+],
+"ch2_sem_a2": [
+408.2,
+160.2
+],
+"ch2_sem_a3": [
+408.2,
+160.2
+],
+"ch2_sem_a4": [
+408.2,
+160.2
+],
+"ch2_sem_a56": [
+408.2,
+160.5
+],
+"ch2_sem_amh_btc": [
+408.2,
+101.6
+],
+"ch2_sem_b1": [
+408.2,
+126.7
+],
+"ch2_sem_b2": [
+408.2,
+160.2
+],
+"ch2_sem_b3_rolling": [
+408.2,
+160.7
+],
+"ch2_sem_b3_window": [
+408.2,
+127.0
+],
+"ch2_sem_b5": [
+408.2,
+127.8
+],
+"ch2_sem_b6": [
+408.2,
+161.9
+],
+"ch2_sem_b7": [
+408.2,
+110.0
+],
+"ch2_sem_b8": [
+408.2,
+160.2
+],
+"ch2_sem_b9": [
+408.2,
+160.2
+],
+"ch2_sem_c1": [
+408.2,
+160.2
+],
+"ch2_sem_data": [
+408.2,
+160.6
+],
+"ch2_tsmom": [
+408.2,
+161.9
+],
+"ch2_vr_markets": [
+408.2,
+160.5
+],
+"ch2_vr_profile": [
+408.2,
+160.5
+],
+"ch3_ai_momentum": [
+408.2,
+160.5
+],
+"ch3_beta_shrink": [
+236.8,
+148.6
+],
+"ch3_bvb_betas": [
+408.2,
+161.0
+],
+"ch3_etf_alphas": [
+404.9,
+114.2
+],
+"ch3_factor_cum": [
+405.7,
+115.2
+],
+"ch3_factor_etfs": [
+408.2,
+160.5
+],
+"ch3_factor_tstats": [
+405.7,
+115.2
+],
+"ch3_false_discoveries": [
+405.2,
+114.2
+],
+"ch3_fama_macbeth": [
+408.2,
+160.7
+],
+"ch3_frontier": [
+408.2,
+161.9
+],
+"ch3_jkp_replication": [
+408.2,
+160.5
+],
+"ch3_pca": [
+402.2,
+114.2
+],
+"ch3_rolling_beta": [
+404.0,
+114.5
+],
+"ch3_sem_a1_sml": [
+408.2,
+161.9
+],
+"ch3_sem_a2_grs": [
+408.2,
+160.2
+],
+"ch3_sem_a3_bayes": [
+408.2,
+160.5
+],
+"ch3_sem_a4_blume": [
+408.2,
+160.2
+],
+"ch3_sem_a5_pvalues": [
+236.8,
+127.8
+],
+"ch3_sem_a6_useless": [
+408.2,
+160.2
+],
+"ch3_sem_a7_eiv": [
+212.3,
+144.9
+],
+"ch3_sem_a8_equicorr": [
+195.9,
+145.6
+],
+"ch3_sem_b10_sharpe": [
+408.2,
+160.2
+],
+"ch3_sem_b11_boot": [
+408.2,
+160.2
+],
+"ch3_sem_b1_xlk": [
+408.2,
+160.6
+],
+"ch3_sem_b2_grs": [
+342.9,
+153.7
+],
+"ch3_sem_b3_pca": [
+408.2,
+160.5
+],
+"ch3_sem_b4_bvb": [
+408.2,
+160.5
+],
+"ch3_sem_b5_fm": [
+408.2,
+160.2
+],
+"ch3_sem_b6_alpha": [
+408.2,
+160.2
+],
+"ch3_sem_b7_alphas": [
+408.2,
+160.2
+],
+"ch3_sem_b8_bvb_pca": [
+408.2,
+160.2
+],
+"ch3_sem_b9_lns": [
+408.2,
+160.2
+],
+"ch3_sem_bvb_factors": [
+408.2,
+160.2
+],
+"ch3_sem_c2_correction": [
+408.2,
+160.8
+],
+"ch3_sml": [
+408.2,
+160.9
+],
+"ch4_black_litterman": [
+405.7,
+123.7
+],
+"ch4_bvb": [
+244.9,
+144.0
+],
+"ch4_costs": [
+408.2,
+160.5
+],
+"ch4_estimation_error": [
+224.5,
+140.8
+],
+"ch4_frontier": [
+236.8,
+148.0
+],
+"ch4_hrp": [
+408.2,
+160.5
+],
+"ch4_jkmp_paper": [
+244.9,
+131.3
+],
+"ch4_jkmp_replication": [
+408.2,
+160.2
+],
+"ch4_mp": [
+405.2,
+116.3
+],
+"ch4_oos_cum": [
+244.9,
+143.8
+],
+"ch4_oos_sharpe": [
+244.9,
+135.3
+],
+"ch4_risk_contrib": [
+405.2,
+122.7
+],
+"ch4_rolling_weights": [
+408.2,
+161.9
+],
+"ch4_sem_a1_two_asset": [
+408.2,
+161.9
+],
+"ch4_sem_a3_erc": [
+408.2,
+140.8
+],
+"ch4_sem_a4_6040": [
+228.6,
+153.7
+],
+"ch4_sem_a5_bl": [
+408.2,
+160.2
+],
+"ch4_sem_a6_bl_sectors": [
+228.6,
+147.2
+],
+"ch4_sem_a7_normal": [
+204.1,
+149.6
+],
+"ch4_sem_a8_intervals": [
+408.2,
+160.5
+],
+"ch4_sem_a9_bias": [
+408.2,
+160.2
+],
+"ch4_sem_b1_boot": [
+408.2,
+160.5
+],
+"ch4_sem_b1_timeline": [
+326.6,
+108.5
+],
+"ch4_sem_b1_wealth": [
+408.2,
+143.8
+],
+"ch4_sem_b2_varratio": [
+408.2,
+160.5
+],
+"ch4_sem_b2x_eigen": [
+228.6,
+155.8
+],
+"ch4_sem_b3_sectors": [
+408.2,
+160.5
+],
+"ch4_sem_b3_worked": [
+408.2,
+160.5
+],
+"ch4_sem_b4_shrink": [
+408.2,
+160.2
+],
+"ch4_sem_b5_btc": [
+228.6,
+151.8
+],
+"ch4_sem_b6_hrp_gmv": [
+408.2,
+160.2
+],
+"ch4_sem_b7_bl_multi": [
+228.6,
+149.6
+],
+"ch4_sem_b8_breakeven": [
+228.6,
+153.2
+],
+"ch4_sem_b9_bj": [
+408.2,
+160.2
+],
+"ch4_sem_bvb_global": [
+408.2,
+160.2
+],
+"ch4_sem_c1_tests": [
+228.6,
+150.7
+],
+"ch4_sem_c2_correction": [
+408.2,
+160.8
+],
+"ch4_sharpe_test": [
+408.2,
+160.5
+],
+"ch4_shrinkage": [
+408.2,
+160.5
+],
+"ch4_two_asset": [
+244.9,
+143.8
+],
+"ch4_window_length": [
+244.9,
+145.0
+],
+"ch5_acf_r_r2": [
+244.9,
+169.3
+],
+"ch5_clustering": [
+408.2,
+160.6
+],
+"ch5_covid": [
+244.9,
+169.2
+],
+"ch5_diag_acf": [
+244.9,
+169.2
+],
+"ch5_forecast_oos": [
+244.9,
+169.2
+],
+"ch5_innovations": [
+408.2,
+160.5
+],
+"ch5_long_memory": [
+244.9,
+169.2
+],
+"ch5_markets_vol": [
+408.2,
+160.5
+],
+"ch5_mz": [
+244.9,
+169.2
+],
+"ch5_nic": [
+244.9,
+169.2
+],
+"ch5_persistence": [
+408.2,
+160.5
+],
+"ch5_qlike": [
+244.9,
+169.2
+],
+"ch5_qsd_gap": [
+408.2,
+160.7
+],
+"ch5_qsd_nic": [
+408.2,
+160.7
+],
+"ch5_sem_a1_forecast": [
+408.2,
+160.7
+],
+"ch5_sem_a1_recursion": [
+391.9,
+131.3
+],
+"ch5_sem_a2_skewt": [
+408.2,
+160.2
+],
+"ch5_sem_a3_halflife": [
+408.2,
+160.2
+],
+"ch5_sem_a4_kurtosis": [
+408.2,
+160.2
+],
+"ch5_sem_a5_ratio": [
+408.2,
+126.4
+],
+"ch5_sem_a6_acf": [
+408.2,
+160.2
+],
+"ch5_sem_b1_diag": [
+391.9,
+131.1
+],
+"ch5_sem_b1_fit": [
+391.9,
+131.1
+],
+"ch5_sem_b2_nic": [
+391.9,
+131.1
+],
+"ch5_sem_b3_thresholds": [
+408.2,
+160.5
+],
+"ch5_sem_b4_btc": [
+408.2,
+160.2
+],
+"ch5_sem_b56_gwmcs": [
+391.9,
+130.8
+],
+"ch5_sem_b5_losses": [
+408.2,
+160.2
+],
+"ch5_sem_b5_mz": [
+408.2,
+160.2
+],
+"ch5_sem_b5_timeline": [
+408.2,
+160.2
+],
+"ch5_sem_b6_losses": [
+408.2,
+160.2
+],
+"ch5_sem_b6_mz": [
+408.2,
+160.2
+],
+"ch5_sem_b7_lr": [
+408.2,
+160.2
+],
+"ch5_sem_b7_persistence": [
+244.9,
+158.3
+],
+"ch5_sem_b8_bet": [
+408.2,
+160.2
+],
+"ch5_sem_c1_alignment": [
+391.9,
+130.8
+],
+"ch5_sem_c1_decomp": [
+408.2,
+160.2
+],
+"ch5_sem_c3_pit": [
+408.2,
+160.2
+],
+"ch5_simulation": [
+408.2,
+160.5
+],
+"ch5_sp500_vol": [
+244.9,
+169.2
+],
+"ch5_term_structure": [
+408.2,
+160.5
+],
+"ch6_ai_inflation": [
+408.2,
+160.5
+],
+"ch6_async": [
+224.5,
+148.0
+],
+"ch6_banks_avgcorr": [
+224.5,
+148.0
+],
+"ch6_banks_heatmap": [
+408.2,
+160.5
+],
+"ch6_banks_mst": [
+224.5,
+148.0
+],
+"ch6_copula_fit": [
+212.3,
+161.6
+],
+"ch6_copula_zoo": [
+334.7,
+120.8
+],
+"ch6_corr_hac": [
+224.5,
+148.0
+],
+"ch6_covol_replication": [
+224.5,
+148.2
+],
+"ch6_covol_table8": [
+261.2,
+98.7
+],
+"ch6_dcc_btc_spy": [
+224.5,
+148.0
+],
+"ch6_dcc_minvar": [
+408.2,
+160.5
+],
+"ch6_dcc_spy_tlt": [
+224.5,
+148.0
+],
+"ch6_ewma_rolling": [
+224.5,
+148.0
+],
+"ch6_exceedance": [
+224.5,
+148.0
+],
+"ch6_forbes_rigobon": [
+224.5,
+148.0
+],
+"ch6_fr_bias": [
+224.5,
+148.0
+],
+"ch6_gas_copula": [
+224.5,
+148.0
+],
+"ch6_hedge_oos": [
+408.2,
+160.5
+],
+"ch6_integration": [
+151.0,
+109.7
+],
+"ch6_pseudo_obs": [
+269.4,
+135.9
+],
+"ch6_sem_a2_gap": [
+183.7,
+147.7
+],
+"ch6_sem_a3_curve": [
+408.2,
+160.5
+],
+"ch6_sem_a3_se": [
+171.4,
+147.7
+],
+"ch6_sem_a5_dcc": [
+183.7,
+147.7
+],
+"ch6_sem_a6_lognormal": [
+408.2,
+160.2
+],
+"ch6_sem_b1_garch": [
+408.2,
+160.5
+],
+"ch6_sem_b1_lr": [
+408.2,
+160.5
+],
+"ch6_sem_b1_returns": [
+408.2,
+160.5
+],
+"ch6_sem_b2_boot": [
+408.2,
+160.2
+],
+"ch6_sem_b2_scatter": [
+408.2,
+160.5
+],
+"ch6_sem_b2_tails": [
+212.3,
+148.0
+],
+"ch6_sem_b3_tails": [
+212.3,
+149.4
+],
+"ch6_sem_b4_windows": [
+408.2,
+160.5
+],
+"ch6_sem_b6_gas": [
+224.5,
+147.7
+],
+"ch6_sem_btc_bands": [
+224.5,
+147.7
+],
+"ch6_sem_c1_change": [
+408.2,
+162.0
+],
+"ch6_sem_forbes_rigobon": [
+408.2,
+162.0
+],
+"ch6_sem_integration": [
+224.5,
+149.4
+],
+"ch6_sem_losses_copula": [
+150.2,
+132.3
+],
+"ch6_sem_tail_gauss_t": [
+151.0,
+132.4
+],
+"ch6_spy_tlt_rolling": [
+224.5,
+148.0
+],
+"ch6_tail_dep": [
+224.5,
+148.0
+],
+"ch6_wkd": [
+204.1,
+147.7
+],
+"ch7_ai_fz0": [
+408.2,
+160.5
+],
+"ch7_basel": [
+405.2,
+97.3
+],
+"ch7_caviar": [
+402.2,
+114.2
+],
+"ch7_components": [
+402.2,
+99.4
+],
+"ch7_cond_evt": [
+403.7,
+114.5
+],
+"ch7_crk_table6": [
+408.2,
+160.5
+],
+"ch7_gev": [
+220.4,
+139.9
+],
+"ch7_gpd_tail": [
+408.2,
+160.9
+],
+"ch7_horizon": [
+408.2,
+160.7
+],
+"ch7_hs_fhs_btc": [
+402.2,
+105.7
+],
+"ch7_hs_fhs_sp500": [
+402.2,
+105.7
+],
+"ch7_loss_distribution": [
+408.2,
+160.5
+],
+"ch7_mean_excess": [
+220.4,
+139.9
+],
+"ch7_methods_assets": [
+408.2,
+161.9
+],
+"ch7_precision": [
+408.2,
+160.5
+],
+"ch7_sem_a1a2_tails": [
+383.7,
+139.6
+],
+"ch7_sem_a3_mass": [
+383.7,
+139.6
+],
+"ch7_sem_a4_var_alpha": [
+408.2,
+160.5
+],
+"ch7_sem_a5_shares": [
+383.7,
+139.8
+],
+"ch7_sem_a6_cf": [
+383.7,
+139.3
+],
+"ch7_sem_a7_ru": [
+383.7,
+139.3
+],
+"ch7_sem_a8_sim": [
+383.7,
+139.3
+],
+"ch7_sem_b1_ci": [
+383.7,
+105.7
+],
+"ch7_sem_b2_clusters": [
+408.2,
+160.2
+],
+"ch7_sem_b3_boot": [
+383.7,
+139.3
+],
+"ch7_sem_b4_methods": [
+408.2,
+160.2
+],
+"ch7_sem_b5_rp": [
+383.7,
+139.3
+],
+"ch7_sem_b5_shares": [
+383.7,
+139.8
+],
+"ch7_sem_b6_ci": [
+383.7,
+139.6
+],
+"ch7_sem_b7_caviar": [
+408.2,
+160.2
+],
+"ch7_sem_bet_data": [
+383.7,
+139.6
+],
+"ch7_sem_bet_gpd": [
+408.2,
+160.8
+],
+"ch7_sem_bet_hs": [
+408.2,
+160.5
+],
+"ch7_sem_btc_fhs": [
+408.2,
+160.5
+],
+"ch7_sem_c1_stress": [
+383.7,
+139.3
+],
+"ch7_sem_c2_horizon": [
+383.7,
+139.8
+],
+"ch7_sem_c3_design": [
+408.2,
+160.2
+],
+"ch7_sem_capital": [
+383.7,
+139.3
+],
+"ch7_subadditivity": [
+220.4,
+140.8
+],
+"ch7_var_levels": [
+408.2,
+161.9
+],
+"ch8_bd_replication": [
+408.2,
+160.7
+],
+"ch8_bd_table3": [
+408.2,
+160.7
+],
+"ch8_breach_rates": [
+261.2,
+118.4
+],
+"ch8_breach_timeline": [
+269.4,
+110.6
+],
+"ch8_conformal_path": [
+408.2,
+160.5
+],
+"ch8_conformal_regimes": [
+228.6,
+154.0
+],
+"ch8_covid_zoom": [
+236.8,
+148.1
+],
+"ch8_dm_matrix": [
+408.2,
+160.7
+],
+"ch8_durations": [
+236.8,
+159.7
+],
+"ch8_elicitability": [
+285.7,
+115.9
+],
+"ch8_es_pvalues": [
+408.2,
+160.7
+],
+"ch8_four_assets": [
+408.2,
+160.7
+],
+"ch8_fz0": [
+236.8,
+153.6
+],
+"ch8_kupiec_curve": [
+408.2,
+160.5
+],
+"ch8_mcs": [
+236.8,
+161.0
+],
+"ch8_mf_residuals": [
+236.8,
+156.6
+],
+"ch8_murphy": [
+285.7,
+121.0
+],
+"ch8_pof_power": [
+236.8,
+162.4
+],
+"ch8_sem_a10_h": [
+302.1,
+130.3
+],
+"ch8_sem_a1_power": [
+408.2,
+160.5
+],
+"ch8_sem_a2_power": [
+236.8,
+159.3
+],
+"ch8_sem_a3_bet": [
+408.2,
+160.5
+],
+"ch8_sem_a4_dq": [
+236.8,
+162.2
+],
+"ch8_sem_a5_zones": [
+212.3,
+146.5
+],
+"ch8_sem_a6_scores": [
+310.2,
+133.7
+],
+"ch8_sem_a7_z2": [
+408.2,
+160.5
+],
+"ch8_sem_a8_aci": [
+408.2,
+160.2
+],
+"ch8_sem_a9_mass": [
+408.2,
+160.2
+],
+"ch8_sem_b1_results": [
+408.2,
+160.7
+],
+"ch8_sem_b1_timing": [
+302.1,
+124.5
+],
+"ch8_sem_b3_null": [
+310.2,
+122.6
+],
+"ch8_sem_b4_null": [
+408.2,
+160.2
+],
+"ch8_sem_b5_dm": [
+408.2,
+160.7
+],
+"ch8_sem_b6_mcs": [
+408.2,
+160.2
+],
+"ch8_sem_b7_conformal": [
+408.2,
+160.6
+],
+"ch8_sem_b9_estrisk": [
+204.1,
+149.6
+],
+"ch8_sem_c2_lookahead": [
+236.8,
+157.2
+],
+"ch8_sem_c3_esr": [
+285.7,
+103.1
+],
+"ch8_sem_conformal": [
+236.8,
+148.0
+],
+"ch8_sem_partc": [
+269.4,
+146.4
+],
+"ch8_sem_traffic_bet": [
+236.8,
+149.8
+],
+"ch8_sp500_var": [
+236.8,
+156.6
+],
+"ch8_traffic_light": [
+236.8,
+150.9
+],
+"ch8_var_pvalues": [
+408.2,
+160.5
+],
+"ch8_z2_rolling": [
+236.8,
+157.3
+],
+"ch9_acf": [
+212.3,
+146.3
+],
+"ch9_csv_horizons": [
+408.2,
+160.5
+],
+"ch9_csv_ranking": [
+408.2,
+160.5
+],
+"ch9_distributions": [
+408.2,
+160.5
+],
+"ch9_har": [
+408.2,
+161.9
+],
+"ch9_intraday_day": [
+408.2,
+160.5
+],
+"ch9_jumps": [
+408.2,
+161.0
+],
+"ch9_mz": [
+408.2,
+160.5
+],
+"ch9_noise_simulation": [
+408.2,
+160.7
+],
+"ch9_oos": [
+408.2,
+160.5
+],
+"ch9_overnight": [
+212.3,
+143.2
+],
+"ch9_rough": [
+408.2,
+160.7
+],
+"ch9_rv_ci": [
+408.2,
+160.5
+],
+"ch9_rv_series": [
+220.4,
+148.4
+],
+"ch9_seasonality": [
+408.2,
+160.5
+],
+"ch9_sem_a1": [
+408.2,
+160.5
+],
+"ch9_sem_a2": [
+408.2,
+127.0
+],
+"ch9_sem_a3": [
+408.2,
+160.5
+],
+"ch9_sem_a4": [
+408.2,
+160.2
+],
+"ch9_sem_a5": [
+408.2,
+160.5
+],
+"ch9_sem_a6": [
+408.2,
+160.5
+],
+"ch9_sem_a7": [
+408.2,
+160.2
+],
+"ch9_sem_a8": [
+408.2,
+160.5
+],
+"ch9_sem_b1": [
+408.2,
+160.2
+],
+"ch9_sem_b2": [
+408.2,
+160.2
+],
+"ch9_sem_b3": [
+408.2,
+160.5
+],
+"ch9_sem_b4": [
+408.2,
+160.2
+],
+"ch9_sem_b5": [
+408.2,
+160.5
+],
+"ch9_sem_b6": [
+408.2,
+160.2
+],
+"ch9_sem_b7": [
+408.2,
+160.2
+],
+"ch9_sem_b8": [
+408.2,
+160.2
+],
+"ch9_sem_b9": [
+408.2,
+160.2
+],
+"ch9_sem_c1": [
+405.7,
+105.5
+],
+"ch9_sem_c1_boot": [
+408.2,
+160.2
+],
+"ch9_sem_day": [
+408.2,
+160.6
+],
+"ch9_sem_frequency": [
+293.9,
+133.8
+],
+"ch9_sem_jump_times": [
+405.2,
+110.0
+],
+"ch9_signature": [
+408.2,
+160.7
+],
+"ch9_vix": [
+408.2,
+160.5
+]
+}

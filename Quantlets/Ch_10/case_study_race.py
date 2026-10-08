@@ -22,6 +22,8 @@ import matplotlib.pyplot as plt
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import intraday_spy   # noqa: E402
 from generate_all_charts import (MainBlue, IDAred, Forest,  # noqa: E402
                                  save_fig, legend_outside_bottom, jsonable)

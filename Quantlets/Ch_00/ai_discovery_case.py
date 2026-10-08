@@ -14,6 +14,9 @@ import numpy as np
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+import sys  # noqa: E402
+sys.path.insert(0, os.path.join(HERE, '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 MARKET = os.path.join(HERE, '..', '..', 'data', 'market')
 RAW = 'https://raw.githubusercontent.com/danpele/MFM/main/data/market/'
 

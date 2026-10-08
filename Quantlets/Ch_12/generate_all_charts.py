@@ -22,6 +22,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import load_close, log_returns, spy_open_close, deribit_chain, dvol_history, read_market, _get  # noqa: E402
 from option_tools import (bs_price, bs_greeks, implied_vol, newton_iv, crr_price, merton_price,  # noqa: E402
                           heston_price, svi_w, svi_fit, variance_from_strip, delta_hedge)

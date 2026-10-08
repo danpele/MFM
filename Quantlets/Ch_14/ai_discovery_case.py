@@ -20,6 +20,9 @@ import pandas as pd
 from scipy import stats
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+import sys  # noqa: E402
+sys.path.insert(0, os.path.join(HERE, '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 RELEASE = '2025-11-03'
 
 

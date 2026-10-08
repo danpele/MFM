@@ -19,6 +19,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import (prices, price, log_returns, french, factors, ols_hac, grs_test,
                       SECTORS, SECTORS_ALL, SECTOR_NAMES, FACTOR_ETFS, BVB, BVB_NAMES)
 
