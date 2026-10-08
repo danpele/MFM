@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch1_seminar_tests'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 1 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A5, A6, A7, B1, B3, B9, B11 with code and output. The proposed exercises A2, A4, A8, A9, A10, A11, B2, B4, B5, B6, B7, B8, B10, B12, B13, B14, B15, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Seminar 1 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A4, A5, A8, B1, B3, B4, B6 with code and output. The proposed exercises A2, A6, A7, A9, A10, A11, B2, B5, B7, B8, B9, B10, B11, B12, B13, B14, B15, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
 
 Keywords: 'returns, variance ratio, Jarque-Bera, Ljung-Box, robust Ljung-Box, drawdown, Parkinson, mixture, Markov regimes, kurtosis, Hill estimator, tail asymmetry, VaR, leverage effect, Newey-West, Sharpe ratio test, block bootstrap, non-synchronous trading, GARCH, local Whittle, BET-TR, Bitcoin, EUR/RON, S&P 500'
 
@@ -12,4 +12,4 @@ Submitted: 'Monday, 21 September 2026'
 
 Datafile: 'Daily market data of the course: S&P 500, SPY, BET-TR, Bitcoin, BVB blue chips; EUR/RON official reference rate'
 
-Output: 'ch1_sem_a1_path.pdf, ch1_sem_a3_chi2.pdf, ch1_sem_a5_ohlc.pdf, ch1_sem_a6_mixture.pdf, ch1_sem_a7_hill.pdf, ch1_sem_b1_sensitivity.pdf, ch1_sem_b3_acf.pdf, ch1_sem_first_look.pdf, ch1_sem_hill_tails.pdf, ch1_sem_robust_acf.pdf'
+Output: 'ch1_sem_a1_path.pdf, ch1_sem_a3_chi2.pdf, ch1_sem_a4_mixture.pdf, ch1_sem_a5_hill.pdf, ch1_sem_a8_ohlc.pdf, ch1_sem_b1_sensitivity.pdf, ch1_sem_b3_acf.pdf, ch1_sem_first_look.pdf, ch1_sem_hill_tails.pdf, ch1_sem_robust_acf.pdf'
