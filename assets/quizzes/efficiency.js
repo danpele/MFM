@@ -157,7 +157,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "incorrectExplanation": "By the delta method √T(VR(q) − 1) → N(0, 2(2q − 1)(q − 1)/(3q)) under RW1; for q = 2 this variance is 1, so z(2) = √T(VR(2) − 1)."
             },
             "ro": {
-                "title": "Distribuția nulă a raportului dispersiilor",
+                "title": "Distribuția nulă a variance ratio-ului",
                 "text": "Sub RW1, T = 6 714 randamente zilnice și VR(2) estimat = 0,901. Cît este aproximativ statistica z omoscedastică?",
                 "options": [
                     "−8,1, pentru că dispersia asimptotică a lui √T(VR(2) − 1) este 1",
@@ -239,7 +239,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
             },
             "ro": {
                 "title": "Chow–Denning",
-                "text": "De ce folosim testul Chow–Denning în locul a patru teste separate ale raportului dispersiilor la q = 2, 5, 10, 20?",
+                "text": "De ce folosim testul Chow–Denning în locul a patru teste variance ratio separate la q = 2, 5, 10, 20?",
                 "options": [
                     "Este mai puternic împotriva oricărei alternative",
                     "Nu are nevoie de randamente",
@@ -643,12 +643,12 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "incorrectExplanation": "The weights (1 − k/q) are missing: with q = 2, VR(2) = 1 + ρ₁, so ρ₁ ≈ −0.10, twice the AI's value."
             },
             "ro": {
-                "title": "Găsiți eroarea AI: raportul dispersiilor și ρ₁",
+                "title": "Găsiți eroarea AI: variance ratio-ul și ρ₁",
                 "text": "Un asistent AI scrie: „VR(2) = 0,90. Deoarece VR(2) = 1 + 2ρ₁, autocorelația de ordinul întîi este ρ₁ = −0,05.” Ce este greșit?",
                 "options": [
                     "VR(q) = 1 + 2 Σ (1 − k/q) ρ_k, deci VR(2) = 1 + ρ₁ și ρ₁ ≈ −0,10",
                     "VR(2) = 0,90 implică ρ₁ = +0,10",
-                    "Raportul dispersiilor nu depinde de autocorelații",
+                    "Variance ratio-ul nu depinde de autocorelații",
                     "VR(2) = 1 + 4ρ₁, deci ρ₁ = −0,025"
                 ],
                 "correctExplanation": "Pentru q = 2 singura pondere este 1 − 1/2, deci VR(2) = 1 + 2 · ½ · ρ₁ = 1 + ρ₁ și ρ₁ ≈ 0,90 − 1 = −0,10.",

@@ -327,7 +327,7 @@ window.MFM_DATA.quizzes['var-es'] = {
                     "O tendință descrescătoare a volatilității",
                     "Autocorelația pozitivă a randamentelor zilnice (autocorelația de ordin 1 egală cu 0,109)"
                 ],
-                "correctExplanation": "Autocorelația pozitivă ridică dispersia sumelor pe mai multe zile peste h sigma^2 (raportul dispersiilor peste 1), deci regula radical(h) subestimează riscul.",
+                "correctExplanation": "Autocorelația pozitivă ridică dispersia sumelor pe mai multe zile peste h sigma^2 (variance ratio peste 1), deci regula radical(h) subestimează riscul.",
                 "incorrectExplanation": "Cheia este persistența: randamentele autocorelate pozitiv se acumulează, iar coada pe mai multe zile devine mai largă decît sugerează radical(h)."
             }
         },
