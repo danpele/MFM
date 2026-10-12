@@ -77,7 +77,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
             },
             "ro": {
                 "title": "Martingala și volatilitatea",
-                "text": "Dacă randamentele în exces formează un joc echitabil (diferență de martingală), ce afirmație este adevărată?",
+                "text": "Dacă randamentele în exces formează un fair game (diferență de martingală), ce afirmație este adevărată?",
                 "options": [
                     "Randamentele sînt necorelate cu trecutul, dar volatilitatea lor poate fi totuși predictibilă",
                     "Randamentele trebuie să fie independente și identic distribuite",
@@ -85,7 +85,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                     "Volatilitatea trebuie să fie constantă în timp"
                 ],
                 "correctExplanation": "Martingala restricționează doar media condiționată; volatility clustering (dispersie predictibilă) este compatibil cu eficiența.",
-                "incorrectExplanation": "Proprietatea de joc echitabil restricționează doar media condiționată; cu dispersie finită implică autocorelații nule (RW3), dar RW3 nu o implică. Volatilitatea poate fi totuși predictibilă."
+                "incorrectExplanation": "Proprietatea de fair game restricționează doar media condiționată; cu dispersie finită implică autocorelații nule (RW3), dar RW3 nu o implică. Volatilitatea poate fi totuși predictibilă."
             }
         },
         {
@@ -185,7 +185,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
             },
             "ro": {
                 "title": "Exponentul Hurst al unui proces cu memorie scurtă",
-                "text": "Pentru un AR(1) cu ρ = −0,1, către ce tinde exponentul Hurst implicat H(q) = 0,5 + ln VR(q)/(2 ln q) cînd q → ∞?",
+                "text": "Pentru un AR(1) cu ρ = −0,1, către ce tinde exponentul Hurst implicit H(q) = 0,5 + ln VR(q)/(2 ln q) cînd q → ∞?",
                 "options": [
                     "0,45, valoarea la q = 20",
                     "0, pentru că procesul este anti-persistent",
@@ -350,7 +350,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "text": "Ce problemă rezolvă statistica R/S modificată a lui Lo (1991)?",
                 "options": [
                     "R/S clasic confundă autocorelația pe termen scurt cu memoria lungă",
-                    "R/S nu poate fi calculat pentru cripto-active",
+                    "R/S nu poate fi calculat pentru criptoactive",
                     "R/S cere randamente cu distribuția Normală",
                     "R/S ignoră semnul randamentelor"
                 ],
@@ -617,7 +617,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
             },
             "ro": {
                 "title": "Semnificație statistică și semnificație economică",
-                "text": "Momentum-ul pe serii de timp pe BET are statistica t HAC egală cu 2,68, dar raportul Sharpe este 0,65 față de 0,75 pentru cumpără-și-păstrează. Ce arată acest lucru?",
+                "text": "Momentum-ul pe serii de timp pe BET are statistica t HAC egală cu 2,68, dar raportul Sharpe este 0,65 față de 0,75 pentru buy-and-hold. Ce arată acest lucru?",
                 "options": [
                     "BET este extrem de ineficient",
                     "Statistica t este greșită",

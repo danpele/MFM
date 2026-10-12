@@ -30,7 +30,7 @@ plt.rcParams['savefig.facecolor'] = 'none'
 plt.rcParams['savefig.transparent'] = True
 plt.rcParams['axes.grid'] = False
 plt.rcParams['font.family'] = 'sans-serif'
-plt.rcParams['font.sans-serif'] = ['Helvetica', 'Arial', 'DejaVu Sans']
+plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Arial', 'Helvetica']
 plt.rcParams['font.size'] = 9
 plt.rcParams['axes.labelsize'] = 10
 plt.rcParams['axes.titlesize'] = 11
@@ -241,20 +241,23 @@ def fig_vr_markets(t):
 # FIG 5: Analiza R/S (Hurst)
 # =============================================================================
 def fig_hurst_rs():
-    fig, axes = plt.subplots(1, 2, figsize=(7.2, 3.1), sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.0), sharey=True)
     out = {}
     for ax, (k, c) in zip(axes, [('sp500', MainBlue), ('bet', IDAred)]):
         h, h_al, d = rs_hurst(rets[k])
         out[k] = (h, h_al)
-        ax.loglog(d['n'], d['rs'], 'o', ms=3.5, color=c, label=f'Observed R/S (slope H = {h:.2f})')
-        ax.loglog(d['n'], d['expected_rs'], '-', color=Gray, lw=1, label='Expected R/S under i.i.d. (Anis-Lloyd)')
-        ax.loglog(d['n'], d['rs'].iloc[0] * (d['n'] / d['n'].iloc[0]) ** 0.5, ':', color=Gray, lw=0.8,
-                  label='Slope 0.5')
+        ax.loglog(d['n'], d['rs'], 'o', ms=3.5, color=c)
+        ax.loglog(d['n'], d['expected_rs'], '-', color=Gray, lw=1)
+        ax.loglog(d['n'], d['rs'].iloc[0] * (d['n'] / d['n'].iloc[0]) ** 0.5, ':', color=Gray, lw=0.8)
         ax.set_xlabel('Window length n (days)')
-        ax.set_title(f'{LABELS[k]}: corrected H = {h_al:.2f}', fontsize=8.5, loc='left', color=c)
-        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.2), ncol=1, frameon=False, fontsize=7)
+        ax.set_title(f'{LABELS[k]}: raw H = {h:.2f}, corrected H = {h_al:.2f}', fontsize=8.5, loc='left', color=c)
     axes[0].set_ylabel('Mean rescaled range R/S')
+    handles = [plt.Line2D([], [], color=MainBlue, marker='o', ls='', ms=3.5, label='Observed R/S, S&P 500'),
+               plt.Line2D([], [], color=IDAred, marker='o', ls='', ms=3.5, label='Observed R/S, BET'),
+               plt.Line2D([], [], color=Gray, lw=1, label='Expected R/S under i.i.d. (Anis-Lloyd)'),
+               plt.Line2D([], [], color=Gray, ls=':', lw=0.8, label='Slope 0.5')]
     plt.tight_layout()
+    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=4, frameon=False)
     save_fig('ch2_hurst_rs')
     return out
 
@@ -434,7 +437,7 @@ def january_regression(r):
 
 
 def turn_of_month(r):
-    """Dummy for the last trading day of the month and the first three days of the next month (Ariel, 1987)."""
+    """Dummy for the last trading day of the month and the first three days of the next month (Lakonishok & Smidt, 1988)."""
     d = pd.DataFrame({'r': complete_months(r) * 1e4})
     ym = d.index.to_period('M')
     rank = d.groupby(ym).cumcount()
@@ -534,21 +537,25 @@ def tsmom_table():
 
 
 def fig_tsmom():
-    t = tsmom_table().sort_values('t_hac')
-    fig, ax = plt.subplots(figsize=(6.8, 4.0))
-    ax.barh(np.arange(len(t)), t['t_hac'], color=[GROUP_COL[g] for g in t['group']], alpha=0.85)
-    for x in (-1.96, 1.96):
-        ax.axvline(x, color=Gray, ls='--', lw=0.8)
-    ax.axvline(0, color=Gray, lw=0.5)
-    ax.set_yticks(np.arange(len(t)), t['market'], fontsize=7.5)
-    ax.set_xlabel('HAC t-statistic of the mean monthly time-series momentum return')
+    t = tsmom_table().sort_values('t_hac', ascending=False)
+    fig, axes, parts, h = _two_columns(len(t))
+    for ax, idx in zip(axes, parts):
+        y = [h - 1 - j for j in range(len(idx))]                # largest t-statistic at the top
+        ax.barh(y, [t['t_hac'].iloc[i] for i in idx], color=[GROUP_COL[t['group'].iloc[i]] for i in idx], alpha=0.85)
+        for x in (-1.96, 1.96):
+            ax.axvline(x, color=Gray, ls='--', lw=0.8)
+        ax.axvline(0, color=Gray, lw=0.5)
+        ax.set_yticks(y, [t['market'].iloc[i] for i in idx], fontsize=7.5)
+        ax.set_ylim(-0.6, h - 0.4)
+        ax.set_xlim(-2.5, 3.0)
+        ax.set_xlabel('HAC t-statistic of the mean monthly return')
     handles = [plt.Rectangle((0, 0), 1, 1, color=GROUP_COL[g], alpha=0.85, label=g)
                for g in ['Developed', 'Emerging/frontier', 'Crypto']]
     handles.append(plt.Line2D([], [], color=Gray, ls='--', label=r'$\pm 1.96$'))
-    ax.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=4, frameon=False)
-    ax.set_title('Index-level time-series momentum: long if the past 12 months were positive, else short',
-                 fontsize=8.5, loc='left')
+    axes[0].set_title('Index-level time-series momentum: long if the past 12 months were positive, else short',
+                      fontsize=8.5, loc='left')
     plt.tight_layout()
+    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=4, frameon=False)
     save_fig('ch2_tsmom')
     return t
 

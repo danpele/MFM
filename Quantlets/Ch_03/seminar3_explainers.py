@@ -44,6 +44,7 @@ plt.rcParams.update({'font.size': FS, 'axes.labelsize': FS, 'axes.titlesize': FS
                      'axes.facecolor': 'none', 'figure.facecolor': 'none', 'savefig.facecolor': 'none',
                      'text.color': 'black', 'axes.labelcolor': 'black', 'xtick.color': 'black',
                      'ytick.color': 'black', 'axes.edgecolor': Navy})
+plt.rcParams['font.sans-serif'] = ['DejaVu Sans']   # as in all course charts
 
 # boxes on the slide (inches): text width 5.69 in, text height 3.03 in
 FULL = (5.6, 1.3)
@@ -309,12 +310,12 @@ def fig_pca(N=11, T=2000, seed=19):
     noise = np.linalg.eigvalsh(np.corrcoef(rng.standard_normal((T, N)).T))[::-1]
     fig, axes = plt.subplots(1, 2, figsize=(5.6, 1.1))
     k = np.arange(1, N + 1)
-    axes[0].plot(k, ev, 'o-', color=MainBlue, ms=3, label='Eigenvalues $\\lambda_k$')
+    axes[0].plot(k, ev, 'o-', color=MainBlue, ms=3, label='Eigenvalues $\\ell_k$')
     axes[0].plot(k, noise, 's--', color=Amber, ms=2.5, label='Pure noise, same $N$, $T$')
-    axes[0].axhline(1, color=IDAred, lw=1.0, ls=':', label='Kaiser: $\\lambda_k = 1$')
+    axes[0].axhline(1, color=IDAred, lw=1.0, ls=':', label='Kaiser: $\\ell_k = 1$')
     axes[0].set_xticks(k)
     axes[0].set_xlabel('Component $k$')
-    axes[0].set_ylabel('$\\lambda_k$')
+    axes[0].set_ylabel('$\\ell_k$')
     axes[0].set_title(f'Scree plot: PC1 explains {100 * ev[0] / N:.0f}%', loc='left')
     w = 0.38
     axes[1].bar(k - w / 2, V[:, 0], width=w, color=MainBlue, label='PC1 loadings')

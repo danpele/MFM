@@ -36,7 +36,7 @@ CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 
 # drawn at the size of their box on the slide (1 pt in the figure = 1 pt on the slide): text >= 7 pt
 FS = 7.5
-plt.rcParams.update({'font.size': FS, 'axes.labelsize': FS, 'axes.titlesize': FS, 'xtick.labelsize': 7,
+plt.rcParams.update({'font.family': 'sans-serif', 'font.sans-serif': ['DejaVu Sans', 'Arial', 'Helvetica'], 'font.size': FS, 'axes.labelsize': FS, 'axes.titlesize': FS, 'xtick.labelsize': 7,
                      'ytick.labelsize': 7, 'legend.fontsize': 7, 'lines.linewidth': 1.0, 'axes.linewidth': 0.6,
                      'xtick.major.width': 0.6, 'ytick.major.width': 0.6, 'xtick.major.size': 2.5,
                      'ytick.major.size': 2.5, 'legend.handlelength': 1.8, 'legend.columnspacing': 1.2, 'axes.facecolor': 'none',

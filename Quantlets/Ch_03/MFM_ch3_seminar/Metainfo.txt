@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch3_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 3 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A2, A2 Extended, A3, A6, B1, B2, B3 with code and output. The proposed exercises A4, A5, A7, A8, B4, B5, B6, B7, B8, B9, B10, B11, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Seminar 3 charts and worked numbers: the in-sample tangency portfolio prices every sector exactly (A2); GRS as a squared Sharpe-ratio gain (A4); the Vasicek posterior and beta forecasts (A3); Blume slope against the implied shrinkage weight (A5); Bonferroni, Holm, Benjamini-Hochberg and Benjamini-Yekutieli thresholds (A1, B9); a useless factor in the second pass (A7); errors-in-variables attenuation (A6); equicorrelated assets (A8); XLK beta with classical, White, Newey-West and block-bootstrap inference (B1); GRS on sector ETFs (B2); PCA and the number of factors (B3, B10); BVB betas with Vasicek and Dimson corrections (B4); Fama-MacBeth on ETFs (B5); factor-ETF alphas (B11); Lewellen-Nagel-Shanken R2 (B6); model comparison by maximum Sharpe ratios (B8); GRS under a residual bootstrap (B7); and the correction of an AI momentum backtest on BVB blue chips (C1).'
 
 Keywords: 'CAPM, tangency portfolio, GRS test, Vasicek, Blume, multiple testing, Fama-MacBeth, PCA, number of factors, Dimson beta, bootstrap, Newey-West, Sharpe ratio, momentum, Bucharest Stock Exchange'
 
@@ -12,4 +12,4 @@ Submitted: 'Monday, 21 September 2026'
 
 Datafile: 'Daily market data (data/market): sector and factor ETFs, SPY, BVB blue chips, BET; portfolios and factors from the Kenneth French Data Library'
 
-Output: 'ch3_sem_a1_pvalues.pdf, ch3_sem_a2_sml.pdf, ch3_sem_a3_bayes.pdf, ch3_sem_a6_eiv.pdf, ch3_sem_b1_xlk.pdf, ch3_sem_b2_grs.pdf, ch3_sem_b3_pca.pdf'
+Output: 'ch3_sem_a2_sml.pdf, ch3_sem_a4_grs.pdf, ch3_sem_a3_bayes.pdf, ch3_sem_a5_blume.pdf, ch3_sem_a1_pvalues.pdf, ch3_sem_a7_useless.pdf, ch3_sem_a6_eiv.pdf, ch3_sem_a8_equicorr.pdf, ch3_sem_b1_xlk.pdf, ch3_sem_b2_grs.pdf, ch3_sem_b3_pca.pdf, ch3_sem_b4_bvb.pdf, ch3_sem_b5_fm.pdf, ch3_sem_b11_alpha.pdf, ch3_sem_b9_alphas.pdf, ch3_sem_b10_bvb_pca.pdf, ch3_sem_b6_lns.pdf, ch3_sem_b8_sharpe.pdf, ch3_sem_b7_boot.pdf, ch3_sem_c1_correction.pdf'

@@ -71,15 +71,15 @@ def fig_ai_etf(o):
     fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.0), gridspec_kw={'width_ratios': [1.1, 1.4]})
     ax = axes[0]
     rows = [('Before', o['pre']['rho1'], o['pre']['se'], MainBlue), ('After', o['post']['rho1'], o['post']['se'], Forest),
-            ('After - before', o['drho'], np.hypot(o['pre']['se'], o['post']['se']), IDAred)]
+            ('After \u2212 before', o['drho'], np.hypot(o['pre']['se'], o['post']['se']), IDAred)]
     for i, (lab, v, se, c) in enumerate(rows):
         ax.errorbar(i, v, yerr=1.96 * se, fmt='o', color=c, capsize=4)
-        ax.text(i + 0.08, v, f'{v:+.3f}', fontsize=7.5, va='center', color='black')
-    ax.errorbar(2.3, 0, yerr=o['mde_rho'], fmt='none', ecolor=Purple, capsize=6, lw=1.6)
+        ax.text(i - 0.12, v, f'{v:+.3f}'.replace('-', '\u2212'), fontsize=7.5, va='center', ha='right', color='black')
+    ax.errorbar(2.45, 0, yerr=o['mde_rho'], fmt='none', ecolor=Purple, capsize=6, lw=1.6)
     ax.axhline(0, color=Gray, lw=0.6)
     ax.set_xticks(range(3))
     ax.set_xticklabels([r[0] for r in rows], fontsize=8)
-    ax.set_xlim(-0.5, 2.7)
+    ax.set_xlim(-0.75, 2.75)
     ax.set_ylabel(r'Lag-1 autocorrelation $\hat\rho_1$')
     ax.set_title(f"Two windows of {o['post']['n']} days around 11 Jan 2024", fontsize=8.5, loc='left')
     ax = axes[1]

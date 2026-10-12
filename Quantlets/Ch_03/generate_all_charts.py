@@ -31,7 +31,7 @@ plt.rcParams['savefig.facecolor'] = 'none'
 plt.rcParams['savefig.transparent'] = True
 plt.rcParams['axes.grid'] = False
 plt.rcParams['font.family'] = 'sans-serif'
-plt.rcParams['font.sans-serif'] = ['Helvetica', 'Arial', 'DejaVu Sans']
+plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Arial', 'Helvetica']
 plt.rcParams['font.size'] = 9
 plt.rcParams['axes.labelsize'] = 10
 plt.rcParams['axes.titlesize'] = 11
@@ -147,8 +147,14 @@ def fig_frontier():
     ax.plot(sd_t, mu_t, '*', ms=11, color=IDAred, label='Tangency portfolio')
     sd_i = np.sqrt(np.diag(cov))
     ax.scatter(sd_i, mu, s=18, color=Purple, zorder=3, label='Sector ETFs')
+    # label offsets (points) chosen so that no label covers a marker or another label
+    off = {'XLI': (-4, 3, 'right'), 'XLU': (4, -7, 'left')}
+    far = {'XLV': (-6, 28, 'center'), 'XLP': (-24, -7, 'right')}     # crowded points: label set apart, leader line
     for s, x, y in zip(SECTORS, sd_i, mu):
-        ax.annotate(s, (x, y), xytext=(3, 2), textcoords='offset points', fontsize=6.5, color='black')
+        dx, dy, ha = far.get(s) or off.get(s, (3, 2, 'left'))
+        ax.annotate(s, (x, y), xytext=(dx, dy), textcoords='offset points', fontsize=6.5, color='black', ha=ha,
+                    arrowprops=dict(arrowstyle='-', color='black', lw=0.4, shrinkA=0, shrinkB=2) if s in far
+                    else None)
     spy_mu, spy_sd = ex['SPY.US'].mean() * 12, ex['SPY.US'].std() * np.sqrt(12)
     ax.plot(spy_sd, spy_mu, 'o', ms=6, color=Forest, label='S&P 500 (SPY)')
     ax.set_xlim(0, 0.32)
@@ -278,8 +284,16 @@ def fig_beta_shrink():
     err = lambda x: float(np.sqrt(((x - b2) ** 2).mean()))
     fig, ax = plt.subplots(figsize=(6.2, 3.2))
     ax.scatter(b1, b2, s=20, color=MainBlue, zorder=3, label='Sector ETFs')
+    # label offsets (points) chosen so that no label covers a marker, a line or another label
+    off = {'XLP': (-3, 3, 'right'), 'XLU': (4, -7, 'left'), 'XLV': (4, -8, 'left'), 'XLE': (-3, 3, 'right'),
+           'XLY': (0, 5, 'center'), 'XLF': (4, -9, 'left'), 'XLK': (3, -8, 'left')}
+    far = {'XLI': (-26, -16, 'right'), 'XLB': (2, -24, 'center')}    # crowded points: label set apart, leader line
     for s in b1.index:
-        ax.annotate(s, (b1[s], b2[s]), xytext=(3, 2), textcoords='offset points', fontsize=6.5, color='black')
+        dx, dy, ha = far.get(s) or off.get(s, (3, 2, 'left'))
+        ax.annotate(s, (b1[s], b2[s]), xytext=(dx, dy), textcoords='offset points', fontsize=6.5, color='black',
+                    ha=ha, arrowprops=dict(arrowstyle='-', color='black', lw=0.4, shrinkA=0, shrinkB=2) if s in far
+                    else None)
+    ax.set_ylim(0.25, 1.7)
     xs = np.linspace(0.4, 1.6, 10)
     ax.plot(xs, xs, color=Gray, ls=':', label='No change (45 degree)')
     ax.plot(xs, icpt + slope * xs, color=IDAred, label=f'Fitted: later beta = {icpt:.2f} + {slope:.2f} x earlier beta')
@@ -303,7 +317,7 @@ def fig_factor_cum():
     cols = ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA', 'MOM']
     fig, ax = plt.subplots(figsize=(7.0, 3.1))
     out = {}
-    for c, col in zip(cols, [MainBlue, Amber, IDAred, Forest, Purple, Orange]):
+    for c, col in zip(cols, [MainBlue, '#17A2B8', IDAred, Forest, Purple, Orange]):   # six clearly distinct hues
         wealth = (1 + F[c]).cumprod()
         ax.plot(wealth.index, wealth.values, color=col, lw=0.9, label=c)
         out[c] = float(wealth.iloc[-1])
@@ -438,10 +452,12 @@ def fig_factor_etfs():
     names = {'MTUM': 'Momentum', 'VLUE': 'Value', 'QUAL': 'Quality', 'USMV': 'Min. volatility',
              'IWM': 'Small caps', 'IWD': 'Large value', 'IWF': 'Large growth', 'SPY': 'S&P 500'}
     out = {}
-    for e, c in zip(E, PALETTE):
+    colours = {'MTUM': MainBlue, 'VLUE': IDAred, 'QUAL': Forest, 'USMV': '#17A2B8', 'IWM': Orange, 'IWD': Purple,
+               'IWF': Amber, 'SPY': 'black'}               # distinct hues; the two Russell style ETFs are dashed
+    for e in E:
         k = e[:-3]
-        ax.plot(wealth.index, wealth[e].values, color=c if k != 'SPY' else 'black', lw=0.8 if k != 'SPY' else 1.2,
-                label=f'{k} ({names[k]})')
+        ax.plot(wealth.index, wealth[e].values, color=colours[k], lw=0.8 if k != 'SPY' else 1.2,
+                ls='--' if k in ('IWD', 'IWF') else '-', label=f'{k} ({names[k]})')
         yrs = (p.index[-1] - p.index[0]).days / 365.25
         out[k] = float(wealth[e].iloc[-1] ** (1 / yrs) - 1)
     ax.set_ylabel('Growth of 1 USD (total return)')
@@ -583,7 +599,13 @@ def fig_fama_macbeth():
     legend_outside_bottom(ax, ncol=4, y=-0.3)
     plt.tight_layout()
     save_fig('ch3_fama_macbeth')
-    return {k: v.round(4).reset_index().to_dict(orient='records') for k, v in out.items()}
+    r = {k: v.round(4).reset_index().to_dict(orient='records') for k, v in out.items()}
+    # dispersion of the pass-1 market betas across the 25 portfolios (identification of the market premium)
+    r['market_betas'] = {}
+    for k, v in models.items():
+        b = np.linalg.lstsq(np.column_stack([np.ones(len(ex)), F[v].values]), ex.values, rcond=None)[0][1]
+        r['market_betas'][k] = dict(min=float(b.min()), max=float(b.max()), sd=float(b.std(ddof=1)))
+    return r
 
 
 
@@ -651,11 +673,15 @@ def jkp_replication(start='1963-07-31'):
     se = np.sqrt((E ** 2).sum(0) / (T - 2) * np.linalg.inv(Z.T @ Z)[0, 0])
     t = a / se
     p = 2 * stats.norm.sf(np.abs(t))
-    # Benjamini-Yekutieli at 5%
+    # Benjamini-Yekutieli at 5%: reject the n_by smallest p-values, n_by = largest k with p_(k) <= 0.05 k / (N c_N)
     o = np.argsort(p)
-    ok = p[o] <= np.arange(1, N + 1) / (N * np.sum(1 / np.arange(1, N + 1))) * 0.05
+    c_by = np.sum(1 / np.arange(1, N + 1))
+    ok = p[o] <= np.arange(1, N + 1) / (N * c_by) * 0.05
+    n_by = int(np.max(np.where(ok)[0]) + 1) if ok.any() else 0
     by = np.zeros(N, bool)
-    by[o[:np.max(np.where(ok)[0]) + 1 if ok.any() else 0]] = True
+    by[o[:n_by]] = True
+    # critical |t| of the procedure: the Normal quantile of its p-value cut-off 0.05 n_by / (N c_N)
+    by_crit_t = float(stats.norm.isf(0.05 * n_by / (N * c_by) / 2)) if n_by else None
     S = np.cov(E.T, ddof=2) / T                                      # Sigma / T
 
     def eb(g):
@@ -683,7 +709,7 @@ def jkp_replication(start='1963-07-31'):
     summ = dict(T=T, start=str(X.index[0].date()), end=str(X.index[-1].date()), k=k,
                 tau_c=r['tau_c'], tau_w=r['tau_w'],
                 rate_ols=float(np.mean(t >= 1.96)), rate_by=float(by.mean()),
-                by_crit_t=float(np.min(np.abs(t[by]))) if by.any() else None,
+                by_crit_t=by_crit_t,
                 rate_eb=float(np.mean(r['z'] >= 1.96)),
                 rate_eb_one_theme=float(np.mean(r1['z'] >= 1.96)), tau_c_one_theme=r1['tau_c'],
                 tau_w_one_theme=r1['tau_w'])
@@ -695,41 +721,50 @@ def fig_jkp_replication():
     order = [nm for nm in JKP_THEME_ORDER if nm in set(tab['theme'])]
     d = pd.concat([tab[tab['theme'] == th].sort_values('alpha') for th in order])
     y = np.arange(len(d))[::-1].astype(float)
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(6.3, 3.6), sharey=True, gridspec_kw=dict(width_ratios=[1.25, 1]))
-    h = 0.17
-    ax1.errorbar(d['alpha'] * 100, y + h, xerr=1.96 * d['se'] * 100, fmt='o', ms=3.5, color=MainBlue, lw=0.9,
+    # laid out at the size of its box on the slide (408 x 160 pt): 15 rows, one label per row
+    fig = plt.figure(figsize=(5.67, 2.23))
+    fig._sf_manual = True
+    fs = 6.5
+    ax1 = fig.add_axes([0.185, 0.26, 0.345, 0.66])
+    ax2 = fig.add_axes([0.555, 0.26, 0.275, 0.66], sharey=ax1)
+    h = 0.19
+    ax1.errorbar(d['alpha'] * 100, y + h, xerr=1.96 * d['se'] * 100, fmt='o', ms=2.4, color=MainBlue, lw=0.8,
                  capsize=0, label='OLS alpha, 95% confidence interval')
-    ax1.errorbar(d['post_mean'] * 100, y - h, xerr=1.96 * d['post_sd'] * 100, fmt='s', ms=3.5, color=IDAred, lw=0.9,
-                 capsize=0, label='Empirical Bayes: posterior mean, 95% credible interval')
-    ax1.axvline(0, color=Gray, lw=0.6)
-    ax1.set_xlabel('Alpha, % per month (scaled)')
+    ax1.errorbar(d['post_mean'] * 100, y - h, xerr=1.96 * d['post_sd'] * 100, fmt='s', ms=2.4, color=IDAred, lw=0.8,
+                 capsize=0, label='Empirical Bayes posterior mean, 95% credible interval')
+    ax1.axvline(0, color=Gray, lw=0.5)
+    ax1.set_xlabel('Alpha, % per month (scaled)', fontsize=fs, labelpad=1.5)
     ax2.barh(y + h, d['t'], 2 * h, color=MainBlue)
     ax2.barh(y - h, d['z'], 2 * h, color=IDAred)
-    ax2.axvline(1.96, color=Forest, ls='--', lw=0.9, label='t = 1.96 (single test, 5%)')
+    ax2.axvline(1.96, color=Forest, ls='--', lw=0.9, label='1.96 (single test, 5%)')
     ax2.axvline(s['by_crit_t'], color=Purple, ls=':', lw=1.2,
-                label=f"t = {s['by_crit_t']:.2f} (Benjamini-Yekutieli, 5%)")
-    ax2.axvline(0, color=Gray, lw=0.6)
-    ax2.set_xlabel('OLS t-statistic / posterior z')
+                label=f"{s['by_crit_t']:.2f} (Benjamini-Yekutieli, 5%)")
+    ax2.axvline(0, color=Gray, lw=0.5)
+    ax2.set_xlabel('OLS t-statistic (blue), posterior z (red)', fontsize=fs, labelpad=1.5)
     ax1.set_yticks(y, d.index)
-    ax1.tick_params(axis='y', labelsize=8)
-    # theme separators and names
+    ax1.set_ylim(-0.6, len(d) - 0.4)
+    ax2.tick_params(axis='y', left=False, labelleft=False)
+    for ax in (ax1, ax2):
+        ax.tick_params(axis='both', labelsize=fs, length=2, pad=1.5)
+    ax2.set_xlim(0, 1.06 * max(d['t'].max(), d['z'].max()))
+    # theme separators (inside the panels) and theme names (right of the second panel)
     th = d['theme'].values
     for i in range(1, len(d)):
         if th[i] != th[i - 1]:
             for ax in (ax1, ax2):
-                ax.axhline(y[i] + 0.5, color=Gray, lw=0.4, ls='-')
-    xr = 1.5 * max(d['t'].max(), d['z'].max())
-    ax2.set_xlim(0, xr)
+                ax.axhline(y[i] + 0.5, color=Gray, lw=0.35, ls='-')
     for nm in order:
         yy = y[th == nm]
-        ax2.text(xr, yy.mean(), nm.replace(' and ', '\nand '), ha='right', va='center', fontsize=7,
-                 color='black', style='italic')
-    ax1.set_title(f"CAPM alphas of 15 US factors, {s['start'][:4]}-{s['end'][:4]}", fontsize=9, loc='left')
-    ax2.set_title('OLS t versus posterior z', fontsize=9, loc='left')
+        ax2.text(1.03, yy.mean(), nm, transform=ax2.get_yaxis_transform(), ha='left', va='center', fontsize=fs,
+                 color='black', style='italic', clip_on=False)
+    ax2.text(1.03, len(d) - 0.1, 'Theme', transform=ax2.get_yaxis_transform(), ha='left', va='bottom', fontsize=fs,
+             color='black', fontweight='bold', clip_on=False)
+    ax1.set_title(f"CAPM alphas of 15 US factors, {s['start'][:4]}-{s['end'][:4]}", fontsize=7, loc='left', pad=3)
+    ax2.set_title('OLS t versus posterior z', fontsize=7, loc='left', pad=3)
     h1, l1 = ax1.get_legend_handles_labels()
     h2, l2 = ax2.get_legend_handles_labels()
-    fig.legend(h1 + h2, l1 + l2, loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=2, frameon=False)
-    plt.tight_layout()
+    fig.legend(h1 + h2, l1 + l2, loc='lower center', bbox_to_anchor=(0.5, 0.0), ncol=2, frameon=False,
+               fontsize=fs, handlelength=1.6, columnspacing=1.5, labelspacing=0.25, borderaxespad=0.1)
     save_fig('ch3_jkp_replication')
     return dict(table=tab.reset_index(names='factor').round(5).to_dict(orient='records'), summary=s)
 
