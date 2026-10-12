@@ -129,7 +129,7 @@ def fig_random_walk_game(seed=7):
         ax.plot(np.arange(len(path)), np.exp(path), color=MainBlue, lw=0.7)
         ax.set_title(f'Series {"ABCD"[i]}', fontsize=9, loc='left')
         ax.set_xticks([])
-        ax.set_ylabel('Growth of 1', fontsize=8)
+        ax.set_ylabel('Value of 1 USD\n(start = 1)', fontsize=8)
     fig.suptitle('One of these is the S&P 500 (2010-2026); three are simulated random walks with the same drift and volatility',
                  fontsize=8.5, x=0.02, ha='left')
     plt.tight_layout()
