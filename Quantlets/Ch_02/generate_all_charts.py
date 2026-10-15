@@ -198,12 +198,15 @@ def fig_vr_profile():
         vp = vr_profile(rets[k])
         res[k] = vp
         ax.fill_between(vp.index, 1 - vp['band'], 1 + vp['band'], color=LightGray, alpha=0.8, lw=0,
-                        label='Robust 95% band under a random walk')
+                        label='Pointwise 95% null band (robust)')
         ax.plot(vp.index, vp['VR'], color=c, lw=1.1, label='VR(q)')
+        test_q = [2, 5, 10, 20]
+        ax.scatter(test_q, vp.loc[test_q, 'VR'], color=c, edgecolors='white',
+                   linewidths=0.5, s=22, zorder=4, label='Test horizons: 2, 5, 10, 20 days')
         ax.axhline(1, color=Gray, lw=0.6)
         ax.set_title(LABELS[k], fontsize=8.5, loc='left', color=c)
     for ax in axes[1]:
-        ax.set_xlabel('Horizon q (days)')
+        ax.set_xlabel('Horizon q (days; curve is descriptive)')
     for ax in axes[:, 0]:
         ax.set_ylabel('Variance ratio')
     h, l = axes[0, 0].get_legend_handles_labels()
