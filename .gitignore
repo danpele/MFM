@@ -33,8 +33,10 @@ latex/
 notebooks/*.py
 Quantlets/Ch_*/build_quantlets.py
 
-# notebooks are published in English only (RO versions stay local)
-notebooks/RO/
+# Romanian student notebooks are public; all other RO build artifacts stay local.
+notebooks/RO/*
+!notebooks/RO/capitol*_notebook_curs.ipynb
+!notebooks/RO/capitol*_notebook_seminar.ipynb
 
 # =====================================================================================================
 # SEMINAR SOLUTIONS ARE INSTRUCTOR-ONLY (students must not see the solutions of [Proposed] exercises).
@@ -604,3 +606,26 @@ ch12_sem_a7_newton.png
 ch12_sem_b5_vrp.pdf
 ch12_sem_b5_vrp.png
 # ---- end of instructor-only seminar block
+
+# Instructor answer charts superseded by student-safe figures
+ch10_sem_ac.pdf
+ch10_sem_ac.png
+ch10_sem_pin.pdf
+ch10_sem_pin.png
+ch11_sem_a39_jumps.pdf
+ch11_sem_a39_jumps.png
+
+# Instructor-only plotting annotations for Proposed exercises
+/Quantlets/Ch_13/ch13_seminar_plot_private.py
+
+# Solved B3 null-distribution figure referenced by student notebooks
+!/Quantlets/Ch_08/MFM_ch8_sem_conformal/ch8_sem_z2_sim.png
+!/Quantlets/Ch_08/MFM_ch8_sem_es/ch8_sem_z2_sim.png
+!/Quantlets/Ch_08/MFM_ch8_sem_var/ch8_sem_z2_sim.png
+!/Quantlets/Ch_08/MFM_ch8_sem_partA/ch8_sem_z2_sim.png
+!/Quantlets/Ch_08/MFM_ch8_sem_compare/ch8_sem_z2_sim.png
+
+# Instructor-only chapter 7 derivations and plot annotations
+/Quantlets/Ch_07/ch7_inference_private.py
+/Quantlets/Ch_07/ch7_inference_private.json
+/Quantlets/Ch_07/ch7_plot_private.py

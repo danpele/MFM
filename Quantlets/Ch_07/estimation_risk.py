@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import log_returns, joint_returns   # noqa: E402
 from risk_measures import hs_var_es, gpd_fit, gpd_se, gpd_var_es, garch_filter, garch_next, rolling_conditional  # noqa: E402
-from seminar7 import boot_ci   # noqa: E402
+
 from generate_all_charts import save_fig, legend_outside_bottom, jsonable, MainBlue, IDAred, Teal, Amber, Purple, SEED  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -333,39 +333,35 @@ def gev_theta(theta):
 
 
 # =============================================================================
-# 7. Numbers for the seminar (A1, A6, A8, B1 Extended)
+# 7. Public percentile-bootstrap helper and lecture precision estimates
 # =============================================================================
-def seminar_extras():
+B_BOOT = 2000
+
+def boot_ci(L, fun, B=B_BOOT, block=None, seed=SEED):
+    """95% percentile bootstrap interval: i.i.d. (block=None) or moving blocks of length block."""
+    rng = np.random.default_rng(seed)
+    L = np.asarray(L)
+    n = len(L)
+    stats_ = np.empty(B)
+    for b in range(B):
+        if block is None:
+            x = L[rng.integers(0, n, n)]
+        else:
+            starts = rng.integers(0, n - block + 1, int(np.ceil(n / block)))
+            x = np.concatenate([L[s:s + block] for s in starts])[:n]
+        stats_[b] = fun(x)
+    return np.percentile(stats_, [2.5, 97.5]), stats_
+
+def lecture_es_bootstrap():
     out = {}
-    # Seminar A8: asymptotic variance of the historical ES 2.5% under N(0, 1): Var((L - v)_+) / alpha^2, truncated Normal moments
-    a = 0.025
-    v = stats.norm.ppf(1 - a)
-    m1 = stats.norm.pdf(v) - v * a                       # E[(L - v)_+]
-    m2 = (1 + v ** 2) * a - v * stats.norm.pdf(v)        # E[(L - v)_+^2]
-    avar = (m2 - m1 ** 2) / a ** 2
-    out['a8'] = dict(v=v, phi=stats.norm.pdf(v), m1=m1, m2=m2, var=m2 - m1 ** 2, avar=avar,
-                     se500=np.sqrt(avar / 500), se500_pct=1.2 * np.sqrt(avar / 500), es=stats.norm.pdf(v) / a)
-    # Seminar A6: monotonicity of the Cornish-Fisher map for z in [z_0.1%, 0]: derivative a z^2 + b z + c > 0
-    def dmin(S, K):
-        z = np.linspace(stats.norm.ppf(0.001), 0, 20001)
-        return (1 + z * S / 3 + (3 * z ** 2 - 3) * K / 24 - (6 * z ** 2 - 5) * S ** 2 / 36).min()
-    S = -0.5
-    kmax = optimize.brentq(lambda K: dmin(S, K), 0.1, 30)
-    kmax0 = optimize.brentq(lambda K: dmin(0.0, K), 0.1, 30)
-    out['a6'] = dict(kmax=kmax, kmax0=kmax0, d3=dmin(S, 3.0), d10=dmin(S, 10.0))
-    # Seminar A1: asymptotic SE of the historical VaR 1% under N(0.04, 1.2^2)
-    z = stats.norm.ppf(0.01)
-    out['a1'] = dict(f=stats.norm.pdf(z) / 1.2, se500=1.2 * np.sqrt(0.01 * 0.99 / 500) / stats.norm.pdf(z),
-                     se6670=1.2 * np.sqrt(0.01 * 0.99 / 6670) / stats.norm.pdf(z))
-    # Seminar B1 Extended: BET, VaR 1%: asymptotic interval (kernel density) and block bootstrap (20 days)
-    L = (-100 * log_returns('bet')).values
-    for tag, x in [('full', L), ('w500', L[-500:])]:
-        se = var_es_se(x)
-        ci_blk, _ = boot_ci(x, lambda y: hs_var_es(y, 0.01)[0], block=20)
-        out[f'b1_{tag}'] = dict(var1=se['var1'], f=se['f'], se=se['se_var'], se_hac=se['se_var_hac'],
-                                lo=se['var1'] - 1.96 * se['se_var'], hi=se['var1'] + 1.96 * se['se_var'],
-                                lo_hac=se['var1'] - 1.96 * se['se_var_hac'], hi_hac=se['var1'] + 1.96 * se['se_var_hac'],
-                                blk_lo=ci_blk[0], blk_hi=ci_blk[1])
+    for k in ['sp500', 'bet']:
+        L = (-100 * log_returns(k)).values
+        for tag, x in [('full', L), ('w500', L[-500:])]:
+            es = hs_var_es(x, 0.025)[1]
+            ci_iid, _ = boot_ci(x, lambda y: hs_var_es(y, 0.025)[1])
+            ci_blk, _ = boot_ci(x, lambda y: hs_var_es(y, 0.025)[1], block=20)
+            out[f'{k}_{tag}'] = dict(N=len(x), es=es, iid_lo=ci_iid[0], iid_hi=ci_iid[1], blk_lo=ci_blk[0],
+                                     blk_hi=ci_blk[1])
     return out
 
 
@@ -399,12 +395,12 @@ def fig_precision(INF, B6):
         y = len(rows) - 1 - i
         for m, (lo, hi) in iv.items():
             ax.plot([lo, hi], [y + offs[m], y + offs[m]], color=col[m], lw=2.6, solid_capstyle='butt')
-            ax.text(hi + 0.04, y + offs[m], f'{hi - lo:.2f}', va='center', fontsize=6.5, color='black')
+            # Interval length is visible directly; adjacent numeric labels obscured the bars.
         ax.plot([est, est], [y - 0.38, y + 0.38], color='black', lw=1.0)
     ax.set_yticks(range(len(rows)))
     ax.set_yticklabels([r[0] for r in rows][::-1], fontsize=8)
-    ax.set_xlabel('Daily loss (%); black tick = estimate, number = interval width')
-    ax.set_xlim(1.4, 4.9)
+    ax.set_xlabel('Daily loss (%); black tick = estimate, interval length = uncertainty')
+    ax.set_xlim(1.4, 5.2)
     for m, c in col.items():
         ax.plot([], [], color=c, lw=2.6, label=m)
     plt.tight_layout()
@@ -417,8 +413,7 @@ def fig_precision(INF, B6):
 if __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == 'precision':
     with open(os.path.join(HERE, 'ch7_inference.json')) as f:
         INF = json.load(f)
-    with open(os.path.join(HERE, 'sem7_results.json')) as f:
-        B6 = json.load(f)['B6']
+    B6 = lecture_es_bootstrap()
     fig_precision(INF, B6)
 elif __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == 'extras':
     with open(os.path.join(HERE, 'ch7_inference.json')) as f:
@@ -428,7 +423,16 @@ elif __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == 'extras':
     OUT['ei_sp1'] = extremal_index(L_sp, 0.01)
     OUT['ei_bet1'] = extremal_index(L_bet, 0.01)
     OUT['gev1'] = gev_theta(OUT['ei_sp1']['theta'])
-    OUT['sem'] = seminar_extras()
+    # Instructor results are saved separately and never added to the public JSON.
+    OUT.pop('sem', None)
+    try:
+        from ch7_inference_private import seminar_extras
+    except ModuleNotFoundError as exc:
+        if exc.name != 'ch7_inference_private':
+            raise
+    else:
+        with open(os.path.join(HERE, 'ch7_inference_private.json'), 'w') as f:
+            json.dump(jsonable(seminar_extras()), f, indent=1)
     r_ = 100 * log_returns('sp500')
     _p, _mu, _sg = garch_filter(r_)
     OUT['ei_z'] = extremal_index(-((r_ - _mu) / _sg).dropna().values, 0.05)
@@ -436,7 +440,7 @@ elif __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == 'extras':
     OUT['drop_full'] = drop_largest(r_sp.values)
     OUT['drop_w500'] = drop_largest(r_sp.values[-500:])
     OUT['drop_w500']['date'] = str(r_sp.iloc[-500:].idxmax().date())
-    print(OUT['ei_sp1'], OUT['ei_bet1'], OUT['gev1'], OUT['sem'])
+    print(OUT['ei_sp1'], OUT['ei_bet1'], OUT['gev1'])
     with open(os.path.join(HERE, 'ch7_inference.json'), 'w') as f:
         json.dump(jsonable(OUT), f, indent=1)
 elif __name__ == '__main__':

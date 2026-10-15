@@ -321,7 +321,7 @@ def fig_se_rho(sr=0.2):
         out[T] = round(float(np.sqrt(12) * np.sqrt((2 - 1 + 0.5 * (2 * sr ** 2 - 2 * sr ** 2 * 0.25)) / T)), 3)
     ax.plot(0.5, out[240], 'o', color=Navy, ms=3.5)
     ax.annotate(f'$\\rho$ = 0.5, $T$ = 240: {out[240]:.2f}', (0.5, out[240]), xytext=(-62, 12),
-                textcoords='offset points', fontsize=ANN, color=Navy)
+                textcoords='offset points', fontsize=ANN, color=Navy, bbox=dict(facecolor='white', edgecolor='none', alpha=0.9, pad=1.5))
     ax.set_xlim(0, 1); ax.set_ylim(0, 0.5)
     ax.set_xlabel('Correlation $\\rho$ of the two strategies')
     ax.set_ylabel('SE of $\\hat\\Delta$ (annual)')

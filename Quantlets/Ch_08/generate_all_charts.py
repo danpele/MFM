@@ -66,6 +66,12 @@ CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
 
 def save_fig(name):
     """Save the figure as transparent PDF and PNG."""
+    # Local geometry for the final full-width chart boxes; numerical code is unchanged.
+    boxes = {'ch8_sem_c3_esr': (410, 94), 'ch8_sem_a8_mass': (410, 95), 'ch8_sem_b8_mcs': (410, 95), 'ch8_kupiec_curve': (240, 175), 'ch8_murphy': (240, 175),
+             'ch8_elicitability': (410, 108), 'ch8_sem_a10_aci': (410, 103),
+             'ch8_sem_b4_conformal': (410, 103), 'ch8_sem_b3_null': (410, 132)}
+    if name in boxes:
+        slide_fit.SIZES[name] = boxes[name]
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -214,7 +220,7 @@ def fig_breach_rates(tab):
 # FIG 5: Kupiec statistic as a function of the number of breaches
 # =============================================================================
 def fig_kupiec_curve():
-    fig, axs = plt.subplots(1, 2, figsize=(6.8, 2.8))
+    fig, axs = plt.subplots(2, 1, figsize=(4.6, 4.2))
     out = {}
     for ax, T in zip(axs, (250, 1000)):
         xs = np.arange(0, int(0.03 * T) + 1)
@@ -228,7 +234,9 @@ def fig_kupiec_curve():
         ax.set_ylim(0, 25)
         out[T] = dict(lo=int(xs[acc].min()), hi=int(xs[acc].max()))
     axs[0].set_ylabel(r'LR$_{uc}$')
-    axs[0].legend(loc='upper center', bbox_to_anchor=(1.1, -0.2), ncol=3, frameon=False)
+    h, l = axs[0].get_legend_handles_labels()
+    fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=1, frameon=False)
+    plt.tight_layout()
     save_fig('ch8_kupiec_curve')
     return out
 
@@ -418,7 +426,7 @@ def fig_elicitability(nu=4, a=0.025, n=2_000_000, seed=3):
     ax = axs[1]
     cs = ax.contour(V, E, FZ, levels=np.nanquantile(FZ, [0.01, 0.03, 0.08, 0.15, 0.3, 0.5]), colors=MainBlue,
                     linewidths=0.8)
-    ax.clabel(cs, fontsize=6, fmt='%.3f')
+    ax.clabel(cs, manual=[(2.1, 3.0), (2.5, 4.4)], fontsize=7, fmt='%.3f', inline_spacing=7)
     i = np.nanargmin(FZ)
     ax.plot(V.flat[i], E.flat[i], 'o', color=Forest, ms=5, label='Minimum of expected FZ0')
     ax.plot(q_true, es_true, 'x', color=IDAred, ms=8, label=f'True (VaR, ES) = ({q_true:.2f}, {es_true:.2f})')
@@ -808,7 +816,7 @@ def murphy(name, mA, mB, col='VaR1', a=0.01, n=240):
 
 def fig_murphy(name='sp500', mA='GARCH-t', mB='FHS'):
     th, a_, b_, d, se = murphy(name, mA, mB)
-    fig, axs = plt.subplots(1, 2, figsize=(7.4, 2.8))
+    fig, axs = plt.subplots(2, 1, figsize=(4.6, 4.2))
     axs[0].plot(100 * th, 1e4 * a_, color=MCOL[mA], lw=1.3, label=mA)
     axs[0].plot(100 * th, 1e4 * b_, color=MCOL[mB], lw=1.3, label=mB)
     axs[0].set_xlabel('Threshold θ (daily loss, %)')
@@ -823,7 +831,7 @@ def fig_murphy(name='sp500', mA='GARCH-t', mB='FHS'):
     axs[1].set_title('Difference: above 0 means FHS better', fontsize=9)
     h0, l0 = axs[0].get_legend_handles_labels()
     h1, l1 = axs[1].get_legend_handles_labels()
-    fig.legend(h0 + h1, l0 + l1, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=4, frameon=False)
+    fig.legend(h0 + h1, l0 + l1, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=2, frameon=False)
     plt.tight_layout()
     save_fig('ch8_murphy')
     sig_pos = (d - 1.96 * se) > 0
@@ -910,8 +918,9 @@ args <- commandArgs(trailingOnly = TRUE)
 d <- read.csv(args[1]); tau <- as.numeric(args[3])
 RNGkind("L'Ecuyer-CMRG"); set.seed(8)
 p <- parallel::mclapply(split(d, d$id), function(s) {
-  b <- suppressWarnings(esback::esr_backtest(r = s$r, e = s$e, alpha = tau, version = 3))
-  data.frame(id = s$id[1], p = b$pvalue_onesided_asymptotic, p2 = b$pvalue_twosided_asymptotic)
+  b <- tryCatch(suppressWarnings(esback::esr_backtest(r = s$r, e = s$e, alpha = tau, version = 3)), error=function(e) e)
+  if(inherits(b, "error")) return(data.frame(id=s$id[1], p=NA_real_, p2=NA_real_, error=conditionMessage(b)))
+  data.frame(id = s$id[1], p = b$pvalue_onesided_asymptotic, p2 = b$pvalue_twosided_asymptotic, error="")
 }, mc.cores = max(1, parallel::detectCores() - 1))
 write.csv(do.call(rbind, p), args[2], row.names = FALSE)
 """
@@ -972,9 +981,15 @@ def bd_replication(n_jobs=-1):
     series = dict(Parallel(n_jobs=n_jobs)(delayed(_bd_one)(*j) for j in jobs))
     pv = esr_intercept(series)
     rows = pd.DataFrame([dict(zip(('sym', 'dist', 'w', 'refit'), k.split('|')), T=len(series[k]),
-                              p=pv.loc[k, 'p'], p2=pv.loc[k, 'p2']) for k in series])
+                              p=pv.loc[k, 'p'], p2=pv.loc[k, 'p2'], error=pv.loc[k, 'error']) for k in series])
     rows[['w', 'refit']] = rows[['w', 'refit']].astype(int)
-    rows['reject'] = rows['p'] < 0.05
+    valid = np.isfinite(rows['p'].to_numpy(dtype=float))
+    rows['reject'] = np.where(valid, rows['p'] < 0.05, np.nan)
+    print(f'ESR fits: {len(rows)} attempted, {valid.sum()} valid, {(~valid).sum()} failed; rejection shares use valid fits only.')
+    print('Valid denominators by distribution, window and refit:')
+    print(rows.assign(valid=valid).groupby(['dist', 'w', 'refit'])['valid'].sum().to_string())
+    if not valid.all():
+        print(rows.loc[~valid, ['sym', 'dist', 'w', 'refit', 'error']].to_string(index=False))
     share = {d: rows[rows.dist == d].pivot_table(index='w', columns='refit', values='reject', aggfunc='mean')
              for d in ('normal', 't')}
     return rows, share
@@ -1010,9 +1025,9 @@ def fig_bd_replication(rows, share):
     for ax, k, ttl in zip(axs, (0, 4), ('Weekly refit (5 days)', 'Yearly refit (250 days)')):
         ref = BD_REFITS[k]
         ax.plot(x, share['normal'][ref].values, '-o', color=IDAred, ms=4,
-                label=f'Normal innovations, {len(BD_STOCKS)} stocks (course data)')
+                label='Normal innovations, valid fits (course data)')
         ax.plot(x, share['t'][ref].values, '-o', color=MainBlue, ms=4,
-                label=f'Student-t innovations, {len(BD_STOCKS)} stocks (course data)')
+                label='Student-t innovations, valid fits (course data)')
         ax.plot(x, paperN[:, k], '--s', color=Orange, ms=3.5, label='Normal innovations, 200 stocks (Table 3)')
         ax.plot(x, papert[:, k], '--s', color=Teal, ms=3.5, label='Student-t innovations, 200 stocks (Table 3)')
         ax.axhline(0.05, color=Gray, lw=0.8, ls=':', label='Nominal size 5%')
@@ -1028,6 +1043,8 @@ def fig_bd_replication(rows, share):
     t = rows[rows.dist == 't']
     n = rows[rows.dist == 'normal']
     return dict(T=int(rows['T'].iloc[0]), n_stocks=len(BD_STOCKS),
+                n_attempted=len(rows), n_valid=int(rows['p'].notna().sum()),
+                failed_fits=rows.loc[rows['p'].isna(), ['sym','dist','w','refit','error']].to_dict('records'),
                 share_n={str(w): {str(k): float(share['normal'].loc[w, k]) for k in BD_REFITS} for w in BD_WINDOWS},
                 share_t={str(w): {str(k): float(share['t'].loc[w, k]) for k in BD_REFITS} for w in BD_WINDOWS},
                 n_min=float(share['normal'].values.min()), n_max=float(share['normal'].values.max()),

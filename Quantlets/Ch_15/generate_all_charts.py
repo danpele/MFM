@@ -293,13 +293,20 @@ def fig_prompts():
 
 
 def fig_embeddings(tw):
+    from matplotlib.lines import Line2D
     fig, ax = plt.subplots(figsize=(5.6, 3.6))
     for l in ('neutral', 'positive', 'negative'):
         q = tw[tw['label'] == l]
         ax.scatter(q['pc1'], q['pc2'], s=5, alpha=0.55, color=LAB_COL[l], label=f'{l} ({len(q):,})', lw=0)
     ax.set_xlabel('First principal component')
     ax.set_ylabel('Second principal component')
-    legend_outside_bottom(ax, ncol=3, y=-0.18, markerscale=3)
+    # Fixed-size proxy markers avoid repeated enlargement when the layout
+    # helper rebuilds the legend from its existing handles.
+    handles = [Line2D([], [], linestyle='', marker='o', markersize=4,
+                      color=LAB_COL[l], label=f'{l} ({(tw["label"] == l).sum():,})')
+               for l in ('neutral', 'positive', 'negative')]
+    ax.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.18),
+              ncol=3, frameon=False, markerscale=1)
     save_fig('ch15_embeddings')
 
 

@@ -234,7 +234,7 @@ def fig_dcc_spy_tlt():
     shade_crises(ax)
     ax.plot(rc.index, rc, color=IDAred, lw=0.7, label='DCC(1,1) conditional correlation')
     ax.plot(roll.index, roll, color=MainBlue, lw=1.5, label='252-day rolling correlation')
-    ax.axhline(d['Qbar'][0, 1], color=Gray, ls='--', lw=0.9, label='DCC target $\\bar Q_{12}$ (sample correlation of standardised residuals)')
+    ax.axhline(d['Qbar'][0, 1], color=Gray, ls='--', lw=0.9, label='DCC target $\\bar Q_{12}$\n(sample covariance of standardised residuals)')
     ax.axhline(0, color='black', lw=0.6)
     ax.set_ylabel('Correlation SPY-TLT')
     legend_outside_bottom(ax, ncol=2, y=-0.1)
@@ -401,7 +401,7 @@ def fig_pseudo_obs(Z, U):
     axes[1].set_ylabel('BAC (uniform scale)')
     h = [axes[0].collections[0], axes[1].collections[0]]
     fig.legend(h, [x.get_label() for x in h], loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=2, frameon=False,
-               markerscale=4)
+               markerscale=1, handletextpad=0.8, columnspacing=1.5)
     plt.tight_layout()
     save_fig('ch6_pseudo_obs')
 
@@ -705,12 +705,18 @@ def fig_covol():
                label='Top 20 in Table 15 of Engle and Campos-Martins (2023)')
     ax.axvline(pd.Timestamp(ECM_END), color=Gray, ls='--', lw=0.8, label='End of the paper sample (1 March 2021)')
     for d, v in top.iloc[:6].items():
-        left = d.year == 2020 and d.month == 3              # label on the left, so that it does not cover November 2020
-        ax.annotate(f'{d.day} {d:%b %Y}', (d, v), xytext=(-4 if left else 4, 2), textcoords='offset points',
-                    fontsize=7, color='black', ha='right' if left else 'left')
+        tx, ty, align = ('2026-01-01', 76, 'right')
+        if d.year == 2001: tx, ty, align = ('2003-06-01', 73, 'left')
+        elif d.year == 2008: tx, ty, align = ('2004-07-01', 50, 'left')
+        elif d.year == 2016: tx, ty, align = ('2011-01-01', 26, 'left')
+        elif d.year == 2020 and d.month == 3: tx, ty, align = ('2011-01-01', 63, 'left')
+        elif d.year == 2020: tx, ty, align = ('2022-01-01', 46, 'left')
+        ax.annotate(f'{d.day} {d:%b %Y}', (d, v), xytext=(pd.Timestamp(tx), ty),
+                    fontsize=7, color='black', ha=align, bbox=dict(fc='white', ec='none', pad=0.5),
+                    arrowprops=dict(arrowstyle='-', lw=0.5, color=MainBlue))
     ax.set_ylabel('Squared common volatility $\\hat x_t$')
     ax.set_xlim(pd.Timestamp('1999-10-01'), x.index[-1] + pd.Timedelta(days=90))
-    ax.set_ylim(0, 1.08 * max(top.iloc[0], paper.max()))
+    ax.set_ylim(0, 1.18 * max(top.iloc[0], paper.max()))
     legend_outside_bottom(ax, ncol=1, y=-0.1)
     save_fig('ch6_covol_replication')
     common = set(pre.index[:20]) & set(paper.index)

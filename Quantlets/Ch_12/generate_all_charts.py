@@ -170,19 +170,19 @@ def fig_binomial():
     Sg = np.linspace(60, 140, 81)
     am = np.array([crr_price(x, K, T, r, s, 500, 'put', True) for x in Sg])
     eu = bs_price(Sg, K, T, r, s, 'put')
-    fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.3))
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.5))
     ax = axes[0]
     ax.plot(Ns, crr, color=MainBlue, lw=0.9, marker='o', ms=1.6, label='Binomial tree (CRR), $N$ steps')
     ax.axhline(bs, color=IDAred, lw=1.1, label=f'Black-Scholes ({bs:.3f})')
     ax.set_xlabel('Number of steps $N$'); ax.set_ylabel('Call price')
-    ax.set_title('European call, $S = K = 100$, $T = 1$, $r = 5\\%$, $\\sigma = 20\\%$', fontsize=8.5, loc='left')
+    ax.set_title('Call: $S=K=100$, $T=1$, $r=5\\%$, $\\sigma=20\\%$', fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=1, y=-0.2)
     ax = axes[1]
     ax.plot(Sg, am, color=Forest, lw=1.4, label='American put (CRR, 500 steps)')
     ax.plot(Sg, eu, color=Purple, lw=1.1, ls='--', label='European put (Black-Scholes)')
     ax.plot(Sg, np.maximum(K - Sg, 0), color=Gray, lw=0.8, ls=':', label='Exercise value $\\max(K - S, 0)$')
     ax.set_xlabel('Price of the underlying $S$'); ax.set_ylabel('Put price')
-    ax.set_title('Early exercise has a value for puts', fontsize=8.5, loc='left')
+    ax.set_title('Early exercise has a value for puts', fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=1, y=-0.2)
     plt.tight_layout()
     save_fig('ch12_binomial')
@@ -405,13 +405,13 @@ def fig_smile_models():
     hes = lambda K, kind: heston_price(S, K, T, 0.0, 0.03, 3.0, 0.04, 0.8, -0.7, kind)
     iv = {'emp': smile_from_prices(S, Ks, T, emp), 'mer': smile_from_prices(S, Ks, T, mer),
           'hes': smile_from_prices(S, Ks, T, hes)}
-    fig, ax = plt.subplots(figsize=(7.2, 3.4))
-    ax.plot(Ks / S, 100 * iv['emp'], color=MainBlue, lw=1.6, label='Historical one-month S&P 500 returns, 1990-2026 (fat tails)')
-    ax.plot(Ks / S, 100 * iv['mer'], color=IDAred, lw=1.3, ls='--', label='Merton jump-diffusion: one crash a year of -8% on average')
+    fig, ax = plt.subplots(figsize=(6.2, 3.4))
+    ax.plot(Ks / S, 100 * iv['emp'], color=MainBlue, lw=1.6, label='Historical S&P 500 returns (1990-2026)')
+    ax.plot(Ks / S, 100 * iv['mer'], color=IDAred, lw=1.3, ls='--', label='Merton: one -8% mean crash per year')
     ax.plot(Ks / S, 100 * iv['hes'], color=Forest, lw=1.3, ls='-.', label='Heston stochastic volatility, $\\rho = -0.7$')
-    ax.axhline(100 * iv['emp'][20], color=Gray, lw=0.7, ls=':', label='Black-Scholes: one volatility for all strikes')
+    ax.axhline(100 * iv['emp'][20], color=Gray, lw=0.7, ls=':', label='Black-Scholes: constant volatility')
     ax.set_xlabel('Moneyness $K/S$'); ax.set_ylabel('Implied volatility (%)')
-    legend_outside_bottom(ax, ncol=1, y=-0.2)
+    legend_outside_bottom(ax, ncol=2, y=-0.2)
     save_fig('ch12_smile_models')
     i90, i100, i110 = 10, 20, 30
     return {k: dict(k90=float(100 * v[i90]), k100=float(100 * v[i100]), k110=float(100 * v[i110]),
@@ -500,15 +500,15 @@ def fig_btc_smile(c, tab, t0):
 
 
 def fig_btc_term(tab, dvol_now):
-    fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.1))
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.4))
     ax = axes[0]
-    ax.plot(tab['days'].astype(float), tab['atm'].astype(float), 'o-', color=MainBlue, ms=4, label='At-the-money implied volatility (SVI, $k = 0$)')
-    ax.axhline(dvol_now, color=Amber, lw=1.1, ls='--', label=f'DVOL index at the snapshot: {dvol_now:.1f}')
+    ax.plot(tab['days'].astype(float), tab['atm'].astype(float), 'o-', color=MainBlue, ms=4, label='ATM implied volatility (SVI, $k=0$)')
+    ax.axhline(dvol_now, color=Amber, lw=1.1, ls='--', label=f'Snapshot DVOL: {dvol_now:.1f}')
     ax.set_xlabel('Days to expiry'); ax.set_ylabel('Implied volatility (%)')
     legend_outside_bottom(ax, ncol=1, y=-0.22)
     ax = axes[1]
     ax.plot(tab['days'].astype(float), tab['rr'].astype(float), 's-', color=Purple, ms=4,
-            label='Skew: IV($k = +0.15$) $-$ IV($k = -0.15$)')
+            label='Skew: IV($+0.15$) $-$ IV($-0.15$)')
     ax.axhline(0, color=Gray, lw=0.6)
     ax.set_xlabel('Days to expiry'); ax.set_ylabel('Volatility points')
     legend_outside_bottom(ax, ncol=1, y=-0.22)
@@ -705,7 +705,7 @@ def fig_mz(d):
     save_fig('ch12_vix_rv_mz')
     wald = m1.t_test('iv2 = 1')
     return dict(a=float(m1.params['const']), a_se=float(m1.bse['const']), b=float(m1.params['iv2']), b_se=float(m1.bse['iv2']),
-                r2=float(m1.rsquared), t_b1=float(wald.tvalue), r2_past=float(m2.rsquared), r2_both=float(m3.rsquared),
+                r2=float(m1.rsquared), t_b1=float(np.asarray(wald.tvalue).item()), r2_past=float(m2.rsquared), r2_both=float(m3.rsquared),
                 b_both=float(m3.params['iv2']), c_both=float(m3.params['rv_past']),
                 b_both_se=float(m3.bse['iv2']), c_both_se=float(m3.bse['rv_past']))
 

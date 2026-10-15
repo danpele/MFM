@@ -73,12 +73,14 @@ def kmz_data():
     df['lty'] = (f['GS10'] / 100).reindex(df.index)
     df['tms'] = df['lty'] - df['tbl']
     df['dfy'] = ((f['BAA'] - f['AAA']) / 100).reindex(df.index)
-    df['infl'] = f['CPIAUCSL'].pct_change().shift(1).reindex(df.index)  # CPI released with a one-month delay
+    cpi = f['CPIAUCSL'].reindex(pd.period_range(f['CPIAUCSL'].index.min(), f['CPIAUCSL'].index.max(), freq='M'))
+    df['infl'] = cpi.pct_change(fill_method=None).shift(1).reindex(df.index)  # CPI released with a one-month delay
     df['svar'] = svar.reindex(df.index)
     df['lag_ret'] = df['ex']
-    df = df.dropna()
+    df = df.reindex(pd.period_range(df.index.min(), df.index.max(), freq='M'))
     # predictors: expanding-window standard deviation, at least 36 months
     G = df[KMZ_PRED] / df[KMZ_PRED].expanding(KMZ_WARMUP).std()
+    # Keep missing months until shifts/rolling windows are formed; do not bridge calendar gaps.
     # target R_{t+1}, scaled by the uncentred standard deviation of the last 12 months (known at t)
     vol12 = np.sqrt((df['ex'] ** 2).rolling(12).mean())
     R = df['ex'].shift(-1) / vol12
@@ -116,7 +118,7 @@ def kmz_run(draws=KMZ_DRAWS, seed=0):
     df, rec = kmz_data()
     G, R = df[KMZ_PRED].values, df['R'].values
     N, T = len(R), KMZ_T
-    tidx = np.arange(T, N)                                   # forecast rows (training rows t-12 ... t-1)
+    tidx = np.arange(T, N)                                   # forecast rows: previous 12 complete observations (may span more than 12 months)
     Rt = R[tidx]
     Y = np.stack([R[t - T:t] for t in tidx])                 # (W, T)
     zs = [10.0 ** e for e in KMZ_LOGZ]

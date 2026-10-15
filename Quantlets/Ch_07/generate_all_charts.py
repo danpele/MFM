@@ -69,6 +69,19 @@ METHODS = ['HS', 'Normal', 'Student-t', 'Cornish-Fisher', 'EVT (GPD)']
 
 def save_fig(name):
     """Save the figure as a transparent PDF and PNG."""
+    try:
+        from ch7_plot_private import save_private_figure
+    except ModuleNotFoundError as exc:
+        if exc.name != 'ch7_plot_private':
+            raise
+    else:
+        if save_private_figure(plt.gcf(), name, CHART_DIR):
+            plt.close()
+            return
+    from ch7_plot_layout import save_reviewed_figure
+    if save_reviewed_figure(plt.gcf(), name, CHART_DIR):
+        plt.close()
+        return
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)

@@ -287,8 +287,8 @@ def fig_boot_p(B=499, seed=66, S_obs=3.4):
     xs = np.linspace(0.05, 10, 300)
     ax.plot(xs, B * 0.25 * stats.chi2.pdf(xs, 1), color=Navy, lw=1.0, ls='--', label=r'$\chi^2_1$ density (scaled)')
     ax.set_ylim(0, 40)
-    ax.annotate(f'{int(np.sum(S < 0.25))} draws in the first bar\n({int(np.sum(S == 0))} with $S^{{(b)}}$ = 0)',
-                xy=(0.25, 39), xytext=(4.6, 33), fontsize=7.0, color=MainBlue,
+    ax.annotate(f'{int(np.sum(S < 0.25))} draws in first bar\n({int(np.sum(S == 0))} with $S^{{(b)}}$ = 0)',
+                xy=(0.25, 39), xytext=(3.8, 32), fontsize=7.0, color=MainBlue,
                 arrowprops=dict(arrowstyle='->', color=MainBlue, lw=0.7))
     ax.axvline(S_obs, color=IDAred, lw=1.2)
     ax.text(S_obs + 0.2, 16, f'observed $S$ = {S_obs}\n$p$ = (1 + {n_ge})/{B + 1}\n   = {p:.3f}',
@@ -541,8 +541,7 @@ def fig_fluctuation(T=2000, r0=-0.3, r1=0.1, seed=73):
         ax.axhline(1.358, color=Navy, lw=0.9, ls='--')
         jm = int(j[np.argmax(stat)])
         ax.plot(jm, stat.max(), 'o', color=col, ms=3.5)
-        ax.text(jm, stat.max() * 1.04 + 0.05, f'max = {stat.max():.2f}', ha='right' if jm > 0.7 * T else 'center',
-                fontsize=7.0, color=col)
+        ax.annotate(f'max = {stat.max():.2f}', (jm, stat.max()), xytext=(0, 9), textcoords='offset points', ha='right' if jm > 0.7 * T else 'center', fontsize=7.0, color=col)
         ax.set_title(ttl, loc='left')
         ax.set_xlabel('Sample size used $j$')
         ax.set_xlim(0, T)
@@ -550,7 +549,7 @@ def fig_fluctuation(T=2000, r0=-0.3, r1=0.1, seed=73):
     axes[0].set_ylabel(r'$\frac{j}{\sqrt{T}\hat D}\,|\hat\rho_j - \hat\rho_T|$')
     ymax = max(a.get_ylim()[1] for a in axes)
     for a in axes:
-        a.set_ylim(0, ymax * 1.1)
+        a.set_ylim(0, ymax * 1.28)
     handles = [Line2D([], [], color=Navy, lw=0.9, ls='--')]
     bottom_legend(fig, ncol=1, handles=handles, labels=['5% critical value 1.358 (supremum of a Brownian bridge)'])
     save_fig(fig, 'ch6_sem_primer_fluctuation')

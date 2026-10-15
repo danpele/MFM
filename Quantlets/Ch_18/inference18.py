@@ -500,8 +500,11 @@ def var_enet_window(Y, p):
     Yt = Y[p:]
     Bm = np.zeros((k * p, k))
     c = np.zeros(k)
+    # Same 30-point regularization path on both old and new scikit-learn APIs.
+    from inspect import signature
+    grid_kw = {'n_alphas': 30} if 'n_alphas' in signature(ElasticNetCV).parameters else {'alphas': 30}
     for i in range(k):
-        m = ElasticNetCV(l1_ratio=1 / 3, cv=10, n_alphas=30, max_iter=5000).fit(X, Yt[:, i])
+        m = ElasticNetCV(l1_ratio=1 / 3, cv=10, max_iter=5000, **grid_kw).fit(X, Yt[:, i])
         Bm[:, i], c[i] = m.coef_, m.intercept_
     E = Yt - c - X @ Bm
     S = E.T @ E / (len(Yt) - 1)

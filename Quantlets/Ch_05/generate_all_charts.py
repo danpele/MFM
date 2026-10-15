@@ -276,7 +276,7 @@ def fig_covid(fits):
     vix = load_vix().loc[a:b]
     r = rets['sp500'].loc[a:b]
     fig, ax = plt.subplots(figsize=(9, 3.8))
-    ax.bar(r.index, np.abs(r.values) * ppy, color=Teal, alpha=0.45, width=1.0, label=r'$|r_t|\sqrt{q}$ (% p.a.), $q$ = ' + f'{PPY["sp500"]:.1f}')
+    ax.bar(r.index, np.abs(r.values) * ppy, color=Teal, alpha=0.45, width=1.0, label=r'$|r_t|\sqrt{A}$ (% p.a.), $A$ = ' + f'{PPY["sp500"]:.1f}')
     ax.plot(g.sigma.loc[a:b] * ppy, color=MainBlue, label='GARCH(1,1)-t')
     ax.plot(j.sigma.loc[a:b] * ppy, color=IDAred, label='GJR-GARCH(1,1)-t')
     ax.plot(vix, color=Amber, label='VIX')
@@ -529,7 +529,7 @@ def forecast_eval(k='sp500', first_year=2016, H=22):
     # chart 1: forecast vs |r|
     ppy = np.sqrt(PPY[k])
     fig, ax = plt.subplots(figsize=(10, 3.6))
-    ax.scatter(f1.index, np.sqrt(proxy) * ppy, s=2, color=Teal, alpha=0.5, label=r'Realised proxy $|r_t|\sqrt{q}$, $q$ = ' + f'{PPY[k]:.1f}')
+    ax.scatter(f1.index, np.sqrt(proxy) * ppy, s=2, color=Teal, alpha=0.5, label=r'Realised proxy $|r_t|\sqrt{A}$, $A$ = ' + f'{PPY[k]:.1f}')
     ax.plot(f1.index, np.sqrt(f1['GJR-t']) * ppy, color=IDAred, lw=0.7, label='GJR-GARCH-t one-day-ahead forecast')
     ax.plot(f1.index, np.sqrt(f1['EWMA']) * ppy, color=MainBlue, lw=0.6, alpha=0.8, label='EWMA ($\\lambda$ = 0.94)')
     ax.set_ylim(0, 110)

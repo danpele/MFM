@@ -251,7 +251,7 @@ def fig_diag(T=2500, K=40, seed=28):
     ax.plot([-4, 4], [-4, 4], color=Navy, lw=0.8, ls='--', label='45-degree line')
     ax.set_xlim(-4, 4); ax.set_ylim(-7, 7)
     ax.set_xlabel('Normal quantile $\\Phi^{-1}(p_i)$')
-    ax.set_ylabel('Sorted standardised return')
+    ax.set_ylabel('Standardised return')
     ax.set_title('QQ plot', loc='left')
     ax = axes[1]
     k = np.arange(1, K + 1)

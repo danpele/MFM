@@ -141,7 +141,7 @@ def _num_hessian(f, x, h=1e-4):
 
 
 def dcc_fit(Z, start=(0.03, 0.95)):
-    """Step 2 of DCC: (a, b) by maximum likelihood, with Qbar fixed at the sample correlation
+    """Step 2 of DCC: (a, b) by maximum likelihood, with Qbar fixed at the sample covariance of standardised residuals
     (correlation targeting). The standard errors come from the step-2 Hessian (they ignore the step-1 error)."""
     X = np.asarray(Z, dtype=float)
     Qbar = np.cov(X.T, bias=True)

@@ -64,16 +64,16 @@ def fig_ai_spread(out):
         m, t = out[key]['mean_ann_pct'], out[key]['t_nw']; se = abs(m / t)
         ax.errorbar(m, k, xerr=1.96 * se, fmt='o', color=[MainBlue, Forest, Forest][k], capsize=3, ms=5, lw=1.3,
                     label='Estimate with HAC 95% interval' if k == 0 else None)
-        ax.annotate(f'{m:+.2f}% (t = {t:.2f})', (m, k), xytext=(0, 7), textcoords='offset points', ha='center',
-                    fontsize=7.5, color='black')
+        ax.annotate(f'{m:+.2f}% (t = {t:.2f})', (m, k), xytext=(m - .3 if k == 0 else m, k + 0.43), textcoords='data', ha='center', va='center',
+                    fontsize=7.5, color='black', bbox=dict(facecolor='white', edgecolor='none', alpha=.95))
         if 'mde_ann_pct' in out[key]:
             ax.plot([out[key]['mde_ann_pct'], -out[key]['mde_ann_pct']], [k, k], '|', color=IDAred, ms=12, mew=2,
                     label='Minimum detectable effect, $\\pm 2.8$ SE' if key == 'full' else None)
     ax.axvline(0, color='black', lw=0.7, ls=':')
     ax.set_yticks(range(3)); ax.set_yticklabels([l for _, l in labs])
-    ax.invert_yaxis(); ax.set_ylim(2.6, -0.6)
+    ax.invert_yaxis(); ax.set_ylim(2.85, -0.4)
     ax.set_xlabel('Mean of $r_{SPY} - r_{RSP}$ (% per year)')
-    ax.set_title('Is there a concentration premium?', loc='left', fontsize=9)
+    ax.set_title('Is there a concentration premium?', loc='left', fontsize=9, pad=18)
     plt.tight_layout()
     h, l = ax.get_legend_handles_labels()
     fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=1, fontsize=7.5)

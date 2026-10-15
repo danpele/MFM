@@ -185,8 +185,8 @@ def fig_drawdown(seed=13, years=4, q=252, mu=0.06, sigma=0.22):
     ax.axvspan(t[bs], t[bs + best - 1], color=BandBlue, lw=0, label='Longest period under water')
     ax.fill_between(t, 100 * DD, 0, color=IDAred, alpha=0.35, lw=0)
     ax.plot(t, 100 * DD, color=IDAred, lw=0.8, label='Drawdown $DD_t$ (underwater)')
-    ax.annotate(f'MDD {100 * DD[i_min]:.1f}%', (t[i_min], 100 * DD[i_min]), xytext=(8, 2),
-                textcoords='offset points', fontsize=7.4, color=IDAred)
+    ax.annotate(f'MDD {100 * DD[i_min]:.1f}%', (t[i_min], 100 * DD[i_min]), xytext=(10, 15),
+                textcoords='offset points', fontsize=7.4, color=IDAred, bbox=dict(facecolor='white', edgecolor='none', alpha=.9), arrowprops=dict(arrowstyle='-', lw=.5))
     ax.set_ylim(100 * DD.min() * 1.3, 3)
     ax.set_xlabel('Years')
     ax.set_ylabel('$DD_t$ (%)')
@@ -203,11 +203,10 @@ def fig_recovery():
     fig, ax = plt.subplots(figsize=HALF)
     ax.plot(100 * L, 100 * L, color=Navy, lw=0.8, ls='--', label='Same size as the loss')
     ax.plot(100 * L, 100 * L / (1 - L), color=IDAred, lw=1.4, label=r'Gain needed $L/(1 - L)$')
-    for l, ha, dx in ((0.25, 'right', -3), (0.5, 'right', -3), (0.8, 'right', -3)):
+    for l, ha, dx in ((0.25, 'left', 3), (0.5, 'left', 3), (0.8, 'right', -3)):
         g = l / (1 - l)
         ax.plot(100 * l, 100 * g, 'o', color=IDAred, ms=3.5)
-        ax.text(100 * l + dx, 100 * g + 30, f'{100 * l:.0f}% loss: +{100 * g:.0f}%', fontsize=7.4, ha=ha,
-                color=IDAred)
+        ax.annotate(f'{100 * l:.0f}% loss: +{100 * g:.0f}%', (100*l, 100*g), xytext=(38 if l < .5 else 59 if l < .8 else 49, 115 if l < .5 else 230 if l < .8 else 430), fontsize=7.4, ha='center', color=IDAred, bbox=dict(facecolor='white', edgecolor='none', alpha=.95), arrowprops=dict(arrowstyle='-', lw=.5, color=IDAred))
     ax.set_ylim(0, 480)
     ax.set_xlabel('Loss from the peak $L$ (%)')
     ax.set_ylabel('Gain needed (%)')

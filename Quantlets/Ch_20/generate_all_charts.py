@@ -344,7 +344,7 @@ def chart_sig_dimension():
         ax.plot(Ns, M, '-o', color=c, ms=3.5, label=f'd = {d} channels')
     ax.set_yscale('log')
     ax.axhline(1000, color=Gray, ls='--', lw=0.8)
-    ax.text(1.05, 1150, 'rolling window of 1000 days', fontsize=8, color='black')
+    ax.text(1.05, 450, 'rolling window: 1000 days', fontsize=8, color='black', bbox=dict(facecolor='white',edgecolor='none',alpha=.9,pad=1))
     ax.set_xlabel('Truncation depth N')
     ax.set_ylabel('Number of signature terms (levels 1..N)')
     legend_outside_bottom(ax, ncol=4, y=-0.2)
@@ -573,12 +573,21 @@ def chart_selection(E):
     ax.bar(range(len(o)), 100 * sel[o], color=cols)
     ax.set_xticks(range(len(o)))
     ax.set_xticklabels([labs[j] for j in o], rotation=45, fontsize=7.5, ha='right')
-    ax.set_ylabel('Selected in % of re-estimations\n(Sig-LK, all assets and horizons)')
+    ax.set_ylabel('Selected\n(%)')
     from matplotlib.patches import Patch
     hd = [Patch(color=c, label=l) for c, l in [(MainBlue, 'log-HAR terms'), (Forest, 'Signature level 1'),
                                                 (Orange, 'Signature level 2'), (Purple, 'Signature level 3')]]
     ax.legend(handles=hd, loc='upper center', bbox_to_anchor=(0.5, -0.32), ncol=4, frameon=False)
-    save_fig('ch20_selection')
+    # Match the full-width, shallow slot; font sizes remain readable on the slide.
+    previous_box = slide_fit.SIZES.get('ch20_selection')
+    slide_fit.SIZES['ch20_selection'] = [395.9, 95.0]
+    try:
+        save_fig('ch20_selection')
+    finally:
+        if previous_box is None:
+            slide_fit.SIZES.pop('ch20_selection', None)
+        else:
+            slide_fit.SIZES['ch20_selection'] = previous_box
     return {labs[j]: float(sel[j]) for j in o}
 
 

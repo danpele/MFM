@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch10_seminar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Seminar 10 of Modelling Financial Markets, student version: setup, data, helper functions and the solved exercises A1, A3, A5, A7, A9, B1, B2, B4, B6, B8 with code and output. The proposed exercises A2, A4, A6, A8, A10, B3, B5, B7, C1, C2, C3 are not solved here (an empty code cell where they need code); their solutions are discussed in the seminar.'
+Description: 'Student seminar: worked examples with code; proposed exercises contain statements and empty work cells. Proposed solutions remain in the instructor version.'
 
 Keywords: 'market microstructure, bid-ask spread, Amihud illiquidity, bootstrap, HAC, liquidity premium, Bucharest Stock Exchange, Bitcoin'
 
@@ -12,4 +12,6 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'SPY and Bitcoin 5-minute bars; daily open, high, low, close and volume for US stocks, Bucharest Stock Exchange stocks and crypto-assets; CBOE VIX; BET-TR; USD/RON official reference rate of the National Bank of Romania'
 
-Output: 'ch10_sem_a1_bounce.pdf, ch10_sem_a3_spread.pdf, ch10_sem_ac.pdf, ch10_sem_b2_estimates.pdf, ch10_sem_b2_mc.pdf, ch10_sem_b4.pdf, ch10_sem_b6.pdf, ch10_sem_b8_prices.pdf, ch10_sem_b8_shares.pdf, ch10_sem_pin.pdf, ch10_sem_ushape.pdf'
+Output: 'ch10_sem_a1_bounce.png, ch10_sem_a3_spread.png, ch10_sem_ac_public.png, ch10_sem_pin_public.png, ch10_sem_ushape.png, ch10_sem_b2_estimates.png, ch10_sem_b2_mc.png, ch10_sem_b4.png, ch10_sem_b6.png, ch10_sem_b8_prices.png, ch10_sem_b8_shares.png'
+
+Note: figures are displayed inline; PNG saving requires SAVE_TO_DRIVE.

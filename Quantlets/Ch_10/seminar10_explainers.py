@@ -84,7 +84,7 @@ def fig_book(seed=1, tick=0.05, bid=19.95, n_lvl=4):
     ax.axhline(mid, color=Forest, lw=1.0, ls='--', label=f'Mid-price $m = (a + b)/2 = {mid:.2f}$')
     ax.axvline(0, color=Navy, lw=0.6)
     ax.annotate('', xy=(2500, ask), xytext=(2500, bid), arrowprops=dict(arrowstyle='<->', color=Navy, lw=0.9))
-    ax.text(2350, mid + 0.004, f'spread $a - b = {ask - bid:.2f}$', va='bottom', ha='right', fontsize=7.4, color=Navy)
+    ax.plot([], [], color=Navy, lw=0.9, label=f'Spread $a-b$ = {ask-bid:.2f} lei')
     ax.text(qa[0] + 100, ask, f'best ask $a$', va='center', ha='left', fontsize=7.4, color=IDAred)
     ax.text(-qb[0] - 100, bid, f'best bid $b$', va='center', ha='right', fontsize=7.4, color=MainBlue)
     lv = np.concatenate([bids, asks])
@@ -154,11 +154,11 @@ def fig_cs(seed=5, n=390, sig_day=0.010, c=0.004):
         x0 = d * n + n - 12
         ax.annotate('', xy=(x0, 100 * p[ih]), xytext=(x0, 100 * p[il]),
                     arrowprops=dict(arrowstyle='<->', color=col, lw=0.9))
-        ax.text(x0, 100 * p[ih] + 0.08, f'day {d + 1}', ha='center', va='bottom', fontsize=7.4, color=col)
+        ax.text(x0 - 20, 100 * p[ih] + 0.08, f'day {d + 1}', ha='right', va='bottom', fontsize=7.4, color=col)
     ih, il = np.argmax(p), np.argmin(p)
     ax.annotate('', xy=(2 * n + 60, 100 * p[ih]), xytext=(2 * n + 60, 100 * p[il]),
                 arrowprops=dict(arrowstyle='<->', color=IDAred, lw=1.0))
-    ax.text(2 * n + 60, 100 * p[ih] + 0.08, 'two days', ha='center', va='bottom', fontsize=7.4, color=IDAred)
+    ax.text(2 * n + 60, 100 * p[ih] + 0.18, 'days 1–2', ha='center', va='bottom', fontsize=7.4, color=IDAred)
     ax.set_ylim(100 * p.min() - 0.15, 100 * p.max() + 0.45)
     ax.plot([], [], '^', color=Navy, ms=4, label='High (a buy at the ask)')
     ax.plot([], [], 'v', color=Navy, ms=4, label='Low (a sell at the bid)')

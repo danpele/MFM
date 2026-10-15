@@ -651,7 +651,7 @@ def fig_bvb_history():
     ax.set_ylabel('Index level (log scale)')
     events = [('1999-04-21', 'Apr 1999\nlow', 0, 18), ('2007-07-24', 'Jul 2007\npeak', 0, 14),
               ('2009-02-25', 'Feb 2009\ntrough', 0, -26), ('2018-12-18', 'Dec 2018\nbank-tax\nannouncement', -34, -16),
-              ('2020-03-16', 'Mar 2020\nCOVID-19', 16, -16), ('2023-07-12', 'Jul 2023\nHidroelectrica\nIPO', 0, -16)]
+              ('2020-03-16', 'Mar 2020\nCOVID-19', 6, -31), ('2023-07-12', 'Jul 2023\nHidroelectrica\nIPO', -8, 16)]
     for d, lab, dx, dy in events:
         t = full.index[full.index.searchsorted(pd.Timestamp(d))]
         ax.plot(t, full.loc[t], 'o', ms=3.5, color=IDAred)
@@ -723,14 +723,14 @@ def _timeline(ax, rows, x0, x1, levels=(0.22, -0.22, 0.40, -0.40), fs=6.3):
             dx = ev[3] if len(ev) == 4 and not isinstance(ev[1], (int, float)) else 0
             dy = levels[lv]
             ax.annotate(txt, xy=(xm, y), xytext=(xm + dx, y + dy), ha='center', va='bottom' if dy > 0 else 'top',
-                        fontsize=fs, color='black', arrowprops=dict(arrowstyle='-', color=col, lw=0.5))
+                        fontsize=fs, color='black', bbox=dict(facecolor='white', edgecolor='none', pad=.1), arrowprops=dict(arrowstyle='-', color=col, lw=0.5))
     ax.set_xlim(x0, x1)
     ax.set_ylim(-len(rows) + 0.4, 0.62)
     ax.set_yticks([])
     ax.spines['left'].set_visible(False)
 
 
-def _timeline_auto(axes, rows, spans, fs=6.4, levels=(0.03, 0.52), reserved=()):
+def _timeline_auto(axes, rows, spans, fs=6.4, levels=(0.03, 0.42, 0.69), reserved=()):
     """Lanes drawn across several axes (spans: one (x0, x1) per axes, e.g. a compressed early period and an
     expanded recent one); every label above its point, at the first free slot among two heights and a few
     horizontal shifts, checked against all the labels already placed (measured with the renderer)."""
@@ -740,6 +740,7 @@ def _timeline_auto(axes, rows, spans, fs=6.4, levels=(0.03, 0.52), reserved=()):
         ax.set_ylim(-len(rows) + 0.7, 0.85)
         for sp in ('left', 'right', 'top'):
             ax.spines[sp].set_visible(False)
+    fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     placed = list(reserved)
     for r, (lab, col, events) in enumerate(rows):
@@ -772,8 +773,9 @@ def _timeline_auto(axes, rows, spans, fs=6.4, levels=(0.03, 0.52), reserved=()):
                 c = min(cands, key=lambda c: (c[0], c[1]))
                 best = (c[2], c[3], c[4])
             dx, lv, bb = best
-            ax.annotate(txt, xy=(xm, y), xytext=(xm + dx, y + lv), ha='center', va='bottom', fontsize=fs,
-                        color='black', arrowprops=dict(arrowstyle='-', color=col, lw=0.5))
+            ax.plot([xm, xm + dx], [y, y + lv], color=col, lw=.5, zorder=1)
+            ax.text(xm + dx, y + lv, txt, ha='center', va='bottom', fontsize=fs,
+                    color='black', bbox=dict(facecolor='white', edgecolor='none', pad=.1), zorder=5)
             if bb is not None:
                 placed.append(bb)
 
@@ -813,28 +815,22 @@ def fig_model_history():
         ('Quantum computing', Teal,
          [(2015, 'quantum MC', 1, -8), (2018, 'option pricing', 0), (2021, 'advantage threshold', 3, 3)]),
     ]
-    # drawn at the size it has on the slide (5.67 x 2.0 in) with a compressed axis before 1985 and an expanded
-    # one after, so that the labels can be placed without overlaps
-    fig, axes = plt.subplots(1, 2, figsize=(5.47, 1.93), gridspec_kw={'width_ratios': [1, 1.75], 'wspace': 0.03})
-    fig._sf_manual = True
-    fig.subplots_adjust(left=0.235, right=0.985, top=0.99, bottom=0.11)
-    for ax in axes:
-        ax.tick_params(axis='x', labelsize=6.6)
-    # the family names on the left first, so that no label is placed over them
-    axes[0].set_yticks([-r for r in range(len(rows))])
-    axes[0].set_yticklabels([lab for lab, _, _ in rows], fontsize=6.8)
-    fig.canvas.draw()
-    names = [t.get_window_extent(fig.canvas.get_renderer()) for t in axes[0].get_yticklabels()]
-    axes[1].set_yticks([])
-    _timeline_auto(axes, rows, [(1895, 1985), (1985, 2036)], fs=6.4, reserved=names)
-    axes[0].set_xticks([1900, 1920, 1940, 1960, 1980])
-    axes[1].set_xticks([1990, 2000, 2010, 2020])
-    # the families named on the left of their lanes (no legend: more height for the labels)
-    for t, (_, col, _) in zip(axes[0].get_yticklabels(), rows):
-        t.set_color(col)
-    axes[0].tick_params(axis='y', length=0)
-    axes[1].spines['bottom'].set_linestyle((0, (2, 1)))
-    save_fig('ch0_model_history')
+    for subset, name in [(rows[:4], 'ch0_model_history'), (rows[4:], 'ch0_model_history_recent')]:
+        fig, axes = plt.subplots(1, 2, figsize=(5.47, 2.25), gridspec_kw={'width_ratios': [1, 1.75], 'wspace': 0.03})
+        fig._sf_manual = True
+        fig.subplots_adjust(left=0.235, right=0.985, top=0.95, bottom=0.11)
+        axes[0].set_yticks([-r for r in range(len(subset))])
+        axes[0].set_yticklabels([lab for lab, _, _ in subset], fontsize=7)
+        fig.canvas.draw()
+        names = [t.get_window_extent(fig.canvas.get_renderer()) for t in axes[0].get_yticklabels()]
+        axes[1].set_yticks([])
+        _timeline_auto(axes, subset, [(1895, 1985), (1985, 2036)], fs=7, reserved=names)
+        axes[0].set_xticks([1900, 1940, 1980]); axes[1].set_xticks([1990, 2000, 2010, 2020])
+        for ax in axes:
+            ax.tick_params(axis='x', labelsize=7)
+        for t, (_, col, _) in zip(axes[0].get_yticklabels(), subset): t.set_color(col)
+        axes[0].tick_params(axis='y', length=0)
+        save_fig(name)
 
 # =============================================================================
 # MAIN

@@ -72,6 +72,25 @@ SEED = 42
 def save_fig(name):
     """Salveaza figura ca PDF si PNG transparent."""
     os.makedirs(CHART_DIR, exist_ok=True)
+    # The optional instructor module is absent from the public repository.
+    try:
+        from ch13_seminar_plot_private import save_private_seminar_figure
+    except ModuleNotFoundError as exc:
+        if exc.name != 'ch13_seminar_plot_private':
+            raise
+    else:
+        if save_private_seminar_figure(plt.gcf(), name, CHART_DIR):
+            plt.close()
+            return
+    from ch13_seminar_plot_layout import save_seminar_figure
+    if save_seminar_figure(plt.gcf(), name, CHART_DIR):
+        plt.close()
+        return
+    from ch13_plot_layout import save_course_figure
+    if save_course_figure(plt.gcf(), name, CHART_DIR):
+        plt.close()
+        print(f'   saved {name}')
+        return
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
     plt.close()
@@ -339,10 +358,10 @@ def fig_leakage_experiment():
         ax.bar(i, np.mean(accs), 0.55, color=colors[i], alpha=0.85)
         ax.scatter(np.full(len(accs), i) + np.linspace(-0.12, 0.12, len(accs)), accs,
                    color='black', s=10, zorder=3)
-        ax.text(i + 0.3, np.mean(accs) + 0.01, f'{np.mean(accs):.1%}', ha='left', fontsize=8.5,
+        ax.text(i, max(accs) + 0.035, f'{np.mean(accs):.1%}', ha='center', fontsize=8.5,
                 fontweight='bold', color=colors[i])
     ax.axhline(0.5, color=Gray, ls='--', lw=0.8)
-    ax.text(2.45, 0.505, 'coin flip', fontsize=7.5, color='black', ha='right', va='bottom')
+    ax.text(0.98, 0.04, 'Dashed line: coin flip (50%)', transform=ax.transAxes, fontsize=8, color='black', ha='right', va='bottom')
     ax.set_xticks(range(len(res)), list(res.keys()))
     ax.set_ylim(0.35, 1.0)
     ax.set_ylabel('Out-of-fold accuracy')
@@ -410,8 +429,8 @@ def fig_model_comparison(df):
     axes[0].bar(x, res['acc'], 0.6, yerr=res['acc_sd'], color=cols, alpha=0.85,
                 error_kw=dict(lw=0.7, capsize=2))
     axes[0].axhline(res['base'].mean(), color=IDAred, ls='--', lw=0.9)
-    axes[0].text(len(res) - 0.5, res['base'].mean() + 0.004, 'always "up"', color=IDAred,
-                 fontsize=7.5, ha='right', va='bottom')
+    axes[0].text(0.04, 0.96, 'Dashed: always "up"', transform=axes[0].transAxes, color=IDAred,
+                 fontsize=8, ha='left', va='top', bbox=dict(facecolor='white', edgecolor='none', pad=1))
     axes[0].set_ylim(0.45, 0.65)
     axes[0].set_ylabel('Accuracy')
     axes[1].bar(x, res['auc'], 0.6, yerr=res['auc_sd'], color=cols, alpha=0.85,
@@ -677,7 +696,7 @@ def fig_deflated_sharpe():
         dsr = deflated_sharpe_ratio(sr, T, np.maximum(N, 1.0001), sr_std, skew=-0.5, kurt=6.0)
         ax.plot(N, dsr, color=c, label=f'observed SR = {sr_ann}')
     ax.axhline(0.95, color=Gray, ls='--', lw=0.8)
-    ax.text(1.05, 0.90, '95% confidence', fontsize=7.5, color='black')
+    ax.text(0.03, 0.12, 'Dashed line: 95% confidence', transform=ax.transAxes, fontsize=8, color='black', bbox=dict(facecolor='white', edgecolor='none', pad=1))
     ax.set_xscale('log')
     ax.set_ylim(0, 1.02)
     ax.set_xlabel('Number of trials $N$')

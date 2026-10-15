@@ -867,11 +867,11 @@ def fig_ltw_table1():
                 ([out[k]['oos'][stat] for k in keys], Forest, oos_lab)]
         for j, (v, c, lab) in enumerate(bars):
             b = ax.bar(x + (j - 1) * bw, v, bw, color=c, label=lab)
-            ax.bar_label(b, fmt='%.1f', fontsize=6.5, color='black', padding=1)
+            ax.bar_label(b, fmt='%.1f', fontsize=6.5, color='black', padding=2 + 7*j)
         ax.set_xticks(x)
         ax.set_xticklabels([LTW_NAME[k] for k in keys])
         ax.set_title(ttl, fontsize=9)
-        ax.set_ylim(0, 1.15 * max(max(v) for v, _, _ in bars))
+        ax.set_ylim(0, 1.28 * max(max(v) for v, _, _ in bars))
     fig.tight_layout()
     fig_legend_bottom(fig, ncol=2, y=0.02)
     save_fig('ch16_ltw_table1')

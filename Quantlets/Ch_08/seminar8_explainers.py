@@ -275,7 +275,8 @@ def fig_durations(a=0.02, b=0.6):
     ax.set_xlim(0, 300)
     ax.annotate('many short gaps', xy=(8, S_w[7]), xytext=(45, 0.5), fontsize=7, color=IDAred,
                 arrowprops=dict(arrowstyle='->', color=IDAred, lw=0.7))
-    ax.annotate('and some very long ones', xy=(250, S_w[249]), xytext=(95, 0.006), fontsize=7, color=IDAred,
+    ax.annotate('and some very long ones', xy=(250, S_w[249]), xytext=(95, 0.003), fontsize=7, color=IDAred,
+                bbox=dict(facecolor='white', edgecolor='none', alpha=0.9, pad=1),
                 arrowprops=dict(arrowstyle='->', color=IDAred, lw=0.7))
     ax.set_xlabel('Duration $d$ between breaches (days)')
     ax.set_ylabel('$S(d) = P(D > d)$, log scale')

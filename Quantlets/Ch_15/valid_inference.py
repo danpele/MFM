@@ -11,7 +11,7 @@ ch15_memory_monthly.csv, ai_discovery_case.json); nu ruleaza din nou niciun mode
     Miller, 2008), corectia Holm pe cele 9 regresii si pe cele 3 strategii
   * studiul de eveniment: diferenta pozitiv - negativ cu CI grupat pe zile; testul Boehmer, Musumeci & Poulsen (1991)
   * curba specificatiilor (Simonsohn, Simmons & Nelson, 2020) pe grila de 36 de strategii, cu nul prin schimbarea
-    semnului pe blocuri de 10 zile de semnal (bootstrap salbatic dependent, Shao, 2010)
+    semnului pe blocuri de 10 zile de tranzacționare consecutive (inclusiv zilele cu randament zero) (bootstrap salbatic dependent, Shao, 2010)
   * testul formal AUC inainte vs dupa publicare (DeLong et al., 1988) si diferenta minima detectabila
   * diferenta diferentelor pentru scurgerea datelor de antrenare, cu CI bootstrap
 Iesire: ch15_inference.json si graficele ch15_ppi, ch15_calibration, ch15_spec_curve.
@@ -408,7 +408,7 @@ def nw_t_mat(X, L):
 
 
 def spec_curve(P, rets, B=2000, seed=15, block=10):
-    """Joint null: Rademacher weights constant over blocks of `block` consecutive signal days (dependent wild
+    """Joint null: Rademacher weights constant over blocks of `block` consecutive trading days (zero-return days included) (dependent wild
     bootstrap, Shao, 2010), the same for all specifications. Assumptions: under the null, the signed returns of each
     block are symmetric around 0 and the blocks are roughly independent; the dependence between
     specifications and the serial dependence within a block are preserved."""

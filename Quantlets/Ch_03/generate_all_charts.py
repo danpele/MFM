@@ -491,6 +491,7 @@ def fig_etf_alphas():
     axes[0].errorbar(res['alpha'], y, xerr=1.96 * res['se_alpha'], fmt='o', color=MainBlue, capsize=2, lw=0.8)
     axes[0].axvline(0, color=Gray, lw=0.6)
     axes[0].set_yticks(y, res.index)
+    axes[0].invert_yaxis()
     axes[0].set_xlabel('Annualised alpha, 95% CI')
     axes[0].set_title('FF5 + momentum alpha', fontsize=9, loc='left')
     L = res[['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA', 'MOM']]
@@ -759,7 +760,7 @@ def fig_jkp_replication():
                  color='black', style='italic', clip_on=False)
     ax2.text(1.03, len(d) - 0.1, 'Theme', transform=ax2.get_yaxis_transform(), ha='left', va='bottom', fontsize=fs,
              color='black', fontweight='bold', clip_on=False)
-    ax1.set_title(f"CAPM alphas of 15 US factors, {s['start'][:4]}-{s['end'][:4]}", fontsize=7, loc='left', pad=3)
+    ax1.set_title(f"CAPM alphas, {s['start'][:4]}-{s['end'][:4]}", fontsize=7, loc='left', pad=3)
     ax2.set_title('OLS t versus posterior z', fontsize=7, loc='left', pad=3)
     h1, l1 = ax1.get_legend_handles_labels()
     h2, l2 = ax2.get_legend_handles_labels()

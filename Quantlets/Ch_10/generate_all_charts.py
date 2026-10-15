@@ -71,6 +71,9 @@ B_BOOT = 1000
 
 def save_fig(name):
     """Save the figure as a transparent PDF and PNG."""
+    boxes = {"ch10_glosten_milgrom": (410, 145), "ch10_april2025": (410, 100), "ch10_race_tax": (410, 145), "ch10_race_prize": (410, 90)}
+    if name in boxes:
+        slide_fit.SIZES[name] = boxes[name]
     os.makedirs(CHART_DIR, exist_ok=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.pdf'), bbox_inches='tight', transparent=True)
     plt.savefig(os.path.join(CHART_DIR, f'{name}.png'), bbox_inches='tight', transparent=True, dpi=180)
@@ -600,7 +603,7 @@ def fig_flash():
     ax.plot(x, d['close'], 'o', color=IDAred, ms=3.5, label='Close')
     i = d.index.get_loc(pd.Timestamp('2010-05-06'))
     ax.annotate('6 May 2010: low of USD 105.00,\n10.1% below the previous close', xy=(i, d['low'].iloc[i]),
-                xytext=(i - 13, d['low'].iloc[i] + 0.3), fontsize=7.5, color='black',
+                xytext=(0.50, 0.82), textcoords='axes fraction', fontsize=7.5, color='black', bbox=dict(facecolor='white', edgecolor='none', alpha=0.9, pad=2),
                 arrowprops=dict(arrowstyle='->', color='black', lw=0.7))
     ax.set_xticks(x[::5])
     ax.set_xticklabels([t.strftime('%d %b') for t in d.index[::5]], fontsize=7.5)

@@ -160,6 +160,7 @@ def fig_greeks(K=100.0, r=0.02, sig=0.30):
         ax.axvline(K, color=Amber, lw=0.6, ls=':')
         ax.set_xlabel('$S$')
     bottom_legend(fig, axes, ncol=4)
+    fig.subplots_adjust(wspace=0.65)
     save_fig(fig, 'ch12_sem_primer_greeks')
 
 
@@ -316,7 +317,7 @@ def fig_strip(F=100.0, T=30 / 365, r=0.0, dK=2.5):
     ax.set_ylabel('Option price $Q(K)$')
     ax2 = ax.twinx()
     ax2.plot(Ks, 1e4 * np.cumsum(contrib), color=Forest, lw=1.2, label=r'Running sum $\times 10^4$ (right axis)')
-    ax2.set_ylabel(r'$\frac{2}{T}\sum \frac{\Delta K}{K^2}Q(K)$, $\times 10^{4}$')
+    ax2.set_ylabel(r'Running strip sum ($\times 10^4$)')
     ax2.spines['right'].set_color(Navy)
     h1, l1 = ax.get_legend_handles_labels()
     h2, l2 = ax2.get_legend_handles_labels()

@@ -238,12 +238,12 @@ def fig_z_null(T=2500, reps=1000, seed=21):
 # =============================================================================
 def fig_hurst(n=1000, Hs=(0.3, 0.5, 0.75), seed=5):
     cols = {0.3: Forest, 0.5: MainBlue, 0.75: IDAred}
-    fig, axes = plt.subplots(1, 2, figsize=FULL)
+    fig, axes = plt.subplots(1, 2, figsize=(5.6,1.65))
     for j, H in enumerate(Hs):
         x = fgn(n, H, seed + j)
         axes[0].plot(np.cumsum(x) / n ** H, color=cols[H], lw=0.9, label=f'$H$ = {H}')
     axes[0].set_xlabel('Day $t$')
-    axes[0].set_ylabel(r'$\sum_{s \leq t} x_s \,/\, n^H$')
+    axes[0].set_ylabel('Rescaled path')
     axes[0].set_title('Paths, rescaled', loc='left')
     q = np.array([1, 2, 5, 10, 20, 50, 100])
     for H in Hs:
@@ -251,9 +251,14 @@ def fig_hurst(n=1000, Hs=(0.3, 0.5, 0.75), seed=5):
     axes[1].set_xscale('log'); axes[1].set_yscale('log')
     axes[1].set_xticks([1, 10, 100]); axes[1].set_xticklabels(['1', '10', '100'])
     axes[1].set_xlabel('Horizon $q$ (log)')
-    axes[1].set_ylabel(r'VR($q$) $= q^{2H-1}$')
+    axes[1].set_ylabel('VR(q)')
     axes[1].set_title('Slope $2H - 1$ on log axes', loc='left')
+    for ax in axes:
+        ax.tick_params(labelsize=10)
+        ax.xaxis.label.set_size(11); ax.yaxis.label.set_size(11); ax.title.set_size(11)
     bottom_legend(fig, axes[0], ncol=3)
+    for leg in fig.legends:
+        for text in leg.get_texts():text.set_fontsize(10)
     save_fig(fig, 'ch2_sem_primer_hurst')
     return {H: float(100 ** (2 * H - 1)) for H in Hs}
 
@@ -300,7 +305,7 @@ def fig_dfa(n=1000, seed=9):
     xl = fgn(n, 0.75, seed + 1)
     y = np.cumsum(x - x.mean())
     seglen = 100
-    fig, axes = plt.subplots(1, 2, figsize=FULL)
+    fig, axes = plt.subplots(1, 2, figsize=(5.6,1.65))
     ax = axes[0]
     ax.plot(y, color=MainBlue, lw=0.9, label='Profile $y_k$')
     t = np.arange(seglen)
@@ -311,7 +316,7 @@ def fig_dfa(n=1000, seed=9):
         ax.axvline(j * seglen, color=Amber, lw=0.6, ls=':')
     ax.set_xlabel('$k$')
     ax.set_ylabel('$y_k$')
-    ax.set_title(f'Segments of length $n$ = {seglen}', loc='left')
+    ax.set_title(f'Segments, $n$ = {seglen}', loc='left')
     ax = axes[1]
     ns = np.unique(np.round(np.exp(np.linspace(np.log(10), np.log(250), 12))).astype(int))
     out = {}
@@ -327,7 +332,12 @@ def fig_dfa(n=1000, seed=9):
     ax.set_title('Fluctuation function', loc='left')
     h1, l1 = axes[0].get_legend_handles_labels()
     h2, l2 = axes[1].get_legend_handles_labels()
+    for ax in axes:
+        ax.tick_params(labelsize=10)
+        ax.xaxis.label.set_size(11); ax.yaxis.label.set_size(11); ax.title.set_size(10)
     bottom_legend(fig, ncol=2, handles=h1 + h2, labels=l1 + l2)
+    for leg in fig.legends:
+        for text in leg.get_texts():text.set_fontsize(9)
     save_fig(fig, 'ch2_sem_primer_dfa')
     return out
 
@@ -343,7 +353,7 @@ def fig_wild(T=1000, B=999, seed=31):
     star = eta * e
     rho_b = np.array([np.sum(s[1:] * s[:-1]) / np.sum(s ** 2) for s in star])
     lo, hi = np.quantile(rho_b, [0.025, 0.975])
-    fig, axes = plt.subplots(1, 2, figsize=FULL)
+    fig, axes = plt.subplots(1, 2, figsize=(5.6,1.65))
     ax = axes[0]
     ax.plot(e, color=MainBlue, lw=0.4, label='Original $e_t$')
     off = 2.2 * np.abs(e).max()
@@ -360,13 +370,18 @@ def fig_wild(T=1000, B=999, seed=31):
         ax.axvline(v, color=Forest, lw=1.2, ls=':')
     ax.set_xlabel(r'$\hat\rho_1^*$')
     ax.set_ylabel('Count')
-    ax.set_title('Null distribution of $\\hat\\rho_1$', loc='left')
+    ax.set_title('Null: $\\hat\\rho_1$', loc='left')
     handles = [Line2D([], [], color=MainBlue, lw=1.5), Line2D([], [], color=IDAred, lw=1.5),
                Patch(facecolor=BandBlue, edgecolor=MainBlue), Line2D([], [], color=IDAred, ls='--', lw=1.4),
                Line2D([], [], color=Forest, ls=':', lw=1.2)]
     labels = ['Original $e_t$', r'One copy $e_t\eta_t$', r'999 values $\hat\rho_1^*$',
-              'Bootstrap band (2.5%, 97.5%)', r'i.i.d. band $\pm 1.96/\sqrt{T}$']
+              'Bootstrap 95% band', r'i.i.d. band $\pm 1.96/\sqrt{T}$']
+    for ax in axes:
+        ax.tick_params(labelsize=10)
+        ax.xaxis.label.set_size(11); ax.yaxis.label.set_size(11); ax.title.set_size(10)
     bottom_legend(fig, ncol=3, handles=handles, labels=labels)
+    for leg in fig.legends:
+        for text in leg.get_texts():text.set_fontsize(9)
     save_fig(fig, 'ch2_sem_primer_wild')
     return dict(lo=float(lo), hi=float(hi), iid=float(1.96 / np.sqrt(T)))
 
@@ -401,7 +416,7 @@ def fig_rolling(T=3000, W=250, step=21, seed=17):
 # (x) multiple testing: FWER and the Bonferroni / Holm thresholds
 # =============================================================================
 def fig_holm(M=10, alpha=0.05):
-    fig, axes = plt.subplots(1, 2, figsize=FULL)
+    fig, axes = plt.subplots(1, 2, figsize=(5.6,1.65))
     m = np.arange(1, 51)
     axes[0].plot(m, 100 * (1 - (1 - alpha) ** m), color=IDAred, lw=1.6, label=r'FWER $= 1 - 0.95^M$')
     axes[0].axhline(5, color=Forest, lw=1.0, ls=':', label='Target 5%')
@@ -425,7 +440,12 @@ def fig_holm(M=10, alpha=0.05):
     stop = int(np.argmax(p >= holm)) if np.any(p >= holm) else M
     h1, l1 = axes[0].get_legend_handles_labels()
     h2, l2 = axes[1].get_legend_handles_labels()
+    for ax in axes:
+        ax.tick_params(labelsize=10)
+        ax.xaxis.label.set_size(11); ax.yaxis.label.set_size(11); ax.title.set_size(10)
     bottom_legend(fig, ncol=3, handles=h1 + h2, labels=l1 + l2)
+    for leg in fig.legends:
+        for text in leg.get_texts():text.set_fontsize(9)
     save_fig(fig, 'ch2_sem_primer_holm')
     return dict(p=p.round(4).tolist(), holm_rej=stop, bonf_rej=int(np.sum(p < alpha / M)),
                 fwer10=1 - 0.95 ** 10)

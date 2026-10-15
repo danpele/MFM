@@ -20,7 +20,9 @@ warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
+import slide_fit
+slide_fit.SIZES.update({'ch11_np_diffusion':[410,155]})
+# noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import LABELS, log_returns, load_close, load_vix, read_fred, periods_per_year, load_spy_5m  # noqa: E402
 from ct_models import (scaled_random_walk, bm_paths, quadratic_variation, total_variation, ito_stratonovich,  # noqa: E402
                        max_prob, convergence_study, slope_ci, slope_boot, gbm_paths, gbm_mle, gbm_simulate_returns,
@@ -140,7 +142,7 @@ def fig_donsker():
     exact = 2 * (1 - stats.norm.cdf(1.0))
     axes[1].errorbar(ns, out['p'], yerr=1.96 * np.array(out['se']), fmt='o-', color=MainBlue, ms=4, capsize=2,
                      label='Random walk, 20,000 paths (95% CI)')
-    axes[1].axhline(exact, color=IDAred, ls='--', lw=1, label=f'Brownian motion: 2(1 - Φ(1)) = {exact:.4f}')
+    axes[1].axhline(exact, color=IDAred, ls='--', lw=1, label=f'Brownian limit: {exact:.4f}')
     axes[1].set_xscale('log')
     axes[1].set_xlabel('Number of steps n')
     axes[1].set_ylabel(r'$P(\max_{t \leq 1} W_n(t) > 1)$')
@@ -550,7 +552,7 @@ def fig_np_diffusion(fits):
     axes[0].plot(g100, 100 * par_a, color=IDAred, ls='--', lw=1.2, label=r'Vasicek: $\hat\kappa(\hat\theta - r)$')
     axes[0].axhline(0, color=Gray, lw=0.6)
     axes[0].set_xlabel('Short rate r (% p.a.)')
-    axes[0].set_ylabel('Drift a(r) (% points per year)')
+    axes[0].set_ylabel('Drift a(r) (p.p./year)')
     axes[0].set_title('Drift: estimated imprecisely', loc='left')
     axes[1].fill_between(g100, 100 * lo_b, 100 * hi_b, color=LightGray, alpha=0.6, lw=0)
     axes[1].plot(g100, 100 * b, color=MainBlue, lw=1.5)
@@ -560,7 +562,7 @@ def fig_np_diffusion(fits):
                'CKLS': rf"CKLS: $\sigma r^{{\gamma}}$, $\hat\gamma$ = {F['ckls']['gamma']:.2f}"}[k]
         axes[1].plot(g100, 100 * v, color=cols[k], lw=1.2, ls='--', label=lab)
     axes[1].set_xlabel('Short rate r (% p.a.)')
-    axes[1].set_ylabel('Diffusion b(r) (% points per year)')
+    axes[1].set_ylabel(r'$b(r)$ (p.p./$\sqrt{\mathrm{year}}$)')
     axes[1].set_title('Diffusion: estimated precisely', loc='left')
     fig_legend_bottom(fig, ncol=3, y=0.03)
     plt.tight_layout(rect=(0, 0.03, 1, 1))

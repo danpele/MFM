@@ -21,7 +21,9 @@ warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
+import slide_fit
+slide_fit.SIZES.update({'ch9_sem_b6':[410,135], 'ch9_sem_b7':[410,140], 'ch9_sem_b8':[410,145], 'ch9_sem_b9':[410,150], 'ch9_sem_a3':[410,130], 'ch9_sem_c2_boot':[410,130], 'ch9_sem_a6':[410,125], 'ch9_sem_a7':[410,105], 'ch9_sem_b4':[410,110], 'ch9_sem_b5':[410,110], 'ch9_sem_a8':[410,105], 'ch9_oos':[410,150], 'ch9_signature':[410,150], 'ch9_csv_ranking':[410,172], 'ch9_sem_day':[410,120], 'ch9_sem_b2':[410,125], 'ch9_sem_b3':[410,140], 'ch9_sem_a5':[410,145]})
+# noqa: E402,F401  charts drawn at the size they have on the slides
 import mfm_data as M      # noqa: E402
 import rv_tools as T      # noqa: E402
 
@@ -317,7 +319,7 @@ def fig_signature():
     ss = T.signature(P_SPY, KS_SPY, 252)
     sb = T.signature(P_BTC, KS_BTC, 365)
     fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.1))
-    for ax, s, ks, col, name in [(axes[0], ss, KS_SPY, MainBlue, 'SPY'), (axes[1], sb, KS_BTC, Amber, 'Bitcoin')]:
+    for ax, s, ks, col, name in [(axes[0], ss, KS_SPY, MainBlue, 'SPY'), (axes[1], sb, KS_BTC, MainBlue, 'Bitcoin')]:
         m = [5 * k for k in ks]
         ax.plot(m, s['sparse'], 'o-', color=col, ms=3.5, label='One grid (sparse sampling)')
         ax.plot(m, s['subsampled'], 's--', color=IDAred, ms=3, label='Average over shifted grids (subsampling)')
@@ -548,20 +550,23 @@ def evaluate(F, y):
 
 def fig_oos(F, y, Fb, yb):
     """SPY 2022-2026: realised volatility (including overnight) and the log-HAR and GARCH-t forecasts; cumulative QLIKE loss."""
-    fig, axes = plt.subplots(2, 1, figsize=(9.6, 5.0), gridspec_kw={'height_ratios': [1.5, 1]})
-    axes[0].plot(y.index, ann(y, 252), color=Teal, lw=0.6, label='SPY realised volatility incl. overnight (% p.a.)')
-    axes[0].plot(F.index, ann(F['GARCH-t'], 252), color=MainBlue, lw=1.0, label='GARCH(1,1)-t forecast')
+    fig, axes = plt.subplots(1, 2, figsize=(10.2, 3.8))
+    axes[0].plot(y.index, ann(y, 252), color=Teal, lw=0.6, label='SPY realised (incl. overnight)')
+    axes[0].plot(F.index, ann(F['GARCH-t'], 252), color=MainBlue, lw=1.0, zorder=4, label='GARCH(1,1)-t forecast')
     axes[0].plot(F.index, ann(F['logHAR'], 252), color=IDAred, lw=1.0, label='log-HAR forecast')
     axes[0].set_ylabel('% p.a.')
     axes[0].set_ylim(0, 80)
     for c in ['GARCH-t', 'EWMA', 'HAR']:
         d = (T.qlike(y, F[c]) - T.qlike(y, F['logHAR'])).cumsum()
-        axes[1].plot(d.index, d.values, color=MODEL_COL[c], lw=1.1, label=f'Cumulative QLIKE: {MODEL_LABEL[c]} minus log-HAR (SPY)')
+        axes[1].plot(d.index, d.values, color={'GARCH-t':Purple, 'EWMA':Forest, 'HAR':Orange}[c], lw=1.1, ls='--' if c=='GARCH-t' else '-', label=f'SPY: {c} minus log-HAR')
     for c in ['GARCH-t']:
         d = (T.qlike(yb, Fb[c]) - T.qlike(yb, Fb['logHAR'])).cumsum()
-        axes[1].plot(d.index, d.values, color=Amber, lw=1.1, ls='--', label='Cumulative QLIKE: GARCH(1,1)-t minus log-HAR (Bitcoin)')
+        axes[1].plot(d.index, d.values, color=Amber, lw=1.1, ls='--', label='Bitcoin: GARCH-t minus log-HAR')
     axes[1].axhline(0, color=Black, lw=0.6)
-    axes[1].set_ylabel('Cumulative loss difference')
+    axes[1].set_ylabel('Cum. QLIKE diff.')
+    axes[1].yaxis.set_major_locator(plt.MaxNLocator(nbins=4))
+    axes[0].set_title('Volatility forecasts', loc='left')
+    axes[1].set_title('Loss relative to log-HAR', loc='left')
     fig_legend_bottom(fig, ncol=2, y=0.02)
     plt.tight_layout(rect=(0, 0.1, 1, 1))
     save_fig('ch9_oos')
@@ -657,7 +662,7 @@ def csv_label(m):
     """Label of a model; NNe_k -> NN_k^e (notation of the paper)."""
     if m.startswith('NN'):
         e, k = m[2:].split('_')
-        return rf'NN$_{k}^{{{e}}}$'
+        return f"NN {k} layer{'' if k == '1' else 's'}, {e} fit{'' if e == '1' else 's'}"
     return CSV_LABEL[m]
 
 
