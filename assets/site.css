@@ -103,8 +103,6 @@ nav a:hover { background: var(--main-blue); }
 }
 
 .lang-btn:hover { background: white; color: var(--dark-gray); }
-.lang-btn { display: inline-flex; align-items: center; gap: 0.35rem; }
-.lang-btn .flag { width: 18px; height: 12px; border-radius: 2px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2); flex: none; }
 .lang-btn.active { background: white; color: var(--main-blue); }
 
 /* ---------------- MAIN ---------------- */
