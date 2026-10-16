@@ -419,10 +419,10 @@ footer {
 
 .resource-logo { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
 .footer-logos img { height: 44px; background: white; padding: 5px; border-radius: 4px; }
-footer .motto { margin: 0 auto 1.2rem; max-width: 40rem; }
-footer .motto blockquote { margin: 0; font-style: italic; font-size: 1.1rem; }
-footer .motto p { margin: 0.3rem 0 0; font-size: 0.88rem; opacity: 0.8; }
-footer .motto figcaption { margin-top: 0.3rem; font-size: 0.85rem; opacity: 0.9; }
+.hero .motto { max-width: 40rem; margin: 0 auto 1.6rem; }
+.hero .motto blockquote { margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-style: italic; font-size: 1.15rem; }
+.hero .motto p { margin: 0.25rem 0 0; font-size: 0.9rem; opacity: 0.85; }
+.hero .motto figcaption { margin-top: 0.25rem; font-size: 0.85rem; opacity: 0.9; letter-spacing: 0.03em; }
 footer .muted { margin-top: 0.5rem; opacity: 0.8; font-size: 0.9rem; }
 
 /* ---------------- RESPONSIVE ---------------- */
