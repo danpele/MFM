@@ -589,3 +589,11 @@ body.no-scroll { overflow: hidden; }
 .teacher-btn { background: none; border: 0; padding: 0; color: white; font: inherit; text-decoration: underline; cursor: pointer; }
 .teacher-btn[hidden] { display: none; }
 #teacher-g-button { display: inline-block; margin-top: 0.4rem; }
+
+/* ---------------- Romanian flag in the background of the top sections ---------------- */
+header, .hero { position: relative; overflow: hidden; background: linear-gradient(160deg, #0E1117 0%, #161B24 55%, #1B2130 100%); }
+header::before, .hero::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.42;
+    background: linear-gradient(90deg, #0B3FB0 0%, #0B3FB0 30%, #FCD116 36%, #FCD116 64%, #CE1126 70%, #CE1126 100%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 72%, transparent 100%); mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 72%, transparent 100%); }
+header > *, .hero > * { position: relative; z-index: 1; }
+@media print { header::before, .hero::before { display: none; } }
