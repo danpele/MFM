@@ -190,6 +190,8 @@
             `<a href="${href}" target="_blank" rel="noopener"><img src="${src}" alt="${alt}"></a>`
         ).join('');
         $('footer-text').innerHTML = `&copy; 2026 ${T.footer}`;
+        $('footer-text').insertAdjacentHTML('beforebegin', `<figure class="motto"><blockquote lang="it">“Tristo è quel discepolo che non avanza il suo maestro.”</blockquote>` +
+            `<p>${LANG === 'ro' ? 'Trist este discipolul care nu își depășește maestrul.' : 'Poor is the pupil who does not surpass his master.'}</p><figcaption>— Leonardo da Vinci</figcaption></figure>`);
     }
 
     // ------------------------------------------------------------
