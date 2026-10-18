@@ -244,7 +244,8 @@ def fig_triple_barrier():
         ax.plot(t0, p0, 'o', color=MainBlue, ms=3.5)
         ax.plot(row['t1'], close.loc[row['t1']], marker='*', ms=9, color=colors[row['barrier']])
         ax.annotate(f"{'+1' if row['label'] > 0 else '-1'}", xy=(row['t1'], close.loc[row['t1']]),
-                    xytext=(3, 6), textcoords='offset points', fontsize=8,
+                    xytext=(5, 9), textcoords='offset points', fontsize=8,
+                    bbox=dict(facecolor='white', edgecolor='none', pad=0.5),
                     color=colors[row['barrier']], fontweight='bold')
     handles = [plt.Line2D([], [], color=Forest, label='Upper barrier (profit-taking)'),
                plt.Line2D([], [], color=IDAred, label='Lower barrier (stop-loss)'),
@@ -253,7 +254,7 @@ def fig_triple_barrier():
                plt.Line2D([], [], color='black', marker='*', ls='', ms=8, label='First touch $t_1$')]
     ax.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=3, frameon=False)
     ax.set_ylabel('Index level')
-    ax.set_title('Triple-barrier labelling: barriers at $\\pm\\sigma_{t_0}\\sqrt{h}$, $h=15$ days',
+    ax.set_title('Triple-barrier labelling: barriers at $\\pm\\sigma_{t_0}\\sqrt{h}$, $h=15$ trading days',
                  fontsize=9, loc='left')
     plt.tight_layout()
     save_fig('ch13_triple_barrier')
@@ -274,13 +275,13 @@ def fig_label_comparison():
         index=['+1 (up)', '-1 (down)', 'time-out'])
     fig, axes = plt.subplots(1, 2, figsize=(7.0, 2.8), gridspec_kw={'width_ratios': [1, 1.25]})
     x = np.arange(3)
-    axes[0].bar(x - 0.18, shares.iloc[:, 0], 0.36, color=MainBlue, label=shares.columns[0])
-    axes[0].bar(x + 0.18, shares.iloc[:, 1], 0.36, color=Amber, label=shares.columns[1])
-    axes[0].set_xticks(x, shares.index)
-    axes[0].set_ylabel('Share of labels')
+    axes[0].bar(x - 0.18, shares.iloc[:, 0], 0.36, color=MainBlue, label='Fixed horizon (10 trading days)')
+    axes[0].bar(x + 0.18, shares.iloc[:, 1], 0.36, color=Amber, label='Triple barrier: first hit (10 trading days)')
+    axes[0].set_xticks(x, ['Up /\nupper', 'Down /\nlower', 'Time-out'])
+    axes[0].set_ylabel('Share of observations')
     axes[0].legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=1, frameon=False)
     hold = (tb['t1'] - tb.index).dt.days
-    axes[1].hist(hold[tb['barrier'] != 'vertical'], bins=np.arange(0, 17, 1), color=MainBlue, alpha=0.85)
+    axes[1].hist(hold[tb['barrier'] != 'vertical'], bins=np.arange(0, int(hold[tb['barrier'] != 'vertical'].max()) + 2, 1), color=MainBlue, alpha=0.85)
     axes[1].set_xlabel('Calendar days until first touch')
     axes[1].set_ylabel('Frequency')
     axes[1].set_title('Horizontal barrier hits', fontsize=8.5, loc='left')
@@ -532,8 +533,19 @@ def fig_feature_importance(df):
                                              min_samples_leaf=100, random_state=SEED)
         gbm.fit(X.iloc[:split], y[:split])
         sample = X.iloc[gap:].sample(min(800, len(X) - gap), random_state=SEED)
-        explainer = shap.Explainer(gbm.predict_proba, X.iloc[:split].sample(200, random_state=SEED))
-        sv = explainer(sample).values[..., 1]
+        background = X.iloc[:split].sample(200, random_state=SEED)
+        # Keep the original effective 100-row background and scope SHAP's RNG.
+        shap_rng_state = np.random.get_state()
+        try:
+            masker = shap.maskers.Independent(background, max_samples=100)
+            explainer = shap.Explainer(gbm.predict_proba, masker,
+                                       algorithm='permutation', seed=SEED)
+            sv = explainer(sample, max_evals=500).values[..., 1]
+        finally:
+            np.random.set_state(shap_rng_state)
+        print(f'SHAP: permutation approximation; seed={SEED}; '
+              f'{len(masker.data)} effective background rows from {len(background)} sampled rows; '
+              f'{len(sample)} explained observations; max_evals=500 per observation.')
         shap_imp = pd.Series(np.abs(sv).mean(0), index=feat_cols)
     except Exception as e:
         print('   SHAP skipped:', e)
@@ -674,7 +686,7 @@ def fig_is_vs_oos():
     lims = [min(res['sr_is'].min(), res['sr_oos'].min()) - 0.1, max(res['sr_is'].max(), res['sr_oos'].max()) + 0.1]
     ax.plot(lims, lims, color=Gray, ls=':', lw=0.8)
     ax.set_xlabel('Sharpe in-sample (May 2015 - 2020)')
-    ax.set_ylabel('Sharpe out-of-sample (2021-2026)')
+    ax.set_ylabel('Sharpe out-of-sample\n(2021-2026)')
     ax.set_title(f'BTC moving-average crossover grid search (Spearman $\\rho$ = {rank_corr:.2f})',
                  fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=2, y=-0.2)

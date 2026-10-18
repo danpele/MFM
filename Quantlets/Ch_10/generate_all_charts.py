@@ -71,7 +71,7 @@ B_BOOT = 1000
 
 def save_fig(name):
     """Save the figure as a transparent PDF and PNG."""
-    boxes = {"ch10_glosten_milgrom": (410, 145), "ch10_april2025": (410, 100), "ch10_race_tax": (410, 145), "ch10_race_prize": (410, 90)}
+    boxes = {"ch10_glosten_milgrom": (410, 145), "ch10_april2025": (410, 100), "ch10_race_tax": (410, 145), "ch10_race_prize": (410, 145)}
     if name in boxes:
         slide_fit.SIZES[name] = boxes[name]
     os.makedirs(CHART_DIR, exist_ok=True)
@@ -332,7 +332,7 @@ def fig_spread_frequency(E, sp_daily):
     ax.set_yscale('log')
     ax.set_xticks(x)
     ax.set_xticklabels(list(vals))
-    ax.set_ylabel('Estimated relative spread (bp, log scale)')
+    ax.set_ylabel('Estimated relative spread\n(bp, log scale)')
     legend_outside_bottom(ax, ncol=1, y=-0.14)
     save_fig('ch10_spread_frequency')
     rng = np.random.default_rng(SEED)
@@ -514,7 +514,7 @@ def fig_kyle():
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.2))
     axes[0].plot(su, lam, color=MainBlue, lw=1.5, label='Price impact $\\lambda = \\sigma_v / (2\\sigma_u)$')
     axes[0].set_xlabel('Noise-trading standard deviation $\\sigma_u$ (thousand shares)')
-    axes[0].set_ylabel('$\\lambda$ (USD per thousand shares of order flow)')
+    axes[0].set_ylabel('$\\lambda$ (USD per thousand shares\nof order flow)')
     axes[1].plot(su, prof, color=Forest, lw=1.5, label='Expected profit of the insider $\\sigma_v \\sigma_u / 2$')
     axes[1].set_xlabel('Noise-trading standard deviation $\\sigma_u$ (thousand shares)')
     axes[1].set_ylabel('Expected profit (thousand USD)')
@@ -549,7 +549,7 @@ def fig_sqrt(s):
     ax.loglog(vv, np.exp(icpt) * vv ** slope, color=MainBlue, lw=1.3, label=f'Fitted power law, slope {slope:.2f}')
     ax.loglog(vv, np.exp(icpt) * vv ** 0.5, color=Gray, ls='--', lw=0.8, label='Slope 1/2 (square-root law)')
     ax.set_xlabel('Bar volume / median volume at that time of day')
-    ax.set_ylabel('Mean |return| / daily s.d. of 5-min returns')
+    ax.set_ylabel('Mean |return| / daily s.d.\nof 5-min returns')
     legend_outside_bottom(ax, ncol=2, y=-0.2)
     save_fig('ch10_sqrt_law')
     return dict(slope=float(slope), n=int(len(x)))

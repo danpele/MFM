@@ -425,7 +425,15 @@ def bh(p):
 
 def mcs(losses, size=0.10, reps=1000, block=None, seed=20):
     """Model confidence set (Hansen, Lunde & Nason, 2011), T_max statistic, stationary bootstrap."""
-    from arch.bootstrap import MCS
+    try:
+        from arch.bootstrap import MCS
+    except ModuleNotFoundError as exc:
+        if exc.name != 'arch':
+            raise
+        import subprocess
+        import sys
+        subprocess.run([sys.executable, '-m', 'pip', 'install', 'arch'], check=True)
+        from arch.bootstrap import MCS
     L = pd.DataFrame(losses)
     m = MCS(L, size=size, reps=reps, block_size=block or 10, method='max', bootstrap='stationary', seed=seed)
     m.compute()

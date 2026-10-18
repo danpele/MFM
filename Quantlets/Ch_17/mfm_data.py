@@ -104,6 +104,21 @@ def shiller():
             break
         except Exception:
             continue
+    # Install only the reader required by the downloaded workbook format.
+    _excel_engine = ('xlrd' if raw.startswith(bytes.fromhex('D0CF11E0A1B11AE1'))
+                     else 'openpyxl' if raw.startswith(b'PK') else None)
+    if _excel_engine is not None:
+        import importlib
+        try:
+            importlib.import_module(_excel_engine)
+        except ModuleNotFoundError as exc:
+            if exc.name != _excel_engine:
+                raise
+            import subprocess
+            import sys
+            subprocess.run([sys.executable, '-m', 'pip', 'install', _excel_engine], check=True)
+            importlib.invalidate_caches()
+            importlib.import_module(_excel_engine)
     d = pd.read_excel(io.BytesIO(raw), sheet_name='Data', header=None, skiprows=8)
     d = d.iloc[:, [0, 1, 2, 7, 8]]
     d.columns = ['date', 'P', 'D', 'real_P', 'real_D']

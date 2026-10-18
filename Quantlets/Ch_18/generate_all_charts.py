@@ -200,7 +200,7 @@ def fig_srisk(t):
                 label=f'{NAMES[k]}: LRMES {100 * lr:.0f}%, break-even leverage {t.loc[k, "Lstar"]:.1f}')
         ax.plot(t.loc[k, 'Lstar'], 0, 'o', color=c, ms=5)
     ax.axhline(0, color=Gray, lw=0.6)
-    ax.set_xlabel('Quasi-market leverage L = (debt + market equity) / market equity (assumed)')
+    ax.set_xlabel('Quasi-market leverage (assumed)\nL = (debt + market equity) / market equity')
     ax.set_ylabel('SRISK / market equity (%)')
     legend_outside_bottom(ax, ncol=1, y=-0.2)
     save_fig('ch18_srisk')
@@ -253,7 +253,7 @@ def fig_dcovar(t):
                 capsize=2, lw=0.8)
     ax.set_xticks(xs)
     ax.set_xticklabels([NAMES[k] for k in ks], rotation=35, ha='right', fontsize=7.5)
-    ax.set_ylabel('ΔCoVaR 1% (system loss, %)')
+    ax.set_ylabel('ΔCoVaR 1%\n(additional system loss, %)')
     h = [plt.Rectangle((0, 0), 1, 1, color=REGION_COL[r]) for r in ['US', 'EU']] + \
         [plt.Line2D([], [], color='black', marker='|', ls='', ms=8)]
     ax.legend(h, ['US banks (system: other US banks)', 'European banks (system: other European banks)',
@@ -271,7 +271,7 @@ def fig_var_vs_dcovar(t):
             ax.annotate(NAMES[k], (s.loc[k, 'var_i'], s.loc[k, 'dcovar']), xytext=(4, 2), textcoords='offset points',
                         fontsize=6.5, color='black')
     ax.set_xlabel('VaR 1% of the bank (daily loss, %)')
-    ax.set_ylabel('ΔCoVaR 1% (system loss, %)')
+    ax.set_ylabel('ΔCoVaR 1%\n(additional system loss, %)')
     legend_outside_bottom(ax, ncol=2, y=-0.2)
     save_fig('ch18_var_vs_dcovar')
     from scipy.stats import spearmanr
@@ -299,7 +299,7 @@ def fig_dcovar_dynamic(dyn):
     for k, f in dyn.items():
         s = f['dcovar'].rolling(21).mean()
         ax.plot(s.index, s.values, color=cols[k], lw=0.8, label=NAMES[k])
-    ax.set_ylabel('ΔCoVaR 1% (%, 21-day average)')
+    ax.set_ylabel('ΔCoVaR 1%\n(%, 21-observation average)')
     ax.set_xlim(R.index[0], R.index[-1])
     ax.set_ylim(bottom=0)
     mark_events(ax)
@@ -311,11 +311,11 @@ def fig_exposure(t):
     ks = list(t.index)
     xs = np.arange(len(ks))
     fig, ax = plt.subplots(figsize=(7.0, 3.0))
-    ax.bar(xs - 0.2, t['dcovar'], 0.38, color=MainBlue, label='ΔCoVaR 1%: loss of the system when the bank is in distress')
-    ax.bar(xs + 0.2, t['exp_dcovar'], 0.38, color=Orange, label='Exposure ΔCoVaR 1%: loss of the bank when the system is in distress')
+    ax.bar(xs - 0.2, t['dcovar'], 0.38, color=MainBlue, label='System ΔCoVaR 1%: bank distress minus median state')
+    ax.bar(xs + 0.2, t['exp_dcovar'], 0.38, color=Orange, label='Bank exposure ΔCoVaR 1%: system distress minus median state')
     ax.set_xticks(xs)
     ax.set_xticklabels([NAMES[k] for k in ks], rotation=35, ha='right', fontsize=7.5)
-    ax.set_ylabel('Daily loss (%)')
+    ax.set_ylabel('Additional loss relative\nto median state (%)')
     legend_outside_bottom(ax, ncol=1, y=-0.42)
     save_fig('ch18_exposure')
 
@@ -414,7 +414,7 @@ def fig_spill_rolling(tot, net):
         s = net[mem].sum(axis=1)
         axes[1].plot(s.index, s.values, color=REGION_COL[reg], lw=0.9, label=f'Net spillover of {REGION_LAB[reg]}')
     axes[1].axhline(0, color=Gray, lw=0.5)
-    axes[1].set_ylabel('Net (to - from, %)')
+    axes[1].set_ylabel('Sum of bank net spillovers\n(pp)')
     fig.tight_layout()
     h = axes[0].get_lines()[:1] + axes[1].get_lines()[:3]
     fig.legend(h, [l.get_label() for l in h], loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=2, frameon=False)

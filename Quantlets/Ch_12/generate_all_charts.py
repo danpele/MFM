@@ -142,7 +142,7 @@ def fig_strategies():
         ax.axhline(0, color=Gray, lw=0.6)
         ax.set_title(name, fontsize=8.2, loc='left')
         ax.set_xlabel('$S_T$')
-        ax.set_ylim(-25, 25)
+        ax.margins(y=0.08)  # show the full computed payoff and stock ranges
     axes[0].set_ylabel('Profit at expiry')
     fig_legend_bottom(fig, [Line2D([], [], color='black', lw=1.6, label='Profit of the strategy'),
                             Line2D([], [], color=MainBlue, lw=0.9, ls='--', label='Profit of the stock alone')], ncol=2, y=-0.02)
@@ -170,20 +170,20 @@ def fig_binomial():
     Sg = np.linspace(60, 140, 81)
     am = np.array([crr_price(x, K, T, r, s, 500, 'put', True) for x in Sg])
     eu = bs_price(Sg, K, T, r, s, 'put')
-    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.5))
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 3.0))
     ax = axes[0]
     ax.plot(Ns, crr, color=MainBlue, lw=0.9, marker='o', ms=1.6, label='Binomial tree (CRR), $N$ steps')
     ax.axhline(bs, color=IDAred, lw=1.1, label=f'Black-Scholes ({bs:.3f})')
     ax.set_xlabel('Number of steps $N$'); ax.set_ylabel('Call price')
     ax.set_title('Call: $S=K=100$, $T=1$, $r=5\\%$, $\\sigma=20\\%$', fontsize=9, loc='left')
-    legend_outside_bottom(ax, ncol=1, y=-0.2)
+    legend_outside_bottom(ax, ncol=1, y=-0.42)
     ax = axes[1]
     ax.plot(Sg, am, color=Forest, lw=1.4, label='American put (CRR, 500 steps)')
     ax.plot(Sg, eu, color=Purple, lw=1.1, ls='--', label='European put (Black-Scholes)')
     ax.plot(Sg, np.maximum(K - Sg, 0), color=Gray, lw=0.8, ls=':', label='Exercise value $\\max(K - S, 0)$')
     ax.set_xlabel('Price of the underlying $S$'); ax.set_ylabel('Put price')
     ax.set_title('Early exercise has a value for puts', fontsize=9, loc='left')
-    legend_outside_bottom(ax, ncol=1, y=-0.2)
+    legend_outside_bottom(ax, ncol=1, y=-0.42)
     plt.tight_layout()
     save_fig('ch12_binomial')
     am100 = crr_price(S, K, T, r, s, 2000, 'put', True)
@@ -500,18 +500,18 @@ def fig_btc_smile(c, tab, t0):
 
 
 def fig_btc_term(tab, dvol_now):
-    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.4))
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 3.0))
     ax = axes[0]
     ax.plot(tab['days'].astype(float), tab['atm'].astype(float), 'o-', color=MainBlue, ms=4, label='ATM implied volatility (SVI, $k=0$)')
     ax.axhline(dvol_now, color=Amber, lw=1.1, ls='--', label=f'Snapshot DVOL: {dvol_now:.1f}')
     ax.set_xlabel('Days to expiry'); ax.set_ylabel('Implied volatility (%)')
-    legend_outside_bottom(ax, ncol=1, y=-0.22)
+    legend_outside_bottom(ax, ncol=1, y=-0.40)
     ax = axes[1]
     ax.plot(tab['days'].astype(float), tab['rr'].astype(float), 's-', color=Purple, ms=4,
             label='Skew: IV($+0.15$) $-$ IV($-0.15$)')
     ax.axhline(0, color=Gray, lw=0.6)
     ax.set_xlabel('Days to expiry'); ax.set_ylabel('Volatility points')
-    legend_outside_bottom(ax, ncol=1, y=-0.22)
+    legend_outside_bottom(ax, ncol=1, y=-0.40)
     plt.tight_layout()
     save_fig('ch12_btc_term')
 
@@ -1062,8 +1062,12 @@ def vix_forecast_inference():
 def vrp_monthly():
     """Monthly data as in BTZ (2009): IV = month-end VIX^2/12, RV = sum of squared daily returns (%) in the month,
     VRP = IV - RV (ex ante), excess return = monthly S&P 500 log return minus TB3MS/12 (FRED)."""
-    spx, vix = read_market('GSPC.INDX')['close'], read_market('VIX.INDX')['close']
-    px = pd.concat([spx, vix], axis=1, keys=['spx', 'vix']).dropna()
+    (spx, vix) = (read_market('GSPC.INDX')['close'], read_market('VIX.INDX')['close'])
+    px = pd.concat([spx, vix], axis=1, keys=['spx', 'vix']).dropna().sort_index()
+    if px.index.tz is not None:
+        raise ValueError('Expected timezone-naive daily market dates')
+    cutoff = min(pd.Timestamp(END), px.index.max())
+    px = px.loc[:cutoff]
     r = 100 * np.log(px['spx']).diff().dropna()
     rv = (r ** 2).resample('ME').sum()
     iv = (px['vix'] ** 2 / 12).resample('ME').last()
@@ -1071,7 +1075,8 @@ def vrp_monthly():
     tb = pd.read_csv('https://fred.stlouisfed.org/graph/fredgraph.csv?id=TB3MS', index_col=0, parse_dates=True).iloc[:, 0]
     tb.index = tb.index + pd.offsets.MonthEnd(0)
     df = pd.DataFrame({'iv': iv, 'rv': rv, 'rm': rm, 'rf': tb / 12}).dropna()
-    df = df[df.index >= '1990-01-31']
+    # Resampling labels a partial final month at its calendar month-end.
+    df = df[(df.index >= '1990-01-31') & (df.index <= cutoff)]
     df['vrp'] = df['iv'] - df['rv']
     df['ex'] = df['rm'] - df['rf']
     return df

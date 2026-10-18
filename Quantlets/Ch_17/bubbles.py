@@ -263,7 +263,15 @@ def ar1_pass(fit, alpha):
     """The residual ln(p_hat) - ln(p) is AR(1) (Ornstein-Uhlenbeck): the Dickey-Fuller and Phillips-Perron tests reject
     a unit root at level alpha."""
     from statsmodels.tsa.stattools import adfuller
-    from arch.unitroot import PhillipsPerron
+    try:
+        from arch.unitroot import PhillipsPerron
+    except ModuleNotFoundError as exc:
+        if exc.name != 'arch':
+            raise
+        import subprocess
+        import sys
+        subprocess.run([sys.executable, '-m', 'pip', 'install', 'arch'], check=True)
+        from arch.unitroot import PhillipsPerron
     e = fit['_yhat'] - fit['_y']
     return bool(adfuller(e, maxlag=0, autolag=None, regression='c')[1] < alpha and PhillipsPerron(e, trend='c').pvalue < alpha)
 

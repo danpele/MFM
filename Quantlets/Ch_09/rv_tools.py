@@ -237,7 +237,15 @@ def har_weights(b, n=30):
 def garch_forecasts(r, dates, refit=21, dist='t'):
     """Forecast variance for each day in dates with GARCH(1,1), re-estimated every `refit` days
     on all earlier data; between re-estimations the parameters stay fixed and the variance is updated daily."""
-    from arch import arch_model
+    try:
+        from arch import arch_model
+    except ModuleNotFoundError as exc:
+        if exc.name != 'arch':
+            raise
+        import subprocess
+        import sys
+        subprocess.run([sys.executable, '-m', 'pip', 'install', 'arch'], check=True)
+        from arch import arch_model
     dates = pd.DatetimeIndex(dates)
     pos = r.index.get_indexer(dates)
     out = pd.Series(np.nan, index=dates)

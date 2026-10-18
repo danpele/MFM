@@ -130,8 +130,12 @@ def fig_vanishing(T=150, H=16, seeds=50):
     for kind, fb, lab, col in cases:
         G = np.mean([grads(kind, s, fb) for s in range(seeds)], axis=0)
         G = G / G[0]
-        ax.semilogy(k[1:101], G[1:101], color=col, label=lab)
+        ax.semilogy(k[:101], G[:101], color=col, label=lab)
         out[f'{kind}_{fb}'] = {str(j): float(G[j]) for j in (1, 5, 10, 20, 50, 100)}
+    limits = ax.get_ylim()
+    ticks = sorted(set([1.0] + [t for t in ax.get_yticks() if limits[0] <= t <= limits[1]]))
+    ax.set_yticks(ticks)
+    ax.set_ylim(limits)
     ax.set_xlabel('Lag $k$ (steps back from the last input)')
     ax.set_ylabel(r'$|\partial h_T / \partial x_{T-k}|$, relative to $k=0$')
     legend_outside_bottom(ax, ncol=3, y=-0.24)
@@ -302,6 +306,7 @@ def fig_return_r2(series):
     ax.set_xticks(x, [M.LABELS[a] for a in M.ASSETS])
     ax.set_ylabel(r'Out-of-sample $R^2$ vs zero forecast (%)')
     legend_outside_bottom(ax, ncol=3, y=-0.13)
+    ax.set_title('95% circular block-bootstrap intervals (20-observation blocks)', loc='left')
     save_fig('ch14_return_r2')
 
 
@@ -313,7 +318,8 @@ def fig_cum_sse(series):
         c = np.cumsum(y ** 2 - (y - d[k].values) ** 2)
         ax.plot(d.index, c, color=RET_COL[k], lw=0.9, label=RET_MODELS[k])
     ax.axhline(0, color=Gray, lw=0.6)
-    ax.set_ylabel('Cumulative SSE(zero) - SSE(model)')
+    ax.set_ylabel('Cumulative SSE(zero) - SSE(model)\n(squared percentage points)')
+    ax.set_title('S&P 500', loc='left')
     legend_outside_bottom(ax, ncol=3, y=-0.12)
     save_fig('ch14_cum_sse')
 
@@ -327,6 +333,7 @@ def fig_lstm_training():
     ax.axvline(best + 1, color=Gray, ls='--', lw=0.7, label='Selected epoch (early stopping)')
     ax.set_xlabel('Epoch')
     ax.set_ylabel('MSE (standardised returns)')
+    ax.set_title('S&P 500, seed 0', loc='left')
     legend_outside_bottom(ax, ncol=2, y=-0.22)
     save_fig('ch14_lstm_training')
     RES['lstm_train'] = dict(epochs=int(len(h)), best=best + 1, train_best=float(h['train'][best]),
@@ -341,7 +348,7 @@ def fig_lstm_seeds():
         ax.scatter(np.full(5, i) + np.linspace(-0.12, 0.12, 5), s, color=Forest, s=18, zorder=3,
                    label='Single seed' if i == 0 else None)
         ax.scatter([i], [R[a]['lstm']['r2']], color=IDAred, marker='D', s=30, zorder=4,
-                   label='Average of the 5 seeds' if i == 0 else None)
+                   label='R-squared of the five-seed mean forecast' if i == 0 else None)
     ax.axhline(0, color=Gray, lw=0.6)
     ax.set_xticks(range(3), [M.LABELS[a] for a in M.ASSETS])
     ax.set_ylabel(r'Out-of-sample $R^2$ (%)')
@@ -487,7 +494,7 @@ def fig_breaches():
                         label='95% range of the breach rate under a correct model' if i == 0 else None)
     for j, m in enumerate(models):
         v = [R[a][m]['rate'] for a in M.ASSETS]
-        ax.bar(x + (j - (len(models) - 1) / 2) * w, v, w, color=RISK_COL[m], label=RISK_LBL[m], zorder=3)
+        ax.bar(x + (j - (len(models) - 1) / 2) * w, v, w, color=RISK_COL[m], label=('Chronos-Bolt: 10% endpoint' if m == 'bolt-raw' else RISK_LBL[m]), zorder=3)
     ax.axhline(1, color=Gray, ls='--', lw=0.7)
     ax.set_yscale('log')
     ax.set_yticks([0.5, 1, 2, 5, 10], ['0.5', '1', '2', '5', '10'])

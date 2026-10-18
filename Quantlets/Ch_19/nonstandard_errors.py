@@ -177,7 +177,7 @@ def part_nse():
                        edgecolor='black', linewidth=0.3, zorder=3)
         ax.set_yscale('symlog', linthresh=10)
         ax.set_xticks(range(3))
-        ax.set_xticklabels(FORK_MODELS)
+        ax.set_xticklabels([m.replace(" ", "\n", 1) for m in FORK_MODELS])
         ax.set_xlim(-0.5, 2.5)
         ax.set_title(f'{lab}: IQR = {q75 - q25:.1f} pp, median = {q50:.1f}%', fontsize=10)
     axes[0].set_ylabel('Average yearly change (%), log scale beyond ±10%')

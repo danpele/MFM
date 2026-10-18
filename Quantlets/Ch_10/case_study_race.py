@@ -92,9 +92,9 @@ def fig_race_prize(P):
             ax.text(b.get_x() + b.get_width() / 2, b.get_height() + 12, f'{b.get_height():.0f}', ha='center',
                     va='bottom', fontsize=7.5, color='black')
     ax.set_xticks(x + 0.04)
-    ax.set_xticklabels([f"{y}\n(mean volatility {P[y]['sigma_mean']:.1f}%)" for y in ys])
-    ax.set_ylabel('Implied annual prize, SPY (USD million)')
-    legend_outside_bottom(ax, ncol=3, y=-0.22)
+    ax.set_xticklabels([f"{y}\nMean volatility\n{P[y]['sigma_mean']:.1f}%" for y in ys])
+    ax.set_ylabel('Implied annual prize, SPY\n(USD million)')
+    legend_outside_bottom(ax, ncol=3, y=-0.4)
     plt.tight_layout()
     save_fig('ch10_race_prize')
     return {y: {k: P[y][k] for k in ('col2', 'col6', 'lo', 'hi', 'sigma_mean')} for y in ys}

@@ -230,10 +230,10 @@ def fig_agreement():
     ax.set_xticks(x)
     rng = {'50Agree': '50% to <66%', '66Agree': '66% to <75%', '75Agree': '75% to <100%', 'AllAgree': '100%'}
     ax.set_xticklabels([f'{rng[l]}\n(n = {n[l]:,})' for l in M.AGREE], fontsize=8)
-    ax.set_xlabel("Share of each sentence's annotators (5-8 per sentence) who agree on the label")
+    ax.set_xlabel("Share of each sentence's annotators (5-8 per sentence)\nwho agree on the label")
     ax.set_ylabel('Accuracy (%)')
     ax.set_ylim(0, 100)
-    legend_outside_bottom(ax, ncol=4, y=-0.32)
+    legend_outside_bottom(ax, ncol=4, y=-0.43)
     save_fig('ch15_agreement')
 
 
@@ -286,7 +286,7 @@ def fig_prompts():
                       'P3': 'P3: "what is the sentiment of this text"'}[p])
     ax.set_xticks(x)
     ax.set_xticklabels(['Qwen2.5-1.5B', 'Qwen2.5-7B', 'Qwen2.5-14B'])
-    ax.set_ylabel('Accuracy on Twitter Financial News (%)')
+    ax.set_ylabel('Accuracy on Twitter\nFinancial News (%)')
     ax.set_ylim(0, 100)
     legend_outside_bottom(ax, ncol=1, y=-0.14)
     save_fig('ch15_prompts')
@@ -317,13 +317,14 @@ def fig_learning_curve():
     R = RES['texts']['tw']
     fig, ax = plt.subplots(figsize=(6.2, 3.2))
     for k, c, lab in (('emb', Magenta, 'MiniLM embeddings + logistic regression'),
-                      ('tfidf', Teal, 'TF-IDF (words and word pairs) + logistic regression')):
+                      ('tfidf', Teal, 'TF-IDF (min_df=1) + logistic regression')):
         ax.plot(m.index, 100 * m[f'{k}_acc'], 'o-', color=c, label=lab, ms=4)
         ax.fill_between(m.index, 100 * (m[f'{k}_acc'] - 2 * s[f'{k}_acc']), 100 * (m[f'{k}_acc'] + 2 * s[f'{k}_acc']),
                         color=c, alpha=0.15, lw=0)
     for mm, c, ls in (('FinBERT', MainBlue, '--'), ('Qwen 7B', IDAred, ':')):
         ax.axhline(100 * R[mm]['acc'], color=c, ls=ls, lw=1.1, label=f'{mm}, no Twitter labels used')
     ax.set_xscale('log')
+    ax.set_title('Bands: mean accuracy plus/minus 2 SD across training resamples')
     ax.set_xlabel('Labelled training examples (log scale)')
     ax.set_ylabel('Accuracy on the validation set (%)')
     legend_outside_bottom(ax, ncol=2, y=-0.22)
@@ -545,7 +546,7 @@ def fig_contemp_next():
     ax.axhline(0, color=Gray, lw=0.6)
     ax.set_xticks(x)
     ax.set_xticklabels([SCORE_LBL[s] for s in SCORE_LBL])
-    ax.set_ylabel('Excess return per 1 s.d. of score (bp)')
+    ax.set_ylabel('Excess return per 1 s.d.\nof score (bp)')
     legend_outside_bottom(ax, ncol=2, y=-0.16)
     save_fig('ch15_contemp_next')
 
@@ -562,7 +563,7 @@ def fig_event_study():
     ax.axvline(0, color=Gray, ls='--', lw=0.8)
     ax.axhline(0, color=Gray, lw=0.6)
     ax.set_xticks(k)
-    ax.axvspan(1.5, 5.4, color=LightGray, alpha=0.4, lw=0)
+    ax.axvspan(1.5, 5.4, color=LightGray, alpha=0.4, lw=0, label='Shaded window: trading days +2 to +5')
     ax.set_xlabel('Trading days relative to the date of the headline (0)')
     ax.set_ylabel('Cumulative excess return vs SPY (%)')
     legend_outside_bottom(ax, ncol=1, y=-0.2)
@@ -593,7 +594,7 @@ def fig_subperiods():
     ax.axhline(0, color=Gray, lw=0.6)
     ax.set_xticks(x)
     ax.set_xticklabels(per)
-    ax.set_ylabel('Mean daily return, before costs (bp)')
+    ax.set_ylabel('Mean daily return,\nbefore costs (bp)')
     legend_outside_bottom(ax, ncol=3, y=-0.16)
     save_fig('ch15_subperiods')
 
@@ -633,7 +634,7 @@ def fig_llt_models():
         a2.text(v + (0.06 if v >= 0 else -0.06), yi, f'{v:.2f}', va='center', ha='left' if v >= 0 else 'right',
                 fontsize=7.5, color='black')
     a2.axvline(0, color=Gray, lw=0.7)
-    a2.set_xlim(-1.2, 3.6)
+    a2.set_xlim(-1.4, 3.6)
     a2.set_xlabel('Annualised Sharpe ratio of the drift')
     a2.set_title('Is the drift profitable?')
     h = [Patch(color=MainBlue), Patch(color=Orange), Patch(color=Forest), Patch(color=IDAred)]

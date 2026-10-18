@@ -335,7 +335,7 @@ def fig_gsy():
                      color=IDAred, capsize=3, label='After a run-up (95% CI, bootstrap by year)')
     axes[0].axhline(100 * pu, color=MainBlue, ls='--', lw=1.0, label='All industry-months (unconditional)')
     axes[0].set_xlabel('Run-up threshold (%)')
-    axes[0].set_ylabel('P(40% drawdown in next 2 years), %')
+    axes[0].set_ylabel('P(40% drawdown\nin next 2 years), %')
     lo = np.array([c[0] for c in R['ret2_ci']])
     hi = np.array([c[1] for c in R['ret2_ci']])
     axes[1].errorbar(x, 100 * R['ret2'], yerr=[100 * (R['ret2'] - lo), 100 * (hi - R['ret2'])], fmt='o-',
@@ -343,10 +343,10 @@ def fig_gsy():
     axes[1].axhline(100 * ru, color=MainBlue, ls='--', lw=1.0)
     axes[1].axhline(0, color=Gray, lw=0.5)
     axes[1].set_xlabel('Run-up threshold (%)')
-    axes[1].set_ylabel('Mean return over next 2 years, %')
+    axes[1].set_ylabel('Mean return over\nnext 2 years, %')
     fig.suptitle('Bubbles for Fama, 48 US industries 1926-2026: two-year run-ups above the threshold, raw and net of the market',
                  fontsize=8.5, x=0.02, ha='left')
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
     fig_legend(fig, axes, ncol=2, y=0.0)
     save_fig('ch17_gsy')
     return out
@@ -466,7 +466,7 @@ def fig_psy(y, o, name, title, ylab, logscale=True, level=None, pwy=False, wild=
 
 
 def real_time(o, p, win_years=2):
-    """For each episode: first signal (real time), price peak within and after the episode, end of the signal."""
+    """Retrospective first exceedance and peak within or after the episode; these are not confirmation-time alarm dates."""
     rows = []
     for s, e, n in o['ep']:
         e2 = e if e is not None else p.index[-1]
@@ -517,7 +517,7 @@ def fig_lppls_btc2017():
     mask = tt < f['tc']
     fig, ax = plt.subplots(figsize=(7.2, 3.2))
     ax.plot(full.index, full.values, color=MainBlue, lw=0.9, label='Bitcoin (USD, log scale)')
-    ax.plot(full.index[mask], np.exp(lppls_path(f, tt[mask])), color=IDAred, lw=1.2, label='LPPLS fit on data up to 15 Nov 2017')
+    ax.plot(full.index[mask], np.exp(lppls_path(f, tt[mask])), color=IDAred, lw=1.2, label='LPPLS fit to 15 Nov 2017 (' + ('qualified' if lppls_qualified(f) else 'unqualified') + ')')
     ax.axvline(pd.Timestamp(t2), color=Gray, ls=':', lw=0.8)
     ax.axvline(todate(f['tc']), color=Orange, ls='--', lw=1.0, label=f"Estimated critical time $t_c$ = {todate(f['tc']).date()}")
     pk = p.loc['2017'].idxmax()
@@ -640,16 +640,18 @@ def condition_shares(tab):
 def fig_lppls_ci(tab_btc, tab_ndx):
     # left: price and confidence indicator; right: share of windows passing each filter (horizontal bars, so
     # that the filter names stay legible on a slide)
-    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.0), gridspec_kw=dict(width_ratios=[1.15, 1]))
+    fig, axes = plt.subplots(2, 1, figsize=(7.4, 5.6), gridspec_kw=dict(height_ratios=[1, 1.2]))
     p = price('btc', 'D', '2015-01-01')
     ax = axes[0]
     ax.plot(p.index, p.values, color=MainBlue, lw=0.8, label='Bitcoin (USD, log scale)')
     ax.set_yscale('log')
+    ax.xaxis.set_major_locator(mdates.YearLocator(2))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
     ax2 = ax.twinx()
     ax2.bar(tab_btc.index, tab_btc['ci'], width=6, color=IDAred, label='LPPLS confidence indicator (right axis)')
     ax2.set_ylim(0, 1)
     ax2.spines['right'].set_visible(True)
-    ax.set_title('Bitcoin: LPPLS confidence indicator, 141 windows of 50-750 days, every 5 days', fontsize=9, loc='left')
+    ax.set_title('Bitcoin: LPPLS confidence indicator\n141 windows of 50-750 days, every 5 days', fontsize=9, loc='left')
     keys = list(COND_LABELS)
     sb, sn = condition_shares(tab_btc), condition_shares(tab_ndx)
     y = np.arange(len(keys))[::-1]

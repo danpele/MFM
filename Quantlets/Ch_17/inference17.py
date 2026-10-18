@@ -246,10 +246,19 @@ def ms_llf(r, k, reps=MS_REPS, seed=None):
     import statsmodels.api as sm
     if seed is not None:
         np.random.seed(seed)
+    # Statsmodels 0.15 exposes rng; use the same MT19937 stream as the
+    # legacy np.random.seed(seed) search, rather than a fresh OS seed.
+    import inspect
+    fit_options = {}
+    supports_rng = any('rng' in inspect.signature(cls.fit).parameters
+                       for cls in sm.tsa.MarkovRegression.__mro__
+                       if 'fit' in cls.__dict__)
+    if seed is not None and supports_rng:
+        fit_options['rng'] = np.random.RandomState(seed)
     best = None
     try:
         res = sm.tsa.MarkovRegression(r, k_regimes=k, trend='c', switching_variance=True).fit(
-            search_reps=reps, maxiter=500, disp=False)
+            search_reps=reps, maxiter=500, disp=False, **fit_options)
         best = res
     except Exception:
         pass

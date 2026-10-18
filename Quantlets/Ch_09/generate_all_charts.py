@@ -348,26 +348,22 @@ def fig_signature():
 # =============================================================================
 def fig_jumps():
     """Days with a significant jump (0.1% level): SPY and Bitcoin; marker size = jump component."""
-    js, jb = T.jump_test(R_SPY), T.jump_test(R_BTC)
+    js, jb = (T.jump_test(R_SPY), T.jump_test(R_BTC))
     fig, axes = plt.subplots(2, 1, figsize=(9.6, 4.6))
     for ax, j, col, ppy, name in [(axes[0], js, MainBlue, 252, 'SPY'), (axes[1], jb, Amber, 365, 'Bitcoin')]:
         jv = j['rv'].asfreq('D') if name == 'Bitcoin' else j['rv']
         ax.plot(jv.index, ann(jv, ppy), color=col, lw=0.6, label=f'{name}: realised volatility (% p.a.)')
         jj = j[j['jump']]
-        ax.scatter(jj.index, ann(jj['rv'], ppy), s=8 + 400 * jj['J'] / j['rv'].max(), color=IDAred, zorder=3,
-                   label='Day with a significant jump (0.1% level)')
+        ax.scatter(jj.index, ann(jj['rv'], ppy), s=8 + 400 * jj['J'] / j['rv'].max(), color=IDAred, zorder=3, label='Day with a significant jump (0.1% level)')
         ax.set_ylabel('% p.a.')
+        ax.margins(y=0.3)
     fig_legend_bottom(fig, ncol=3, y=0.02)
     plt.tight_layout(rect=(0, 0.06, 1, 1))
     save_fig('ch9_jumps')
     out = {}
     for k, j, R in [('spy', js, R_SPY), ('btc', jb, R_BTC)]:
         top = j.loc[j['z'].idxmax()]
-        out[k] = {'share': float(j['jump'].mean()), 'n_jump': int(j['jump'].sum()), 'N': int(len(j)),
-                  'jshare': float(j['J'].sum() / j['rv'].sum()), 'bv_rv': float((j['bv'] / j['rv']).mean()),
-                  'top_date': str(j['z'].idxmax().date()), 'top_z': float(top['z']),
-                  'top_jshare': float(top['J'] / top['rv']), 'top_rv_vol': float(ann(top['rv'], 252 if k == 'spy' else 365)),
-                  'mean_jshare_on_jump': float((j.loc[j['jump'], 'J'] / j.loc[j['jump'], 'rv']).mean())}
+        out[k] = {'share': float(j['jump'].mean()), 'n_jump': int(j['jump'].sum()), 'N': int(len(j)), 'jshare': float(j['J'].sum() / j['rv'].sum()), 'bv_rv': float((j['bv'] / j['rv']).mean()), 'top_date': str(j['z'].idxmax().date()), 'top_z': float(top['z']), 'top_jshare': float(top['J'] / top['rv']), 'top_rv_vol': float(ann(top['rv'], 252 if k == 'spy' else 365)), 'mean_jshare_on_jump': float((j.loc[j['jump'], 'J'] / j.loc[j['jump'], 'rv']).mean())}
     return out
 
 
@@ -555,10 +551,11 @@ def fig_oos(F, y, Fb, yb):
     axes[0].plot(F.index, ann(F['GARCH-t'], 252), color=MainBlue, lw=1.0, zorder=4, label='GARCH(1,1)-t forecast')
     axes[0].plot(F.index, ann(F['logHAR'], 252), color=IDAred, lw=1.0, label='log-HAR forecast')
     axes[0].set_ylabel('% p.a.')
-    axes[0].set_ylim(0, 80)
+    axes[0].autoscale(enable=True, axis='y')
+    axes[0].margins(y=0.05)
     for c in ['GARCH-t', 'EWMA', 'HAR']:
         d = (T.qlike(y, F[c]) - T.qlike(y, F['logHAR'])).cumsum()
-        axes[1].plot(d.index, d.values, color={'GARCH-t':Purple, 'EWMA':Forest, 'HAR':Orange}[c], lw=1.1, ls='--' if c=='GARCH-t' else '-', label=f'SPY: {c} minus log-HAR')
+        axes[1].plot(d.index, d.values, color={'GARCH-t': Purple, 'EWMA': Forest, 'HAR': Orange}[c], lw=1.1, ls='--' if c == 'GARCH-t' else '-', label=f'SPY: {c} minus log-HAR')
     for c in ['GARCH-t']:
         d = (T.qlike(yb, Fb[c]) - T.qlike(yb, Fb['logHAR'])).cumsum()
         axes[1].plot(d.index, d.values, color=Amber, lw=1.1, ls='--', label='Bitcoin: GARCH-t minus log-HAR')
@@ -585,7 +582,7 @@ def fig_mz(F, y):
         ax.set_xscale('log')
         ax.set_yscale('log')
         ax.set_xlabel('Forecast (%$^2$)')
-        ax.set_title(MODEL_LABEL[c], fontsize=9, loc='left')
+        ax.set_title(f'SPY, 2022–2026: {MODEL_LABEL[c]}', fontsize=9, loc='left')
     axes[0].set_ylabel('Realised variance (%$^2$)')
     fig_legend_bottom(fig, ncol=2, y=0.02)
     plt.tight_layout(rect=(0, 0.12, 1, 1))
@@ -702,7 +699,7 @@ def fig_csv_horizons():
 def fig_csv_ranking():
     """Ranking of the 21 models, one month ahead, M_ALL (Table 7), coloured by family; two panels (ranks 1-11 and
     12-21) so that the 21 model names stay legible on a slide."""
-    s = csv_table().loc[('month', 'ALL')].sort_values(ascending=True)
+    s = csv_table().loc['month', 'ALL'].sort_values(ascending=True)
     col = {m: c for _, c, ms in CSV_FAMILY for m in ms}
     fig, axes = plt.subplots(1, 2, figsize=(9.0, 4.4), sharex=True)
     parts = [s.iloc[:11], s.iloc[11:]]
@@ -710,20 +707,18 @@ def fig_csv_ranking():
         y = np.arange(len(part))[::-1]
         ax.barh(y, part.values - 1.0, left=1.0, color=[col[m] for m in part.index], height=0.7)
         for yi, (m, v) in zip(y, part.items()):
-            ax.text(v + (0.015 if v >= 1 else -0.015), yi, f'{v:.3f}', va='center', ha='left' if v >= 1 else 'right',
-                    fontsize=9.5, color='black')
+            ax.text(v + (0.015 if v >= 1 else -0.015), yi, f'{v:.3f}', va='center', ha='left' if v >= 1 else 'right', fontsize=9.5, color='black')
         ax.axvline(1.0, color=Black, lw=0.8, ls='--')
         ax.set_yticks(y)
         ax.set_yticklabels([f'{k0 + i}. {csv_label(m)}' for i, m in enumerate(part.index)], fontsize=10)
         ax.set_ylim(-0.6, 10.6)
-        ax.set_xlim(0.30, 1.80)
+        ax.set_xlim(0.3, 1.8)
         ax.set_xlabel('Out-of-sample MSE relative to HAR', fontsize=10.5)
         ax.tick_params(axis='x', labelsize=10)
-    axes[0].set_title('Ranks 1-11 (below 1: more accurate than HAR)', fontsize=10.5, loc='left')
-    axes[1].set_title('Ranks 12-21', fontsize=10.5, loc='left')
+    axes[0].set_title('1 month, $\\mathcal{M}_{ALL}$\nRanks 1-11 (below 1: more accurate than HAR)', fontsize=10.5, loc='left')
+    axes[1].set_title('1 month, $\\mathcal{M}_{ALL}$\nRanks 12-21', fontsize=10.5, loc='left')
     handles = [plt.Rectangle((0, 0), 1, 1, color=c) for _, c, _ in CSV_FAMILY]
-    fig.legend(handles, [f for f, _, _ in CSV_FAMILY], loc='upper center', bbox_to_anchor=(0.5, 0.01), ncol=4,
-               frameon=False, fontsize=9.5, handlelength=1.2, columnspacing=1.0)
+    fig.legend(handles, [f for f, _, _ in CSV_FAMILY], loc='upper center', bbox_to_anchor=(0.5, 0.01), ncol=4, frameon=False, fontsize=9.5, handlelength=1.2, columnspacing=1.0)
     plt.tight_layout(rect=(0, 0.03, 1, 1))
     save_fig('ch9_csv_ranking')
     return s.to_dict()

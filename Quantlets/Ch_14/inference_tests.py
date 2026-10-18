@@ -357,7 +357,7 @@ def calibration():
         ax.set_title(M.LABELS[a], color='black')
         ax.set_xlabel('PIT $u_t = \\hat F_t(r_t)$')
         ax.set_ylim(0, 2.0)
-    axs[0].set_ylabel('Observed / expected frequency')
+    axs[0].set_ylabel('Observed / expected\nfrequency')
     fig_legend_bottom(fig, hs, ['Chronos-2 quantiles (zero-shot)', 'FHS (GARCH-t filter)', 'GARCH-t'], ncol=3,
                       y=0.04)
     fig.tight_layout(rect=(0, 0.08, 1, 1))
