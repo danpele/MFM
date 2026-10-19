@@ -371,10 +371,10 @@
    "beta": 0.673,
    "se": 0.044,
    "r2": 0.208,
-   "n": 2326,
-   "from": "2017-05-18",
-   "n_removed": 1,
-   "vasicek": 0.687
+   "n": 2323,
+   "from": "2017-05-24",
+   "n_removed": 0,
+   "vasicek": 0.686
   },
   {
    "stock": "H2O",
@@ -394,7 +394,7 @@
    "n": 2925,
    "from": "2015-01-06",
    "n_removed": 0,
-   "vasicek": 0.764
+   "vasicek": 0.765
   },
   {
    "stock": "SNN",
@@ -418,13 +418,13 @@
   },
   {
    "stock": "FP",
-   "beta": 0.811,
+   "beta": 0.813,
    "se": 0.068,
    "r2": 0.328,
-   "n": 2923,
+   "n": 2924,
    "from": "2015-01-06",
-   "n_removed": 2,
-   "vasicek": 0.822
+   "n_removed": 0,
+   "vasicek": 0.824
   },
   {
    "stock": "EL",
@@ -454,7 +454,7 @@
    "n": 2925,
    "from": "2015-01-06",
    "n_removed": 0,
-   "vasicek": 1.046
+   "vasicek": 1.045
   },
   {
    "stock": "BRD",
@@ -468,13 +468,13 @@
   },
   {
    "stock": "TLV",
-   "beta": 1.254,
+   "beta": 1.241,
    "se": 0.045,
-   "r2": 0.585,
+   "r2": 0.624,
    "n": 2925,
    "from": "2015-01-06",
    "n_removed": 0,
-   "vasicek": 1.231
+   "vasicek": 1.219
   }
  ],
  "fama_macbeth": {

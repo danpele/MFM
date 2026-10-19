@@ -357,7 +357,7 @@ def fig_factor_tstats():
     ax.axhline(3.0, color=IDAred, ls='--', lw=0.8, label='t = 3.0 (Harvey, Liu & Zhu hurdle)')
     ax.axhline(0, color=Gray, lw=0.5)
     ax.set_xticks(x, cols)
-    ax.set_ylabel('t-statistic of the mean (Newey-West)')
+    ax.set_ylabel('t-statistic of the mean\n(Newey-West)')
     ax.set_title('Factor premia before and after 2000', fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=2, y=-0.15)
     plt.tight_layout()
@@ -595,7 +595,7 @@ def fig_fama_macbeth():
         ticks += list(np.arange(len(out[k])) + x0)
         x0 += len(out[k]) + 1
     ax.set_xticks(ticks, [l.split(': ')[1] for l in labels], rotation=45, fontsize=7)
-    ax.set_ylabel('Premium (ann.), 95% CI (Shanken)')
+    ax.set_ylabel('Premium (ann.)\n95% CI (Shanken)')
     ax.set_title('Fama-MacBeth risk premia on 25 size x B/M portfolios, 1963-2026', fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=4, y=-0.3)
     plt.tight_layout()
