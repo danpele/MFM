@@ -306,7 +306,7 @@ def fig_persistence(gt):
         ax.plot(h, pers ** h, color=COL[k], label=lab, ls='--' if k == 'btc' else '-')
     ax.axhline(0.5, color=Gray, lw=0.6, ls='--')
     ax.set_xlabel('Horizon $h$ (days)')
-    ax.set_ylabel(r'Share of a variance shock left, $(\alpha+\beta)^h$')
+    ax.set_ylabel('Share of a variance shock left,\n' + r'$(\alpha+\beta)^h$')
     ax.set_ylim(0, 1.02)
     legend_outside_bottom(ax, ncol=2, y=-0.2)
     save_fig('ch5_persistence')
@@ -452,7 +452,7 @@ def fig_term_structure(fits, gt):
             ax.axhline(gt.loc[k, 'uncond_ann_vol'], color=COL[k], ls=':', lw=0.8)
     for ax in axes:
         ax.set_xlabel('Horizon $h$ (days)')
-        ax.set_ylabel('Average volatility over $[T+1, T+h]$ (% p.a.)')
+        ax.set_ylabel('Average volatility over\n$[T+1, T+h]$ (% p.a.)')
         legend_outside_bottom(ax, ncol=3, y=-0.2)
     axes[1].set_ylim(0, None)
     fig.tight_layout()

@@ -206,7 +206,7 @@ def fig_rolling_vol(start='2018-01-01'):
         v = v.loc['2019-01-01':]
         ax.plot(v.index, v.values, color=VOL_COL[k], lw=1.0, ls=VOL_LS[k], label=LABELS[k])
         out[k] = dict(last=v.iloc[-1], min=v.min(), max=v.max(), min_date=str(v.idxmin().date()))
-    ax.set_ylabel('Annualised volatility (%), 1-year window')
+    ax.set_ylabel('Annualised volatility (%),\n1-year window')
     legend_outside_bottom(ax, ncol=4, y=-0.14)
     save_fig('ch16_rolling_vol')
     out['btc_eth_ratio_last'] = out['ETH']['last'] / out['BTC']['last']
@@ -332,7 +332,7 @@ def crix_index(k=None, weighting='cap', mv=None, px=None):
 
 def crix_aic(mv=None, px=None):
     """AIC(k) = n ln(s2_k) + 2k, with s2_k the mean squared difference between the log returns of the total index
-    (all 7 constituents) and of the index with k constituents; over the full period and for each year."""
+    (all constituents in CRIX_UNIVERSE) and of the index with k constituents; over the full period and for each year."""
     if mv is None:
         mv = market_values()
     if px is None:
@@ -358,7 +358,7 @@ def crix_aic(mv=None, px=None):
 
 
 def fig_crix():
-    """Total index (7 assets), Bitcoin alone (k = 1), the equal-weight index; AIC(k) and the weights over time."""
+    """Total index (all CRIX_UNIVERSE assets), Bitcoin alone (k = 1), the equal-weight index; AIC(k) and the weights over time."""
     mv = market_values()
     px = pd.concat([price(a) for a in CRIX_UNIVERSE], axis=1).reindex(mv.index)
     tot, w = crix_index(None, 'cap', mv, px)

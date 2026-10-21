@@ -105,11 +105,20 @@ def expected_rs(n):
     return f * np.sum(np.sqrt((n - i) / i))
 
 
+def _integer_log_scales(first, last, count):
+    """Floor log-spaced scales; snap floating-point roundoff at exact integers."""
+    raw = np.logspace(np.log10(first), np.log10(last), count)
+    nearest = np.rint(raw)
+    tolerance = 8 * np.spacing(np.maximum(1.0, np.abs(raw)))
+    stable = np.where(np.abs(raw - nearest) <= tolerance, nearest, raw)
+    return np.unique(np.floor(stable).astype(int))
+
+
 def rs_hurst(r, min_n=10, n_sizes=20):
     """H from the slope of log(R/S) on log(n) (Hurst, 1951) and the Anis-Lloyd corrected H (slope of R/S - E[R/S], plus 0.5)."""
     x = np.asarray(r, dtype=float)
     T = len(x)
-    sizes = np.unique(np.logspace(np.log10(min_n), np.log10(T // 4), n_sizes).astype(int))
+    sizes = _integer_log_scales(min_n, T // 4, n_sizes)
     rs, ers = [], []
     for n in sizes:
         k = T // n
@@ -144,7 +153,7 @@ def dfa_hurst(r, min_box=10, n_sizes=18, max_frac=0.25):
     x = np.asarray(r, dtype=float)
     y = np.cumsum(x - x.mean())
     T = len(y)
-    sizes = np.unique(np.logspace(np.log10(min_box), np.log10(int(T * max_frac)), n_sizes).astype(int))
+    sizes = _integer_log_scales(min_box, int(T * max_frac), n_sizes)
     F = []
     for n in sizes:
         k = T // n

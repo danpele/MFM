@@ -541,7 +541,8 @@ def fig_conformal_path():
     ax.plot(c.index, 100 * va, color=IDAred, lw=1.0, label='ACI VaR 1% (gaps: infinite)')
     ax.plot(c.index, 100 * g, color=Forest, lw=0.9, ls='--', label='GARCH-t VaR 1%')
     ax.set_ylabel('Loss (%)')
-    ax.set_ylim(-3, 20)
+    ax.autoscale(enable=True, axis="y")
+    ax.margins(y=0.05)
     ax = axs[1]
     ax.plot(c.index, 100 * c['alpha_t'], color=IDAred, lw=1.0, label=r'ACI level $\alpha_t$')
     ax.axhline(1.0, color='black', ls='--', lw=0.8, label=r'Target $\alpha$ = 1%')

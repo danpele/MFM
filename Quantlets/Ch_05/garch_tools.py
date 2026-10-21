@@ -100,8 +100,120 @@ def scale_for(r):
 def fit_garch(r, vol='GARCH', dist='t', mean='Constant', last_obs=None, c=None):
     c = scale_for(r) if c is None else c
     am = arch_model(c * r, mean=mean, dist=dist, **VOL_SPEC[vol])
-    res = am.fit(disp='off', last_obs=last_obs, options={'maxiter': 1000})
-    return Fit(res, c, r, vol)
+    if not (vol == 'EGARCH' and dist == 't' and mean == 'Constant'):
+        res = am.fit(disp='off', last_obs=last_obs, options={'maxiter': 1000})
+        return Fit(res, c, r, vol)
+
+    import warnings
+    # Numerical recovery uses the same model, scale and estimation sample.
+    with warnings.catch_warnings(record=True) as initial_warnings:
+        warnings.simplefilter('always')
+        res = am.fit(disp='off', last_obs=last_obs, options={'maxiter': 1000})
+    fit_indices = tuple(am._fit_indices)
+    fit_y = np.asarray(am._fit_y).copy()
+    backcast = np.asarray(am._backcast).copy()
+    variance_bounds = np.asarray(am._var_bounds).copy()
+    residuals0 = np.asarray(am.resids(am.starting_values()))
+    volatility_start = am.volatility.starting_values(residuals0)
+    sigma2 = np.empty_like(residuals0)
+    am.volatility.compute_variance(volatility_start, residuals0, sigma2,
+                                   am._backcast, variance_bounds)
+    bounds = (list(am.bounds()) + list(am.volatility.bounds(residuals0))
+              + list(am.distribution.bounds(residuals0 / np.sqrt(sigma2))))
+    groups = [(am.constraints(), slice(0, 1)),
+              (am.volatility.constraints(), slice(1, 5)),
+              (am.distribution.constraints(), slice(5, 6))]
+    names = list(res.params.index)
+    if names != ['mu', 'omega', 'alpha[1]', 'gamma[1]', 'beta[1]', 'nu']:
+        raise RuntimeError('Unsupported EGARCH parameter order for numerical recovery.')
+    if len(bounds) != 6 or not np.isfinite(fit_y).all():
+        raise RuntimeError('Invalid EGARCH estimation sample or parameter bounds.')
+
+    def feasible(p, tolerance=1e-8):
+        if not np.isfinite(p).all():
+            return False
+        if any(value < lo - tolerance or value > hi + tolerance
+               for value, (lo, hi) in zip(p, bounds)):
+            return False
+        return all(np.all(A @ p[sl] - b >= -tolerance)
+                   for (A, b), sl in groups)
+
+    def assess(result, caught):
+        p = np.asarray(result.params)
+        opt = result.optimization_result
+        reasons = []
+        if result.convergence_flag != 0 or not bool(opt.success):
+            reasons.append('optimizer did not converge')
+        if any(type(w.message).__name__ in ('ConvergenceWarning', 'StartingValueWarning')
+               for w in caught):
+            reasons.append('optimizer or rejected-start warning')
+        if not feasible(p):
+            reasons.append('nonfinite or inadmissible parameters')
+        objective = float(opt.fun)
+        if (not np.isfinite(objective) or not np.isfinite(result.loglikelihood)
+                or not np.isclose(objective, -result.loglikelihood, rtol=1e-10, atol=1e-8)):
+            reasons.append('inconsistent or nonfinite objective')
+        start, stop = fit_indices
+        sig = np.asarray(result.conditional_volatility)[start:stop]
+        z = np.asarray(result.std_resid)[start:stop]
+        if len(sig) != len(fit_y) or not (np.isfinite(sig).all() and np.all(sig > 0)
+                                         and np.isfinite(z).all()):
+            reasons.append('invalid fitted conditional variance or residuals')
+        if (tuple(am._fit_indices) != fit_indices
+                or not np.array_equal(np.asarray(am._fit_y), fit_y)
+                or not np.array_equal(np.asarray(am._backcast), backcast)
+                or not np.array_equal(np.asarray(am._var_bounds), variance_bounds)):
+            raise RuntimeError('EGARCH recovery changed sample, backcast or variance bounds.')
+        if feasible(p):
+            common_objective = float(am._loglikelihood(
+                p, np.empty_like(fit_y), am._backcast, variance_bounds))
+            if not np.isclose(objective, common_objective, rtol=1e-10, atol=1e-8):
+                reasons.append('objective differs from the frozen original problem')
+        else:
+            common_objective = float('nan')
+        return {'flag': int(result.convergence_flag), 'success': bool(opt.success),
+                'message': str(opt.message), 'objective': objective,
+                'common_objective': common_objective, 'admissible': not reasons,
+                'reasons': reasons, 'warnings': [str(w.message) for w in caught]}
+
+    default_record = assess(res, initial_warnings)
+    if default_record['admissible']:
+        for warning in initial_warnings:
+            warnings.warn_explicit(warning.message, warning.category, warning.filename, warning.lineno)
+        return Fit(res, c, r, vol)
+
+    starts = [(0.90, 0.10, 0.0, 8.0), (0.95, 0.15, 0.0, 8.0),
+              (0.90, 0.30, -0.05, 4.0), (0.98, 0.10, 0.05, 12.0),
+              (0.80, 0.20, 0.0, 6.0)]
+    attempts, valid = [], []
+    for number, (beta, alpha, gamma, nu) in enumerate(starts):
+        omega = float(np.clip((1 - beta) * np.log(np.var(fit_y)), *bounds[1]))
+        start = np.array([fit_y.mean(), omega, alpha, gamma, beta, nu])
+        if not feasible(start, tolerance=0):
+            raise RuntimeError('Generic EGARCH starting value is outside the original constraints.')
+        try:
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter('always')
+                candidate = am.fit(disp='off', last_obs=last_obs,
+                                   starting_values=start, options={'maxiter': 1000})
+            record = assess(candidate, caught)
+            if record['admissible']:
+                valid.append((record['objective'], number, candidate))
+        except (ValueError, FloatingPointError, np.linalg.LinAlgError) as exc:
+            record = {'admissible': False, 'error': type(exc).__name__ + ': ' + str(exc)}
+        record.update(start_number=number, starting_values=start.tolist())
+        attempts.append(record)
+    if not valid:
+        raise RuntimeError('EGARCH default and all recovery attempts failed: ' + str(attempts))
+    _, selected, result = min(valid, key=lambda entry: (entry[0], entry[1]))
+    fit = Fit(result, c, r, vol)
+    fit.recovery = {'default': default_record, 'attempts': attempts,
+                    'selected_start': selected, 'scale': c,
+                    'fit_indices': fit_indices, 'estimation_sample_size': len(fit_y),
+                    'interpretation': 'Same-model local optimizer recovery, not proof of a global optimum.'}
+    print('EGARCH numerical recovery: default flag', default_record['flag'],
+          '; selected generic start', selected, '; negative log-likelihood', result.optimization_result.fun)
+    return fit
 
 
 def half_life(persistence):

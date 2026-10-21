@@ -352,22 +352,22 @@
   }
  },
  "stable_supply": {
-  "total_end": 308.019607521,
+  "total_end": 302.981861792,
   "total_2020": 4.171183915,
-  "n_big": 45,
-  "other": 2.62885040499998,
+  "n_big": 42,
+  "other": 2.64959572500004,
   "usdt_end": 183.32932036,
   "usdc_end": 73.916109054,
   "dai_end": 4.771140262,
-  "usdt_share": 59.51871760225558,
-  "usdc_share": 23.997209024740606,
+  "usdt_share": 60.5083483465612,
+  "usdc_share": 24.396215871412174,
   "usdc_peak": 79.62020699,
   "usdc_peak_date": "2026-03-18",
-  "n_coins": 339,
+  "n_coins": 333,
   "mech": {
    "algorithmic": 0.147140204,
-   "crypto-backed": 22.362326069,
-   "fiat-backed": 282.881290843
+   "crypto-backed": 22.17113342,
+   "fiat-backed": 278.013992443
   },
   "top": [
    {
@@ -419,12 +419,6 @@
     "supply": 2.80528532
    },
    {
-    "symbol": "USYC",
-    "name": "Circle USYC",
-    "mechanism": "fiat-backed",
-    "supply": 2.553948998
-   },
-   {
     "symbol": "BUIDL",
     "name": "BlackRock USD",
     "mechanism": "fiat-backed",
@@ -437,16 +431,22 @@
     "supply": 2.353105865
    },
    {
-    "symbol": "USDY",
-    "name": "Ondo US Dollar Yield",
+    "symbol": "USDGO",
+    "name": "USDGO",
     "mechanism": "fiat-backed",
-    "supply": 2.215145817
+    "supply": 1.381472619
+   },
+   {
+    "symbol": "U",
+    "name": "United Stables",
+    "mechanism": "crypto-backed",
+    "supply": 1.380927223
    }
   ],
   "end": "2026-09-18",
   "tot_peak22": 187.391942652,
   "tot_peak22_date": "2022-04-02",
-  "tot_trough": 122.660540921,
+  "tot_trough": 122.654960254,
   "tot_trough_date": "2023-08-19",
   "usdc_peak22": 55.19135477,
   "usdc_peak22_date": "2022-06-20",
@@ -662,28 +662,28 @@
  "defi": {
   "peak": 177.493346508,
   "peak_date": "2021-11-09",
-  "last": 88.131011144,
+  "last": 88.099591298,
   "last_date": "2026-09-18",
   "start": 0.606094144,
-  "beta": 0.7894816040818687,
-  "se": 0.06574994766366928,
-  "r2": 0.6203903578259771,
+  "beta": 0.7895363259188791,
+  "se": 0.06574539453618909,
+  "r2": 0.6204361240941413,
   "n": 80,
-  "corr": 0.7876486258643363,
+  "corr": 0.7876776777934875,
   "chains": {
-   "Ethereum": 49.8271445,
-   "Solana": 5.897086928,
-   "Base": 5.58137505,
-   "BSC": 5.571916332,
+   "Ethereum": 49.817446769,
+   "Solana": 5.871750319,
+   "Base": 5.577350804,
+   "BSC": 5.571617256,
    "Tron": 5.416886891,
-   "Bitcoin": 4.128198215,
-   "Hyperliquid L1": 1.374219286,
-   "Arbitrum": 1.370825875,
-   "Monad": 1.016079718,
+   "Bitcoin": 4.12670864,
+   "Hyperliquid L1": 1.373707922,
+   "Arbitrum": 1.369709319,
+   "Monad": 1.016054064,
    "Robinhood Chain": 0.956868696
   },
-  "eth_share": 56.53758405039275,
-  "chains_total": 88.131011144
+  "eth_share": 56.54673992810104,
+  "chains_total": 88.099591298
  },
  "alt": {
   "ev1": 34.890637857384085,

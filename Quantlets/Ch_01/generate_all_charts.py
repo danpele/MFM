@@ -258,7 +258,7 @@ def fig_aggregation():
     ax.set_xscale('log'); ax.set_xticks(HORIZONS, [str(h) for h in HORIZONS])
     ax.set_xlabel('Aggregation horizon (trading days, non-overlapping)')
     ax.set_ylabel('Excess kurtosis')
-    ax.set_title('Aggregational Gaussianity: tails thin out as the horizon grows', fontsize=9, loc='left')
+    ax.set_title('Aggregation across horizons: changes in tail thickness', fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=5, y=-0.25)
     plt.tight_layout()
     save_fig('ch1_aggregation_kurtosis')

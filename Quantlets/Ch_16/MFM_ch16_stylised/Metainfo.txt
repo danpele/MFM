@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch16_stylised'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Stylised facts of Bitcoin, Ethereum, Solana and Dogecoin against the S&P 500 and gold, 2018-2026: volatility, skewness, kurtosis, drawdowns, volatility clustering, Hill tail index, VaR 1% and ES 2.5%; rolling one-year volatility and drawdowns.'
+Description: 'Stylised facts of Bitcoin, Ethereum, Solana and Dogecoin against the S&P 500 and gold, 2018-2026: volatility, skewness, kurtosis, drawdowns, volatility clustering, Hill tail index, VaR 1% and ES 2.5%; rolling one-year volatility and drawdowns. The reported kurt statistic is excess kurtosis, with Normal benchmark 0; the LTW replication uses raw kurtosis with benchmark 3.'
 
 Keywords: 'stylised facts, cryptocurrency, volatility, drawdown, heavy tails, Hill estimator, value-at-risk, expected shortfall'
 

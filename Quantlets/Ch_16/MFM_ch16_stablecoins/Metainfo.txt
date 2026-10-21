@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch16_stablecoins'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Stablecoins: supply of USD stablecoins (DefiLlama), daily deviations of Tether, USD Coin and Dai from 1 USD (2021-2026), the March 2023 USD Coin depeg and the May 2022 TerraUSD run.'
+Description: 'Stablecoins: supply of USD stablecoins (DefiLlama), daily deviations of Tether, USD Coin and Dai from 1 USD (2021-2026), the March 2023 USD Coin depeg and the May 2022 TerraUSD run. Peg deviations and intraday extremes are in basis points; gt50/gt100 are percentages of observed days and half-life is in days. The extreme vendor highs on 2021-11-16 are retained as data-quality flags, not validated executable prices. The displayed UST sample ends on 2022-05-11: its minimum and decline describe only that observed window, not the full May crash trough.'
 
 Keywords: 'stablecoin, peg, depeg, Tether, USD Coin, Dai, TerraUSD, half-life, Silicon Valley Bank'
 

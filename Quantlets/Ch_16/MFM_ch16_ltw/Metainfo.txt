@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch16_ltw'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Case study, Liu, Tsyvinski and Wu (2022, Journal of Finance), Common risk factors in cryptocurrency: Table 1, Panel B rebuilt for Bitcoin, XRP and Ether with the paper calendar (52 weeks a year, the first 51 of seven days), January 2014 (Ether: August 2015) - July 2020, against the published mean and standard deviation; the same statistics out of sample, August 2020 - September 2026; rolling 52-week standard deviation.'
+Description: 'Case study, Liu, Tsyvinski and Wu (2022, Journal of Finance), Common risk factors in cryptocurrency: Table 1, Panel B rebuilt for Bitcoin, XRP and Ether with the paper calendar (52 weeks a year, the first 51 of seven days), January 2014 (Ether: August 2015) - July 2020, against the published mean and standard deviation; the same statistics out of sample, August 2020 - September 2026; rolling 52-week standard deviation. The reported kurt statistic is raw (Pearson) kurtosis, with Normal benchmark 3. Other Chapter16 stylised-fact tables use excess kurtosis, with Normal benchmark 0.'
 
 Keywords: 'cryptocurrency, factor model, replication, weekly returns, Bitcoin, XRP, Ether, out-of-sample, volatility'
 

@@ -295,7 +295,7 @@ def log_density(fam, par, u, v):
     if fam == 't':
         rho, nu = par
         x, y = stats.t.ppf(u, nu), stats.t.ppf(v, nu)
-        return (gammaln((nu + 2) / 2) + gammaln(nu / 2) - 2 * gammaln((nu + 1) / 2) - 0.5 * np.log(1 - rho ** 2)
+        return (stable_constant(nu) - 0.5 * np.log(1 - rho ** 2)
                 - (nu + 2) / 2 * np.log1p((x ** 2 + y ** 2 - 2 * rho * x * y) / (nu * (1 - rho ** 2)))
                 + (nu + 1) / 2 * (np.log1p(x ** 2 / nu) + np.log1p(y ** 2 / nu)))
     th = par[0]
@@ -367,23 +367,13 @@ def simulate(fam, par, n, rng):
         return np.column_stack([u, v])
 
 
-def fit_copula(fam, u, v):
+def fit_copula(fam, u, v, diagnostics=None):
     """ML estimation on pseudo-observations (canonical maximum likelihood, CML)."""
     tau = kendall_tau(u, v)
     if fam == 'gaussian':
-        f = lambda p: -np.sum(log_density('gaussian', [np.tanh(p[0])], u, v))
-        r = optimize.minimize(f, [np.arctanh(np.sin(np.pi * tau / 2))], method='BFGS')
-        par = [np.tanh(r.x[0])]
+        par = [_gaussian_rho_mle(u,v,diagnostics)]
     elif fam == 't':
-        f = lambda p: -np.sum(log_density('t', [np.tanh(p[0]), 2.01 + np.exp(p[1])], u, v))
-        best = None
-        for nu0 in (3, 6, 15):
-            r = optimize.minimize(f, [np.arctanh(np.sin(np.pi * tau / 2)), np.log(nu0 - 2.01)], method='Nelder-Mead',
-                                  options=dict(xatol=1e-6, fatol=1e-6))
-            if best is None or r.fun < best.fun:
-                best = r
-        r = best
-        par = [np.tanh(r.x[0]), 2.01 + np.exp(r.x[1])]
+        par = _fit_t_numerically(u,v,tau,diagnostics)
     else:
         lo, hi = {'clayton': (1e-4, 30), 'gumbel': (1.0001, 30), 'frank': (1e-4, 60)}[fam]
         f = lambda p: -np.sum(log_density(fam, [p], u, v))
@@ -433,3 +423,73 @@ def gof_test(fam, u, v, B=200, seed=42, fit=None):
 def empirical_tail_dep(u, v, q):
     """lambda_L(q) = P(U<=q, V<=q)/q and lambda_U(q) = P(U>1-q, V>1-q)/q."""
     return np.mean((u <= q) & (v <= q)) / q, np.mean((u > 1 - q) & (v > 1 - q)) / q
+
+
+def stable_constant(nu):
+    if nu < 100:
+        return gammaln((nu+2)/2)+gammaln(nu/2)-2*gammaln((nu+1)/2)
+    h=1/nu; a=nu/2
+    if h < 1e-3:
+        t=sum((-1)**(k+1)*h**k/(k+1) for k in range(1,7))
+    else:t=1-np.log1p(h)/h
+    def mu(x):
+        inv=1/x
+        return inv*(1/12+inv**2*(-1/360+inv**2*(1/1260-inv**2/1680)))
+    return t-2*(mu(a+0.5)-mu(a))
+
+
+def _gaussian_rho_mle(u, v, diagnostics=None):
+    if not np.isfinite(u).all() or not np.isfinite(v).all():
+        raise ValueError('Copula input must be finite')
+    x, y = stats.norm.ppf(np.clip(u, EPS, 1-EPS)), stats.norm.ppf(np.clip(v, EPS, 1-EPS))
+    if len(x)==0 or x.shape!=y.shape:
+        raise ValueError('Copula inputs must have the same nonempty shape')
+    left=float(np.mean((x+y)**2));right=-float(np.mean((x-y)**2))
+    if left<=0 or right>=0 or np.all(np.asarray(u)+np.asarray(v)==1):
+        raise ValueError('Perfect dependence has no finite Gaussian copula MLE')
+    a=float(np.mean(x*x+y*y));b=float(np.mean(x*y))
+    def poly(rho):
+        if rho == -1:return left
+        if rho == 1:return right
+        return -rho**3+b*rho**2+(1-a)*rho+b
+    cuts=[-1.,1.];disc=b*b+3*(1-a)
+    if disc>=0:
+        cuts+= [z for z in [(b-np.sqrt(disc))/3,(b+np.sqrt(disc))/3]if -1<z<1]
+    cuts=sorted(set(cuts));values=[left if z==-1 else right if z==1 else poly(z)for z in cuts]
+    roots=[z for z,vv in zip(cuts,values)if -1<z<1 and vv==0]
+    for lo,hi,fl,fh in zip(cuts[:-1],cuts[1:],values[:-1],values[1:]):
+        if fl*fh<0:roots.append(optimize.brentq(poly,lo,hi,xtol=1e-14,rtol=4*np.finfo(float).eps))
+    candidates=[(float(log_density('gaussian',[z],u,v).sum()),z)for z in roots if -1<z<1]
+    candidates=[x for x in candidates if np.isfinite(x[0])]
+    if not candidates:raise RuntimeError('No finite Gaussian copula maximum found')
+    best=max(candidates,key=lambda x:x[0])
+    if diagnostics is not None:diagnostics.append(dict(candidates=candidates,near_tie=sum(abs(z[0]-best[0])<=1e-10 for z in candidates)>1))
+    return best[1]
+
+
+def _fit_t_numerically(u,v,tau,diagnostics=None):
+    def objective(p):
+        with np.errstate(over='ignore',invalid='ignore',divide='ignore'):
+            rho=float(np.tanh(p[0]));nu=float(2.01+np.exp(p[1]))
+            if not np.isfinite(rho) or not np.isfinite(nu) or abs(rho)>=1 or nu<=2.01:return np.inf
+            value=-float(log_density('t',[rho,nu],u,v).sum())
+        return value if np.isfinite(value) else np.inf
+    diagnostic_offset=len(diagnostics) if diagnostics is not None else 0
+    runs=[]
+    for nu0 in (3,6,15):
+        x0=[np.arctanh(np.sin(np.pi*tau/2)),np.log(nu0-2.01)]
+        z=optimize.minimize(objective,x0,method='Nelder-Mead',options=dict(xatol=1e-6,fatol=1e-6,maxfev=4000,maxiter=4000))
+        runs.append(z)
+        if diagnostics is not None:diagnostics.append(dict(start_nu=nu0,success=bool(z.success),status=int(z.status),fun=float(z.fun) if np.isfinite(z.fun) else None,finite_objective=bool(np.isfinite(z.fun)),x=[float(v) if np.isfinite(v) else None for v in z.x],finite_parameters=bool(np.isfinite(z.x).all()),nfev=int(z.nfev),nit=int(z.nit)))
+    valid=[z for z in runs if z.success and np.isfinite(z.fun)]
+    if not valid:raise RuntimeError('No converged finite t-copula fit; bootstrap must stop')
+    best=min(valid,key=lambda z:z.fun)
+    if any(np.isfinite(z.fun) and z.fun<best.fun-1e-8 for z in runs if not z.success):
+        raise RuntimeError('Unconverged t start has a better objective; bootstrap must stop')
+    par=[float(np.tanh(best.x[0])),float(2.01+np.exp(best.x[1]))]
+    if diagnostics is not None:
+        selected=next(i for i,z in enumerate(runs) if z is best)
+        diagnostics[diagnostic_offset+selected].update(selected=True,one_minus_abs_rho=1-abs(par[0]),nu_minus_lower=par[1]-2.01,log_nu_minus_lower=float(best.x[1]))
+    rho_g=_gaussian_rho_mle(u,v);ll_g=float(log_density('gaussian',[rho_g],u,v).sum())
+    if -best.fun < ll_g-1e-6:raise RuntimeError('t likelihood is below Gaussian closure; bootstrap must stop')
+    return par

@@ -675,7 +675,7 @@ def fig_window_length(nsim=300, seed=SEED):
     ax.set_xscale('log')
     ax.set_xticks(Ts, [str(T) for T in Ts])
     ax.set_xlabel('Estimation window (months, log scale)')
-    ax.set_ylabel('True Sharpe ratio of the estimated portfolio (median)')
+    ax.set_ylabel('True Sharpe ratio of the\nestimated portfolio (median)')
     ax.set_title(f'How long must the window be? {nsim} simulations per window, nine sectors', fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=4, y=-0.16)
     plt.tight_layout()
@@ -697,7 +697,8 @@ def fig_rolling_weights(bt):
         ax.axhline(0, color=Gray, lw=0.5)
         ax.set_ylabel('Weight')
         ax.set_title(f'{s}: weights re-estimated each month on the last 60 months', fontsize=9, loc='left')
-    axes[0].set_ylim(-6, 6)
+    # Display every MV weight; the scale is determined by the plotted data.
+    axes[0].margins(y=0.05)
     legend_outside_bottom(axes[1], ncol=9, y=-0.2)
     plt.tight_layout()
     save_fig('ch4_rolling_weights')
@@ -898,9 +899,10 @@ def fig_oos_cum(bts, universe='Multi-asset'):
                 label=f'{s} (Sharpe {sharpe(ret[s]):.2f})')
     ax.set_yscale('log')
     ax.set_ylabel('Wealth relative to T-bills (log scale)')
+    ax.set_xlabel('Paths stop after a monthly loss of 100% or more')
     ax.set_title(f'{universe}: out-of-sample, 60-month rolling window, monthly rebalancing, no costs',
                  fontsize=9, loc='left')
-    legend_outside_bottom(ax, ncol=4, y=-0.1)
+    legend_outside_bottom(ax, ncol=4, y=-0.25)
     plt.tight_layout()
     save_fig('ch4_oos_cum')
 

@@ -200,7 +200,7 @@ def fig_qsd_nic(t):
         ax.plot(e, nic(z50), color=c, ls=ls, lw=2.2, label=fr'{name}, median over stocks ({z50:.3f})')
         ax.plot(e, nic(z5), color=c, ls=ls, lw=0.9, label=fr'{name}, 5% and 95% quantiles ({z5:.3f}, {z95:.3f})')
         ax.plot(e, nic(z95), color=c, ls=ls, lw=0.9, label='_nolegend_')
-    ax.set_ylim(0, 40)
+    ax.set_ylim(bottom=0)
     ax.set_xlabel(r'Standardised shock $\epsilon_t$')
     ax.set_ylabel(r'Impact on $f_{t+1}$ (units of $\alpha f_t$)')
     ax.set_title('News impact curves, 11 S&P 500 stocks (quantiles over the stocks)', color='black')

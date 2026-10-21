@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch16_alt_assets'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Are cryptos becoming alternative assets? Eight tail, memory and moment features of 26 assets (cryptos, equity indices, currencies, commodities, bonds) in 2019-2021 and 2024-2026, principal components and distances between class centroids (a small replication of the feature-space approach of Pele et al., 2023).'
+Description: 'Are cryptos becoming alternative assets? Eight tail, memory and moment features of 26 assets (cryptos, equity indices, currencies, commodities, bonds) in 2019-2021 and 2024-2026, principal components and distances between class centroids (a small replication of the feature-space approach of Pele et al., 2023). The kurt feature is excess kurtosis (Normal benchmark 0). It is not the raw kurtosis reported in the separate LTW replication.'
 
 Keywords: 'alternative assets, asset classes, cryptocurrency, principal component analysis, tail index, classification'
 

@@ -206,11 +206,11 @@ def fig_vr_profile():
         ax.axhline(1, color=Gray, lw=0.6)
         ax.set_title(LABELS[k], fontsize=8.5, loc='left', color=c)
     for ax in axes[1]:
-        ax.set_xlabel('Horizon q (days; curve is descriptive)')
+        ax.set_xlabel('Horizon q (days)\nCurve is descriptive')
     for ax in axes[:, 0]:
         ax.set_ylabel('Variance ratio')
     h, l = axes[0, 0].get_legend_handles_labels()
-    axes[1, 0].legend(h, l, loc='upper center', bbox_to_anchor=(1.05, -0.3), ncol=2, frameon=False)
+    axes[1, 0].legend(h, l, loc='upper center', bbox_to_anchor=(1.05, -0.48), ncol=2, frameon=False)
     plt.tight_layout()
     save_fig('ch2_vr_profile')
     return {k: v.loc[[2, 5, 10, 20, 60]] for k, v in res.items()}
@@ -301,7 +301,7 @@ def fig_hurst_markets(t):
         ax.axvline(0.5, color=Gray, ls='--', lw=0.8)
         ax.set_yticks(y, tt['market'], fontsize=7.5)
         ax.set_ylim(-0.6, h - 0.4)
-        ax.set_xlabel(r'DFA exponent $\alpha_{DFA}$ (0.5 = no long memory)')
+        ax.set_xlabel(r'DFA exponent $\alpha_{DFA}$' + '\n' + '(0.5 = no long memory)')
     handles = [plt.Line2D([], [], color=c, marker='o', ls='', label=g) for g, c in GROUP_COL.items()]
     handles.append(plt.Line2D([], [], color=LightGray, lw=6, label='Wild-bootstrap 95% band (RW3 null)'))
     axes[0].set_title('Long memory in returns? Detrended fluctuation analysis of daily log returns', fontsize=9, loc='left')
@@ -551,7 +551,7 @@ def fig_tsmom():
         ax.set_yticks(y, [t['market'].iloc[i] for i in idx], fontsize=7.5)
         ax.set_ylim(-0.6, h - 0.4)
         ax.set_xlim(-2.5, 3.0)
-        ax.set_xlabel('HAC t-statistic of the mean monthly return')
+        ax.set_xlabel('HAC t-statistic of the\nmean monthly return')
     handles = [plt.Rectangle((0, 0), 1, 1, color=GROUP_COL[g], alpha=0.85, label=g)
                for g in ['Developed', 'Emerging/frontier', 'Crypto']]
     handles.append(plt.Line2D([], [], color=Gray, ls='--', label=r'$\pm 1.96$'))

@@ -616,16 +616,83 @@ def covol_panel():
     return R, pd.Series(f, index=R.index, name='PC1')
 
 
-def covol_residuals(R, f):
-    """AR(1) with the PC1 factor in the mean and GARCH(1,1) for each ETF; AR(1)-GARCH(1,1) for PC1.
-    Returns the standardised residuals (unbalanced panel)."""
+def covol_residuals(R, f, diagnostics=None):
+    """AR(1)-GARCH(1,1) residuals with PC1 in ETF means; Gaussian innovations.
+
+    Each series uses the best valid likelihood from a finite deterministic set
+    of starts. This does not certify a global optimum. The model, input scale
+    and observation window are unchanged.
+    """
+    import warnings
+    from importlib.metadata import version
+    environment = {name: version(name) for name in ('numpy', 'scipy', 'arch')}
+    covol_residuals.last_environment = environment
+    records = []
+    covol_residuals.last_diagnostics = records
+
+    def fit_series(y, factor, label):
+        model = arch_model(y, x=factor, mean='ARX' if factor is not None else 'AR',
+                           lags=1, vol='GARCH', p=1, q=1)
+        values = np.asarray(y, float)
+        design = np.column_stack([np.ones(len(values)-1), values[:-1]])
+        if factor is not None:
+            design = np.column_stack([design, np.asarray(factor)[1:]])
+        mean_start = np.linalg.lstsq(design, values[1:], rcond=None)[0]
+        residual = values[1:] - design @ mean_start
+        variance = float(np.mean(residual ** 2))
+        starts = [('default', None, None), ('default_tight', None, 1e-9)]
+        for alpha, beta in [(0.03, 0.96), (0.05, 0.90), (0.10, 0.80), (0.15, 0.80)]:
+            initial = np.r_[mean_start, variance * (1-alpha-beta), alpha, beta]
+            starts.append((f'generic_{alpha}_{beta}', initial, 1e-9))
+        attempts = []
+        best = None
+        best_ll = -np.inf
+        best_index = None
+        for name, initial, tolerance in starts:
+            row = {'start': name, 'initial': None if initial is None else initial.tolist(),
+                   'tol': tolerance, 'valid': False}
+            try:
+                with warnings.catch_warnings(record=True) as captured:
+                    warnings.simplefilter('always')
+                    res = model.fit(starting_values=initial, disp='off', tol=tolerance,
+                                    options=None if tolerance is None else {'maxiter': 2000})
+                params = res.params
+                ll = float(res.loglikelihood)
+                fixed_ll = float(model.fix(params.values).loglikelihood)
+                volatility = np.asarray(res.conditional_volatility)[1:]
+                omega, alpha, beta = (float(params[k]) for k in ['omega', 'alpha[1]', 'beta[1]'])
+                ignored_start = any(type(w.message).__name__ == 'StartingValueWarning' for w in captured)
+                valid = (res.convergence_flag == 0 and np.isfinite(params.values).all()
+                         and np.isfinite(ll) and np.isfinite(fixed_ll)
+                         and omega > 0 and alpha >= 0 and beta >= 0 and alpha+beta <= 1+1e-8
+                         and np.isfinite(volatility).all() and (volatility > 0).all()
+                         and abs(ll-fixed_ll) <= 1e-7
+                         and not ignored_start)
+                row.update(valid=bool(valid), flag=int(res.convergence_flag), ll=ll,
+                           fixed_ll=fixed_ll, params={k:float(v) for k,v in params.items()},
+                           iterations=getattr(res.optimization_result, 'nit', None),
+                           message=str(getattr(res.optimization_result, 'message', '')),
+                           warnings=[str(w.message) for w in captured])
+                if valid and ll > best_ll:
+                    best, best_ll, best_index = res, ll, len(attempts)
+            except Exception as error:
+                row.update(error_type=type(error).__name__, error=str(error))
+            attempts.append(row)
+        entry = {'asset': label, 'environment': environment, 'nobs_input': len(y), 'attempts': attempts,
+                 'selected': best_index, 'selected_ll': None if best is None else best_ll}
+        records.append(entry)
+        if diagnostics is not None:
+            diagnostics.append(entry)
+        if best is None:
+            raise RuntimeError(f'No valid Gaussian GARCH fit for {label}; see covol_residuals.last_diagnostics')
+        return best
+
     E = {}
     for c in R.columns:
         r = 100 * R[c].dropna()
-        x = f.reindex(r.index).to_frame()
-        res = arch_model(r, x=x, mean='ARX', lags=1, vol='GARCH', p=1, q=1).fit(disp='off')
+        res = fit_series(r, f.reindex(r.index).to_frame(), c)
         E[c] = res.resid / res.conditional_volatility
-    res = arch_model(f, mean='AR', lags=1, vol='GARCH', p=1, q=1).fit(disp='off')
+    res = fit_series(f, None, 'PC1')
     E['PC1'] = res.resid / res.conditional_volatility
     return pd.DataFrame(E).dropna(how='all')
 
@@ -704,19 +771,18 @@ def fig_covol():
     ax.scatter(paper.index, paper.values, marker='D', s=16, facecolors='none', edgecolors=Orange, lw=0.9, zorder=4,
                label='Top 20 in Table 15 of Engle and Campos-Martins (2023)')
     ax.axvline(pd.Timestamp(ECM_END), color=Gray, ls='--', lw=0.8, label='End of the paper sample (1 March 2021)')
+    # Explicit label positions keep dates clear of paper diamonds and the sample-end line.
+    label_positions = {2001: (.12, .72), 2008: (.10, .38), 2016: (.42, .82), 2024: (.83, .75)}
     for d, v in top.iloc[:6].items():
-        tx, ty, align = ('2026-01-01', 76, 'right')
-        if d.year == 2001: tx, ty, align = ('2003-06-01', 73, 'left')
-        elif d.year == 2008: tx, ty, align = ('2004-07-01', 50, 'left')
-        elif d.year == 2016: tx, ty, align = ('2011-01-01', 26, 'left')
-        elif d.year == 2020 and d.month == 3: tx, ty, align = ('2011-01-01', 63, 'left')
-        elif d.year == 2020: tx, ty, align = ('2022-01-01', 46, 'left')
-        ax.annotate(f'{d.day} {d:%b %Y}', (d, v), xytext=(pd.Timestamp(tx), ty),
-                    fontsize=7, color='black', ha=align, bbox=dict(fc='white', ec='none', pad=0.5),
-                    arrowprops=dict(arrowstyle='-', lw=0.5, color=MainBlue))
+        position = ((.48, .59) if d.month == 3 else (.83, .40)) if d.year == 2020 else label_positions.get(d.year, (.8, .9))
+        label = f'{d.day} {d:%b}\n{d:%Y}' if (d.year == 2024 or (d.year == 2020 and d.month == 11)) else f'{d.day} {d:%b %Y}'
+        ax.annotate(label, (d, v), xytext=position, textcoords='axes fraction',
+                    fontsize=7, color='black', ha='left',
+                    bbox=dict(facecolor='white', edgecolor='none', pad=.4),
+                    arrowprops=dict(arrowstyle='-', color=MainBlue, lw=.5))
     ax.set_ylabel('Squared common volatility $\\hat x_t$')
     ax.set_xlim(pd.Timestamp('1999-10-01'), x.index[-1] + pd.Timedelta(days=90))
-    ax.set_ylim(0, 1.18 * max(top.iloc[0], paper.max()))
+    ax.set_ylim(0, 1.08 * max(top.iloc[0], paper.max()))
     legend_outside_bottom(ax, ncol=1, y=-0.1)
     save_fig('ch6_covol_replication')
     common = set(pre.index[:20]) & set(paper.index)

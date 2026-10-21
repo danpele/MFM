@@ -69,6 +69,62 @@ UA = {'User-Agent': 'Mozilla/5.0 (MFM course notebook)'}
 
 def _get_json(url, tries=4):
     """Read a JSON response."""
+    if url == 'https://api.llama.fi/v2/chains' or url.startswith('https://api.llama.fi/v2/historicalChainTvl'):
+        import gzip, hashlib
+        snapshot_sha = '11d0bbfc3695f65c286f12d4dd97109eafac97e6e6551ddf0fdcf43197b48cf9'
+        snapshot_name = 'defi16-20261016-11d0bbfc3695f65c.json.gz'
+        cache_key = ('defi_snapshot', snapshot_sha)
+        if cache_key not in _CACHE:
+            local = os.path.join(os.path.dirname(MARKET_DIR), 'snapshots', snapshot_name)
+            if os.path.isfile(local):
+                with open(local, 'rb') as handle:
+                    raw = handle.read()
+            else:
+                snapshot_url = 'https://raw.githubusercontent.com/danpele/MFM/main/data/snapshots/' + snapshot_name
+                with urllib.request.urlopen(snapshot_url, timeout=120) as response:
+                    raw = response.read()
+            if hashlib.sha256(raw).hexdigest() != snapshot_sha:
+                raise ValueError('DeFi snapshot SHA256 mismatch; refusing different data.')
+            _CACHE[cache_key] = json.loads(gzip.decompress(raw))
+            print('DeFi snapshot: extracted 2026-10-16 UTC; SHA256 ' + snapshot_sha)
+            print('Candidates: current top15 chains at extraction; report top10 using last historical observation <= END=' + END + '.')
+            print('Current candidate universe is not the full END-date universe. Endpoint timestamps differ; this is not an atomic snapshot or a claim of identity to earlier runs.')
+        payloads = _CACHE[cache_key]['payloads']
+        if url not in payloads:
+            raise KeyError('Endpoint absent from frozen DeFi course snapshot: ' + url)
+        return payloads[url]
+    if url.startswith('https://stablecoins.llama.fi/'):
+        import gzip, hashlib
+        snapshot_sha = '979c073f257838890203b31fc46d3f074b750c3b51978cd4f4432d4ef2cf6528'
+        snapshot_name = 'stablecoin16-20261021-979c073f25783889.json.gz'
+        cache_key = ('stablecoin_snapshot', snapshot_sha)
+        if cache_key not in _CACHE:
+            local = os.path.join(os.path.dirname(MARKET_DIR), 'snapshots', snapshot_name)
+            if os.path.isfile(local):
+                with open(local, 'rb') as handle:
+                    raw = handle.read()
+            else:
+                snapshot_url = 'https://raw.githubusercontent.com/danpele/MFM/main/data/snapshots/' + snapshot_name
+                with urllib.request.urlopen(snapshot_url, timeout=120) as response:
+                    raw = response.read()
+            if hashlib.sha256(raw).hexdigest() != snapshot_sha:
+                raise ValueError('Stablecoin snapshot SHA256 mismatch; refusing to use different data.')
+            _CACHE[cache_key] = json.loads(gzip.decompress(raw))
+            print('Stablecoin snapshot: extracted 2026-10-21 UTC; SHA256 ' + snapshot_sha)
+            print('Universe and peg mechanism: current metadata at extraction; select current supply >= USD 100m. Values: last observation <= END=' + END + ', at most 3 days old.')
+            print('This is not the complete END-date universe. Missing/stale values are omitted, not economic zeros; endpoints were fetched at different times.')
+        if url == 'https://stablecoins.llama.fi/stablecoins?includePrices=false':
+            key = 'list'
+        elif url == 'https://stablecoins.llama.fi/stablecoincharts/all':
+            key = 'all'
+        elif url.startswith('https://stablecoins.llama.fi/stablecoincharts/all?stablecoin=') and url.split('stablecoin=')[1].isdigit():
+            key = 'id_' + url.split('stablecoin=')[1]
+        else:
+            raise KeyError('Unsupported frozen stablecoin endpoint: ' + url)
+        payloads = _CACHE[cache_key]['payloads']
+        if key not in payloads:
+            raise KeyError('Stablecoin id absent from this frozen course snapshot: ' + key)
+        return payloads[key]
     for i in range(tries):
         try:
             return json.load(urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=120))
