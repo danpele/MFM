@@ -138,20 +138,20 @@ def fig_loss_distribution():
     v2, e2 = hs_var_es(L, 0.025)
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.4), gridspec_kw={'width_ratios': [1.3, 1]})
     ax = axes[0]
-    bins = np.linspace(-8, 12, 161)
+    bins = np.linspace(min(-8, np.floor(L.min())), max(12, np.ceil(L.max())), 161)
     ax.hist(L, bins=bins, density=True, color=MainBlue, alpha=0.55, label='S&P 500 daily losses, 2000-2026')
-    x = np.linspace(-8, 12, 600)
+    x = np.linspace(bins[0], bins[-1], 600)
     ax.plot(x, stats.norm.pdf(x, L.mean(), L.std()), color=Orange, lw=1.2, label='Normal distribution, same mean and s.d.')
     ax.axvline(v, color=IDAred, lw=1.3, label=f'VaR 1% = {v:.2f}%')
     ax.axvline(e, color=IDAred, lw=1.3, ls='--', label=f'ES 1% = {e:.2f}%')
-    ax.set_xlim(-6, 10)
+    ax.set_xlim(bins[0], bins[-1])
     ax.set_xlabel('Daily loss L = -r (%)')
     ax.set_ylabel('Density')
     ax.set_title('Loss distribution')
     legend_outside_bottom(ax, 2, -0.2)
     ax = axes[1]
     tail = L[L > 2]
-    ax.hist(tail, bins=np.linspace(2, 12, 51), color=MainBlue, alpha=0.55, label='Losses above 2%')
+    ax.hist(tail, bins=np.linspace(2, max(12, np.ceil(L.max())), 51), color=MainBlue, alpha=0.55, label='Losses above 2%')
     ax.axvline(v, color=IDAred, lw=1.3, label='VaR 1%')
     ax.axvline(e, color=IDAred, lw=1.3, ls='--', label='ES 1% (mean beyond VaR)')
     ax.axvline(e2, color=Amber, lw=1.3, ls='-.', label=f'ES 2.5% = {e2:.2f}%')
@@ -243,7 +243,7 @@ def fig_var_levels():
         ax.set_xlabel('Tail probability alpha (%)')
         ax.set_ylabel('Daily loss (%)')
         ax.set_title(f'{t}, S&P 500 2000-2026')
-        ax.set_ylim(0, 16)
+        ax.set_ylim(bottom=0)
         legend_outside_bottom(ax, 3, -0.2)
     plt.tight_layout()
     save_fig('ch7_var_levels')
@@ -281,16 +281,16 @@ def fig_methods_assets(t):
 def fig_rolling(name, d, fname, title, start):
     d = d.loc[start:]
     fig, ax = plt.subplots(figsize=(10, 3.4))
-    ax.bar(d.index, d['loss'].clip(lower=0), width=1.5, color=Teal, alpha=0.45, label='Daily loss (gains set to 0)')
+    ax.vlines(d.index, 0, d['loss'].clip(lower=0), color=Teal, alpha=0.45, linewidth=0.6, label='Daily loss (gains set to 0)')
     ax.plot(d.index, d['hs_var'], color=MainBlue, lw=1.1, label='HS VaR 1% (500-day window)')
     ax.plot(d.index, d['fhs_var'], color=IDAred, lw=0.8, label='FHS VaR 1% (GARCH-filtered)')
     exc_h = d['loss'] > d['hs_var']
     exc_f = d['loss'] > d['fhs_var']
     ax.scatter(d.index[exc_h], d['loss'][exc_h], s=6, color=MainBlue, zorder=3, label='Loss above HS VaR')
-    ax.scatter(d.index[exc_f], d['loss'][exc_f], s=6, marker='x', color=IDAred, zorder=3, label='Loss above FHS VaR')
+    ax.scatter(d.index[exc_f], d['loss'][exc_f], s=12, marker='x', color=IDAred, zorder=4, label='Loss above FHS VaR')
     ax.set_ylabel('Daily loss (%)')
     ax.set_title(title)
-    ax.set_ylim(0, np.percentile(d['loss'], 99.95) * 1.1)
+    ax.set_ylim(0, 1.08 * d[['loss', 'hs_var', 'fhs_var']].max().max())
     legend_outside_bottom(ax, 3, -0.14)
     save_fig(fname)
     return dict(n=len(d), exc_hs=float(exc_h.mean()), exc_fhs=float(exc_f.mean()),
@@ -514,12 +514,12 @@ def fig_gev():
 def fig_cond_evt(d):
     d = d.loc['2018-01-01':]
     fig, ax = plt.subplots(figsize=(10, 3.4))
-    ax.bar(d.index, d['loss'].clip(lower=0), width=1.5, color=Teal, alpha=0.45, label='Daily loss (gains set to 0)')
+    ax.vlines(d.index, 0, d['loss'].clip(lower=0), color=Teal, alpha=0.45, linewidth=0.6, label='Daily loss (gains set to 0)')
     ax.plot(d.index, d['hs_var'], color=MainBlue, lw=1.1, label='HS VaR 1% (500 days)')
     ax.plot(d.index, d['ngarch_var'], color=Orange, lw=0.8, ls='--', label='GARCH with Normal shocks, VaR 1%')
     ax.plot(d.index, d['cevt_var'], color=IDAred, lw=0.8, label='Conditional EVT VaR 1% (McNeil-Frey)')
     ax.set_ylabel('Daily loss (%)')
-    ax.set_ylim(0, 12)
+    ax.set_ylim(0, 1.08 * d[['loss', 'hs_var', 'ngarch_var', 'cevt_var']].max().max())
     ax.set_title('S&P 500, 2018-2026: unconditional vs conditional VaR')
     legend_outside_bottom(ax, 2, -0.14)
     save_fig('ch7_cond_evt')

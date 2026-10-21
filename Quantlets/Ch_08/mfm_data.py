@@ -105,19 +105,53 @@ def t_std_es(nu, a):
     return stats.t.pdf(q, nu) / a * (nu + q ** 2) / (nu - 1) * np.sqrt((nu - 2) / nu)
 
 
+import numpy as np
+
+class NoAdmissibleInitialFit(RuntimeError):
+    """The fitted candidate was rejected and no prior admissible fit exists."""
+
 def garch_fit(x, prev=None):
-    """GARCH(1,1) with Student-t innovations by maximum likelihood; parameters in decimal units.
-    The series is rescaled to unit variance for numerical stability; if the optimisation fails,
-    the previous estimates are kept."""
+    """Same Student-t GARCH(1,1); unresolved boundary fits cannot update parameters.
+
+    The numerical band diagnoses precision near alpha+beta=1. It neither clamps
+    parameters nor changes the maintained finite-variance restriction alpha+beta<1.
+    Only a previously clearly admissible fit may be reused, with status reported.
+    """
+    garch_fit.last_diagnostic = None
     from arch import arch_model
+    resolution = 1e-8
     c = 1 / x.std()
     res = arch_model(c * x, mean='Constant', vol='GARCH', p=1, q=1, dist='t',
                      rescale=False).fit(disp='off', show_warning=False)
     mu, om, a, b, nu = res.params.values
-    ok = res.convergence_flag == 0 and abs(mu) < 1 and a + b < 1 and om > 0
-    if not ok and prev is not None:
-        return prev
-    return mu / c, om / c ** 2, a, b, nu
+    finite = np.isfinite([mu, om, a, b, nu, res.loglikelihood]).all()
+    gap = 1-a-b
+    if res.convergence_flag != 0 or not finite or abs(mu)>=1 or om<=0 or a<0 or b<0 or nu<=2:
+        status = 'fit-invalid'
+    elif abs(gap) <= resolution:
+        status = 'numeric-unidentified'
+    elif gap < 0:
+        status = 'finite-variance-inadmissible'
+    else:
+        status = 'clearly-admissible'
+    garch_fit.last_diagnostic = {
+        'status':status, 'flag':int(res.convergence_flag),
+        'raw_persistence':float(a+b) if np.isfinite(a+b) else None,
+        'loglikelihood':float(res.loglikelihood) if np.isfinite(res.loglikelihood) else None,
+        'resolution':resolution,
+        'candidate_params_scaled':[float(v) if np.isfinite(v) else None for v in (mu,om,a,b,nu)],
+        'fallback':False}
+    if status=='clearly-admissible':
+        return mu/c, om/c**2, a, b, nu
+    if prev is None:
+        garch_fit.last_diagnostic['fallback'] = False
+        raise NoAdmissibleInitialFit(f'GARCH fit is {status}; no earlier clearly admissible parameters are available')
+    pm, po, pa, pb, pn = prev
+    if not (np.isfinite(prev).all() and po>0 and pa>=0 and pb>=0 and 1-pa-pb>resolution and pn>2):
+        raise RuntimeError('Previous GARCH parameters are not clearly admissible; cannot use fallback')
+    garch_fit.last_diagnostic['fallback'] = True
+    return prev
+
 
 
 def garch_filter(x, mu, om, a, b, s2_0):
@@ -153,12 +187,16 @@ def rolling_forecasts(r, eval_from=EVAL_FROM, w=W, refit=REFIT):
     """One-day-ahead VaR (LEVELS) and ES (A_ES) forecasts for the loss L = -r, for all models.
 
     Result: dict model -> DataFrame (index = forecast day) with columns
-    VaR1, VaR2.5, VaR5, ES2.5, ES1, pit (F(L_t)), scale, mu, plus information for tail simulation."""
+    VaR1, VaR2.5, VaR5, ES2.5, ES1, pit (F(L_t)), scale, mu, plus information for tail simulation.
+    GARCH-dependent models retain NaN forecast rows until an admissible initial
+    fit exists. Consumers must check completeness before computing any metric."""
     r = r.dropna()
     L = -r.values
     idx = r.index
     start = max(w, int(np.searchsorted(idx, pd.Timestamp(eval_from))))
     T = len(r) - start
+    if T <= 0:
+        raise ValueError('No evaluation rows after the estimation window')
     days = idx[start:]
     out = {m: {k: np.full(T, np.nan) for k in ['VaR1', 'VaR2.5', 'VaR5', 'ES2.5', 'ES1', 'pit', 'scale', 'mu', 'nu',
                                                'u', 'xi', 'beta', 'pu']} for m in MODELS}
@@ -190,6 +228,13 @@ def rolling_forecasts(r, eval_from=EVAL_FROM, w=W, refit=REFIT):
 
     # --- models re-estimated every `refit` days
     prev = None
+    source_origin = None
+    refit_records = []
+    daily_status = np.empty(T, dtype=object)
+    daily_age = np.full(T, None, dtype=object)
+    daily_source = np.empty(T, dtype=object)
+    daily_estimation_end = np.empty(T, dtype=object)
+    daily_fallback = np.empty(T, dtype=bool)
     for b0 in range(0, T, refit):
         t0 = start + b0
         b1 = min(T, b0 + refit)
@@ -198,8 +243,49 @@ def rolling_forecasts(r, eval_from=EVAL_FROM, w=W, refit=REFIT):
         nu_t, loc_t, sc_t = stats.t.fit(x)
         nu_t = max(nu_t, 2.2)
         sd_t = sc_t * np.sqrt(nu_t / (nu_t - 2))                # implied standard deviation
+        for t in range(b0, b1):
+            Lt = Lcur[t]
+            # unconditional Student-t
+            o = out['Student-t']
+            for a, k in lev.items():
+                o[k][t] = -loc_t + sd_t * t_std_q(nu_t, a)
+            o['ES2.5'][t] = -loc_t + sd_t * t_std_es(nu_t, 0.025)
+            o['ES1'][t] = -loc_t + sd_t * t_std_es(nu_t, 0.01)
+            o['pit'][t] = stats.t.cdf((Lt + loc_t) / sc_t, nu_t)
+            o['scale'][t], o['mu'][t], o['nu'][t] = sd_t, loc_t, nu_t
         # GARCH(1,1)-t
-        prev = garch_fit(x, prev if b0 > 0 else None)
+        try:
+            prev = garch_fit(x, prev)
+        except NoAdmissibleInitialFit:
+            if prev is not None:
+                raise RuntimeError('Initial-fit exception with an existing prior')
+            record = dict(garch_fit.last_diagnostic)
+            record.update(forecast_available=False,refit_date=str(days[b0].date()),
+                          estimation_end_date=str(idx[t0-1].date()),
+                          parameter_source_date=None, parameter_estimation_end_date=None,
+                          age_at_refit_trading_rows=None)
+            refit_records.append(record)
+            daily_status[b0:b1] = record['status']
+            daily_source[b0:b1] = None
+            daily_estimation_end[b0:b1] = None
+            daily_fallback[b0:b1] = False
+            continue
+        fit_record = dict(garch_fit.last_diagnostic)
+        if not fit_record['fallback']:
+            source_origin = b0
+        if source_origin is None:
+            raise RuntimeError('No admissible source fit for rolling forecasts')
+        fit_record.update(forecast_available=True,refit_date=str(days[b0].date()),
+                          estimation_end_date=str(idx[t0-1].date()),
+                          parameter_source_date=str(days[source_origin].date()),
+                          parameter_estimation_end_date=str(idx[start+source_origin-1].date()),
+                          age_at_refit_trading_rows=int(b0-source_origin))
+        refit_records.append(fit_record)
+        daily_status[b0:b1] = fit_record['status']
+        daily_age[b0:b1] = list(range(b0-source_origin,b1-source_origin))
+        daily_source[b0:b1] = str(days[source_origin].date())
+        daily_fallback[b0:b1] = fit_record['fallback']
+        daily_estimation_end[b0:b1] = str(idx[start+source_origin-1].date())
         mu, om, al, be, nu = prev
         nu = max(nu, 2.2)
         xx = r.values[t0 - w:t0 + (b1 - b0)]
@@ -211,14 +297,6 @@ def rolling_forecasts(r, eval_from=EVAL_FROM, w=W, refit=REFIT):
             j = w + (t - b0)
             sig = np.sqrt(s2[j])
             Lt = Lcur[t]
-            # unconditional Student-t
-            o = out['Student-t']
-            for a, k in lev.items():
-                o[k][t] = -loc_t + sd_t * t_std_q(nu_t, a)
-            o['ES2.5'][t] = -loc_t + sd_t * t_std_es(nu_t, 0.025)
-            o['ES1'][t] = -loc_t + sd_t * t_std_es(nu_t, 0.01)
-            o['pit'][t] = stats.t.cdf((Lt + loc_t) / sc_t, nu_t)
-            o['scale'][t], o['mu'][t], o['nu'][t] = sd_t, loc_t, nu_t
             # GARCH-t
             o = out['GARCH-t']
             for a, k in lev.items():
@@ -251,18 +329,89 @@ def rolling_forecasts(r, eval_from=EVAL_FROM, w=W, refit=REFIT):
         df = pd.DataFrame(out[m], index=days)
         df['L'] = Lcur
         res[m] = df
+    # Metadata do not enter any forecast, loss, statistic, or common-sample selection.
+    daily = pd.DataFrame({'forecast_available':[a is not None for a in daily_age], 'fit_status':daily_status, 'fallback':daily_fallback,
+                          'parameter_age_trading_rows':daily_age,
+                          'parameter_source_date':daily_source,'parameter_estimation_end_date':daily_estimation_end}, index=days)
+    counts = {s:sum(row['status']==s for row in refit_records) for s in
+              ['clearly-admissible','numeric-unidentified','finite-variance-inadmissible','fit-invalid']}
+    summary = {'policy':'finite-variance-resolution-1e-8-v1', 'refits_by_status':counts,
+               'fallback_forecast_days':int(daily_fallback.sum()),
+               'max_parameter_age_trading_rows':max((int(a) for a in daily_age if a is not None), default=None),
+               'age_definition':'trading rows since source refit origin; variance/residuals filtered on current data',
+               'no_previous_fit':'dependent forecasts missing; original calendar and independent forecasts preserved',
+               'unavailable_forecast_days':sum(a is None for a in daily_age),
+               'unavailable_refits':sum(not row['forecast_available'] for row in refit_records)}
+    for model in ['GARCH-t','FHS','GARCH-EVT']:
+        res[model].attrs['garch_numerics'] = summary
+    rolling_forecasts.last_diagnostics = {'summary':summary,'refits':refit_records,'daily':dict(forecast_date=[str(d.date()) for d in days],**daily.to_dict(orient='list'))}
+    print('GARCH numerical status:', summary)
+    if summary['unavailable_forecast_days']:
+        print('GARCH-dependent forecasts unavailable on', summary['unavailable_forecast_days'], 'original calendar rows; full-sample metrics require completeness checks.')
+    if daily_fallback.any():
+        print('Fallback parameters are stale; filtering still uses current observations.')
+        spells = daily.loc[daily.fallback].groupby('parameter_source_date',sort=True).agg(
+            fallback_days=('fallback','size'), max_age=('parameter_age_trading_rows','max'))
+        print(spells.to_string())
     return res, tails
 
 
+
 def get_forecasts(name):
-    """Forecasts for one asset, with a temporary cache (the computation takes a few minutes)."""
-    path = os.path.join(tempfile.gettempdir(), f'mfm_ch8_fc_{name}_{W}_{REFIT}.pkl')
+    """Forecast cache tied to exact input, configuration, code and package versions."""
+    import hashlib, json, types, sys
+    from importlib.metadata import version
+    r = load_returns(name)
+    def code_record(code):
+        def const(x):
+            if isinstance(x, types.CodeType): return code_record(x)
+            if isinstance(x, bytes): return {'bytes':x.hex()}
+            if isinstance(x, tuple): return [const(v) for v in x]
+            if isinstance(x, frozenset): return {'frozenset':sorted([const(v) for v in x],key=lambda v:json.dumps(v,sort_keys=True))}
+            if x is None or isinstance(x,(str,int,float,bool)): return x
+            return repr(x)
+        return {'bytecode':code.co_code.hex(),'constants':[const(x) for x in code.co_consts],
+                'names':code.co_names,'varnames':code.co_varnames,
+                'argcount':code.co_argcount,'kwonlyargcount':code.co_kwonlyargcount}
+    helpers = (garch_fit,garch_filter,rolling_forecasts,gpd_tail,gpd_cdf,t_std_q,t_std_es)
+    config = {'policy':'finite-variance-resolution-1e-8-v1','name':name,
+              'window':W,'refit':REFIT,'eval_from':EVAL_FROM,'tail_count':K_TAIL,'evt_q':EVT_Q,
+              'models':MODELS,'python':sys.version,
+              'versions':{p:version(p) for p in ['numpy','scipy','arch','pandas']},
+              'code':{f.__name__:{'code':code_record(f.__code__),'defaults':f.__defaults__,'kwdefaults':f.__kwdefaults__} for f in helpers},
+              'returns_sha256':hashlib.sha256(np.ascontiguousarray(r.values,dtype='<f8').tobytes()).hexdigest(),
+              'dates_sha256':hashlib.sha256(np.ascontiguousarray(r.index.asi8,dtype='<i8').tobytes()).hexdigest()}
+    fingerprint=hashlib.sha256(json.dumps(config,sort_keys=True).encode()).hexdigest()
+    path=os.path.join(tempfile.gettempdir(),f'mfm_ch8_fc_v2_{fingerprint}.pkl')
     if os.path.exists(path):
-        with open(path, 'rb') as f:
-            return pickle.load(f)
-    fc = rolling_forecasts(load_returns(name))
-    with open(path, 'wb') as f:
-        pickle.dump(fc, f)
+        with open(path,'rb') as f: stored=pickle.load(f)
+        if stored.get('fingerprint')==fingerprint:
+            fc=stored['forecasts']
+            report=stored.get('garch_numerics')
+            if (report and report['summary']['policy']==config['policy'] and all(fc[0][m].attrs.get('garch_numerics',{}).get('policy')==config['policy'] for m in ['GARCH-t','FHS','GARCH-EVT'])):
+                get_forecasts.last_cache_identity=fingerprint
+                get_forecasts.last_diagnostics=report
+                rolling_forecasts.last_diagnostics=report
+                print('GARCH numerical status:',report['summary'])
+                if report['summary']['fallback_forecast_days']:
+                    print('Fallback parameters are stale; filtering still uses current observations.')
+                    daily=pd.DataFrame(report['daily'])
+                    print(daily.loc[daily.fallback].groupby('parameter_source_date').agg(
+                        fallback_days=('fallback','size'),max_age=('parameter_age_trading_rows','max')).to_string())
+                return fc
+    fc=rolling_forecasts(r)
+    report=rolling_forecasts.last_diagnostics
+    get_forecasts.last_diagnostics=report
+    stored={'fingerprint':fingerprint,'configuration':config,'forecasts':fc,'garch_numerics':report}
+    temporary=None
+    try:
+        with tempfile.NamedTemporaryFile(mode='wb',dir=tempfile.gettempdir(),delete=False) as f:
+            temporary=f.name
+            pickle.dump(stored,f)
+        os.replace(temporary,path)
+    finally:
+        if temporary and os.path.exists(temporary):os.unlink(temporary)
+    get_forecasts.last_cache_identity=fingerprint
     return fc
 
 

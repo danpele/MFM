@@ -27,7 +27,7 @@ def hs_var_es(L, alpha):
 
 
 def normal_var_es(L, alpha):
-    """Distributia Normala: VaR = -mu_X + sigma z_{1-alpha}, ES = -mu_X + sigma phi(z_alpha)/alpha (mu_L = -mu_X)."""
+    """Normal distribution: VaR = -mu_X + sigma z_{1-alpha}, ES = -mu_X + sigma phi(z_alpha)/alpha (mu_L = -mu_X)."""
     mu, s = np.mean(L), np.std(L, ddof=1)
     z = stats.norm.ppf(1 - alpha)
     return mu + s * z, mu + s * stats.norm.pdf(z) / alpha
@@ -99,6 +99,100 @@ def garch_backcast(x):
     return float((w / w.sum()) @ e[:tau] ** 2)
 
 
+def robust_garch_fit(r, last_obs=None, audit=None):
+    """Same Normal QML objective; allow up to 2000 SLSQP iterations per candidate.
+
+    Refined projected starts use ftol=1e-10. Fixed scales and starts use only the estimation window. A large likelihood
+    advantage from a near-feasible rejected candidate is an explicit diagnostic
+    failure, never a silent fallback to a poorly optimized accepted candidate.
+    """
+    import math
+    import warnings
+    import numpy as np
+    from arch import arch_model
+    from arch.utility.exceptions import StartingValueWarning
+    spec = dict(mean='AR', lags=1, vol='GARCH', p=1, q=1,
+                dist='normal', rescale=False)
+    base = arch_model(r, **spec)
+    best = None
+    rows = []
+    expected_nobs = None
+    expected_names = None
+    for scale in (1.0, 10.0, 100.0):
+        model = arch_model(scale * r, **spec)
+        starts = [('default', None)]
+        for mode, start in starts:
+            try:
+                with warnings.catch_warnings(record=True) as caught:
+                    warnings.simplefilter('always')
+                    options = {'maxiter': 2000}
+                    if mode.startswith('refine'):
+                        options['ftol'] = 1e-10
+                    fit = model.fit(disp='off', last_obs=last_obs,
+                                    starting_values=start, options=options)
+            except Exception as exc:
+                if scale == 1 and mode == 'default':
+                    raise
+                rows.append(dict(scale=scale, start=mode, accepted=False,
+                                 error=f'{type(exc).__name__}: {exc}'))
+                continue
+            p = fit.params.copy()
+            if expected_names is None:
+                expected_names = list(p.index)
+            if list(p.index) != expected_names:
+                raise RuntimeError('GARCH parameter labels or order changed across scales')
+            if len(starts) < 5 and np.isfinite(p).all() and p.iloc[3] + p.iloc[4] > 1:
+                # Only the initial point is projected. The fitted parameter space is unchanged.
+                seed = p.copy()
+                if 0 <= seed.iloc[3] <= 1:
+                    seed.iloc[4] = max(0.0, np.nextafter(1.0 - seed.iloc[3], 0.0))
+                    starts.append(('projected' if mode == 'default' else f'refine{len(starts)}', seed))
+            p.iloc[0] /= scale
+            p.iloc[2] /= scale ** 2
+            try:
+                fixed = base.fix(p, last_obs=last_obs)
+            except Exception as exc:
+                if scale == 1 and mode == 'default':
+                    raise
+                rows.append(dict(scale=scale, start=mode, accepted=False,
+                                 error=f'{type(exc).__name__}: {exc}'))
+                continue
+            ll = float(fixed.loglikelihood)
+            equivalent_ll = float(fit.loglikelihood + fit.nobs * math.log(scale))
+            if expected_nobs is None:
+                expected_nobs = fit.nobs
+            violation = max(0., float(p.iloc[3] + p.iloc[4] - 1))
+            ignored_start = any(issubclass(w.category, StartingValueWarning) for w in caught)
+            accepted = bool(fit.convergence_flag == 0 and not ignored_start
+                            and np.isfinite(p).all() and np.isfinite(ll)
+                            and p.iloc[2] > 0 and p.iloc[3] >= 0 and p.iloc[4] >= 0
+                            and violation <= 1e-10
+                            and fit.nobs == fixed.nobs == expected_nobs
+                            and abs(ll - equivalent_ll) <= 1e-7)
+            row = dict(scale=scale, start=mode, flag=int(fit.convergence_flag),
+                       accepted=accepted, ll=ll, likelihood_equivalence_error=ll-equivalent_ll,
+                       nobs=int(fit.nobs), constraint_violation=violation,
+                       params=p.to_dict(), warnings=[str(w.message) for w in caught])
+            rows.append(row)
+            # Differences below 1e-6 are treated as numerical ties, in fixed candidate order.
+            if accepted and (best is None or ll > best[0] + 1e-6):
+                best = (ll, p, len(rows)-1)
+    if audit is not None:
+        audit.update(candidates=rows, selected=None if best is None else best[2])
+    if best is None:
+        raise RuntimeError('No converged feasible Normal AR(1)-GARCH(1,1) candidate')
+    suspect = [row for row in rows if not row['accepted']
+               and row.get('flag') in (0, 8)
+               and row.get('constraint_violation', float('inf')) <= 1e-6
+               and np.isfinite(row.get('ll', float('nan')))
+               and row['ll'] > best[0] + 1.0]
+    if suspect:
+        if audit is not None:
+            audit['suspect_rejected_advantage'] = suspect
+        raise RuntimeError('Near-feasible GARCH candidate has materially higher likelihood; numerical review required')
+    return best[1]
+
+
 def garch_filter(r, params=None, last_obs=None):
     """AR(1)-GARCH(1,1) by Normal QML (Chapter 5); r in %.
     Parameters are estimated on the data before last_obs; the filter is causal: mu_t and sigma_t use
@@ -106,7 +200,7 @@ def garch_filter(r, params=None, last_obs=None):
     Returns the parameters and the series mu_t, sigma_t for the whole sample."""
     if params is None:
         am = arch_model(r, mean='AR', lags=1, vol='GARCH', p=1, q=1, dist='normal', rescale=False)
-        params = am.fit(disp='off', last_obs=last_obs).params
+        params = robust_garch_fit(r, last_obs=last_obs)
     est = r if last_obs is None else r.loc[r.index < pd.Timestamp(last_obs)]
     c, phi, om, al, be = params.values[:5]
     x = np.asarray(r, float)

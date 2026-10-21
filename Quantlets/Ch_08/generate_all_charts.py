@@ -108,36 +108,483 @@ _FC = {}
 
 
 def fc(name):
-    if name not in _FC:
-        _FC[name] = M.get_forecasts(name)
-    return _FC[name]
+    if name not in _VALIDATED_FC:
+        result=M.get_forecasts(name)
+        _FC_REPORTS[name]=M.get_forecasts.last_diagnostics
+        calendar,losses=canonical_sample(name)
+        validate_forecast_contract(result[0],M.MODELS,calendar,losses,M.get_forecasts.last_diagnostics)
+        _VALIDATED_FC[name]=result
+    return _VALIDATED_FC[name]
 
 
-def hits(name, model, col='VaR1'):
-    df = fc(name)[0][model]
-    return (df['L'] > df[col]).astype(int)
+def hits(name,model,col='VaR1'):
+    df=fc(name)[0][model]
+    values=df[['L',col]].to_numpy(dtype=float)
+    if not np.isfinite(values).all():raise ValueError('Hit indicators require finite losses and forecasts')
+    return (df['L']>df[col]).astype(int)
+
+
+# --- Google-validated helpers (synchronised from the Chapter 8 lecture notebook) ---
+"""Prototype only: metric eligibility on an externally supplied canonical calendar.
+Caller must retain the original model universe; this function cannot establish it.
+"""
+
+
+import numpy as np
+
+
+import pandas as pd
+
+
+from pandas.api.types import is_numeric_dtype, is_bool_dtype, is_complex_dtype
+
+
+def completeness(frame, calendar, columns, losses):
+    if isinstance(columns, (str, bytes)):
+        raise ValueError('Metric columns must be a sequence, not a bare string')
+    columns = list(columns)
+    if not columns or any(not isinstance(c, str) or c == 'L' for c in columns) or len(set(columns)) != len(columns):
+        raise ValueError('Metric columns must be unique forecast names, excluding L')
+    calendar = pd.Index(calendar)
+    if len(calendar) == 0 or not calendar.is_unique or not calendar.is_monotonic_increasing:
+        raise ValueError('Canonical calendar must be nonempty, unique, ordered')
+    if not isinstance(losses, pd.Series) or not losses.index.equals(calendar):
+        raise ValueError('Canonical losses must align exactly with the calendar')
+    def real_values(series):
+        if not is_numeric_dtype(series.dtype) or is_bool_dtype(series.dtype) or is_complex_dtype(series.dtype):
+            return None
+        return series.to_numpy(dtype=float, na_value=np.nan)
+    expected = real_values(losses)
+    if expected is None or not np.isfinite(expected).all():
+        raise ValueError('Canonical losses must be finite real numbers')
+    if not isinstance(frame, pd.DataFrame) or not frame.columns.is_unique or isinstance(frame.columns, pd.MultiIndex):
+        return {'eligible': False, 'reason': 'invalid_frame'}
+    if not frame.index.equals(calendar):
+        return {'eligible': False, 'reason': 'calendar_mismatch'}
+    for name in dict.fromkeys(['L'] + columns):
+        if name not in frame:
+            return {'eligible': False, 'reason': 'missing_column', 'column': name}
+        values = real_values(frame[name])
+        if values is None or not np.isfinite(values).all():
+            return {'eligible': False, 'reason': 'nonfinite_or_nonreal', 'column': name}
+        if name == 'L' and not np.array_equal(values, expected):
+            return {'eligible': False, 'reason': 'loss_mismatch'}
+    return {'eligible': True, 'reason': None}
+
+
+"""Validate forecast absence against the producer's dated availability record."""
+
+
+import numpy as np
+
+
+import pandas as pd
+
+
+from pandas.api.types import is_numeric_dtype,is_bool_dtype,is_complex_dtype
+
+
+def validate_forecast_contract(frames,models,calendar,losses,report):
+    calendar=pd.Index(calendar)
+    if not calendar.is_unique or not calendar.is_monotonic_increasing or not len(calendar):
+        raise ValueError('Invalid canonical calendar')
+    if not isinstance(losses,pd.Series) or not losses.index.equals(calendar) or not np.isfinite(losses.to_numpy()).all():
+        raise ValueError('Invalid canonical losses')
+    if set(frames)!=set(models):raise ValueError('Forecast universe mismatch')
+    daily=report['daily']
+    if list(daily['forecast_date'])!=[str(d.date()) for d in calendar]:
+        raise ValueError('Diagnostic calendar mismatch')
+    available=daily['forecast_available']
+    if len(available)!=len(calendar) or any(type(x) is not bool for x in available):
+        raise ValueError('Invalid availability record')
+    missing=~np.array(available,dtype=bool)
+    for model in models:
+        frame=frames[model]
+        if not isinstance(frame,pd.DataFrame) or not frame.index.equals(calendar) or not frame.columns.is_unique:
+            raise ValueError('Forecast structure mismatch: '+model)
+        if 'L' not in frame or not np.array_equal(frame['L'].values,losses.values):
+            raise ValueError('Forecast loss mismatch: '+model)
+        expected=missing if model in ['GARCH-t','FHS','GARCH-EVT'] else np.zeros(len(calendar),dtype=bool)
+        for column in ['VaR1','VaR2.5','VaR5','ES1','ES2.5']:
+            if column not in frame:raise ValueError('Missing forecast column: '+column)
+            series=frame[column]
+            if not is_numeric_dtype(series.dtype) or is_bool_dtype(series.dtype) or is_complex_dtype(series.dtype):
+                raise ValueError('Nonreal forecast: '+model+'/'+column)
+            values=series.to_numpy(dtype=float,na_value=np.nan)
+            if np.isinf(values).any() or not np.array_equal(np.isnan(values),expected):
+                raise ValueError('Forecast missingness disagrees with producer: '+model+'/'+column)
+    return frames
+
+
+import numpy as np
+
+
+from pandas.api.types import is_numeric_dtype,is_bool_dtype,is_complex_dtype
+
+
+def validate_es_contract(frames,models,calendar,losses,report,tails,k_tail):
+    if set(models)!={'HS','Normal','Student-t','GARCH-t','FHS','GARCH-EVT'} or len(models)!=6:raise ValueError('Unknown model universe')
+    if type(k_tail) is not int or k_tail<1:raise ValueError('Invalid empirical tail width')
+    validate_forecast_contract(frames,models,calendar,losses,report)
+    available=np.asarray(report['daily']['forecast_available'],dtype=bool)
+    if np.any(available[:-1] & ~available[1:]):raise ValueError('Availability must be an initial missing prefix')
+    for model in models:
+        missing=~available if model in ('GARCH-t','FHS','GARCH-EVT') else np.zeros(len(calendar),dtype=bool)
+        columns=['pit','scale','mu']
+        if model in ('Student-t','GARCH-t'):columns+=['nu']
+        if model=='GARCH-EVT':columns+=['u','xi','beta','pu']
+        for col in columns:
+            if col not in frames[model]:raise ValueError('Missing ES field: '+col)
+            series=frames[model][col]
+            if not is_numeric_dtype(series.dtype) or is_bool_dtype(series.dtype) or is_complex_dtype(series.dtype):raise ValueError('Nonreal ES field')
+            a=series.to_numpy(dtype=float,na_value=np.nan)
+            if a.dtype.kind not in 'fi' or np.isinf(a).any() or not np.array_equal(np.isnan(a),missing):
+                raise ValueError(f'Invalid ES field {model}/{col}')
+            v=a[~missing]
+            if col=='pit' and ((v<0)|(v>1)).any():raise ValueError('PIT outside [0,1]')
+            if col in ('scale','beta') and (v<=0).any():raise ValueError('Nonpositive scale')
+            if col=='nu' and (v<=2).any():raise ValueError('Invalid t degrees of freedom')
+            if col=='xi' and ((v>=1)|(v==0)).any():raise ValueError('GPD ES domain or singular implemented formula')
+            if col=='pu' and ((v<.05)|(v>1)).any():raise ValueError('Invalid tail probability')
+        if model in ('HS','FHS'):
+            if model not in tails or not isinstance(tails[model],np.ndarray):raise ValueError('Expected producer positional tail ndarray')
+            a=tails[model]  # producer sorts standardised losses ascending, then applies positive scale
+            if a.shape!=(len(calendar),k_tail) or a.dtype.kind not in 'fi' or np.isinf(a).any():raise ValueError('Invalid tail array')
+            if not np.array_equal(np.isnan(a),np.broadcast_to(missing[:,None],a.shape)):raise ValueError('Tail availability mismatch')
+            if (np.diff(a[~missing],axis=1)<0).any():raise ValueError('Unsorted empirical tails')
+    return True
+
+
+"""Individual-model coverage on the original full evaluation sample."""
+
+
+def coverage_table(assets,models,frames_for,canonical_for,kupiec,christoffersen,duration_test,report_for,col='VaR1',p=.01):
+    if not assets or not models or len(set(assets))!=len(assets) or len(set(models))!=len(models):
+        raise ValueError('Assets and models must be nonempty and unique')
+    if col not in {'VaR1':.01,'VaR2.5':.025,'VaR5':.05} or p!={'VaR1':.01,'VaR2.5':.025,'VaR5':.05}[col]:
+        raise ValueError('VaR column and nominal probability must agree')
+    rows={}
+    for name in assets:
+        frames=frames_for(name);calendar,losses=canonical_for(name)
+        validate_forecast_contract(frames,models,calendar,losses,report_for(name))
+        for model in models:
+            check=completeness(frames[model],calendar,[col],losses)
+            if not check['eligible']:
+                if check['reason']!='nonfinite_or_nonreal' or check.get('column')!=col:
+                    raise ValueError('Forecast contract violation: '+str(check))
+                rows[(name,model)]=dict(status='withheld',reason=check,result=None)
+                continue
+            h=(frames[model]['L']>frames[model][col]).astype(int).values
+            k=kupiec(h,p);c=christoffersen(h,p);d=duration_test(h)
+            if k['T']!=len(calendar):raise ValueError('Coverage sample changed')
+            result=dict(T=k['T'],x=k['x'],rate=k['rate'],LR_uc=k['LR'],p_uc=k['p'],LR_ind=c['LR_ind'],
+                        p_ind=c['p_ind'],LR_cc=c['LR_cc'],p_cc=c['p_cc'],pi01=c['pi01'],pi11=c['pi11'],
+                        b=d['b'],LR_dur=d['LR'],p_dur=d['p'])
+            rows[(name,model)]=dict(status='computed',reason=None,result=result)
+    return rows
+
+
+"""Eligibility plan only. Never computes a metric or shrinks its model universe."""
+
+
+from collections.abc import Mapping
+
+
+def metric_plan(frames, original_models, calendar, losses, columns):
+    if isinstance(original_models,(str,bytes)):
+        raise ValueError('Original model universe must be a sequence')
+    models=list(original_models)
+    if not models or any(not isinstance(m,str) or not m for m in models) or len(set(models))!=len(models):
+        raise ValueError('Original model universe must be nonempty and unique')
+    if not isinstance(frames,Mapping) or set(frames)!=set(models):
+        raise ValueError('Frames must retain exactly the original model universe')
+    if isinstance(columns,(str,bytes)):
+        raise ValueError('Metric columns must be a sequence')
+    columns=list(columns)
+    checks={m:completeness(frames[m],calendar,columns,losses) for m in models}
+    withheld=[m for m in models if not checks[m]['eligible']]
+    return {'original_models':models,'per_model':checks,
+            'joint_eligible':not withheld,'withheld_models':withheld,
+            'joint_reason':'incomplete_original_model_universe' if withheld else None}
+
+
+"""Prototype gate; caller must supply the original universe and canonical sample."""
+
+
+def execute_joint_metric(frames, original_models, calendar, losses, columns, evaluate):
+    plan=metric_plan(frames,original_models,calendar,losses,columns)
+    if not plan['joint_eligible']:
+        return {'status':'withheld','plan':plan,'result':None}
+    result=evaluate(frames)
+    return {'status':'computed','plan':plan,'result':result}
+
+
+"""Staged replacement contract; rendering must handle explicit withheld assets."""
+
+
+import numpy as np
+
+
+import pandas as pd
+
+
+def comparative_table(assets, models, frames_for, canonical_for, fz0,
+                      diebold_mariano, mcs, pinball):
+    out={}
+    for name in assets:
+        frames=frames_for(name)
+        calendar,losses=canonical_for(name)
+        def evaluate(F):
+            Lf=pd.DataFrame({m:fz0(F[m]['L'].values,F[m]['VaR2.5'].values,F[m]['ES2.5'].values)
+                             for m in models},index=calendar)
+            if not np.isfinite(Lf.to_numpy()).all():
+                raise ValueError('FZ0 produced nonfinite scores on complete inputs')
+            best=Lf.mean().idxmin()
+            dm={m:diebold_mariano(Lf[m],Lf[best]) for m in models if m!=best}
+            mc=mcs(Lf)
+            return dict(mean={m:float(v) for m,v in Lf.mean().items()},best=best,
+                        dm={m:dict(DM=d['DM'],p=d['p'],dbar=d['dbar']) for m,d in dm.items()},
+                        mcs={m:float(v) for m,v in mc.items()},
+                        pin={m:float(pinball(F[m]['L'].values,F[m]['VaR1'].values,.01).mean()) for m in models})
+        out[name]=execute_joint_metric(frames,models,calendar,losses,
+                                      ['VaR1','VaR2.5','ES2.5'],evaluate)
+    return out
+
+
+"""Render staged table contracts without treating missing comparisons as zeros."""
+
+
+import numpy as np
+
+
+import matplotlib.pyplot as plt
+
+
+def comparative_figure(table, assets, models, labels, colors):
+    fig,ax=plt.subplots(figsize=(6.8,3.4))
+    width=.78/len(models)
+    for i,model in enumerate(models):
+        values=[]
+        for asset in assets:
+            row=table[asset]
+            if row['status']=='withheld':values.append(np.nan)
+            elif row['status']=='computed':
+                result=row['result']
+                values.append(result['mean'][model]-result['mean'][result['best']])
+            else:raise ValueError('Unknown comparative table status')
+        ax.bar(np.arange(len(assets))+(i-(len(models)-1)/2)*width,
+               values,width,color=colors[model],label=model)
+    for i,asset in enumerate(assets):
+        if table[asset]['status']=='withheld':
+            ax.text(i,.5,'Comparison\nunavailable',transform=ax.get_xaxis_transform(),
+                    ha='center',va='center',fontsize=8,color='black')
+    ax.set_xticks(range(len(assets)),[labels[a] for a in assets])
+    ax.set_xlim(-.6,len(assets)-.4)
+    ax.set_ylabel('Mean FZ0 loss minus\nthat of the best model')
+    ax.legend(loc='upper center',bbox_to_anchor=(.5,-.13),ncol=3,frameon=False)
+    fig.subplots_adjust(left=.14,right=.98,top=.95,bottom=.27)
+    return fig,ax
+
+
+"""Render MCS contracts; unavailable assets have no fabricated p-values."""
+
+
+import numpy as np
+
+
+import pandas as pd
+
+
+import matplotlib.pyplot as plt
+
+
+def comparative_mcs_figure(table,assets,models,labels,cmap='viridis'):
+    if not assets or not models or len(set(models))!=len(models) or len(set(assets))!=len(assets):
+        raise ValueError('Assets and models must be nonempty and unique')
+    values=np.full((len(models),len(assets)),np.nan)
+    for j,asset in enumerate(assets):
+        row=table[asset]
+        if row['status']=='withheld':
+            if row.get('result') is not None:raise ValueError('Withheld result must be None')
+            continue
+        if row['status']!='computed':raise ValueError('Unknown comparative table status')
+        pvalues=row['result']['mcs']
+        if set(pvalues)!=set(models):raise ValueError('MCS must retain the original model universe')
+        column=np.array([pvalues[m] for m in models],dtype=float)
+        if not np.isfinite(column).all() or ((column<0)|(column>1)).any():
+            raise ValueError('MCS p-values must be finite and in [0,1]')
+        values[:,j]=column
+    fig,ax=plt.subplots(figsize=(6.4,3.6))
+    im=ax.imshow(np.ma.masked_invalid(values),cmap=cmap,vmin=0,vmax=1,aspect='auto')
+    for j,asset in enumerate(assets):
+        if table[asset]['status']=='withheld':
+            ax.text(j,(len(models)-1)/2,'Unavailable',rotation=90,ha='center',va='center',color='black')
+        else:
+            for i in range(len(models)):
+                rgba=im.cmap(im.norm(values[i,j]))
+                color='black' if np.dot(rgba[:3],[.299,.587,.114])>.5 else 'white'
+                ax.text(j,i,f'{values[i,j]:.3f}'+ (' *' if values[i,j]>=.10 else ''),ha='center',va='center',color=color,fontsize=8)
+    ax.set_xticks(range(len(assets)),[labels[a] for a in assets])
+    ax.set_yticks(range(len(models)),models)
+    ax.set_title('MCS p-values (FZ0 loss)\n* p ≥ 0.10: retained in the 90% MCS',fontsize=9)
+    fig.colorbar(im,ax=ax,label='p-value',shrink=.8)
+    fig.tight_layout()
+    return fig,ax,pd.DataFrame(values,index=models,columns=assets)
+
+
+"""Gate score consumers on the complete original forecast universe."""
+
+
+import numpy as np
+
+
+import pandas as pd
+
+
+def guarded_fz_scores(frames,models,calendar,losses,fz0,evaluate):
+    def scores(F):
+        Lf=pd.DataFrame({m:fz0(F[m]['L'].values,F[m]['VaR2.5'].values,F[m]['ES2.5'].values)
+                         for m in models},index=calendar)
+        if not np.isfinite(Lf.to_numpy()).all():
+            raise ValueError('FZ0 produced nonfinite scores on complete inputs')
+        return evaluate(Lf)
+    return execute_joint_metric(frames,models,calendar,losses,['VaR2.5','ES2.5'],scores)
+
+
+def canonical_sample(name):
+    if name in _CANONICAL:return _CANONICAL[name]
+    r=M.load_returns(name).dropna()
+    start=max(M.W,int(np.searchsorted(r.index,pd.Timestamp(M.EVAL_FROM))))
+    _CANONICAL[name]=(r.index[start:],-r.iloc[start:])
+    return _CANONICAL[name]
+
+
+class ComparisonUnavailable(RuntimeError):
+    def __init__(self,plan):
+        self.plan=plan
+        super().__init__('Comparison unavailable: incomplete original model universe')
+
+
+def fc(name):
+    if name not in _VALIDATED_FC:
+        result=M.get_forecasts(name)
+        _FC_REPORTS[name]=M.get_forecasts.last_diagnostics
+        calendar,losses=canonical_sample(name)
+        validate_forecast_contract(result[0],M.MODELS,calendar,losses,M.get_forecasts.last_diagnostics)
+        _VALIDATED_FC[name]=result
+    return _VALIDATED_FC[name]
+
+
+def hits(name,model,col='VaR1'):
+    df=fc(name)[0][model]
+    values=df[['L',col]].to_numpy(dtype=float)
+    if not np.isfinite(values).all():raise ValueError('Hit indicators require finite losses and forecasts')
+    return (df['L']>df[col]).astype(int)
+
+
+def es_inputs(name):
+    frames,tails=fc(name);calendar,losses=canonical_sample(name)
+    validate_es_contract(frames,M.MODELS,calendar,losses,_FC_REPORTS[name],tails,M.K_TAIL)
+    return frames,tails,calendar,losses
+
+
+def es_eligible(frame,calendar,losses):
+    check=completeness(frame,calendar,['VaR2.5','ES2.5','pit','scale'],losses)
+    if not check['eligible'] and check['reason']!='nonfinite_or_nonreal':raise ValueError(str(check))
+    return check
+
+
+def require_es_complete(name,model):
+    frames,tails,calendar,losses=es_inputs(name)
+    check=es_eligible(frames[model],calendar,losses)
+    if not check['eligible']:raise ValueError('ES figure requires complete original sample: '+str(check))
+
+
+def es_one(df,m,tails):
+    mf = M.mcneil_frey(df['L'].values, df['VaR2.5'].values, df['ES2.5'].values, df['scale'].values)
+    z = M.z_pvalues(df, m, tails, M=2000)
+    de = M.du_escanciano(df['pit'].values)
+    return dict(n_hit=mf['n'], MF_mean=mf['mean'], MF_t=mf['t'], MF_p=mf['p'], Z1=z['Z1'], p1=z['p1'], Z2=z['Z2'], p2=z['p2'], Z2_crit=z['crit2'], U_ES=de['U'], p_U=de['pU'], C_ES=de['C'], p_C=de['pC'], meanH=de['meanH'])
+
+
+_CANONICAL={}
+
+
+_VALIDATED_FC={}
+
+
+_FC_REPORTS={}
+
+
+def validate_conformal_frame(frame,calendar,losses):
+    if not frame.index.equals(calendar) or not np.array_equal(frame['L'].values,losses.values):raise ValueError('Conformal canonical sample mismatch')
+    for column in ['L','sd','alpha_t']:
+        if not np.isfinite(frame[column].values).all():raise ValueError('Invalid conformal field: '+column)
+    if (frame['sd']<=0).any():raise ValueError('Nonpositive conformal scale')
+    for column in ['VaR_split','VaR_aci']:
+        a=frame[column].values
+        if np.isnan(a).any() or np.isneginf(a).any():raise ValueError('Invalid conformal quantile')
+    return frame
+
+
+def metric_display(records):
+    rows={}
+    for key,record in records.items():
+        if record['status']=='computed':rows[key]=dict(status='computed',**record['result'])
+        elif record['status']=='withheld' and record['result'] is None:rows[key]=dict(status='withheld: incomplete sample')
+        else:raise ValueError('Invalid metric record')
+    return pd.DataFrame.from_dict(rows, orient='index')
+
+
+def mcs_display(records):
+    rows={}
+    for name,record in records.items():
+        if record['status']=='computed':rows[name]=dict(status='computed',**record['result']['mcs'])
+        elif record['status']=='withheld' and record['result'] is None:rows[name]=dict(status='withheld: incomplete sample')
+        else:raise ValueError('Invalid MCS record')
+    return pd.DataFrame.from_dict(rows, orient='index')
+
+
+def show_conformal_rates(cf):
+    import pandas as pd
+    rows = []
+    for market, data in cf.items():
+        for method in ('split', 'aci', 'garch'):
+            all_days, calm, crisis = data[method]
+            rows.append({'Market': market, 'Method': {'split':'Split conformal','aci':'ACI','garch':'GARCH-t'}[method], 'Status': data['garch_status'] if method=='garch' else 'computed',
+                         'All (%)':100*all_days, 'Calm (%)':100*calm, 'Crisis (%)':100*crisis})
+    print('VaR 5% breach rates; percentages of the observations in each regime:')
+    print(pd.DataFrame(rows).to_string(index=False, float_format=lambda x:f'{x:.2f}'))
 
 
 # =============================================================================
 # FIG 1: four assets, losses and GARCH-EVT VaR 1%
 # =============================================================================
 def fig_four_assets():
-    fig, axs = plt.subplots(2, 2, figsize=(7.0, 3.9), sharex=False)
-    out = {}
-    for ax, n in zip(axs.flat, M.ASSETS):
-        df = fc(n)[0]['GARCH-EVT']
-        ax.plot(df.index, 100 * df['L'], color=Orange, lw=0.5, alpha=0.7, label='Daily loss')
-        ax.plot(df.index, 100 * df['VaR1'], color=IDAred, lw=0.7, label='VaR 1% (GARCH-EVT)')
-        h = df['L'] > df['VaR1']
-        ax.scatter(df.index[h], 100 * df['L'][h], s=4, color=MainBlue, zorder=3, label='Breach')
-        ax.set_title(M.LABELS[n], fontsize=9)
-        ax.set_ylabel('Loss (%)', fontsize=8)
-        ax.tick_params(labelsize=7)
-        ax.xaxis.set_major_locator(mdates.YearLocator(4 if n != 'btc' else 2))
+    fig,axs=plt.subplots(2,2,figsize=(7.0,4.2),sharex=False)
+    out={}
+    for ax,name in zip(axs.flat,M.ASSETS):
+        df=fc(name)[0]['GARCH-EVT']
+        available=df['VaR1'].notna()
+        h=pd.Series(pd.NA,index=df.index,dtype='boolean')
+        h.loc[available]=df.loc[available,'L']>df.loc[available,'VaR1']
+        ax.plot(df.index,100*df['L'],color=Orange,lw=.5,alpha=.7,label='Daily loss')
+        ax.plot(df.index,100*df['VaR1'],color=IDAred,lw=.7,label='VaR 1% (GARCH-EVT)')
+        observed_breaches=h.fillna(False)
+        ax.scatter(df.index[observed_breaches],100*df.loc[observed_breaches,'L'],s=4,color=MainBlue,zorder=3,label='Breach (available forecasts)')
+        missing=int((~available).sum())
+        if missing:
+            ax.text(.02,.96,f'{missing} days without a forecast',transform=ax.transAxes,ha='left',va='top',fontsize=7,
+                    bbox=dict(facecolor='white',edgecolor='none',alpha=.85))
+        ax.set_title(M.LABELS[name],fontsize=9)
+        ax.set_ylabel('Loss (%)',fontsize=8);ax.tick_params(labelsize=7)
+        ax.xaxis.set_major_locator(mdates.YearLocator(4 if name!='btc' else 2))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-        out[n] = dict(start=str(df.index[0].date()), end=str(df.index[-1].date()), T=len(df))
-    axs[1, 0].legend(loc='upper center', bbox_to_anchor=(1.1, -0.18), ncol=3, frameon=False)
-    plt.tight_layout()
+        out[name]=dict(start=str(df.index[0].date()),end=str(df.index[-1].date()),T=len(df),
+                       available_days=int(available.sum()),unavailable_days=missing)
+    handles,labels=axs[0,0].get_legend_handles_labels()
+    fig.legend(handles,labels,loc='lower center',ncol=3,frameon=False,fontsize=8)
+    fig.tight_layout(rect=(0,.08,1,1))
     save_fig('ch8_four_assets')
     return out
 
@@ -153,11 +600,12 @@ def fig_sp500_var():
     for m, ls in (('HS', '-'), ('GARCH-t', '-')):
         ax.plot(L.index, 100 * F[m]['VaR1'], color=MCOL[m], lw=0.8, ls=ls, label=f'VaR 1%, {m}')
     for m, mk in (('HS', 'o'), ('GARCH-t', 'x')):
-        h = F[m]['L'] > F[m]['VaR1']
+        h = hits('sp500',m).astype(bool)
         ax.scatter(L.index[h], 100 * L[h] + (0.4 if m == 'GARCH-t' else 0), s=7, marker=mk, color=MCOL[m],
-                   zorder=3, label=f'Breach, {m}')
+                   zorder=3, label=f'Breach, {m}' + (' (+0.4 pp)' if m == 'GARCH-t' else ''))
     ax.set_ylabel('Loss (%)')
-    ax.set_ylim(-4, 13)
+    ax.autoscale(enable=True, axis='y')
+    ax.margins(y=0.05)
     legend_outside_bottom(ax, ncol=3, y=-0.12)
     save_fig('ch8_sp500_var')
     return {m: int(hits('sp500', m).sum()) for m in ('HS', 'GARCH-t')}
@@ -176,7 +624,7 @@ def fig_covid_zoom():
     for m in M.MODELS:
         v = F[m]['VaR1'].loc[a:b]
         ax.plot(v.index, 100 * v, color=MCOL[m], lw=1.0, label=m)
-        out[m] = int((L > v).sum())
+        out[m] = int(hits('sp500',m).loc[a:b].sum())
     ax.set_ylabel('Loss / VaR 1% (%)')
     legend_outside_bottom(ax, ncol=7, y=-0.12)
     save_fig('ch8_covid_zoom')
@@ -189,30 +637,27 @@ def fig_covid_zoom():
 # =============================================================================
 # FIG 4: VaR 1% breach rates by model and asset
 # =============================================================================
-def breach_table(col='VaR1', p=0.01):
-    rows = {}
-    for n in M.ASSETS:
-        for m in M.MODELS:
-            h = hits(n, m, col).values
-            k = M.kupiec(h, p)
-            c = M.christoffersen(h, p)
-            d = M.duration_test(h)
-            rows[(n, m)] = dict(T=k['T'], x=k['x'], rate=k['rate'], LR_uc=k['LR'], p_uc=k['p'], LR_ind=c['LR_ind'],
-                                p_ind=c['p_ind'], LR_cc=c['LR_cc'], p_cc=c['p_cc'], pi01=c['pi01'], pi11=c['pi11'],
-                                b=d['b'], LR_dur=d['LR'], p_dur=d['p'])
-    return rows
+def breach_table(col='VaR1',p=.01):
+    return coverage_table(M.ASSETS,M.MODELS,lambda n:fc(n)[0],canonical_sample,M.kupiec,M.christoffersen,M.duration_test,_FC_REPORTS.__getitem__,col,p)
 
 
 def fig_breach_rates(tab):
-    fig, ax = plt.subplots(figsize=(6.8, 3.0))
-    w = 0.13
-    for i, m in enumerate(M.MODELS):
-        y = [100 * tab[(n, m)]['rate'] for n in M.ASSETS]
-        ax.bar(np.arange(4) + (i - 2.5) * w, y, w, color=MCOL[m], label=m)
-    ax.axhline(1.0, color='black', lw=0.8, ls='--', label='Nominal 1%')
-    ax.set_xticks(range(4), [M.LABELS[n] for n in M.ASSETS])
+    fig,ax=plt.subplots(figsize=(7.0,3.6))
+    w=.78/len(M.MODELS)
+    for i,m in enumerate(M.MODELS):
+        y=[100*tab[n,m]['result']['rate'] if tab[n,m]['status']=='computed' else np.nan for n in M.ASSETS]
+        ax.bar(np.arange(len(M.ASSETS))+(i-(len(M.MODELS)-1)/2)*w,y,w,color=MCOL[m],label=m)
+    for j,n in enumerate(M.ASSETS):
+        missing=[m for m in M.MODELS if tab[n,m]['status']=='withheld']
+        if missing:
+            ax.text(j,.98,', '.join(missing)+'\nwithheld: incomplete sample',transform=ax.get_xaxis_transform(),ha='center',va='top',fontsize=6)
+    ax.axhline(1.0,color='black',lw=.8,ls='--',label='Nominal 1%')
+    ax.set_xticks(range(len(M.ASSETS)),[M.LABELS[n] for n in M.ASSETS])
+    ax.set_xlim(-.6,len(M.ASSETS)-.4)
     ax.set_ylabel('Breach rate of VaR 1% (%)')
-    legend_outside_bottom(ax, ncol=7, y=-0.13)
+    ax.margins(y=.35)
+    ax.legend(loc='upper center',bbox_to_anchor=(.5,-.13),ncol=4,frameon=False,fontsize=8)
+    fig.subplots_adjust(left=.11,right=.98,top=.96,bottom=.27)
     save_fig('ch8_breach_rates')
 
 
@@ -231,7 +676,7 @@ def fig_kupiec_curve():
         ax.axhline(stats.chi2.ppf(0.95, 1), color='black', ls='--', lw=0.8, label=r'$\chi^2_1$ 5% critical value 3.84')
         ax.set_title(f'T = {T} days, α = 1%', fontsize=9)
         ax.set_xlabel('Number of breaches x')
-        ax.set_ylim(0, 25)
+        ax.set_ylim(0, max(25, 1.05 * float(lr.max())))
         out[T] = dict(lo=int(xs[acc].min()), hi=int(xs[acc].max()))
     axs[0].set_ylabel(r'LR$_{uc}$')
     h, l = axs[0].get_legend_handles_labels()
@@ -245,16 +690,22 @@ def fig_kupiec_curve():
 # FIG 6: p-values of the VaR tests (Kupiec, Christoffersen, durations)
 # =============================================================================
 def fig_var_pvalues(tab):
-    fig, axs = plt.subplots(1, 3, figsize=(7.2, 2.7), sharey=True)
-    for ax, (key, title) in zip(axs, (('p_uc', 'Kupiec POF'), ('p_cc', 'Christoffersen CC'),
-                                      ('p_dur', 'Duration (Weibull)'))):
-        P = pd.DataFrame({M.LABELS[n]: [tab[(n, m)][key] for m in M.MODELS] for n in M.ASSETS}, index=M.MODELS)
-        pv_heatmap(ax, P, title=title)
-        ax.label_outer()
-        if not ax.get_subplotspec().is_last_row():
-            ax.tick_params(axis='x', length=0)
-    plt.tight_layout()
-    save_fig('ch8_var_pvalues')
+    fig,axs=plt.subplots(1,3,figsize=(7.2,3.1),sharey=True)
+    for ax,(key,title) in zip(axs,(('p_uc','Kupiec POF'),('p_cc','Christoffersen CC'),('p_dur','Duration (Weibull)'))):
+        P=np.array([[tab[n,m]['result'][key] if tab[n,m]['status']=='computed' else np.nan for n in M.ASSETS] for m in M.MODELS])
+        for i,m in enumerate(M.MODELS):
+            for j,n in enumerate(M.ASSETS):
+                if tab[n,m]['status']=='computed' and (not np.isfinite(P[i,j]) or not 0<=P[i,j]<=1):raise ValueError('Invalid computed coverage p-value')
+        ax.imshow(np.ma.masked_invalid(np.log10(np.clip(P,1e-4,1))),cmap=PV_CMAP,vmin=-4,vmax=0,aspect='auto')
+        for i in range(len(M.MODELS)):
+            for j in range(len(M.ASSETS)):
+                v=P[i,j];txt='—' if np.isnan(v) else ('<.001' if v<.001 else f'{v:.3f}')
+                ax.text(j,i,txt,ha='center',va='center',fontsize=7,color='black')
+        ax.set_xticks(range(len(M.ASSETS)),[M.LABELS[n] for n in M.ASSETS],rotation=30,fontsize=7.5)
+        ax.set_yticks(range(len(M.MODELS)),M.MODELS,fontsize=7.5);ax.set_title(title,fontsize=9)
+        for spine in ax.spines.values():spine.set_visible(False)
+    fig.text(.5,.015,'— withheld: incomplete sample',ha='center',fontsize=8)
+    fig.tight_layout(rect=(0,.06,1,1));save_fig('ch8_var_pvalues')
 
 
 # =============================================================================
@@ -286,7 +737,7 @@ def fig_durations(tab):
         D, _, _ = M.durations(hits('sp500', m).values)
         Ds = np.sort(D)
         surv = 1 - np.arange(1, len(Ds) + 1) / (len(Ds) + 1)
-        ax.step(Ds, surv, where='post', color=MCOL[m], label=f'{m} (b = {tab[("sp500", m)]["b"]:.2f})')
+        ax.step(Ds, surv, where='post', color=MCOL[m], label=f'{m} (b = {tab[("sp500", m)]["result"]["b"]:.2f})')
         out[m] = dict(n=len(D), median=float(np.median(D)), share_le5=float(np.mean(D <= 5)))
     d = np.linspace(1, 800, 200)
     ax.plot(d, (1 - 0.01) ** d, color='black', ls='--', lw=0.9, label='No memory, α = 1% (geometric)')
@@ -309,17 +760,18 @@ def fig_traffic_light():
     fig, ax = plt.subplots(figsize=(6.8, 3.0))
     ax.axhspan(-0.5, 4.5, color=Forest, alpha=0.10, lw=0)
     ax.axhspan(4.5, 9.5, color='#F1C40F', alpha=0.15, lw=0)
-    ax.axhspan(9.5, 40, color=IDAred, alpha=0.10, lw=0)
     out = {}
     for m in ('HS', 'Normal', 'GARCH-t', 'FHS'):
         x = rolling_exceptions('sp500', m)
         ax.plot(x.index, x, color=MCOL[m], lw=0.9, label=m)
         out[m] = dict(max=int(x.max()), max_day=str(x.idxmax().date()), share_red=float(np.mean(x >= 10)),
                       share_yellow=float(np.mean((x >= 5) & (x <= 9))), last=int(x.iloc[-1]))
-    ax.text(1.01, 2 / 36.5, 'green', color=Forest, fontsize=8, transform=ax.transAxes)
-    ax.text(1.01, 7.5 / 36.5, 'yellow', color=Amber, fontsize=8, transform=ax.transAxes)
-    ax.text(1.01, 20 / 36.5, 'red', color=IDAred, fontsize=8, transform=ax.transAxes)
-    ax.set_ylim(-0.5, 36)
+    plot_top = max(40, 1.05 * max(v['max'] for v in out.values()))
+    ax.axhspan(9.5, plot_top, color=IDAred, alpha=0.10, lw=0)
+    ax.text(1.01, 2, 'green', color=Forest, fontsize=8, transform=ax.get_yaxis_transform())
+    ax.text(1.01, 7.5, 'yellow', color=Amber, fontsize=8, transform=ax.get_yaxis_transform())
+    ax.text(1.01, (9.5 + plot_top) / 2, 'red', color=IDAred, fontsize=8, transform=ax.get_yaxis_transform())
+    ax.set_ylim(-0.5, plot_top)
     ax.set_ylabel('Exceptions of VaR 1%\nin the last 250 days')
     legend_outside_bottom(ax, ncol=4, y=-0.13)
     save_fig('ch8_traffic_light')
@@ -330,32 +782,36 @@ def fig_traffic_light():
 # ES TESTS: McNeil-Frey, Acerbi-Szekely, Du-Escanciano
 # =============================================================================
 def es_table():
-    rows = {}
-    for n in M.ASSETS:
-        F, tails = fc(n)
-        for m in M.MODELS:
-            df = F[m]
-            mf = M.mcneil_frey(df['L'].values, df['VaR2.5'].values, df['ES2.5'].values, df['scale'].values)
-            z = M.z_pvalues(df, m, tails, M=2000)
-            de = M.du_escanciano(df['pit'].values)
-            rows[(n, m)] = dict(n_hit=mf['n'], MF_mean=mf['mean'], MF_t=mf['t'], MF_p=mf['p'], Z1=z['Z1'], p1=z['p1'],
-                                Z2=z['Z2'], p2=z['p2'], Z2_crit=z['crit2'], U_ES=de['U'], p_U=de['pU'], C_ES=de['C'],
-                                p_C=de['pC'], meanH=de['meanH'])
+    rows={}
+    for name in M.ASSETS:
+        frames,tails,calendar,losses=es_inputs(name)
+        for model in M.MODELS:
+            check=es_eligible(frames[model],calendar,losses)
+            rows[name,model]=dict(status='computed' if check['eligible'] else 'withheld',reason=None if check['eligible'] else check,result=es_one(frames[model],model,tails) if check['eligible'] else None)
     return rows
 
 
 def fig_es_pvalues(tab):
-    fig, axs = plt.subplots(1, 3, figsize=(7.2, 2.7), sharey=True)
-    for ax, (key, title) in zip(axs, (('MF_p', 'McNeil-Frey'), ('p2', 'Acerbi-Szekely Z2'),
-                                      ('p_U', 'Du-Escanciano U'))):
-        P = pd.DataFrame({M.LABELS[n]: [tab[(n, m)][key] for m in M.MODELS] for n in M.ASSETS}, index=M.MODELS)
-        pv_heatmap(ax, P, title=title)
-        ax.tick_params(axis='x', rotation=30)
-    plt.tight_layout()
-    save_fig('ch8_es_pvalues')
+    fig,axs=plt.subplots(1,3,figsize=(7.2,3.1),sharey=True)
+    for ax,(key,title) in zip(axs,(('MF_p','McNeil-Frey'),('p2','Acerbi-Szekely Z2'),('p_U','Du-Escanciano U'))):
+        P=np.array([[tab[n,m]['result'][key] if tab[n,m]['status']=='computed' else np.nan for n in M.ASSETS] for m in M.MODELS])
+        for i,m in enumerate(M.MODELS):
+            for j,n in enumerate(M.ASSETS):
+                if tab[n,m]['status']=='computed' and (not np.isfinite(P[i,j]) or not 0<=P[i,j]<=1):raise ValueError('Invalid computed ES p-value')
+        ax.imshow(np.ma.masked_invalid(np.log10(np.clip(P,1e-4,1))),cmap=PV_CMAP,vmin=-4,vmax=0,aspect='auto')
+        for i in range(len(M.MODELS)):
+            for j in range(len(M.ASSETS)):
+                v=P[i,j];txt='—' if np.isnan(v) else ('<.001' if v<.001 else f'{v:.3f}')
+                ax.text(j,i,txt,ha='center',va='center',fontsize=7,color='black')
+        ax.set_xticks(range(len(M.ASSETS)),[M.LABELS[n] for n in M.ASSETS],rotation=30,fontsize=7.5)
+        ax.set_yticks(range(len(M.MODELS)),M.MODELS,fontsize=7.5);ax.set_title(title,fontsize=9)
+        for spine in ax.spines.values():spine.set_visible(False)
+    fig.text(.5,.015,'— withheld: incomplete sample',ha='center',fontsize=8)
+    fig.tight_layout(rect=(0,.06,1,1));save_fig('ch8_es_pvalues')
 
 
 def rolling_z2(name, model, n=250):
+    require_es_complete(name,model)
     df = fc(name)[0][model]
     L, v, e = df['L'].values, df['VaR2.5'].values, df['ES2.5'].values
     term = np.where(L > v, L / e, 0.0)
@@ -383,6 +839,7 @@ def fig_mf_residuals():
     fig, ax = plt.subplots(figsize=(6.4, 3.0))
     data, out = [], {}
     for m in M.MODELS:
+        require_es_complete('sp500',m)
         df = fc('sp500')[0][m]
         h = df['L'] > df['VaR2.5']
         e = ((df['L'] - df['ES2.5']) / df['scale'])[h]
@@ -396,7 +853,7 @@ def fig_mf_residuals():
         ax.plot(i + 1, out[m], 'D', color='black', ms=4, label='Mean' if i == 0 else None)
     ax.axhline(0, color='black', lw=0.8, ls='--', label='Expected under a correct ES (mean 0)')
     ax.set_xticks(range(1, 7), M.MODELS)
-    ax.set_ylabel('Exceedance residual (L - ES) / σ (forecast volatility)')
+    ax.set_ylabel('Exceedance residual (L - ES) / σ\n(σ: forecast volatility)')
     legend_outside_bottom(ax, ncol=2, y=-0.13)
     save_fig('ch8_mf_residuals')
     return out
@@ -443,35 +900,19 @@ def fig_elicitability(nu=4, a=0.025, n=2_000_000, seed=3):
 # FZ0 LOSS, DIEBOLD-MARIANO, MCS
 # =============================================================================
 def fz_losses(name):
-    F = fc(name)[0]
-    return pd.DataFrame({m: M.fz0(F[m]['L'].values, F[m]['VaR2.5'].values, F[m]['ES2.5'].values)
-                         for m in M.MODELS}, index=F['HS'].index)
+    calendar,losses=canonical_sample(name)
+    result=guarded_fz_scores(fc(name)[0],M.MODELS,calendar,losses,M.fz0,lambda scores:scores)
+    if result['status']=='withheld':raise ComparisonUnavailable(result['plan'])
+    return result['result']
 
 
 def fz_table():
-    out = {}
-    for n in M.ASSETS:
-        Lf = fz_losses(n)
-        best = Lf.mean().idxmin()
-        dm = {m: M.diebold_mariano(Lf[m], Lf[best]) for m in M.MODELS if m != best}
-        mc = M.mcs(Lf)
-        out[n] = dict(mean={m: float(v) for m, v in Lf.mean().items()}, best=best,
-                      dm={m: dict(DM=d['DM'], p=d['p'], dbar=d['dbar']) for m, d in dm.items()},
-                      mcs={m: float(v) for m, v in mc.items()},
-                      pin={m: float(M.pinball(fc(n)[0][m]['L'].values, fc(n)[0][m]['VaR1'].values, 0.01).mean())
-                           for m in M.MODELS})
-    return out
+    return comparative_table(M.ASSETS,M.MODELS,lambda n:fc(n)[0],canonical_sample,
+                             M.fz0,M.diebold_mariano,M.mcs,M.pinball)
 
 
 def fig_fz0(tab):
-    fig, ax = plt.subplots(figsize=(6.8, 3.0))
-    w = 0.13
-    for i, m in enumerate(M.MODELS):
-        y = [tab[n]['mean'][m] - tab[n]['mean'][tab[n]['best']] for n in M.ASSETS]
-        ax.bar(np.arange(4) + (i - 2.5) * w, y, w, color=MCOL[m], label=m)
-    ax.set_xticks(range(4), [M.LABELS[n] for n in M.ASSETS])
-    ax.set_ylabel('Mean FZ0 loss minus\nthat of the best model')
-    legend_outside_bottom(ax, ncol=6, y=-0.13)
+    comparative_figure(tab,M.ASSETS,M.MODELS,M.LABELS,MCOL)
     save_fig('ch8_fz0')
 
 
@@ -501,10 +942,8 @@ def fig_dm_matrix(name='sp500'):
 
 
 def fig_mcs(tab):
-    P = pd.DataFrame({M.LABELS[n]: [tab[n]['mcs'][m] for m in M.MODELS] for n in M.ASSETS}, index=M.MODELS)
-    fig, ax = plt.subplots(figsize=(5.0, 3.0))
-    pv_heatmap(ax, P)
-    ax.set_title('MCS p-values (FZ0 loss); models with p >= 0.10 are in the 90% MCS', fontsize=8.5)
+    comparative_mcs_figure(tab,M.ASSETS,M.MODELS,M.LABELS,
+                          cmap=LinearSegmentedColormap.from_list('mcs',[IDAred,'#FFFFFF',Forest]))
     save_fig('ch8_mcs')
 
 
@@ -517,13 +956,18 @@ def conformal_table(a=0.01):
         r = M.load_returns(n)
         c = M.conformal_var(r, a=a).loc[fc(n)[0]['HS'].index[0]:]
         reg = M.regimes(r, c.index)
-        g = fc(n)[0]['GARCH-t'].reindex(c.index)
+        g = fc(n)[0]['GARCH-t']
+        validate_conformal_frame(c,*canonical_sample(n))
         col = {0.01: 'VaR1', 0.05: 'VaR5', 0.025: 'VaR2.5'}[a]
-        hs, ha, hg = c['L'] > c['VaR_split'], c['L'] > c['VaR_aci'], g['L'] > g[col]
+        hs, ha = c['L'] > c['VaR_split'], c['L'] > c['VaR_aci']
+        check=completeness(g,c.index,[col],c['L'])
+        if not check['eligible'] and check['reason']!='nonfinite_or_nonreal':raise ValueError(str(check))
+        hg=(g['L']>g[col]) if check['eligible'] else None
         out[n] = dict(T=len(c), n_crisis=int(reg.sum()),
                       split=[float(hs.mean()), float(hs[~reg].mean()), float(hs[reg].mean())],
                       aci=[float(ha.mean()), float(ha[~reg].mean()), float(ha[reg].mean())],
-                      garch=[float(hg.mean()), float(hg[~reg].mean()), float(hg[reg].mean())],
+                      garch=[float(hg.mean()),float(hg[~reg].mean()),float(hg[reg].mean())] if hg is not None else [np.nan]*3,
+                      garch_status='computed' if hg is not None else 'withheld', garch_reason=check,
                       inf_share=float(np.isinf(c['VaR_aci']).mean()),
                       kup_split=M.kupiec(hs.values, a)['p'], kup_aci=M.kupiec(ha.values, a)['p'])
     return out
@@ -533,13 +977,17 @@ def fig_conformal_path():
     r = M.load_returns('sp500')
     c = M.conformal_var(r, a=0.01).loc['2019-07-01':'2021-06-30']
     g = fc('sp500')[0]['GARCH-t']['VaR1'].loc[c.index]
+    g_available=bool(np.isfinite(g).all())
     fig, axs = plt.subplots(2, 1, figsize=(6.8, 3.6), sharex=True, gridspec_kw=dict(height_ratios=[2.2, 1]))
     ax = axs[0]
     ax.bar(c.index, 100 * c['L'], color=Orange, alpha=0.5, width=1.0, label='Daily loss')
     ax.plot(c.index, 100 * c['VaR_split'], color=MainBlue, lw=1.0, label='Split conformal VaR 1%')
     va = np.where(np.isinf(c['VaR_aci']), np.nan, c['VaR_aci'])
     ax.plot(c.index, 100 * va, color=IDAred, lw=1.0, label='ACI VaR 1% (gaps: infinite)')
-    ax.plot(c.index, 100 * g, color=Forest, lw=0.9, ls='--', label='GARCH-t VaR 1%')
+    if g_available:
+        ax.plot(c.index,100*g,color=Forest,lw=.9,ls='--',label='GARCH-t VaR 1%')
+    else:
+        ax.plot([],[],color=Forest,ls='--',label='GARCH-t withheld: incomplete sample')
     ax.set_ylabel('Loss (%)')
     ax.autoscale(enable=True, axis="y")
     ax.margins(y=0.05)
@@ -565,10 +1013,12 @@ def fig_conformal_regimes(tab):
                    label={'split': 'Split conformal', 'aci': 'ACI', 'garch': 'GARCH-t'}[k] + ', calm' if n == 'sp500' else None)
             ax.bar(x + j * 0.27 - 0.27 + 0.12, 100 * tab[n][k][2], 0.12, color=col,
                    label={'split': 'Split conformal', 'aci': 'ACI', 'garch': 'GARCH-t'}[k] + ', crisis' if n == 'sp500' else None)
+        if tab[n]['garch_status']=='withheld':
+            ax.text(x+.33,0,'GARCH withheld',rotation=90,ha='center',va='bottom',fontsize=7)
         labels.append(M.LABELS[n])
         x += 1
     ax.axhline(5.0, color='black', ls='--', lw=0.8, label='Nominal 5%')
-    ax.set_xticks(np.arange(4) - 0.2, labels)
+    ax.set_xticks(np.arange(len(M.ASSETS)) + .06, labels)
     ax.set_ylabel('Breach rate of VaR 5% (%)')
     legend_outside_bottom(ax, ncol=4, y=-0.13)
     save_fig('ch8_conformal_regimes')
@@ -586,8 +1036,13 @@ def worked_examples():
     h = hits('sp500', 'GARCH-t').loc['2007':'2010']
     out['chr_garch'] = dict(**M.transitions(h.values), **M.christoffersen(h.values, 0.01))
     # FRTB: desk-level exceptions in the last 250 days
-    out['desk'] = {n: {m: dict(x99=int(hits(n, m, 'VaR1').iloc[-250:].sum()),
-                                x975=int(hits(n, m, 'VaR2.5').iloc[-250:].sum())) for m in M.MODELS}
+    def window_hits(n, m, col, k=250):
+        df = fc(n)[0][m].iloc[-k:]
+        if not np.isfinite(df[['L', col]].to_numpy(dtype=float)).all():
+            raise ValueError(f'{n} {m}: last {k} days need finite forecasts')
+        return (df['L'] > df[col]).astype(int)
+    out['desk'] = {n: {m: dict(x99=int(window_hits(n, m, 'VaR1').sum()),
+                                x975=int(window_hits(n, m, 'VaR2.5').sum())) for m in M.MODELS}
                    for n in M.ASSETS}
     out['last_window'] = {n: [str(hits(n, 'HS').index[-250].date()), str(hits(n, 'HS').index[-1].date())]
                           for n in M.ASSETS}
@@ -615,32 +1070,57 @@ def dq_test(hit, var, a, lags=4):
     return dict(DQ=dq, df=X.shape[1], p=float(stats.chi2.sf(dq, X.shape[1])))
 
 
-def dq_table(col='VaR1', a=0.01):
-    out = {}
-    for n in M.ASSETS:
-        for m in M.MODELS:
-            df = fc(n)[0][m]
-            out[f'{n}|{m}'] = dq_test((df['L'] > df[col]).astype(int).values, df[col].values, a)
+def dq_table(col='VaR1', a=.01):
+    if col not in {'VaR1':.01,'VaR2.5':.025,'VaR5':.05} or a!={'VaR1':.01,'VaR2.5':.025,'VaR5':.05}[col]:
+        raise ValueError('VaR column and probability must agree')
+    out={}
+    for name in M.ASSETS:
+        frames=fc(name)[0]; calendar,losses=canonical_sample(name)
+        validate_forecast_contract(frames,M.MODELS,calendar,losses,_FC_REPORTS[name])
+        for model in M.MODELS:
+            check=completeness(frames[model],calendar,[col],losses)
+            if not check['eligible']:
+                if check['reason']!='nonfinite_or_nonreal' or check.get('column')!=col:
+                    raise ValueError('Forecast contract violation: '+str(check))
+                out[f'{name}|{model}']=dict(status='withheld',reason=check,result=None)
+                continue
+            frame=frames[model]
+            result=dq_test((frame['L']>frame[col]).astype(int).values,frame[col].values,a)
+            out[f'{name}|{model}']=dict(status='computed',reason=None,result=result)
     return out
 
 
-def fig_var_pvalues4(tab, dq):
-    """Heat map of p-values: Kupiec, CC, durations and DQ (VaR 1%)."""
-    # 2 x 2 panels: cells wide enough for the p-values on a slide
-    fig, axs = plt.subplots(2, 2, figsize=(7.4, 3.8), sharex=True, sharey=True)
-    axs = axs.ravel()
-    for ax, (key, title) in zip(axs, (('p_uc', 'Kupiec POF'), ('p_cc', 'Christoffersen CC'),
-                                      ('p_dur', 'Duration (Weibull)'), ('dq', 'Dynamic Quantile'))):
-        if key == 'dq':
-            P = pd.DataFrame({M.LABELS[n]: [dq[f'{n}|{m}']['p'] for m in M.MODELS] for n in M.ASSETS}, index=M.MODELS)
-        else:
-            P = pd.DataFrame({M.LABELS[n]: [(tab[f'{n}|{m}'] if f'{n}|{m}' in tab else tab[(n, m)])[key]
-                                            for m in M.MODELS] for n in M.ASSETS}, index=M.MODELS)
-        pv_heatmap(ax, P, title=title)
+def fig_var_pvalues4(tab,dq):
+    fig,axs=plt.subplots(2,2,figsize=(7.4,4.2),sharex=True,sharey=True)
+    for ax,(key,title) in zip(axs.ravel(),(('p_uc','Kupiec POF'),('p_cc','Christoffersen CC'),('p_dur','Duration (Weibull)'),('dq','Dynamic Quantile'))):
+        values=[]
+        for model in M.MODELS:
+            row=[]
+            for name in M.ASSETS:
+                record=dq[f'{name}|{model}'] if key=='dq' else tab[(name,model)]
+                if record['status']=='withheld':
+                    if record['result'] is not None: raise ValueError('Withheld result must be None')
+                    value=np.nan
+                elif record['status']=='computed':
+                    value=record['result']['p' if key=='dq' else key]
+                    if not np.isfinite(value) or not 0<=value<=1:raise ValueError('Invalid computed p-value')
+                else:raise ValueError('Unknown metric status')
+                row.append(value)
+            values.append(row)
+        P=np.asarray(values,dtype=float)
+        ax.imshow(np.ma.masked_invalid(np.log10(np.clip(P,1e-4,1))),cmap=PV_CMAP,vmin=-4,vmax=0,aspect='auto')
+        for i in range(len(M.MODELS)):
+            for j in range(len(M.ASSETS)):
+                v=P[i,j]
+                txt='—' if np.isnan(v) else ('<.001' if v<.001 else f'{v:.3f}')
+                ax.text(j,i,txt,ha='center',va='center',fontsize=7,color='black')
+        ax.set_xticks(range(len(M.ASSETS)),[M.LABELS[n] for n in M.ASSETS],fontsize=7.5)
+        ax.set_yticks(range(len(M.MODELS)),M.MODELS,fontsize=7.5)
+        ax.set_title(title,fontsize=9)
+        for spine in ax.spines.values():spine.set_visible(False)
         ax.label_outer()
-        if not ax.get_subplotspec().is_last_row():
-            ax.tick_params(axis='x', length=0)
-    plt.tight_layout()
+    fig.text(.5,.015,'— withheld: incomplete sample',ha='center',fontsize=8)
+    fig.tight_layout(rect=(0,.05,1,1))
     save_fig('ch8_var_pvalues')
 
 
@@ -734,7 +1214,8 @@ def mc_size_power(reps=1000, seed=8, Ts=(250, 1000, 5000), a=0.01, w=1000):
 
 def mc_estimation_risk(reps=400, seed=9, Rw=1000, Ps=(250, 1000, 5000), a=0.01):
     """Estimation risk: GARCH-t estimated once on R = 1000 days (fixed scheme), VaR 1% over P days.
-    POF rejection rate at 5% with estimated versus true parameters, on the same paths."""
+    POF rejection rate at 5% with estimated versus true parameters, on the same paths.
+    If any replication has no admissible estimate, withhold estimated aggregates over the original replication set."""
     r0 = M.load_returns('sp500').values
     par = M.garch_fit(r0)
     rng = np.random.default_rng(seed)
@@ -744,9 +1225,22 @@ def mc_estimation_risk(reps=400, seed=9, Rw=1000, Ps=(250, 1000, 5000), a=0.01):
     rej_est = {P: 0 for P in Ps}
     rej_true = {P: 0 for P in Ps}
     rate_est = {P: [] for P in Ps}
+    fit_records=[]
+    unavailable=[]
     for i in range(reps):
         x = R[i, :Rw]
-        mu, om, al, be, nu = M.garch_fit(x)
+        v_true = -mu0 + S[i, Rw:] * M.t_std_q(nu0, a)
+        L = -R[i, Rw:]
+        for P in Ps:
+            ht = (L[:P] > v_true[:P]).astype(int)
+            rej_true[P] += M.kupiec(ht, a)['p'] < 0.05
+        try:
+            mu, om, al, be, nu = M.garch_fit(x)
+        except M.NoAdmissibleInitialFit:
+            unavailable.append(i)
+            fit_records.append(dict(replication=i, **M.garch_fit.last_diagnostic))
+            continue
+        fit_records.append(dict(replication=i, **M.garch_fit.last_diagnostic))
         nu = max(nu, 2.2)
         s2 = M.garch_filter(R[i], mu, om, al, be, np.var(x[:50]))
         v_est = -mu + np.sqrt(s2[Rw:Rw + Pm]) * M.t_std_q(nu, a)
@@ -754,13 +1248,17 @@ def mc_estimation_risk(reps=400, seed=9, Rw=1000, Ps=(250, 1000, 5000), a=0.01):
         L = -R[i, Rw:]
         for P in Ps:
             he = (L[:P] > v_est[:P]).astype(int)
-            ht = (L[:P] > v_true[:P]).astype(int)
             rej_est[P] += M.kupiec(he, a)['p'] < 0.05
-            rej_true[P] += M.kupiec(ht, a)['p'] < 0.05
             rate_est[P].append(he.mean())
-    return {str(P): dict(est=rej_est[P] / reps, true=rej_true[P] / reps,
-                         sd_rate=float(np.std(rate_est[P])), sd_binom=float(np.sqrt(a * (1 - a) / P)))
-            for P in Ps} | dict(reps=reps)
+    complete=not unavailable
+    return {str(P): dict(est=rej_est[P]/reps if complete else None,
+                         true=rej_true[P]/reps,
+                         sd_rate=float(np.std(rate_est[P])) if complete else None,
+                         sd_binom=float(np.sqrt(a*(1-a)/P)),
+                         estimated_status='computed' if complete else 'withheld')
+            for P in Ps} | dict(reps=reps, unavailable_replications=unavailable,
+                               fit_diagnostics=fit_records,
+                               estimated_reason=None if complete else 'incomplete original replication set')
 
 
 def gw_test(la, lb):
@@ -781,17 +1279,43 @@ def gw_table():
     return {f'{a}|FHS': gw_test(Lf[a], Lf['FHS']) for a in ('GARCH-t', 'HS', 'GARCH-EVT', 'Normal')}
 
 
-def nz_zones(standard='HS', internals=('GARCH-t', 'FHS', 'GARCH-EVT'), level=0.05):
-    """Three-zone comparative backtesting (Nolde & Ziegel, 2017): two one-sided DM tests on FZ0
-    of the internal model against the standard model. Green: internal significantly better; red: significantly worse."""
-    z = stats.norm.ppf(1 - level)
-    out = {}
-    for n in M.ASSETS:
-        Lf = fz_losses(n)
-        for m in internals:
-            dm = M.diebold_mariano(Lf[m], Lf[standard])['DM']
-            out[f'{n}|{m}'] = dict(DM=float(dm), zone='green' if dm < -z else ('red' if dm > z else 'yellow'))
+def nz_zones(standard='HS',internals=('GARCH-t','FHS','GARCH-EVT'),level=.05):
+    return comparative_zones(M.ASSETS,M.MODELS,lambda n:fc(n)[0],canonical_sample,
+                             M.fz0,M.diebold_mariano,standard,internals,level)
+
+
+def comparative_zones(assets, models, frames_for, canonical_for, fz0, diebold_mariano,
+                      standard='HS', internals=('GARCH-t','FHS','GARCH-EVT'), level=.05):
+    if standard not in models or any(m not in models for m in internals):
+        raise ValueError('Zone models must belong to the original universe')
+    if standard in internals:
+        raise ValueError('The standard cannot also be an internal model')
+    if not 0 < level < .5:
+        raise ValueError('level must lie between 0 and .5')
+    z=stats.norm.ppf(1-level)
+    out={}
+    for name in assets:
+        calendar,losses=canonical_for(name)
+        def evaluate(F):
+            Lf=pd.DataFrame({m:fz0(F[m]['L'].values,F[m]['VaR2.5'].values,F[m]['ES2.5'].values)
+                             for m in models},index=calendar)
+            if not np.isfinite(Lf.to_numpy()).all():
+                raise ValueError('FZ0 produced nonfinite scores on complete inputs')
+            result={}
+            for m in internals:
+                dm=diebold_mariano(Lf[m],Lf[standard])['DM']
+                if not np.isfinite(dm):
+                    raise ValueError('DM statistic is nonfinite; no zone assigned')
+                # Negative DM means lower FZ0 loss for the internal model.
+                result[m]=dict(DM=float(dm),zone='green' if dm < -z else ('red' if dm > z else 'yellow'))
+            return result
+        out[name]=execute_joint_metric(frames_for(name),models,calendar,losses,
+                                      ['VaR2.5','ES2.5'],evaluate)
     return out
+
+
+
+
 
 
 def elementary_scores(L, v, thetas, tau):
@@ -821,7 +1345,7 @@ def fig_murphy(name='sp500', mA='GARCH-t', mB='FHS'):
     axs[0].plot(100 * th, 1e4 * a_, color=MCOL[mA], lw=1.3, label=mA)
     axs[0].plot(100 * th, 1e4 * b_, color=MCOL[mB], lw=1.3, label=mB)
     axs[0].set_xlabel('Threshold θ (daily loss, %)')
-    axs[0].set_ylabel('Mean elementary score (×10⁴)')
+    axs[0].set_ylabel('Mean elementary\nscore (×10⁴)')
     axs[0].set_title('Murphy diagram, VaR 1%, S&P 500', fontsize=9)
     axs[1].fill_between(100 * th, 1e4 * (d - 1.96 * se), 1e4 * (d + 1.96 * se), color=LightGray, alpha=0.8,
                         label='95% pointwise band (HAC)')
@@ -846,6 +1370,54 @@ def fig_murphy(name='sp500', mA='GARCH-t', mB='FHS'):
                 th_sig_hi=float(th[sig_pos].max()) if sig_pos.any() else None)
 
 
+# Google-validated wrappers (synchronised from MFM_ch8_comparative)
+_original_murphy=murphy
+
+
+def murphy(name,mA,mB,col='VaR1',a=.01,n=240):
+    calendar,losses=canonical_sample(name)
+    result=execute_joint_metric(fc(name)[0],M.MODELS,calendar,losses,[col],
+                               lambda F:_original_murphy(name,mA,mB,col,a,n))
+    if result['status']=='withheld':raise ComparisonUnavailable(result['plan'])
+    return result['result']
+
+
+def unavailable_figure(name,asset):
+    fig,ax=plt.subplots(figsize=(5.4,3.3))
+    ax.text(.5,.5,'Comparison unavailable\n'+M.LABELS[asset],ha='center',va='center',transform=ax.transAxes)
+    ax.set_axis_off()
+    save_fig(name)
+
+
+_original_dm_figure=fig_dm_matrix
+
+
+def fig_dm_matrix(name='sp500'):
+    try:return dict(status='computed',result=_original_dm_figure(name))
+    except ComparisonUnavailable as e:
+        unavailable_figure('ch8_dm_matrix',name)
+        return dict(status='withheld',plan=e.plan,result=None)
+
+
+_original_gw_table=gw_table
+
+
+def gw_table():
+    try:return dict(status='computed',result=_original_gw_table())
+    except ComparisonUnavailable as e:return dict(status='withheld',plan=e.plan,result=None)
+
+
+_original_murphy_figure=fig_murphy
+
+
+def fig_murphy(name='sp500',mA='GARCH-t',mB='FHS'):
+    try:return dict(status='computed',result=_original_murphy_figure(name,mA,mB))
+    except ComparisonUnavailable as e:
+        unavailable_figure('ch8_murphy',name)
+        return dict(status='withheld',plan=e.plan,result=None)
+
+
+
 def murphy_summary(name, mA, mB, col, a):
     th, a_, b_, d, se = murphy(name, mA, mB, col, a)
     return dict(share_pos=float(np.mean(d > 0)), share_neg=float(np.mean(d < 0)),
@@ -853,22 +1425,21 @@ def murphy_summary(name, mA, mB, col, a):
                 crosses=bool((d > 0).any() and (d < 0).any()))
 
 
-def multinomial_table(N=4, a=0.025):
-    """Multinomial VaR test (Kratz, Lok & McNeil, 2018), Pearson statistic, N = 4 tail levels
-    a_j = a (1 - (j-1)/N): 2.5%, 1.875%, 1.25%, 0.625%; cells are defined through the PIT."""
-    lev = np.array([1 - a * (1 - j / N) for j in range(N)])      # 0.975, 0.98125, 0.9875, 0.99375
-    probs = np.diff(np.r_[0.0, lev, 1.0])
-    out = {}
-    for n in M.ASSETS:
-        for m in M.MODELS:
-            u = fc(n)[0][m]['pit'].values
-            cell = np.sum(u[:, None] > lev[None, :], axis=1)
-            O = np.bincount(cell, minlength=N + 1)
-            E = len(u) * probs
-            S = float(((O - E) ** 2 / E).sum())
-            out[f'{n}|{m}'] = dict(S=S, p=float(stats.chi2.sf(S, N)), O=O.tolist())
-    out['probs'] = probs.tolist()
-    return out
+def multinomial_table(N=4,a=.025):
+    lev=np.array([1-a*(1-j/N) for j in range(N)])
+    probs=np.diff(np.r_[0.,lev,1.]);out={}
+    for name in M.ASSETS:
+        frames,tails,calendar,losses=es_inputs(name)
+        for model in M.MODELS:
+            check=es_eligible(frames[model],calendar,losses)
+            if not check['eligible']:
+                out[f'{name}|{model}']=dict(status='withheld',reason=check,result=None);continue
+            u=frames[model]['pit'].values
+            cell=np.sum(u[:,None]>lev[None,:],axis=1)
+            O=np.bincount(cell,minlength=N+1);E=len(u)*probs
+            S=float(((O-E)**2/E).sum())
+            out[f'{name}|{model}']=dict(status='computed',reason=None,result=dict(S=S,p=float(stats.chi2.sf(S,N)),O=O.tolist()))
+    out['probs']=probs.tolist();return out
 
 
 def extras(R):
@@ -879,7 +1450,10 @@ def extras(R):
     R['gw'] = gw_table()
     R['nz'] = nz_zones()
     R['murphy'] = fig_murphy()
-    R['murphy_btc'] = murphy_summary('btc', 'HS', 'GARCH-EVT', 'VaR2.5', 0.025)
+    try:
+        R['murphy_btc'] = murphy_summary('btc', 'HS', 'GARCH-EVT', 'VaR2.5', 0.025)
+    except ComparisonUnavailable as e:
+        R['murphy_btc'] = dict(status='withheld', plan=e.plan)
     R['multinomial'] = multinomial_table()
     R['mc'] = mc_size_power()
     R['estrisk'] = mc_estimation_risk()
@@ -974,13 +1548,36 @@ def _bd_one(sym, dist, w, refit):
     return f'{sym}|{dist}|{w}|{refit}', pd.DataFrame({'r': r.loc[e.index].values, 'e': e.values})
 
 
+def esr_preflight():
+    """Check R before forecasts; install missing esback in the same temp library as ESBACK_R."""
+    import shutil
+    import subprocess
+    rscript = shutil.which('Rscript')
+    if rscript is None:
+        raise RuntimeError('ESR requires Rscript. Install R in this environment before running the forecast grid; no forecasts were started.')
+    code = """
+lib <- Sys.getenv('MFM_RLIB'); dir.create(lib, showWarnings = FALSE, recursive = TRUE); .libPaths(c(lib, .libPaths()))
+if (!requireNamespace('esback', quietly = TRUE))
+  install.packages('esback', lib = lib, repos = 'https://cloud.r-project.org', quiet = TRUE)
+if (!requireNamespace('esback', quietly = TRUE)) stop('esback is unavailable after installation; forecast grid was not started')
+cat('ESR preflight: R ', as.character(getRversion()), ', esback ', as.character(utils::packageVersion('esback')), '\n', sep='')
+"""
+    print('Checking Rscript and esback before the forecast grid...', flush=True)
+    env = dict(os.environ, MFM_RLIB=os.path.join(tempfile.gettempdir(), 'mfm_rlib'))
+    subprocess.run([rscript, '-e', code], check=True, env=env)
+
+
 def bd_replication(n_jobs=-1):
     """Table 3 design on the course data: GARCH(1,1)-N and GARCH(1,1)-t, five windows x five refit frequencies,
     one-sided Intercept ESR at 5%; share of the stocks rejected."""
+    esr_preflight()
     from joblib import Parallel, delayed
     jobs = [(s, d, w, k) for s in BD_STOCKS for d in ('normal', 't') for w in BD_WINDOWS for k in BD_REFITS]
-    series = dict(Parallel(n_jobs=n_jobs)(delayed(_bd_one)(*j) for j in jobs))
+    print(f'Forecast grid: {len(jobs)} tasks; joblib reports completed batches.', flush=True)
+    series = dict(Parallel(n_jobs=n_jobs, verbose=10)(delayed(_bd_one)(*j) for j in jobs))
+    print(f'Forecast grid complete: {len(series)} series. Starting ESR regressions in R.', flush=True)
     pv = esr_intercept(series)
+    print(f'R ESR stage complete: {len(pv)} regression results.', flush=True)
     rows = pd.DataFrame([dict(zip(('sym', 'dist', 'w', 'refit'), k.split('|')), T=len(series[k]),
                               p=pv.loc[k, 'p'], p2=pv.loc[k, 'p2'], error=pv.loc[k, 'error']) for k in series])
     rows[['w', 'refit']] = rows[['w', 'refit']].astype(int)

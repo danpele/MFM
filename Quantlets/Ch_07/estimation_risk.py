@@ -181,6 +181,8 @@ def fhs_bootstrap(r, alpha=0.01, B=999, seed=SEED, level=0.90, return_draws=Fals
     m1, s1 = garch_next(r, params)
     var0 = -m1 + s1 * np.quantile(-z, 1 - alpha)
     c, phi, om, al, be = params.values[:5]
+    if al + be >= 1 - 1e-10:
+        raise ValueError("Stationary bootstrap initialization requires alpha + beta strictly below 1; this fitted boundary model has no finite unconditional variance.")
     n = len(r)
     out = np.empty(B)
     parts = np.empty((B, 2))
@@ -281,7 +283,7 @@ def caviar_study(name, est_end='2015-12-31', oos_start='2016-01-01', alpha=0.01,
 def fig_caviar(v, fhs, name='sp500', title='S&P 500', start='2016-01-01'):
     d = fhs.loc[start:]
     fig, ax = plt.subplots(figsize=(10, 3.3))
-    ax.bar(d.index, d['loss'].clip(lower=0), width=1.5, color=Teal, alpha=0.45, label='Daily loss (gains set to 0)')
+    ax.vlines(d.index, 0, d['loss'].clip(lower=0), color=Teal, alpha=0.45, linewidth=0.6, label='Daily loss (gains set to 0)')
     ax.plot(d.index, v.loc[d.index], color=MainBlue, lw=0.9, label='CAViaR (SAV) VaR 1%, parameters from 2000-2015')
     ax.plot(d.index, d['fhs_var'], color=IDAred, lw=0.8, label='FHS VaR 1%, re-estimated every January')
     ax.set_ylabel('Daily loss (%)')
@@ -395,12 +397,12 @@ def fig_precision(INF, B6):
         y = len(rows) - 1 - i
         for m, (lo, hi) in iv.items():
             ax.plot([lo, hi], [y + offs[m], y + offs[m]], color=col[m], lw=2.6, solid_capstyle='butt')
-            # Interval length is visible directly; adjacent numeric labels obscured the bars.
+            ax.text(hi + 0.04, y + offs[m], f'{hi - lo:.2f}', va='center', fontsize=6.5, color='black')
         ax.plot([est, est], [y - 0.38, y + 0.38], color='black', lw=1.0)
     ax.set_yticks(range(len(rows)))
     ax.set_yticklabels([r[0] for r in rows][::-1], fontsize=8)
-    ax.set_xlabel('Daily loss (%); black tick = estimate, interval length = uncertainty')
-    ax.set_xlim(1.4, 5.2)
+    ax.set_xlabel('Daily loss (%); black tick = estimate, number = interval width')
+    ax.set_xlim(1.4, 4.9)
     for m, c in col.items():
         ax.plot([], [], color=c, lw=2.6, label=m)
     plt.tight_layout()
