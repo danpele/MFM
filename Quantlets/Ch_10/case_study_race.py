@@ -57,9 +57,9 @@ def race_prize(d):
 
 def fig_race_tax(d):
     fig, ax = plt.subplots(figsize=(9, 3.4))
-    ax.plot(d.index, d['tax6'], color=MainBlue, lw=0.8, label='Implied daily tax at mean traded value, Table XV col. 6: 0.3354 + 0.0066 x annualised realised volatility of the day (%), in bp')
-    ax.axhline(ABO['col2'], color=IDAred, lw=1.0, ls='--', label='Table XV col. 2: 0.4213 bp')
-    ax.axhline(ABO['lo'], color=Forest, lw=1.0, ls=':', label='Table XIV lowest and highest scenarios: 0.20 and 0.74 bp')
+    ax.plot(d.index, d['tax6'], color=MainBlue, lw=0.8, label='Implied daily tax at mean traded value, value-and-volatility specification: 0.3354 + 0.0066 x annualised realised volatility of the day (%), in bp')
+    ax.axhline(ABO['col2'], color=IDAred, lw=1.0, ls='--', label='Value-only specification: 0.4213 bp')
+    ax.axhline(ABO['lo'], color=Forest, lw=1.0, ls=':', label="The paper's lowest and highest scenarios: 0.20 and 0.74 bp")
     ax.axhline(ABO['hi'], color=Forest, lw=1.0, ls=':')
     top = d['tax6'].idxmax()
     ax.annotate(f"{top.day} {top.strftime('%B %Y')}: {d.loc[top, 'tax6']:.2f} bp\n(volatility {d.loc[top, 'sigma']:.1f}%)",
@@ -81,11 +81,11 @@ def fig_race_prize(P):
     x = np.arange(len(ys))
     w = 0.36
     fig, ax = plt.subplots(figsize=(9, 3.4))
-    b2 = ax.bar(x - w / 2, [P[y]['col2'] for y in ys], w, color=MainBlue, label='Table XV col. 2 (traded value)')
-    b6 = ax.bar(x + w / 2, [P[y]['col6'] for y in ys], w, color=IDAred, label='Table XV col. 6 (traded value and volatility)')
+    b2 = ax.bar(x - w / 2, [P[y]['col2'] for y in ys], w, color=MainBlue, label='Value-only specification (traded value)')
+    b6 = ax.bar(x + w / 2, [P[y]['col6'] for y in ys], w, color=IDAred, label='Value-and-volatility specification (traded value and volatility)')
     xr = x + w + 0.08                                             # range of the scenarios, to the right of each pair of bars
     ax.vlines(xr, [P[y]['lo'] for y in ys], [P[y]['hi'] for y in ys], color=Forest, lw=1.6,
-              label='Range between the Table XIV lowest and highest scenarios (0.20 to 0.74 bp)')
+              label="Range between the paper's lowest and highest scenarios (0.20 to 0.74 bp)")
     ax.scatter(np.r_[xr, xr], [P[y]['lo'] for y in ys] + [P[y]['hi'] for y in ys], color=Forest, marker='_', s=120, zorder=3)
     for bars in (b2, b6):
         for b in bars:

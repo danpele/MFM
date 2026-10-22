@@ -614,7 +614,7 @@ def fig_bad_ticks():
     res = data_pitfall()
     fig, ax = plt.subplots(figsize=(6.6, 2.1))
     ax.plot(mk.index, mk.values, color=IDAred, lw=0.6,
-            label=f"Market-data EUR/RON series: volatility {res['vol_market']:.1%}")
+            label=f"EODHD EUR/RON series: volatility {res['vol_market']:.1%}")
     ax.plot(bn.index, bn.values, color=MainBlue, lw=0.9, label=f"BNR reference rate: volatility {res['vol_bnr']:.1%}")
     for d, dy in [('2025-08-13', 0), ('2022-01-05', 0)]:
         t = pd.Timestamp(d)

@@ -397,7 +397,7 @@ def fig_memory_timeline(mm):
     ax.set_ylim(-0.04, 1.12)
     ax.xaxis.set_major_locator(mdates.YearLocator(4))
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-    legend_outside_bottom(ax, ncol=2, y=-0.16, markerscale=2)
+    legend_outside_bottom(ax, ncol=2, y=-0.16, markerscale=1)
     save_fig('ch15_memory_timeline')
 
 
@@ -514,6 +514,7 @@ def fig_news_coverage():
     ax.bar(tot.index.astype(int), tot.values / 1e3, color=MainBlue, width=0.75, label='Headlines about the stocks studied')
     ax.set_ylabel('Headlines (thousands)')
     ax.set_xlabel('Year (trading day the headline is assigned to)')
+    ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True))
     legend_outside_bottom(ax, ncol=1, y=-0.28)
     save_fig('ch15_news_coverage')
 
@@ -575,11 +576,12 @@ def fig_strategy():
     fig, ax = plt.subplots(figsize=(6.8, 3.1))
     for c in SCORE_LBL:
         St = R[c]['cum']
-        ax.plot(St.index, St['gross'].cumsum(), color=SCORE_COL[c], lw=1.1, label=f'{SCORE_LBL[c]}, before costs')
-        ax.plot(St.index, St['net'].cumsum(), color=SCORE_COL[c], lw=0.9, ls='--', label=f'{SCORE_LBL[c]}, 5 bp per trade')
+        short = {'lm': 'LM'}.get(c, SCORE_LBL[c])   # short labels keep the six-entry legend on two lines
+        ax.plot(St.index, St['gross'].cumsum(), color=SCORE_COL[c], lw=1.1, label=f'{short}, gross')
+        ax.plot(St.index, St['net'].cumsum(), color=SCORE_COL[c], lw=0.9, ls='--', label=f'{short}, net of 5 bp')
     ax.axhline(0, color=Gray, lw=0.6)
     ax.set_ylabel('Cumulative d+2 return (%, sum)')
-    legend_outside_bottom(ax, ncol=2, y=-0.14)
+    legend_outside_bottom(ax, ncol=3, y=-0.14)
     save_fig('ch15_strategy')
 
 
@@ -650,10 +652,11 @@ def fig_llt_decay():
     v = [LLT_FIG8[p] for p in per]
     fig, ax = plt.subplots(figsize=(5.6, 2.9))
     x = np.arange(len(per))
-    ax.bar(x, v, 0.55, color=MainBlue, label='GPT-4 drift strategy, overnight news (Figure 8)')
+    ax.bar(x, v, 0.55, color=MainBlue, label='GPT-4 drift strategy, overnight news')
     for xi, vi in zip(x, v):
-        ax.text(xi, vi + 0.12, f'{vi:.2f}', ha='center', va='bottom', fontsize=8.5, color='black')
-    ax.axhline(LLT_FULL_SR, color=IDAred, lw=1.0, ls='--', label=f'Full sample, Oct 2021 - May 2024 (Table 1): {LLT_FULL_SR:.2f}')
+        # labels inside the bars, so none collides with the full-sample line
+        ax.text(xi, vi - 0.15, f'{vi:.2f}', ha='center', va='top', fontsize=8.5, color='white')
+    ax.axhline(LLT_FULL_SR, color=IDAred, lw=1.0, ls='--', label=f'Full sample, Oct 2021–May 2024: {LLT_FULL_SR:.2f}')
     ax.set_xticks(x)
     ax.set_xticklabels(per)
     ax.set_ylim(0, 7.4)

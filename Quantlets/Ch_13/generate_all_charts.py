@@ -210,7 +210,7 @@ def fig_memory_estimation(d_ffd=0.25):
         ax.axhline(v, color=Gray, ls=':', lw=0.7)
     ax.axvline(0.65, color=Gray, ls='--', lw=0.7)
     ax.set_xlabel('Bandwidth exponent $a$ (number of frequencies $m = n^{a}$)')
-    ax.set_ylabel('Estimated memory $\\hat d$')
+    ax.set_ylabel('Estimated memory $\\hat\\delta$')
     ax.set_title('S&P 500, 2000-2026: memory parameter with 95% CI ($\\pm 1.96/(2\\sqrt{m})$)', fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=2, y=-0.25)
     plt.tight_layout()

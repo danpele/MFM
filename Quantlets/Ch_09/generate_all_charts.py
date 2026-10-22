@@ -675,8 +675,8 @@ def fig_csv_horizons():
     show = [('HAR-X', Amber, 'D'), ('LogHAR', IDAred, 'o'), ('HARQ', Orange, 'v'), ('EN', Purple, 's'),
             ('RF', Forest, '^'), ('NN10_2', MainBlue, 'P')]
     fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.4), sharey=True)
-    for ax, info, ttl in [(axes[0], 'HAR', r'$\mathcal{M}_{HAR}$: daily, weekly, monthly RV (Tables 2, 4, 6)'),
-                          (axes[1], 'ALL', r'$\mathcal{M}_{ALL}$: RV lags + 9 predictors (12 in total; Tables 3, 5, 7)')]:
+    for ax, info, ttl in [(axes[0], 'HAR', r'$\mathcal{M}_{HAR}$: daily, weekly, monthly RV'),
+                          (axes[1], 'ALL', r'$\mathcal{M}_{ALL}$: RV lags + 9 predictors (12 in total)')]:
         ax.axhline(1.0, color=Black, lw=0.8, ls='--', label='HAR = 1')
         for m, c, mk in show:
             ax.plot(range(3), [tab.loc[(h, info), m] for h in hz], marker=mk, ms=5, color=c, lw=1.3, label=csv_label(m))
