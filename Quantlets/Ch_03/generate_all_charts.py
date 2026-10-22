@@ -501,7 +501,7 @@ def fig_etf_alphas():
     axes[1].set_yticks(y, res.index)
     for i in range(L.shape[0]):
         for j in range(L.shape[1]):
-            axes[1].text(j, i, f'{L.values[i, j]:.2f}', ha='center', va='center', fontsize=6.5,
+            axes[1].text(j, i, f'{L.values[i, j] + 0.0:.2f}'.replace('-0.00', '0.00'), ha='center', va='center', fontsize=6.5,
                          color='white' if abs(L.values[i, j]) > 0.6 else 'black')
     axes[1].set_title('Factor loadings', fontsize=9, loc='left')
     plt.tight_layout()

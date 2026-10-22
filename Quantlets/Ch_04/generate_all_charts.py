@@ -555,20 +555,21 @@ def fig_frontier():
     wg, wt, wtl = w_gmv(S), w_tan(mu, S), w_long_only(S, mu)
     pt = lambda w: (np.sqrt(w @ S @ w), w @ mu)
     fig, ax = plt.subplots(figsize=(7, 4.4))
-    ax.plot(s_u, t, color=MainBlue, lw=1.4, label='Frontier, short sales allowed')
+    ax.plot(s_u, t, color=MainBlue, lw=1.4, label='Frontier, short sales')
     ax.plot(s_lo, t_lo, color=Forest, lw=1.4, ls='--', label='Frontier, long-only')
     for k, s in enumerate(SECTORS):
         ax.plot(np.sqrt(S[k, k]), mu[k], 's', color='#17A2B8', ms=4)
-        ax.annotate(s, (np.sqrt(S[k, k]), mu[k]), xytext=(-18, 3) if s == 'XLI' else (4, 2),
-                    textcoords='offset points', fontsize=7)
+        off = {'XLI': (-16, 4), 'XLV': (-4, -10), 'XLY': (2, 4), 'XLB': (4, -3), 'XLP': (-20, -2),
+               'XLU': (4, -6), 'XLF': (4, -7), 'XLK': (-4, 5), 'XLE': (4, 2)}.get(s, (4, 2))
+        ax.annotate(s, (np.sqrt(S[k, k]), mu[k]), xytext=off, textcoords='offset points', fontsize=7)
     for w, lab, c, mk in [(wg, 'GMV', Amber, 'o'), (wt, 'Tangency (MV)', IDAred, '*'),
                           (wtl, 'Tangency, long-only', Orange, 'D'), (w_ew(9), '1/N', Purple, '^')]:
         x, y = pt(w)
         ax.plot(x, y, mk, color=c, ms=8 if mk == '*' else 6, label=f'{lab}: Sharpe {y / x:.2f}')
     sm = max(np.sqrt(np.diag(S)).max(), pt(wt)[0]) * 1.1
-    ax.plot([0, sm], [0, sm * pt(wt)[1] / pt(wt)[0]], color=IDAred, lw=0.7, ls=':')
-    ax.set_xlim(0, sm)
-    ax.set_ylim(-0.02, 0.2)
+    ax.plot([0, sm], [0, sm * pt(wt)[1] / pt(wt)[0]], color=IDAred, lw=0.7, ls=':', label='Line through the tangency portfolio')
+    ax.set_xlim(0.08, sm)
+    ax.set_ylim(0.0, 0.2)
     ax.set_xlabel('Volatility (annualised)')
     ax.set_ylabel('Mean excess return (annualised)')
     ax.set_title(f'Nine sector ETFs, monthly excess returns {Rex.index[0]:%b %Y} - {Rex.index[-1]:%b %Y} (in-sample)',
@@ -615,10 +616,11 @@ def fig_estimation_error(T=60, nsim=25, seed=SEED):
             w = Si @ (lam * one + gam * m_hat)
             real_m.append(w @ mu)
             real_s.append(np.sqrt(w @ S @ w))
-        ax.plot(s_hat * np.sqrt(12), t * 12, color=IDAred, lw=0.5, alpha=0.5,
-                label='Estimated frontier (in-sample, 60 months)' if k == 0 else None)
-        ax.plot(np.array(real_s) * np.sqrt(12), np.array(real_m) * 12, color=Forest, lw=0.5, alpha=0.5,
-                label='Realised frontier (same weights, true parameters)' if k == 0 else None)
+        ax.plot(s_hat * np.sqrt(12), t * 12, color=IDAred, lw=0.5, alpha=0.5)
+        ax.plot(np.array(real_s) * np.sqrt(12), np.array(real_m) * 12, color=Forest, lw=0.5, alpha=0.5)
+        if k == 0:   # legend entries at full colour
+            ax.plot([], [], color=IDAred, lw=1.2, label='Estimated frontier (in-sample, 60 months)')
+            ax.plot([], [], color=Forest, lw=1.2, label='Realised frontier (same weights, true parameters)')
     for k in range(2000):
         X = rng.multivariate_normal(mu, S, T)
         m_hat, S_hat = X.mean(0), np.cov(X.T)
@@ -1514,7 +1516,7 @@ def fig_jkmp_paper():
             ax.text(x + (0.02 * span if x >= 0 else -0.02 * span), b.get_y() + b.get_height() / 2,
                     f'{x:.2f}' if j == 0 else f'{x:.3f}', va='center', ha='left' if x >= 0 else 'right',
                     fontsize=8, color='black')
-        ax.set_xlim(min(0, min(v)) - 0.25 * span if min(v) < 0 else 0, max(v) + 0.22 * span)
+        ax.set_xlim(min(0, min(v)) - 0.6 * span if min(v) < 0 else 0, max(v) + 0.22 * span)
     handles = [plt.Rectangle((0, 0), 1, 1, color=c) for c in cols]
     fig.legend(handles, names, loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=5, frameon=False)
     fig.suptitle('Out of sample 1981-2020, US stocks, wealth \\$10 billion (Markowitz-ML off scale)',

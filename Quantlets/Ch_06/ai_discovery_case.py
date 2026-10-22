@@ -75,12 +75,12 @@ def fig_ai_inflation(df, res):
     ax = axes[1]
     for i, (k, col, lab) in enumerate((('full', Amber, 'full sample'), ('pre2022', Forest, '2002-2021'))):
         b, se = res[k]['b'], res[k]['b_se']
-        ax.errorbar(b, i, xerr=1.96 * se, fmt='o', color=col, capsize=3, label=f'Slope b, {lab}, 95% HAC interval')
+        ax.errorbar(b, i, xerr=1.96 * se, fmt='o', color=col, capsize=3, label=f'Slope $\\gamma_1$, {lab}, 95% HAC interval')
     ax.axvline(0, color='black', lw=0.8)
     ax.set_yticks([0, 1])
     ax.set_yticklabels(['Full', '2002-2021'])
     ax.set_ylim(-0.7, 1.7)
-    ax.set_xlabel('b per percentage point of inflation')
+    ax.set_xlabel(r'$\gamma_1$ per percentage point of inflation')
     hs, ls_ = [], []
     for a_ in axes:
         h_, l_ = a_.get_legend_handles_labels()

@@ -614,14 +614,14 @@ def fig_bad_ticks():
     res = data_pitfall()
     fig, ax = plt.subplots(figsize=(6.6, 2.1))
     ax.plot(mk.index, mk.values, color=IDAred, lw=0.6,
-            label=f"EODHD EUR/RON series: volatility {res['vol_market']:.1%}")
+            label=f"Market-data EUR/RON series: volatility {res['vol_market']:.1%}")
     ax.plot(bn.index, bn.values, color=MainBlue, lw=0.9, label=f"BNR reference rate: volatility {res['vol_bnr']:.1%}")
     for d, dy in [('2025-08-13', 0), ('2022-01-05', 0)]:
         t = pd.Timestamp(d)
         ax.annotate(f'{t:%d %b %Y}: {mk[t]:.2f}', (t, mk[t]), xytext=(-8, 0), textcoords='offset points', ha='right',
                     va='center', fontsize=7, color='black')
     ax.set_ylabel('RON per EUR'); ax.set_ylim(4.2, 6.05)
-    ax.set_title('EUR/RON 2015-2026 from two sources', fontsize=9, loc='left')
+    ax.set_title('EUR/RON 2015–2026 from two sources', fontsize=9, loc='left')
     bottom_legend(fig, ncol=2)
     save_fig('ch0_bad_ticks')
     return res

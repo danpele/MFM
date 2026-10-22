@@ -208,7 +208,7 @@ def fig_vr_profile():
         ax.axhline(1, color=Gray, lw=0.6)
         ax.set_title(LABELS[k], fontsize=8.5, loc='left', color=c)
     for ax in axes[1]:
-        ax.set_xlabel('Horizon q (days)\nCurve is descriptive')
+        ax.set_xlabel('Horizon q (days)\nBeyond q = 20: descriptive only')
     for ax in axes[:, 0]:
         ax.set_ylabel('Variance ratio')
     h, l = axes[0, 0].get_legend_handles_labels()
