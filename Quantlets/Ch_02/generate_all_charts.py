@@ -166,7 +166,7 @@ def fig_acf_markets(t):
         ax.set_ylim(-0.6, h - 0.4)
         ax.set_xlabel(r'Lag-1 autocorrelation $\hat\rho_1$')
     handles = [plt.Line2D([], [], color=c, marker='o', ls='', label=g) for g, c in GROUP_COL.items()]
-    handles += [plt.Line2D([], [], color=Gray, lw=0.8, label=r'i.i.d. 95% band $\pm 1.96/\sqrt{T}$'),
+    handles += [plt.Line2D([], [], color=Gray, lw=0.8, label=r'i.i.d. 95% interval $\hat\rho_1 \pm 1.96/\sqrt{T}$'),
                 plt.Line2D([], [], color='k', lw=0.9, label='Robust 95% interval (bars)')]
     axes[0].set_title('Lag-1 autocorrelation of daily log returns across markets (full samples)', fontsize=9, loc='left')
     plt.tight_layout()
