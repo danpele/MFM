@@ -239,6 +239,7 @@ def fig_rolling_beta(window=252):
         ax.plot(b.index, b.values, color=c, lw=0.8, label=f'{s[:-3]} ({SECTOR_NAMES[s[:-3]]})')
         out[s[:-3]] = dict(min=float(b.min()), max=float(b.max()), last=float(b.dropna().iloc[-1]))
     ax.axhline(1, color=Gray, lw=0.6, ls=':')
+    ax.set_xlim(b.dropna().index[0], r.index[-1])
     ax.set_ylabel('252-day rolling beta vs SPY')
     ax.set_title('Betas are not constant: rolling one-year betas of sector ETFs', fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=4, y=-0.13)
@@ -315,15 +316,15 @@ def fig_beta_shrink():
 def fig_factor_cum():
     F = factors('M').loc[:END]
     cols = ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA', 'MOM']
-    fig, ax = plt.subplots(figsize=(7.0, 3.1))
+    fig, ax = plt.subplots(figsize=(7.0, 4.6))
     out = {}
     for c, col in zip(cols, [MainBlue, '#17A2B8', IDAred, Forest, Purple, Orange]):   # six clearly distinct hues
         wealth = (1 + F[c]).cumprod()
         ax.plot(wealth.index, wealth.values, color=col, lw=0.9, label=c)
         out[c] = float(wealth.iloc[-1])
     ax.set_yscale('log')
-    ax.set_ylabel('Compounded return index, start = 1')
-    ax.set_title(f'Excess and long-short factor returns, {F.index[0]:%b %Y} - {F.index[-1]:%b %Y} (Kenneth French data)',
+    ax.set_ylabel('Growth of 1 (log scale)')
+    ax.set_title(f'Excess and long-short factor returns, {F.index[0]:%b %Y}–{F.index[-1]:%b %Y} (Kenneth French data)',
                  fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=6, y=-0.13)
     plt.tight_layout()
@@ -385,7 +386,7 @@ def fig_false_discoveries(M=300, T=600, reps=2000):
     axes[1].axvline(bonf, color=IDAred, ls='--', lw=0.9, label=f'Bonferroni threshold {bonf:.2f}')
     axes[1].axvline(3.0, color=Gray, ls=':', lw=0.9, label='t = 3.0')
     axes[1].set_xlabel('Largest |t| among 300 useless factors')
-    axes[1].set_title('The best "factor" always looks strong', fontsize=9, loc='left')
+    axes[1].set_title('The best useless factor often looks strong', fontsize=9, loc='left')
     legend_outside_bottom(axes[1], ncol=1, y=-0.25)
     plt.tight_layout()
     save_fig('ch3_false_discoveries')

@@ -11,6 +11,8 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+import matplotlib
+import matplotlib.ticker
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import warnings
@@ -255,6 +257,9 @@ def fig_hurst_rs():
         ax.set_xlabel('Window length n (days)')
         ax.set_title(f'{LABELS[k]}: raw H = {h:.2f}, corrected H = {h_al:.2f}', fontsize=8.5, loc='left', color=c)
     axes[0].set_ylabel('Mean rescaled range R/S')
+    axes[0].yaxis.set_major_locator(matplotlib.ticker.FixedLocator([2, 5, 10, 20, 50, 100]))
+    axes[0].yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    axes[0].yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
     handles = [plt.Line2D([], [], color=MainBlue, marker='o', ls='', ms=3.5, label='Observed R/S, S&P 500'),
                plt.Line2D([], [], color=IDAred, marker='o', ls='', ms=3.5, label='Observed R/S, BET'),
                plt.Line2D([], [], color=Gray, lw=1, label='Expected R/S under i.i.d. (Anis-Lloyd)'),
