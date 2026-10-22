@@ -181,7 +181,8 @@ def fig_qsd_gap(t):
     ax.set_xticklabels([f'{n} ({k})' for k, n in zip(t.index, t.name)], fontsize=7.5, rotation=30, ha='right')
     ax.set_ylabel(r'QSD GARCH(1,1)-t estimate')
     ax.set_title(f'Quasi score-driven GARCH(1,1)-t, 11 S&P 500 stocks, {QSD_START[:4]}\u2013{QSD_END[:4]}: '
-                 '\n' r'tail parameter $\hat\xi$ vs downweighting $\hat\zeta$', color='black')
+                 '\n' r'tail minus downweighting $\hat\xi-\hat\zeta$, and $\hat\zeta$', color='black')
+    ax.set_ylim(top=0.22)
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.36), ncol=3, frameon=False)
     save_fig('ch5_qsd_gap')
 
