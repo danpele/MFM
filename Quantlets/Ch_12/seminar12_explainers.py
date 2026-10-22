@@ -258,7 +258,8 @@ def fig_newton(S=100.0, K=100.0, tau=0.5, r=0.01, cmkt=9.0, s0=0.10):
         p, v = bs_call(S, K, tau, r, s), bs_vega(S, K, tau, r, s)
         s_new = s - (p - cmkt) / v
         xs = np.array([s, s_new])
-        ax.plot(xs * 100, p + v * (xs - s), color=Forest, lw=0.9, label='Tangent (Newton step)' if k == 0 else '_')
+        ax.plot(xs * 100, p + v * (xs - s), color=Forest, lw=1.8, ls=(0, (3, 1.5)), zorder=4,
+                label='Tangent (Newton step)' if k == 0 else '_')
         ax.plot(s * 100, p, 'o', color=Forest, ms=3.5)
         if k < 2:
             ax.text(s * 100 + 0.8, p - 1.4, f'$\\sigma_{k}$', color=Forest, fontsize=7)

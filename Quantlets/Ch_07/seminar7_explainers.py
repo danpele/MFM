@@ -172,7 +172,7 @@ def fig_discrete(p=0.04, lgd=50):
 
 
 # =============================================================================
-# (4) ES as the minimum of G(v) = v + E[(L - v)+] / alpha (Normal loss)
+# (4) ES as the minimum of F(v) = v + E[(L - v)+] / alpha (Normal loss)
 # =============================================================================
 def fig_es_min(alpha=0.025):
     v = np.linspace(0.5, 3.5, 300)
@@ -180,7 +180,7 @@ def fig_es_min(alpha=0.025):
     G = v + EL / alpha
     var = stats.norm.ppf(1 - alpha); es = stats.norm.pdf(var) / alpha
     fig, ax = plt.subplots(figsize=HALF)
-    ax.plot(v, G, color=MainBlue, lw=1.5, label=r'$G(v) = v + \mathrm{E}[(L-v)_+]/\alpha$')
+    ax.plot(v, G, color=MainBlue, lw=1.5, label=r'$F(v) = v + \mathrm{E}[(L-v)_+]/\alpha$')
     ax.plot(var, es, 'o', color=IDAred, ms=4.5, label='minimum')
     ax.vlines(var, 1.9, es, color=IDAred, lw=0.8, ls='--')
     ax.hlines(es, 0.5, var, color=Forest, lw=0.8, ls='--')
@@ -188,7 +188,7 @@ def fig_es_min(alpha=0.025):
     ax.text(0.55, es + 0.05, f'min = ES = {es:.2f}', color=Forest, fontsize=7.2, bbox=dict(facecolor='white',edgecolor='none',pad=.8))
     ax.set_xlim(0.5, 3.5); ax.set_ylim(1.9, 3.6)
     ax.set_xlabel('Candidate threshold $v$')
-    ax.set_ylabel('$G(v)$')
+    ax.set_ylabel('$F(v)$')
     ax.set_title(r'$L \sim N(0, 1)$, $\alpha$ = 2.5%', loc='left')
     bottom_legend(fig, ax, ncol=1)
     save_fig(fig, 'ch7_sem_primer_es_min')

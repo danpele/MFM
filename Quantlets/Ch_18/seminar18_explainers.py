@@ -210,7 +210,7 @@ def fig_mes(seed=7, n=2500, beta=1.2, s_m=1.0, s_e=1.0, alpha=0.05):
 
 
 # =============================================================================
-# (iv) SRISK per unit of equity as a function of leverage; zero at L*
+# (iv) SRISK per unit of equity as a function of leverage; zero at Lambda*
 # =============================================================================
 def fig_srisk(k=0.08, lrmes=(0.2, 0.3, 0.5)):
     L = np.linspace(1, 20, 400)
@@ -221,14 +221,14 @@ def fig_srisk(k=0.08, lrmes=(0.2, 0.3, 0.5)):
         s = k * (L - 1) - (1 - k) * (1 - lr)          # SRISK / W, with D = (L - 1) W
         Ls = 1 + (1 - k) * (1 - lr) / k
         out[lr] = Ls
-        ax.plot(L, s, color=c, lw=1.6, label=f'LRMES {100 * lr:.0f}%: $L^*$ = {Ls:.1f}')
+        ax.plot(L, s, color=c, lw=1.6, label=f'LRMES {100 * lr:.0f}%: $\\Lambda^*$ = {Ls:.1f}')
         ax.plot(Ls, 0, 'o', color=c, ms=4)
     ax.axhline(0, color=Navy, lw=0.8)
     ax.fill_between(L, 0, 0.75, color=BandBlue, alpha=0.6, lw=0)
     ax.text(1.6, 0.6, 'capital shortfall', color=Navy, fontsize=7)
     ax.text(12.5, -0.62, 'surplus', color=Navy, fontsize=7)
     ax.set_xlim(1, 20); ax.set_ylim(-0.8, 0.75)
-    ax.set_xlabel('Leverage $L = (D + W)/W$')
+    ax.set_xlabel('Leverage $\\Lambda = (D + W)/W$')
     ax.set_ylabel('SRISK / $W$')
     ax.set_title('$k$ = 8%', loc='left')
     bottom_legend(fig, ax, ncol=2)

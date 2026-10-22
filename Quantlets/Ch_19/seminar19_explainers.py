@@ -193,7 +193,7 @@ def fig_profile(T=2000, seed=21):
     ax.set_title(f'Simulated GARCH, $T$ = {T:,}', loc='left')
     ax = axes[1]
     hh = np.arange(0, 201)
-    for p, col in ((0.95, Forest), (0.98, Amber), (0.99, MainBlue), (0.999, IDAred)):
+    for p, col in ((0.95, Forest), (0.99, MainBlue), (0.999, IDAred)):
         hl = np.log(0.5) / np.log(p)
         ax.plot(hh, p ** hh, color=col, lw=1.3, label=f'$p$ = {p:g} ({hl:.0f} days)')
     ax.axhline(0.5, color=Navy, lw=0.7, ls=':')
@@ -268,7 +268,7 @@ def fig_var_es(nu=5):
     n_, t_ = out['Normal'], out[f'Student-$t$({nu})']
     bottom_legend(fig, ncol=2, handles=handles,
                   labels=[f"Normal: VaR {n_['var1']:.2f}, ES {n_['es25']:.2f}",
-                          f"Student-$t$({nu}): VaR {t_['var1']:.2f}, ES {t_['es25']:.2f}", '$-$VaR 1%', '$-$ES 2.5%'])
+                          f"Student-$t$({nu})", '$-$VaR 1%', '$-$ES 2.5%'])
     save_fig(fig, 'ch19_sem_primer_var_es')
     return out
 

@@ -284,7 +284,7 @@ def fig_costs(T=240, seed=11):
 # =============================================================================
 # (7) the two-sided z-test: rejection region and p-value on the standard Normal density
 # =============================================================================
-def fig_ztest(z_obs=1.47):
+def fig_ztest(z_obs=1.20):
     x = np.linspace(-4, 4, 801)
     f = stats.norm.pdf(x)
     p = 2 * stats.norm.sf(abs(z_obs))

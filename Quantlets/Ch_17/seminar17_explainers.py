@@ -116,7 +116,7 @@ def adf_t(y):
 # =============================================================================
 # (1) a rational bubble that bursts (Blanchard-Watson), on top of growing fundamentals
 # =============================================================================
-def fig_bubble(seed=21, n=60, r=0.06, g=0.02, pi=0.9, B0=15.0, F0=50.0):
+def fig_bubble(seed=21, n=60, r=0.06, g=0.02, pi=0.9, B0=10.0, F0=40.0):
     rng = np.random.default_rng(seed)
     t = np.arange(n + 1)
     F = F0 * (1 + g) ** t
@@ -187,8 +187,8 @@ def fig_df_dist(seed=3, n=200, R=5000):
     ax.hist(t, bins=70, density=True, color=BandBlue, label=f'$t_b$ under a random walk ({R} paths, $T = {n}$)')
     xs = np.linspace(-5, 4, 300)
     ax.plot(xs, stats.norm.pdf(xs), color=Forest, lw=1.0, label='$N(0, 1)$: not the right reference')
-    ax.axvline(q05, color=MainBlue, lw=0.9, ls='--', label=f'5% quantile {q05:.2f}: left-tailed test')
-    ax.axvline(q95, color=IDAred, lw=0.9, ls='--', label=f'95% quantile {q95:.2f}: right-tailed test')
+    ax.axvline(q05, color=MainBlue, lw=0.9, ls='--', label='5% quantile: left-tailed test')
+    ax.axvline(q95, color=IDAred, lw=0.9, ls='--', label='95% quantile: right-tailed test')
     ax.axvline(1.645, color=Amber, lw=0.9, ls=':', label='1.645: almost never exceeded')
     ax.set_xlabel('ADF statistic $t_b = \\hat b/\\mathrm{SE}(\\hat b)$')
     ax.set_ylabel('Density')

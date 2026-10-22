@@ -75,10 +75,13 @@ def save_seminar_figure(fig,name,folder):
             fig.axes[2].set_xlabel('Memory; 95% CI',fontsize=8)
             for ax,pos in zip(fig.axes[:3],[[.08,.40,.20,.43],[.40,.40,.17,.43],[.79,.40,.19,.43]]):ax.set_position(pos)
             fig.axes[2].set_yticklabels(['log price (ELW)','FFD (ELW)','returns (LW)','|returns| (LW)'])
-            fig.axes[2].set_ylim(4,-.5)
+            fig.axes[2].set_ylim(3.6,-.95)
             fig.axes[2].set_xlim(-.25,1.3)
             for text in fig.axes[2].texts:
-                if hasattr(text,'xyann'):text.xyann=(-15,-10)
+                if hasattr(text,'xyann'):
+                    # value above its own marker, clear of the interval and of the neighbouring rows
+                    text.xy=(float(text.get_text()),text.xy[1]);text.xyann=(0,4);text.set_ha('center');text.set_va('bottom')
+                    text.set_bbox(dict(facecolor='white',edgecolor='none',alpha=.9,pad=.3))
             fig.axes[0].set_ylabel('')
         if key=='a1_weights':
             for ax,title in zip(fig.axes,['Absolute weights','Partial sums','Decomposition']):ax.set_title(title,loc='left',fontsize=8)
