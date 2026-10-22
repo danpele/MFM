@@ -650,7 +650,7 @@
                 title: { en: 'Market Efficiency: From EMH to Adaptive Markets', ro: 'Eficiența pieței: de la EMH la piețe adaptive' },
                 topics: {
                     en: ['Efficient Market Hypothesis', 'Adaptive Market Hypothesis', 'Time-varying efficiency (rolling Hurst, variance ratio)', 'Anomalies'],
-                    ro: ['Ipoteza pieței eficiente', 'Ipoteza pieței adaptive', 'Eficiență variabilă în timp (Hurst rulant, variance ratio)', 'Anomalii']
+                    ro: ['Ipoteza pieței eficiente', 'Ipoteza pieței adaptive', 'Eficiență variabilă în timp (Hurst rolling, variance ratio)', 'Anomalii']
                 },
                 links: efficiencyLinks,
                 quantinar: q('cryptoEfficiency', 'gmm')

@@ -390,7 +390,7 @@ def fig_concentration():
 
 
 # =============================================================================
-# FIG 7: Corelatii rulante: actiuni-obligatiuni si Bitcoin-actiuni
+# FIG 7: Corelatii rolling: actiuni-obligatiuni si Bitcoin-actiuni
 # =============================================================================
 def fig_rolling_correlations(window=252):
     eq = np.log(px['S&P 500'].dropna()).diff()              # dropna before diff: own calendar
@@ -419,7 +419,7 @@ def fig_rolling_correlations(window=252):
 
 
 # =============================================================================
-# FIG 8: Volatilitate rulanta: Bitcoin vs S&P 500
+# FIG 8: Volatilitate rolling: Bitcoin vs S&P 500
 # =============================================================================
 def fig_rolling_vol(window=63):
     eq = np.log(px['S&P 500'].dropna()).diff()

@@ -496,7 +496,7 @@ def fig_risk_return(t):
 
 
 # =============================================================================
-# FIG 14: Volatilitate rulanta (clustering in timp)
+# FIG 14: Volatilitate rolling (clustering in timp)
 # =============================================================================
 def fig_rolling_vol():
     fig, ax = plt.subplots(figsize=(7.0, 2.9))

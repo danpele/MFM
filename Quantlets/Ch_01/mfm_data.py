@@ -89,7 +89,7 @@ def log_returns(close, max_abs=None):
 
 
 # =============================================================================
-# ESTIMATORI DE VOLATILITATE (anualizati, fereastra rulanta n zile)
+# ESTIMATORI DE VOLATILITATE (anualizati, fereastra rolling de n zile)
 # =============================================================================
 def vol_close_to_close(df, n=21, periods=252):
     r = np.log(df['Close']).diff()
