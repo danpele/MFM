@@ -2,12 +2,13 @@
 ai_discovery_case.py -- Capitolul 19, mini-caz „AI pentru descoperire stiintifica” (replicare, apoi extindere)
 ==========================================================================================================
 Pornim de la rezultatele deja calculate in capitolele anterioare:
-  * Capitolul 8 (Quantlets/Ch_08/ch8_results.json, cheia var99): VaR 1% pentru 4 active x 6 modele,
-    cu testele Kupiec (acoperire neconditionata) si Christoffersen (acoperire conditionata);
+  * Capitolul 8 (Quantlets/Ch_08/ch8_results.json, cheia var99): VaR 1% pentru 6 modele, cu testele Kupiec
+    (acoperire neconditionata) si Christoffersen (acoperire conditionata);
   * Capitolul 19 (ch19_results.json): acelasi model FHS pe BET, dar pe alt esantion de evaluare.
 Pasul 1 (replicare): FHS pe BET in cele doua capitole -- aceeasi metoda, ferestre diferite.
-Pasul 2 (extindere): 24 de teste de acoperire conditionata (4 active x 6 modele) tratate ca o familie:
+Pasul 2 (extindere): 12 teste de acoperire conditionata (S&P 500 si BET x 6 modele) tratate ca o familie:
   respingeri la 5% fara corectie, cu corectia Holm (FWER) si cu Benjamini-Hochberg (FDR 5%).
+  Bitcoin si EUR/RON nu intra in familie: Capitolul 8 retine prognozele bazate pe GARCH pentru ele.
 Iesire: ai_discovery_case.json
 """
 
@@ -18,6 +19,8 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 CH8 = os.path.join(HERE, '..', 'Ch_08', 'ch8_results.json')
 ALPHA = 0.05
+ASSETS = ('sp500', 'bet')            # the markets on which Chapter 8 computes all six models
+MODELS = ('HS', 'Normal', 'Student-t', 'GARCH-t', 'FHS', 'GARCH-EVT')
 
 
 def holm(p):
@@ -44,8 +47,38 @@ def bh(p):
     return adj
 
 
+def ch8_family(var99):
+    """The family defined explicitly for the revised mini-case: VaR 1% conditional-coverage tests of Chapter 8 for ASSETS x MODELS.
+
+    Chapter 8 stores each entry as {status, reason, result} (older files: the result alone). Every member of the
+    family must be present, computed and carry finite p-values in [0, 1]; otherwise the run stops before writing,
+    so the family is never shrunk silently. Returns the family and the Chapter 8 entries left outside it."""
+    want = [f'{a}|{m}' for a in ASSETS for m in MODELS]
+    out, problems = {}, []
+    for k in want:
+        v = var99.get(k)
+        if v is None:
+            problems.append(k + ': missing')
+            continue
+        if 'status' in v:
+            if v['status'] != 'computed' or v.get('result') is None:
+                problems.append(k + ': ' + str(v['status']))
+                continue
+            v = v['result']
+        if not all(isinstance(v.get(c), (int, float)) and 0 <= v[c] <= 1 for c in ('p_uc', 'p_cc')):
+            problems.append(k + ': p-value not in [0, 1]')
+            continue
+        out[k] = v
+    if problems:
+        raise SystemExit('The family of %d tests is incomplete (%s); ai_discovery_case.json is left unchanged.'
+                         % (len(want), '; '.join(problems)))
+    outside = {k: (v.get('status', 'computed') if isinstance(v, dict) else 'computed') for k, v in var99.items()
+               if k not in out}
+    return out, outside
+
+
 def main():
-    v8 = json.load(open(CH8))['var99']
+    v8, outside = ch8_family(json.load(open(CH8))['var99'])
     c19 = json.load(open(os.path.join(HERE, 'ch19_results.json')))
     keys = list(v8.keys())
     pcc = np.array([v8[k]['p_cc'] for k in keys])
@@ -59,7 +92,7 @@ def main():
         rep19=dict(T=c19['backtest']['FHS']['T'], x=c19['backtest']['FHS']['x'],
                    rate=100 * c19['backtest']['FHS']['rate'], p_uc=c19['backtest']['FHS']['p_uc'],
                    p_cc=c19['backtest']['FHS']['p_cc'], start=c19['eval']['start']),
-        n_tests=len(keys), rej_raw=int((pcc < ALPHA).sum()), rej_holm=int((h < ALPHA).sum()),
+        family=list(ASSETS), outside_family=outside, n_tests=len(keys), rej_raw=int((pcc < ALPHA).sum()), rej_holm=int((h < ALPHA).sum()),
         rej_bh=int((b < ALPHA).sum()),
         pass_all_raw=[m for m in models if survive_raw[m]], pass_all_holm=[m for m in models if survive[m]],
         table={k: dict(p_cc=float(pcc[i]), holm=float(h[i]), bh=float(b[i])) for i, k in enumerate(keys)})
