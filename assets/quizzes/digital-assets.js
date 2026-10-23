@@ -165,7 +165,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "În jurul lui martie 2020",
                     "Niciodată"
                 ],
-                "correctExplanation": "Corelația pe fereastră mobilă a crescut brusc în martie 2020 și a rămas în jur de 0,4 de atunci.",
+                "correctExplanation": "Corelația pe fereastră rolling a crescut brusc în martie 2020 și a rămas în jur de 0,4 de atunci.",
                 "incorrectExplanation": "Ruptura a avut loc odată cu pandemia din 2020, nu la lansarea ETF-urilor."
             }
         },

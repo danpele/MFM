@@ -375,9 +375,9 @@ window.MFM_DATA.quizzes['signatures'] = {
             },
             "ro": {
                 "title": "Alegerea lui lambda fără look-ahead bias",
-                "text": "Într-un studiu de prognoză pe fereastră mobilă, ce alegere a penalizării LASSO evită look-ahead bias?",
+                "text": "Într-un studiu de prognoză pe fereastră rolling, ce alegere a penalizării LASSO evită look-ahead bias?",
                 "options": [
-                    "Validare încrucișată pe tot eșantionul, o dată, înaintea buclei mobile",
+                    "Validare încrucișată pe tot eșantionul, o dată, înaintea buclei rolling",
                     "Lambda care minimizează QLIKE în afara eșantionului",
                     "Un criteriu precum BIC sau o validare ordonată în timp, calculate în fiecare fereastră de antrenare",
                     "Cel mai mare lambda care păstrează toți termenii HAR pe o traiectorie LASSO estimată folosind întregul eșantion, inclusiv perioada de evaluare"
@@ -647,7 +647,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                 "title": "Ineficiența ponderilor nucleului",
                 "text": "În crahul COVID-19, ponderile nucleului au rămas aproape plate și chiar au redus ponderea ferestrelor de stres trecute. Care este motivul principal?",
                 "options": [
-                    "Fereastra mobilă era prea scurtă pentru a conține vreo perioadă de stres",
+                    "Fereastra rolling era prea scurtă pentru a conține vreo perioadă de stres",
                     "Nucleul a fost calculat cu semnul greșit",
                     "LASSO a eliminat nucleul",
                     "Nucleul de semnătură este invariant la translație: compară forma ferestrelor, nu nivelul volatilității"

@@ -216,7 +216,7 @@ window.MFM_DATA.quizzes['dependence'] = {
                 text: 'În modelul DCC al lui Engle (2002), H_t = D_t R_t D_t. Ce determină R_t?',
                 options: [
                     'O recursie de tip GARCH Q_t = (1-a-b)Qbar + a e e\' + b Q_{t-1} pe reziduurile standardizate, rescalată la o matrice de corelație',
-                    'O fereastră mobilă de lungime fixă',
+                    'O fereastră rolling de lungime fixă',
                     'Indicele VIX',
                     'Este constantă în timp'
                 ],
@@ -483,7 +483,7 @@ window.MFM_DATA.quizzes['dependence'] = {
             },
             ro: {
                 title: "O dată de ruptură aleasă vizual",
-                text: "Alegeți ianuarie 2022 de pe graficul corelației mobile și apoi testați o schimbare a corelației la acea dată cu un test Fisher z. Testul este:",
+                text: "Alegeți ianuarie 2022 de pe graficul corelației rolling și apoi testați o schimbare a corelației la acea dată cu un test Fisher z. Testul este:",
                 options: [
                     "Cu nivel real prea mare: data a fost aleasă pe baza datelor; folosiți un test cu dată necunoscută, precum Wied, Krämer și Dehling (2012)",
                     "Cu nivel exact, pentru că data este fixată înainte de calculul statisticii",

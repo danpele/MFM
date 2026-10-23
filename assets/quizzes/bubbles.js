@@ -166,7 +166,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
                     "Sînt mereu detectate de testul Jarque-Bera"
                 ],
                 "correctExplanation": "Colapsurile readuc prețul în jos de mai multe ori, așa că un singur test pe întregul eșantion caută o singură rădăcină explozivă și le ratează pe cele scurte.",
-                "incorrectExplanation": "Problema este puterea testului: o regresie pe întregul eșantion amestecă fazele explozive cu colapsurile, ceea ce motivează ferestrele recursive și mobile."
+                "incorrectExplanation": "Problema este puterea testului: o regresie pe întregul eșantion amestecă fazele explozive cu colapsurile, ceea ce motivează ferestrele recursive și rolling."
             }
         },
         {
@@ -374,7 +374,7 @@ window.MFM_DATA.quizzes['bubbles'] = {
             },
             "ro": {
                 "title": "Stabilitatea lui tc",
-                "text": "Ce au arătat ajustările LPPLS pe ferestre mobile din acest capitol despre momentul critic estimat?",
+                "text": "Ce au arătat ajustările LPPLS pe ferestre rolling din acest capitol despre momentul critic estimat?",
                 "options": [
                     "Este stabil de la o dată de estimare la alta",
                     "Coincide mereu cu vîrful real",

@@ -117,7 +117,7 @@
     D.chapterCharts = {
         'markets': { src: 'charts/ch0_cross_asset_growth.png', en: 'Growth of 1 USD across asset classes, 2015–2026', ro: 'Creșterea a 1 USD pe clase de active, 2015–2026' },
         'stylized': { src: 'charts/ch1_hist_qq.png', en: 'Fat tails: S&P 500 and Bitcoin against the Normal distribution', ro: 'Cozi groase: S&P 500 și Bitcoin față de distribuția Normală' },
-        'efficiency': { src: 'charts/ch2_rolling_hurst.png', en: 'Time-varying memory: rolling DFA exponents', ro: 'Memorie variabilă în timp: exponenți DFA pe ferestre mobile' },
+        'efficiency': { src: 'charts/ch2_rolling_hurst.png', en: 'Time-varying memory: rolling DFA exponents', ro: 'Memorie variabilă în timp: exponenți DFA pe ferestre rolling' },
         'factors': { src: 'charts/ch3_factor_cum.png', en: 'Fama–French factors and momentum since 1963', ro: 'Factorii Fama–French și momentum din 1963' },
         'portfolio': { src: 'charts/ch4_frontier.png', en: 'Efficient frontier of sector ETFs', ro: 'Frontiera eficientă a ETF-urilor sectoriale' },
         'garch': { src: 'charts/ch5_sp500_vol.png', en: 'VIX against GARCH volatility, 2000–2026', ro: 'VIX față de volatilitatea GARCH, 2000–2026' },

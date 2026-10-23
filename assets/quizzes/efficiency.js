@@ -427,8 +427,8 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "incorrectExplanation": "The share must be compared with the 5% chance level, and runs of rejections in overlapping windows are correlated."
             },
             "ro": {
-                "title": "Citirea testelor pe ferestre mobile",
-                "text": "Pe ferestre mobile, S&P 500 respinge mersul aleator (|z*(5)| > 1,96) în 6,4% din ferestre. Cum trebuie interpretat acest rezultat?",
+                "title": "Citirea testelor pe ferestre rolling",
+                "text": "Pe ferestre rolling, S&P 500 respinge mersul aleator (|z*(5)| > 1,96) în 6,4% din ferestre. Cum trebuie interpretat acest rezultat?",
                 "options": [
                     "Ca dovadă puternică de ineficiență în 6,4% din ani",
                     "Ca fiind aproape de cei 5% așteptați din întîmplare, ținînd cont că ferestrele suprapuse sînt corelate",

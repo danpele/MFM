@@ -431,12 +431,12 @@ window.MFM_DATA.quizzes['garch'] = {
                 text: "Comparați GARCH-t cu GJR-t (care îl include) cu testul Diebold-Mariano pe prognoze cu fereastră în expansiune și parametri estimați. Care este problema principală?",
                 options: [
                     "Diebold-Mariano cere pierderi distribuite Normal",
-                    "Sub ipoteza nulă diferența de pierderi degenerează, deci limita N(0,1) nu este validă; testați metoda cu o fereastră mobilă (Giacomini-White)",
+                    "Sub ipoteza nulă diferența de pierderi degenerează, deci limita N(0,1) nu este validă; testați metoda cu o fereastră rolling (Giacomini-White)",
                     "QLIKE nu este robustă la o aproximare zgomotoasă a volatilității",
                     "Diebold-Mariano nu poate folosi erori standard HAC"
                 ],
-                correctExplanation: "Cu modele imbricate și parametri estimați pe o fereastră în expansiune, sub ipoteza nulă cele două prognoze converg spre aceeași, deci diferența dispare (West; Clark și McCracken). Giacomini și White testează metoda de prognoză cu o fereastră mobilă finită, unde zgomotul estimării persistă.",
-                incorrectExplanation: "Pierderile Normale nu sînt necesare, QLIKE este robustă în sensul lui Patton, iar erorile HAC sînt standard în Diebold-Mariano. Problema este diferența degenerată a modelelor imbricate cu parametri estimați, pe care Giacomini-White o evită cu o fereastră mobilă."
+                correctExplanation: "Cu modele imbricate și parametri estimați pe o fereastră în expansiune, sub ipoteza nulă cele două prognoze converg spre aceeași, deci diferența dispare (West; Clark și McCracken). Giacomini și White testează metoda de prognoză cu o fereastră rolling finită, unde zgomotul estimării persistă.",
+                incorrectExplanation: "Pierderile Normale nu sînt necesare, QLIKE este robustă în sensul lui Patton, iar erorile HAC sînt standard în Diebold-Mariano. Problema este diferența degenerată a modelelor imbricate cu parametri estimați, pe care Giacomini-White o evită cu o fereastră rolling."
             }
         },
         {

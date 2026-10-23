@@ -678,7 +678,7 @@ window.MFM_DATA.quizzes['portfolio'] = {
                     "Ponderile GMV sînt proporționale cu inversa matricei de covarianță înmulțită cu randamentele așteptate, nu cu un vector de unu",
                     "Ponderile GMV nu pot fi reechilibrate lunar, deoarece nu însumează unu"
                 ],
-                "correctExplanation": "În afara eșantionului înseamnă că ponderile lunii t folosesc doar date pînă în luna t-1, de exemplu o fereastră mobilă de 60 de luni. O matrice de covarianță din tot eșantionul introduce look-ahead bias; sqrt(12) este factorul corect pentru randamente lunare necorelate serial.",
+                "correctExplanation": "În afara eșantionului înseamnă că ponderile lunii t folosesc doar date pînă în luna t-1, de exemplu o fereastră rolling de 60 de luni. O matrice de covarianță din tot eșantionul introduce look-ahead bias; sqrt(12) este factorul corect pentru randamente lunare necorelate serial.",
                 "incorrectExplanation": "Anualizarea cu sqrt(12) (randamente lunare necorelate serial) și formula GMV sînt corecte; problema este că matricea de covarianță conține deja lunile evaluate (look-ahead bias)."
             }
         },

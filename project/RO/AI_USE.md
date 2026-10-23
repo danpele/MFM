@@ -18,7 +18,7 @@ Enumerați fișierele sau secțiunile în care ați păstrat cod sau text genera
 
 | Fișier sau secțiune | Ce a scris AI-ul | Ce am modificat |
 |---|---|---|
-| `src/garch.py` | prima versiune a buclei de estimare | am corectat fereastra mobilă, am adăugat testul |
+| `src/garch.py` | prima versiune a buclei de estimare | am corectat fereastra rolling, am adăugat testul |
 
 ## 3. Ce am verificat noi
 

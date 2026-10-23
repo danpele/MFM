@@ -239,7 +239,7 @@ window.MFM_DATA.quizzes['markets'] = {
             },
             "ro": {
                 "title": "Corelația acțiuni-obligațiuni",
-                "text": "Corelația mobilă pe 1 an dintre randamentele S&P 500 și ale obligațiunilor Trezoreriei pe termen lung (TLT) a fost în medie -0,43 în 2010–2020 și +0,08 în 2022–2026. Ce implică acest lucru?",
+                "text": "Corelația rolling pe 1 an dintre randamentele S&P 500 și ale obligațiunilor Trezoreriei pe termen lung (TLT) a fost în medie -0,43 în 2010–2020 și +0,08 în 2022–2026. Ce implică acest lucru?",
                 "options": [
                     "Obligațiunile pe termen lung au oferit un hedge mai slab pentru pierderile la acțiuni după șocul inflaționist din 2022",
                     "Obligațiunile au devenit mai riscante decît Bitcoin",
@@ -266,7 +266,7 @@ window.MFM_DATA.quizzes['markets'] = {
             },
             "ro": {
                 "title": "Bitcoin și acțiunile",
-                "text": "În datele noastre, corelația mobilă medie dintre Bitcoin și S&P 500 a crescut de la 0,01 (2016–2019) la 0,38 (2022–2026). Ce implică acest lucru pentru un portofoliu?",
+                "text": "În datele noastre, corelația rolling medie dintre Bitcoin și S&P 500 a crescut de la 0,01 (2016–2019) la 0,38 (2022–2026). Ce implică acest lucru pentru un portofoliu?",
                 "options": [
                     "Bitcoin a devenit un hedge perfect pentru acțiuni",
                     "Volatilitatea Bitcoin a scăzut la nivelul acțiunilor",
@@ -292,16 +292,16 @@ window.MFM_DATA.quizzes['markets'] = {
                 "incorrectExplanation": "The question asks for one correlation over 2022-2026: the whole-period estimate on common days, 0.42. The mean of 252-day rolling correlations is the average of one-year correlations, partly measured in 2021."
             },
             "ro": {
-                "title": "Corelație mobilă sau pe toată perioada?",
-                "text": "Bitcoin și S&P 500, log-randamente zilnice pe zilele comune, 2022-2026: corelația pe toată perioada 0,42; media corelațiilor mobile pe 252 de zile 0,38 (primele ferestre încep în 2021). Ce cifră răspunde la întrebarea „care a fost corelația în 2022-2026”?",
+                "title": "Corelație rolling sau pe toată perioada?",
+                "text": "Bitcoin și S&P 500, log-randamente zilnice pe zilele comune, 2022-2026: corelația pe toată perioada 0,42; media corelațiilor rolling pe 252 de zile 0,38 (primele ferestre încep în 2021). Ce cifră răspunde la întrebarea „care a fost corelația în 2022-2026”?",
                 "options": [
-                    "0,38: corelațiile mobile sînt întotdeauna mai precise",
+                    "0,38: corelațiile rolling sînt întotdeauna mai precise",
                     "Media lor, 0,40",
-                    "0,42: media corelațiilor mobile agregă ferestre de un an, parțial din 2021, adică o altă mărime estimată",
+                    "0,42: media corelațiilor rolling agregă ferestre de un an, parțial din 2021, adică o altă mărime estimată",
                     "Niciuna: corelațiile nu se pot estima pe mai mulți ani"
                 ],
-                "correctExplanation": "Corelația pe toată perioada, pe zilele comune, estimează corelația din 2022-2026; media corelațiilor mobile agregă ferestre de un an, unele începute în 2021, adică o altă mărime.",
-                "incorrectExplanation": "Întrebarea cere o singură corelație pentru 2022-2026: estimația pe toată perioada, pe zilele comune, 0,42. Media corelațiilor mobile pe 252 de zile este media unor corelații anuale, măsurate parțial în 2021."
+                "correctExplanation": "Corelația pe toată perioada, pe zilele comune, estimează corelația din 2022-2026; media corelațiilor rolling agregă ferestre de un an, unele începute în 2021, adică o altă mărime.",
+                "incorrectExplanation": "Întrebarea cere o singură corelație pentru 2022-2026: estimația pe toată perioada, pe zilele comune, 0,42. Media corelațiilor rolling pe 252 de zile este media unor corelații anuale, măsurate parțial în 2021."
             }
         },
         {
@@ -592,7 +592,7 @@ window.MFM_DATA.quizzes['markets'] = {
                 "title": "Cotații eronate",
                 "text": "Fișierul de piață EUR/RON dă o volatilitate anualizată de 12,4% pentru 2015–2026, iar cursul de referință BNR dă 2,1%. De ce?",
                 "options": [
-                    "Cursul de referință este o medie mobilă pe 30 de zile a cotațiilor de piață",
+                    "Cursul de referință este o medie rolling pe 30 de zile a cotațiilor de piață",
                     "Fișierul de piață conține cotații eronate izolate (de exemplu +/-15% pe 13–14 august 2025), inversate a doua zi",
                     "EUR/RON este mai volatil dimineața",
                     "Cele două serii folosesc monede diferite"

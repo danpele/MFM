@@ -679,7 +679,7 @@ window.MFM_DATA.quizzes['wrap-up'] = {
                     "O fereastră de 500 de zile este prea lungă pentru simularea istorică",
                     "Depășirile trebuie numărate pe randamente, nu pe pierderi"
                 ],
-                "correctExplanation": "Cuantila pe fereastra mobilă de la momentul t include r_t, deci o pierdere poate depăși doar dacă este dincolo de cuantila 1% a unui eșantion care o conține: numărul depășirilor este subestimat. Prognoza pentru ziua t trebuie să folosească datele pînă la t - 1. În plus, comparațiile cu VaR-ul lipsă din primele 500 de zile dau False, deci hit.mean() pe toate zilele subestimează rata: păstrați doar rîndurile în care var.shift(1) nu lipsește.",
+                "correctExplanation": "Cuantila pe fereastra rolling de la momentul t include r_t, deci o pierdere poate depăși doar dacă este dincolo de cuantila 1% a unui eșantion care o conține: numărul depășirilor este subestimat. Prognoza pentru ziua t trebuie să folosească datele pînă la t - 1. În plus, comparațiile cu VaR-ul lipsă din primele 500 de zile dau False, deci hit.mean() pe toate zilele subestimează rata: păstrați doar rîndurile în care var.shift(1) nu lipsește.",
                 "incorrectExplanation": "Lungimea ferestrei și convenția de semn (pierderea = -r, VaR pozitiv) sînt corecte; eroarea ține de momentul informației: VaR-ul folosit în ziua t cunoaște deja randamentul zilei t."
             }
         },

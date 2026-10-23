@@ -293,7 +293,7 @@ window.MFM_DATA.quizzes['systemic'] = {
             },
             "ro": {
                 "title": "Intervale bootstrap",
-                "text": "De ce folosește cursul bootstrap pe blocuri mobile de 20 de zile pentru Delta-CoVaR?",
+                "text": "De ce folosește cursul bootstrap pe blocuri suprapuse de 20 de zile pentru Delta-CoVaR?",
                 "options": [
                     "Pentru că randamentele sînt Normale",
                     "Pentru că este mai rapid decît bootstrap-ul i.i.d.",
@@ -401,7 +401,7 @@ window.MFM_DATA.quizzes['systemic'] = {
             },
             "ro": {
                 "title": "Eroarea de estimare a rețelei",
-                "text": "Un VAR(1) pe volatilitățile a 13 bănci este estimat pe ferestre mobile de 250 de zile. Care este principala problemă pentru tabelul de conectivitate?",
+                "text": "Un VAR(1) pe volatilitățile a 13 bănci este estimat pe ferestre rolling de 250 de zile. Care este principala problemă pentru tabelul de conectivitate?",
                 "options": [
                     "169 de coeficienți de pantă din 250 de zile dau o eroare de estimare mare: raportăm intervale bootstrap și luăm în calcul VAR-uri cu shrinkage (elastic net)",
                     "Tabelul depinde de ordinea băncilor",
@@ -455,7 +455,7 @@ window.MFM_DATA.quizzes['systemic'] = {
             },
             "ro": {
                 "title": "Conectivitatea în date",
-                "text": "Ce a arătat indicele Diebold-Yilmaz pe ferestre mobile pentru 13 bănci în jurul lui martie 2020?",
+                "text": "Ce a arătat indicele Diebold-Yilmaz pe ferestre rolling pentru 13 bănci în jurul lui martie 2020?",
                 "options": [
                     "O scădere la cea mai mică valoare",
                     "Nicio schimbare",

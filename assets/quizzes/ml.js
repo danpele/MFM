@@ -268,13 +268,13 @@ window.MFM_DATA.quizzes['ml'] = {
                 title: 'Embargoul',
                 text: 'De ce se aplică un embargo după fiecare pliu de test, pe lîngă purjare?',
                 options: [
-                    'Pentru că variabilele construite pe ferestre mobile și seriile autocorelate pot transporta informație din perioada de test în observațiile imediat următoare',
+                    'Pentru că variabilele construite pe ferestre rolling și seriile autocorelate pot transporta informație din perioada de test în observațiile imediat următoare',
                     'Pentru a mări setul de antrenare',
                     'Pentru că așa cer autoritățile de reglementare',
                     'Pentru a elimina weekendurile din date'
                 ],
                 correctExplanation: 'Embargoul elimină o mică fracțiune (de exemplu 1%) din observațiile imediat de după setul de test, deoarece variabilele lor se suprapun cu informația din perioada de test.',
-                incorrectExplanation: 'Embargoul protejează împotriva leakage-ului prin autocorelare și prin ferestrele mobile imediat după setul de test.'
+                incorrectExplanation: 'Embargoul protejează împotriva leakage-ului prin autocorelare și prin ferestrele rolling imediat după setul de test.'
             }
         },
         {
@@ -347,7 +347,7 @@ window.MFM_DATA.quizzes['ml'] = {
             },
             ro: {
                 title: 'Teste de data snooping',
-                text: 'Faceți backtesting pentru 1.279 de reguli de medii mobile, puternic corelate, pe Bitcoin. Ce procedură testează dacă cea mai bună regulă depășește buy-and-hold, estimînd din date distribuția sub ipoteza nulă a statisticii celei mai bune reguli, inclusiv corelația dintre reguli?',
+                text: 'Faceți backtesting pentru 1.279 de reguli de medii rolling, puternic corelate, pe Bitcoin. Ce procedură testează dacă cea mai bună regulă depășește buy-and-hold, estimînd din date distribuția sub ipoteza nulă a statisticii celei mai bune reguli, inclusiv corelația dintre reguli?',
                 options: [
                     'Testul SPA al lui Hansen (sau Reality Check al lui White) cu bootstrap staționar al întregii matrice a randamentelor regulilor',
                     'O corecție Bonferroni cu N = 1.279',
@@ -482,10 +482,10 @@ window.MFM_DATA.quizzes['ml'] = {
             },
             ro: {
                 title: 'Căutare exhaustivă pe Bitcoin',
-                text: 'O căutare pe 1.279 de configurații de încrucișare a mediilor mobile pe BTC găsește un Sharpe in-sample maxim de 1,89 (mai 2015-2020). Sharpe-ul său out-of-sample (2021-2026) este 0,02. Care este lecția principală?',
+                text: 'O căutare pe 1.279 de configurații de încrucișare a mediilor rolling pe BTC găsește un Sharpe in-sample maxim de 1,89 (mai 2015-2020). Sharpe-ul său out-of-sample (2021-2026) este 0,02. Care este lecția principală?',
                 options: [
                     'Alegerea cîștigătorului in-sample dintre multe încercări captează zgomot; Sharpe-ul out-of-sample scade drastic (overfitting de backtest)',
-                    'Mediile mobile nu funcționează niciodată, pe niciun activ',
+                    'Mediile rolling nu funcționează niciodată, pe niciun activ',
                     'Perioada out-of-sample a fost probabil măsurată greșit',
                     'Mai multe configurații ar fi rezolvat problema'
                 ],
@@ -671,14 +671,14 @@ window.MFM_DATA.quizzes['ml'] = {
             },
             ro: {
                 title: 'Găsiți eroarea AI: validarea încrucișată cu amestecare',
-                text: 'Un clasificator prezice, în fiecare zi, direcția Bitcoin pe următoarele 5 zile din caracteristici mobile pe 20 de zile. Un asistent AI scrie: „Folosiți KFold(n_splits=5, shuffle=True): amestecarea elimină efectul ordinii, deci AUC este o estimare curată în afara eșantionului.” Ce este greșit?',
+                text: 'Un clasificator prezice, în fiecare zi, direcția Bitcoin pe următoarele 5 zile din caracteristici rolling pe 20 de zile. Un asistent AI scrie: „Folosiți KFold(n_splits=5, shuffle=True): amestecarea elimină efectul ordinii, deci AUC este o estimare curată în afara eșantionului.” Ce este greșit?',
                 options: [
                     'Cinci blocuri sînt prea puține; cu 10 blocuri amestecate estimarea ar fi curată',
                     'AUC nu poate fi folosit pentru un clasificator binar',
                     'Amestecarea pune în antrenare zilele vecine fiecărei zile de test; caracteristicile și etichetele suprapuse produc atunci leakage, deci folosiți purged K-fold cu embargo sau validare walk-forward',
                     'Amestecarea este o problemă doar pentru regresie, nu pentru clasificare'
                 ],
-                correctExplanation: 'Într-o serie de timp, observațiile vecine au informație comună (caracteristici mobile, etichete suprapuse); o împărțire amestecată pune această informație la dispoziția modelului, ceea ce exagerează scorul.',
+                correctExplanation: 'Într-o serie de timp, observațiile vecine au informație comună (caracteristici rolling, etichete suprapuse); o împărțire amestecată pune această informație la dispoziția modelului, ceea ce exagerează scorul.',
                 incorrectExplanation: 'Întrebați-vă ce zile vecine cu o zi de test se află în setul de antrenare și ce informație au în comun cu ea.'
             }
         },

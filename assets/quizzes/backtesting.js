@@ -138,7 +138,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                     "Riscul de estimare contează doar pentru testele ES, nu pentru VaR",
                     "Un P mai mare elimină întotdeauna riscul de estimare"
                 ],
-                "correctExplanation": "Depășirile din afara eșantionului depind de parametrii estimați; termenul suplimentar este de ordinul sqrt(P/R). În simularea Monte Carlo din curs, cu schemă fixă, un GARCH-t corect este respins în circa 27% din eșantioane la P = 5000 cu parametri estimați; schema mobilă are un alt termen de corecție, de același ordin.",
+                "correctExplanation": "Depășirile din afara eșantionului depind de parametrii estimați; termenul suplimentar este de ordinul sqrt(P/R). În simularea Monte Carlo din curs, cu schemă fixă, un GARCH-t corect este respins în circa 27% din eșantioane la P = 5000 cu parametri estimați; schema rolling are un alt termen de corecție, de același ordin.",
                 "incorrectExplanation": "Eroarea de estimare intră în depășiri prin VaR_t(theta estimat); efectul ei crește cu P/R, deci un eșantion de evaluare mai mare o agravează, nu o elimină."
             }
         },
@@ -536,15 +536,15 @@ window.MFM_DATA.quizzes['backtesting'] = {
             },
             "ro": {
                 "title": "Giacomini-White față de Diebold-Mariano",
-                "text": "Prognozele provin din ferestre mobile de 1000 de zile, cu parametri GARCH reestimați. Ce test de acuratețe predictivă egală are o justificare asimptotică validă pentru compararea lor?",
+                "text": "Prognozele provin din ferestre rolling de 1000 de zile, cu parametri GARCH reestimați. Ce test de acuratețe predictivă egală are o justificare asimptotică validă pentru compararea lor?",
                 "options": [
                     "Testul Giacomini-White al abilității predictive (condiționate) a metodelor de prognoză",
                     "Testul Diebold-Mariano cu dispersie i.i.d.",
                     "Un test Kupiec pe diferența de pierdere",
                     "O regresie Mincer-Zarnowitz a pierderilor pe prognoze"
                 ],
-                "correctExplanation": "Giacomini și White (2006) testează metoda de prognoză, inclusiv estimarea ei, și permit o fereastră mobilă finită, în care eroarea de estimare nu dispare; cu o funcție test constantă, statistica are forma DM.",
-                "incorrectExplanation": "Justificarea DM vizează acuratețea populațională a modelelor; cu ferestre mobile finite, obiectul comparat este metoda, iar dispersia i.i.d. ignoră și autocorelația pierderilor."
+                "correctExplanation": "Giacomini și White (2006) testează metoda de prognoză, inclusiv estimarea ei, și permit o fereastră rolling finită, în care eroarea de estimare nu dispare; cu o funcție test constantă, statistica are forma DM.",
+                "incorrectExplanation": "Justificarea DM vizează acuratețea populațională a modelelor; cu ferestre rolling finite, obiectul comparat este metoda, iar dispersia i.i.d. ignoră și autocorelația pierderilor."
             }
         },
         {
@@ -697,7 +697,7 @@ window.MFM_DATA.quizzes['backtesting'] = {
                 "incorrectExplanation": "The sign convention and the exception rule are right; the error is that the forecast for day t uses the return of day t."
             },
             "ro": {
-                "title": "Găsiți eroarea AI: fereastra VaR mobilă",
+                "title": "Găsiți eroarea AI: fereastra VaR rolling",
                 "text": "Un asistent AI scrie: „Pentru VaR 1% prin simulare istorică în ziua t, luați minus cuantila de 1% a celor 250 de randamente r_{t-249}, ..., r_t, apoi marcați o excepție cînd -r_t îl depășește.” Ce este greșit?",
                 "options": [
                     "VaR ar trebui să fie plus cuantila de 1%, nu minus",
