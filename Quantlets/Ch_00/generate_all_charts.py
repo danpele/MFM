@@ -195,7 +195,7 @@ def fig_cross_asset_growth(start='2015-01-02'):
 # FIG 2: Randament vs risc, 2015-2026
 # =============================================================================
 OFFSETS = {'Gold': (-7, 2, 'right'), 'S&P 500 TR (SPY)': (0, 8, 'center'), 'Nikkei 225 (USD)': (7, 2, 'left'),
-           'Euro Stoxx 50 (USD)': (7, -7, 'left'), 'US Treasuries 20y+ (TLT)': (-7, -9, 'right'),
+           'Euro Stoxx 50 (USD)': (7, -10, 'left'), 'US Treasuries 20y+ (TLT)': (-7, -11, 'right'),
            'EUR/USD': (0, 7, 'center'), 'EUR/RON': (6, 3, 'left'), 'Bitcoin': (-6, 3, 'right'),
            'Ethereum': (-6, 3, 'right')}
 
@@ -224,7 +224,7 @@ def fig_risk_return(start='2015-01-02'):
     ax.xaxis.set_minor_formatter(plt.NullFormatter())
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f'{v:.0%}'))
     ax.axhline(0, color=Gray, lw=0.5)
-    ax.set_ylim(-0.08, None)
+    ax.set_ylim(-0.17, None)
     ax.set_xlabel('Annualised volatility (log scale)')
     ax.set_ylabel('Annualised return (CAGR)')
     ax.set_title('Risk and return, 2015-2026', fontsize=9, loc='left')

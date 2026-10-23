@@ -275,16 +275,22 @@ def fig_acf_sp500(nlags=100):
     series = [(r, 'Returns $r_t$', MainBlue), (r.abs(), 'Absolute returns $|r_t|$', Amber),
               (r ** 2, 'Squared returns $r_t^2$', IDAred)]
     fig, axes = plt.subplots(1, 3, figsize=(7.4, 2.6), sharey=True)
+    x = (r - r.mean()).values
+    s2 = np.sum(x ** 2)
+    lags = np.arange(1, nlags + 1)
+    rob = 1.96 * np.sqrt([np.sum(x[k:] ** 2 * x[:-k] ** 2) / s2 ** 2 for k in lags])   # Romano & Thombs (1996)
     for ax, (s, t, c) in zip(axes, series):
         a = acf(s, nlags=nlags, fft=True)[1:]
-        ax.bar(range(1, nlags + 1), a, color=c, width=0.8)
-        ax.axhspan(-band, band, color=BandBlue, alpha=0.7, lw=0, label='i.i.d. reference band $\\pm1.96/\\sqrt{T}$')
+        ax.bar(lags, a, color=c, width=0.8)
+        ax.axhspan(-band, band, color=BandBlue, alpha=0.7, lw=0, label='95% band under H$_0$: i.i.d., $\\pm1.96/\\sqrt{T}$')
         ax.axhline(0, color=Navy, lw=0.4)
         ax.set_title(t, fontsize=8.5, loc='left')
         ax.set_xlabel('Lag (days)')
+    axes[0].step(lags, rob, where='mid', color=Navy, lw=0.8, label='95% band under H$_0$: $\\rho_k = 0$, robust, $\\pm1.96\\sqrt{\\hat\\tau_k}$')
+    axes[0].step(lags, -rob, where='mid', color=Navy, lw=0.8)
     axes[0].set_ylabel('Autocorrelation')
     h, l = axes[0].get_legend_handles_labels()
-    fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=1, frameon=False)
+    fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=2, frameon=False)
     plt.tight_layout()
     save_fig('ch1_acf_sp500')
 
@@ -319,6 +325,13 @@ def leverage_corr(r, K=20):
     return ks, np.array([r.corr(a.shift(-k)) for k in ks])     # corr(r_t, |r_{t+k}|)
 
 
+def leverage_tau(r, k):
+    """Variance of corr(r_t, |r_{t+k}|) under no correlation, robust to volatility clustering."""
+    df = pd.concat([r - r.mean(), (r.abs() - r.abs().mean()).shift(-k)], axis=1).dropna()
+    x, y = df.iloc[:, 0].values, df.iloc[:, 1].values
+    return np.sum(x ** 2 * y ** 2) / (np.sum(x ** 2) * np.sum(y ** 2))
+
+
 def fig_leverage():
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.8), sharey=True)
     out = {}
@@ -327,13 +340,16 @@ def fig_leverage():
         out[a] = pd.Series(c, index=ks)
         ax.bar(ks, c, color=np.where(c < 0, IDAred, Forest), width=0.8)
         band = 1.96 / np.sqrt(len(rets[a]))
-        ax.axhspan(-band, band, color=BandBlue, alpha=0.7, lw=0, label='i.i.d. reference band $\\pm1.96/\\sqrt{T}$')
+        ax.axhspan(-band, band, color=BandBlue, alpha=0.7, lw=0, label='95% band under H$_0$: i.i.d., $\\pm1.96/\\sqrt{T}$')
+        rob = 1.96 * np.array([np.sqrt(leverage_tau(rets[a], k)) for k in ks])
+        ax.step(ks, rob, where='mid', color=Navy, lw=0.8, label='95% band under H$_0$: no correlation, robust')
+        ax.step(ks, -rob, where='mid', color=Navy, lw=0.8)
         ax.axhline(0, color=Navy, lw=0.4)
         ax.set_xlabel('Lag $k$ (days)')
         ax.set_title(f'{LABELS[a]}: corr$(r_t, |r_{{t+k}}|)$', fontsize=8.5, loc='left')
     axes[0].set_ylabel('Correlation')
     h, l = axes[0].get_legend_handles_labels()
-    fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=1, frameon=False)
+    fig.legend(h, l, loc='upper center', bbox_to_anchor=(0.5, 0.02), ncol=2, frameon=False)
     plt.tight_layout()
     save_fig('ch1_leverage')
     return pd.DataFrame(out)
@@ -478,10 +494,11 @@ def fig_risk_return(t):
     for a in ASSETS:
         row = t.loc[LABELS[a]]
         ax.scatter(row['ann_vol_pct'], row['CAGR_pct'], s=60, color=COLORS[a], zorder=3)
-        off = {'sp500': (8, -14), 'gold': (-8, 14), 'bettr': (8, 0), 'btc': (-10, -18), 'eurron': (8, 2)}[a]
+        pos = {'sp500': (22, 9), 'gold': (12.5, 13), 'bettr': (18, 23), 'btc': (58, 50), 'eurron': (5.2, -6)}[a]
         ax.annotate(f"{LABELS[a]}\nSharpe {row['Sharpe']:.2f} (SE {row['Sharpe_SE_Lo']:.2f}), MDD {row['maxDD_pct']:.0f}%",
-                    (row['ann_vol_pct'], row['CAGR_pct']), xytext=off, textcoords='offset points', fontsize=7,
-                    ha='right' if off[0] < 0 else 'left')
+                    (row['ann_vol_pct'], row['CAGR_pct']), xytext=pos, textcoords='data', fontsize=7,
+                    ha='right' if a in ('gold', 'btc') else 'left', va='center',
+                    arrowprops=dict(arrowstyle='-', color=Navy, lw=0.4, shrinkA=0, shrinkB=4))
     ax.set_xscale('log')
     ax.set_xticks([5, 10, 20, 50, 100])
     ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f'{v:g}'))
@@ -489,6 +506,7 @@ def fig_risk_return(t):
     ax.set_xlabel('Annualised volatility (%, log scale)')
     ax.set_ylabel('CAGR (%)')
     ax.set_xlim(3, 120)
+    ax.set_ylim(-12, 60)
     ax.axhline(0, color=Navy, lw=0.4)
     ax.set_title('Risk and return across markets (full samples; Sharpe SE for i.i.d. Normal returns)', fontsize=9, loc='left')
     plt.tight_layout()
@@ -840,6 +858,83 @@ def pdv_weight_shares(params):
     return pd.DataFrame(out)
 
 
+def fact_tests(n_boot=1000, block=20, seed=42, n_sim=5000):
+    """One statistic and one test per stylised fact (Ch. 1 slides): robust ACF bands, leverage, volume-volatility,
+    gain/loss asymmetry, aggregational Gaussianity and the maximum drawdown against a Gaussian random walk."""
+    rng = np.random.default_rng(seed)
+    rows = []
+    # Facts 1 and 6: lags (1..100) of the S&P 500 ACF outside the i.i.d. and the robust 95% null bands
+    x = (rets['sp500'] - rets['sp500'].mean()).values
+    s2, T = np.sum(x ** 2), len(x)
+    lags = np.arange(1, 101)
+    rho = np.array([np.sum(x[k:] * x[:-k]) / s2 for k in lags])
+    tau = np.array([np.sum(x[k:] ** 2 * x[:-k] ** 2) / s2 ** 2 for k in lags])
+    rows.append({'fact': 'acf_sp500_lags1to100', 'asset': 'S&P 500', 'stat': np.sum(np.abs(rho) > 1.96 / np.sqrt(T)),
+                 'se': np.nan, 'lo': np.nan, 'hi': np.nan, 'z': np.sum(np.abs(rho) > 1.96 * np.sqrt(tau))})
+    for a in ASSETS:
+        r = rets[a]
+        # Fact 9: L(1) = corr(r_t, |r_{t+1}|), robust z
+        L1 = r.corr(r.abs().shift(-1))
+        rows.append({'fact': 'leverage_L1', 'asset': LABELS[a], 'stat': L1, 'se': np.sqrt(leverage_tau(r, 1)),
+                     'lo': np.nan, 'hi': np.nan, 'z': L1 / np.sqrt(leverage_tau(r, 1))})
+        # Fact 3: Delta = -q_0.01 - q_0.99 (in %), moving-block bootstrap CI
+        v = r.values
+        f = lambda z: -np.quantile(z, 0.01) - np.quantile(z, 0.99)
+        b = [f(v[moving_block_indices(len(v), block, rng)]) for _ in range(n_boot)]
+        rows.append({'fact': 'gainloss_delta_pct', 'asset': LABELS[a], 'stat': 100 * f(v), 'se': 100 * np.std(b, ddof=1),
+                     'lo': 100 * np.quantile(b, 0.025), 'hi': 100 * np.quantile(b, 0.975), 'z': np.nan})
+    # Fact 3, far tails: Hill alpha_loss - alpha_gain at the common threshold u, block-bootstrap SE (u fixed)
+    for a in ASSETS:
+        v = rets[a].values
+        k = int(0.025 * len(v))
+        u = min(np.sort(-v)[::-1][k], np.sort(v)[::-1][k])
+        dd = hill_threshold(-v, u) - hill_threshold(v, u)
+        b = []
+        for _ in range(500):
+            z = v[moving_block_indices(len(v), block, rng)]
+            b.append(hill_threshold(-z, u) - hill_threshold(z, u))
+        rows.append({'fact': 'tail_diff_loss_minus_gain', 'asset': LABELS[a], 'stat': dd, 'se': np.std(b, ddof=1),
+                     'lo': np.quantile(b, 0.025), 'hi': np.quantile(b, 0.975), 'z': dd / np.std(b, ddof=1)})
+    # Fact 10: Spearman rank correlation of abnormal log volume and |r_t|, block-bootstrap CI
+    for a in ['sp500', 'btc']:
+        d = load_data(a)
+        v = np.log(d['Volume'].replace(0, np.nan))
+        df = pd.DataFrame({'v': (v - v.rolling(250).mean()), 'a': np.log(d['Close']).diff().abs()}).dropna()
+        df = df[df['a'] > 0]
+        rs = stats.spearmanr(df['v'], df['a'])[0]
+        b = [stats.spearmanr(df['v'].values[i], df['a'].values[i])[0]
+             for i in (moving_block_indices(len(df), block, rng) for _ in range(n_boot))]
+        rows.append({'fact': 'volume_spearman', 'asset': LABELS[a], 'stat': rs, 'se': np.std(b, ddof=1),
+                     'lo': np.quantile(b, 0.025), 'hi': np.quantile(b, 0.975), 'z': np.nan})
+    # Fact 4: z = excess kurtosis / sqrt(24/n) of non-overlapping h-day returns, h = 60
+    k60, n60 = aggregation_kurtosis().loc[60], aggregation_counts()[0].loc[60]
+    for a in ASSETS:
+        rows.append({'fact': 'aggregation_h60', 'asset': LABELS[a], 'stat': k60[a], 'se': np.sqrt(24 / n60[a]),
+                     'lo': np.nan, 'hi': np.nan, 'z': k60[a] / np.sqrt(24 / n60[a])})
+    # Drawdowns: D = max_t (max_{s<=t} ln P_s - ln P_t) against a Gaussian random walk with the same drift and volatility
+    sim = np.random.default_rng(1)
+    for a in ASSETS:
+        lp = np.log(closes[a].values)
+        r = np.diff(lp)
+        D = np.max(np.maximum.accumulate(lp) - lp)
+        mu_d, sd_d = r.mean(), r.std(ddof=1)
+        sig, mu, Ty = sd_d * np.sqrt(PERIODS[a]), mu_d * PERIODS[a], len(r) / PERIODS[a]
+        ed0 = np.sqrt(np.pi / 2) * sig * np.sqrt(Ty)                              # zero drift
+        xq = mu ** 2 * Ty / (2 * sig ** 2)
+        edmu = 2 * sig ** 2 / mu * (0.25 * np.log(xq) + 0.49088)                 # positive drift, large x
+        ds = []
+        for _ in range(n_sim // 250):
+            p = np.cumsum(mu_d + sd_d * sim.standard_normal((250, len(r))), axis=1)
+            p = np.concatenate([np.zeros((250, 1)), p], axis=1)
+            ds.append(np.max(np.maximum.accumulate(p, axis=1) - p, axis=1))
+        ds = np.concatenate(ds)
+        rows.append({'fact': 'drawdown_D', 'asset': LABELS[a], 'stat': D, 'se': ed0, 'lo': edmu, 'hi': ds.mean(),
+                     'z': np.mean(ds >= D)})
+    t = pd.DataFrame(rows)
+    t.to_csv(os.path.join(TABLE_DIR, 'ch1_fact_tests.csv'), index=False, float_format='%.4g')
+    return t
+
+
 if __name__ == '__main__':
     pd.set_option('display.width', 200)
     print('Chapter 1 charts')
@@ -864,6 +959,7 @@ if __name__ == '__main__':
     print(hill_inference().round(3).T)
     print(robust_moments().round(3).T)
     print(acf_robust_lag1().round(3).T)
+    print(fact_tests().round(3))
     print(long_memory_table().round(3).T)
     so, so_y = stale_open_check(); print(so.round(3)); print(so_y.loc[[1995, 2000, 2005, 2006, 2007, 2008, 2010, 2020, 2026]].round(3))
     pvix, pfit, pparams, pscores = pdv_fit(); print(pparams.round(3)); print(pscores.round(3))

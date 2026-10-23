@@ -248,6 +248,8 @@ def fig_hedge_oos(h_all, h_static, h_expost, e_un, e_st, e_dc, split):
     for e, col, lab in ((e_un, Amber, 'Unhedged BET'), (e_st, MainBlue, 'Static hedge'), (e_dc, IDAred, 'DCC hedge')):
         ax.plot(e.index, np.cumsum((100 * e) ** 2), color=col, lw=1.1, label=f'{lab}: cumulative squared return')
     ax.set_ylabel('Cum. squared return (%^2)')
+    ax.axvline(pd.Timestamp(split), color='black', lw=0.8, ls=':')
+    ax.set_xlim(axes[0].get_xlim())          # same dates on both panels
     hs, ls_ = [], []
     for a_ in axes:
         h_, l_ = a_.get_legend_handles_labels()

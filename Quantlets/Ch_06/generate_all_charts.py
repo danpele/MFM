@@ -765,16 +765,20 @@ def fig_covol():
     top = x.sort_values(ascending=False)
     pre = x.loc[:ECM_END].sort_values(ascending=False)
     post = x.loc[pd.Timestamp(ECM_END) + pd.Timedelta(days=1):].sort_values(ascending=False)
-    paper = pd.Series({pd.Timestamp(d): v for d, v in ECM_TABLE15})
+    # the paper's dates on our calendar: a closed day (11 and 14 September 2001) maps to the next trading day
+    on_cal = lambda d: x.index[x.index.searchsorted(pd.Timestamp(d))]
+    paper_days = sorted({on_cal(d) for d, _ in ECM_TABLE15})
+    paper = x.loc[paper_days]            # the diamonds sit on our own series: the two scales are not comparable
     fig, ax = plt.subplots(figsize=(5.6, 3.6))
     ax.plot(x.index, x.values, color=MainBlue, lw=0.5, label='Squared asset-class COVOL $\\hat x_t$ (20 US-listed ETFs + PC1)')
     ax.scatter(paper.index, paper.values, marker='D', s=16, facecolors='none', edgecolors=Orange, lw=0.9, zorder=4,
-               label='Top 20 in Table 15 of Engle and Campos-Martins (2023)')
+               label='Dates of the top 20 in Table 15 of Engle and Campos-Martins (2023), at our $\\hat x_t$')
     ax.axvline(pd.Timestamp(ECM_END), color=Gray, ls='--', lw=0.8, label='End of the paper sample (1 March 2021)')
     # Explicit label positions keep dates clear of paper diamonds and the sample-end line.
-    label_positions = {2001: (.12, .72), 2008: (.10, .38), 2016: (.42, .82), 2024: (.83, .75)}
+    # labels in the empty band above every spike, so that no label covers a spike
+    label_positions = {2001: (.08, .80), 2008: (.10, .50), 2016: (.24, .94), 2024: (.86, .94)}
     for d, v in top.iloc[:6].items():
-        position = ((.48, .59) if d.month == 3 else (.83, .40)) if d.year == 2020 else label_positions.get(d.year, (.8, .9))
+        position = ((.53, .94) if d.month == 3 else (.65, .64)) if d.year == 2020 else label_positions.get(d.year, (.8, .9))
         label = f'{d.day} {d:%b}\n{d:%Y}' if (d.year == 2024 or (d.year == 2020 and d.month == 11)) else f'{d.day} {d:%b %Y}'
         ax.annotate(label, (d, v), xytext=position, textcoords='axes fraction',
                     fontsize=7, color='black', ha='left',
@@ -782,7 +786,7 @@ def fig_covol():
                     arrowprops=dict(arrowstyle='-', color=MainBlue, lw=.5))
     ax.set_ylabel('Squared common volatility $\\hat x_t$')
     ax.set_xlim(pd.Timestamp('1999-10-01'), x.index[-1] + pd.Timedelta(days=90))
-    ax.set_ylim(0, 1.08 * max(top.iloc[0], paper.max()))
+    ax.set_ylim(0, 1.45 * max(top.iloc[0], paper.max()))
     legend_outside_bottom(ax, ncol=1, y=-0.1)
     save_fig('ch6_covol_replication')
     common = set(pre.index[:20]) & set(paper.index)
