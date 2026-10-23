@@ -592,12 +592,12 @@ window.MFM_DATA.quizzes['factors'] = {
                 title: "Prima componentă principală",
                 text: "În PCA pe 11 ETF-uri sectoriale din SUA (2018–2026), cum trebuie interpretată prima componentă principală?",
                 options: [
-                    "Ca factor de piață: toate încărcările sînt pozitive, iar corelația cu SPY este 0,95",
+                    "Ca factor de piață: toate loadings sînt pozitive, iar corelația cu SPY este 0,95",
                     "Ca factor de valoare",
                     "Ca factor defensiv față de creștere",
                     "Ca zgomot pur"
                 ],
-                correctExplanation: "PC1 explică 66% din varianță, cu încărcări de același semn; contrastul dintre sectoarele defensive și cele de creștere apare în PC2.",
+                correctExplanation: "PC1 explică 66% din varianță, cu loadings de același semn; contrastul dintre sectoarele defensive și cele de creștere apare în PC2.",
                 incorrectExplanation: "Primul factor latent este piața; factorul sectoare defensive față de sectoare de creștere este a doua componentă."
             }
         },
@@ -620,12 +620,12 @@ window.MFM_DATA.quizzes['factors'] = {
                 text: "Care este ideea de bază a PCA instrumentate (Kelly, Pruitt și Su, 2019)?",
                 options: [
                     "Factorii sînt aleși de investitor",
-                    "Încărcările factoriale sînt funcții liniare de caracteristici observate ale firmelor, estimate împreună cu factorii latenți",
-                    "Încărcările sînt constante în timp",
+                    "Loadings pe factori sînt funcții liniare de caracteristici observate ale firmelor, estimate împreună cu factorii latenți",
+                    "Loadings sînt constante în timp",
                     "Se folosește doar factorul de piață"
                 ],
                 correctExplanation: "β_{i,t}′ = z_{i,t}′Γ_β permite ca beta să se schimbe cu caracteristicile; articolul arată că acestea contează prin covarianțe, nu ca alfa.",
-                incorrectExplanation: "IPCA face încărcările variabile în timp prin caracteristici; PCA standard le păstrează constante."
+                incorrectExplanation: "IPCA face loadings variabile în timp prin caracteristici; PCA standard le păstrează constante."
             }
         },
         {
@@ -648,10 +648,10 @@ window.MFM_DATA.quizzes['factors'] = {
                 options: [
                     "Valori alfa mari, pozitive, de aproximativ 5% pe an",
                     "Beta de piață aproape de zero",
-                    "Valori alfa apropiate de zero, cu încărcări care corespund denumirilor (MTUM pe MOM, QUAL pe RMW)",
-                    "Încărcări negative pe propriul factor"
+                    "Valori alfa apropiate de zero, cu loadings care corespund denumirilor (MTUM pe MOM, QUAL pe RMW)",
+                    "Loadings negative pe propriul factor"
                 ],
-                correctExplanation: "MTUM a avut alfa −0,2% (t = −0,11) și încărcarea pe MOM 0,36; nicio dovadă de abilitate dincolo de expunerea factorială.",
+                correctExplanation: "MTUM a avut alfa −0,2% (t = −0,11) și loading pe MOM 0,36; nicio dovadă de abilitate dincolo de expunerea factorială.",
                 incorrectExplanation: "Valorile alfa nu s-au distins statistic de zero, iar beta de piață a variat între 0,74 și 1,04."
             }
         },

@@ -624,7 +624,7 @@ window.MFM_DATA.quizzes['digital-assets'] = {
                     "Volumul tranzacționat",
                     "Numărul de burse"
                 ],
-                "correctExplanation": "Metodele de clasificare plasează cripto-activele într-o clasă separată în principal din cauza factorului de coadă, un factor al spațiului caracteristicilor cu încărcări pe cuantile, așteptări în coadă, varianță și parametrii de coadă și de scală ai distribuției stabile, nu o diferență între indici Hill.",
+                "correctExplanation": "Metodele de clasificare plasează cripto-activele într-o clasă separată în principal din cauza factorului de coadă, un factor al spațiului caracteristicilor cu loadings pe cuantile, așteptări în coadă, varianță și parametrii de coadă și de scală ai distribuției stabile, nu o diferență între indici Hill.",
                 "incorrectExplanation": "Studiul folosește factorii de coadă, memorie și momente; factorul de coadă determină separarea."
             }
         },

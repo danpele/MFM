@@ -707,7 +707,7 @@ window.MFM_DATA.quizzes['signatures'] = {
                     "Folosirea unei singure împărțiri și raportarea QLIKE cu trei zecimale"
                 ],
                 "correctExplanation": "Calibrarea trebuie să folosească doar datele de antrenare; qlike(F, RV) = F/RV - ln(F/RV) - 1 este minimizată de media armonică, nu de E[RV]. Afirmației îi lipsesc și calculul reperului și un test DM.",
-                "incorrectExplanation": "Ținta logaritmică, LASSO și QLIKE sînt alegeri legitime; erorile sînt look-ahead bias la calibrare și pierderea inversată."
+                "incorrectExplanation": "Ținta logaritmică, LASSO și QLIKE sînt opțiuni legitime; erorile sînt look-ahead bias la calibrare și pierderea inversată."
             }
         }
     ]

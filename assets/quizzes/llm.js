@@ -651,7 +651,7 @@ window.MFM_DATA.quizzes['llm'] = {
                     "Media celor 36 de statistici t, pentru că media elimină zgomotul",
                     "Întreaga curbă, cu testul comun: dovezile sînt compatibile cu lipsa predictibilității la 5%"
                 ],
-                "correctExplanation": "O curbă a specificațiilor (Simonsohn, Simmons & Nelson, 2020) raportează toate alegerile rezonabile și le testează împreună. Schimbările comune, pe blocuri, păstrează dependența dintre variante și dependența serială pe termen scurt; testul presupune, sub ipoteza nulă, randamente cu semn simetrice și blocuri aproximativ independente. Aici p-value-ul comun este 0,113, iar t median este 0,50.",
+                "correctExplanation": "O curbă a specificațiilor (Simonsohn, Simmons & Nelson, 2020) raportează toate specificațiile rezonabile și le testează împreună. Schimbările comune, pe blocuri, păstrează dependența dintre variante și dependența serială pe termen scurt; testul presupune, sub ipoteza nulă, randamente cu semn simetrice și blocuri aproximativ independente. Aici p-value-ul comun este 0,113, iar t median este 0,50.",
                 "incorrectExplanation": "Variantele folosesc aceleași zile și acțiuni, deci statisticile lor t sînt dependente; selecția sau media lor ignoră căutarea. Este nevoie de un test comun, sub o ipoteză nulă comună."
             }
         },
