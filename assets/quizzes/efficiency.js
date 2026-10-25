@@ -107,7 +107,7 @@ window.MFM_DATA.quizzes['efficiency'] = {
                 "text": "Ce implică paradoxul Grossman–Stiglitz?",
                 "options": [
                     "Piețele sînt întotdeauna perfect eficiente",
-                    "Trebuie să rămînă o anumită ineficiență, suficientă pentru a remunera traderii informați pentru informația costisitoare",
+                    "Trebuie să rămînă o anumită ineficiență, suficientă pentru a plăti traderii informați pentru informația costisitoare",
                     "Prețurile nu reflectă niciodată informația privată",
                     "Arbitrajul este gratuit și fără risc"
                 ],

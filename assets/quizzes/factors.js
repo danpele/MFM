@@ -246,7 +246,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Sectoarele nu creează dispersie în mărime și valoare, deci au puțină dispersie în valorile alfa care contează: testul are putere mică",
                     "Eșantionul sectorial este mai lung"
                 ],
-                correctExplanation: "Activele de test trebuie să aibă dispersie mare în caracteristicile remunerate; sectoarele combină firme mici și mari, de valoare și de creștere. Nerespingerea este o dovadă slabă.",
+                correctExplanation: "Activele de test trebuie să aibă dispersie mare în caracteristicile care aduc o primă; sectoarele combină firme mici și mari, de valoare și de creștere. Nerespingerea este o dovadă slabă.",
                 incorrectExplanation: "Nerespingerea nu este o dovadă că CAPM este adevărat; testul pe sectoare are putere mică."
             }
         },
