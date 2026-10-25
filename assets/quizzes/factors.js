@@ -138,8 +138,8 @@ window.MFM_DATA.quizzes['factors'] = {
                     "0,096",
                     "0,02"
                 ],
-                correctExplanation: "Var_cs(β̂) = σ²_β + media se², pentru că zgomotul de estimare se adaugă dispersiei valorilor beta adevărate; deci σ²_β = 0,116 − 0,02 = 0,096.",
-                incorrectExplanation: "Varianța valorilor beta estimate include zgomotul de eșantionare; informația a priori trebuie să descrie valorile beta adevărate, deci se scade media pătratelor erorilor standard."
+                correctExplanation: "Var_cs(β̂) = σ²_β + media se², pentru că zgomotul de estimare se adaugă dispersiei parametrilor β_i; deci σ²_β = 0,116 − 0,02 = 0,096.",
+                incorrectExplanation: "Varianța valorilor beta estimate include zgomotul de eșantionare; informația a priori trebuie să descrie parametrii β_i, nu estimările, deci se scade media pătratelor erorilor standard."
             }
         },
         {
