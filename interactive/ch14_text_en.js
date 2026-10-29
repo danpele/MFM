@@ -1,0 +1,25 @@
+// Readouts of the Chapter 14 interactive page, written by latex/build_interactive_ch14.py.
+window.CH14_TEXT = {
+ play: 'Play', pause: 'Pause', none: 'none', plen: P => `${P} days`,
+ ac1: (y, n, b, r1, k, L) => `S&P 500 from ${y}: ${n} days, band ±${b}. Returns: lag-1 autocorrelation ${r1}; ${k} of ${L} lags outside the band.`,
+ ac2: (sq, a1, L, aL, k) => `${sq ? 'Squared returns' : 'Absolute returns'}: ${a1} at lag 1, ${aL} at lag ${L}; ${k} of ${L} lags outside the band.`,
+ pa: (n, P, k, full, sc, ratio) => `Context of ${n} days in patches of ${P} days: ${k} tokens and ${sc} attention scores per layer, against ${full} with one token per day (${ratio} times fewer).`,
+ pa2: (k, s) => `TimesFM-2.5 (patches of 32 days): ${k} tokens, ${s} scores.`,
+ r2: (a, s, n, b, v, p, tf, tp) => `${a}, from ${s} (${n} days): highest R² ${b}, ${v}% (DM p = ${p}); TimesFM-2.5 ${tf}% (p = ${tp}).`,
+ rv1: (a, b, n, pk, d) => `${a} – ${b} (${n} days): peak realised volatility ${pk}% a year, on ${d}.`,
+ rv2: (m, q, lh, c2) => `Mean QLIKE in this window: lowest ${m} (${q}); log-HAR ${lh}, Chronos-2 ${c2}.`,
+ ql1: (l, s, n, m, v, lh, c2) => `${l} from ${s} (${n} days): lowest ${m} (${v}); log-HAR ${lh}, Chronos-2 ${c2}.`,
+ ql2: (d, p) => `DM test, Chronos-2 against log-HAR: ${d}, p = ${p}.`,
+ br: (a, n, c2, p, f, h, lo, hi) => `${a} (${n} days): raw Chronos-2 ${c2} (Kupiec p = ${p}), FHS ${f}, FHS with Chronos-2 volatility ${h}; a correct model gives ${lo} to ${hi} breaches with 95% probability.`,
+ vp1: (n, f, c, h, hs) => `${n} days. Breaches: FHS ${f}, raw Chronos-2 ${c}, FHS with Chronos-2 volatility ${h}, HS ${hs}.`,
+ vp2: (h, d, f, l) => `Highest VaR 1% of the hybrid: ${h}% on ${d}; FHS at most ${f}%; largest daily loss ${l}%.`,
+ pi: (a, c2, f, g) => `${a}: the return falls below the 1% quantile on ${c2} of the days with Chronos-2, ${f} with FHS and ${g} with GARCH-t (expected: 1%).`,
+ mc1: (lev, s) => `Eliminated from the ${lev}% set: ${s}.`,
+ mc2: (m, fz, d, p) => `S&P 500: lowest mean FZ0 ${m} (${fz}); DM of FHS with Chronos-2 volatility against FHS: ${d}, p = ${p}.`,
+ cf1: (n, s, x, e, r, xf) => `${n} days from ${s}: ${x} breaches with the conformal correction (${e} expected, rate ${r}); FHS has ${xf}.`,
+ cf2: (a, f, k) => `Average VaR 1%: ${a}% with the correction, ${f}% for FHS.` + (k ? ` On ${k} days the level α_t fell below the smallest attainable rank and the VaR is infinite.` : ''),
+ kz1: (c, z, r2, sr, lin) => `c = ${c}, z = ${z}: R² ${r2}%, Sharpe ratio ${sr}; linear model with z = 10³: ${lin}.`,
+ kz2: (z, sr, c) => `Highest Sharpe ratio for z = ${z}: ${sr}, at c = ${c}.`,
+ ai1: (d, n0, n1, m0, m1) => `Break on ${d}: mean d_t ${m0} over the ${n0} days before and ${m1} over the ${n1} days after.`,
+ ai2: (b, t, p, m) => `Change ${b}, HAC t = ${t}, p = ${p}; MDE at 80% power: ${m}.`
+};

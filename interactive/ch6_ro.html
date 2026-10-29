@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capitolul 6 · Volatilitate multivariată și dependență</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'ro';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch6_data.js?v=20261029b"></script>
+<script src="ch6_text_ro.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch6.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelarea piețelor financiare</h1><p>Capitolul 6 · Volatilitate multivariată și dependență</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index_ro.html#chapters">← Site-ul cursului</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf" target="_blank" rel="noopener">PDF-ul cursului</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_06" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch6.html" class="lang-btn">EN</a><a href="ch6_ro.html" class="lang-btn active">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
+<p class="toc"><a href="#s-why">Cînd se mișcă piețele împreună?</a> · <a href="#s-meas">Măsurarea covarianței și a incertitudinii ei</a> · <a href="#s-dcc">GARCH multivariat și DCC</a> · <a href="#s-crisis">Corelații în criză și distorsiunea Forbes–Rigobon</a> · <a href="#s-cop">Copule și dependență în cozi</a> · <a href="#s-app">Aplicații: Europa, România și bănci</a> · <a href="#s-ai">AI pentru descoperire științifică</a></p>
+<h2 class="sec" id="s-why">Cînd se mișcă piețele împreună?</h2>
+<section class="blk" id="rolling">
+  <h3>Acțiuni și obligațiuni: o corelație care și-a schimbat semnul</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=6" target="_blank" rel="noopener"><img src="slides/ch6_spy_tlt_rolling_ro.jpg" alt="Slide-ul 5: Acțiuni și obligațiuni: o corelație care și-a schimbat semnul" loading="lazy"></a>
+      <figcaption>Slide-ul 5</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ro-m">Fereastra (zile de tranzacționare): <b id="ro-m-v"></b></label><input type="range" id="ro-m" min="63" max="756" step="21" value="252"></div><div class="ctl"><label for="ro-t">Ultima zi a ferestrei: <b id="ro-t-v"></b></label><input type="range" id="ro-t" min="0" max="9999" step="1" value="9999"></div><button class="btn play" id="ro-play" type="button"></button></div><div class="charts "><div class="chart" id="ro-chart"></div><div class="chart" id="ro-sc"></div></div><ul class="out" id="ro-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pînă în 2021, corelația SPY–TLT pe 252 de zile a fost aproape mereu negativă. Ce s-a schimbat din 2022?</div>
+  <details><summary>Răspuns</summary><p>Corelația a devenit pozitivă: înainte de 2022 a fost pozitivă în 6% din zile, iar din ianuarie 2022 în 81% din zile. Șocurile de creștere economică mișcă acțiunile și obligațiunile în sensuri opuse, iar șocurile de inflație, dominante în 2022, le mișcă în același sens.</p></details>
+</section><h2 class="sec" id="s-meas">Măsurarea covarianței și a incertitudinii ei</h2>
+<section class="blk" id="async">
+  <h3>Corelații zilnice, pe 2 zile și săptămînale, 2000–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=10" target="_blank" rel="noopener"><img src="slides/ch6_async_ro.jpg" alt="Slide-ul 9: Corelații zilnice, pe 2 zile și săptămînale, 2000–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 9</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="as-k">Orizontul randamentelor din mijloc, k (zile): <b id="as-k-v"></b></label><input type="range" id="as-k" min="1" max="20" step="1" value="2"></div><button class="btn play" id="as-play" type="button"></button></div><div class="charts "><div class="chart" id="as-chart"></div><div class="chart" id="as-k-chart"></div></div><ul class="out" id="as-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Corelația zilnică SPY–Euro Stoxx 50 este 0,59. De ce urcă la 0,79 pe randamente săptămînale?</div>
+  <details><summary>Răspuns</summary><p>Bursele din zona euro se închid înaintea celei din New York, deci știrile americane de după închiderea europeană intră în prețurile europene abia a doua zi. Corelația din aceeași zi este deplasată spre zero, iar corelația decalată (SPY ieri, Euro Stoxx 50 azi) este 0,20. Pe orizonturi mai lungi, decalajul de o zi cîntărește tot mai puțin.</p></details>
+</section>
+<section class="blk" id="hac">
+  <h3>Intervale Fisher față de HAC: SPY și TLT</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch6_corr_hac_ro.jpg" alt="Slide-ul 14: Intervale Fisher față de HAC: SPY și TLT" loading="lazy"></a>
+      <figcaption>Slide-ul 14</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ha-m">Fereastra rolling (zile)</label><select id="ha-m"><option value="126">126</option><option value="252" selected>252</option><option value="504">504</option></select></div><div class="ctl"><label for="ha-L">Laguri Bartlett, L: <b id="ha-L-v"></b></label><input type="range" id="ha-L" min="0" max="20" step="1" value="4"></div><button class="btn play" id="ha-play" type="button"></button></div><div class="charts "><div class="chart" id="ha-chart"></div><div class="chart" id="ha-ratio"></div></div><ul class="out" id="ha-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Este intervalul Fisher de 95% potrivit pentru corelația a două serii de randamente zilnice?</div>
+  <details><summary>Răspuns</summary><p>Nu. Formula Fisher presupune perechi i.i.d. cu distribuția Normală bivariată. Cu cozi groase și volatility clustering, intervalul HAC este mai larg (mediana raportului lățimilor este 1,24), iar concluzia testului se schimbă în 8,2% din ferestre. Diferența vine mai ales din momentele de ordinul patru, nu din autocorelație.</p></details>
+</section>
+<section class="blk" id="ewma">
+  <h3>EWMA față de ferestre rolling, SPY–TLT din 2019</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=19" target="_blank" rel="noopener"><img src="slides/ch6_ewma_rolling_ro.jpg" alt="Slide-ul 18: EWMA față de ferestre rolling, SPY–TLT din 2019" loading="lazy"></a>
+      <figcaption>Slide-ul 18</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ew-l">Factorul de descreștere λ: <b id="ew-l-v"></b></label><input type="range" id="ew-l" min="0.8" max="0.995" step="0.005" value="0.94"></div><div class="ctl"><label for="ew-m">Fereastra rolling m (zile): <b id="ew-m-v"></b></label><input type="range" id="ew-m" min="20" max="500" step="10" value="60"></div><button class="btn play" id="ew-play" type="button"></button></div><div class="charts "><div class="chart" id="ew-chart"></div></div><ul class="out" id="ew-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care dintre estimatori a semnalat primul corelația pozitivă din 2022?</div>
+  <details><summary>Răspuns</summary><p>EWMA cu λ = 0,94: semnalul de 20 de zile consecutive cu corelație pozitivă apare pe 10 mai 2022, iar la fereastra de 250 de zile abia pe 8 decembrie 2022. Viteza are un preț: abaterea standard a variației zilnice a corelației este 0,060 pentru EWMA cu λ = 0,94 și 0,0088 pentru fereastra de 250 de zile.</p></details>
+</section><h2 class="sec" id="s-dcc">GARCH multivariat și DCC</h2>
+<section class="blk" id="dcc">
+  <h3>Corelația DCC dintre SPY și TLT, 2002–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=27" target="_blank" rel="noopener"><img src="slides/ch6_dcc_spy_tlt_ro.jpg" alt="Slide-ul 26: Corelația DCC dintre SPY și TLT, 2002–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 26</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="dc-a">Reacția a: <b id="dc-a-v"></b></label><input type="range" id="dc-a" min="0" max="0.15" step="any" value="0.0522"></div><div class="ctl"><label for="dc-b">Memoria b: <b id="dc-b-v"></b></label><input type="range" id="dc-b" min="0.8" max="0.999" step="any" value="0.9335"></div><button class="btn play" id="dc-play" type="button"></button></div><div class="charts "><div class="chart" id="dc-chart"></div></div><ul class="out" id="dc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Estimările DCC sînt a = 0,052 și b = 0,934. Ce spune suma lor?</div>
+  <details><summary>Răspuns</summary><p>Este persistența corelației: a + b = 0,986, deci un șoc asupra lui Q_t se înjumătățește în aproximativ 48 de zile. Testul LR față de corelația constantă dă 533,4; bootstrap-ul sub CCC dă p = 0,005, cea mai mică valoare posibilă cu B = 199.</p></details>
+</section>
+<section class="blk" id="minvar">
+  <h3>Aplicație: ponderi de varianță minimă cu DCC</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch6_dcc_minvar_ro.jpg" alt="Slide-ul 27: Aplicație: ponderi de varianță minimă cu DCC" loading="lazy"></a>
+      <figcaption>Slide-ul 27</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mv-r">Corelația constantă din varianta CCC: <b id="mv-r-v"></b></label><input type="range" id="mv-r" min="-0.9" max="0.9" step="any" value="-0.3"></div><button class="btn play" id="mv-play" type="button"></button></div><div class="charts "><div class="chart" id="mv-w"></div><div class="chart" id="mv-v"></div></div><ul class="out" id="mv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cu cît reduce DCC volatilitatea portofoliului de varianță minimă față de o corelație constantă?</div>
+  <details><summary>Răspuns</summary><p>Cu foarte puțin: 9,06% cu DCC, față de 9,10% cu corelație constantă și 10,99% pentru portofoliul 60/40 fix. Cea mai mare parte a cîștigului vine din volatilitățile GARCH. Parametrii sînt estimați pe tot eșantionul, deci comparația este in-sample.</p></details>
+</section><h2 class="sec" id="s-crisis">Corelații în criză și distorsiunea Forbes–Rigobon</h2>
+<section class="blk" id="fr-bias">
+  <h3>Creșterea corelației cauzată numai de volatilitate</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch6_fr_bias_ro.jpg" alt="Slide-ul 32: Creșterea corelației cauzată numai de volatilitate" loading="lazy"></a>
+      <figcaption>Slide-ul 32</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fb-d">Creșterea relativă a varianței, δ: <b id="fb-d-v"></b></label><input type="range" id="fb-d" min="0" max="10" step="any" value="6.54"></div><div class="ctl"><label for="fb-r">Corelația adevărată aleasă: <b id="fb-r-v"></b></label><input type="range" id="fb-r" min="0.05" max="0.95" step="0.05" value="0.4"></div><button class="btn play" id="fb-play" type="button"></button></div><div class="charts "><div class="chart" id="fb-chart"></div></div><ul class="out" id="fb-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În criza din 2008, varianța randamentelor S&P 500 pe 2 zile a crescut de 7,5 ori. Cum s-ar fi măsurat o corelație adevărată de 0,4 care nu se schimbă?</div>
+  <details><summary>Răspuns</summary><p>Ca 0,77. Cu δ = 6,54, formula ρ_c = ρ√((1 + δ)/(1 + δρ²)) crește corelația măsurată, deși coeficientul de transmitere β rămîne același. O corelație adevărată de 0,2 s-ar fi măsurat ca 0,49.</p></details>
+</section>
+<section class="blk" id="forbes-rigobon">
+  <h3>2008: corelații de criză brute față de cele corectate</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch6_forbes_rigobon_ro.jpg" alt="Slide-ul 34: 2008: corelații de criză brute față de cele corectate" loading="lazy"></a>
+      <figcaption>Slide-ul 34</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fr-k">Deplasarea ambelor ferestre (săptămîni): <b id="fr-k-v"></b></label><input type="range" id="fr-k" min="-8" max="8" step="1" value="0"></div><button class="btn play" id="fr-play" type="button"></button></div><div class="charts "><div class="chart" id="fr-chart"></div><div class="chart" id="fr-p"></div></div><ul class="out" id="fr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Corelația S&P 500–Euro Stoxx 50 a urcat de la 0,61 în anul calm la 0,80 în criza din 2008. Este aceasta contagion?</div>
+  <details><summary>Răspuns</summary><p>Nu, în ipotezele modelului. Creșterea brută este semnificativă (p = 0,005), dar corelația corectată pentru volatilitate este 0,44, sub nivelul din anul calm (p = 0,93). La BET, 0,48 devine 0,20 (p = 0,55). Cifrele se schimbă cînd deplasăm ferestrele, deci alegerea lor trebuie justificată.</p></details>
+</section><h2 class="sec" id="s-cop">Copule și dependență în cozi</h2>
+<section class="blk" id="exceedance">
+  <h3>Corelații de depășire: S&P 500 și Euro Stoxx 50</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch6_exceedance_ro.jpg" alt="Slide-ul 36: Corelații de depășire: S&P 500 și Euro Stoxx 50" loading="lazy"></a>
+      <figcaption>Slide-ul 36</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ex-q">Cuantila prag q: <b id="ex-q-v"></b></label><input type="range" id="ex-q" min="0.05" max="0.5" step="0.01" value="0.1"></div><button class="btn play" id="ex-play" type="button"></button></div><div class="charts "><div class="chart" id="ex-chart"></div><div class="chart" id="ex-sc"></div></div><ul class="out" id="ex-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La q = 0,10, cît de corelate sînt pierderile comune ale S&P 500 și Euro Stoxx 50, față de distribuția Normală?</div>
+  <details><summary>Răspuns</summary><p>Corelația pe pierderile comune este 0,80 (86 de săptămîni), iar pe cîștigurile comune 0,69 (70 de săptămîni). Distribuția Normală bivariată cu aceeași corelație, 0,78, dă la același prag doar 0,41.</p></details>
+</section>
+<section class="blk" id="copula-zoo">
+  <h3>Cinci copule cu același tau al lui Kendall</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch6_copula_zoo_ro.jpg" alt="Slide-ul 43: Cinci copule cu același tau al lui Kendall" loading="lazy"></a>
+      <figcaption>Slide-ul 43</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cz-t">Tau al lui Kendall: <b id="cz-t-v"></b></label><input type="range" id="cz-t" min="0.05" max="0.9" step="0.05" value="0.5"></div><button class="btn play" id="cz-play" type="button"></button></div><div class="charts "><div class="chart" id="cz-chart"></div></div><ul class="out" id="cz-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cele cinci copule au același tau al lui Kendall, 0,5. Dau și aceeași probabilitate a crahurilor comune?</div>
+  <details><summary>Răspuns</summary><p>Nu. Copulele Gaussiană și Frank au λ_L = 0. Copula t cu ν = 4 are λ_L = λ_U = 0,40, Clayton are λ_L = 0,71, iar Gumbel are dependență doar în upper tail, cu λ_U = 0,59.</p></details>
+</section>
+<section class="blk" id="pseudo-obs">
+  <h3>De la reziduuri la pseudo-observații: JPM și BAC</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch6_pseudo_obs_ro.jpg" alt="Slide-ul 45: De la reziduuri la pseudo-observații: JPM și BAC" loading="lazy"></a>
+      <figcaption>Slide-ul 45</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="po-y">Eșantionul începe în anul: <b id="po-y-v"></b></label><input type="range" id="po-y" min="2010" max="2024" step="1" value="2010"></div><button class="btn play" id="po-play" type="button"></button></div><div class="charts "><div class="chart" id="po-z"></div><div class="chart" id="po-u"></div></div><ul class="out" id="po-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> De ce estimăm copula pe rangurile reziduurilor GARCH, nu direct pe randamente?</div>
+  <details><summary>Răspuns</summary><p>Copula presupune observații i.i.d.; filtrul GARCH elimină volatility clustering, care altfel s-ar amesteca cu dependența. Rangurile împărțite la T + 1 dau marginale uniforme fără să alegem o distribuție marginală. Măsurile de rang nu depind de marginale: pentru JPM și BAC, τ = 0,641 și ρ_S = 0,822.</p></details>
+</section>
+<section class="blk" id="copula-fit">
+  <h3>Estimările copulelor și adecvarea lor: JPM și BAC</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch6_copula_fit_ro.jpg" alt="Slide-ul 46: Estimările copulelor și adecvarea lor: JPM și BAC" loading="lazy"></a>
+      <figcaption>Slide-ul 46</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cf-n">Gradele de libertate ν ale copulei t: <b id="cf-n-v"></b></label><input type="range" id="cf-n" min="2.2" max="40" step="any" value="4.24"></div><button class="btn play" id="cf-play" type="button"></button></div><div class="charts "><div class="chart" id="cf-chart"></div><div class="chart" id="cf-prof"></div></div><ul class="out" id="cf-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Copula Student t are cel mai mic AIC. Înseamnă asta că este un model adecvat?</div>
+  <details><summary>Răspuns</summary><p>Nu neapărat. AIC doar ordonează familiile. Testul Rosenblatt le respinge pe toate cinci, cu p-value-ul minim posibil; copula t are cea mai mică statistică, 0,082. Pe măsură ce ν crește, copula t se apropie de cea Gaussiană, iar avantajul ei de 309 puncte AIC scade.</p></details>
+</section>
+<section class="blk" id="tail-dep">
+  <h3>Dependența empirică în cozi: JPM și BAC</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch6_tail_dep_ro.jpg" alt="Slide-ul 48: Dependența empirică în cozi: JPM și BAC" loading="lazy"></a>
+      <figcaption>Slide-ul 48</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="td-q">Probabilitatea din coadă, q: <b id="td-q-v"></b></label><input type="range" id="td-q" min="0" max="19" step="1" value="4"></div><button class="btn play" id="td-play" type="button"></button></div><div class="charts "><div class="chart" id="td-chart"></div><div class="chart" id="td-sc"></div></div><ul class="out" id="td-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cînd JPM are una dintre cele mai proaste 5% zile, cît de des are BAC una dintre propriile 5% cele mai proaste zile?</div>
+  <details><summary>Răspuns</summary><p>În aproximativ 61% din cazuri (λ_L(0,05) = 0,61), în banda copulei t estimate (0,57–0,65). Upper tail-ul, 0,55, este sub bandă: cîștigurile comune sînt mai slabe decît prezice copula t, care este simetrică.</p></details>
+</section><h2 class="sec" id="s-app">Aplicații: Europa, România și bănci</h2>
+<section class="blk" id="integration">
+  <h3>Acțiuni din SUA, zona euro și România, 2000–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch6_integration_ro.jpg" alt="Slide-ul 50: Acțiuni din SUA, zona euro și România, 2000–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 50</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="in-w">Fereastra rolling (săptămîni): <b id="in-w-v"></b></label><input type="range" id="in-w" min="26" max="260" step="2" value="104"></div><button class="btn play" id="in-play" type="button"></button></div><div class="charts "><div class="chart" id="in-chart"></div></div><ul class="out" id="in-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Este piața românească mai legată de zona euro acum decît în anii 2000?</div>
+  <details><summary>Răspuns</summary><p>În medie, da: corelația Euro Stoxx 50–BET este 0,33 în 2000–2009, 0,45 în 2010–2019 și 0,61 din 2020. Pe fereastra rolling, corelația urcă în crize (0,76 la sfîrșitul lui 2021) și coboară după aceea (0,34 în septembrie 2026), deci o parte din creștere poate fi distorsiunea de volatilitate Forbes–Rigobon.</p></details>
+</section>
+<section class="blk" id="banks-heatmap">
+  <h3>Bănci: corelațiile randamentelor săptămînale, 2010–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=53" target="_blank" rel="noopener"><img src="slides/ch6_banks_heatmap_ro.jpg" alt="Slide-ul 52: Bănci: corelațiile randamentelor săptămînale, 2010–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 52</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bh-w">Fereastra</label><select id="bh-w"><option value="all" selected>Toată perioada (din ianuarie 2010)</option><option value="52">52 de săptămîni</option><option value="104">104 de săptămîni</option><option value="156">156 de săptămîni</option></select></div><div class="ctl"><label for="bh-t">Ultima săptămînă: <b id="bh-t-v"></b></label><input type="range" id="bh-t" min="51" max="9999" step="1" value="9999"></div><button class="btn play" id="bh-play" type="button"></button></div><div class="charts "><div class="chart" id="bh-chart"></div></div><ul class="out" id="bh-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care sînt cele mai slabe legături dintre băncile din regiuni diferite?</div>
+  <details><summary>Răspuns</summary><p>Legăturile cu băncile românești: BNP–TLV 0,33 și JPM–BRD 0,30, față de 0,86 pentru JPM–BAC și 0,75 pentru DBK–BNP. Factorii la nivel de țară (riscul suveran, dobînzile interne, reglementarea) separă sistemele bancare.</p></details>
+</section>
+<section class="blk" id="banks-avgcorr">
+  <h3>Corelațiile dintre bănci în timp</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch6_banks_avgcorr_ro.jpg" alt="Slide-ul 54: Corelațiile dintre bănci în timp" loading="lazy"></a>
+      <figcaption>Slide-ul 54</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ba-w">Fereastra rolling (săptămîni): <b id="ba-w-v"></b></label><input type="range" id="ba-w" min="26" max="156" step="2" value="52"></div><button class="btn play" id="ba-play" type="button"></button></div><div class="charts "><div class="chart" id="ba-chart"></div></div><ul class="out" id="ba-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce s-a întîmplat în martie–iunie 2020 cu legătura dintre băncile românești și celelalte?</div>
+  <details><summary>Răspuns</summary><p>Media corelațiilor pe 52 de săptămîni a urcat la 0,56, față de 0,25 pe toată perioada, adică de peste două ori. Diversificarea între sistemele bancare funcționează în perioade normale și slăbește în șocurile globale.</p></details>
+</section>
+<section class="blk" id="banks-mst">
+  <h3>O rețea de corelații între bănci</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch6_banks_mst_ro.jpg" alt="Slide-ul 55: O rețea de corelații între bănci" loading="lazy"></a>
+      <figcaption>Slide-ul 55</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bm-w">Fereastra</label><select id="bm-w"><option value="all" selected>Toată perioada (din ianuarie 2010)</option><option value="52">52 de săptămîni</option><option value="104">104 de săptămîni</option><option value="156">156 de săptămîni</option></select></div><div class="ctl"><label for="bm-t">Ultima săptămînă: <b id="bm-t-v"></b></label><input type="range" id="bm-t" min="51" max="9999" step="1" value="9999"></div><button class="btn play" id="bm-play" type="button"></button></div><div class="charts "><div class="chart" id="bm-chart"></div></div><ul class="out" id="bm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Prin ce muchie se leagă băncile românești de restul rețelei?</div>
+  <details><summary>Răspuns</summary><p>Prin BNP–BRD, cu o corelație de 0,35. Celelalte muchii sînt JPM–BAC (0,86), DBK–BNP (0,75), JPM–BNP (0,65) și TLV–BRD (0,65). Arborele este neorientat și contemporan, deci nu arată direcția transmiterii.</p></details>
+</section><h2 class="sec" id="s-ai">AI pentru descoperire științifică</h2>
+<section class="blk" id="ai-inflation">
+  <h3>Mini-studiu de caz: inflația și corelația acțiuni–obligațiuni</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch6_ai_inflation_ro.jpg" alt="Slide-ul 61: Mini-studiu de caz: inflația și corelația acțiuni–obligațiuni" loading="lazy"></a>
+      <figcaption>Slide-ul 61</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ai-t">Eșantionul se termină în: <b id="ai-t-v"></b></label><input type="range" id="ai-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-chart"></div><div class="chart" id="ai-ci"></div></div><ul class="out" id="ai-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Este nivelul inflației cel care explică corelația pozitivă dintre SPY și TLT?</div>
+  <details><summary>Răspuns</summary><p>Pe tot eșantionul panta este 0,055 pe punct procentual de inflație (t = 2,96), dar pe 2002–2021, cînd inflația a variat fără schimbare de regim, este 0,002 (t = 0,06). Panta vine din episodul de după 2022, iar o singură schimbare de regim nu separă nivelul inflației de regimul politicii monetare.</p></details>
+</section>
+<p class="src foot">Prețuri zilnice EODHD: SPY, TLT, S&P 500, Euro Stoxx 50, BET și acțiunile JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania și BRD. Inflația CPI din SUA: U.S. Bureau of Labor Statistics, prin FRED.</p>
+</main>
+</body>
+</html>

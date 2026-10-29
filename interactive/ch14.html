@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 14 · Deep Learning and Foundation Models</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'en';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch14_data.js?v=20261029b"></script>
+<script src="ch14_text_en.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch14.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelling Financial Markets</h1><p>Chapter 14 · Deep Learning and Foundation Models</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index.html#chapters">← Course site</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf" target="_blank" rel="noopener">Lecture PDF</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_14" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch14.html" class="lang-btn active">EN</a><a href="ch14_ro.html" class="lang-btn">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
+<p class="toc"><a href="#s-sig">What We Forecast and Where the Signal Is</a> · <a href="#s-att">Attention and Transformers</a> · <a href="#s-t1">Test 1: Forecasting Returns</a> · <a href="#s-t2">Test 2: Forecasting Realised Volatility</a> · <a href="#s-t3">Test 3: VaR 1% and ES 2.5%</a> · <a href="#s-kmz">Case Study: The Virtue of Complexity</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
+<h2 class="sec" id="s-sig">What We Forecast and Where the Signal Is</h2>
+<section class="blk" id="signal">
+  <h3>Where Is the Signal?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=5" target="_blank" rel="noopener"><img src="slides/ch14_acf_signal_en.jpg" alt="Slide 4: Where Is the Signal?" loading="lazy"></a>
+      <figcaption>Slide 4</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ac-y">First year: <b id="ac-y-v"></b></label><input type="range" id="ac-y" min="1990" max="2020" step="1" value="2000"></div><div class="ctl"><label for="ac-L">Lags: <b id="ac-L-v"></b></label><input type="range" id="ac-L" min="10" max="250" step="10" value="50"></div><div class="ctl"><label for="ac-s">Volatility series</label><select id="ac-s"><option value="abs" selected>|r|</option><option value="sq">r²</option></select></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-chart"></div></div><ul class="out" id="ac-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which series carries a forecastable signal: S&P 500 returns or their absolute values?</div>
+  <details><summary>Answer</summary><p>The absolute values. Their autocorrelation is 0.29 at lag 1 and still 0.13 at lag 50, and all 50 lags lie outside the ±0.024 band. Returns have a lag-1 autocorrelation of −0.099 and 15 lags outside the band, small and of changing sign.</p></details>
+</section><h2 class="sec" id="s-att">Attention and Transformers</h2>
+<section class="blk" id="patching">
+  <h3>Patching a 512-Day Context</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=16" target="_blank" rel="noopener"><img src="slides/ch14_patching_en.jpg" alt="Slide 15: Patching a 512-Day Context" loading="lazy"></a>
+      <figcaption>Slide 15</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pa-p">Patch length (top panel): <b id="pa-p-v"></b></label><input type="range" id="pa-p" min="0" max="5" step="1" value="3"></div><div class="ctl"><label for="pa-n">Context length (days): <b id="pa-n-v"></b></label><input type="range" id="pa-n" min="128" max="512" step="32" value="512"></div><button class="btn play" id="pa-play" type="button"></button></div><div class="charts "><div class="chart" id="pa-chart"></div></div><ul class="out" id="pa-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Chronos-2 cuts a context of 512 daily returns into patches of 16 days. How many attention scores does one layer compute?</div>
+  <details><summary>Answer</summary><p>32 tokens give 32² = 1,024 scores, against 512² = 262,144 if each day were a token: 256 times fewer. TimesFM-2.5 uses patches of 32 days, so 16 tokens and 256 scores.</p></details>
+</section><h2 class="sec" id="s-t1">Test 1: Forecasting Returns</h2>
+<section class="blk" id="return-r2">
+  <h3>Out-of-Sample R² for Returns</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch14_return_r2_en.jpg" alt="Slide 27: Out-of-Sample R² for Returns" loading="lazy"></a>
+      <figcaption>Slide 27</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="r2-w">Evaluation starts in: <b id="r2-w-v"></b></label><input type="range" id="r2-w" min="0" max="10" step="1" value="0"></div><button class="btn play" id="r2-play" type="button"></button></div><div class="charts "><div class="chart" id="r2-chart"></div></div><ul class="out" id="r2-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On the S&P 500, AR(1) and the LSTM have a positive out-of-sample R² (0.94% and 0.93%). Do they beat the zero forecast?</div>
+  <details><summary>Answer</summary><p>Not in the two-sided DM test: p = 0.639 for AR(1) and 0.090 for the LSTM. TimesFM-2.5 is significantly worse than zero (R² −3.35%, DM p = 0.001). Only on the BET does the LSTM pass at 5% (R² +1.15%, p = 0.014), before the correction for multiple tests.</p></details>
+</section><h2 class="sec" id="s-t2">Test 2: Forecasting Realised Volatility</h2>
+<section class="blk" id="rv-forecasts">
+  <h3>Forecasts Through the April 2025 Shock</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=36" target="_blank" rel="noopener"><img src="slides/ch14_rv_forecasts_en.jpg" alt="Slide 35: Forecasts Through the April 2025 Shock" loading="lazy"></a>
+      <figcaption>Slide 35</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rv-t">6-month window: <b id="rv-t-v"></b></label><input type="range" id="rv-t" min="0" max="40" step="1" value="28"></div><button class="btn play" id="rv-play" type="button"></button></div><div class="charts "><div class="chart" id="rv-chart"></div></div><ul class="out" id="rv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> SPY realised volatility peaked at 107% a year on 7 April 2025. Which model anticipated the jump?</div>
+  <details><summary>Answer</summary><p>None. All forecasts rise only the next day: a one-day forecast extrapolates the past, and the shock came from the tariff announcements. The foundation models and log-HAR then decay at similar speeds; GARCH-t decays more slowly.</p></details>
+</section>
+<section class="blk" id="qlike">
+  <h3>QLIKE Losses of Eight Volatility Models</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch14_qlike_en.jpg" alt="Slide 36: QLIKE Losses of Eight Volatility Models" loading="lazy"></a>
+      <figcaption>Slide 36</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ql-l">Loss function</label><select id="ql-l"><option value="qlike" selected>QLIKE</option><option value="mse">MSE</option></select></div><div class="ctl"><label for="ql-s">Left panel starts on: <b id="ql-s-v"></b></label><input type="range" id="ql-s" min="0" max="860" step="1" value="0"></div><button class="btn play" id="ql-play" type="button"></button></div><div class="charts "><div class="chart" id="ql-full"></div><div class="chart" id="ql-post"></div></div><ul class="out" id="ql-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Does Chronos-2, with no estimation on SPY, forecast realised variance better than log-HAR?</div>
+  <details><summary>Answer</summary><p>Its mean QLIKE loss is lower (0.231 against 0.234), but the DM test is not significant (p = 0.537), and the 90% model confidence set keeps six of the eight models. After 3 November 2025 the small LSTM is best (0.233).</p></details>
+</section><h2 class="sec" id="s-t3">Test 3: VaR 1% and ES 2.5%</h2>
+<section class="blk" id="breach-rates">
+  <h3>VaR 1% Breach Rates</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch14_breach_rates_en.jpg" alt="Slide 43: VaR 1% Breach Rates" loading="lazy"></a>
+      <figcaption>Slide 43</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="br-w">Evaluation starts in: <b id="br-w-v"></b></label><input type="range" id="br-w" min="0" max="10" step="1" value="0"></div><button class="btn play" id="br-play" type="button"></button></div><div class="charts "><div class="chart" id="br-chart"></div></div><ul class="out" id="br-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Raw Chronos-2 quantiles give 45 breaches of VaR 1% over 2,693 S&P 500 days. Is that consistent with a correct model?</div>
+  <details><summary>Answer</summary><p>No. The rate is 1.67% against an expected 1% (Kupiec p = 0.001), above the upper limit of 37 breaches of the 95% range. Used as a volatility filter for FHS, the same model gives 0.93% (p = 0.71).</p></details>
+</section>
+<section class="blk" id="covid-var">
+  <h3>The COVID-19 Crash: VaR 1% of Three Models</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch14_var_path_en.jpg" alt="Slide 44: The COVID-19 Crash: VaR 1% of Three Models" loading="lazy"></a>
+      <figcaption>Slide 44</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vp-t">5-month window: <b id="vp-t-v"></b></label><input type="range" id="vp-t" min="0" max="120" step="1" value="49"></div><button class="btn play" id="vp-play" type="button"></button></div><div class="charts "><div class="chart" id="vp-chart"></div></div><ul class="out" id="vp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> During the COVID-19 crash, FHS with Chronos-2 volatility has as few breaches as FHS. Is it the better forecast?</div>
+  <details><summary>Answer</summary><p>Not necessarily. Both have 2 breaches in 104 days, but the hybrid overshoots: its VaR 1% reaches 58.9% on 17.03.2020, against 26.4% for FHS and a largest daily loss of 12.8%. Raw Chronos-2 has 4 breaches, HS 12.</p></details>
+</section>
+<section class="blk" id="pit">
+  <h3>The Probability Integral Transform (PIT) and Calibration</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch14_pit_en.jpg" alt="Slide 46: The Probability Integral Transform (PIT) and Calibration" loading="lazy"></a>
+      <figcaption>Slide 46</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pi-w">Evaluation starts in: <b id="pi-w-v"></b></label><input type="range" id="pi-w" min="0" max="10" step="1" value="0"></div><button class="btn play" id="pi-play" type="button"></button></div><div class="charts three"><div class="chart" id="pi-sp500"></div><div class="chart" id="pi-btc"></div><div class="chart" id="pi-bet"></div></div><ul class="out" id="pi-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On the S&P 500, how often does the realised return fall below the Chronos-2 1% quantile?</div>
+  <details><summary>Answer</summary><p>On 1.67% of the days, so the first PIT bar is about 1.7 times its expected height: the lower tail of the zero-shot distribution is too thin. FHS gives 1.11%. The Berkowitz test rejects Chronos-2 on the S&P 500 (p = 0.019, σ̂ = 1.03) and never rejects FHS.</p></details>
+</section>
+<section class="blk" id="mcs">
+  <h3>Comparing (VaR 2.5%, ES 2.5%) Forecasts: the MCS</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch14_mcs_en.jpg" alt="Slide 48: Comparing (VaR 2.5%, ES 2.5%) Forecasts: the MCS" loading="lazy"></a>
+      <figcaption>Slide 48</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mc-w">Evaluation starts in: <b id="mc-w-v"></b></label><input type="range" id="mc-w" min="0" max="10" step="1" value="0"></div><div class="ctl"><label for="mc-a">MCS level</label><select id="mc-a"><option value="0.75">75%</option><option value="0.9" selected>90%</option><option value="0.95">95%</option></select></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts "><div class="chart" id="mc-chart"></div></div><ul class="out" id="mc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which (VaR 2.5%, ES 2.5%) models does the 90% model confidence set eliminate?</div>
+  <details><summary>Answer</summary><p>Only HS on the BET (p = 0.015). On the S&P 500 FHS has the lowest FZ0 loss, and the pairwise DM test, more powerful than the MCS, shows that FHS beats the Chronos-2 hybrid (DM +2.65, p = 0.008).</p></details>
+</section>
+<section class="blk" id="conformal">
+  <h3>Adaptive Conformal VaR 1% on the S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=52" target="_blank" rel="noopener"><img src="slides/ch14_conformal_en.jpg" alt="Slide 51: Adaptive Conformal VaR 1% on the S&P 500" loading="lazy"></a>
+      <figcaption>Slide 51</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cf-a">Market</label><select id="cf-a"><option value="sp500" selected>S&P 500</option><option value="btc">Bitcoin</option><option value="bet">BET</option></select></div><div class="ctl"><label for="cf-g">Step γ: <b id="cf-g-v"></b></label><input type="range" id="cf-g" min="0" max="5" step="1" value="2"></div><div class="ctl"><label for="cf-n">Calibration days</label><select id="cf-n"><option value="125">125</option><option value="250" selected>250</option><option value="500">500</option></select></div><button class="btn play" id="cf-play" type="button"></button></div><div class="charts "><div class="chart" id="cf-chart"></div></div><ul class="out" id="cf-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> With γ = 0.001, adaptive conformal inference brings the S&P 500 breaches of Chronos-2 close to 1%. What does the correction cost?</div>
+  <details><summary>Answer</summary><p>21 breaches against 24.4 expected over 2,443 days, but an average VaR 1% of 3.36% against 2.85% for FHS on the same days, so the FZ0 loss is significantly higher. With γ = 0 (split conformal) there are 16 breaches and an average VaR of 3.58%.</p></details>
+</section><h2 class="sec" id="s-kmz">Case Study: The Virtue of Complexity</h2>
+<section class="blk" id="complexity">
+  <h3>Case Study: Complexity on Course Data</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch14_kmz_complexity_en.jpg" alt="Slide 57: Case Study: Complexity on Course Data" loading="lazy"></a>
+      <figcaption>Slide 57</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="kz-z">Ridge penalty z: <b id="kz-z-v"></b></label><input type="range" id="kz-z" min="-3" max="3" step="1" value="3"></div><div class="ctl"><label for="kz-c">Complexity c (cursor): <b id="kz-c-v"></b></label><input type="range" id="kz-c" min="0" max="23" step="1" value="23"></div><div class="ctl"><label for="kz-v">Left panel</label><select id="kz-v"><option value="r2" selected>R²</option><option value="bn">‖β̂‖²</option></select></div><button class="btn play" id="kz-play" type="button"></button></div><div class="charts "><div class="chart" id="kz-r2"></div><div class="chart" id="kz-sr"></div></div><ul class="out" id="kz-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On course data, does the Sharpe ratio of the RFF timing strategy keep rising with complexity, as in the paper?</div>
+  <details><summary>Answer</summary><p>No. With z = 10³ it rises from 0.14 at c = 1 to 0.26 at c = 20 and falls to 0.07 at c = 1,000 (t = 0.4). The linear model with the same 7 predictors and z = 10³ has 0.32. Complexity helps up to c ≈ 20, not up to c = 1,000.</p></details>
+</section><h2 class="sec" id="s-ai">AI for Scientific Discovery</h2>
+<section class="blk" id="pre-post">
+  <h3>Mini-Case: a Test Without Power</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=63" target="_blank" rel="noopener"><img src="slides/ch14_ai_prepost_en.jpg" alt="Slide 62: Mini-Case: a Test Without Power" loading="lazy"></a>
+      <figcaption>Slide 62</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ai-m">Model</label><select id="ai-m"><option value="Chronos-2" selected>Chronos-2</option><option value="Chronos-Bolt">Chronos-Bolt</option><option value="TimesFM-2.5">TimesFM-2.5</option></select></div><div class="ctl"><label for="ai-b">Break date: <b id="ai-b-v"></b></label><input type="range" id="ai-b" min="120" max="919" step="1" value="761"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-chart"></div></div><ul class="out" id="ai-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> After the release of the Chronos-2 weights, its loss relative to log-HAR rises by 0.0088. Is this evidence of memorisation?</div>
+  <details><summary>Answer</summary><p>No. The change has a HAC t of 1.00 and p = 0.32, and the minimum detectable effect at 80% power is 0.0247, 4.9 times the pre-release gap. Even an infinite post-release window would leave an MDE of 0.0169, so “no memorisation” is not a finding either.</p></details>
+</section>
+<p class="src foot">Daily returns of the S&P 500, Bitcoin and the BET and 5-minute SPY prices: EODHD. One-day-ahead forecasts: Quantlets/Ch_14 (run_forecasts.py). Case study: SPY (EODHD) and FRED series.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 8 · Backtesting Risk Forecasts</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'en';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch8_data.js?v=20261029b"></script>
+<script src="ch8_text_en.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch8.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelling Financial Markets</h1><p>Chapter 8 · Backtesting Risk Forecasts</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index.html#chapters">← Course site</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf" target="_blank" rel="noopener">Lecture PDF</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_08" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch8.html" class="lang-btn active">EN</a><a href="ch8_ro.html" class="lang-btn">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same forecasts. The ▶ button moves the parameter step by step.</p>
+<p class="toc"><a href="#s-role">Why Backtest Risk Forecasts?</a> · <a href="#s-var">Backtesting VaR: Coverage and Independence</a> · <a href="#s-basel">The Regulator's View: Basel Traffic Light and FRTB</a> · <a href="#s-es">Backtesting Expected Shortfall</a> · <a href="#s-elicit">Elicitability and Scoring Functions</a> · <a href="#s-comp">Comparative Backtesting</a> · <a href="#s-conf">Conformal Prediction for Tail Risk</a> · <a href="#s-case">Case Study: Backtesting ES with ES Forecasts Only</a></p>
+<h2 class="sec" id="s-role">Why Backtest Risk Forecasts?</h2>
+<section class="blk" id="four-assets">
+  <h3>Four Markets, One Risk Model</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=8" target="_blank" rel="noopener"><img src="slides/ch8_four_assets_en.jpg" alt="Slide 7: Four Markets, One Risk Model" loading="lazy"></a>
+      <figcaption>Slide 7</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fa-l">VaR level (GARCH-EVT)</label><select id="fa-l"><option value="VaR1" selected>VaR 1%</option><option value="VaR2.5">VaR 2.5%</option><option value="VaR5">VaR 5%</option></select></div><div class="ctl"><label for="fa-y">Evaluation up to the end of: <b id="fa-y-v"></b></label><input type="range" id="fa-y" min="2007" max="2026" step="1" value="2026"></div><button class="btn play" id="fa-play" type="button"></button></div><div class="charts "><div class="chart" id="fa-chart"></div></div><ul class="out" id="fa-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The GARCH-EVT VaR 1% breach rate is 1.15% on the S&amp;P 500. Is a rate close to 1% enough to call the model good?</div>
+  <details><summary>Answer</summary><p>No. The rate checks only the number of breaches: 57 in 4,959 days. The Kupiec test does not reject GARCH-EVT on the S&amp;P 500 (p = 0.302), but the DQ test does (p &lt; 0.001): the breaches can be predicted from the VaR level and from past breaches.</p></details>
+</section><h2 class="sec" id="s-var">Backtesting VaR: Coverage and Independence</h2>
+<section class="blk" id="sp500-var">
+  <h3>S&P 500: Two VaR Forecasts, 2007–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch8_sp500_var_en.jpg" alt="Slide 11: S&P 500: Two VaR Forecasts, 2007–2026" loading="lazy"></a>
+      <figcaption>Slide 11</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sv-y">Period shown (far left: whole period): <b id="sv-y-v"></b></label><input type="range" id="sv-y" min="2006" max="2026" step="1" value="2006"></div><button class="btn play" id="sv-play" type="button"></button></div><div class="charts "><div class="chart" id="sv-chart"></div></div><ul class="out" id="sv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> HS has 83 breaches and GARCH-t 88, in 4,959 days. Which of the two forecasts is better?</div>
+  <details><summary>Answer</summary><p>The count does not separate them: the rates are 1.67% and 1.77%, and Kupiec rejects both (p &lt; 0.001). The difference is in the timing: HS has 26 breaches in 2008 and 12 in 2020, GARCH-t 8 and 6. Independence is rejected for HS (LR_ind = 15.90, p &lt; 0.001) but not for GARCH-t (p = 0.095).</p></details>
+</section>
+<section class="blk" id="kupiec">
+  <h3>How Many Breaches Are Acceptable?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch8_kupiec_curve_en.jpg" alt="Slide 14: How Many Breaches Are Acceptable?" loading="lazy"></a>
+      <figcaption>Slide 14</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="kp-a">VaR level α</label><select id="kp-a"><option value="0.01" selected>1%</option><option value="0.025">2.5%</option><option value="0.05">5%</option></select></div><div class="ctl"><label for="kp-T">Sample length T (right chart): <b id="kp-T-v"></b></label><input type="range" id="kp-T" min="250" max="5000" step="50" value="1000"></div><button class="btn play" id="kp-play" type="button"></button></div><div class="charts "><div class="chart" id="kp-top"></div><div class="chart" id="kp-bot"></div></div><ul class="out" id="kp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> A VaR 1% is never breached in one year (T = 250). Does the Kupiec test reject the model?</div>
+  <details><summary>Answer</summary><p>Yes: LR_uc = −500 ln 0.99 = 5.03 &gt; 3.84, so the VaR is too conservative. In 250 days only 1 to 6 breaches are accepted, in 1,000 days 5 to 16. The rule LR_uc &gt; 3.84 has an effective size of 9.5% at T = 250; P(x = 0) = 8.1% is the largest part.</p></details>
+</section>
+<section class="blk" id="pof-power">
+  <h3>Power of the POF Test</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=17" target="_blank" rel="noopener"><img src="slides/ch8_pof_power_en.jpg" alt="Slide 16: Power of the POF Test" loading="lazy"></a>
+      <figcaption>Slide 16</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pp-T">Sample length T (red curves): <b id="pp-T-v"></b></label><input type="range" id="pp-T" min="100" max="5000" step="50" value="1000"></div><button class="btn play" id="pp-play" type="button"></button></div><div class="charts "><div class="chart" id="pp-chart"></div></div><ul class="out" id="pp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The true breach rate is 2%, twice the 1% target. How likely is the POF test to reject at 5% on one year of data?</div>
+  <details><summary>Answer</summary><p>24%, by the exact Binomial calculation; the local χ²₁(λ) approximation gives 36%. On 1,000 days the exact power rises to 78%. A power of 50% needs π ≈ 2.67% at T = 250 and π ≈ 1.67% at T = 1,000.</p></details>
+</section>
+<section class="blk" id="breach-rates">
+  <h3>Breach Rates Across Models and Markets</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=19" target="_blank" rel="noopener"><img src="slides/ch8_breach_rates_en.jpg" alt="Slide 18: Breach Rates Across Models and Markets" loading="lazy"></a>
+      <figcaption>Slide 18</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="br-l">VaR level</label><select id="br-l"><option value="VaR1" selected>VaR 1%</option><option value="VaR2.5">VaR 2.5%</option><option value="VaR5">VaR 5%</option></select></div><div class="ctl"><label for="br-y">Evaluation starts in: <b id="br-y-v"></b></label><input type="range" id="br-y" min="2007" max="2024" step="1" value="2007"></div><button class="btn play" id="br-play" type="button"></button></div><div class="charts "><div class="chart" id="br-chart"></div></div><ul class="out" id="br-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The Normal model breaches VaR 1% on 2.70% of the S&amp;P 500 days. On which market is it not rejected by the Kupiec test?</div>
+  <details><summary>Answer</summary><p>On EUR/RON: the rate is 1.06%, with p = 0.708. It is rejected on the S&amp;P 500 (2.70%), BET (1.90%) and Bitcoin (1.74%). On EUR/RON, HS is too conservative (0.51%): an old crisis stays in the 1,000-day window and keeps its VaR high.</p></details>
+</section>
+<section class="blk" id="timeline">
+  <h3>When Do Breaches Happen?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=22" target="_blank" rel="noopener"><img src="slides/ch8_breach_timeline_en.jpg" alt="Slide 21: When Do Breaches Happen?" loading="lazy"></a>
+      <figcaption>Slide 21</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="tl-m">Model tested</label><select id="tl-m"><option value="HS" selected>HS</option><option value="Normal">Normal</option><option value="Student-t">Student-t</option><option value="GARCH-t">GARCH-t</option><option value="FHS">FHS</option><option value="GARCH-EVT">GARCH-EVT</option></select></div><div class="ctl"><label for="tl-s">First year of the subsample: <b id="tl-s-v"></b></label><input type="range" id="tl-s" min="2007" max="2023" step="1" value="2007"></div><div class="ctl"><label for="tl-n">Length of the subsample (years): <b id="tl-n-v"></b></label><input type="range" id="tl-n" min="1" max="10" step="1" value="4"></div><button class="btn play" id="tl-play" type="button"></button></div><div class="charts "><div class="chart" id="tl-chart"></div></div><ul class="out" id="tl-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For HS over 2007–2010, π̂₁₁ = 0.0732, almost twice π̂₀₁ = 0.0393. Does the Christoffersen test reject independence?</div>
+  <details><summary>Answer</summary><p>No: LR_ind = 0.95, with p = 0.33. The estimate π̂₁₁ rests on only 3 pairs of consecutive breaches (n₁₁ = 3, n₁₀ = 38). On the whole 2007–2026 sample, the same test rejects independence for HS: LR_ind = 15.90, p &lt; 0.001.</p></details>
+</section>
+<section class="blk" id="var-pvalues">
+  <h3>All VaR Tests at a Glance</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch8_var_pvalues_en.jpg" alt="Slide 23: All VaR Tests at a Glance" loading="lazy"></a>
+      <figcaption>Slide 23</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vp-s">Significance level: <b id="vp-s-v"></b></label><input type="range" id="vp-s" min="0.01" max="0.1" step="0.005" value="0.05"></div><button class="btn play" id="vp-play" type="button"></button></div><div class="charts three"><div class="chart" id="vp-uc"></div><div class="chart" id="vp-cc"></div><div class="chart" id="vp-dur"></div></div><ul class="out" id="vp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The Kupiec test does not reject FHS on the S&amp;P 500 (p = 0.116). Does any other test reject it?</div>
+  <details><summary>Answer</summary><p>Yes. The conditional coverage test gives p = 0.040, a rejection at 5%, and the DQ test gives p &lt; 0.001. The duration test does not reject (p = 0.527). Each test checks a different implication of conditional calibration.</p></details>
+</section><h2 class="sec" id="s-basel">The Regulator's View: Basel Traffic Light and FRTB</h2>
+<section class="blk" id="traffic-light">
+  <h3>The Traffic Light Through Time</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch8_traffic_light_en.jpg" alt="Slide 27: The Traffic Light Through Time" loading="lazy"></a>
+      <figcaption>Slide 27</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="tf-a">Market</label><select id="tf-a"><option value="sp500" selected>S&amp;P 500</option><option value="bet">BET</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option></select></div><div class="ctl"><label for="tf-t">Day (end of the 250-day window): <b id="tf-t-v"></b></label><input type="range" id="tf-t" min="0" max="4958" step="1" value="4958"></div><button class="btn play" id="tf-play" type="button"></button></div><div class="charts "><div class="chart" id="tf-chart"></div></div><ul class="out" id="tf-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On the S&amp;P 500, the Normal model reaches 37 exceptions in 250 days. What share of the days does each model spend in the red zone?</div>
+  <details><summary>Answer</summary><p>Normal 22.3%, HS 14.7%, GARCH-t 2.0%, FHS 0.8%. GARCH-t, however, is in the yellow zone 46.5% of the time. The peaks of Normal (37) and HS (27) fall in the window ending 01.12.2008; the penalty stays in force for another year after the crisis.</p></details>
+</section><h2 class="sec" id="s-es">Backtesting Expected Shortfall</h2>
+<section class="blk" id="mf-residuals">
+  <h3>Exceedance Residuals on the S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch8_mf_residuals_en.jpg" alt="Slide 31: Exceedance Residuals on the S&P 500" loading="lazy"></a>
+      <figcaption>Slide 31</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mf-a">Market</label><select id="mf-a"><option value="sp500" selected>S&amp;P 500</option><option value="bet">BET</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option></select></div><div class="ctl"><label for="mf-y">Evaluation up to the end of: <b id="mf-y-v"></b></label><input type="range" id="mf-y" min="2008" max="2026" step="1" value="2026"></div><button class="btn play" id="mf-play" type="button"></button></div><div class="charts "><div class="chart" id="mf-chart"></div></div><ul class="out" id="mf-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The mean exceedance residual is 0.100 for GARCH-t and 0.104 for FHS. Why is GARCH-t rejected at 5% and FHS not?</div>
+  <details><summary>Answer</summary><p>GARCH-t has more VaR 2.5% breach days: 198, against 128 for FHS. With almost equal means, the t statistic grows with √N: 1.73 for GARCH-t, 1.34 for FHS. The bootstrap p-values are 0.025 and 0.072.</p></details>
+</section>
+<section class="blk" id="z2-rolling">
+  <h3>Z₂ Over Rolling 250-Day Windows</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch8_z2_rolling_en.jpg" alt="Slide 34: Z₂ Over Rolling 250-Day Windows" loading="lazy"></a>
+      <figcaption>Slide 34</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="z2-a">Market</label><select id="z2-a"><option value="sp500" selected>S&amp;P 500</option><option value="bet">BET</option></select></div><div class="ctl"><label for="z2-n">Window length (days): <b id="z2-n-v"></b></label><input type="range" id="z2-n" min="125" max="1000" step="25" value="250"></div><button class="btn play" id="z2-play" type="button"></button></div><div class="charts "><div class="chart" id="z2-chart"></div></div><ul class="out" id="z2-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How often is the GARCH-t Z₂ below the −0.70 threshold on 250-day windows?</div>
+  <details><summary>Answer</summary><p>In 44.3% of the windows; below −1.8 in only 3.0%. The −0.70 threshold is the 5% critical value for T = 250, so a daily check raises many alarms. The GARCH-t minimum is −2.52, in the window ending 05.02.2008.</p></details>
+</section>
+<section class="blk" id="es-pvalues">
+  <h3>All ES Tests at a Glance</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=36" target="_blank" rel="noopener"><img src="slides/ch8_es_pvalues_en.jpg" alt="Slide 35: All ES Tests at a Glance" loading="lazy"></a>
+      <figcaption>Slide 35</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ep-k">Cell values</label><select id="ep-k"><option value="p" selected>p-value</option><option value="stat">test statistic</option></select></div><div class="ctl"><label for="ep-s">Significance level: <b id="ep-s-v"></b></label><input type="range" id="ep-s" min="0.01" max="0.1" step="0.005" value="0.05"></div><button class="btn play" id="ep-play" type="button"></button></div><div class="charts three"><div class="chart" id="ep-mf"></div><div class="chart" id="ep-z2"></div><div class="chart" id="ep-u"></div></div><ul class="out" id="ep-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On the S&amp;P 500, McNeil–Frey does not reject Student-t (p = 0.173). What does Z₂ say?</div>
+  <details><summary>Answer</summary><p>Z₂ rejects it: Z₂ = −0.723, with p = 0.002. McNeil–Frey compares only the size of the losses on breach days, while Z₂ combines frequency and size. Student-t breaches VaR 2.5% on 4.19% of the days.</p></details>
+</section><h2 class="sec" id="s-elicit">Elicitability and Scoring Functions</h2>
+<section class="blk" id="elicitability">
+  <h3>Elicitability in Pictures</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch8_elicitability_en.jpg" alt="Slide 41: Elicitability in Pictures" loading="lazy"></a>
+      <figcaption>Slide 41</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="el-nu">Degrees of freedom ν of the Student-t: <b id="el-nu-v"></b></label><input type="range" id="el-nu" min="2.5" max="30" step="0.1" value="4"></div><div class="ctl"><label for="el-a">Level α</label><select id="el-a"><option value="0.01">1%</option><option value="0.025" selected>2.5%</option><option value="0.05">5%</option></select></div><button class="btn play" id="el-play" type="button"></button></div><div class="charts "><div class="chart" id="el-pin"></div><div class="chart" id="el-fz"></div></div><ul class="out" id="el-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Losses follow a Student-t distribution with ν = 4 and unit variance. Where does the expected pinball loss reach its minimum?</div>
+  <details><summary>Answer</summary><p>At the true VaR 2.5%, 1.96: the derivative F(v) − (1 − α) is zero at the quantile. The expected FZ0 loss reaches its minimum at (1.96, 2.82), the true (VaR, ES) pair, up to the grid. No scoring function of the ES alone has this property.</p></details>
+</section><h2 class="sec" id="s-comp">Comparative Backtesting</h2>
+<section class="blk" id="fz0">
+  <h3>Average FZ0 Loss by Model</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch8_fz0_en.jpg" alt="Slide 44: Average FZ0 Loss by Model" loading="lazy"></a>
+      <figcaption>Slide 44</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fz-y">Evaluation starts in: <b id="fz-y-v"></b></label><input type="range" id="fz-y" min="2007" max="2025" step="1" value="2007"></div><button class="btn play" id="fz-play" type="button"></button></div><div class="charts "><div class="chart" id="fz-chart"></div></div><ul class="out" id="fz-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The mean FZ0 loss of GARCH-t exceeds that of FHS by 0.040 on the S&amp;P 500. Is the difference significant?</div>
+  <details><summary>Answer</summary><p>Yes: DM = 2.66, with p = 0.008 and q = 9 Newey–West lags. GARCH-EVT differs from FHS by only 0.003 (DM = 1.24, p = 0.21). On BET, FHS also has the lowest mean FZ0 loss.</p></details>
+</section>
+<section class="blk" id="dm-matrix">
+  <h3>Pairwise Diebold–Mariano Tests, S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch8_dm_matrix_en.jpg" alt="Slide 45: Pairwise Diebold–Mariano Tests, S&P 500" loading="lazy"></a>
+      <figcaption>Slide 45</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="dm-q">Number of Newey–West lags q: <b id="dm-q-v"></b></label><input type="range" id="dm-q" min="0" max="40" step="1" value="9"></div><div class="ctl"><label for="dm-y">Evaluation starts in: <b id="dm-y-v"></b></label><input type="range" id="dm-y" min="2007" max="2024" step="1" value="2007"></div><button class="btn play" id="dm-play" type="button"></button></div><div class="charts "><div class="chart" id="dm-chart"></div></div><ul class="out" id="dm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Normal minus HS: DM = 2.88. What does the positive sign mean?</div>
+  <details><summary>Answer</summary><p>The Normal model has the higher mean FZ0 loss, so it is worse, and the difference is significant at 5%. An empirical quantile, even one that adjusts slowly, beats a thin tail. 13 of the 15 pairs differ significantly at 5%; the exceptions are Normal–Student-t (1.94) and FHS–GARCH-EVT (−1.24).</p></details>
+</section>
+<section class="blk" id="mcs">
+  <h3>Which Models Survive?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch8_mcs_en.jpg" alt="Slide 48: Which Models Survive?" loading="lazy"></a>
+      <figcaption>Slide 48</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mc-a">Level α_MCS: <b id="mc-a-v"></b></label><input type="range" id="mc-a" min="0.01" max="0.3" step="0.01" value="0.1"></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts "><div class="chart" id="mc-chart"></div></div><ul class="out" id="mc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which models stay in the 90% MCS on the S&amp;P 500 and on BET?</div>
+  <details><summary>Answer</summary><p>FHS (p = 1.000 on both markets) and GARCH-EVT (p = 0.211 on the S&amp;P 500, above 0.96 on BET). GARCH-t is excluded on the S&amp;P 500 (p = 0.010) and, narrowly, on BET (p = 0.096): with α_MCS = 5% it would stay in the MCS on BET.</p></details>
+</section><h2 class="sec" id="s-conf">Conformal Prediction for Tail Risk</h2>
+<section class="blk" id="conformal-path">
+  <h3>Conformal VaR Through COVID-19</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=53" target="_blank" rel="noopener"><img src="slides/ch8_conformal_path_en.jpg" alt="Slide 52: Conformal VaR Through COVID-19" loading="lazy"></a>
+      <figcaption>Slide 52</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cp-g">ACI step γ: <b id="cp-g-v"></b></label><input type="range" id="cp-g" min="0.001" max="0.05" step="0.001" value="0.005"></div><div class="ctl"><label for="cp-a">VaR level</label><select id="cp-a"><option value="VaR1" selected>VaR 1%</option><option value="VaR2.5">VaR 2.5%</option><option value="VaR5">VaR 5%</option></select></div><button class="btn play" id="cp-play" type="button"></button></div><div class="charts "><div class="chart" id="cp-chart"></div></div><ul class="out" id="cp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Between 20.02 and 30.04.2020, 0.5 breaches of VaR 1% were expected. How many did split conformal and ACI have?</div>
+  <details><summary>Answer</summary><p>Split conformal 6, ACI 4 (8% of the 50 days). ACI set VaR = ∞ on 37 of these days, and α_t fell to 0.09%. Split conformal then stays near 18% for a year, because the March 2020 scores remain in the 250-day calibration set.</p></details>
+</section>
+<section class="blk" id="conformal-regimes">
+  <h3>Coverage in Calm and Crisis Periods</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch8_conformal_regimes_en.jpg" alt="Slide 54: Coverage in Calm and Crisis Periods" loading="lazy"></a>
+      <figcaption>Slide 54</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cr-q">Crisis day: 20-day volatility above the percentile: <b id="cr-q-v"></b></label><input type="range" id="cr-q" min="0.75" max="0.95" step="0.05" value="0.9"></div><button class="btn play" id="cr-play" type="button"></button></div><div class="charts "><div class="chart" id="cr-chart"></div></div><ul class="out" id="cr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On all S&amp;P 500 days, split conformal breaches VaR 5% on 5.34% of the days. What is the rate on crisis days?</div>
+  <details><summary>Answer</summary><p>7.29%, on the 713 crisis days; on EUR/RON it reaches 11.43%. ACI lowers the crisis rate to 4.49% on the S&amp;P 500 and 5.38% on BET. Marginal coverage does not guarantee coverage in a crisis.</p></details>
+</section><h2 class="sec" id="s-case">Case Study: Backtesting ES with ES Forecasts Only</h2>
+<section class="blk" id="case-table3">
+  <h3>Case Study (3/4): Tails Matter More Than Refits</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch8_bd_table3_en.jpg" alt="Slide 57: Case Study (3/4): Tails Matter More Than Refits" loading="lazy"></a>
+      <figcaption>Slide 57</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bd-r">Refit frequency, dashed line (days): <b id="bd-r-v"></b></label><input type="range" id="bd-r" min="0" max="4" step="1" value="4"></div><button class="btn play" id="bd-play" type="button"></button></div><div class="charts "><div class="chart" id="bd-chart"></div></div><ul class="out" id="bd-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> With Normal innovations, what share of the 200 stocks has its ES 2.5% forecasts rejected?</div>
+  <details><summary>Answer</summary><p>Between 0.80 and 0.96 in all 50 cells (5 windows × 5 refit frequencies × GARCH/GJR-GARCH). With Student-t innovations: at most 0.12 with 250-day windows and at most 0.01 with windows of at least 1,000 days. The tail of the distribution matters more than the refit frequency.</p></details>
+</section>
+<p class="src foot">Daily losses (negative log returns) of the S&amp;P 500, BET and Bitcoin, EODHD prices, and of EUR/RON, the BNR reference rate. One-day VaR and ES forecasts on a rolling window of 1,000 days, evaluated from January 2007 (EUR/RON from June 2009, Bitcoin from June 2017) to 18 September 2026. Case study: Table 3 of Bayer and Dimitriadis (2022).</p>
+</main>
+</body>
+</html>

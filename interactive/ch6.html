@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 6 · Multivariate Volatility and Dependence</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'en';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch6_data.js?v=20261029b"></script>
+<script src="ch6_text_en.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch6.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelling Financial Markets</h1><p>Chapter 6 · Multivariate Volatility and Dependence</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index.html#chapters">← Course site</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf" target="_blank" rel="noopener">Lecture PDF</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_06" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch6.html" class="lang-btn active">EN</a><a href="ch6_ro.html" class="lang-btn">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
+<p class="toc"><a href="#s-why">When Do Markets Move Together?</a> · <a href="#s-meas">Measuring Covariance and Its Uncertainty</a> · <a href="#s-dcc">Multivariate GARCH and DCC</a> · <a href="#s-crisis">Crisis Correlations and the Forbes–Rigobon Bias</a> · <a href="#s-cop">Copulas and Tail Dependence</a> · <a href="#s-app">Applications: Europe, Romania and Banks</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
+<h2 class="sec" id="s-why">When Do Markets Move Together?</h2>
+<section class="blk" id="rolling">
+  <h3>Stocks and Bonds: A Correlation That Changed Sign</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=6" target="_blank" rel="noopener"><img src="slides/ch6_spy_tlt_rolling_en.jpg" alt="Slide 5: Stocks and Bonds: A Correlation That Changed Sign" loading="lazy"></a>
+      <figcaption>Slide 5</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ro-m">Window (trading days): <b id="ro-m-v"></b></label><input type="range" id="ro-m" min="63" max="756" step="21" value="252"></div><div class="ctl"><label for="ro-t">Last day of the window: <b id="ro-t-v"></b></label><input type="range" id="ro-t" min="0" max="9999" step="1" value="9999"></div><button class="btn play" id="ro-play" type="button"></button></div><div class="charts "><div class="chart" id="ro-chart"></div><div class="chart" id="ro-sc"></div></div><ul class="out" id="ro-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Until 2021 the 252-day SPY–TLT correlation was almost always negative. What changed from 2022?</div>
+  <details><summary>Answer</summary><p>The correlation turned positive: it was positive on 6% of the days before 2022 and on 81% of the days from January 2022. Growth shocks move stocks and bonds in opposite directions; inflation shocks, which dominated in 2022, move them in the same direction.</p></details>
+</section><h2 class="sec" id="s-meas">Measuring Covariance and Its Uncertainty</h2>
+<section class="blk" id="async">
+  <h3>Daily, 2-Day and Weekly Correlations, 2000–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=10" target="_blank" rel="noopener"><img src="slides/ch6_async_en.jpg" alt="Slide 9: Daily, 2-Day and Weekly Correlations, 2000–2026" loading="lazy"></a>
+      <figcaption>Slide 9</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="as-k">Horizon of the middle returns, k (days): <b id="as-k-v"></b></label><input type="range" id="as-k" min="1" max="20" step="1" value="2"></div><button class="btn play" id="as-play" type="button"></button></div><div class="charts "><div class="chart" id="as-chart"></div><div class="chart" id="as-k-chart"></div></div><ul class="out" id="as-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The daily SPY–Euro Stoxx 50 correlation is 0.59. Why does it rise to 0.79 on weekly returns?</div>
+  <details><summary>Answer</summary><p>Euro-area exchanges close before New York, so US news released after the European close enters European prices only the next day. The same-day correlation is biased towards zero, and the lagged correlation (SPY yesterday, Euro Stoxx 50 today) is 0.20. Over longer horizons the one-day lag matters less and less.</p></details>
+</section>
+<section class="blk" id="hac">
+  <h3>Fisher versus HAC Intervals: SPY and TLT</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch6_corr_hac_en.jpg" alt="Slide 14: Fisher versus HAC Intervals: SPY and TLT" loading="lazy"></a>
+      <figcaption>Slide 14</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ha-m">Rolling window (days)</label><select id="ha-m"><option value="126">126</option><option value="252" selected>252</option><option value="504">504</option></select></div><div class="ctl"><label for="ha-L">Bartlett lags, L: <b id="ha-L-v"></b></label><input type="range" id="ha-L" min="0" max="20" step="1" value="4"></div><button class="btn play" id="ha-play" type="button"></button></div><div class="charts "><div class="chart" id="ha-chart"></div><div class="chart" id="ha-ratio"></div></div><ul class="out" id="ha-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Is the 95% Fisher interval adequate for the correlation of two daily return series?</div>
+  <details><summary>Answer</summary><p>No. The Fisher formula assumes i.i.d. pairs from the bivariate Normal distribution. With fat tails and volatility clustering the HAC interval is wider (the median ratio of the widths is 1.24), and the conclusion of the test changes in 8.2% of the windows. Most of the difference comes from the fourth moments, not from autocorrelation.</p></details>
+</section>
+<section class="blk" id="ewma">
+  <h3>EWMA versus Rolling Windows, SPY–TLT since 2019</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=19" target="_blank" rel="noopener"><img src="slides/ch6_ewma_rolling_en.jpg" alt="Slide 18: EWMA versus Rolling Windows, SPY–TLT since 2019" loading="lazy"></a>
+      <figcaption>Slide 18</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ew-l">Decay factor λ: <b id="ew-l-v"></b></label><input type="range" id="ew-l" min="0.8" max="0.995" step="0.005" value="0.94"></div><div class="ctl"><label for="ew-m">Rolling window m (days): <b id="ew-m-v"></b></label><input type="range" id="ew-m" min="20" max="500" step="10" value="60"></div><button class="btn play" id="ew-play" type="button"></button></div><div class="charts "><div class="chart" id="ew-chart"></div></div><ul class="out" id="ew-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which estimator was the first to signal the positive correlation of 2022?</div>
+  <details><summary>Answer</summary><p>EWMA with λ = 0.94: the signal of 20 consecutive days of positive correlation comes on 10 May 2022, and for the 250-day window only on 8 December 2022. Speed has a price: the standard deviation of the daily change of the correlation is 0.060 for EWMA with λ = 0.94 and 0.0088 for the 250-day window.</p></details>
+</section><h2 class="sec" id="s-dcc">Multivariate GARCH and DCC</h2>
+<section class="blk" id="dcc">
+  <h3>DCC Correlation of SPY and TLT, 2002–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=27" target="_blank" rel="noopener"><img src="slides/ch6_dcc_spy_tlt_en.jpg" alt="Slide 26: DCC Correlation of SPY and TLT, 2002–2026" loading="lazy"></a>
+      <figcaption>Slide 26</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="dc-a">Reaction a: <b id="dc-a-v"></b></label><input type="range" id="dc-a" min="0" max="0.15" step="any" value="0.0522"></div><div class="ctl"><label for="dc-b">Memory b: <b id="dc-b-v"></b></label><input type="range" id="dc-b" min="0.8" max="0.999" step="any" value="0.9335"></div><button class="btn play" id="dc-play" type="button"></button></div><div class="charts "><div class="chart" id="dc-chart"></div></div><ul class="out" id="dc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The DCC estimates are a = 0.052 and b = 0.934. What does their sum tell us?</div>
+  <details><summary>Answer</summary><p>It is the persistence of the correlation: a + b = 0.986, so a shock to Q_t halves in about 48 days. The LR test against constant correlation gives 533.4; the bootstrap under CCC gives p = 0.005, the smallest possible value with B = 199.</p></details>
+</section>
+<section class="blk" id="minvar">
+  <h3>Application: Minimum-Variance Weights with DCC</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch6_dcc_minvar_en.jpg" alt="Slide 27: Application: Minimum-Variance Weights with DCC" loading="lazy"></a>
+      <figcaption>Slide 27</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mv-r">Constant correlation of the CCC variant: <b id="mv-r-v"></b></label><input type="range" id="mv-r" min="-0.9" max="0.9" step="any" value="-0.3"></div><button class="btn play" id="mv-play" type="button"></button></div><div class="charts "><div class="chart" id="mv-w"></div><div class="chart" id="mv-v"></div></div><ul class="out" id="mv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> By how much does DCC reduce the volatility of the minimum-variance portfolio compared with a constant correlation?</div>
+  <details><summary>Answer</summary><p>By very little: 9.06% with DCC, against 9.10% with a constant correlation and 10.99% for the fixed 60/40 portfolio. Most of the gain comes from the GARCH volatilities. The parameters are estimated on the full sample, so the comparison is in-sample.</p></details>
+</section><h2 class="sec" id="s-crisis">Crisis Correlations and the Forbes–Rigobon Bias</h2>
+<section class="blk" id="fr-bias">
+  <h3>How Much Can Volatility Alone Raise a Correlation?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch6_fr_bias_en.jpg" alt="Slide 32: How Much Can Volatility Alone Raise a Correlation?" loading="lazy"></a>
+      <figcaption>Slide 32</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fb-d">Relative rise of the variance, δ: <b id="fb-d-v"></b></label><input type="range" id="fb-d" min="0" max="10" step="any" value="6.54"></div><div class="ctl"><label for="fb-r">Chosen true correlation: <b id="fb-r-v"></b></label><input type="range" id="fb-r" min="0.05" max="0.95" step="0.05" value="0.4"></div><button class="btn play" id="fb-play" type="button"></button></div><div class="charts "><div class="chart" id="fb-chart"></div></div><ul class="out" id="fb-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> In the 2008 crisis the variance of 2-day S&P 500 returns rose 7.5 times. How would an unchanged true correlation of 0.4 have been measured?</div>
+  <details><summary>Answer</summary><p>As 0.77. With δ = 6.54, the formula ρ_c = ρ√((1 + δ)/(1 + δρ²)) raises the measured correlation although the transmission coefficient β stays the same. A true correlation of 0.2 would have been measured as 0.49.</p></details>
+</section>
+<section class="blk" id="forbes-rigobon">
+  <h3>2008: Raw versus Adjusted Crisis Correlations</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch6_forbes_rigobon_en.jpg" alt="Slide 34: 2008: Raw versus Adjusted Crisis Correlations" loading="lazy"></a>
+      <figcaption>Slide 34</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fr-k">Shift of both windows (weeks): <b id="fr-k-v"></b></label><input type="range" id="fr-k" min="-8" max="8" step="1" value="0"></div><button class="btn play" id="fr-play" type="button"></button></div><div class="charts "><div class="chart" id="fr-chart"></div><div class="chart" id="fr-p"></div></div><ul class="out" id="fr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The S&P 500–Euro Stoxx 50 correlation rose from 0.61 in the calm year to 0.80 in the 2008 crisis. Is this contagion?</div>
+  <details><summary>Answer</summary><p>Not under the assumptions of the model. The raw rise is significant (p = 0.005), but the correlation adjusted for volatility is 0.44, below its calm-year level (p = 0.93). For the BET, 0.48 becomes 0.20 (p = 0.55). The numbers change when the windows are shifted, so their choice has to be justified.</p></details>
+</section><h2 class="sec" id="s-cop">Copulas and Tail Dependence</h2>
+<section class="blk" id="exceedance">
+  <h3>Exceedance Correlations: S&P 500 and Euro Stoxx 50</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch6_exceedance_en.jpg" alt="Slide 36: Exceedance Correlations: S&P 500 and Euro Stoxx 50" loading="lazy"></a>
+      <figcaption>Slide 36</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ex-q">Threshold quantile q: <b id="ex-q-v"></b></label><input type="range" id="ex-q" min="0.05" max="0.5" step="0.01" value="0.1"></div><button class="btn play" id="ex-play" type="button"></button></div><div class="charts "><div class="chart" id="ex-chart"></div><div class="chart" id="ex-sc"></div></div><ul class="out" id="ex-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> At q = 0.10, how correlated are the joint losses of the S&P 500 and the Euro Stoxx 50, compared with the Normal distribution?</div>
+  <details><summary>Answer</summary><p>The correlation of joint losses is 0.80 (86 weeks) and that of joint gains 0.69 (70 weeks). The bivariate Normal distribution with the same correlation, 0.78, gives only 0.41 at the same threshold.</p></details>
+</section>
+<section class="blk" id="copula-zoo">
+  <h3>Five Copulas with the Same Kendall's Tau</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch6_copula_zoo_en.jpg" alt="Slide 43: Five Copulas with the Same Kendall's Tau" loading="lazy"></a>
+      <figcaption>Slide 43</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cz-t">Kendall's tau: <b id="cz-t-v"></b></label><input type="range" id="cz-t" min="0.05" max="0.9" step="0.05" value="0.5"></div><button class="btn play" id="cz-play" type="button"></button></div><div class="charts "><div class="chart" id="cz-chart"></div></div><ul class="out" id="cz-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The five copulas have the same Kendall's tau, 0.5. Do they give the same probability of joint crashes?</div>
+  <details><summary>Answer</summary><p>No. The Gaussian and Frank copulas have λ_L = 0. The t copula with ν = 4 has λ_L = λ_U = 0.40, Clayton has λ_L = 0.71, and Gumbel has dependence only in the upper tail, with λ_U = 0.59.</p></details>
+</section>
+<section class="blk" id="pseudo-obs">
+  <h3>From Residuals to Pseudo-Observations: JPM and BAC</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch6_pseudo_obs_en.jpg" alt="Slide 45: From Residuals to Pseudo-Observations: JPM and BAC" loading="lazy"></a>
+      <figcaption>Slide 45</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="po-y">Sample starts in the year: <b id="po-y-v"></b></label><input type="range" id="po-y" min="2010" max="2024" step="1" value="2010"></div><button class="btn play" id="po-play" type="button"></button></div><div class="charts "><div class="chart" id="po-z"></div><div class="chart" id="po-u"></div></div><ul class="out" id="po-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Why do we estimate the copula on the ranks of the GARCH residuals rather than on the returns?</div>
+  <details><summary>Answer</summary><p>A copula assumes i.i.d. observations; the GARCH filter removes volatility clustering, which would otherwise mix with the dependence. Ranks divided by T + 1 give uniform margins without choosing a marginal distribution. Rank measures do not depend on the margins: for JPM and BAC, τ = 0.641 and ρ_S = 0.822.</p></details>
+</section>
+<section class="blk" id="copula-fit">
+  <h3>Copula Estimates and Goodness of Fit: JPM and BAC</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch6_copula_fit_en.jpg" alt="Slide 46: Copula Estimates and Goodness of Fit: JPM and BAC" loading="lazy"></a>
+      <figcaption>Slide 46</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cf-n">Degrees of freedom ν of the t copula: <b id="cf-n-v"></b></label><input type="range" id="cf-n" min="2.2" max="40" step="any" value="4.24"></div><button class="btn play" id="cf-play" type="button"></button></div><div class="charts "><div class="chart" id="cf-chart"></div><div class="chart" id="cf-prof"></div></div><ul class="out" id="cf-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The Student t copula has the lowest AIC. Does that make it an adequate model?</div>
+  <details><summary>Answer</summary><p>Not necessarily. AIC only ranks the families. The Rosenblatt test rejects all five, with the smallest possible p-value; the t copula has the smallest statistic, 0.082. As ν grows, the t copula approaches the Gaussian one and its AIC advantage of 309 points shrinks.</p></details>
+</section>
+<section class="blk" id="tail-dep">
+  <h3>Empirical Tail Dependence: JPM and BAC</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch6_tail_dep_en.jpg" alt="Slide 48: Empirical Tail Dependence: JPM and BAC" loading="lazy"></a>
+      <figcaption>Slide 48</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="td-q">Tail probability, q: <b id="td-q-v"></b></label><input type="range" id="td-q" min="0" max="19" step="1" value="4"></div><button class="btn play" id="td-play" type="button"></button></div><div class="charts "><div class="chart" id="td-chart"></div><div class="chart" id="td-sc"></div></div><ul class="out" id="td-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> When JPM has one of its worst 5% days, how often does BAC have one of its own worst 5% days?</div>
+  <details><summary>Answer</summary><p>In about 61% of the cases (λ_L(0.05) = 0.61), inside the band of the fitted t copula (0.57–0.65). The upper tail, 0.55, lies below the band: joint gains are weaker than the t copula, which is symmetric, predicts.</p></details>
+</section><h2 class="sec" id="s-app">Applications: Europe, Romania and Banks</h2>
+<section class="blk" id="integration">
+  <h3>US, Euro-Area and Romanian Equities, 2000–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch6_integration_en.jpg" alt="Slide 50: US, Euro-Area and Romanian Equities, 2000–2026" loading="lazy"></a>
+      <figcaption>Slide 50</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="in-w">Rolling window (weeks): <b id="in-w-v"></b></label><input type="range" id="in-w" min="26" max="260" step="2" value="104"></div><button class="btn play" id="in-play" type="button"></button></div><div class="charts "><div class="chart" id="in-chart"></div></div><ul class="out" id="in-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Is the Romanian market more closely linked to the euro area now than in the 2000s?</div>
+  <details><summary>Answer</summary><p>On average, yes: the Euro Stoxx 50–BET correlation is 0.33 in 2000–2009, 0.45 in 2010–2019 and 0.61 since 2020. On the rolling window it jumps in crises (0.76 at the end of 2021) and falls back afterwards (0.34 in September 2026), so part of the rise may be the Forbes–Rigobon volatility bias.</p></details>
+</section>
+<section class="blk" id="banks-heatmap">
+  <h3>Banks: Correlations of Weekly Returns, 2010–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=53" target="_blank" rel="noopener"><img src="slides/ch6_banks_heatmap_en.jpg" alt="Slide 52: Banks: Correlations of Weekly Returns, 2010–2026" loading="lazy"></a>
+      <figcaption>Slide 52</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bh-w">Window</label><select id="bh-w"><option value="all" selected>Whole period (from January 2010)</option><option value="52">52 weeks</option><option value="104">104 weeks</option><option value="156">156 weeks</option></select></div><div class="ctl"><label for="bh-t">Last week: <b id="bh-t-v"></b></label><input type="range" id="bh-t" min="51" max="9999" step="1" value="9999"></div><button class="btn play" id="bh-play" type="button"></button></div><div class="charts "><div class="chart" id="bh-chart"></div></div><ul class="out" id="bh-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which links between banks of different regions are the weakest?</div>
+  <details><summary>Answer</summary><p>The links with the Romanian banks: BNP–TLV 0.33 and JPM–BRD 0.30, against 0.86 for JPM–BAC and 0.75 for DBK–BNP. Country factors (sovereign risk, domestic interest rates, regulation) separate the banking systems.</p></details>
+</section>
+<section class="blk" id="banks-avgcorr">
+  <h3>Bank Correlations over Time</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch6_banks_avgcorr_en.jpg" alt="Slide 54: Bank Correlations over Time" loading="lazy"></a>
+      <figcaption>Slide 54</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ba-w">Rolling window (weeks): <b id="ba-w-v"></b></label><input type="range" id="ba-w" min="26" max="156" step="2" value="52"></div><button class="btn play" id="ba-play" type="button"></button></div><div class="charts "><div class="chart" id="ba-chart"></div></div><ul class="out" id="ba-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> What happened to the link between the Romanian banks and the others in March–June 2020?</div>
+  <details><summary>Answer</summary><p>The average 52-week correlation rose to 0.56, against 0.25 over the whole period, i.e. more than twice as high. Diversification across banking systems works in normal times and weakens in global shocks.</p></details>
+</section>
+<section class="blk" id="banks-mst">
+  <h3>A Correlation Network of Banks</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch6_banks_mst_en.jpg" alt="Slide 55: A Correlation Network of Banks" loading="lazy"></a>
+      <figcaption>Slide 55</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bm-w">Window</label><select id="bm-w"><option value="all" selected>Whole period (from January 2010)</option><option value="52">52 weeks</option><option value="104">104 weeks</option><option value="156">156 weeks</option></select></div><div class="ctl"><label for="bm-t">Last week: <b id="bm-t-v"></b></label><input type="range" id="bm-t" min="51" max="9999" step="1" value="9999"></div><button class="btn play" id="bm-play" type="button"></button></div><div class="charts "><div class="chart" id="bm-chart"></div></div><ul class="out" id="bm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Through which edge are the Romanian banks connected to the rest of the network?</div>
+  <details><summary>Answer</summary><p>Through BNP–BRD, with a correlation of 0.35. The other edges are JPM–BAC (0.86), DBK–BNP (0.75), JPM–BNP (0.65) and TLV–BRD (0.65). The tree is undirected and contemporaneous, so it does not show the direction of transmission.</p></details>
+</section><h2 class="sec" id="s-ai">AI for Scientific Discovery</h2>
+<section class="blk" id="ai-inflation">
+  <h3>Mini-Case: Does Inflation Drive the Stock–Bond Correlation?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch6_ai_inflation_en.jpg" alt="Slide 61: Mini-Case: Does Inflation Drive the Stock–Bond Correlation?" loading="lazy"></a>
+      <figcaption>Slide 61</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ai-t">Sample ends in: <b id="ai-t-v"></b></label><input type="range" id="ai-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-chart"></div><div class="chart" id="ai-ci"></div></div><ul class="out" id="ai-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Does the level of inflation explain the positive SPY–TLT correlation?</div>
+  <details><summary>Answer</summary><p>On the full sample the slope is 0.055 per percentage point of inflation (t = 2.96), but on 2002–2021, when inflation varied without a change of regime, it is 0.002 (t = 0.06). The slope comes from the episode after 2022, and a single change of regime cannot separate the level of inflation from the monetary-policy regime.</p></details>
+</section>
+<p class="src foot">EODHD daily prices: SPY, TLT, S&P 500, Euro Stoxx 50, BET and the shares of JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania and BRD. US CPI inflation: U.S. Bureau of Labor Statistics, via FRED.</p>
+</main>
+</body>
+</html>

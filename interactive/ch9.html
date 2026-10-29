@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 9 · Realised Volatility</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'en';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch9_data.js?v=20261029b"></script>
+<script src="ch9_text_en.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch9.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelling Financial Markets</h1><p>Chapter 9 · Realised Volatility</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index.html#chapters">← Course site</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf" target="_blank" rel="noopener">Lecture PDF</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_09" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch9.html" class="lang-btn active">EN</a><a href="ch9_ro.html" class="lang-btn">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
+<p class="toc"><a href="#s-rv">Realised Variance</a> · <a href="#s-noise">Microstructure Noise</a> · <a href="#s-jump">Jumps</a> · <a href="#s-facts">Stylised Facts of Realised Volatility</a> · <a href="#s-fc">Forecasting: HAR vs GARCH</a> · <a href="#s-rough">Rough Volatility</a> · <a href="#s-case">Case Study: Machine Learning vs HAR</a></p>
+<h2 class="sec" id="s-rv">Realised Variance</h2>
+<section class="blk" id="one-day">
+  <h3>One Day, 78 Returns: 7 April 2025</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=10" target="_blank" rel="noopener"><img src="slides/ch9_intraday_day_en.jpg" alt="Slide 9: One Day, 78 Returns: 7 April 2025" loading="lazy"></a>
+      <figcaption>Slide 9</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="id-d">Day</label><select id="id-d"><option value="2020-11-20">2020-11-20 (volatility 10%)</option><option value="2021-06-25">2021-06-25 (volatility 3%)</option><option value="2021-08-27">2021-08-27 (volatility 6%)</option><option value="2022-01-24">2022-01-24 (volatility 40%)</option><option value="2022-06-15">2022-06-15 (volatility 37%)</option><option value="2022-09-21">2022-09-21 (volatility 41%)</option><option value="2024-08-05">2024-08-05 (volatility 31%)</option><option value="2025-04-04">2025-04-04 (volatility 46%)</option><option value="2025-04-07" selected>2025-04-07 (volatility 107%)</option><option value="2025-04-08">2025-04-08 (volatility 46%)</option><option value="2025-04-09">2025-04-09 (volatility 72%)</option><option value="2025-04-10">2025-04-10 (volatility 54%)</option></select></div><div class="ctl"><label for="id-k">Time (end of the 5-minute interval): <b id="id-k-v"></b></label><input type="range" id="id-k" min="0" max="78" step="1" value="78"></div><button class="btn play" id="id-play" type="button"></button></div><div class="charts "><div class="chart" id="id-p"></div><div class="chart" id="id-c"></div></div><ul class="out" id="id-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On 7 April 2025, what share of the realised variance of the day comes from a single 5-minute return?</div>
+  <details><summary>Answer</summary><p>41%. The +4.28% return of the interval ending at 10:15 contributes 18.3 %² of RV = 45.1 %². By 11:00, i.e. in the first hour and a half, 76% of the day's RV has accumulated.</p></details>
+</section>
+<section class="blk" id="rv-series">
+  <h3>Daily Realised Volatility: SPY and Bitcoin</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch9_rv_series_en.jpg" alt="Slide 11: Daily Realised Volatility: SPY and Bitcoin" loading="lazy"></a>
+      <figcaption>Slide 11</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rs-k">Most volatile days left out of the mean: <b id="rs-k-v"></b></label><input type="range" id="rs-k" min="0" max="100" step="1" value="0"></div><button class="btn play" id="rs-play" type="button"></button></div><div class="charts "><div class="chart" id="rs-chart"></div></div><ul class="out" id="rs-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The SPY volatility computed from mean RV is 12.9% a year, and the daily median is 9.7%. How much does the first value fall if the 20 most volatile days are left out?</div>
+  <details><summary>Answer</summary><p>To 11.9%: 20 days, i.e. 1.3% of the 1,489, raise the volatility computed from mean RV by 1.0 percentage point. The mean of the variances is sensitive to a few extreme days; the median is not. For Bitcoin, leaving out its 20 most volatile days lowers the value from 45.1% to 41.6%.</p></details>
+</section>
+<section class="blk" id="overnight">
+  <h3>Where Is the Risk: Day or Night?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=14" target="_blank" rel="noopener"><img src="slides/ch9_overnight_en.jpg" alt="Slide 13: Where Is the Risk: Day or Night?" loading="lazy"></a>
+      <figcaption>Slide 13</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="on-g">Aggregation</label><select id="on-g"><option value="year" selected>By year</option><option value="quarter">By quarter</option><option value="month">By month</option></select></div><div class="ctl"><label for="on-c">Scaling factor c of intraday RV: <b id="on-c-v"></b></label><input type="range" id="on-c" min="1" max="2" step="0.01" value="1"></div><button class="btn play" id="on-play" type="button"></button></div><div class="charts "><div class="chart" id="on-chart"></div></div><ul class="out" id="on-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The market is closed 17.5 hours a day. What share of the SPY daily variance comes from the overnight return?</div>
+  <details><summary>Answer</summary><p>38% over the whole sample, between 33% (2023) and 51% (2020, an incomplete year). For intraday RV to have the same mean as the total variance, it would have to be multiplied by c = 1.62; the annualised volatility then rises from 12.9% to 16.4%.</p></details>
+</section><h2 class="sec" id="s-noise">Microstructure Noise</h2>
+<section class="blk" id="signature">
+  <h3>The Signature Plot on Real Data</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=20" target="_blank" rel="noopener"><img src="slides/ch9_signature_en.jpg" alt="Slide 19: The Signature Plot on Real Data" loading="lazy"></a>
+      <figcaption>Slide 19</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sg-y">Period</label><select id="sg-y"><option value="all" selected>Whole sample</option><option value="2020">2020</option><option value="2021">2021</option><option value="2022">2022</option><option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option></select></div><div class="ctl"><label for="sg-w">Added i.i.d. noise, standard deviation ω: <b id="sg-w-v"></b></label><input type="range" id="sg-w" min="0" max="0.05" step="0.001" value="0"></div><button class="btn play" id="sg-play" type="button"></button></div><div class="charts "><div class="chart" id="sg-s"></div><div class="chart" id="sg-b"></div></div><ul class="out" id="sg-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How much i.i.d. noise would have to be added to the SPY prices for the 5-minute volatility to rise from 12.9% to above 14%?</div>
+  <details><summary>Answer</summary><p>About ω = 0.027%: the bias 2nω² = 2 × 78 × 0.027² = 0.11 %² a day raises the 5-minute volatility to 14.0%, while at 130 minutes, with n = 3 returns a day, it changes almost nothing. The actual signature plot stays flat, between 12.6% and 13.1%, so the noise at 5 minutes is much smaller.</p></details>
+</section><h2 class="sec" id="s-jump">Jumps</h2>
+<section class="blk" id="jumps">
+  <h3>Jump Days: SPY and Bitcoin</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=25" target="_blank" rel="noopener"><img src="slides/ch9_jumps_en.jpg" alt="Slide 24: Jump Days: SPY and Bitcoin" loading="lazy"></a>
+      <figcaption>Slide 24</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="jp-a">Test level α: <b id="jp-a-v"></b></label><input type="range" id="jp-a" min="0" max="6" step="1" value="4"></div><div class="ctl"><label for="jp-m">Multiple testing</label><select id="jp-m"><option value="none" selected>No correction</option><option value="bh">Benjamini–Hochberg, FDR = α</option></select></div><button class="btn play" id="jp-play" type="button"></button></div><div class="charts "><div class="chart" id="jp-chart"></div></div><ul class="out" id="jp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How many jump days would the test give at the 5% level for SPY if there were no jumps?</div>
+  <details><summary>Answer</summary><p>About 74 of 1,489; the test gives 235. At 0.1%, 35 days remain, against 1.5 expected without jumps, and with FDR at 5% (Benjamini–Hochberg) 42 remain.</p></details>
+</section><h2 class="sec" id="s-facts">Stylised Facts of Realised Volatility</h2>
+<section class="blk" id="distributions">
+  <h3>Distributions: log RV and Standardised Returns</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch9_distributions_en.jpg" alt="Slide 31: Distributions: log RV and Standardised Returns" loading="lazy"></a>
+      <figcaption>Slide 31</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ds-m">Asset</label><select id="ds-m"><option value="spy" selected>SPY</option><option value="btc">Bitcoin</option></select></div><div class="ctl"><label for="ds-lam">Box–Cox parameter λ (0: log, 1: level): <b id="ds-lam-v"></b></label><input type="range" id="ds-lam" min="0" max="1" step="0.05" value="0"></div><button class="btn play" id="ds-play" type="button"></button></div><div class="charts "><div class="chart" id="ds-l"></div><div class="chart" id="ds-r"></div></div><ul class="out" id="ds-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Why do we model log RV and not RV?</div>
+  <details><summary>Answer</summary><p>RV for SPY has skewness 20.0 and kurtosis 550, while log RV has 0.29 and 3.20, close to the values of the Normal distribution (0 and 3). At λ = 0.5 (the square root) the skewness is still 3.9.</p></details>
+</section>
+<section class="blk" id="persistence">
+  <h3>Persistence of Realised Volatility</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=34" target="_blank" rel="noopener"><img src="slides/ch9_acf_en.jpg" alt="Slide 33: Persistence of Realised Volatility" loading="lazy"></a>
+      <figcaption>Slide 33</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ac-c">Comparison</label><select id="ac-c"><option value="none" selected>None</option><option value="ar1">AR(1) with ρ</option><option value="har">Fitted log-HAR (SPY)</option></select></div><div class="ctl"><label for="ac-r">ρ of the AR(1): <b id="ac-r-v"></b></label><input type="range" id="ac-r" min="0.3" max="0.99" step="0.01" value="0.64"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-chart"></div></div><ul class="out" id="ac-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The autocorrelation of log RV for SPY is 0.64 at lag 1. What would it be at lag 22 for an AR(1) with the same lag-1 autocorrelation?</div>
+  <details><summary>Answer</summary><p>0.64²² ≈ 0.00005, against 0.24 in the data. The fitted log-HAR, seen as an AR(22), gives 0.63 at lag 1 and 0.24 at lag 22, as the data do, but only 0.02 at lag 100, against 0.10: the three components reproduce the slow decay over a month, not beyond it.</p></details>
+</section>
+<section class="blk" id="vix">
+  <h3>Implied vs Realised Volatility</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=36" target="_blank" rel="noopener"><img src="slides/ch9_vix_en.jpg" alt="Slide 35: Implied vs Realised Volatility" loading="lazy"></a>
+      <figcaption>Slide 35</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vx-h">Horizon of the realised volatility (trading days): <b id="vx-h-v"></b></label><input type="range" id="vx-h" min="5" max="63" step="1" value="21"></div><div class="ctl"><label for="vx-t">Date: <b id="vx-t-v"></b></label><input type="range" id="vx-t" min="0" max="1468" step="1" value="1467"></div><button class="btn play" id="vx-play" type="button"></button></div><div class="charts "><div class="chart" id="vx-l"></div><div class="chart" id="vx-r"></div></div><ul class="out" id="vx-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On what share of the days was the VIX above the realised volatility over the next 21 trading days?</div>
+  <details><summary>Answer</summary><p>On 88% of the 1,468 days, by 4.37 percentage points on average (19.52% against 15.15%). The gap stays positive on average for other horizons too: 4.84 percentage points at 5 days, 4.06 at 63 days.</p></details>
+</section><h2 class="sec" id="s-fc">Forecasting: HAR vs GARCH</h2>
+<section class="blk" id="forecasts">
+  <h3>Forecasts over Time</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=50" target="_blank" rel="noopener"><img src="slides/ch9_oos_en.jpg" alt="Slide 49: Forecasts over Time" loading="lazy"></a>
+      <figcaption>Slide 49</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="oo-l">Loss function</label><select id="oo-l"><option value="qlike" selected>QLIKE</option><option value="mse">MSE</option></select></div><div class="ctl"><label for="oo-t">Evaluation starts in: <b id="oo-t-v"></b></label><input type="range" id="oo-t" min="0" max="48" step="1" value="0"></div><button class="btn play" id="oo-play" type="button"></button></div><div class="charts "><div class="chart" id="oo-f"></div><div class="chart" id="oo-c"></div></div><ul class="out" id="oo-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Is log-HAR still better than GARCH(1,1)-t if the evaluation starts in January 2024?</div>
+  <details><summary>Answer</summary><p>Yes. From 2024, the mean QLIKE is 0.362 for log-HAR and 0.409 for GARCH(1,1)-t, with DM t = −2.26. Over the whole sample, from 2022, the values are 0.310 and 0.343, with t = −2.30.</p></details>
+</section><h2 class="sec" id="s-rough">Rough Volatility</h2>
+<section class="blk" id="rough">
+  <h3>Scaling of Log Volatility Increments</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch9_rough_en.jpg" alt="Slide 54: Scaling of Log Volatility Increments" loading="lazy"></a>
+      <figcaption>Slide 54</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ro-a">Lags Δ used in the regression: <b id="ro-a-v"></b></label><input type="range" id="ro-a" min="1" max="20" step="1" value="1"></div><button class="btn play" id="ro-play" type="button"></button></div><div class="charts "><div class="chart" id="ro-m"></div><div class="chart" id="ro-z"></div></div><ul class="out" id="ro-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How does Ĥ for SPY change if the regression uses only the lags from 5 to 30 days?</div>
+  <details><summary>Answer</summary><p>It falls, from 0.106 (lags 1–30) to 0.089. Under i.i.d. measurement error, Ĥ should rise when the small lags are dropped, so this result does not support the i.i.d.-error explanation. For Bitcoin, Ĥ goes from 0.071 to 0.068.</p></details>
+</section><h2 class="sec" id="s-case">Case Study: Machine Learning vs HAR</h2>
+<section class="blk" id="ml-vs-har">
+  <h3>Case Study: Gains by Horizon</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=60" target="_blank" rel="noopener"><img src="slides/ch9_csv_horizons_en.jpg" alt="Slide 59: Case Study: Gains by Horizon" loading="lazy"></a>
+      <figcaption>Slide 59</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cs-m">Highlighted model</label><select id="cs-m"><option value="HAR-X">HAR-X (OLS, all predictors)</option><option value="LogHAR">log-HAR</option><option value="LevHAR">HAR with leverage</option><option value="SHAR">SHAR</option><option value="HARQ">HARQ</option><option value="RR">Ridge</option><option value="LA">Lasso</option><option value="EN">Elastic net</option><option value="A-LA">Adaptive lasso</option><option value="P-LA">Post-lasso</option><option value="BG">Bagging</option><option value="RF">Random forest</option><option value="GB">Gradient boosting</option><option value="NN1_1">NN 1 layer, 1 fit</option><option value="NN10_1">NN 1 layer, 10 fits</option><option value="NN1_2">NN 2 layers, 1 fit</option><option value="NN10_2" selected>NN 2 layers, 10 fits</option><option value="NN1_3">NN 3 layers, 1 fit</option><option value="NN10_3">NN 3 layers, 10 fits</option><option value="NN1_4">NN 4 layers, 1 fit</option><option value="NN10_4">NN 4 layers, 10 fits</option></select></div><button class="btn play" id="cs-play" type="button"></button></div><div class="charts "><div class="chart" id="cs-chart"></div></div><ul class="out" id="cs-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> With all 12 predictors, which model has the lowest one-month error, and by how much does it beat HAR?</div>
+  <details><summary>Answer</summary><p>Random forest, with 0.604 of the HAR MSE, followed by bagging (0.621). HAR-X, i.e. OLS with the same predictors, has 1.290 and HARQ 1.569: linearity and overfitting hurt the long-horizon forecasts.</p></details>
+</section>
+<p class="src foot">SPY: 5-minute bars of the regular US session (09:30–16:00, New York time), October 2020 – September 2026, and adjusted daily returns; Bitcoin: 5-minute bars on complete UTC days, September 2024 – September 2026; the VIX index. EODHD prices. Case study: Tables 2–7 of Christensen, Siggaard and Veliyev (2023).</p>
+</main>
+</body>
+</html>

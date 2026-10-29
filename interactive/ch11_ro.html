@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capitolul 11 · Modele în timp continuu</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'ro';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch11_data.js?v=20261029b"></script>
+<script src="ch11_text_ro.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch11.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelarea piețelor financiare</h1><p>Capitolul 11 · Modele în timp continuu</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index_ro.html#chapters">← Site-ul cursului</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol11_timp_continuu.pdf" target="_blank" rel="noopener">PDF-ul cursului</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_11" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch11.html" class="lang-btn">EN</a><a href="ch11_ro.html" class="lang-btn active">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
+<p class="toc"><a href="#s-bm">De la random walk la mișcarea browniană</a> · <a href="#s-qv">Variația pătratică și calculul Itô</a> · <a href="#s-gbm">Mișcarea browniană geometrică</a> · <a href="#s-ou">Revenirea la medie: procesul Ornstein–Uhlenbeck</a> · <a href="#s-jump">Salturi: modelul Merton</a> · <a href="#s-cmp">Modelele confruntate cu datele</a> · <a href="#s-rough">Studiu de caz: rough volatility și persistență</a></p>
+<h2 class="sec" id="s-bm">De la random walk la mișcarea browniană</h2>
+<section class="blk" id="donsker">
+  <h3>De la random walk la mișcarea browniană: teorema lui Donsker</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol11_timp_continuu.pdf#page=5" target="_blank" rel="noopener"><img src="slides/ch11_donsker_ro.jpg" alt="Slide-ul 4: De la random walk la mișcarea browniană: teorema lui Donsker" loading="lazy"></a>
+      <figcaption>Slide-ul 4</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="dk-a">Nivelul a: <b id="dk-a-v"></b></label><input type="range" id="dk-a" min="0.25" max="2.5" step="0.05" value="1"></div><button class="btn play" id="dk-play" type="button"></button></div><div class="charts "><div class="chart" id="dk-paths"></div><div class="chart" id="dk-p"></div></div><ul class="out" id="dk-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Maximul unei traiectorii observate doar la închiderile zilnice este mai mic sau mai mare decît maximul traiectoriei continue?</div>
+  <details><summary>Răspuns</summary><p>Mai mic, în medie. Pe o grilă rară, maximul atins între observații se pierde: P(max W_n > 1) este 0,220 cu n = 5 și 0,316 cu n = 2 000, față de limita browniană 2(1 − Φ(1)) = 0,3173. Diferența scade lent, de ordinul 1/√n.</p></details>
+</section><h2 class="sec" id="s-qv">Variația pătratică și calculul Itô</h2>
+<section class="blk" id="quadratic-variation">
+  <h3>Variația pătratică: simulare și date</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol11_timp_continuu.pdf#page=9" target="_blank" rel="noopener"><img src="slides/ch11_quadratic_variation_ro.jpg" alt="Slide-ul 8: Variația pătratică: simulare și date" loading="lazy"></a>
+      <figcaption>Slide-ul 8</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="qv-p">Exponentul p în Σ|ΔW|^p: <b id="qv-p-v"></b></label><input type="range" id="qv-p" min="0.5" max="3" step="0.1" value="2"></div><div class="ctl"><label for="qv-c">Perioada marcată</label><select id="qv-c"><option value="none" selected>Niciuna</option><option value="2008">Sep. 2008 – mar. 2009</option><option value="2020">Feb. – apr. 2020</option></select></div><button class="btn play" id="qv-play" type="button"></button></div><div class="charts "><div class="chart" id="qv-grid"></div><div class="chart" id="qv-sp"></div></div><ul class="out" id="qv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce se întîmplă cu Σ|ΔW|^p cînd grila se îndesește, pentru p sub 2, egal cu 2 și peste 2?</div>
+  <details><summary>Răspuns</summary><p>Media sumei este n^(1−p/2)·E|Z|^p. Pentru p < 2 suma crește fără limită (variația totală, p = 1, ajunge la 205 cu 65 536 de intervale), pentru p = 2 tinde la T = 1 (1,006 pe grila cea mai fină), iar pentru p > 2 tinde la zero. Doar exponentul 2 dă o limită nedegenerată, de aceea (dW)² = dt.</p></details>
+</section><h2 class="sec" id="s-gbm">Mișcarea browniană geometrică</h2>
+<section class="blk" id="drift-precision">
+  <h3>Precizia estimării driftului</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol11_timp_continuu.pdf#page=19" target="_blank" rel="noopener"><img src="slides/ch11_drift_precision_ro.jpg" alt="Slide-ul 18: Precizia estimării driftului" loading="lazy"></a>
+      <figcaption>Slide-ul 18</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="dp-w">Fereastra rolling (ani): <b id="dp-w-v"></b></label><input type="range" id="dp-w" min="1" max="20" step="1" value="10"></div><button class="btn play" id="dp-play" type="button"></button></div><div class="charts "><div class="chart" id="dp-ci"></div><div class="chart" id="dp-roll"></div></div><ul class="out" id="dp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe 10 ani de date zilnice, cît de precis este estimat driftul S&P 500?</div>
+  <details><summary>Răspuns</summary><p>Intervalul de 95% are o semilățime de circa ±11 puncte procentuale, oricît de deasă este grila, pentru că eroarea standard este σ/√T. Pe ferestre de 10 ani, driftul logaritmic variază între −6,0% (2009-03) și 15,8% (2000-09), în mare parte zgomot; o precizie de ±1 punct ar cere 1 243 de ani de date.</p></details>
+</section>
+<section class="blk" id="gbm-vs-data">
+  <h3>Adecvarea GBM pentru S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol11_timp_continuu.pdf#page=21" target="_blank" rel="noopener"><img src="slides/ch11_gbm_vs_data_ro.jpg" alt="Slide-ul 20: Adecvarea GBM pentru S&P 500" loading="lazy"></a>
+      <figcaption>Slide-ul 20</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="gd-k">Pragul k (abateri standard): <b id="gd-k-v"></b></label><input type="range" id="gd-k" min="2" max="6" step="0.25" value="4"></div><div class="ctl"><label for="gd-s">Seria pentru ACF</label><select id="gd-s"><option value="abs" selected>|r|</option><option value="sq">r²</option><option value="raw">r</option></select></div><button class="btn play" id="gd-play" type="button"></button></div><div class="charts "><div class="chart" id="gd-qq"></div><div class="chart" id="gd-acf"></div></div><ul class="out" id="gd-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cîte zile dincolo de ±4 abateri standard ar trebui să apară în 9 245 de zile, dacă randamentele ar avea distribuția Normală?</div>
+  <details><summary>Răspuns</summary><p>Circa 0,59. În date sînt 62, iar cea mai rea zi este la −11,3 abateri standard; excesul de kurtosis este 10,9. ACF a lui |r| este 0,27 la lagul 1 și 0,14 la lagul 50, în timp ce banda GBM rămîne sub 0,024.</p></details>
+</section><h2 class="sec" id="s-ou">Revenirea la medie: procesul Ornstein–Uhlenbeck</h2>
+<section class="blk" id="vasicek">
+  <h3>Vasicek pe randamentul titlurilor de stat pe 3 luni</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol11_timp_continuu.pdf#page=26" target="_blank" rel="noopener"><img src="slides/ch11_vasicek_ro.jpg" alt="Slide-ul 25: Vasicek pe randamentul titlurilor de stat pe 3 luni" loading="lazy"></a>
+      <figcaption>Slide-ul 25</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="va-a">Începutul eșantionului: <b id="va-a-v"></b></label><input type="range" id="va-a" min="1954" max="2021" step="1" value="1954"></div><div class="ctl"><label for="va-b">Sfîrșitul eșantionului: <b id="va-b-v"></b></label><input type="range" id="va-b" min="1959" max="2026" step="1" value="2026"></div><button class="btn play" id="va-play" type="button"></button></div><div class="charts "><div class="chart" id="va-rate"></div><div class="chart" id="va-k"></div></div><ul class="out" id="va-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Dovedește un κ̂ pozitiv pe 1954–2026 că rata pe termen scurt revine la medie?</div>
+  <details><summary>Răspuns</summary><p>Nu. κ̂ = 0,101 (SE 0,051) corespunde unui timp de înjumătățire de 6,8 ani, iar coeficientul AR(1) zilnic este 0,99960, aproape o rădăcină unitară. Pe subperioade, κ̂ este −0,034, 0,213 și 0,032, iar două dintre cele trei intervale includ zero. Testul bootstrap al ipotezei random walk dă p-value = 0,287.</p></details>
+</section><h2 class="sec" id="s-jump">Salturi: modelul Merton</h2>
+<section class="blk" id="merton-density">
+  <h3>Estimarea Merton pentru distribuția randamentelor</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol11_timp_continuu.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch11_merton_density_ro.jpg" alt="Slide-ul 40: Estimarea Merton pentru distribuția randamentelor" loading="lazy"></a>
+      <figcaption>Slide-ul 40</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mj-l">Intensitatea salturilor λ: <b id="mj-l-v"></b></label><input type="range" id="mj-l" min="0" max="1.15" step="0.05" value="1"></div><button class="btn play" id="mj-play" type="button"></button></div><div class="charts "><div class="chart" id="mj-sp"></div><div class="chart" id="mj-btc"></div></div><ul class="out" id="mj-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Modelul Merton estimat pentru S&P 500 are circa 102 salturi pe an. Sînt acestea crahuri?</div>
+  <details><summary>Răspuns</summary><p>Nu. Salturile sînt mici (abatere standard 1,44%) și explică 71% din dispersie; modelul le folosește pentru a imita volatilitatea variabilă. Excesul de kurtosis implicat este 3,7, față de 10,9 în date, iar zilele cele mai extreme rămîn dincolo de ambele curbe.</p></details>
+</section><h2 class="sec" id="s-cmp">Modelele confruntate cu datele</h2>
+<section class="blk" id="models-vs-data">
+  <h3>Capacitatea modelelor de a reproduce S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol11_timp_continuu.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch11_models_vs_data_ro.jpg" alt="Slide-ul 48: Capacitatea modelelor de a reproduce S&P 500" loading="lazy"></a>
+      <figcaption>Slide-ul 48</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mv-k">Simulări incluse: <b id="mv-k-v"></b></label><input type="range" id="mv-k" min="1" max="100" step="1" value="100"></div><div class="ctl"><label for="mv-m">Simulările individuale</label><select id="mv-m"><option value="none" selected>Ascunse</option><option value="GBM">GBM</option><option value="Merton">Merton</option><option value="Heston">Heston</option></select></div><button class="btn play" id="mv-play" type="button"></button></div><div class="charts three"><div class="chart" id="mv-acf"></div><div class="chart" id="mv-ku"></div><div class="chart" id="mv-hi"></div></div><ul class="out" id="mv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care dintre cele trei modele reproduce volatility clustering din S&P 500?</div>
+  <details><summary>Răspuns</summary><p>Doar Heston, cu parametrii din VIX: ACF simulată a lui |r| urmează datele, în timp ce GBM și Merton dau autocorelații în jur de zero. Merton reproduce statistica Hill (2,70 față de 2,56) și asimetria, dar niciun model nu atinge excesul de kurtosis din date, 10,88.</p></details>
+</section><h2 class="sec" id="s-rough">Studiu de caz: rough volatility și persistență</h2>
+<section class="blk" id="rough-volatility">
+  <h3>Studiu de caz: replicare pe SPY, Δ = o zi</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol11_timp_continuu.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch11_case_rough_spy_ro.jpg" alt="Slide-ul 55: Studiu de caz: replicare pe SPY, Δ = o zi" loading="lazy"></a>
+      <figcaption>Slide-ul 55</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ro-m">Laguri pentru OLS, k = 1..m: <b id="ro-m-v"></b></label><input type="range" id="ro-m" min="2" max="30" step="1" value="6"></div><div class="ctl"><label for="ro-H">Laguri pentru ajustarea ACF, h = 1..H: <b id="ro-H-v"></b></label><input type="range" id="ro-H" min="4" max="60" step="1" value="12"></div><button class="btn play" id="ro-play" type="button"></button></div><div class="charts "><div class="chart" id="ro-vg"></div><div class="chart" id="ro-acf"></div></div><ul class="out" id="ro-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Poate un proces OU, cu memorie scurtă, să reproducă autocorelația log-volatilității SPY la lagul 100?</div>
+  <details><summary>Răspuns</summary><p>Nu. Ajustat pe primele 12 laguri, OU are un timp de înjumătățire de 11 zile și implică o autocorelație de 0,002 la lagul 100, față de 0,13 în date. Clasa Cauchy dă β̂ = 0,26 și β̂* = 0,24, ambele sub 1, în acord cu memoria lungă; variograma dă α̂ = −0,32 (OLS) și −0,35 (NLLS), deci o traiectorie mai rugoasă decît cea browniană.</p></details>
+</section>
+<p class="src foot">Randamente logaritmice zilnice pînă la 18 septembrie 2026: S&amp;P 500 (din 1990) și Bitcoin (din 2014), prețuri EODHD. Randamentul titlurilor de stat SUA pe 3 luni: FRED, seria DTB3, 1954–2026. Studiul de caz: bare SPY de 5 minute, EODHD, octombrie 2020 – septembrie 2026. Simulările (random walk, mișcare browniană, GBM, Merton, Heston) folosesc aceleași seed-uri ca graficele din curs.</p>
+</main>
+</body>
+</html>

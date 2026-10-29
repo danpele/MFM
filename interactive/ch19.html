@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 19 · Review and Project Presentations</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'en';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch19_data.js?v=20261029b"></script>
+<script src="ch19_text_en.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch19.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelling Financial Markets</h1><p>Chapter 19 · Review and Project Presentations</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index.html#chapters">← Course site</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter19_review_projects.pdf" target="_blank" rel="noopener">Lecture PDF</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_19" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch19.html" class="lang-btn active">EN</a><a href="ch19_ro.html" class="lang-btn">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
+<p class="toc"><a href="#s-bet">Integrated Case Study: BET</a> · <a href="#s-nse">Case Study: Nonstandard Errors</a></p>
+<h2 class="sec" id="s-bet">Integrated Case Study: BET</h2>
+<section class="blk" id="bet-facts">
+  <h3>Step 1: Stylised Facts of the BET</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter19_review_projects.pdf#page=38" target="_blank" rel="noopener"><img src="slides/ch19_bet_facts_en.jpg" alt="Slide 37: Step 1: Stylised Facts of the BET" loading="lazy"></a>
+      <figcaption>Slide 37</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bf-y0">First year: <b id="bf-y0-v"></b></label><input type="range" id="bf-y0" min="2000" max="2025" step="1" value="2000"></div><div class="ctl"><label for="bf-y1">Last year: <b id="bf-y1-v"></b></label><input type="range" id="bf-y1" min="2001" max="2026" step="1" value="2026"></div><div class="ctl"><label for="bf-k">Hill: k as a share of the loss days: <b id="bf-k-v"></b></label><input type="range" id="bf-k" min="1" max="10" step="0.5" value="5"></div><button class="btn play" id="bf-play" type="button"></button></div><div class="charts "><div class="chart" id="bf-qq"></div><div class="chart" id="bf-acf"></div></div><ul class="out" id="bf-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The Hill tail index of BET losses is 2.39. What does this value say about the kurtosis of the returns?</div>
+  <details><summary>Answer</summary><p>Moments of order 2.39 and above are infinite, so the population kurtosis is infinite too. The whole 95% confidence interval [2.12, 3.03] lies below 4, so the sample excess kurtosis (11.1) estimates nothing and the tail index is reported instead. Over the full sample, 51 days lie beyond ±4 standard deviations, against 0.42 expected under the Normal distribution.</p></details>
+</section>
+<section class="blk" id="bet-garch">
+  <h3>Step 2: GARCH(1,1)-t Volatility</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter19_review_projects.pdf#page=40" target="_blank" rel="noopener"><img src="slides/ch19_bet_garch_en.jpg" alt="Slide 39: Step 2: GARCH(1,1)-t Volatility" loading="lazy"></a>
+      <figcaption>Slide 39</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bg-a">α, weight of yesterday’s shock: <b id="bg-a-v"></b></label><input type="range" id="bg-a" min="0.02" max="0.4" step="0.001" value="0.192"></div><div class="ctl"><label for="bg-p">Persistence α + β: <b id="bg-p-v"></b></label><input type="range" id="bg-p" min="0.9" max="1.0" step="0.0001" value="0.9907"></div><button class="btn play" id="bg-play" type="button"></button></div><div class="charts "><div class="chart" id="bg-chart"></div></div><ul class="out" id="bg-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The estimated persistence is α + β = 0.9907. After how many days has half of a volatility shock died out?</div>
+  <details><summary>Answer</summary><p>After about 74 trading days, from ln 0.5 / ln 0.9907. The persistence cannot be bounded away from 1: the likelihood-ratio test of p = 1 gives LR = 1.01 with p-value 0.16, so the interval for the half-life starts at 27 days and has no finite upper limit.</p></details>
+</section>
+<section class="blk" id="bet-var">
+  <h3>Step 3: Losses and VaR 1%, 2020–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter19_review_projects.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch19_bet_var_en.jpg" alt="Slide 40: Step 3: Losses and VaR 1%, 2020–2026" loading="lazy"></a>
+      <figcaption>Slide 40</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bv-m">Model compared with FHS</label><select id="bv-m"><option value="Normal" selected>Normal (500 days)</option><option value="HS">HS</option><option value="GARCH-t">GARCH-t</option></select></div><div class="ctl"><label for="bv-l">VaR level</label><select id="bv-l"><option value="1" selected>1%</option><option value="2.5">2.5%</option></select></div><div class="ctl"><label for="bv-y0">Start of the window: <b id="bv-y0-v"></b></label><input type="range" id="bv-y0" min="2005" max="2025" step="1" value="2020"></div><div class="ctl"><label for="bv-t">Up to: <b id="bv-t-v"></b></label><input type="range" id="bv-t" min="0" max="1000" step="1" value="1000"></div><button class="btn play" id="bv-play" type="button"></button></div><div class="charts "><div class="chart" id="bv-chart"></div></div><ul class="out" id="bv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Over the 1,675 days of 2020–2026, about 17 breaches of the VaR 1% were expected. Which of the two models comes close to this number?</div>
+  <details><summary>Answer</summary><p>FHS, with 22 breaches; the Normal model has 41. The FHS VaR rose to 11.6% on 18 Mar 2020, while the Normal VaR, estimated on 500 days, adjusts slowly and its breaches cluster in the first weeks of every stress episode.</p></details>
+</section>
+<section class="blk" id="breach-rates">
+  <h3>Step 4: Breach Rates</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter19_review_projects.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch19_breach_rates_en.jpg" alt="Slide 41: Step 4: Breach Rates" loading="lazy"></a>
+      <figcaption>Slide 41</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="br-l">VaR level</label><select id="br-l"><option value="1" selected>1%</option><option value="2.5">2.5%</option></select></div><div class="ctl"><label for="br-adj">Reading of the four Kupiec tests</label><select id="br-adj"><option value="none" selected>separately, no correction</option><option value="holm">Holm (FWER)</option><option value="bh">Benjamini–Hochberg (FDR 5%)</option></select></div><div class="ctl"><label for="br-y0">First year: <b id="br-y0-v"></b></label><input type="range" id="br-y0" min="2005" max="2026" step="1" value="2005"></div><div class="ctl"><label for="br-y1">Last year: <b id="br-y1-v"></b></label><input type="range" id="br-y1" min="2005" max="2026" step="1" value="2026"></div><button class="btn play" id="br-play" type="button"></button></div><div class="charts "><div class="chart" id="br-chart"></div></div><ul class="out" id="br-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which of the four models has a breach rate compatible with 1% over the 5,432 evaluation days?</div>
+  <details><summary>Answer</summary><p>Only FHS: 1.23%, inside the 95% binomial band [0.74%, 1.27%], and the Kupiec test does not reject it (p = 0.095). HS has 1.45%, GARCH-t 1.47% and the Normal model 2.25%, more than twice the target.</p></details>
+</section>
+<section class="blk" id="kupiec-power">
+  <h3>How Much Can a Backtest Detect? The Power of Kupiec</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter19_review_projects.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch19_kupiec_power_en.jpg" alt="Slide 44: How Much Can a Backtest Detect? The Power of Kupiec" loading="lazy"></a>
+      <figcaption>Slide 44</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="kp-T">Evaluation days T: <b id="kp-T-v"></b></label><input type="range" id="kp-T" min="50" max="6000" step="1" value="250"></div><div class="ctl"><label for="kp-pi">True breach rate: <b id="kp-pi-v"></b></label><input type="range" id="kp-pi" min="0.2" max="4.0" step="0.05" value="2.0"></div><div class="ctl"><label for="kp-a">Level of the test</label><select id="kp-a"><option value="0.01">1%</option><option value="0.05" selected>5%</option><option value="0.1">10%</option></select></div><button class="btn play" id="kp-play" type="button"></button></div><div class="charts "><div class="chart" id="kp-chart"></div></div><ul class="out" id="kp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> A VaR 1% model in fact breaches at a rate of 2%. How often does the 5% Kupiec test reject it after one Basel year (T = 250)?</div>
+  <details><summary>Answer</summary><p>Only 24% of the time. The minimum detectable effect at 80% power is 3.65% at T = 250, 2.05% at T = 1,000 and 1.45% at T = 5,432. A non-rejection with low power means “no evidence”, not “no problem”.</p></details>
+</section><h2 class="sec" id="s-nse">Case Study: Nonstandard Errors</h2>
+<section class="blk" id="nse-multiverse">
+  <h3>A Mini-Multiverse on Course Data: 27 Paths per Index</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter19_review_projects.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch19_nse_multiverse_en.jpg" alt="Slide 55: A Mini-Multiverse on Course Data: 27 Paths per Index" loading="lazy"></a>
+      <figcaption>Slide 55</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="nm-model">Model of the yearly change</label><select id="nm-model"><option value="all" selected>all three</option><option value="Linear trend">Linear trend</option><option value="Log difference">Log difference</option><option value="Relative difference">Relative difference</option></select></div><div class="ctl"><label for="nm-meas">Measure of inefficiency</label><select id="nm-meas"><option value="all" selected>all three</option><option value="|VR(5) - 1|">|VR(5) − 1|</option><option value="|VR(21) - 1|">|VR(21) − 1|</option><option value="AR(1) R$^2$">AR(1) R²</option></select></div><div class="ctl"><label for="nm-ol">Outliers</label><select id="nm-ol"><option value="all" selected>all three</option><option value="None">none</option><option value="Winsorised">winsorised</option><option value="Trimmed">trimmed</option></select></div><div class="ctl"><label for="nm-q">Winsorising and trimming percentile: <b id="nm-q-v"></b></label><input type="range" id="nm-q" min="1" max="10" step="0.5" value="2.5"></div><button class="btn play" id="nm-play" type="button"></button></div><div class="charts "><div class="chart" id="nm-chart"></div></div><ul class="out" id="nm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which of the three forks (outliers, measure, model) creates most of the dispersion of the 27 estimates?</div>
+  <details><summary>Answer</summary><p>The model. Over the nine linear-trend paths the IQR is 2.0 pp for the Euro Stoxx 50 and 7.5 pp for the BET, against 22.9 pp and 84.4 pp over all 27. With relative differences the medians rise to +210.4% and +108.7% a year.</p></details>
+</section>
+<p class="src foot">BET index: official daily closing values, 6 Jan 2000 – 18 Sep 2026, log returns in %. One-day VaR forecasts: rolling window of 1,000 days (500 for HS and the Normal model), GARCH re-estimated every 21 days, evaluation from 3 Jan 2005. Mini-multiverse: daily closes of the Euro Stoxx 50 (EODHD) and the BET, 2002–2018.</p>
+</main>
+</body>
+</html>

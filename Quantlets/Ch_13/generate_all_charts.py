@@ -295,21 +295,31 @@ def fig_label_comparison():
 # FIG 6: Schema Purged K-Fold cu embargo
 # =============================================================================
 def fig_purged_cv_scheme():
+    # n observations, labels of h observations (t1 = t0 + h), embargo of emb observations;
+    # the sets are the ones PurgedKFold.split returns, not drawn by hand
     n, k, h, emb = 100, 5, 4, 3
+    idx = np.arange(n)
+    t1 = pd.Series(np.minimum(idx + h, n - 1), index=idx)
+    cv = PurgedKFold(k, t1=t1, pct_embargo=(emb + 0.5) / n)   # int(n * pct) = emb
     fig, ax = plt.subplots(figsize=(7.0, 2.6))
-    for fold in range(k):
+    for fold, (train, test) in enumerate(cv.split(idx)):
         y = k - fold
-        t_start, t_end = fold * n // k, (fold + 1) * n // k
+        stop = test[-1]
+        colours = []
         for t in range(n):
-            if t_start <= t < t_end:
-                c = IDAred
-            elif t_start - h <= t < t_start:
-                c = Purple
-            elif t_end <= t < t_end + emb:
-                c = Amber
+            if t in test:
+                colours.append(IDAred)
+            elif t in train:
+                colours.append(MainBlue)
+            elif stop < t <= stop + emb:
+                colours.append(Amber)     # embargo: the emb observations right after the test block
             else:
-                c = MainBlue
-            ax.add_patch(mpatches.Rectangle((t, y - 0.35), 1, 0.7, fc=c, ec='none'))
+                colours.append(Purple)    # purged: label interval overlaps the test labels
+        start = 0                         # one rectangle per run of equal colour (no seams in the PDF)
+        for t in range(1, n + 1):
+            if t == n or colours[t] != colours[start]:
+                ax.add_patch(mpatches.Rectangle((start, y - 0.35), t - start, 0.7, fc=colours[start], ec='none'))
+                start = t
         ax.text(-2, y, f'Fold {fold + 1}', ha='right', va='center', fontsize=8)
     ax.set_xlim(-12, n + 1)
     ax.set_ylim(0.3, k + 0.7)

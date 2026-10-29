@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capitolul 20 · Semnăturile traiectoriilor și volatilitatea realizată</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'ro';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch20_data.js?v=20261029b"></script>
+<script src="ch20_text_ro.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch20.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelarea piețelor financiare</h1><p>Capitolul 20 · Semnăturile traiectoriilor și volatilitatea realizată</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index_ro.html#chapters">← Site-ul cursului</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol20_signaturi_volatilitate_realizata.pdf" target="_blank" rel="noopener">PDF-ul cursului</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_20" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch20.html" class="lang-btn">EN</a><a href="ch20_ro.html" class="lang-btn active">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
+<p class="toc"><a href="#s-vol">Baza de date VOLARE</a> · <a href="#s-res">Rezultate</a> · <a href="#s-abl">Ablații și robustețe</a></p>
+<h2 class="sec" id="s-vol">Baza de date VOLARE</h2>
+<section class="blk" id="volare">
+  <h3>Volatilitatea realizată în clasele de active</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol20_signaturi_volatilitate_realizata.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch20_volare_rv_ro.jpg" alt="Slide-ul 11: Volatilitatea realizată în clasele de active" loading="lazy"></a>
+      <figcaption>Slide-ul 11</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vr-k">Media mobilă: <b id="vr-k-v"></b></label><input type="range" id="vr-k" min="1" max="13" step="1" value="1"></div><div class="ctl"><label for="vr-s">Scala</label><select id="vr-s"><option value="log" selected>logaritmică</option><option value="lin">liniară</option></select></div><button class="btn play" id="vr-play" type="button"></button></div><div class="charts three"><div class="chart" id="vr-stocks"></div><div class="chart" id="vr-futures"></div><div class="chart" id="vr-forex"></div></div><ul class="out" id="vr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În ce clasă de active este cel mai mare vîrful de volatilitate din 2020?</div>
+  <details><summary>Răspuns</summary><p>La futures. Media pe cinci zile a volatilității anualizate a petrolului (CL) ajunge la 458% în zilele încheiate pe 22 aprilie 2020, iar cea a ES la 115% în martie. La acțiuni, JPM ajunge la 111% și NVDA la 118%, iar EURUSD și USDJPY rămîn în jur de 20%. Volatilitatea mediană pe clasă este 17,1% la acțiuni, 19,7% la futures și 7,3% la FX.</p></details>
+</section><h2 class="sec" id="s-res">Rezultate</h2>
+<section class="blk" id="qlike">
+  <h3>QLIKE relativ la HAR, activ cu activ</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol20_signaturi_volatilitate_realizata.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch20_qlike_ratio_ro.jpg" alt="Slide-ul 40: QLIKE relativ la HAR, activ cu activ" loading="lazy"></a>
+      <figcaption>Slide-ul 40</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="qr-b">Reperul</label><select id="qr-b"><option value="HAR" selected>HAR</option><option value="logHAR">log-HAR</option></select></div><div class="ctl"><label for="qr-g">Activele</label><select id="qr-g"><option value="all" selected>Toate cele 50 de active</option><option value="stocks">Acțiuni americane (40)</option><option value="futures">Futures (5)</option><option value="forex">FX (5)</option></select></div><div class="ctl"><label for="qr-k">Active excluse, cu cele mai mari rapoarte: <b id="qr-k-v"></b></label><input type="range" id="qr-k" min="0" max="10" step="1" value="0"></div><button class="btn play" id="qr-play" type="button"></button></div><div class="charts three"><div class="chart" id="qr-1"></div><div class="chart" id="qr-5"></div><div class="chart" id="qr-22"></div></div><ul class="out" id="qr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La h = 1, aduc cele 36 de trăsături de semnătură un cîștig față de log-HAR?</div>
+  <details><summary>Răspuns</summary><p>Nu. Media rapoartelor față de HAR este 0,883 pentru log-HAR, 0,885 pentru log-HAR-K și 0,886 pentru Sig-L. Față de log-HAR, Sig-L pierde 0,4%, iar Sig-LK 4,5%. La h = 5 și 22, medianele Sig-LK (0,997 și 0,968) sînt mult sub medii, deci cîteva active trag media în sus.</p></details>
+</section>
+<section class="blk" id="mcs">
+  <h3>Mulțimi de încredere pentru modele</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol20_signaturi_volatilitate_realizata.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch20_mcs_ro.jpg" alt="Slide-ul 45: Mulțimi de încredere pentru modele" loading="lazy"></a>
+      <figcaption>Slide-ul 45</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mc-l">Pierderea</label><select id="mc-l"><option value="ql" selected>QLIKE</option><option value="se">MSE</option></select></div><div class="ctl"><label for="mc-g">Activele</label><select id="mc-g"><option value="all" selected>Toate cele 50 de active</option><option value="stocks">Acțiuni americane (40)</option><option value="futures">Futures (5)</option><option value="forex">FX (5)</option></select></div><div class="ctl"><label for="mc-a">Nivelul MCS: <b id="mc-a-v"></b></label><input type="range" id="mc-a" min="75" max="99" step="1" value="90"></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts "><div class="chart" id="mc-chart"></div></div><ul class="out" id="mc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru ce proporție dintre active rămîn log-HAR și Sig-LK în MCS de 90% sub QLIKE?</div>
+  <details><summary>Răspuns</summary><p>log-HAR: 100%, 98% și 98% la h = 1, 5 și 22; Sig-LK: 100%, 94% și 88%. Cele patru modele logaritmice se separă rar, iar HAR, HARQ și SHAR sînt excluse pentru o cincime pînă la o treime dintre active. Sub MSE aproape fiecare model rămîne în mulțime.</p></details>
+</section>
+<section class="blk" id="covid">
+  <h3>În crahul din pandemia COVID-19: JPM, ziua următoare</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol20_signaturi_volatilitate_realizata.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch20_covid_forecasts_ro.jpg" alt="Slide-ul 48: În crahul din pandemia COVID-19: JPM, ziua următoare" loading="lazy"></a>
+      <figcaption>Slide-ul 48</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cv-h">Orizontul</label><select id="cv-h"><option value="1" selected>h = 1</option><option value="5">h = 5</option><option value="22">h = 22</option></select></div><div class="ctl"><label for="cv-t">Pînă la: <b id="cv-t-v"></b></label><input type="range" id="cv-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="cv-play" type="button"></button></div><div class="charts "><div class="chart" id="cv-chart"></div></div><ul class="out" id="cv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care model reacționează primul la saltul volatilității JPM din martie 2020?</div>
+  <details><summary>Răspuns</summary><p>Niciunul nu anticipează primul salt. Sig-LK reacționează puțin mai repede decît log-HAR la mijlocul lui martie, după ce traiectoria și-a schimbat direcția. HAR în nivel depășește ținta, apoi devine negativ la sfîrșitul lui martie, iar regula de pozitivitate îl înlocuiește cu media in-sample.</p></details>
+</section>
+<section class="blk" id="subperiods">
+  <h3>Perioade de stres față de perioade normale (H4)</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol20_signaturi_volatilitate_realizata.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch20_subperiod_ro.jpg" alt="Slide-ul 50: Perioade de stres față de perioade normale (H4)" loading="lazy"></a>
+      <figcaption>Slide-ul 50</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sp-g">Activele: <b id="sp-g-v"></b></label><input type="range" id="sp-g" min="0" max="3" step="1" value="0"></div><div class="ctl"><label for="sp-st">Agregarea pe active</label><select id="sp-st"><option value="mean" selected>media</option><option value="median">mediana</option></select></div><button class="btn play" id="sp-play" type="button"></button></div><div class="charts "><div class="chart" id="sp-chart"></div></div><ul class="out" id="sp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cîștigă modelele cu semnături mai mult în perioadele de stres, așa cum prevede H4?</div>
+  <details><summary>Răspuns</summary><p>Nu. La h = 1, în crahul COVID-19, log-HAR are 0,70 și Sig-LK 0,73 din pierderea HAR, iar în celelalte zile 0,94 și 0,97. La h = 22, în același crah, Sig-LK are de 6,35 ori și Sig-L de 8,30 ori pierderea HAR.</p></details>
+</section>
+<section class="blk" id="weights">
+  <h3>Ponderile nucleului la originea din 16 martie 2020</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol20_signaturi_volatilitate_realizata.pdf#page=53" target="_blank" rel="noopener"><img src="slides/ch20_weights_2020_ro.jpg" alt="Slide-ul 52: Ponderile nucleului la originea din 16 martie 2020" loading="lazy"></a>
+      <figcaption>Slide-ul 52</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="kw-N">Adîncimea de trunchiere N: <b id="kw-N-v"></b></label><input type="range" id="kw-N" min="1" max="3" step="1" value="3"></div><div class="ctl"><label for="kw-c">Temperatura c, γ = c / mediana distanțelor: <b id="kw-c-v"></b></label><input type="range" id="kw-c" min="0" max="10" step="1" value="2"></div><button class="btn play" id="kw-play" type="button"></button><div style="flex-basis:100%;height:0"></div><div class="ctl"><label for="kw-k">Puncte desenate din fereastra originii: <b id="kw-k-v"></b></label><input type="range" id="kw-k" min="2" max="22" step="1" value="22"></div><button class="btn play" id="kw-play2" type="button"></button></div><div class="charts "><div class="chart" id="kw-chart"></div></div><div class="charts "><div class="chart" id="kw-path"></div></div><ul class="out" id="kw-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cîtă pondere primesc ferestrele asemănătoare cu cea din 16 martie 2020?</div>
+  <details><summary>Răspuns</summary><p>Foarte puțină în plus: cu c = 0,5, ponderea medie pe cele 40 de acțiuni rămîne între 0,61 și 1,43 ori 1/n, iar mărimea efectivă a eșantionului este 975 din 1 000. Ponderile cele mai mari revin ultimelor zile dinaintea originii, ale căror ferestre de 22 de puncte se suprapun cu fereastra curentă. Corelația ponderilor cu log-volatilitatea este +0,04.</p></details>
+</section><h2 class="sec" id="s-abl">Ablații și robustețe</h2>
+<section class="blk" id="ablation">
+  <h3>Ablația 2 × 2</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol20_signaturi_volatilitate_realizata.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch20_ablation_ro.jpg" alt="Slide-ul 54: Ablația 2 × 2" loading="lazy"></a>
+      <figcaption>Slide-ul 54</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ab-g">Activele</label><select id="ab-g"><option value="all" selected>Toate cele 50 de active</option><option value="stocks">Acțiuni americane (40)</option><option value="futures">Futures (5)</option><option value="forex">FX (5)</option></select></div><div class="ctl"><label for="ab-x">Activ exclus: <b id="ab-x-v"></b></label><input type="range" id="ab-x" min="0" max="50" step="1" value="0"></div><button class="btn play" id="ab-play" type="button"></button><div class="ctl"><label for="ab-h">Orizontul</label><select id="ab-h"><option value="1" selected>h = 1</option><option value="5">h = 5</option><option value="22">h = 22</option></select></div></div><div class="charts "><div class="chart" id="ab-chart"></div><div class="chart" id="ab-assets"></div></div><ul class="out" id="ab-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care componentă produce rezultatul: trăsăturile de semnătură sau ponderile nucleului?</div>
+  <details><summary>Răspuns</summary><p>Ponderile singure (log-HAR-K) nu schimbă nimic: 1,002, 1,002 și 1,004 față de log-HAR. Trăsăturile singure (Sig-L) înrăutățesc prognoza la orizonturi lungi: 1,004, 1,285 și 2,238. Ambele (Sig-LK): 1,045, 1,280 și 1,929. La h = 1 pierderea vine în principal de la petrol (CL, raportul 2,71): fără CL, Sig-LK are 1,011.</p></details>
+</section>
+<p class="src foot">Varianța realizată din baza de date VOLARE (Cipollini et al., 2026): 40 de acțiuni americane (2015–2026), 5 futures și 5 perechi valutare (2009–2026), randamente de 5 minute. Datele VOLARE sînt licențiate pentru cercetare și nu se redistribuie; aici apar doar rezumate: pierderile medii și valorile p ale MCS pe fiecare activ, ponderile și distanțele nucleului, medii pe cinci zile ale volatilității pentru cele șase active din slide (o valoare pe săptămînă) și prognozele JPM din februarie–mai 2020.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,27 @@
+// Readouts of the Chapter 9 interactive page, written by latex/build_interactive_ch9.py.
+window.CH9_TEXT = {
+ play: 'Play', pause: 'Pause', rw: "Yesterday's RV",
+ fam: { 'HAR family (OLS)': 'HAR family (OLS)', 'Penalised regression': 'penalised regression', 'Regression trees': 'regression trees', 'Neural networks': 'neural networks' },
+ id: (t, rv, sh) => `Up to ${t}: cumulative RV ${rv} %², i.e. ${sh} of the day's RV.`,
+ id2: (d, rv, vol, mx, tm, sh, on, oc) => `${d}: RV = ${rv} %², annualised volatility √(252 × RV) = ${vol}. The largest 5-minute return, ${mx}, in the interval ending at ${tm}, contributes ${sh} of RV. Overnight return: ${on}; open to close: ${oc}.`,
+ rs: (s, n, m, md, mx, dmx, k, mk) => `${s}, ${n} days: volatility from mean RV ${m} a year, daily median ${md}, maximum ${mx} (${dmx}).` + (k ? ` Without the ${k} most volatile days: ${mk}.` : ''),
+ on: (sh, cc, oc, onv, tot, lo, hi) => `Overnight returns bring ${sh} of the SPY daily variance (between ${lo} and ${hi} over the periods of the chart). Annualised volatility: ${cc} close to close, ${oc} open to close, ${onv} overnight; from the mean total variance: ${tot}.`,
+ on2: (c, v, cs) => `Intraday RV multiplied by c = ${c}: annualised volatility ${v}. The factor that matches the mean total variance is c = ${cs}.`,
+ sg: (s, v5, vm, lm, vl, ll, r1) => `${s}: ${v5} at 5 minutes, ${vm} at ${lm} and ${vl} at ${ll} (average over shifted grids). First-order autocorrelation of the 5-minute returns: ${r1}.`,
+ sg2: (s, om, b, w, v) => `${s} with noise ω = ${om}%: the bias at 5 minutes is 2nω² = ${b} %² a day, and the volatility rises from ${v} to ${w}.`,
+ jp: (s, n, N, sh, ex, js, mj) => `${s}: ${n} jump days of ${N} (${sh}); without jumps, ${ex} rejections would be expected. Jumps account for ${js} of the total realised variance; on a jump day, ${mj} of the day's RV on average.`,
+ jp2: (a, c) => `One-sided test at α = ${a}: the critical value for z is ${c}.`,
+ jp3: a => `Benjamini–Hochberg: the daily p-values, 1 − Φ(z), are ordered and the k smallest are rejected, with the expected share of false rejections at most ${a}.`,
+ ds: (s, l, sk, ku, vs, vk) => `${s}, λ = ${l}: skewness ${sk} and kurtosis ${ku} (Normal distribution: 0 and 3). For RV in levels: ${vs} and ${vk}.`,
+ ds2: (s, uk, zk, sd) => `${s}: the kurtosis of the returns falls from ${uk} (divided by their standard deviation) to ${zk} (divided by √RV); standard deviation after division by √RV: ${sd}.`,
+ ac: (a1, a22, a100, s1, b7, b30) => `log RV, SPY: ${a1} at lag 1, ${a22} at lag 22, ${a100} at lag 100. Squared daily return: ${s1} at lag 1. Bitcoin: ${b7} at lag 7, ${b30} at lag 30 (the weekly cycle).`,
+ ac2: (r, a22, a100) => `AR(1) with ρ = ${r}: ${a22} at lag 22 and ${a100} at lag 100.`,
+ ac3: (a1, a22, a100) => `Fitted log-HAR for SPY, as an AR(22): ${a1} at lag 1, ${a22} at lag 22, ${a100} at lag 100.`,
+ vx: (h, n, mv, mf, sh, g, c) => `Horizon of ${h} trading days, ${n} days in the sample: mean VIX ${mv}, mean subsequent realised volatility ${mf}. The VIX is higher on ${sh} of the days, by ${g} percentage points on average; the correlation is ${c}.`,
+ vx2: (d, v, f, g) => `${d}: VIX ${v}, subsequent realised volatility ${f}, difference ${g} percentage points.`,
+ oo: (s, d0, n, L, list) => `${s}, from ${d0} (${n} days), mean ${L}: ${list}.`,
+ oo2: (h, g, e, w) => `DM test against log-HAR (t < 0 favours log-HAR): t = ${h} for HAR, ${g} for GARCH(1,1)-t, ${e} for EWMA, ${w} for yesterday's RV.`,
+ oo3: (d0, n, L, a, b, t) => `Bitcoin, from ${d0} (${n} days): mean ${L} ${a} for log-HAR and ${b} for GARCH(1,1)-t; DM t = ${t}.`,
+ ro: (lo, hi, hs, hb, z2, f) => `Lags ${lo}–${hi}: Ĥ = ${hs} for SPY and ${hb} for Bitcoin (Brownian motion: 0.5). For SPY ζ₂ = ${z2}, so doubling Δ multiplies m(2, Δ) by ${f}.`,
+ cs: (m, f, a1, a2, a3, b1, b2, b3, r) => `${m} (${f}). MSE relative to HAR, RV lags only: ${a1} at one day, ${a2} at one week, ${a3} at one month. With all 12 predictors: ${b1}, ${b2} and ${b3}; rank ${r} of 21 at one month.`
+};

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 4 · Portfolio Optimisation</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'en';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch4_data.js?v=20261029b"></script>
+<script src="ch4_text_en.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch4.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelling Financial Markets</h1><p>Chapter 4 · Portfolio Optimisation</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index.html#chapters">← Course site</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf" target="_blank" rel="noopener">Lecture PDF</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_04" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch4.html" class="lang-btn active">EN</a><a href="ch4_ro.html" class="lang-btn">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
+<p class="toc"><a href="#s-mv">Mean–Variance Optimisation</a> · <a href="#s-est">Estimation Risk</a> · <a href="#s-shr">Covariance Shrinkage</a> · <a href="#s-bl">Black–Litterman</a> · <a href="#s-rp">Risk Parity and Hierarchical Risk Parity</a> · <a href="#s-oos">Out-of-Sample Evaluation</a> · <a href="#s-bvb">A Portfolio of BVB Blue Chips</a></p>
+<h2 class="sec" id="s-mv">Mean–Variance Optimisation</h2>
+<section class="blk" id="two-asset">
+  <h3>Two Assets: How Correlation Diversifies</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=8" target="_blank" rel="noopener"><img src="slides/ch4_two_asset_en.jpg" alt="Slide 7: Two Assets: How Correlation Diversifies" loading="lazy"></a>
+      <figcaption>Slide 7</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ta-rho">Correlation SPY–TLT: <b id="ta-rho-v"></b></label><input type="range" id="ta-rho" min="-1" max="1" step="0.05" value="-0.1"></div><div class="ctl"><label for="ta-w">Weight of SPY: <b id="ta-w-v"></b></label><input type="range" id="ta-w" min="0" max="1" step="0.01" value="0.46"></div><button class="btn play" id="ta-play" type="button"></button></div><div class="charts "><div class="chart" id="ta-chart"></div></div><ul class="out" id="ta-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The annual volatilities are 14.7% for SPY and 13.5% for TLT. Can a mix of the two have a volatility below 10%?</div>
+  <details><summary>Answer</summary><p>Yes. With a correlation of −0.10, the minimum-variance portfolio holds 46% in SPY and has a volatility of 9.4%. Portfolio volatility equals the weighted average of the volatilities only when the correlation is 1.</p></details>
+</section>
+<section class="blk" id="frontier">
+  <h3>The Frontier of US Sectors</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch4_frontier_en.jpg" alt="Slide 11: The Frontier of US Sectors" loading="lazy"></a>
+      <figcaption>Slide 11</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fr-n">Sectors included: <b id="fr-n-v"></b></label><input type="range" id="fr-n" min="2" max="9" step="1" value="9"></div><button class="btn play" id="fr-play" type="button"></button></div><div class="charts "><div class="chart" id="fr-chart"></div><div class="chart" id="fr-w"></div></div><ul class="out" id="fr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Does the tangency portfolio hold every sector with a positive mean return?</div>
+  <details><summary>Answer</summary><p>No. With short sales allowed, it is short XLB and XLF, although both have positive means. XLB has a correlation of 0.85 with XLI, and XLF has the lowest Sharpe ratio. The long-only constraint lowers the Sharpe ratio from 0.66 to 0.61.</p></details>
+</section><h2 class="sec" id="s-est">Estimation Risk</h2>
+<section class="blk" id="estimation-error">
+  <h3>Error Maximisation: Estimated versus Realised Frontiers</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch4_estimation_error_en.jpg" alt="Slide 14: Error Maximisation: Estimated versus Realised Frontiers" loading="lazy"></a>
+      <figcaption>Slide 14</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ee-T">Sample length (months)</label><select id="ee-T"><option value="36">36</option><option value="60" selected>60</option><option value="120">120</option><option value="240">240</option></select></div><div class="ctl"><label for="ee-k">Samples drawn: <b id="ee-k-v"></b></label><input type="range" id="ee-k" min="1" max="25" step="1" value="25"></div><button class="btn play" id="ee-play" type="button"></button><button class="btn" id="ee-new" type="button">New samples</button></div><div class="charts "><div class="chart" id="ee-chart"></div><div class="chart" id="ee-hist"></div></div><ul class="out" id="ee-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> With 60 months of data, how often does the estimated tangency portfolio beat 1/N?</div>
+  <details><summary>Answer</summary><p>In about 4% of the samples. The median realised Sharpe ratio is 0.30, against 0.54 for 1/N, while the median in-sample estimate is 1.56.</p></details>
+</section>
+<section class="blk" id="rolling-weights">
+  <h3>Unstable Weights</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=19" target="_blank" rel="noopener"><img src="slides/ch4_rolling_weights_en.jpg" alt="Slide 18: Unstable Weights" loading="lazy"></a>
+      <figcaption>Slide 18</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rw-t">Month: <b id="rw-t-v"></b></label><input type="range" id="rw-t" min="0" max="270" step="1" value="270"></div><button class="btn play" id="rw-play" type="button"></button></div><div class="charts "><div class="chart" id="rw-w"></div><div class="chart" id="rw-g"></div></div><ul class="out" id="rw-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How large do mean–variance weights become when they are re-estimated each month on the last 60 months?</div>
+  <details><summary>Answer</summary><p>The median gross exposure (sum of absolute weights) is 4.9 for MV and 1.5 for GMV-LW. The largest absolute MV weight is 26; in 90% of the months the MV gross exposure exceeds 3.</p></details>
+</section>
+<section class="blk" id="window-length">
+  <h3>How Long Must the Window Be to Beat 1/N?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=21" target="_blank" rel="noopener"><img src="slides/ch4_window_length_en.jpg" alt="Slide 20: How Long Must the Window Be to Beat 1/N?" loading="lazy"></a>
+      <figcaption>Slide 20</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="wl-t">Window T (months): <b id="wl-t-v"></b></label><input type="range" id="wl-t" min="0" max="7" step="1" value="1"></div><button class="btn play" id="wl-play" type="button"></button></div><div class="charts "><div class="chart" id="wl-chart"></div><div class="chart" id="wl-hist"></div></div><ul class="out" id="wl-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How many months of data does the estimated mean–variance portfolio need to beat 1/N?</div>
+  <details><summary>Answer</summary><p>In the simulation, the median MV Sharpe ratio exceeds the 1/N value (0.54) only at T = 480 months, i.e. 40 years. GMV and ERC pass 1/N much earlier because they do not use estimated means.</p></details>
+</section><h2 class="sec" id="s-shr">Covariance Shrinkage</h2>
+<section class="blk" id="noise-band">
+  <h3>Sample Eigenvalues versus the Noise Band</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch4_mp_en.jpg" alt="Slide 23: Sample Eigenvalues versus the Noise Band" loading="lazy"></a>
+      <figcaption>Slide 23</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mp-src">Data</label><select id="mp-src"><option value="Combined" selected>Combined (N = 16)</option><option value="Sectors">Sectors (N = 9)</option><option value="noise">Pure noise, N = 16</option></select></div><div class="ctl"><label for="mp-T">T for the noise: <b id="mp-T-v"></b></label><input type="range" id="mp-T" min="20" max="400" step="10" value="60"></div><button class="btn play" id="mp-play" type="button"></button></div><div class="charts "><div class="chart" id="mp-chart"></div></div><ul class="out" id="mp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How many of the 16 eigenvalues of the correlation matrix lie above the Marchenko–Pastur band?</div>
+  <details><summary>Answer</summary><p>Only one, the common market factor, which explains 56% of the total variance. The other 15 lie in the band that pure noise with the same N/T ratio also produces.</p></details>
+</section>
+<section class="blk" id="shrinkage">
+  <h3>Shrinkage on US Sectors</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=27" target="_blank" rel="noopener"><img src="slides/ch4_shrinkage_en.jpg" alt="Slide 26: Shrinkage on US Sectors" loading="lazy"></a>
+      <figcaption>Slide 26</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sh-d">Intensity δ: <b id="sh-d-v"></b></label><input type="range" id="sh-d" min="0" max="1" step="0.05" value="0.25"></div><button class="btn play" id="sh-play" type="button"></button></div><div class="charts three"><div class="chart" id="sh-ev"></div><div class="chart" id="sh-w"></div><div class="chart" id="sh-roll"></div></div><ul class="out" id="sh-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> What happens to the extreme eigenvalues as δ increases?</div>
+  <details><summary>Answer</summary><p>Large eigenvalues fall and small ones rise, so the condition number drops (from 52 to 32 at δ = 0.24, the Ledoit–Wolf value on the last 60 months). The GMV weights become less extreme.</p></details>
+</section><h2 class="sec" id="s-bl">Black–Litterman</h2>
+<section class="blk" id="black-litterman">
+  <h3>Black–Litterman on US Sectors</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch4_black_litterman_en.jpg" alt="Slide 31: Black–Litterman on US Sectors" loading="lazy"></a>
+      <figcaption>Slide 31</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bl-q">View XLK − XLU, per year: <b id="bl-q-v"></b></label><input type="range" id="bl-q" min="-5" max="10" step="0.5" value="3"></div><div class="ctl"><label for="bl-c">Uncertainty of the view, Ω: <b id="bl-c-v"></b></label><input type="range" id="bl-c" min="-2" max="2" step="0.1" value="0"></div><button class="btn play" id="bl-play" type="button"></button></div><div class="charts "><div class="chart" id="bl-mu"></div><div class="chart" id="bl-w"></div></div><ul class="out" id="bl-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The view is that XLK beats XLU by 3% a year. How do the weights of the other seven sectors change?</div>
+  <details><summary>Answer</summary><p>They do not. The XLK weight rises and the XLU weight falls by the same amount, 3.3 percentage points. The means of the other sectors move through their correlations with XLK and XLU, but their weights stay at 1/N.</p></details>
+</section><h2 class="sec" id="s-rp">Risk Parity and Hierarchical Risk Parity</h2>
+<section class="blk" id="risk-contributions">
+  <h3>Weights versus Risk Contributions</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch4_risk_contrib_en.jpg" alt="Slide 34: Weights versus Risk Contributions" loading="lazy"></a>
+      <figcaption>Slide 34</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rc-k">ERC iteration: <b id="rc-k-v"></b></label><input type="range" id="rc-k" min="0" max="30" step="1" value="0"></div><button class="btn play" id="rc-play" type="button"></button></div><div class="charts "><div class="chart" id="rc-it"></div><div class="chart" id="rc-st"></div></div><ul class="out" id="rc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> In the 1/N portfolio, equities and high-yield bonds hold half of the capital. What share of the risk do they generate?</div>
+  <details><summary>Answer</summary><p>69%. Equal risk contribution (ERC) moves capital towards Treasuries: IEF receives 25%, and each asset contributes 12.5% of the risk.</p></details>
+</section>
+<section class="blk" id="hrp">
+  <h3>HRP on 16 ETFs</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=40" target="_blank" rel="noopener"><img src="slides/ch4_hrp_en.jpg" alt="Slide 39: HRP on 16 ETFs" loading="lazy"></a>
+      <figcaption>Slide 39</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="hrp-s">Step: <b id="hrp-s-v"></b></label><input type="range" id="hrp-s" min="1" max="6" step="1" value="1"></div><button class="btn play" id="hrp-play" type="button"></button></div><div class="charts "><div class="chart" id="hrp-heat"></div><div class="chart" id="hrp-w"></div></div><ul class="out" id="hrp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Why does HRP not invert the covariance matrix?</div>
+  <details><summary>Answer</summary><p>HRP orders the assets by the correlation tree and splits the weights recursively by the variance of each group. It uses only group variances, so it avoids the inversion that amplifies estimation errors. Long-only GMV puts non-zero weights on only 5 of the 16 ETFs.</p></details>
+</section><h2 class="sec" id="s-oos">Out-of-Sample Evaluation</h2>
+<section class="blk" id="oos-growth">
+  <h3>Out-of-Sample Growth: Multi-Asset</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch4_oos_cum_en.jpg" alt="Slide 41: Out-of-Sample Growth: Multi-Asset" loading="lazy"></a>
+      <figcaption>Slide 41</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ow-u">Universe</label><select id="ow-u"><option value="Sectors">Sectors</option><option value="Multi-asset" selected>Multi-asset</option><option value="Combined">Combined</option></select></div><div class="ctl"><label for="ow-c">Costs: <b id="ow-c-v"></b></label><input type="range" id="ow-c" min="0" max="50" step="5" value="0"></div><div class="ctl"><label for="ow-t">Up to month: <b id="ow-t-v"></b></label><input type="range" id="ow-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="ow-play" type="button"></button></div><div class="charts "><div class="chart" id="ow-chart"></div></div><ul class="out" id="ow-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which rule has the highest out-of-sample Sharpe ratio in the multi-asset universe?</div>
+  <details><summary>Answer</summary><p>MV-LO, with 0.80, followed by 1/N with 0.52 and ERC with 0.49. Unconstrained MV has −0.22 and a mean monthly turnover of 44.</p></details>
+</section>
+<section class="blk" id="oos-sharpe">
+  <h3>Sharpe Ratios Across Universes</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=43" target="_blank" rel="noopener"><img src="slides/ch4_oos_sharpe_en.jpg" alt="Slide 42: Sharpe Ratios Across Universes" loading="lazy"></a>
+      <figcaption>Slide 42</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="os-y">Evaluation starts in: <b id="os-y-v"></b></label><input type="range" id="os-y" min="0" max="15" step="1" value="0"></div><button class="btn play" id="os-play" type="button"></button></div><div class="charts "><div class="chart" id="os-chart"></div></div><ul class="out" id="os-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Does the ranking of the rules stay the same if the evaluation starts later?</div>
+  <details><summary>Answer</summary><p>No. The differences between 1/N, ERC, HRP and the long-only rules are small and change with the evaluation period; unconstrained MV stays last.</p></details>
+</section>
+<section class="blk" id="costs">
+  <h3>Sharpe Ratios after Costs</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch4_costs_en.jpg" alt="Slide 45: Sharpe Ratios after Costs" loading="lazy"></a>
+      <figcaption>Slide 45</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="co-u">Universe</label><select id="co-u"><option value="Sectors">Sectors</option><option value="Multi-asset">Multi-asset</option><option value="Combined" selected>Combined</option></select></div><div class="ctl"><label for="co-c">Cost per unit of turnover: <b id="co-c-v"></b></label><input type="range" id="co-c" min="0" max="100" step="5" value="10"></div><button class="btn play" id="co-play" type="button"></button></div><div class="charts "><div class="chart" id="co-chart"></div><div class="chart" id="co-to"></div></div><ul class="out" id="co-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> At what cost per unit of turnover does unconstrained MV lose its Sharpe ratio in the combined universe?</div>
+  <details><summary>Answer</summary><p>The MV Sharpe ratio is 0.11 without costs and −0.51 at 50 bp, because its mean monthly turnover is 22. 1/N goes from 0.76 to 0.75.</p></details>
+</section>
+<section class="blk" id="sharpe-test">
+  <h3>Is Anything Better than 1/N?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=50" target="_blank" rel="noopener"><img src="slides/ch4_sharpe_test_en.jpg" alt="Slide 49: Is Anything Better than 1/N?" loading="lazy"></a>
+      <figcaption>Slide 49</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="st-p">Comparison</label><select id="st-p"><option value="Sectors|GMV-LW" selected>Sectors: GMV-LW − 1/N</option><option value="Multi-asset|ERC">Multi-asset: ERC − 1/N</option><option value="Multi-asset|MV">Multi-asset: MV − 1/N</option><option value="Combined|MV-LO">Combined: MV-LO − 1/N</option></select></div><div class="ctl"><label for="st-m">Bootstrap draws: <b id="st-m-v"></b></label><input type="range" id="st-m" min="50" max="2000" step="50" value="2000"></div><button class="btn play" id="st-play" type="button"></button></div><div class="charts "><div class="chart" id="st-chart"></div></div><ul class="out" id="st-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Is the difference between GMV-LW and 1/N on sectors significant?</div>
+  <details><summary>Answer</summary><p>No. The difference of Sharpe ratios is −0.02, with p = 0.93 (HAC) and p = 0.94 (bootstrap). None of the estimated rules beats 1/N significantly in the three universes.</p></details>
+</section><h2 class="sec" id="s-bvb">A Portfolio of BVB Blue Chips</h2>
+<section class="blk" id="bvb">
+  <h3>BVB Portfolios versus BET-TR</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter4_portfolio_optimization.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch4_bvb_en.jpg" alt="Slide 55: BVB Portfolios versus BET-TR" loading="lazy"></a>
+      <figcaption>Slide 55</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bv-t">Up to month: <b id="bv-t-v"></b></label><input type="range" id="bv-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="bv-play" type="button"></button></div><div class="charts "><div class="chart" id="bv-chart"></div></div><ul class="out" id="bv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Does any portfolio of BVB blue chips beat the BET-TR index?</div>
+  <details><summary>Answer</summary><p>MV-LO has a Sharpe ratio of 1.66 against 1.45 for BET-TR, but the difference is not significant (p = 0.44, HAC). 1/N has 1.41 and ERC 1.38.</p></details>
+</section>
+<p class="src foot">US ETFs: monthly excess returns over the one-month Treasury bill; EODHD prices, risk-free rate from the Kenneth French Data Library. BVB: EODHD prices, in RON.</p>
+</main>
+</body>
+</html>

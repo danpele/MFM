@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 13 · Machine Learning in Finance</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'en';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch13_data.js?v=20261029b"></script>
+<script src="ch13_text_en.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch13.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelling Financial Markets</h1><p>Chapter 13 · Machine Learning in Finance</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index.html#chapters">← Course site</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf" target="_blank" rel="noopener">Lecture PDF</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_13" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch13.html" class="lang-btn active">EN</a><a href="ch13_ro.html" class="lang-btn">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
+<p class="toc"><a href="#s-pred">What Can Machine Learning Predict in Finance?</a> · <a href="#s-tool">A Minimal Machine Learning Toolbox</a> · <a href="#s-feat">Features: Fractional Differencing and Its Pitfall</a> · <a href="#s-lab">Labels: What Exactly the Model Learns</a> · <a href="#s-val">Honest Validation</a> · <a href="#s-case">Case Study: Predicting the S&P 500</a> · <a href="#s-sel">Selection and Backtest Overfitting</a> · <a href="#s-inf">Machine Learning for Inference</a> · <a href="#s-front">Research Frontier: Structure before Flexibility</a></p>
+<h2 class="sec" id="s-pred">What Can Machine Learning Predict in Finance?</h2>
+<section class="blk" id="predictability">
+  <h3>What Is Predictable? Direction vs. Risk</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=6" target="_blank" rel="noopener"><img src="slides/ch13_signal_to_noise_en.jpg" alt="Slide 5: What Is Predictable? Direction vs. Risk" loading="lazy"></a>
+      <figcaption>Slide 5</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sn-p">Power p in |r|^p: <b id="sn-p-v"></b></label><input type="range" id="sn-p" min="0.25" max="3" step="0.25" value="1"></div><div class="ctl"><label for="sn-per">Period</label><select id="sn-per"><option value="all" selected>2000–2026</option><option value="a">2000–2012</option><option value="b">2013–2026</option></select></div><button class="btn play" id="sn-play" type="button"></button></div><div class="charts "><div class="chart" id="sn-chart"></div></div><ul class="out" id="sn-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The first-order autocorrelation of daily S&P 500 returns is −0.10, and the other 39 are below 0.07 in absolute value. What do the autocorrelations of |r_t| look like?</div>
+  <details><summary>Answer</summary><p>They are large and persistent: 0.29 at lag 1 and 0.16 at lag 40, all 40 above the ±0.024 band. Direction is almost unpredictable, risk is predictable; this is why ML is most useful for volatility, risk and liquidity.</p></details>
+</section><h2 class="sec" id="s-tool">A Minimal Machine Learning Toolbox</h2>
+<section class="blk" id="lasso-path">
+  <h3>LASSO Regularisation Path</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch13_lasso_path_en.jpg" alt="Slide 12: LASSO Regularisation Path" loading="lazy"></a>
+      <figcaption>Slide 12</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="la-pen">Penalty</label><select id="la-pen"><option value="l1" selected>LASSO (L1)</option><option value="l2">Ridge (L2)</option></select></div><div class="ctl"><label for="la-k">Penalty, from strong to weak: <b id="la-k-v"></b></label><input type="range" id="la-k" min="0" max="39" step="1" value="39"></div><button class="btn play" id="la-play" type="button"></button></div><div class="charts "><div class="chart" id="la-path"></div><div class="chart" id="la-bar"></div></div><ul class="out" id="la-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which feature enters the LASSO model first as the penalty falls?</div>
+  <details><summary>Answer</summary><p>The FFD log price (ffd_price), i.e. a scaled price level. At weak penalties the volatility features have the largest coefficients, but all coefficients stay below 0.16 in absolute value. In purged CV, every λ at which at least one feature enters gives an AUC between 0.477 and 0.485, below 0.5.</p></details>
+</section><h2 class="sec" id="s-feat">Features: Fractional Differencing and Its Pitfall</h2>
+<section class="blk" id="ffd-adf">
+  <h3>The ADF Statistic Along d: S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=19" target="_blank" rel="noopener"><img src="slides/ch13_ffd_adf_en.jpg" alt="Slide 18: The ADF Statistic Along d: S&P 500" loading="lazy"></a>
+      <figcaption>Slide 18</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ff-k">Differentiation order d: <b id="ff-k-v"></b></label><input type="range" id="ff-k" min="0" max="20" step="1" value="5"></div><div class="ctl"><label for="ff-lag">Lags of the ADF test</label><select id="ff-lag"><option value="1" selected>1 lag</option><option value="aic">chosen by AIC</option></select></div><button class="btn play" id="ff-play" type="button"></button></div><div class="charts "><div class="chart" id="ff-adf"></div><div class="chart" id="ff-series"></div></div><ul class="out" id="ff-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> At d = 0.25 the ADF statistic with 1 lag is −2.96, below the critical value −2.86. Is the FFD series stationary?</div>
+  <details><summary>Answer</summary><p>The test does not show it. With 34 lags chosen by AIC, the ADF statistic is −0.72 and does not reject. The correlation with the log price is 0.98 and the truncated weights sum to 0.178: the series contains a scaled random walk.</p></details>
+</section><h2 class="sec" id="s-lab">Labels: What Exactly the Model Learns</h2>
+<section class="blk" id="triple-barrier">
+  <h3>Triple Barrier: S&P 500 in 2022</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch13_triple_barrier_en.jpg" alt="Slide 23: Triple Barrier: S&P 500 in 2022" loading="lazy"></a>
+      <figcaption>Slide 23</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="tb-w">Barrier width π (in σ√h): <b id="tb-w-v"></b></label><input type="range" id="tb-w" min="0.25" max="3" step="0.25" value="1"></div><div class="ctl"><label for="tb-h">Horizon h (trading days): <b id="tb-h-v"></b></label><input type="range" id="tb-h" min="5" max="40" step="1" value="15"></div><button class="btn play" id="tb-play" type="button"></button></div><div class="charts "><div class="chart" id="tb-chart"></div></div><ul class="out" id="tb-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The May, August and November events are labelled +1. Did they reach the profit barrier?</div>
+  <details><summary>Answer</summary><p>No. They end at the vertical barrier, after 15 days, above the entry level, and the sign rule labels them +1. Only the March event reaches the profit barrier; the January event hits the stop-loss (−1).</p></details>
+</section><h2 class="sec" id="s-val">Honest Validation</h2>
+<section class="blk" id="purged-cv">
+  <h3>Purged K-Fold with Embargo</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=30" target="_blank" rel="noopener"><img src="slides/ch13_purged_cv_scheme_en.jpg" alt="Slide 29: Purged K-Fold with Embargo" loading="lazy"></a>
+      <figcaption>Slide 29</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pc-k">Number of folds K: <b id="pc-k-v"></b></label><input type="range" id="pc-k" min="3" max="10" step="1" value="5"></div><div class="ctl"><label for="pc-h">Label length h (observations): <b id="pc-h-v"></b></label><input type="range" id="pc-h" min="0" max="15" step="1" value="4"></div><div class="ctl"><label for="pc-e">Embargo e (observations): <b id="pc-e-v"></b></label><input type="range" id="pc-e" min="0" max="10" step="1" value="3"></div><button class="btn play" id="pc-play" type="button"></button></div><div class="charts "><div class="chart" id="pc-chart"></div></div><ul class="out" id="pc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> With labels of h = 4 observations and an embargo of e = 3, how many observations are lost at each boundary of the test fold?</div>
+  <details><summary>Answer</summary><p>h = 4 before the block, whose labels end inside the test set, and max(h, e) = 4 after it. The embargo adds something only if e > h.</p></details>
+</section>
+<section class="blk" id="leakage">
+  <h3>Leakage Experiment: Nothing to Predict</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=31" target="_blank" rel="noopener"><img src="slides/ch13_leakage_experiment_en.jpg" alt="Slide 30: Leakage Experiment: Nothing to Predict" loading="lazy"></a>
+      <figcaption>Slide 30</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="lk-h">Length h of the labels and of the rolling means (days): <b id="lk-h-v"></b></label><input type="range" id="lk-h" min="0" max="6" step="1" value="4"></div><button class="btn play" id="lk-play" type="button"></button></div><div class="charts "><div class="chart" id="lk-bar"></div><div class="chart" id="lk-line"></div></div><ul class="out" id="lk-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The price is a random walk, so the true accuracy is 50%. Why does shuffled K-fold report 69.4%?</div>
+  <details><summary>Answer</summary><p>The 20-day labels overlap and the features are persistent, so shuffling puts nearly identical days in training and in test. Contiguous folds give 50.0%, purging and embargo 49.7%. With h = 2, shuffled K-fold gives 49.9%; with h = 60 it reaches 84.5%.</p></details>
+</section><h2 class="sec" id="s-case">Case Study: Predicting the S&P 500</h2>
+<section class="blk" id="model-comparison">
+  <h3>Model Comparison: Fold Means</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=38" target="_blank" rel="noopener"><img src="slides/ch13_model_comparison_en.jpg" alt="Slide 37: Model Comparison: Fold Means" loading="lazy"></a>
+      <figcaption>Slide 37</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mc-c">Probability threshold for "up": <b id="mc-c-v"></b></label><input type="range" id="mc-c" min="0.4" max="0.65" step="0.005" value="0.5"></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts "><div class="chart" id="mc-acc"></div><div class="chart" id="mc-auc"></div></div><div class="charts "><div class="chart" id="mc-thr"></div></div><ul class="out" id="mc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The L2-penalised logit has an accuracy of 57.6%. Is it a good model?</div>
+  <details><summary>Answer</summary><p>No. The always-"up" benchmark has 58.1%. The logit predicts "up" on 98.3% of the days (TP = 3,572, FP = 2,591), so it has learnt the majority rule. The fold-mean AUCs lie between 0.478 and 0.515, close to 0.5.</p></details>
+</section>
+<section class="blk" id="walk-forward">
+  <h3>Walk-Forward Backtest: Results</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch13_walk_forward_backtest_en.jpg" alt="Slide 41: Walk-Forward Backtest: Results" loading="lazy"></a>
+      <figcaption>Slide 41</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="wf-c">Threshold on the predicted probability for a long position: <b id="wf-c-v"></b></label><input type="range" id="wf-c" min="0.45" max="0.6" step="0.005" value="0.5"></div><div class="ctl"><label for="wf-b">Cost per change of position: <b id="wf-b-v"></b></label><input type="range" id="wf-b" min="0" max="20" step="1" value="5"></div><button class="btn play" id="wf-play" type="button"></button></div><div class="charts "><div class="chart" id="wf-chart"></div></div><ul class="out" id="wf-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> After 5 bp costs, the GBM long/cash strategy has a Sharpe ratio of 0.49. What is the Sharpe ratio of buy-and-hold over the same period?</div>
+  <details><summary>Answer</summary><p>0.66. The mean exposure of the strategy is 77%. The difference, −0.17, has p = 0.073 (Ledoit–Wolf HAC test): there is neither evidence of skill nor significant evidence that the strategy is worse.</p></details>
+</section><h2 class="sec" id="s-sel">Selection and Backtest Overfitting</h2>
+<section class="blk" id="max-sharpe">
+  <h3>The Best of N Zero-Skill Strategies</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch13_expected_max_sharpe_en.jpg" alt="Slide 44: The Best of N Zero-Skill Strategies" loading="lazy"></a>
+      <figcaption>Slide 44</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="em-k">Number of strategies N: <b id="em-k-v"></b></label><input type="range" id="em-k" min="0" max="9" step="1" value="9"></div><button class="btn play" id="em-play" type="button"></button></div><div class="charts "><div class="chart" id="em-curve"></div><div class="chart" id="em-hist"></div></div><ul class="out" id="em-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> A researcher tries 1,000 zero-skill strategies on 5 years of daily data. What annualised Sharpe ratio does the best one have?</div>
+  <details><summary>Answer</summary><p>About 1.45: the False Strategy Theorem gives 1.46 and the mean of the 200 simulations is 1.43. The value rises with N and falls with the sample length, because the standard deviation of the annualised SR is √(1/5) ≈ 0.45.</p></details>
+</section>
+<section class="blk" id="is-oos">
+  <h3>In-Sample (IS) vs. Out-of-Sample (OOS): Bitcoin Grid Search</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch13_is_vs_oos_en.jpg" alt="Slide 46: In-Sample (IS) vs. Out-of-Sample (OOS): Bitcoin Grid Search" loading="lazy"></a>
+      <figcaption>Slide 46</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="io-y">Start of the out-of-sample period (1 January): <b id="io-y-v"></b></label><input type="range" id="io-y" min="2018" max="2024" step="1" value="2021"></div><div class="ctl"><label for="io-q">Best q% in-sample: <b id="io-q-v"></b></label><input type="range" id="io-q" min="1" max="50" step="1" value="10"></div><button class="btn play" id="io-play" type="button"></button></div><div class="charts "><div class="chart" id="io-chart"></div></div><ul class="out" id="io-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The rule with the highest in-sample SR, 1.89, is selected. What is its out-of-sample SR?</div>
+  <details><summary>Answer</summary><p>0.02. The Spearman rank correlation between in-sample and out-of-sample SR is 0.18. The median out-of-sample SR of the top 10% in-sample rules is 0.55, against 0.42 for all rules: the family of trend rules contains information, but the selected optimum reflects noise.</p></details>
+</section><h2 class="sec" id="s-inf">Machine Learning for Inference</h2>
+<section class="blk" id="vix">
+  <h3>Worked Example: Does the VIX Predict S&P 500 Returns?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch13_vix_inference_en.jpg" alt="Slide 54: Worked Example: Does the VIX Predict S&P 500 Returns?" loading="lazy"></a>
+      <figcaption>Slide 54</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vx-l">Newey–West (HAC) lags: <b id="vx-l-v"></b></label><input type="range" id="vx-l" min="0" max="9" step="1" value="4"></div><button class="btn play" id="vx-play" type="button"></button></div><div class="charts "><div class="chart" id="vx-chart"></div></div><ul class="out" id="vx-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> OLS on the VIX alone gives 7.5 bp, with interval [−10.3, 25.2]. Why is the double-selection interval almost twice as wide?</div>
+  <details><summary>Answer</summary><p>The 15 controls that predict log VIX absorb part of its variation, leaving d_t with less variation of its own. Double selection gives 9.4 [−22.1, 40.8]. All intervals contain zero: the data do not allow a conclusion.</p></details>
+</section><h2 class="sec" id="s-front">Research Frontier: Structure before Flexibility</h2>
+<section class="blk" id="deep-sdf">
+  <h3>Deep Learning in Asset Pricing: Out-of-Sample Sharpe Ratios</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=59" target="_blank" rel="noopener"><img src="slides/ch13_cpz_sharpe_en.jpg" alt="Slide 58: Deep Learning in Asset Pricing: Out-of-Sample Sharpe Ratios" loading="lazy"></a>
+      <figcaption>Slide 58</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cp-y">Estimation period of the weights: <b id="cp-y-v"></b></label><input type="range" id="cp-y" min="1976" max="1991" step="1" value="1986"></div><div class="ctl"><label for="cp-t">Test period</label><select id="cp-t"><option value="paper" selected>1992–2016</option><option value="after">2017–2026</option><option value="all">1992–2026</option></select></div><button class="btn play" id="cp-play" type="button"></button></div><div class="charts "><div class="chart" id="cp-sr"></div><div class="chart" id="cp-w"></div></div><ul class="out" id="cp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> What monthly out-of-sample Sharpe ratio does the FF5 tangency portfolio have, with weights fixed on 1967–1986?</div>
+  <details><summary>Answer</summary><p>0.22 over 1992–2016, with 95% interval [0.11, 0.34]; the paper also reports 0.22. GAN has 0.75 and the regularised linear SDF (EN) 0.50, above the FFN forecasting network (0.44): the no-arbitrage structure matters more than flexibility.</p></details>
+</section>
+<p class="src foot">S&P 500 and VIX: daily closes, January 2000 – September 2026; Bitcoin: daily closes from September 2014; EODHD prices. Fama–French factors: Kenneth French Data Library. Sharpe ratios of the SDF models: Chen, Pelger and Zhu (2024), Table I and Table A.VI.</p>
+</main>
+</body>
+</html>

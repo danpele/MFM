@@ -1,0 +1,25 @@
+// Readouts of the Chapter 13 interactive page, written by latex/build_interactive_ch13.py.
+window.CH13_TEXT = {
+ play: 'Play', pause: 'Pause',
+ sn: (r1, nr, p, a1, a40, na, b) => `Returns: ρ₁ = ${r1}; ${nr} of 40 autocorrelations lie outside the ±${b} band. |r|${p}: ρ₁ = ${a1}, ρ₄₀ = ${a40}; ${na} of 40 lie outside the band.`,
+ la1: (nz, p, f) => `${nz} of ${p} coefficients are non-zero. First feature to enter the model: ${f}.`,
+ la2: p => `Ridge: all ${p} coefficients are non-zero and shrink towards zero together.`,
+ la3: (a, b) => `Purged 5-fold CV AUC at this λ: ${a}; highest with at least one feature in the model: ${b}.`,
+ ff: (d, k, s, c) => `d = ${d}: window of ${k} lag${k === 1 ? '' : 's'}, sum of the weights ${s}, correlation with the log price ${c}.`,
+ ff2: (a1, r1, aa, l, ra, cr) => `ADF with 1 lag: ${a1}, ${r1 ? 'rejects' : 'does not reject'} at 5% (critical value ${cr}). With ${l} lags chosen by AIC: ${aa}, ${ra ? 'rejects' : 'does not reject'}.`,
+ tb: (u, l, v, p, n) => `First barrier touched: upper ${u}, lower ${l}, vertical ${v}. ${p} of ${n} labels are +1.`,
+ tbe: (d, lab, b, k) => `${d}: ${lab} (${b} barrier, after ${k} day${k === 1 ? '' : 's'})`,
+ tb2: s => s + '.',
+ pc: (f, a, t, p, e) => `Fold ${f}: ${a} training observations, ${t} test, ${p} purged, ${e} embargoed.`,
+ pc2: (m, n) => `On average, ${m} of ${n} observations remain for training.`,
+ lk: (h, a, b, c) => `h = ${h} day${h === 1 ? '' : 's'}: shuffled K-fold ${a}, contiguous K-fold ${b}, purged K-fold with embargo ${c}. The true accuracy is 50%.`,
+ mc: (s, b) => `Fold-mean accuracy: ${s}. Always-"up" benchmark: ${b}.`,
+ mc2: (tp, fn, fp, tn, u, y) => `Logit, pooled predictions: TP = ${tp}, FN = ${fn}, FP = ${fp}, TN = ${tn}; "up" is predicted on ${u} of the days and realised on ${y}.`,
+ wf: (s, b, e, k, c) => `Annualised Sharpe ratio: strategy ${s}, buy-and-hold ${b}. Mean exposure ${e}; ${k} changes of position, each costing ${c} bp.`,
+ em: (n, t, m, s, k) => `N = ${n}: the theorem gives ${t}, the simulations a mean of ${m} with standard deviation ${s}. In ${k} of 200 samples the best strategy has an SR above 1.`,
+ io: (f, s, b, a, o, r) => `Selected rule: MA ${f}/${s}, band ${b}%; SR ${a} in-sample and ${o} out-of-sample. Spearman ρ = ${r}.`,
+ io2: (q, t, a, y, e) => `In-sample 15 May 2015 – December ${y - 1}, out-of-sample ${y}–${e}. Median out-of-sample SR: ${t} for the top ${q}% in-sample, ${a} for all rules.`,
+ vx: (l, a, b, r) => `HAC with ${l} lags: OLS on the VIX alone [${a}] bp, double selection [${b}] bp; the double-selection interval is ${r} times wider.`,
+ vx2: (a, b, k) => `Standard error of double selection: ${a} bp with these lags, ${b} bp without the HAC correction (days treated as independent). ${k} of 5 intervals exclude zero.`,
+ cp: (y, p, a, al, ah, b, bl, bh, m, se) => `Weights 1967–${y}, test ${p}, monthly SR: FF5 ${a} [${al}, ${ah}], FF3 ${b} [${bl}, ${bh}], market ${m}. Standard error of the FF5 SR: ${se}.`
+};

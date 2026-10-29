@@ -1,0 +1,32 @@
+// Readouts of the Chapter 1 interactive page, written by latex/build_interactive_ch1.py.
+const Z = n => (n === 1 ? '1 day' : n + ' days');
+window.CH1_TEXT = {
+ lab: { sp500: 'S&P 500', bettr: 'BET-TR', btc: 'Bitcoin', eurron: 'EUR/RON', gold: 'gold' },
+ pr: (t, s) => `Days with |r<sub>t</sub>| &gt; ${t}: ${s}.`,
+ pr2: (d, r, p) => `Worst Bitcoin day: ${d}, log return ${r}, i.e. a price fall of ${p}.`,
+ hq: (m, k, o, n, nu, t, f) => `${m}: excess kurtosis ${k}. Days with |z| &gt; 4: ${o} in the data, ${n} under the Normal distribution, ${t} under a Student-t with ν = ${nu} (estimated ν: ${f}).`,
+ hl: (f, l, n) => `α̂ at k/n = ${f}: ${l}. 95% intervals (i.i.d.) that exclude α = 4: ${n} of 5.`,
+ gl: (m, p, lo, hi, d, ci) => `${m}, p = ${p}: −q(p) = ${lo}%, q(1 − p) = ${hi}%, Δ = ${d} pp.` + (ci ? ` 95% bootstrap interval in the lecture: [${ci[0]}, ${ci[1]}] pp.` : ''),
+ gl2: n => `The extreme loss exceeds the extreme gain on ${n} of 5 markets.`,
+ ac: (m, s, r, a, b) => `${m}, from ${s}: ρ̂₁ = ${r}. Of 100 lags, ${a} leave the i.i.d. band and ${b} the robust band.`,
+ ac2: (a, n, m) => `ρ̂₁(|r<sub>t</sub>|) = ${a}; positive autocorrelations: ${n} of 100 for |r<sub>t</sub>|, ${m} of 100 for r<sub>t</sub><sup>2</sup>.`,
+ rv: (n, l) => `${n}-day window, highest annualised volatility: ${l}.`,
+ rv2: (a, b) => `EUR/RON: mean volatility ${a}% before July 2013 and ${b}% after.`,
+ ag: (m, h, k, n, z) => `${m}, h = ${h}: excess kurtosis ${k}, n<sub>h</sub> = ${n}, z = ${z}.`,
+ ag2: (h, l) => `At h = ${h}, normality is rejected at 5% (|z| > 1.96) for: ${l}.`,
+ lv: (m, k, l, z) => `${m}: L(${k}) = ${l}, z = ${z} with the robust standard error.`,
+ lv2: (k, a, b) => `Mean |r<sub>t+${k}</sub>|: ${a}% after the worst 5% of days, ${b}% after the best 5%.`,
+ vv: (m, w, r, n, ci) => `${m}, ${w}-day mean of volume: Spearman correlation ${r}, from ${Z(n)}.` + (ci ? ` 95% bootstrap interval in the lecture: [${ci[0]}, ${ci[1]}].` : ''),
+ aa: (m, a, b, c) => `${m}: the ACF of |r<sub>t</sub>| is ${a} at lag 1, ${b} at lag 20 and ${c} at lag 100.`,
+ aa2: (d, h, e, x, f, w) => `At lag 250, the hyperbolic curve with d = ${d} gives ${h}, the exponential curve (fitted on lags 1–20) ${e}, and the data ${x}. The log–log slope of the ACF on lags 10–250 corresponds to d = ${f}; local Whittle estimate in the lecture: d̂ = ${w}.`,
+ ty: (m, k, d, v, a, b) => `${m}, lag ${k}: the peak is at δ = ${d} (autocorrelation ${v}); at δ = 1 it is ${a}, at δ = 2 it is ${b}.`,
+ oh: (m, o, h, l, c) => `Minute ${m}: open ${o}%, high ${h}%, low ${l}%, current price ${c}% (relative to the previous close).`,
+ oh2: (r, p, c) => `The range h − l is ${r}%; the Parkinson estimate from this day is ${p}%, and |c<sub>t</sub> − c<sub>t−1</sub>| is ${c}%. The daily volatility of the simulation is 1.2%.`,
+ ve: (n, l) => `Mean over 2008–2026, ${n}-day window: ${l}.`,
+ ve2: (a, b) => `The range-based estimators are ${a}–${b} times smoother than close-to-close.`,
+ dd: (d, l) => `Maximum drawdown up to ${d}: ${l}.`,
+ dd2: (p, pp, t, tp, x, g) => `S&P 500: the peak of ${p} (${pp}) and the trough of ${t} (${tp}) give ${x}%; regaining the peak requires +${g}%.`,
+ rr: (y, l) => (y === 1990 ? 'Full samples' : `Samples from ${y}`) + `, Sharpe ratio (r<sub>f</sub> = 0): ${l}.`,
+ pv: (L, a, b, c, e, f) => `With the last ${Z(L)}: R² = ${a} in training, ${b} in the test and ${c} after the test; RMSE ${e} in training and ${f} in the test.`,
+ pv2: (L, s) => `A window of ${Z(L)} holds ${s} of the weight of the 1000-day volatility kernel; the β coefficients are re-estimated by least squares on 2000–2018.`
+};

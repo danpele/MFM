@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 12 · Options and the Implied Volatility Surface</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'en';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch12_data.js?v=20261029b"></script>
+<script src="ch12_text_en.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch12.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelling Financial Markets</h1><p>Chapter 12 · Options and the Implied Volatility Surface</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index.html#chapters">← Course site</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter12_options_volatility_surface.pdf" target="_blank" rel="noopener">Lecture PDF</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_12" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch12.html" class="lang-btn active">EN</a><a href="ch12_ro.html" class="lang-btn">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
+<p class="toc"><a href="#s-bs">Black–Scholes and the Greeks</a> · <a href="#s-dh">Delta Hedging in Practice</a> · <a href="#s-iv">Implied Volatility and the Smile</a> · <a href="#s-btc">Bitcoin Options and the Volatility Surface</a> · <a href="#s-vix">The VIX and the Variance Risk Premium</a> · <a href="#s-odte">Options with Zero Days to Expiry</a> · <a href="#s-case">Case Study: Are Option-Implied Bounds Valid and Tight?</a></p>
+<h2 class="sec" id="s-bs">Black–Scholes and the Greeks</h2>
+<section class="blk" id="greeks">
+  <h3>The Greeks: One Identity, All Sensitivities</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter12_options_volatility_surface.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch12_greeks_en.jpg" alt="Slide 11: The Greeks: One Identity, All Sensitivities" loading="lazy"></a>
+      <figcaption>Slide 11</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="gk-sig">Volatility σ (%): <b id="gk-sig-v"></b></label><input type="range" id="gk-sig" min="5" max="60" step="1" value="20"></div><div class="ctl"><label for="gk-S">Price of the underlying S: <b id="gk-S-v"></b></label><input type="range" id="gk-S" min="60" max="140" step="1" value="100"></div><button class="btn play" id="gk-play" type="button"></button></div><div class="charts "><div class="chart" id="gk-d"></div><div class="chart" id="gk-g"></div><div class="chart" id="gk-v"></div><div class="chart" id="gk-t"></div></div><ul class="out" id="gk-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which expiry has the largest gamma at the strike, and which has the largest vega?</div>
+  <details><summary>Answer</summary><p>The one-month call has the largest gamma and theta at K = 100, and the one-year call has the largest vega. For one expiry, vega = ΓS²στ: at S = 100 and σ = 20%, the three-month call has a vega of 0.197 per volatility point.</p></details>
+</section><h2 class="sec" id="s-dh">Delta Hedging in Practice</h2>
+<section class="blk" id="hedge-error">
+  <h3>Discrete Delta Hedging: Algorithm and Error</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter12_options_volatility_surface.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch12_hedge_error_en.jpg" alt="Slide 14: Discrete Delta Hedging: Algorithm and Error" loading="lazy"></a>
+      <figcaption>Slide 14</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="he-n">Number of rebalancings N: <b id="he-n-v"></b></label><input type="range" id="he-n" min="0" max="7" step="1" value="5"></div><button class="btn play" id="he-play" type="button"></button></div><div class="charts "><div class="chart" id="he-hist"></div><div class="chart" id="he-sd"></div></div><ul class="out" id="he-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> With daily rebalancing, the standard deviation of the error is 9.5% of the premium. How much more often must the hedge be adjusted to halve it?</div>
+  <details><summary>Answer</summary><p>About four times as often, because the standard deviation falls like 1/√N (the estimated log-log slope is −0.48). With N = 252, four times a day, it is 4.8% of the premium. Transaction costs, however, grow in proportion to N.</p></details>
+</section>
+<section class="blk" id="vol-mismatch">
+  <h3>Selling Volatility at 20%: Three Outcomes</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter12_options_volatility_surface.pdf#page=18" target="_blank" rel="noopener"><img src="slides/ch12_vol_mismatch_en.jpg" alt="Slide 17: Selling Volatility at 20%: Three Outcomes" loading="lazy"></a>
+      <figcaption>Slide 17</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vm-s">Realised volatility: <b id="vm-s-v"></b></label><input type="range" id="vm-s" min="10" max="30" step="1" value="20"></div><button class="btn play" id="vm-play" type="button"></button></div><div class="charts "><div class="chart" id="vm-chart"></div></div><ul class="out" id="vm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> A three-month call is sold at 20% implied volatility and hedged daily. What is the mean P&amp;L of the seller if realised volatility is 25%?</div>
+  <details><summary>Answer</summary><p>−0.99 per option, positive on only 2.2% of the paths. The mean is close to vega × 5 volatility points = 0.197 × 5. With realised volatility of 15%, the mean is +0.98, positive on 99.8% of the paths.</p></details>
+</section><h2 class="sec" id="s-iv">Implied Volatility and the Smile</h2>
+<section class="blk" id="smile-models">
+  <h3>Three Sources of a Smile</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter12_options_volatility_surface.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch12_smile_models_en.jpg" alt="Slide 22: Three Sources of a Smile" loading="lazy"></a>
+      <figcaption>Slide 22</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sm-rho">Heston: price–variance correlation ρ: <b id="sm-rho-v"></b></label><input type="range" id="sm-rho" min="-0.9" max="0.9" step="0.1" value="-0.7"></div><div class="ctl"><label for="sm-j">Merton: mean jump (log): <b id="sm-j-v"></b></label><input type="range" id="sm-j" min="-20" max="10" step="1" value="-8"></div><button class="btn play" id="sm-play" type="button"></button></div><div class="charts "><div class="chart" id="sm-chart"></div></div><ul class="out" id="sm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which of the three sources gives the steepest left wing at K/S = 0.8?</div>
+  <details><summary>Answer</summary><p>Merton jumps: 31.0%, against 16.3% ATM, close to the historical distribution (30.6%, against 13.9% ATM). Heston with ρ = −0.7 gives 28.6%, and its right wing is the lowest (15.0% at K/S = 1.2), because a negative correlation tilts the smile to the left.</p></details>
+</section><h2 class="sec" id="s-btc">Bitcoin Options and the Volatility Surface</h2>
+<section class="blk" id="btc-smile">
+  <h3>The Bitcoin Smile</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter12_options_volatility_surface.pdf#page=29" target="_blank" rel="noopener"><img src="slides/ch12_btc_smile_en.jpg" alt="Slide 28: The Bitcoin Smile" loading="lazy"></a>
+      <figcaption>Slide 28</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bs-e">Expiry: <b id="bs-e-v"></b></label><input type="range" id="bs-e" min="0" max="8" step="1" value="4"></div><div class="ctl"><label for="bs-rho">Tilt ρ: <b id="bs-rho-v"></b></label><input type="range" id="bs-rho" min="-0.95" max="0.95" step="0.01" value="-0.26"></div><div class="ctl"><label for="bs-b">Wing slope b, relative to the fit: <b id="bs-b-v"></b></label><input type="range" id="bs-b" min="0.5" max="1.5" step="0.05" value="1"></div><button class="btn play" id="bs-play" type="button"></button></div><div class="charts "><div class="chart" id="bs-chart"></div><div class="chart" id="bs-w"></div></div><ul class="out" id="bs-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Is the Bitcoin smile a skew, as for equity indices?</div>
+  <details><summary>Answer</summary><p>No. Both wings rise, because Bitcoin can jump up as well as down. Puts are still dearer than calls at the same |k|: the skew is negative at all 9 expiries. The root mean squared error of the SVI fits is at most 0.70 volatility points.</p></details>
+</section>
+<section class="blk" id="btc-rnd">
+  <h3>What the Market Prices for Bitcoin</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter12_options_volatility_surface.pdf#page=31" target="_blank" rel="noopener"><img src="slides/ch12_btc_rnd_en.jpg" alt="Slide 30: What the Market Prices for Bitcoin" loading="lazy"></a>
+      <figcaption>Slide 30</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rn-x">Fall threshold, S<sub>T</sub>/F: <b id="rn-x-v"></b></label><input type="range" id="rn-x" min="0.5" max="0.95" step="0.01" value="0.7"></div><button class="btn play" id="rn-play" type="button"></button></div><div class="charts "><div class="chart" id="rn-chart"></div></div><ul class="out" id="rn-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> According to option prices, how likely is a fall of Bitcoin by more than 30% within 38 days?</div>
+  <details><summary>Answer</summary><p>1.21%, with a bootstrap interval of 1.08–1.24%, about 8 times the 0.14% of a log-normal distribution with the ATM volatility of 36.4%. 0.13 of the 1.21 points lie below the lowest quoted strike (0.47F), where the density is an SVI extrapolation.</p></details>
+</section><h2 class="sec" id="s-vix">The VIX and the Variance Risk Premium</h2>
+<section class="blk" id="vix-history">
+  <h3>The VIX, 1990–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter12_options_volatility_surface.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch12_vix_history_en.jpg" alt="Slide 34: The VIX, 1990–2026" loading="lazy"></a>
+      <figcaption>Slide 34</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vh-l">VIX level: <b id="vh-l-v"></b></label><input type="range" id="vh-l" min="10" max="80" step="1" value="30"></div><button class="btn play" id="vh-play" type="button"></button></div><div class="charts "><div class="chart" id="vh-chart"></div></div><ul class="out" id="vh-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How often was the VIX above 30 between 1990 and 2026?</div>
+  <details><summary>Answer</summary><p>On 7.9% of days. The mean is 19.4, and the maximum, 82.7, was reached on 16 March 2020. Spikes are sudden and decay slowly, as in GARCH models.</p></details>
+</section>
+<section class="blk" id="vrp">
+  <h3>Implied vs Realised Volatility, S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter12_options_volatility_surface.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch12_vrp_en.jpg" alt="Slide 36: Implied vs Realised Volatility, S&P 500" loading="lazy"></a>
+      <figcaption>Slide 36</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vr-y">Sample starts in: <b id="vr-y-v"></b></label><input type="range" id="vr-y" min="1990" max="2020" step="1" value="1990"></div><button class="btn play" id="vr-play" type="button"></button></div><div class="charts "><div class="chart" id="vr-chart"></div></div><ul class="out" id="vr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On what share of days is the VIX above the volatility realised over the next 21 trading days?</div>
+  <details><summary>Answer</summary><p>On 86% of days. The mean premium is 4.09 volatility points (Newey–West standard error 0.27), or 113 %² in variance, with t = 5.5. The exceptions are crashes: the worst window, starting on 20 February 2020, has −72.0 points.</p></details>
+</section>
+<section class="blk" id="mincer-zarnowitz">
+  <h3>Is the VIX a Good Forecast?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter12_options_volatility_surface.pdf#page=39" target="_blank" rel="noopener"><img src="slides/ch12_vix_rv_mz_en.jpg" alt="Slide 38: Is the VIX a Good Forecast?" loading="lazy"></a>
+      <figcaption>Slide 38</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mz-c">Only days with VIX up to: <b id="mz-c-v"></b></label><input type="range" id="mz-c" min="20" max="90" step="1" value="90"></div><button class="btn play" id="mz-play" type="button"></button></div><div class="charts "><div class="chart" id="mz-chart"></div></div><ul class="out" id="mz-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Taken separately, neither α̂ = −51.9 nor β̂ = 0.86 differs significantly from (0, 1). Is the VIX an unbiased forecast?</div>
+  <details><summary>Answer</summary><p>No. The two estimates have a correlation of −0.90, and the joint Wald test gives χ²₂ = 41.7, with p = 8.9·10⁻¹⁰. The VIX explains R² = 0.37 of the subsequent realised variance, past realised variance only 0.29.</p></details>
+</section><h2 class="sec" id="s-odte">Options with Zero Days to Expiry</h2>
+<section class="blk" id="odte">
+  <h3>Gamma and Time Decay Near Expiry</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter12_options_volatility_surface.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch12_0dte_gamma_en.jpg" alt="Slide 40: Gamma and Time Decay Near Expiry" loading="lazy"></a>
+      <figcaption>Slide 40</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="od-d">Trading days to expiry: <b id="od-d-v"></b></label><input type="range" id="od-d" min="1" max="21" step="1" value="1"></div><div class="ctl"><label for="od-sig">Volatility σ (%): <b id="od-sig-v"></b></label><input type="range" id="od-sig" min="8" max="40" step="1" value="16"></div><button class="btn play" id="od-play" type="button"></button></div><div class="charts "><div class="chart" id="od-g"></div><div class="chart" id="od-t"></div></div><ul class="out" id="od-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How much larger is the ATM gamma one trading day before expiry than one month before?</div>
+  <details><summary>Answer</summary><p>4.6 times (0.396 against 0.086), i.e. √21, because the ATM gamma is proportional to 1/√τ. A 1% move in the last day changes delta by about 0.4. Time decay is 0.167 in the last calendar day, against 0.030 with 30 days left.</p></details>
+</section><h2 class="sec" id="s-case">Case Study: Are Option-Implied Bounds Valid and Tight?</h2>
+<section class="blk" id="bounds">
+  <h3>Case Study: the Bound and the Realised Premium</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter12_options_volatility_surface.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch12_bck_bound_en.jpg" alt="Slide 48: Case Study: the Bound and the Realised Premium" loading="lazy"></a>
+      <figcaption>Slide 48</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bk-h">Horizon: <b id="bk-h-v"></b></label><input type="range" id="bk-h" min="0" max="3" step="1" value="3"></div><button class="btn play" id="bk-play" type="button"></button></div><div class="charts "><div class="chart" id="bk-chart"></div></div><ul class="out" id="bk-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The realised 12-month excess return is below the Martin bound on 33% of dates. Does this contradict the validity of the bound?</div>
+  <details><summary>Answer</summary><p>No. The bound restricts the conditional mean E_t[R^e], not each realisation. The paper does not reject validity (D₁ = 0 at every horizon) but rejects tightness: the mean slackness is 4.8–5.2 points a year. The correlation between the bound and the realised return is only 0.15.</p></details>
+</section>
+<p class="src foot">S&amp;P 500 and VIX: EODHD daily closes, 1990–2026. Bitcoin options: snapshot of the Deribit chain, 22 September 2026, 07:51 UTC. Delta hedging: 20,000 paths of geometric Brownian motion. Case study: daily bounds from the replication package of Back, Crotty and Kazempour (2022); risk-free rate from the Kenneth French Data Library.</p>
+</main>
+</body>
+</html>

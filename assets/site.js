@@ -101,7 +101,7 @@
     // ------------------------------------------------------------
     // CHAPTER CARDS
     // ------------------------------------------------------------
-    const LINK_CLASS = { slides: 'btn-primary', seminar: 'btn-secondary', lectureNb: 'btn-outline', seminarNb: 'btn-outline', quantlets: 'btn-outline' };
+    const LINK_CLASS = { slides: 'btn-primary', seminar: 'btn-secondary', lectureNb: 'btn-outline', seminarNb: 'btn-outline', quantlets: 'btn-outline', interactive: 'btn-outline' };
     const PLACEHOLDER_LINKS = ['slides', 'seminar', 'lectureNb', 'seminarNb'];
 
     function linkButton(l) {
@@ -113,12 +113,20 @@
         return `<span class="link-group">${main}<a href="${l.colab}" class="btn btn-colab" target="_blank" rel="noopener" title="${T.links.colab}">Colab</a></span>`;
     }
 
+    // interactive companion page of a chapter (interactive/chN.html), placed after the slides
+    function withInteractive(links) {
+        const s = links.find(l => l.type === 'slides'), m = s && /(?:chapter|capitol)(\d+)_/.exec(s.href);
+        if (!m) return links;
+        const i = links.indexOf(s), it = { type: 'interactive', href: `interactive/ch${m[1]}${LANG === 'ro' ? '_ro' : ''}.html` };
+        return [...links.slice(0, i + 1), it, ...links.slice(i + 1)];
+    }
+
     function renderChapters() {
         $('chapters-grid').innerHTML = D.chapters.map(ch => {
             const badge = (ch.available ? '' : `<span class="badge badge-soon">${T.comingSoon}</span>`) +
                 (ch.selfStudy ? `<span class="badge badge-self">${T.selfStudy}</span>` : '');
             const links = ch.available
-                ? ch.links[LANG].map(linkButton).join('')
+                ? withInteractive(ch.links[LANG]).map(linkButton).join('')
                 : PLACEHOLDER_LINKS.map(t => `<span class="btn disabled" aria-disabled="true">${T.links[t]}</span>`).join('');
             const qn = (ch.quantinar || []).length
                 ? `<div class="quantinar-box"><h4><img src="logos/qr_logo.png" alt="">${T.quantinar}</h4><ul>` +

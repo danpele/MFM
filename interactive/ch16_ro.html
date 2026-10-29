@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capitolul 16 · Active digitale și DeFi</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'ro';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch16_data.js?v=20261029b"></script>
+<script src="ch16_text_ro.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch16.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelarea piețelor financiare</h1><p>Capitolul 16 · Active digitale și DeFi</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index_ro.html#chapters">← Site-ul cursului</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf" target="_blank" rel="noopener">PDF-ul cursului</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_16" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch16.html" class="lang-btn">EN</a><a href="ch16_ro.html" class="lang-btn active">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
+<p class="toc"><a href="#s-mkt">Activele digitale și piața lor</a> · <a href="#s-sty">Faptele stilizate ale randamentelor cripto</a> · <a href="#s-crix">Indici cripto: CRIX</a> · <a href="#s-stab">Stablecoin-uri</a> · <a href="#s-defi">DeFi și formatorii automați de piață</a> · <a href="#s-etf">ETF-uri spot și acțiuni „cripto”</a> · <a href="#s-alt">Cripto-activele ca active alternative</a> · <a href="#s-case">Studiu de caz: factorii de risc comuni ai criptomonedelor</a> · <a href="#s-ai">AI pentru descoperire științifică</a></p>
+<h2 class="sec" id="s-mkt">Activele digitale și piața lor</h2>
+<section class="blk" id="market-value">
+  <h3>Cinci monede, un activ dominant</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=5" target="_blank" rel="noopener"><img src="slides/ch16_market_value_ro.jpg" alt="Slide-ul 4: Cinci monede, un activ dominant" loading="lazy"></a>
+      <figcaption>Slide-ul 4</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mv-t">Luna: <b id="mv-t-v"></b></label><input type="range" id="mv-t" min="0" max="104" step="1" value="104"></div><button class="btn play" id="mv-play" type="button"></button></div><div class="charts "><div class="chart" id="mv-chart"></div></div><ul class="out" id="mv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce parte din valoarea celor cinci monede revine Bitcoin și cît de stabilă a fost această pondere din 2018?</div>
+  <details><summary>Răspuns</summary><p>82,5% pe 18 septembrie 2026. Ponderea a variat între 55,8% (1 feb. 2018) și 88,5% (5 sept. 2019). Ethereum are 16,2%, iar Dogecoin, Cardano și Litecoin împreună au sub 1,5%. Valoarea totală, 1 970 de miliarde USD, urmează prețurile, pentru că oferta se modifică lent.</p></details>
+</section><h2 class="sec" id="s-sty">Faptele stilizate ale randamentelor cripto</h2>
+<section class="blk" id="rolling-vol">
+  <h3>Volatilitatea în timp</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=11" target="_blank" rel="noopener"><img src="slides/ch16_rolling_vol_ro.jpg" alt="Slide-ul 10: Volatilitatea în timp" loading="lazy"></a>
+      <figcaption>Slide-ul 10</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rv-w">Fereastra (zile calendaristice): <b id="rv-w-v"></b></label><input type="range" id="rv-w" min="30" max="730" step="5" value="365"></div><button class="btn play" id="rv-play" type="button"></button></div><div class="charts "><div class="chart" id="rv-chart"></div></div><ul class="out" id="rv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît de volatil este Bitcoin azi în comparație cu S&P 500?</div>
+  <details><summary>Răspuns</summary><p>Pe fereastra de un an, volatilitatea anualizată este 45% pentru Bitcoin și 13% pentru S&P 500, deci Bitcoin este de 3,5 ori mai volatil. Volatilitatea Bitcoin a scăzut de la 88% la 45%, iar cea a Ethereum de la 109% la 64%. Scăderea este compatibilă cu maturizarea pieței, dar graficul nu identifică o cauză.</p></details>
+</section>
+<section class="blk" id="weekday">
+  <h3>O piață de 7 zile, cu volatilitate redusă în weekend</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch16_weekday_ro.jpg" alt="Slide-ul 11: O piață de 7 zile, cu volatilitate redusă în weekend" loading="lazy"></a>
+      <figcaption>Slide-ul 11</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="wd-s">Data de separare: <b id="wd-s-v"></b></label><input type="range" id="wd-s" min="0" max="86" step="1" value="60"></div><button class="btn play" id="wd-play" type="button"></button></div><div class="charts "><div class="chart" id="wd-chart"></div></div><ul class="out" id="wd-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Este Bitcoin la fel de volatil în weekend ca în zilele lucrătoare?</div>
+  <details><summary>Răspuns</summary><p>Nu. Raportul dintre dispersia din weekend și cea din zilele lucrătoare este 0,45 înainte de 11 ianuarie 2024 și 0,39 după. În weekend lipsesc știrile macroeconomice, bursa americană și fluxurile ETF. După lansarea ETF-urilor toate zilele sînt mai calme: în zilele lucrătoare, rădăcina mediei pătratelor scade de la 4,01% la 2,73%.</p></details>
+</section>
+<section class="blk" id="rolling-corr">
+  <h3>Corelația dintre Bitcoin și acțiuni</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch16_rolling_corr_ro.jpg" alt="Slide-ul 12: Corelația dintre Bitcoin și acțiuni" loading="lazy"></a>
+      <figcaption>Slide-ul 12</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rc-w">Fereastra (zile comune): <b id="rc-w-v"></b></label><input type="range" id="rc-w" min="20" max="500" step="10" value="250"></div><button class="btn play" id="rc-play" type="button"></button></div><div class="charts "><div class="chart" id="rc-chart"></div></div><ul class="out" id="rc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Corelația dintre Bitcoin și S&P 500 s-a schimbat la lansarea ETF-urilor spot sau mai devreme?</div>
+  <details><summary>Răspuns</summary><p>Mai devreme. Corelația este 0,02 în 2017–2019, 0,39 în 2020–2023 și 0,38 după lansarea ETF-urilor. Ruptura apare la începutul lui 2020; testul sup-Wald din curs o datează pe 9 martie 2020. Cu aurul, corelația crește de la −0,02 la 0,12 și apoi la 0,22.</p></details>
+</section><h2 class="sec" id="s-crix">Indici cripto: CRIX</h2>
+<section class="blk" id="crix">
+  <h3>Indicii cripto din 2018</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch16_crix_index_ro.jpg" alt="Slide-ul 22: Indicii cripto din 2018" loading="lazy"></a>
+      <figcaption>Slide-ul 22</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cx-s">Începutul perioadei: <b id="cx-s-v"></b></label><input type="range" id="cx-s" min="0" max="92" step="1" value="0"></div><button class="btn play" id="cx-play" type="button"></button></div><div class="charts "><div class="chart" id="cx-chart"></div></div><ul class="out" id="cx-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Indicele cu ponderi egale a avut un randament anual compus de 30,0%, peste cei 21,4% ai indicelui ponderat cu valoarea de piață. Este aceasta o primă stabilă?</div>
+  <details><summary>Răspuns</summary><p>Nu. Diferența provine din 2021, cînd indicele cu ponderi egale a crescut cu 998%, iar cel ponderat cu valoarea de piață cu 113%. Volatilitatea este și ea mai mare: 82,5% față de 65,7%. Cele cinci monede sînt alese ex post, dintre supraviețuitorii de azi, deci ambele randamente sînt deplasate în sus (survivorship bias).</p></details>
+</section><h2 class="sec" id="s-stab">Stablecoin-uri</h2>
+<section class="blk" id="peg">
+  <h3>Abaterile de la 1 USD</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch16_peg_deviation_ro.jpg" alt="Slide-ul 27: Abaterile de la 1 USD" loading="lazy"></a>
+      <figcaption>Slide-ul 27</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pg-c">Pragul pentru |abatere|: <b id="pg-c-v"></b></label><input type="range" id="pg-c" min="10" max="200" step="5" value="50"></div><button class="btn play" id="pg-play" type="button"></button></div><div class="charts "><div class="chart" id="pg-chart"></div></div><ul class="out" id="pg-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît de des se abate prețul de închidere al unui stablecoin cu mai mult de 50 pb de la 1 USD?</div>
+  <details><summary>Răspuns</summary><p>În mai puțin de 1% din zile, în 2021–2026: 0,14% pentru Tether și USD Coin, 0,57% pentru Dai. Abaterea standard a închiderii este 7,3 pb, 7,5 pb și, respectiv, 10,8 pb. Episoadele de stres sînt rare, dar severe: minimul zilnic al USD Coin a fost −1 226 pb, pe 11 martie 2023.</p></details>
+</section>
+<section class="blk" id="svb">
+  <h3>Martie 2023: falimentul unei bănci afectează USD Coin</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch16_depeg_2023_ro.jpg" alt="Slide-ul 32: Martie 2023: falimentul unei bănci afectează USD Coin" loading="lazy"></a>
+      <figcaption>Slide-ul 32</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="dp-t">Ziua: <b id="dp-t-v"></b></label><input type="range" id="dp-t" min="0" max="15" step="1" value="6"></div><button class="btn play" id="dp-play" type="button"></button></div><div class="charts "><div class="chart" id="dp-chart"></div></div><ul class="out" id="dp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Silicon Valley Bank a fost închisă vineri, 10 martie 2023. De ce USD Coin a atins minimul sîmbătă?</div>
+  <details><summary>Răspuns</summary><p>În weekend răscumpărările nu se puteau deconta, deci arbitrajul care ține prețul în bandă a dispărut. Minimul zilnic USD Coin a fost 0,8774 USD sîmbătă, 11 martie, cu închiderea la 0,9715 USD. Dai, acoperit cu cripto-active, a coborît la 0,8970 USD, iar Tether a rămas deasupra parității.</p></details>
+</section><h2 class="sec" id="s-defi">DeFi și formatorii automați de piață</h2>
+<section class="blk" id="tvl">
+  <h3>Valoarea totală blocată în DeFi</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch16_defi_tvl_ro.jpg" alt="Slide-ul 34: Valoarea totală blocată în DeFi" loading="lazy"></a>
+      <figcaption>Slide-ul 34</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="tv-s">Prima lună din regresie: <b id="tv-s-v"></b></label><input type="range" id="tv-s" min="0" max="56" step="1" value="0"></div><button class="btn play" id="tv-play" type="button"></button></div><div class="charts "><div class="chart" id="tv-chart"></div><div class="chart" id="tv-sc"></div></div><ul class="out" id="tv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît din variația lunară a TVL se explică prin prețul Ether?</div>
+  <details><summary>Răspuns</summary><p>În regresia schimbărilor logaritmice lunare, β = 0,79 (SE Newey–West 0,07) și R² = 0,62, pe 80 de luni. TVL este valoarea tokenurilor depuse, deci se mișcă mecanic cu prețul lor. TVL a crescut de la 0,6 miliarde USD în ianuarie 2020 la 177 de miliarde pe 9 nov. 2021 și este azi 88 de miliarde.</p></details>
+</section>
+<section class="blk" id="lp">
+  <h3>Un furnizor de lichiditate într-un pool Ether</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch16_lp_vs_hodl_ro.jpg" alt="Slide-ul 40: Un furnizor de lichiditate într-un pool Ether" loading="lazy"></a>
+      <figcaption>Slide-ul 40</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="lp-t">Data: <b id="lp-t-v"></b></label><input type="range" id="lp-t" min="0" max="992" step="1" value="992"></div><div class="ctl"><label for="lp-f">Comisioane încasate de pool (% pe an): <b id="lp-f-v"></b></label><input type="range" id="lp-f" min="0" max="12" step="0.5" value="0"></div><button class="btn play" id="lp-play" type="button"></button></div><div class="charts "><div class="chart" id="lp-chart"></div><div class="chart" id="lp-il"></div></div><ul class="out" id="lp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ether a încheiat perioada aproape de prețul inițial (r = 1,11). A pierdut furnizorul de lichiditate față de simpla deținere?</div>
+  <details><summary>Răspuns</summary><p>Foarte puțin: 105,4 față de 105,5, o pierdere impermanentă de −0,14%. Față de reperul de reechilibrare (122,4), diferența este însă de 17,0 puncte. LVR realizată este 5,83% pe an, aproape de σ²/8 = 5,79% (σ = 68,1%), deci comisioanele trebuie să aducă aproximativ 5,8% pe an pentru a egala reperul.</p></details>
+</section><h2 class="sec" id="s-etf">ETF-uri spot și acțiuni „cripto”</h2>
+<section class="blk" id="etf-tracking">
+  <h3>IBIT replică Bitcoin</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch16_etf_tracking_ro.jpg" alt="Slide-ul 44: IBIT replică Bitcoin" loading="lazy"></a>
+      <figcaption>Slide-ul 44</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="et-p">ETF-ul</label><select id="et-p"><option value="IBIT" selected>IBIT / Bitcoin</option><option value="ETHA">ETHA / Ether</option></select></div><div class="ctl"><label for="et-t">Pînă la data: <b id="et-t-v"></b></label><input type="range" id="et-t" min="0" max="672" step="1" value="672"></div><button class="btn play" id="et-play" type="button"></button></div><div class="charts "><div class="chart" id="et-chart"></div></div><ul class="out" id="et-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît pierde IBIT pe an față de Bitcoin?</div>
+  <details><summary>Răspuns</summary><p>Logaritmul raportului IBIT/Bitcoin scade cu 0,24% pe an, aproape de comisionul anual de 0,25%. Pe 18 septembrie 2026, IBIT este la 172,8, iar Bitcoin la 174,5 (ambele 100 pe 11 ian. 2024). ETHA are același drift, −0,24% pe an.</p></details>
+</section>
+<section class="blk" id="etf-timing">
+  <h3>Randamentele zilnice, cele săptămînale și beta Dimson</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch16_etf_timing_ro.jpg" alt="Slide-ul 47: Randamentele zilnice, cele săptămînale și beta Dimson" loading="lazy"></a>
+      <figcaption>Slide-ul 47</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="tm-p">ETF-ul</label><select id="tm-p"><option value="IBIT" selected>IBIT / Bitcoin</option><option value="ETHA">ETHA / Ether</option></select></div><div class="ctl"><label for="tm-h">Orizontul randamentelor din stînga: <b id="tm-h-v"></b></label><input type="range" id="tm-h" min="1" max="10" step="1" value="1"></div><button class="btn play" id="tm-play" type="button"></button></div><div class="charts "><div class="chart" id="tm-d"></div><div class="chart" id="tm-w"></div></div><ul class="out" id="tm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> De ce R² dintre IBIT și Bitcoin este 0,82 pe randamente zilnice, dar 0,98 pe randamente săptămînale?</div>
+  <details><summary>Răspuns</summary><p>Închiderea zilnică a monedei și cea de la New York sînt separate de cîteva ore, deci o parte din mișcarea din ziua t ajunge în ETF în ziua t ± 1. Pe randamente săptămînale decalajul contează puțin: beta trece de la 0,93 la 1,01. Erorile standard Newey–West nu corectează deplasarea lui beta.</p></details>
+</section><h2 class="sec" id="s-alt">Cripto-activele ca active alternative</h2>
+<section class="blk" id="alt-assets">
+  <h3>Cripto-activele printre celelalte clase de active</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch16_alt_assets_ro.jpg" alt="Slide-ul 54: Cripto-activele printre celelalte clase de active" loading="lazy"></a>
+      <figcaption>Slide-ul 54</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="aa-k">Variabila omisă din PCA: <b id="aa-k-v"></b></label><input type="range" id="aa-k" min="0" max="8" step="1" value="0"></div><button class="btn play" id="aa-play" type="button"></button></div><div class="charts "><div class="chart" id="aa-chart"></div></div><ul class="out" id="aa-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> S-au apropiat cripto-activele de celelalte clase de active între W1 (2019 – iunie 2021) și W2 (ianuarie 2024 – septembrie 2026)?</div>
+  <details><summary>Răspuns</summary><p>Estimările punctuale indică o apropiere: distanța față de acțiuni scade de la 3,03 la 2,63, iar față de mărfuri de la 2,26 la 1,86. Cripto-activele au devenit și mai asemănătoare între ele: dispersia în jurul centrului lor scade de la 2,13 la 1,43. Volatilitatea Bitcoin scade de la 77% la 47%.</p></details>
+</section><h2 class="sec" id="s-case">Studiu de caz: factorii de risc comuni ai criptomonedelor</h2>
+<section class="blk" id="ltw">
+  <h3>Studiu de caz: Tabelul 1 refăcut pe datele cursului</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=60" target="_blank" rel="noopener"><img src="slides/ch16_ltw_table1_ro.jpg" alt="Slide-ul 59: Studiu de caz: Tabelul 1 refăcut pe datele cursului" loading="lazy"></a>
+      <figcaption>Slide-ul 59</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="lt-e">Sfîrșitul eșantionului in-sample: <b id="lt-e-v"></b></label><input type="range" id="lt-e" min="0" max="95" step="1" value="30"></div><button class="btn play" id="lt-play" type="button"></button></div><div class="charts "><div class="chart" id="lt-chart"></div></div><ul class="out" id="lt-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Se mențin pe datele noi media și volatilitatea săptămînală raportate de Liu, Tsyvinski și Wu (2022)?</div>
+  <details><summary>Răspuns</summary><p>Pe aceleași săptămîni, eșantionul nostru reproduce Tabelul 1: cea mai mare diferență, la media Ether, este de 0,26 erori standard. Out-of-sample (319 săptămîni), mediile sînt mai mici (Bitcoin 0,9%, XRP 1,6%, Ether 1,2%), iar abaterea standard a Ether scade aproximativ la jumătate, de la 20,7% la 11,1%.</p></details>
+</section><h2 class="sec" id="s-ai">AI pentru descoperire științifică</h2>
+<section class="blk" id="zscan">
+  <h3>Mini studiu de caz: efectul ETF-urilor asupra corelației</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol16_active_digitale_defi.pdf#page=65" target="_blank" rel="noopener"><img src="slides/ch16_ai_zscan_ro.jpg" alt="Slide-ul 64: Mini studiu de caz: efectul ETF-urilor asupra corelației" loading="lazy"></a>
+      <figcaption>Slide-ul 64</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="az-w">Fereastra h de fiecare parte: <b id="az-w-v"></b></label><input type="range" id="az-w" min="100" max="800" step="50" value="500"></div><button class="btn play" id="az-play" type="button"></button></div><div class="charts "><div class="chart" id="az-chart"></div></div><ul class="out" id="az-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Dacă lăsăm datele să aleagă data rupturii, este aceasta 11 ianuarie 2024?</div>
+  <details><summary>Răspuns</summary><p>Nu. Cel mai mare z apare pe 5 februarie 2020 (z = 7,26). La data ETF, z = −1,48, iar 82% dintre datele candidate dau un |z| mai mare. Banda ±1,96 este punctuală: maximul pe peste o mie de date suprapuse cere o valoare critică proprie, de aceea inferența se face cu testul sup-Wald.</p></details>
+</section>
+<p class="src foot">Prețuri zilnice EODHD (cripto-active, stablecoin-uri, ETF-uri, S&P 500, aur), pînă la 18 septembrie 2026. Oferta în circulație a monedelor: Coin Metrics Community Data. Valoarea totală blocată (TVL): DefiLlama. Tabelul 1: Liu, Tsyvinski și Wu (2022), Journal of Finance.</p>
+</main>
+</body>
+</html>

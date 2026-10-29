@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 7 · Value-at-Risk and Expected Shortfall</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'en';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch7_data.js?v=20261029b"></script>
+<script src="ch7_text_en.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch7.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelling Financial Markets</h1><p>Chapter 7 · Value-at-Risk and Expected Shortfall</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index.html#chapters">← Course site</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf" target="_blank" rel="noopener">Lecture PDF</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_07" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch7.html" class="lang-btn active">EN</a><a href="ch7_ro.html" class="lang-btn">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
+<p class="toc"><a href="#s-var">Value-at-Risk and Expected Shortfall</a> · <a href="#s-coh">Coherent Risk Measures</a> · <a href="#s-est">Estimation Methods</a> · <a href="#s-prec">How Precise Are VaR and ES?</a> · <a href="#s-cond">Conditional VaR and ES</a> · <a href="#s-evt">Extreme Value Theory</a> · <a href="#s-hor">The Horizon: Square-Root-of-Time</a> · <a href="#s-port">Portfolio VaR and Risk Contributions</a> · <a href="#s-reg">Liquidity and Regulation</a> · <a href="#s-case">Case Study: Deep Quantile Regression for VaR</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
+<h2 class="sec" id="s-var">Value-at-Risk and Expected Shortfall</h2>
+<section class="blk" id="loss-distribution">
+  <h3>VaR and ES on the S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=9" target="_blank" rel="noopener"><img src="slides/ch7_loss_distribution_en.jpg" alt="Slide 8: VaR and ES on the S&P 500" loading="lazy"></a>
+      <figcaption>Slide 8</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ld-a">Level α: <b id="ld-a-v"></b></label><input type="range" id="ld-a" min="0" max="10" step="1" value="6"></div><button class="btn play" id="ld-play" type="button"></button></div><div class="charts "><div class="chart" id="ld-dist"></div><div class="chart" id="ld-tail"></div></div><ul class="out" id="ld-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The historical VaR 1% of the S&P 500 is 3.45%. How much does the position lose, on average, on the days when the loss exceeds this threshold?</div>
+  <details><summary>Answer</summary><p>5.01%, which is ES 1%. The threshold was exceeded on 68 of 6,717 days (1.01%). The Normal distribution with the same mean and standard deviation gives a VaR 1% of 2.80% and an ES 1% of 3.21%: its tails are too thin.</p></details>
+</section><h2 class="sec" id="s-coh">Coherent Risk Measures</h2>
+<section class="blk" id="subadditivity">
+  <h3>Subadditivity: VaR Fails, ES Holds</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=17" target="_blank" rel="noopener"><img src="slides/ch7_subadditivity_en.jpg" alt="Slide 16: Subadditivity: VaR Fails, ES Holds" loading="lazy"></a>
+      <figcaption>Slide 16</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sa-p">Default probability of each bond: <b id="sa-p-v"></b></label><input type="range" id="sa-p" min="0.1" max="2" step="0.1" value="0.9"></div><button class="btn play" id="sa-play" type="button"></button></div><div class="charts "><div class="chart" id="sa-chart"></div></div><ul class="out" id="sa-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Each bond has a VaR 1% of 0. Why does the portfolio of the two have a VaR 1% of 100?</div>
+  <details><summary>Answer</summary><p>The default probability of each bond, 0.9%, is below the 1% level, so the individual VaR is 0. The probability that at least one defaults is 1.79%, above 1%, so the portfolio VaR is 100 > 0 + 0. ES is subadditive: 100.8 for the portfolio against 90 + 90 = 180. VaR violates subadditivity only when the default probability lies between about 0.5% and 1%.</p></details>
+</section><h2 class="sec" id="s-est">Estimation Methods</h2>
+<section class="blk" id="var-levels">
+  <h3>Five Methods Across Tail Probabilities</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch7_var_levels_en.jpg" alt="Slide 22: Five Methods Across Tail Probabilities" loading="lazy"></a>
+      <figcaption>Slide 22</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vl-a">Level α (cursor): <b id="vl-a-v"></b></label><input type="range" id="vl-a" min="0" max="54" step="1" value="54"></div><button class="btn play" id="vl-play" type="button"></button></div><div class="charts "><div class="chart" id="vl-var"></div><div class="chart" id="vl-es"></div></div><ul class="out" id="vl-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> At which level α do the five methods differ most?</div>
+  <details><summary>Answer</summary><p>In the far tail. At α = 0.1%, VaR is 7.22% historical, 7.04% with EVT, 8.58% with Student-t and 15.06% with Cornish–Fisher, while the Normal distribution gives only 3.72%. At α = 5%, all five values lie between 1.67% and 1.97%.</p></details>
+</section><h2 class="sec" id="s-prec">How Precise Are VaR and ES?</h2>
+<section class="blk" id="precision">
+  <h3>Precision on the S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=27" target="_blank" rel="noopener"><img src="slides/ch7_precision_en.jpg" alt="Slide 26: Precision on the S&P 500" loading="lazy"></a>
+      <figcaption>Slide 26</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pr-n">Last n days (rows 2 and 4): <b id="pr-n-v"></b></label><input type="range" id="pr-n" min="0" max="7" step="1" value="1"></div><button class="btn play" id="pr-play" type="button"></button></div><div class="charts "><div class="chart" id="pr-chart"></div></div><ul class="out" id="pr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How many losses enter the ES 2.5% estimated on the last 500 days, and how wide is its 95% interval?</div>
+  <details><summary>Answer</summary><p>13 losses. The HAC interval is 2.55 pp wide and the block bootstrap interval 2.36 pp. On the 2000–2026 sample, volatility clustering widens the ES interval from 0.60 pp (i.i.d.) to 1.00 pp (HAC), and the bootstrap interval from 0.62 pp to 1.16 pp.</p></details>
+</section><h2 class="sec" id="s-cond">Conditional VaR and ES</h2>
+<section class="blk" id="hs-fhs">
+  <h3>Historical vs Filtered Historical Simulation: S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch7_hs_fhs_sp500_en.jpg" alt="Slide 31: Historical vs Filtered Historical Simulation: S&P 500" loading="lazy"></a>
+      <figcaption>Slide 31</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="hf-a">VaR level</label><select id="hf-a"><option value="0.05">5%</option><option value="0.025">2.5%</option><option value="0.01" selected>1%</option><option value="0.005">0.5%</option><option value="0.0025">0.25%</option><option value="0.001">0.1%</option></select></div><div class="ctl"><label for="hf-w">Historical simulation window (days)</label><select id="hf-w"><option value="250">250</option><option value="500" selected>500</option><option value="1000">1000</option></select></div><div class="ctl"><label for="hf-t">Up to: <b id="hf-t-v"></b></label><input type="range" id="hf-t" min="0" max="5209" step="1" value="5209"></div><button class="btn play" id="hf-play" type="button"></button></div><div class="charts "><div class="chart" id="hf-chart"></div></div><ul class="out" id="hf-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> In 2006–2026, which method comes closest to the 1% target for exceedances of VaR 1%?</div>
+  <details><summary>Answer</summary><p>FHS, with 1.54% (80 of 5,210 days), against 1.67% for historical simulation on 500 days and 2.34% for GARCH with Normal shocks. The exceedances of historical simulation come in clusters, in 2008 and 2020, because the window reacts with months of delay.</p></details>
+</section>
+<section class="blk" id="caviar">
+  <h3>CAViaR vs Filtered Historical Simulation, Out of Sample</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch7_caviar_en.jpg" alt="Slide 34: CAViaR vs Filtered Historical Simulation, Out of Sample" loading="lazy"></a>
+      <figcaption>Slide 34</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cv-b1">Persistence β₁: <b id="cv-b1-v"></b></label><input type="range" id="cv-b1" min="0.7" max="0.98" step="0.001" value="0.897"></div><div class="ctl"><label for="cv-b2">Reaction β₂ to yesterday's |r|: <b id="cv-b2-v"></b></label><input type="range" id="cv-b2" min="0.05" max="0.6" step="0.001" value="0.246"></div><button class="btn play" id="cv-play" type="button"></button></div><div class="charts "><div class="chart" id="cv-chart"></div></div><ul class="out" id="cv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> After a shock, how many days does it take for its effect on the estimated CAViaR VaR to halve?</div>
+  <details><summary>Answer</summary><p>About 6.4 days: the half-life is ln 0.5 / ln β₁, with β₁ = 0.897. Out of sample, in 2016–2026, CAViaR and FHS each have 35 exceedances (1.30%), and the mean pinball loss is 0.039 for CAViaR and 0.037 for FHS.</p></details>
+</section><h2 class="sec" id="s-evt">Extreme Value Theory</h2>
+<section class="blk" id="gev">
+  <h3>Monthly Maxima of S&P 500 Losses</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch7_gev_en.jpg" alt="Slide 36: Monthly Maxima of S&P 500 Losses" loading="lazy"></a>
+      <figcaption>Slide 36</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="gv-b">Block</label><select id="gv-b"><option value="week">week</option><option value="month" selected>calendar month (slide)</option><option value="quarter">quarter</option><option value="half">half-year</option><option value="year">year</option></select></div><div class="ctl"><label for="gv-y">Return period (years): <b id="gv-y-v"></b></label><input type="range" id="gv-y" min="2" max="50" step="1" value="10"></div><button class="btn play" id="gv-play" type="button"></button></div><div class="charts "><div class="chart" id="gv-chart"></div></div><ul class="out" id="gv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How large is the daily loss that the S&P 500 exceeds, on average, once every ten years?</div>
+  <details><summary>Answer</summary><p>8.09%, the 10-year (120-month) return level of the GEV distribution fitted to the monthly maxima, with ξ = 0.22. Four of the 321 monthly maxima exceed it, and the largest observed monthly maximum is 12.77%.</p></details>
+</section>
+<section class="blk" id="mean-excess">
+  <h3>Mean Excess Plot: S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=43" target="_blank" rel="noopener"><img src="slides/ch7_mean_excess_en.jpg" alt="Slide 42: Mean Excess Plot: S&P 500" loading="lazy"></a>
+      <figcaption>Slide 42</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="me-k">Threshold: largest losses: <b id="me-k-v"></b></label><input type="range" id="me-k" min="0" max="10" step="1" value="4"></div><button class="btn play" id="me-play" type="button"></button></div><div class="charts "><div class="chart" id="me-chart"></div></div><ul class="out" id="me-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Why does the mean excess rise with the threshold?</div>
+  <details><summary>Answer</summary><p>Because the tail is heavy: for a GPD with ξ > 0, e(u) is linear with slope ξ/(1 − ξ) = 0.23. At the threshold u₀ = 1.85% (the largest 5% of losses, 336 exceedances), the empirical mean excess is 1.09% and the GPD gives 1.11%. For an exponential tail the plot would be flat.</p></details>
+</section>
+<section class="blk" id="gpd-tail">
+  <h3>GPD Tails: S&P 500 and Bitcoin</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch7_gpd_tail_en.jpg" alt="Slide 43: GPD Tails: S&P 500 and Bitcoin" loading="lazy"></a>
+      <figcaption>Slide 43</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="gt-k">Threshold: largest losses: <b id="gt-k-v"></b></label><input type="range" id="gt-k" min="0" max="10" step="1" value="4"></div><button class="btn play" id="gt-play" type="button"></button></div><div class="charts "><div class="chart" id="gt-sp500"></div><div class="chart" id="gt-btc"></div></div><ul class="out" id="gt-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which series has the heavier tail, the S&P 500 or Bitcoin?</div>
+  <details><summary>Answer</summary><p>The shape estimates are close: ξ = 0.19 (SE 0.065) for the S&P 500 and ξ = 0.16 (SE 0.078) for Bitcoin, so the difference is not significant. Bitcoin has a much larger scale, however: the GPD VaR 1% is 10.23%, against 3.54% for the S&P 500.</p></details>
+</section>
+<section class="blk" id="cond-evt">
+  <h3>Conditional EVT on the S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch7_cond_evt_en.jpg" alt="Slide 46: Conditional EVT on the S&P 500" loading="lazy"></a>
+      <figcaption>Slide 46</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ce-a">VaR level α: <b id="ce-a-v"></b></label><input type="range" id="ce-a" min="0" max="5" step="1" value="2"></div><button class="btn play" id="ce-play" type="button"></button></div><div class="charts "><div class="chart" id="ce-chart"></div></div><ul class="out" id="ce-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> GARCH with Normal shocks tracks the rises and falls of risk correctly. Why does it still have too many exceedances?</div>
+  <details><summary>Answer</summary><p>Because the standardised shocks have heavier tails than the Normal distribution. In 2018–2026 (2,190 days), the GARCH-Normal VaR 1% is exceeded on 2.42% of the days, conditional EVT on 1.23% and historical simulation on 500 days on 1.60%. Conditional EVT keeps the GARCH dynamics and corrects the level with a GPD tail of the residuals.</p></details>
+</section><h2 class="sec" id="s-hor">The Horizon: Square-Root-of-Time</h2>
+<section class="blk" id="horizon">
+  <h3>Square-Root-of-Time in the Data</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch7_horizon_en.jpg" alt="Slide 50: Square-Root-of-Time in the Data" loading="lazy"></a>
+      <figcaption>Slide 50</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="hz-h">Horizon h (days): <b id="hz-h-v"></b></label><input type="range" id="hz-h" min="1" max="20" step="1" value="10"></div><button class="btn play" id="hz-play" type="button"></button></div><div class="charts "><div class="chart" id="hz-ratio"></div><div class="chart" id="hz-mc"></div></div><ul class="out" id="hz-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> At h = 10 days, is the √h rule too small or too large?</div>
+  <details><summary>Answer</summary><p>It depends on the series. The ratio of the empirical 10-day VaR 1% to √10 × the one-day VaR is 1.22 for BET (first-order autocorrelation 0.109) and 1.05 for EUR/RON, so the rule understates the risk. For the S&P 500 (0.95), gold (0.92) and Bitcoin (0.89) the rule is conservative. For the S&P 500, filtered Monte Carlo gives 6.29%, against 6.22% for √10 × the one-day filtered VaR.</p></details>
+</section><h2 class="sec" id="s-port">Portfolio VaR and Risk Contributions</h2>
+<section class="blk" id="components">
+  <h3>Who Contributes the Risk?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=54" target="_blank" rel="noopener"><img src="slides/ch7_components_en.jpg" alt="Slide 53: Who Contributes the Risk?" loading="lazy"></a>
+      <figcaption>Slide 53</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pc-w">Bitcoin weight (the rest in the ratio 40:30:20): <b id="pc-w-v"></b></label><input type="range" id="pc-w" min="0" max="30" step="1" value="10"></div><button class="btn play" id="pc-play" type="button"></button></div><div class="charts "><div class="chart" id="pc-chart"></div></div><ul class="out" id="pc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Bitcoin holds 10% of the capital. What share of the portfolio risk does it account for?</div>
+  <details><summary>Answer</summary><p>37.8% of VaR 1% (Normal, Euler) and 36.6% of ES 2.5% (historical). TLT, with 30% of the capital, accounts for only 6.5% of ES. Diversification lowers VaR 1% from 3.11% (the sum of the individual VaRs) to 1.77%.</p></details>
+</section><h2 class="sec" id="s-reg">Liquidity and Regulation</h2>
+<section class="blk" id="basel">
+  <h3>VaR 1% vs ES 2.5% on Five Assets</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch7_basel_en.jpg" alt="Slide 57: VaR 1% vs ES 2.5% on Five Assets" loading="lazy"></a>
+      <figcaption>Slide 57</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bs-a">ES level (VaR stays at 1%): <b id="bs-a-v"></b></label><input type="range" id="bs-a" min="1" max="5" step="0.25" value="2.5"></div><button class="btn play" id="bs-play" type="button"></button></div><div class="charts "><div class="chart" id="bs-chart"></div></div><ul class="out" id="bs-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Under the Normal distribution, ES 2.5% is almost equal to VaR 1%. What is the ratio ES 2.5% / VaR 1% in the data?</div>
+  <details><summary>Answer</summary><p>Between 1.03 (Bitcoin) and 1.11 (BET): 1.09 for the S&P 500, 1.10 for EUR/RON and 1.06 for gold. Under the Normal distribution the ratio is 2.338/2.326 ≈ 1.005. Moving from VaR 1% to ES 2.5% therefore raises the one-day measure by 3–11%.</p></details>
+</section><h2 class="sec" id="s-case">Case Study: Deep Quantile Regression for VaR</h2>
+<section class="blk" id="deep-quantile">
+  <h3>Case Study: Relative Forecast Error, α = 1%</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch7_crk_table6_en.jpg" alt="Slide 61: Case Study: Relative Forecast Error, α = 1%" loading="lazy"></a>
+      <figcaption>Slide 61</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ck-s">Predictor set: <b id="ck-s-v"></b></label><input type="range" id="ck-s" min="0" max="4" step="1" value="0"></div><button class="btn play" id="ck-play" type="button"></button></div><div class="charts "><div class="chart" id="ck-chart"></div></div><ul class="out" id="ck-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Does a relative RMSFE below 1 show that deep networks estimate the conditional quantile better?</div>
+  <details><summary>Answer</summary><p>Not directly. All 20 bars of the deep networks (deep MIDAS included) are below 1, between 0.014 and 0.850, but RMSFE is minimised by the conditional mean, not by the quantile. The accuracy of a quantile forecast is compared with the pinball loss. The result also comes from a single fixed calibration window.</p></details>
+</section><h2 class="sec" id="s-ai">AI for Scientific Discovery</h2>
+<section class="blk" id="fz0-ranking">
+  <h3>Mini-Case: Can We Rank ES Models?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=66" target="_blank" rel="noopener"><img src="slides/ch7_ai_fz0_en.jpg" alt="Slide 65: Mini-Case: Can We Rank ES Models?" loading="lazy"></a>
+      <figcaption>Slide 65</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ai-y">Last year of the first subperiod: <b id="ai-y-v"></b></label><input type="range" id="ai-y" min="2008" max="2024" step="1" value="2015"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-ci"></div><div class="chart" id="ai-cum"></div></div><ul class="out" id="ai-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Is the gain of conditional EVT over FHS demonstrated under the pre-registered rule?</div>
+  <details><summary>Answer</summary><p>No. The mean FZ0 score difference is significantly negative over 2006–2026 (t = −2.62) and in 2006–2015 (t = −2.31), but not in 2016–2026 (t = −1.23; interval [−0.018, 0.004]). The rule requires significance at 5% in both halves. FHS against GARCH–Normal meets it: t = −3.24 and t = −3.38.</p></details>
+</section>
+<p class="src foot">Daily losses L = −r, in %, up to 18 September 2026. S&P 500, BET, Bitcoin, gold (XAU/USD) and the ETFs SPY, TLT, GLD: EODHD daily prices; EUR/RON: the NBR reference rate. Case study: Table 6 of Chronopoulos, Raftapostolos and Kapetanios (2024), Journal of Financial Econometrics.</p>
+</main>
+</body>
+</html>

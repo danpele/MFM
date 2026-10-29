@@ -1,0 +1,30 @@
+// Readouts of the Chapter 10 interactive page, written by latex/build_interactive_ch10.py.
+const dn = s => { const n = +String(s).replace(/\D/g, ''), r = n % 100; return n > 0 && (r === 0 || r >= 20) ? s + ' de' : s; };
+window.CH10_TEXT = {
+ play: 'Pornește', pause: 'Pauză',
+ lob: (k, n, ev, bb, ba, sp) => `Instantaneul ${k} din ${n} (evenimentul ${ev}): cel mai bun bid este la ${bb} pași sub mijloc, cel mai bun ask la ${ba} pași deasupra; spread-ul, în pași: ${sp}.`,
+ lob2: (m, md, d1, d10, d25) => `Pe toată simularea, spread-ul are în medie ${m} pași (mediana ${md}). Adîncimea medie: ${d1} ordine la 1 pas de mijloc, ${d10} la 10 pași, ${d25} la 25 de pași.`,
+ wb: (q, d, v, n, s1, s2) => `Ordin de ${dn(q)} unități: nivelul cel mai adînc atins este în medie la ${d} pași peste mijloc, prețul mediu de execuție la ${v} pași (${dn(n)} instantanee). Pantele pe axe logaritmice, pe cele 10 mărimi: ${s1} pentru nivelul atins, ${s2} pentru prețul mediu.`,
+ ro: (n, s, sh, r1, th) => `n = ${n}: spread-ul adevărat 2c = ${s}, estimarea Roll ŝ = ${sh}. Autocorelația de ordinul 1 este ${r1}; valoarea teoretică −c²/(σ² + 2c²) = ${th}.`,
+ ro_pos: (n, s, r1, th) => `n = ${n}: autocovarianța de ordinul 1 este pozitivă, deci estimatorul Roll nu este definit (spread-ul adevărat 2c = ${s}). Autocorelația de ordinul 1 este ${r1}; valoarea teoretică ${th}.`,
+ sf_slide: 'ca în slide',
+ sf_d2: 'sep. 2024 – sep. 2026',
+ sf: (p, n, r, cs, ar, e) => `Bare zilnice (${p}, ${dn(n)} zile): Roll ${r}, Corwin–Schultz ${cs}, Abdi–Ranaldo ${ar}, EDGE ${e} pb.`,
+ sf5: (n, r, cs, ar, e, t) => `Bare de 5 minute (${dn(n)} zile): Roll ${r}, Corwin–Schultz ${cs}, Abdi–Ranaldo ${ar}, EDGE ${e} pb. Un pas de cotare: ${t} pb.`,
+ sc: (e, us, bvb, cr, rho, n, z) => `${e}: mediana este ${us} pb în SUA, ${bvb} pb la BVB și ${cr} pb pentru cripto. Corelația Spearman cu volatilitatea anualizată, pe ${dn(n)} active: ${rho}. Estimări egale cu 0: ${z}.`,
+ am: (m, n, spy, btc, tlv, tel, r) => `Fereastra ${m} – sep. 2026 (${dn(n)} zile de tranzacționare pentru SPY), în pb la 1 milion USD: SPY ${spy}, Bitcoin ${btc}, Banca Transilvania ${tlv}, Transelectrica ${tel}. Banca Transilvania are de ${dn(r)} ori valoarea SPY.`,
+ at: (m, us, bvb, cr, r) => `${m}, mediana pe grup, în pb la 1 milion USD: SUA ${us}, BVB ${bvb}, cripto ${cr}. BVB este de ${dn(r)} ori peste SUA.`,
+ at2: (y, us, bvb, cr) => `Media lunilor din ${y} afișate: SUA ${us}, BVB ${bvb}, cripto ${cr}.`,
+ id_all: 'toate zilele',
+ id: (p, n, t, s, a, c) => `${p} (${dn(n)} zile), bara de la ${t}: ${s}% din volumul zilei, randament absolut mediu ${a} pb. De la deschidere pînă la sfîrșitul acestei bare se tranzacționează ${c}% din volum.`,
+ id2: (f, l, r) => `Primele 30 de minute: ${f}% din volum; ultimele 30 de minute: ${l}%. Randamentul absolut mediu al primei bare față de media barelor de la prînz (11:30–14:00): ${r}.`,
+ iv_f: { day: 'zi', week: 'săptămînă', month: 'lună', quarter: 'trimestru' },
+ iv: (f, n, c, b) => `Medii pe ${f} (${dn(n)} observații): corelația ilichiditate–VIX este ${c}; panta OLS a logaritmului ilichidității pe logaritmul VIX este ${b}.`,
+ iv2: se => `Eroarea standard HAC a pantei pe date zilnice: ${se}.`,
+ ky: (sv, su, l, dep, b, p, d) => `σ<sub>v</sub> = ${sv} USD, σ<sub>u</sub> = ${su} mii de acțiuni: λ = ${l} USD la o mie de acțiuni, adîncimea 1/λ = ${dep} mii de acțiuni la 1 USD, β = ${b}, profitul așteptat ${p} mii USD. Un flux net de 10 000 de acțiuni mută prețul cu ${d} USD.`,
+ ac: (l, f, e, s, k) => `λ = ${l}: în prima zi se vinde ${f} din poziție; costul așteptat ${e} milioane USD, abaterea standard a costului ${s} milioane USD; urgența κ = ${k} pe zi.`,
+ fc: (d, lo, lp, c, cp, v) => `${d}: minimul ${lo} USD (${lp} față de închiderea anterioară), închiderea ${c} USD (${cp}); volumul este de ${v} ori mediana zilelor de pînă la 5 mai.`,
+ rt: (b, m, h, s, nh, mx, d, n) => `Coeficientul volatilității ${b}: mediana taxei este ${m} pb, ${s} din cele ${dn(n)} zile depășesc pragul de ${h} pb, iar ${dn(nh)} zile depășesc 0,74 pb. Maximul, ${mx} pb, este pe ${d}.`,
+ mc_set: { all: 'toate cele 25', US: 'fără SUA', BVB: 'fără BVB', Crypto: 'fără cripto' },
+ mc: (s, n, r1, r2, r3, d) => `Active: ${s} (${n}). Corelații Spearman: Corwin–Schultz și volatilitatea ${r1}; Amihud și valoarea tranzacționată ${r2}; Corwin–Schultz și Amihud ${r3}. Diferența (1) − (3): ${d}.`
+};

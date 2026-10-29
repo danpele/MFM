@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capitolul 10 · Microstructura pieței</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'ro';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch10_data.js?v=20261029b"></script>
+<script src="ch10_text_ro.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch10.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelarea piețelor financiare</h1><p>Capitolul 10 · Microstructura pieței</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index_ro.html#chapters">← Site-ul cursului</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf" target="_blank" rel="noopener">PDF-ul cursului</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_10" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch10.html" class="lang-btn">EN</a><a href="ch10_ro.html" class="lang-btn active">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
+<p class="toc"><a href="#s-lob">Registrul de ordine limită</a> · <a href="#s-spr">Spread-ul bid-ask</a> · <a href="#s-ill">Ilichiditatea și tiparele intrazilnice</a> · <a href="#s-inf">Informația și prețurile</a> · <a href="#s-exe">Impactul asupra prețului și execuția optimă</a> · <a href="#s-hft">Tranzacționarea de înaltă frecvență și stresul pe piață</a> · <a href="#s-race">Studiu de caz: costul competiției pentru viteză</a> · <a href="#s-ai">AI pentru descoperire științifică</a></p>
+<h2 class="sec" id="s-lob">Registrul de ordine limită</h2>
+<section class="blk" id="order-book">
+  <h3>Un registru de ordine simulat</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=5" target="_blank" rel="noopener"><img src="slides/ch10_lob_snapshot_ro.jpg" alt="Slide-ul 4: Un registru de ordine simulat" loading="lazy"></a>
+      <figcaption>Slide-ul 4</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="lob-k">Instantaneul: <b id="lob-k-v"></b></label><input type="range" id="lob-k" min="0" max="198" step="1" value="99"></div><button class="btn play" id="lob-play" type="button"></button></div><div class="charts three"><div class="chart" id="lob-book"></div><div class="chart" id="lob-depth"></div><div class="chart" id="lob-path"></div></div><ul class="out" id="lob-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La ce distanță de prețul de mijloc se află cele mai multe ordine limită în registrul simulat?</div>
+  <details><summary>Răspuns</summary><p>Departe de mijloc. Adîncimea medie este 0,8 ordine la 1 pas de mijloc, 4,8 la 10 pași și 5,0 la 25 de pași. Lîngă mijloc, ordinele la piață consumă lichiditatea mai repede decît o refac ordinele limită; spread-ul are în medie 3,23 pași de cotare.</p></details>
+</section>
+<section class="blk" id="walk-book">
+  <h3>Impactul unui ordin la piață asupra prețului</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=7" target="_blank" rel="noopener"><img src="slides/ch10_walk_book_ro.jpg" alt="Slide-ul 6: Impactul unui ordin la piață asupra prețului" loading="lazy"></a>
+      <figcaption>Slide-ul 6</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="wb-q">Mărimea ordinului de cumpărare (unități): <b id="wb-q-v"></b></label><input type="range" id="wb-q" min="1" max="80" step="1" value="80"></div><button class="btn play" id="wb-play" type="button"></button></div><div class="charts "><div class="chart" id="wb-chart"></div><div class="chart" id="wb-book"></div></div><ul class="out" id="wb-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Un ordin de cumpărare la piață de 80 de unități este de 80 de ori mai mare decît unul de o unitate. De cîte ori mai departe de mijloc ajunge?</div>
+  <details><summary>Răspuns</summary><p>De circa 12 ori: de la 1,7 la 20,1 pași. Pe axe logaritmice panta este 0,53, aproape de 1/2, deci impactul este concav. Prețul mediu de execuție crește cu panta 0,44: cele 80 de unități plătesc în medie 11,9 pași pe unitate.</p></details>
+</section><h2 class="sec" id="s-spr">Spread-ul bid-ask</h2>
+<section class="blk" id="roll">
+  <h3>Bid-ask bounce (simulare)</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch10_roll_bounce_ro.jpg" alt="Slide-ul 12: Bid-ask bounce (simulare)" loading="lazy"></a>
+      <figcaption>Slide-ul 12</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ro-c">Jumătatea de spread c: <b id="ro-c-v"></b></label><input type="range" id="ro-c" min="0" max="0.15" step="0.005" value="0.05"></div><div class="ctl"><label for="ro-s">Volatilitatea prețului eficient σ: <b id="ro-s-v"></b></label><input type="range" id="ro-s" min="0.005" max="0.05" step="0.005" value="0.02"></div><div class="ctl"><label for="ro-n">Numărul de tranzacții n</label><select id="ro-n"><option value="78">78</option><option value="250">250</option><option value="1000">1 000</option><option value="5000" selected>5 000</option></select></div><button class="btn play" id="ro-play" type="button"></button></div><div class="charts "><div class="chart" id="ro-path"></div><div class="chart" id="ro-acf"></div></div><ul class="out" id="ro-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Prețul eficient este un random walk. Sînt necorelate variațiile prețului tranzacțiilor?</div>
+  <details><summary>Răspuns</summary><p>Nu. Autocorelația lor de ordinul 1 este −0,458, aproape de valoarea teoretică −c²/(σ² + 2c²) = −0,463. Estimatorul Roll dă ŝ = 0,0998, față de spread-ul adevărat 2c = 0,10. După lagul 1, autocorelațiile rămîn în banda de 95%.</p></details>
+</section>
+<section class="blk" id="spread-frequency">
+  <h3>Estimatori de spread la două frecvențe: SPY</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=19" target="_blank" rel="noopener"><img src="slides/ch10_spread_frequency_ro.jpg" alt="Slide-ul 18: Estimatori de spread la două frecvențe: SPY" loading="lazy"></a>
+      <figcaption>Slide-ul 18</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sf-y">Perioada: <b id="sf-y-v"></b></label><input type="range" id="sf-y" min="0" max="7" step="1" value="0"></div><button class="btn play" id="sf-play" type="button"></button></div><div class="charts "><div class="chart" id="sf-chart"></div></div><ul class="out" id="sf-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Un pas de cotare înseamnă 0,21 pb din prețul SPY. Care estimator se apropie cel mai mult de această valoare?</div>
+  <details><summary>Răspuns</summary><p>EDGE pe barele de 5 minute: 0,46 pb, cu intervalul de 95% [0,42; 0,49]. Pe bare zilnice toate estimările sînt cu două ordine de mărime peste un pas (Roll 64,3, Corwin–Schultz 26,5, Abdi–Ranaldo 55,1 și EDGE 40,1 pb), pentru că intervalul zilnic este dominat de volatilitate.</p></details>
+</section>
+<section class="blk" id="spread-cross">
+  <h3>Estimări ale spread-ului pentru 25 de active</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=21" target="_blank" rel="noopener"><img src="slides/ch10_spread_estimators_ro.jpg" alt="Slide-ul 20: Estimări ale spread-ului pentru 25 de active" loading="lazy"></a>
+      <figcaption>Slide-ul 20</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sc-e">Estimatorul: <b id="sc-e-v"></b></label><input type="range" id="sc-e" min="0" max="3" step="1" value="0"></div><div class="ctl"><label for="sc-s">Ordinea activelor</label><select id="sc-s"><option value="group" selected>Pe piețe, ca în slide</option><option value="vol">După volatilitate</option></select></div><button class="btn play" id="sc-play" type="button"></button></div><div class="charts "><div class="chart" id="sc-bars"></div><div class="chart" id="sc-scat"></div></div><ul class="out" id="sc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Mediana estimărilor Corwin–Schultz este 53 pb în SUA și 54 pb la BVB. Sînt acțiunile BVB la fel de lichide ca marile companii americane?</div>
+  <details><summary>Răspuns</summary><p>Nu. Valoarea tranzacționată zilnică mediană este 10 505 milioane USD în SUA și 0,34 milioane USD la BVB, un raport de circa 31 000. Estimările din bare zilnice ordonează activele după volatilitate (corelația Spearman cu volatilitatea anualizată este 0,94), iar Abdi–Ranaldo este 0 pentru 8 din cele 25 de active.</p></details>
+</section><h2 class="sec" id="s-ill">Ilichiditatea și tiparele intrazilnice</h2>
+<section class="blk" id="amihud">
+  <h3>Ilichiditatea Amihud pentru 25 de active</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=25" target="_blank" rel="noopener"><img src="slides/ch10_amihud_ro.jpg" alt="Slide-ul 24: Ilichiditatea Amihud pentru 25 de active" loading="lazy"></a>
+      <figcaption>Slide-ul 24</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="am-s">Fereastra începe în: <b id="am-s-v"></b></label><input type="range" id="am-s" min="0" max="23" step="1" value="0"></div><button class="btn play" id="am-play" type="button"></button></div><div class="charts "><div class="chart" id="am-chart"></div></div><ul class="out" id="am-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> De cîte ori este mai mare raportul Amihud al Băncii Transilvania, cea mai lichidă acțiune BVB, decît cel al SPY?</div>
+  <details><summary>Răspuns</summary><p>De circa 15 500 de ori: 24,7 pb față de 0,0016 pb la 1 milion USD tranzacționat. Bitcoin are 0,0037 pb, aproape de SPY, iar Transelectrica 1 024,0 pb. Raportul Amihud separă cele trei piețe prin ordine de mărime, ceea ce estimatorii de spread din bare zilnice nu fac.</p></details>
+</section>
+<section class="blk" id="amihud-time">
+  <h3>Ilichiditatea în timp: trei piețe</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=27" target="_blank" rel="noopener"><img src="slides/ch10_amihud_time_ro.jpg" alt="Slide-ul 26: Ilichiditatea în timp: trei piețe" loading="lazy"></a>
+      <figcaption>Slide-ul 26</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="at-t">Pînă în luna: <b id="at-t-v"></b></label><input type="range" id="at-t" min="0" max="115" step="1" value="115"></div><button class="btn play" id="at-play" type="button"></button></div><div class="charts "><div class="chart" id="at-chart"></div></div><ul class="out" id="at-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> A scăzut ilichiditatea BVB după ce România a devenit piață emergentă, în septembrie 2020?</div>
+  <details><summary>Răspuns</summary><p>Nu se vede nicio ruptură în septembrie 2020. Mediana BVB scade treptat, de la 435 pb la 1 milion USD în 2017 la 169 pb în 2026, și rămîne de circa 7 000 de ori peste mediana americană (0,023 pb în 2026). Cea mai mare scădere o au cripto-activele: de la 7,6 pb la 0,089 pb.</p></details>
+</section>
+<section class="blk" id="intraday">
+  <h3>SPY în cursul zilei de tranzacționare</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=29" target="_blank" rel="noopener"><img src="slides/ch10_spy_intraday_ro.jpg" alt="Slide-ul 28: SPY în cursul zilei de tranzacționare" loading="lazy"></a>
+      <figcaption>Slide-ul 28</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="id-p">Perioada: <b id="id-p-v"></b></label><input type="range" id="id-p" min="0" max="7" step="1" value="0"></div><div class="ctl"><label for="id-t">Bara de 5 minute: <b id="id-t-v"></b></label><input type="range" id="id-t" min="0" max="77" step="1" value="0"></div><button class="btn play" id="id-play" type="button"></button></div><div class="charts "><div class="chart" id="id-vol"></div><div class="chart" id="id-abs"></div></div><ul class="out" id="id-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce parte din volumul zilnic al SPY se tranzacționează în ultimele 30 de minute ale sesiunii?</div>
+  <details><summary>Răspuns</summary><p>18,6%, față de 12,7% în primele 30 de minute și 0,9% pentru o bară de 5 minute de la prînz. Randamentul absolut mediu este 10,6 pb în prima bară și 5,1 pb la prînz, un raport de 2,06.</p></details>
+</section>
+<section class="blk" id="illiq-vix">
+  <h3>Lichiditatea și volatilitatea: SPY și VIX</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch10_spy_illiq_vix_ro.jpg" alt="Slide-ul 31: Lichiditatea și volatilitatea: SPY și VIX" loading="lazy"></a>
+      <figcaption>Slide-ul 31</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="iv-f">Media pe: <b id="iv-f-v"></b></label><input type="range" id="iv-f" min="0" max="3" step="1" value="2"></div><button class="btn play" id="iv-play" type="button"></button></div><div class="charts "><div class="chart" id="iv-chart"></div><div class="chart" id="iv-scat"></div></div><ul class="out" id="iv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Crește ilichiditatea SPY atunci cînd crește VIX?</div>
+  <details><summary>Răspuns</summary><p>Da. Corelația este 0,58 pe date zilnice și 0,69 pe mediile lunare, iar elasticitatea logaritmului ilichidității față de logaritmul VIX este 0,95 (eroare standard HAC 0,12). În aprilie 2025 ilichiditatea a fost 3,04 pb la 100 de milioane USD, față de o medie de 1,83.</p></details>
+</section><h2 class="sec" id="s-inf">Informația și prețurile</h2>
+<section class="blk" id="kyle">
+  <h3>Lambda lui Kyle și profitul investitorului din interior</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=38" target="_blank" rel="noopener"><img src="slides/ch10_kyle_ro.jpg" alt="Slide-ul 37: Lambda lui Kyle și profitul investitorului din interior" loading="lazy"></a>
+      <figcaption>Slide-ul 37</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ky-v">σ<sub>v</sub>, abaterea standard a valorii: <b id="ky-v-v"></b></label><input type="range" id="ky-v" min="0.5" max="5" step="0.5" value="2"></div><div class="ctl"><label for="ky-u">σ<sub>u</sub>, ordinele noise traders: <b id="ky-u-v"></b></label><input type="range" id="ky-u" min="2" max="40" step="1" value="10"></div><button class="btn play" id="ky-play" type="button"></button></div><div class="charts three"><div class="chart" id="ky-lam"></div><div class="chart" id="ky-prof"></div><div class="chart" id="ky-imp"></div></div><ul class="out" id="ky-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce se întîmplă cu lambda lui Kyle și cu profitul investitorului din interior dacă abaterea standard a ordinelor noise traders se dublează?</div>
+  <details><summary>Răspuns</summary><p>λ = σ<sub>v</sub>/(2σ<sub>u</sub>) se înjumătățește, deci adîncimea pieței 1/λ se dublează; profitul așteptat σ<sub>v</sub>σ<sub>u</sub>/2 se dublează și el. Investitorul din interior tranzacționează mai agresiv (β = σ<sub>u</sub>/σ<sub>v</sub>), iar prețul dezvăluie tot jumătate din informația privată.</p></details>
+</section><h2 class="sec" id="s-exe">Impactul asupra prețului și execuția optimă</h2>
+<section class="blk" id="almgren-chriss">
+  <h3>Traiectorii optime și frontiera eficientă</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch10_almgren_chriss_ro.jpg" alt="Slide-ul 45: Traiectorii optime și frontiera eficientă" loading="lazy"></a>
+      <figcaption>Slide-ul 45</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ac-l">Aversiunea la risc λ: <b id="ac-l-v"></b></label><input type="range" id="ac-l" min="0" max="15" step="1" value="8"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-traj"></div><div class="chart" id="ac-front"></div></div><ul class="out" id="ac-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît costă reducerea riscului cînd vindem 1 milion de acțiuni în 5 zile?</div>
+  <details><summary>Răspuns</summary><p>Cu λ = 2·10⁻⁶, abaterea standard a costului scade de la 1,04 milioane USD (vînzare uniformă) la 0,45 milioane USD, iar costul așteptat crește cu 0,48 milioane USD, de la 0,60 la 1,08 milioane. În prima zi se vinde 57% din poziție. Frontiera este convexă: primele reduceri de risc sînt ieftine, ultimele scumpe.</p></details>
+</section><h2 class="sec" id="s-hft">Tranzacționarea de înaltă frecvență și stresul pe piață</h2>
+<section class="blk" id="flash-crash">
+  <h3>Crahul fulger din 6 mai 2010</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch10_flash_crash_ro.jpg" alt="Slide-ul 50: Crahul fulger din 6 mai 2010" loading="lazy"></a>
+      <figcaption>Slide-ul 50</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fc-t">Pînă în ziua: <b id="fc-t-v"></b></label><input type="range" id="fc-t" min="0" max="40" step="1" value="40"></div><button class="btn play" id="fc-play" type="button"></button></div><div class="charts "><div class="chart" id="fc-chart"></div></div><ul class="out" id="fc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît a scăzut SPY pe 6 mai 2010, la minimul zilei și la închidere?</div>
+  <details><summary>Răspuns</summary><p>Minimul, 105,00 USD, a fost cu 10,1% sub închiderea anterioară (116,82 USD), dar închiderea a fost doar cu 3,3% mai jos. Volumul zilei a fost de 3,0 ori mediana zilelor anterioare. Barele zilnice arată intervalul, nu și căderea și revenirea din cursul zilei.</p></details>
+</section><h2 class="sec" id="s-race">Studiu de caz: costul competiției pentru viteză</h2>
+<section class="blk" id="race-tax">
+  <h3>Studiu de caz: taxa zilnică implicită pentru SPY</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch10_race_tax_ro.jpg" alt="Slide-ul 57: Studiu de caz: taxa zilnică implicită pentru SPY" loading="lazy"></a>
+      <figcaption>Slide-ul 57</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rt-h">Pragul taxei: <b id="rt-h-v"></b></label><input type="range" id="rt-h" min="0.2" max="1.1" step="0.0001" value="0.4213"></div><div class="ctl"><label for="rt-b">Coeficientul volatilității: <b id="rt-b-v"></b></label><input type="range" id="rt-b" min="0" max="0.02" step="0.0001" value="0.0066"></div><button class="btn play" id="rt-play" type="button"></button></div><div class="charts "><div class="chart" id="rt-chart"></div><div class="chart" id="rt-hist"></div></div><ul class="out" id="rt-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În cîte zile depășește taxa implicită pentru SPY cel mai pesimist scenariu al autorilor, 0,74 pb?</div>
+  <details><summary>Răspuns</summary><p>În 2 din cele 1 244 de zile. Maximul, 1,04 pb, apare pe 7 aprilie 2025, cu o volatilitate realizată de 106,7%. Mediana taxei este 0,40 pb, apropiată de cei 0,419 pb măsurați la Londra, iar în 30% din zile taxa depășește 0,4213 pb.</p></details>
+</section><h2 class="sec" id="s-ai">AI pentru descoperire științifică</h2>
+<section class="blk" id="mini-case">
+  <h3>Mini studiu de caz: cost sau volatilitate?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch10_sem_cross_ro.jpg" alt="Slide-ul 61: Mini studiu de caz: cost sau volatilitate?" loading="lazy"></a>
+      <figcaption>Slide-ul 61</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mc-x">Activele incluse: <b id="mc-x-v"></b></label><input type="range" id="mc-x" min="0" max="3" step="1" value="0"></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts three"><div class="chart" id="mc-1"></div><div class="chart" id="mc-2"></div><div class="chart" id="mc-3"></div></div><ul class="out" id="mc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Urmează rangurile Corwin–Schultz din bare zilnice costul tranzacționării sau volatilitatea?</div>
+  <details><summary>Răspuns</summary><p>Volatilitatea. Corelația Spearman cu volatilitatea anualizată este 0,94, iar cu raportul Amihud −0,12 (p = 0,58). Diferența dintre cele două corelații este 1,06, cu intervalul de 95% [0,58; 1,44] pe active. Raportul Amihud și valoarea tranzacționată au corelația −0,99.</p></details>
+</section>
+<p class="src foot">SPY: bare de 5 minute, sesiunea regulată, octombrie 2020 – septembrie 2026, și bare zilnice. Cele 25 de active din SUA, de la BVB și cripto: bare zilnice, septembrie 2024 – septembrie 2026; valorile tranzacționate la BVB sînt convertite în USD. Prețuri EODHD; VIX. Registrul de ordine și modelul Roll sînt simulate.</p>
+</main>
+</body>
+</html>

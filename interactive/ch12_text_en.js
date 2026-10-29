@@ -1,0 +1,26 @@
+// Readouts of the Chapter 12 interactive page, written by latex/build_interactive_ch12.py.
+window.CH12_TEXT = {
+ play: 'Play', pause: 'Pause',
+ gk: (S, s, d, g, v, t, vg) => `Three-month call, S = ${S}, σ = ${s}: delta ${d}, gamma ${g}, vega ${v} per volatility point, theta ${t} per day. ΓS²στ = ${vg}, equal to vega.`,
+ he: (n, sd, sp, p, m, q, th) => `N = ${n}: the standard deviation of the error is ${sd} (${sp} of the premium of ${p}), the mean ${m}, the 1% quantile ${q}. The approximation √(π/4)·vega·σ/√N gives ${th}.`,
+ vm: (s, m, sd, w, v, a) => `Realised volatility ${s}%: mean P&L ${m}, standard deviation ${sd}, positive on ${w} of the paths. The approximation vega × (20 − ${s}) = ${v} × (20 − ${s}) gives ${a}.`,
+ sm: (e1, e2, e3, m1, m2, m3, h1, h2, h3) => `Implied volatility at K/S = 0.8, ATM and 1.2: history ${e1}%, ${e2}%, ${e3}%; Merton ${m1}%, ${m2}%, ${m3}%; Heston ${h1}%, ${h2}%, ${h3}%.`,
+ bs1: (d, n, F, a, r) => `Expiry ${d}, ${n} days, forward ${F} USD: ATM volatility ${a}%, root mean squared error of the SVI fit ${r} volatility points.`,
+ bs2: (rho, b, l, r, e, g, ok) => `SVI with ρ = ${rho} and b = ${b}: wing slopes b(1 − ρ) = ${l} on the left and b(1 + ρ) = ${r} on the right (Lee bound: 2); root mean squared error ${e} points; min g(k) = ${g}, ${ok ? 'so no butterfly arbitrage' : 'so the density turns negative: butterfly arbitrage'}.`,
+ rn1: (x, p, lo, hi, ln, k) => `A fall of more than ${x}: ${p} from the SVI smile (95% bootstrap interval: ${lo}–${hi}), against ${ln} under the log-normal distribution (ratio ${k}).`,
+ rn2: (x, p, ln) => `A rise of more than ${x}: ${p} from the SVI smile and ${ln} under the log-normal distribution.`,
+ rn3: (k, e) => `Below the lowest quoted strike (${k}F) lie ${e} percentage points of the density: this part is an SVI extrapolation.`,
+ vh: (L, s, n, e, l) => e === 0 ? `The VIX never exceeded ${L} in the ${n} days.` : `The VIX was above ${L} on ${s} of the ${n} days, in ${e === 1 ? 'a single episode' : e + ' separate episodes'}; ${e === 1 ? 'it' : 'the longest'} lasted ${l} trading day${l === 1 ? '' : 's'}.`,
+ vh2: (m, lo, hi) => `Mean ${m}, minimum ${lo}, maximum ${hi}.`,
+ vr1: (y, n, v, r) => `From ${y}: ${n} days; mean VIX ${v}, mean realised volatility ${r}.`,
+ vr2: (m, se, mv, t) => `Mean premium ${m} volatility points (Newey–West standard error, 21 lags: ${se}); in variance, ${mv} %², with t = ${t}.`,
+ vr3: (s, w, d) => `The premium is positive on ${s} of the days; the worst value is ${w} points, for the window starting on ${d}.`,
+ mz1: (n, a, as, b, bs, r) => `${n} days: α̂ = ${a} (${as}), β̂ = ${b} (${bs}), R² = ${r}; Newey–West standard errors, 21 lags.`,
+ mz2: (w, p, c, rp) => `Joint Wald test of α = 0, β = 1: χ²₂ = ${w}, p = ${p}; the correlation of the estimates is ${c}. With past realised variance alone: R² = ${rp}.`,
+ od1: (s, g1, g21, k) => `σ = ${s}: the ATM gamma is ${g1} one trading day before expiry and ${g21} one month before, ${k} times larger.`,
+ od2: (d, g, g2) => `With ${d} trading day${d > 1 ? 's' : ''} left: the ATM gamma is ${g}, so a 1% move changes delta by about ${g2}.`,
+ od3: (t1, t30, k) => `The ATM time decay is ${t1} in the last calendar day and ${t30} with 30 days left, ${k} times smaller.`,
+ bk1: (h, a, b, n, s, c) => `Horizon of ${h} month${h > 1 ? 's' : ''}, formation dates ${a} – ${b} (${n}): the realised excess return is below the Martin bound on ${s} of the dates; the correlation is ${c}.`,
+ bk2: (f, p, m, s) => `Mean excess return ${f}% a year (price index; with dividends, in the paper: ${p}%), mean bound ${m}%, mean slackness ${s} points.`,
+ bk3: (md, mx, d, s) => `One-month Martin bound: median ${md}%, maximum ${mx}% (${d}); the Chabi-Yo–Loudis bound is at least the Martin bound on ${s} of the days.`
+};

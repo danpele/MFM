@@ -859,7 +859,7 @@ def extra_numbers():
     rc = pd.Series(d['R'][:, 0, 1], index=Z.index)
     NUM.update(dcc_above_post=(rc.loc['2022-01-01':] > d['Qbar'][0, 1]).mean(),
                dcc_above_pre=(rc.loc[:'2021-12-31'] > d['Qbar'][0, 1]).mean())
-    W = weekly_returns(['stoxx', 'bet'], start='2000-01-01')
+    W = weekly_returns(['sp500', 'stoxx', 'bet'], start='2000-01-01')   # the three-market calendar of fig_integration
     r = W['stoxx'].rolling(104).corr(W['bet']).dropna()
     NUM.update(int_last=r.iloc[-1], int_2021=r.loc[:'2021-12-31'].iloc[-1], int_2019=r.loc[:'2019-12-31'].iloc[-1],
                int_2007=r.loc[:'2007-12-31'].iloc[-1], int_2009=r.loc[:'2009-12-31'].iloc[-1])

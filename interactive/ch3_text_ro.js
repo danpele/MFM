@@ -1,0 +1,25 @@
+// Readouts of the Chapter 3 interactive page, written by latex/build_interactive_ch3.py.
+window.CH3_TEXT = {
+ play: 'Pornește', pause: 'Pauză',
+ fr: (d, m, s, sr, spy, sh) => `Eșantion 1999-01 – ${d}: portofoliul tangent are media ${m}, volatilitatea ${s} și raportul Sharpe ${sr}; SPY are raportul Sharpe ${spy}. Poziții short: ${sh}.`,
+ fr0: d => `Eșantion 1999-01 – ${d}: nu există un portofoliu tangent cu raport Sharpe pozitiv.`,
+ xk1: (a, b, sc, sw, L, sn, t) => `Alfa anual ${a}, beta ${b}. Eroarea standard a lui beta: ${sc} clasică, ${sw} White, ${sn} Newey–West cu L = ${L}; t(alfa) = ${t}.`,
+ xk2: (bl, lo, hi, bs, sn) => `Bootstrap pe blocuri de ${bl} luni, 2000 de reeșantionări: intervalul de 95% pentru alfa este [${lo}; ${hi}], SE bootstrap ${bs} (Newey–West: ${sn}).`,
+ dm: (p, b, b0, bm, bd) => `Acțiunea se tranzacționează în ${p} din zile, beta adevărat ${b}. Panta pe ziua anterioară: ${bm}; pe aceeași zi: ${b0}; beta Dimson: ${bd}.`,
+ days: w => (w % 100 >= 1 && w % 100 <= 19 ? `${w} zile` : `${w} de zile`),
+ months: n => (n % 100 >= 1 && n % 100 <= 19 ? `${n} luni` : `${n} de luni`),
+ rb: w => `Fereastra de ${w % 100 >= 1 && w % 100 <= 19 ? w : w + ' de'} zile: valorile minimă și maximă ale beta și ultima valoare.`,
+ rbRow: (s, lo, hi, l) => `${s}: între ${lo} și ${hi}; la sfîrșitul eșantionului ${l}.`,
+ pg: (p, n, mg, ag, mv, av, ns) => `${p} (${n}): small-growth are media ${mg} și alfa ${ag}; small-value are media ${mv} și alfa ${av}. ${ns} din 25 de valori alfa au |t| > 1,96.`,
+ sm1: (p, n, pr, sl, b0, b1) => `${p}, T = ${n}: panta CAPM (prima pieței) ${pr}, panta dreptei estimate ${sl} pe an. Valorile beta: ${b0}–${b1}.`,
+ sm2: (w, p, ns) => `GRS = ${w}, p = ${p}; ${ns} din 25 de valori alfa au |t| > 1,96.`,
+ fc: (p, l) => `${p}, valoarea finală a unei unități și randamentul mediu anual: ${l}.`,
+ fcItem: (c, v, m) => `${c} ${v} (${m})`,
+ fmSE: { sh: 'Shanken', fm: 'Fama–MacBeth', nw: 'Newey–West' },
+ fm: (p, se, mk, mkm, h, hm, b0, b1) => `${p}, intervale cu erori ${se}. FF3: prima pieței ${mk}, media factorului ${mkm}; HML: prima ${h}, media factorului ${hm}. Beta de piață în FF3: ${b0}–${b1}.`,
+ fmCapm: (c, cs, m, ms) => `CAPM: termenul liber ${c} (SE ${cs}), prima pieței ${m} (SE ${ms}).`,
+ pc: (p, n, s1, s2, s3, c3, r) => `${p} (${n}): PC1 explică ${s1} din varianță, PC2 ${s2}, PC3 ${s3}; primele trei ${c3}. Corelația PC1 cu SPY: ${r}.`,
+ fe: (d0, d1, l) => `De la ${d0} la ${d1}, CAGR: ${l}.`,
+ ai1: (pub, a, ta, b2, t2, dec, inc, ti) => `Publicare presupusă în ${pub}. MOM: media in-sample ${a} pe lună (t = ${ta}); scăderea după publicare b₂ = ${b2} (t = ${t2}), adică ${dec} din medie; efectul incremental b₂ − b₁ = ${inc} (t = ${ti}).`,
+ ai2: (b, t) => `Placebo Mkt-RF: b₂ = ${b} (t = ${t}).`
+};

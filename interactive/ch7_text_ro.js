@@ -1,0 +1,21 @@
+// Readouts of the Chapter 7 interactive page, written by latex/build_interactive_ch7.py.
+const ch7de = n => { const k = +String(n).replace(/\D/g, '') % 100; return +String(n).replace(/\D/g, '') >= 20 && !(k >= 1 && k <= 19) ? 'de ' : ''; };
+window.CH7_TEXT = {
+ names: { sp500: 'S&P 500', bet: 'BET', btc: 'Bitcoin', eurron: 'EUR/RON', gold: 'aur' },
+ ld: (a, v, nb, N, sh, e, vn, en) => `α = ${a}: VaR istoric ${v}, depășit în ${nb} din ${N} ${ch7de(N)}zile (${sh}); ES ${e}. Distribuția Normală cu aceeași medie și abatere standard: VaR ${vn}, ES ${en}.`,
+ sa: (p, pa, vs, vp, es, ep, viol) => `Probabilitatea de default a fiecărei obligațiuni: ${p}; probabilitatea ca cel puțin una să intre în default: ${pa}. VaR 1%: ${vs} pentru suma celor două, ${vp} pentru portofoliu (${viol ? 'subaditivitatea este încălcată' : 'subaditivitatea este respectată'}). ES 1%: ${es} pentru sumă, ${ep} pentru portofoliu.`,
+ vl: (a, v, e) => `α = ${a}. VaR: ${v}. ES: ${e}.`,
+ pr: (n, k, wv, we, wb, fi, fh, bi, bb) => `Ultimele ${n} ${ch7de(n)}zile: ES 2,5% este media a ${k} ${ch7de(k)}pierderi. Lățimea intervalului de 95%: VaR 1% ${wv} pp (HAC); ES 2,5% ${we} pp (HAC) și ${wb} pp (bootstrap pe blocuri). ES 2,5% pe 2000–2026: ${fi} pp (i.i.d.), ${fh} pp (HAC), ${bi} pp (bootstrap i.i.d.), ${bb} pp (bootstrap pe blocuri).`,
+ hf: (d, n, a, h, nh, f, nfh, g, w) => `De la 2006-01-03 pînă la ${d} (${n} ${ch7de(n)}zile), ținta ${a}: VaR istoric pe ${w} ${ch7de(w)}zile depășit în ${h} din zile (${nh}), FHS în ${f} (${nfh}), GARCH cu șocuri Normale în ${g}.`,
+ hfm: (m, d) => `Cel mai mare VaR FHS din perioadă: ${m}, pe ${d}.`,
+ cv: (b1, hl, nh, N, rate, pc, pf, cm, b0) => `β₁ = ${b1}, β₀ = ${b0} (ales astfel încît nivelul VaR pe termen lung să rămînă cel estimat): timpul de înjumătățire al unui șoc este ${hl} zile. 2016–2026: ${nh} ${ch7de(nh)}depășiri din ${N} ${ch7de(N)}zile (${rate}); pierderea pinball medie este ${pc} pentru CAViaR și ${pf} pentru FHS. VaR CAViaR maxim în criza COVID-19: ${cm}.`,
+ gv: (b, xi, mu, s, y, k, rl, na, nb) => `Blocul: ${({ week: 'săptămîna', month: 'luna calendaristică', quarter: 'trimestrul', half: 'semestrul', year: 'anul' })[b]}. GEV: ξ = ${xi}, μ = ${mu}, σ = ${s}. Nivelul de revenire la ${y} ${ch7de(y)}ani (${k} ${ch7de(k)}blocuri) este ${rl}; ${na} din ${nb} ${ch7de(nb)}maxime îl depășesc.`,
+ me: (t, u, nu, xi, b, sl, gm, em) => `Pragul u₀ = ${u} lasă deasupra cele mai mari ${t} dintre pierderi (${nu} ${ch7de(nu)}depășiri). GPD: ξ = ${xi}, β = ${b}, panta ξ/(1 − ξ) = ${sl}. Excesul mediu la u₀: ${gm} din GPD, ${em} empiric.`,
+ gt: (t, sx, sse, sti, sv, bx, bse, bti, bv) => `GPD pe cele mai mari ${t} dintre pierderi. S&P 500: ξ = ${sx} (SE ${sse}), tail index ${sti}, VaR 1% ${sv}. Bitcoin: ξ = ${bx} (SE ${bse}), tail index ${bti}, VaR 1% ${bv}.`,
+ ce: (a, N, ce, nce, cg, ncg, ch, nch, ex) => `VaR ${a}, 2018–2026 (${N} ${ch7de(N)}zile; numărul așteptat de depășiri: ${ex}): EVT condiționată ${ce} (${nce} ${ch7de(nce)}zile), GARCH cu șocuri Normale ${cg} (${ncg}), simularea istorică pe 500 de zile ${ch} (${nch}).`,
+ hz: (h, rt, mc, sq, sh) => `h = ${h}: raportul VaR 1% empiric / (√h × VaR pe o zi) este ${rt}. S&P 500, VaR 1% pe ${h === 1 ? 'o zi' : h + ' ' + ch7de(h) + 'zile'}: ${mc} prin Monte Carlo filtrat, ${sq} ca √${h} × VaR filtrat pe o zi, ${sh} ca √${h} × VaR istoric pe o zi.`,
+ pc: (w, vp, vu, red, ep, eu, bv, be, te) => `Ponderile SPY/TLT/GLD/Bitcoin: ${w}. VaR 1%: ${vp}, față de ${vu} nediversificat (${red}). ES 2,5%: ${ep}, față de ${eu} nediversificat. Bitcoin aduce ${bv} din VaR și ${be} din ES; TLT aduce ${te} din ES.`,
+ bs: (a, rt, nr) => `Raportul ES ${a} / VaR 1%: ${rt}. Sub distribuția Normală: ${nr}.`,
+ ck: (set, nf, tf, nd, td, lo, hi) => `${set ? 'Predictori: ' + set : 'Toate cele patru seturi de predictori'}. Modele flexibile fără rețele: ${nf} din ${tf} bare la 1 sau peste. Rețele adînci (inclusiv MIDAS adînc): ${nd} din ${td} ${ch7de(td)}bare sub 1, între ${lo} și ${hi}.`,
+ ai: (y, t1, t2, t3, t4, ok1, ok2) => `Subperioadele 2006–${y} și ${y + 1}–2026. FHS față de GARCH–Normal: t = ${t1} și ${t2}, deci cîștigul ${ok1 ? 'este' : 'nu este'} demonstrat. EVT condiționată față de FHS: t = ${t3} și ${t4}, deci cîștigul ${ok2 ? 'este' : 'nu este'} demonstrat. Regula: t < −1,96 în ambele subperioade.`
+};

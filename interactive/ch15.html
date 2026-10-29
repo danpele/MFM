@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 15 · LLMs and Sentiment Analysis</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'en';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch15_data.js?v=20261029b"></script>
+<script src="ch15_text_en.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch15.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelling Financial Markets</h1><p>Chapter 15 · LLMs and Sentiment Analysis</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index.html#chapters">← Course site</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf" target="_blank" rel="noopener">Lecture PDF</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_15" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch15.html" class="lang-btn active">EN</a><a href="ch15_ro.html" class="lang-btn">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
+<p class="toc"><a href="#s-dict">Dictionaries</a> · <a href="#s-eval">Labelled Data and Evaluation</a> · <a href="#s-llm">Language Models: FinBERT and LLMs</a> · <a href="#s-emb">Embeddings as Features</a> · <a href="#s-look">Look-Ahead Bias and Memorisation</a> · <a href="#s-sig">From Sentiment to a Trading Signal</a> · <a href="#s-est">Sentiment Scores Are Estimates</a> · <a href="#s-case">Case Study: Can ChatGPT Forecast Stock Returns?</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
+<h2 class="sec" id="s-dict">Dictionaries</h2>
+<section class="blk" id="dict-words">
+  <h3>Negative for a Psychologist, Neutral for an Accountant</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=9" target="_blank" rel="noopener"><img src="slides/ch15_dict_words_en.jpg" alt="Slide 8: Negative for a Psychologist, Neutral for an Accountant" loading="lazy"></a>
+      <figcaption>Slide 8</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="dw-l">Word list</label><select id="dw-l"><option value="gi" selected>Negative in GI, not in LM</option><option value="lm">Negative in LM, not in GI</option></select></div><div class="ctl"><label for="dw-k">Words shown: <b id="dw-k-v"></b></label><input type="range" id="dw-k" min="5" max="30" step="1" value="14"></div><button class="btn play" id="dw-play" type="button"></button></div><div class="charts "><div class="chart" id="dw-chart"></div></div><ul class="out" id="dw-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> "Service", "capital" and "board" are negative words in the Harvard IV-4 dictionary. How often do they occur in sentences that annotators labelled negative?</div>
+  <details><summary>Answer</summary><p>Rarely. "Service" occurs in 106 Financial PhraseBank sentences, "capital" in 104 and "board" in 79; 98%, 93% and 96% of them are not labelled negative. The exception is "lower": only 26% of its sentences are not negative, although "lower costs" is good news.</p></details>
+</section><h2 class="sec" id="s-eval">Labelled Data and Evaluation</h2>
+<section class="blk" id="accuracy">
+  <h3>Eleven Classifiers, Two Data Sets: No Single Winner</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=14" target="_blank" rel="noopener"><img src="slides/ch15_accuracy_en.jpg" alt="Slide 13: Eleven Classifiers, Two Data Sets: No Single Winner" loading="lazy"></a>
+      <figcaption>Slide 13</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ac-m">Metric</label><select id="ac-m"><option value="acc" selected>Accuracy</option><option value="f1">Macro-F1</option></select></div><div class="ctl"><label for="ac-a">PhraseBank: annotator agreement: <b id="ac-a-v"></b></label><input type="range" id="ac-a" min="0" max="3" step="1" value="0"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-pb"></div><div class="chart" id="ac-tw"></div></div><ul class="out" id="ac-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On the Twitter headlines, which of the 11 methods has the highest accuracy?</div>
+  <details><summary>Answer</summary><p>TF-IDF + logistic regression, with 83.2%. Together with MiniLM + LR, it is one of the two methods trained on Twitter labels. FinBERT has 72.5%, zero-shot Qwen2.5-7B 74.2%, and all three dictionaries stay below the "always neutral" benchmark (66%).</p></details>
+</section><h2 class="sec" id="s-llm">Language Models: FinBERT and LLMs</h2>
+<section class="blk" id="llm-size">
+  <h3>Bigger Is Not Always Better</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=22" target="_blank" rel="noopener"><img src="slides/ch15_llm_size_en.jpg" alt="Slide 21: Bigger Is Not Always Better" loading="lazy"></a>
+      <figcaption>Slide 21</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ls-m">Metric</label><select id="ls-m"><option value="f1" selected>Macro-F1</option><option value="acc">Accuracy</option></select></div><div class="ctl"><label for="ls-p">Prompt on Twitter: <b id="ls-p-v"></b></label><input type="range" id="ls-p" min="1" max="3" step="1" value="1"></div><button class="btn play" id="ls-play" type="button"></button></div><div class="charts "><div class="chart" id="ls-chart"></div></div><ul class="out" id="ls-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Does macro-F1 on Twitter rise with the number of parameters of Qwen2.5?</div>
+  <details><summary>Answer</summary><p>Not monotonically. The 1.5B model is the weakest (55.3%) and 7B the best (72.6%), above FinBERT (66.8%). The accuracy of 7B exceeds that of 1.5B by 21.5 percentage points (McNemar test: p < 0.001). With prompt P1, the 1.5B model answers "neutral" for only 23% of the headlines.</p></details>
+</section><h2 class="sec" id="s-emb">Embeddings as Features</h2>
+<section class="blk" id="embeddings">
+  <h3>Can Generic Text Vectors Measure Sentiment?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch15_embeddings_en.jpg" alt="Slide 22: Can Generic Text Vectors Measure Sentiment?" loading="lazy"></a>
+      <figcaption>Slide 22</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="em-t">Projection direction in the PC1–PC2 plane: <b id="em-t-v"></b></label><input type="range" id="em-t" min="0" max="180" step="5" value="0"></div><button class="btn play" id="em-play" type="button"></button></div><div class="charts "><div class="chart" id="em-sc"></div><div class="chart" id="em-h"></div></div><ul class="out" id="em-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Do the first two principal components of the MiniLM vectors separate positive from negative headlines?</div>
+  <details><summary>Answer</summary><p>No. PCA keeps the directions of largest variance, not those related to the label: the best direction in the plane of the first two components gives an AUC of only 0.64 between positive and negative headlines. A logistic regression on all 384 dimensions reaches 78.6% accuracy on Twitter.</p></details>
+</section>
+<section class="blk" id="learning-curve">
+  <h3>How Many Labels Do You Need?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch15_learning_curve_en.jpg" alt="Slide 23: How Many Labels Do You Need?" loading="lazy"></a>
+      <figcaption>Slide 23</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="lc-k">Training labels: <b id="lc-k-v"></b></label><input type="range" id="lc-k" min="0" max="7" step="1" value="0"></div><button class="btn play" id="lc-play" type="button"></button></div><div class="charts "><div class="chart" id="lc-chart"></div></div><ul class="out" id="lc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How many Twitter labels does logistic regression on embeddings need to beat FinBERT?</div>
+  <details><summary>Answer</summary><p>About 400. With 100 labels its accuracy is 69.0%, below FinBERT (72.5%). TF-IDF starts lower (66.9%) but reaches about 83% with all 9,543 labels, against 78.6% for embeddings.</p></details>
+</section><h2 class="sec" id="s-look">Look-Ahead Bias and Memorisation</h2>
+<section class="blk" id="memory">
+  <h3>Memory Measured: Months Yes, Days No</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch15_memory_auc_en.jpg" alt="Slide 27: Memory Measured: Months Yes, Days No" loading="lazy"></a>
+      <figcaption>Slide 27</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ma-s">Series</label><select id="ma-s"><option value="monthly" selected>S&P 500, months</option><option value="daily">Apple, days</option></select></div><div class="ctl"><label for="ma-m">Model</label><select id="ma-m"><option value="1.5B">Qwen2.5-1.5B</option><option value="7B">Qwen2.5-7B</option><option value="14B" selected>Qwen2.5-14B</option></select></div><div class="ctl"><label for="ma-c">Threshold: "rise" if P(rise) >: <b id="ma-c-v"></b></label><input type="range" id="ma-c" min="0" max="1" step="0.02" value="0.5"></div><button class="btn play" id="ma-play" type="button"></button></div><div class="charts "><div class="chart" id="ma-auc"></div><div class="chart" id="ma-roc"></div></div><ul class="out" id="ma-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Does Qwen2.5-14B remember whether the S&P 500 rose or fell in a month before its weights were released?</div>
+  <details><summary>Answer</summary><p>Partly. On the 296 months before the release, the AUC is 0.69 (CI [0.62; 0.75]) for 14B and 0.67 for 7B. For single days of Apple, the AUC stays between 0.48 and 0.52. The 23 months after the release give intervals too wide to conclude: about 101 months would be needed.</p></details>
+</section><h2 class="sec" id="s-sig">From Sentiment to a Trading Signal</h2>
+<section class="blk" id="news-hours">
+  <h3>The Timestamp Problem: Dates, Not Times</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch15_news_hours_en.jpg" alt="Slide 31: The Timestamp Problem: Dates, Not Times" loading="lazy"></a>
+      <figcaption>Slide 31</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="nh-o">Clock: offset from UTC (hours): <b id="nh-o-v"></b></label><input type="range" id="nh-o" min="-12" max="12" step="1" value="0"></div><button class="btn play" id="nh-play" type="button"></button></div><div class="charts "><div class="chart" id="nh-chart"></div></div><ul class="out" id="nh-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Can we tell from FNSPID whether a headline appeared before or after the close?</div>
+  <details><summary>Answer</summary><p>No. 99.8% of the headlines are stamped exactly 00:00 UTC, so the source gives only the date. The returns of days d and d+1 may therefore still contain the reaction, and the first safe forecast is the return of day d+2.</p></details>
+</section>
+<section class="blk" id="reaction">
+  <h3>Reaction versus Prediction: Headlines Describe Prices</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=36" target="_blank" rel="noopener"><img src="slides/ch15_contemp_next_en.jpg" alt="Slide 35: Reaction versus Prediction: Headlines Describe Prices" loading="lazy"></a>
+      <figcaption>Slide 35</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cn-n">Minimum number of headlines per stock-day: <b id="cn-n-v"></b></label><input type="range" id="cn-n" min="1" max="20" step="1" value="1"></div><div class="ctl"><label for="cn-h">Horizons</label><select id="cn-h"><option value="3" selected>d, d+1, d+2</option><option value="6">d … d+5</option></select></div><button class="btn play" id="cn-play" type="button"></button></div><div class="charts "><div class="chart" id="cn-chart"></div></div><ul class="out" id="cn-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Do the headline scores forecast the excess return of day d+2?</div>
+  <details><summary>Answer</summary><p>No. On day d the slopes are large: FinBERT +39.2 bp (t = 17.27) and Qwen +41.4 bp (t = 19.07). On day d+2 they are −0.5 bp for FinBERT, +2.3 bp for Qwen and −0.0 bp for LM, all with |t| < 2. Many headlines report the price move itself.</p></details>
+</section>
+<section class="blk" id="strategy">
+  <h3>Cumulative Strategy Returns: No Net Profit</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch15_strategy_en.jpg" alt="Slide 43: Cumulative Strategy Returns: No Net Profit" loading="lazy"></a>
+      <figcaption>Slide 43</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sg-l">Return day: <b id="sg-l-v"></b></label><input type="range" id="sg-l" min="1" max="5" step="1" value="2"></div><div class="ctl"><label for="sg-c">Cost per one-way trade: <b id="sg-c-v"></b></label><input type="range" id="sg-c" min="0" max="10" step="0.5" value="5"></div><div class="ctl"><label for="sg-t">Up to: <b id="sg-t-v"></b></label><input type="range" id="sg-t" min="0" max="3567" step="1" value="3567"></div><button class="btn play" id="sg-play" type="button"></button></div><div class="charts "><div class="chart" id="sg-chart"></div></div><ul class="out" id="sg-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The Qwen2.5-7B strategy earns 5.64 bp a day before costs. Is it still profitable at 5 bp per trade?</div>
+  <details><summary>Answer</summary><p>No. The break-even cost is 1.5 bp per trade. With positions on 95% of the days and 20 bp per active day, the net mean is −13.36 bp a day, and the Sharpe ratio falls from +0.63 to −1.48.</p></details>
+</section><h2 class="sec" id="s-est">Sentiment Scores Are Estimates</h2>
+<section class="blk" id="ppi">
+  <h3>PPI on Twitter Headlines: the Bias Correction Is the Main Gain</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=50" target="_blank" rel="noopener"><img src="slides/ch15_ppi_en.jpg" alt="Slide 49: PPI on Twitter Headlines: the Bias Correction Is the Main Gain" loading="lazy"></a>
+      <figcaption>Slide 49</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pp-n">Human-labelled headlines, n: <b id="pp-n-v"></b></label><input type="range" id="pp-n" min="0" max="6" step="1" value="1"></div><button class="btn play" id="pp-play" type="button"></button></div><div class="charts "><div class="chart" id="pp-w"></div><div class="chart" id="pp-c"></div></div><div class="charts "><div class="chart" id="pp-h"></div></div><ul class="out" id="pp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The mean FinBERT score on the Twitter headlines is −0.014, while the mean human tone is 0.054. Does a larger sample remove this difference?</div>
+  <details><summary>Answer</summary><p>No: it is a bias, not noise. PPI subtracts the mean bias estimated on the labelled texts and keeps nominal coverage (94.3% at n = 100). The interval narrows only a little: 0.204 with PPI against 0.229 with human labels only.</p></details>
+</section><h2 class="sec" id="s-case">Case Study: Can ChatGPT Forecast Stock Returns?</h2>
+<section class="blk" id="llt-models">
+  <h3>Which Models Read the News Right, and Which Earn the Drift</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=54" target="_blank" rel="noopener"><img src="slides/ch15_llt_models_en.jpg" alt="Slide 53: Which Models Read the News Right, and Which Earn the Drift" loading="lazy"></a>
+      <figcaption>Slide 53</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="lt-h">Threshold on the hit rate of the initial reaction: <b id="lt-h-v"></b></label><input type="range" id="lt-h" min="50" max="95" step="1" value="50"></div><button class="btn play" id="lt-play" type="button"></button></div><div class="charts "><div class="chart" id="lt-hit"></div><div class="chart" id="lt-sr"></div></div><ul class="out" id="lt-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Is it enough for a model to get the initial market reaction right in order to earn the drift?</div>
+  <details><summary>Answer</summary><p>No. FinBERT gets the reaction right on 90% of the days, but the Sharpe ratio of its drift is −0.33. Of the seven models with hit rates of 86–93%, only GPT-4 (2.97) and GPT-3.5 (1.66) also have a large Sharpe ratio. The models with hit rates of 53–66% have negative Sharpe ratios.</p></details>
+</section><h2 class="sec" id="s-ai">AI for Scientific Discovery</h2>
+<section class="blk" id="spec-curve">
+  <h3>The Specification Curve: Is It Different from Noise?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=61" target="_blank" rel="noopener"><img src="slides/ch15_spec_curve_en.jpg" alt="Slide 60: The Specification Curve: Is It Different from Noise?" loading="lazy"></a>
+      <figcaption>Slide 60</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sc-c">Critical value of t: <b id="sc-c-v"></b></label><input type="range" id="sc-c" min="1" max="3.5" step="0.01" value="1.96"></div><div class="ctl"><label for="sc-b">Draws under the null: <b id="sc-b-v"></b></label><input type="range" id="sc-b" min="100" max="2000" step="100" value="2000"></div><button class="btn play" id="sc-play" type="button"></button></div><div class="charts "><div class="chart" id="sc-curve"></div><div class="chart" id="sc-null"></div></div><ul class="out" id="sc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Three of the 36 specifications have t > 1.96. Is that more than noise would produce?</div>
+  <details><summary>Answer</summary><p>No. Under the joint null, with the signs of the positions flipped at random in blocks of 10 days, the probability of at least 3 specifications with t > 1.96 is 0.113, and that of a median t at least as high as 0.50 is 0.207. No specification passes the Bonferroni cut-off, |t| > 3.20.</p></details>
+</section>
+<p class="src foot">Labelled texts: Financial PhraseBank (Malo et al., 2014) and Twitter Financial News (2022). Dated headlines: FNSPID (Dong, Fan and Peng, 2024), 16 US stocks, 2009–2023; EODHD daily prices. The scores of the dictionaries, FinBERT, the Qwen2.5 models, MiniLM and TF-IDF are those computed in the chapter. Case study: Lopez-Lira and Tang (2026), Table 5.</p>
+</main>
+</body>
+</html>

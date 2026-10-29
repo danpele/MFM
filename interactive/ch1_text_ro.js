@@ -1,0 +1,32 @@
+// Readouts of the Chapter 1 interactive page, written by latex/build_interactive_ch1.py.
+const Z = n => (n === 1 ? '1 zi' : n % 100 === 0 || n % 100 >= 20 ? n + ' de zile' : n + ' zile');
+window.CH1_TEXT = {
+ lab: { sp500: 'S&P 500', bettr: 'BET-TR', btc: 'Bitcoin', eurron: 'EUR/RON', gold: 'aur' },
+ pr: (t, s) => `Zile cu |r<sub>t</sub>| &gt; ${t}: ${s}.`,
+ pr2: (d, r, p) => `Cea mai slabă zi a Bitcoin: ${d}, randament logaritmic ${r}, adică o scădere a prețului de ${p}.`,
+ hq: (m, k, o, n, nu, t, f) => `${m}: exces de kurtosis ${k}. Zile cu |z| &gt; 4: ${o} în date, ${n} sub distribuția Normală, ${t} sub Student-t cu ν = ${nu} (ν estimat: ${f}).`,
+ hl: (f, l, n) => `α̂ la k/n = ${f}: ${l}. Intervale de 95% (i.i.d.) care exclud α = 4: ${n} din 5.`,
+ gl: (m, p, lo, hi, d, ci) => `${m}, p = ${p}: −q(p) = ${lo}%, q(1 − p) = ${hi}%, Δ = ${d} pp.` + (ci ? ` Intervalul bootstrap de 95% din curs: [${ci[0]}; ${ci[1]}] pp.` : ''),
+ gl2: n => `Pierderea extremă depășește cîștigul extrem pe ${n} din 5 piețe.`,
+ ac: (m, s, r, a, b) => `${m}, din ${s}: ρ̂₁ = ${r}. Din 100 de laguri, ${a} ies din banda i.i.d. și ${b} din banda robustă.`,
+ ac2: (a, n, m) => `ρ̂₁(|r<sub>t</sub>|) = ${a}; autocorelații pozitive: ${n} din 100 pentru |r<sub>t</sub>|, ${m} din 100 pentru r<sub>t</sub><sup>2</sup>.`,
+ rv: (n, l) => `Fereastra de ${Z(n)}, maximul volatilității anualizate: ${l}.`,
+ rv2: (a, b) => `EUR/RON: media volatilității este ${a}% înainte de iulie 2013 și ${b}% după.`,
+ ag: (m, h, k, n, z) => `${m}, h = ${h}: exces de kurtosis ${k}, n<sub>h</sub> = ${n}, z = ${z}.`,
+ ag2: (h, l) => `La h = ${h}, normalitatea este respinsă la 5% (|z| > 1,96) pentru: ${l}.`,
+ lv: (m, k, l, z) => `${m}: L(${k}) = ${l}, z = ${z} cu eroarea standard robustă.`,
+ lv2: (k, a, b) => `Media lui |r<sub>t+${k}</sub>|: ${a}% după cele mai slabe 5% dintre zile, ${b}% după cele mai bune 5%.`,
+ vv: (m, w, r, n, ci) => `${m}, media volumului pe ${Z(w)}: corelația Spearman ${r}, din ${Z(n)}.` + (ci ? ` Intervalul bootstrap de 95% din curs: [${ci[0]}; ${ci[1]}].` : ''),
+ aa: (m, a, b, c) => `${m}: ACF a lui |r<sub>t</sub>| este ${a} la lagul 1, ${b} la lagul 20 și ${c} la lagul 100.`,
+ aa2: (d, h, e, x, f, w) => `La lagul 250, curba hiperbolică cu d = ${d} dă ${h}, curba exponențială (ajustată pe lagurile 1–20) ${e}, iar datele ${x}. Panta log–log a ACF pe lagurile 10–250 corespunde lui d = ${f}; estimatorul Whittle local din curs: d̂ = ${w}.`,
+ ty: (m, k, d, v, a, b) => `${m}, lagul ${k}: maximul este la δ = ${d} (autocorelația ${v}); la δ = 1 este ${a}, la δ = 2 este ${b}.`,
+ oh: (m, o, h, l, c) => `Minutul ${m}: deschiderea ${o}%, maximul ${h}%, minimul ${l}%, prețul curent ${c}% (față de închiderea precedentă).`,
+ oh2: (r, p, c) => `Range-ul h − l este ${r}%; estimarea Parkinson din această zi este ${p}%, iar |c<sub>t</sub> − c<sub>t−1</sub>| este ${c}%. Volatilitatea zilnică a simulării este 1,2%.`,
+ ve: (n, l) => `Media pe 2008–2026, fereastra de ${Z(n)}: ${l}.`,
+ ve2: (a, b) => `Estimatorii din range sînt de ${a}–${b} ori mai netezi decît close-to-close.`,
+ dd: (d, l) => `Drawdown-ul maxim pînă în ${d}: ${l}.`,
+ dd2: (p, pp, t, tp, x, g) => `S&P 500: vîrful din ${p} (${pp}) și minimul din ${t} (${tp}) dau ${x}%; revenirea la vîrf cere +${g}%.`,
+ rr: (y, l) => (y === 1990 ? 'Eșantioanele întregi' : `Eșantioanele din ${y}`) + `, raportul Sharpe (r<sub>f</sub> = 0): ${l}.`,
+ pv: (L, a, b, c, e, f) => `Cu ultimele ${Z(L)}: R² = ${a} la antrenare, ${b} la test și ${c} după test; RMSE ${e} la antrenare și ${f} la test.`,
+ pv2: (L, s) => `Fereastra de ${Z(L)} conține ${s} din ponderea nucleului volatilității pe 1000 de zile; coeficienții β se reestimează prin cele mai mici pătrate pe 2000–2018.`
+};

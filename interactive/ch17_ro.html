@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capitolul 17 · Bule și crahuri</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'ro';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch17_data.js?v=20261029b"></script>
+<script src="ch17_text_ro.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch17.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelarea piețelor financiare</h1><p>Capitolul 17 · Bule și crahuri</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index_ro.html#chapters">← Site-ul cursului</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf" target="_blank" rel="noopener">PDF-ul cursului</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_17" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch17.html" class="lang-btn">EN</a><a href="ch17_ro.html" class="lang-btn active">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
+<p class="toc"><a href="#s-def">Definiția bulei</a> · <a href="#s-data">Creșteri și crahuri în date</a> · <a href="#s-tests">Testarea comportamentului exploziv</a> · <a href="#s-lppls">Legea de putere log-periodică (LPPLS)</a> · <a href="#s-ms">Modele cu schimbare de regim</a> · <a href="#s-ai">Bule cripto și AI</a> · <a href="#s-case">Studiu de caz: speculația imobiliară</a></p>
+<h2 class="sec" id="s-def">Definiția bulei</h2>
+<section class="blk" id="rational-bubble">
+  <h3>O bulă rațională simulată</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=8" target="_blank" rel="noopener"><img src="slides/ch17_rational_bubble_ro.jpg" alt="Slide-ul 7: O bulă rațională simulată" loading="lazy"></a>
+      <figcaption>Slide-ul 7</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rb-pi">Probabilitatea de supraviețuire π: <b id="rb-pi-v"></b></label><input type="range" id="rb-pi" min="0.9" max="0.995" step="0.005" value="0.97"></div><div class="ctl"><label for="rb-b">Valoarea de repornire δ: <b id="rb-b-v"></b></label><input type="range" id="rb-b" min="1" max="20" step="1" value="5"></div><button class="btn play" id="rb-play" type="button"></button></div><div class="charts "><div class="chart" id="rb-chart"></div></div><ul class="out" id="rb-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Bula supraviețuiește în fiecare perioadă cu probabilitatea 0,97, iar randamentul cerut este 1%. Cu cît crește cît timp supraviețuiește și cît trăiește în medie?</div>
+  <details><summary>Răspuns</summary><p>Crește cu (1 + r)/π − 1 ≈ 4,1% pe perioadă, astfel încît creșterea așteptată rămîne r = 1%. Durata de viață așteptată este 1/(1 − π) ≈ 33 de perioade. În simulare bula s-a spart vizibil de 4 ori, iar la vîrf prețul a fost de 1,43 ori valoarea fundamentală.</p></details>
+</section><h2 class="sec" id="s-data">Creșteri și crahuri în date</h2>
+<section class="blk" id="episodes">
+  <h3>Creșteri și crahuri aliniate la vîrf</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch17_episodes_ro.jpg" alt="Slide-ul 11: Creșteri și crahuri aliniate la vîrf" loading="lazy"></a>
+      <figcaption>Slide-ul 11</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ep-sel">Episodul evidențiat</label><select id="ep-sel"><option value="all" selected>Toate</option><option value="0">Nasdaq 100, 2000</option><option value="1">Cisco, 2000</option><option value="2">BET, 2007</option><option value="3">Bitcoin, 2017</option><option value="4">Ethereum, 2018</option><option value="5">Bitcoin, 2021</option><option value="6">Dogecoin, 2021</option><option value="7">GameStop, 2021</option><option value="8">Tesla, 2021</option></select></div><div class="ctl"><label for="ep-h">Orizontul după vîrf (ani): <b id="ep-h-v"></b></label><input type="range" id="ep-h" min="0.25" max="2" step="0.25" value="2"></div><button class="btn play" id="ep-play" type="button"></button></div><div class="charts "><div class="chart" id="ep-chart"></div></div><ul class="out" id="ep-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Creșterile din cei doi ani dinaintea vîrfului diferă cu ordine de mărime. Diferă la fel de mult și scăderile de după vîrf?</div>
+  <details><summary>Răspuns</summary><p>Nu. Creșterile merg de la +97% (BET, 2007) la +124 004% (Ethereum, 2018), iar scăderile maxime din cei patru ani de după vîrf sînt între −74% (Tesla) și −94% (Ethereum). Episoadele au fost alese pentru că s-au încheiat cu un crah, deci nu arată cît de des urmează un crah după o creștere.</p></details>
+</section>
+<section class="blk" id="bubbles-for-fama">
+  <h3>Puterea predictivă a creșterilor bruște</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch17_gsy_ro.jpg" alt="Slide-ul 14: Puterea predictivă a creșterilor bruște" loading="lazy"></a>
+      <figcaption>Slide-ul 14</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="gs-c">Crahul: scăderea față de un maxim anterior: <b id="gs-c-v"></b></label><input type="range" id="gs-c" min="0" max="8" step="1" value="4"></div><button class="btn play" id="gs-play" type="button"></button></div><div class="charts "><div class="chart" id="gs-chart"></div></div><ul class="out" id="gs-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> După ce randamentul unei industrii pe doi ani depășește 100%, cît de des urmează un crah de 40%?</div>
+  <details><summary>Răspuns</summary><p>În 45% din cazuri (53 de episoade în 27 de industrii, CI de 95% [27%, 62%]), față de 11% pentru o lună-industrie oarecare. Randamentul mediu pe următorii doi ani este însă 2%, cu CI [−13%, 20%]: o creștere bruscă mărește riscul de crah, dar nu face previzibilă o pierdere medie.</p></details>
+</section><h2 class="sec" id="s-tests">Testarea comportamentului exploziv</h2>
+<section class="blk" id="windows">
+  <h3>Trei moduri de a alege ferestrele</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=19" target="_blank" rel="noopener"><img src="slides/ch17_windows_ro.jpg" alt="Slide-ul 18: Trei moduri de a alege ferestrele" loading="lazy"></a>
+      <figcaption>Slide-ul 18</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="wi-r">Fereastra minimă r₀ (fracție din eșantion): <b id="wi-r-v"></b></label><input type="range" id="wi-r" min="0.05" max="0.5" step="0.05" value="0.25"></div><div class="ctl"><label for="wi-T">Lungimea eșantionului T</label><select id="wi-T"><option value="440" selected>440 (Nasdaq 100, lunar)</option><option value="626">626 (Bitcoin, săptămînal)</option><option value="1865">1 865 (raportul P/D, lunar)</option></select></div><button class="btn play" id="wi-play" type="button"></button></div><div class="charts three"><div class="chart" id="wi-a"></div><div class="chart" id="wi-s"></div><div class="chart" id="wi-g"></div></div><ul class="out" id="wi-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru T = 440 de luni, cîte regresii ADF parcurge GSADF cu fereastra minimă dată de regula PSY?</div>
+  <details><summary>Răspuns</summary><p>Regula dă r₀ = 0,01 + 1,8/√440 = 0,096, adică w₀ = 42 de luni. SADF parcurge 399 de ferestre (un capăt pentru fiecare), GSADF 79 800 (toate perechile început–sfîrșit), de aici supremul pe aproximativ 80 000 de ferestre.</p></details>
+</section>
+<section class="blk" id="null">
+  <h3>Distribuțiile sub ipoteza nulă și valorile critice</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch17_null_ro.jpg" alt="Slide-ul 22: Distribuțiile sub ipoteza nulă și valorile critice" loading="lazy"></a>
+      <figcaption>Slide-ul 22</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="nu-k">Fereastra minimă w₀ (luni): <b id="nu-k-v"></b></label><input type="range" id="nu-k" min="0" max="6" step="1" value="2"></div><button class="btn play" id="nu-play" type="button"></button></div><div class="charts "><div class="chart" id="nu-chart"></div></div><ul class="out" id="nu-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> De ce valoarea critică de 95% a GSADF (2,19) este mult mai mare decît cea a unui singur ADF (−0,06)?</div>
+  <details><summary>Răspuns</summary><p>GSADF este maximul a aproximativ 80 000 de statistici ADF pe ferestre suprapuse, iar sub ipoteza nulă maximul multor statistici depășește tipic oricare dintre ele. Cu o fereastră minimă mai scurtă numărul ferestrelor crește și valoarea critică urcă (2,58 pentru w₀ = 22); pentru w₀ = 132 coboară la 1,65. ADF pe întregul eșantion nu depinde de w₀.</p></details>
+</section>
+<section class="blk" id="sp-pd">
+  <h3>Raportul preț/dividend S&P Composite (Shiller), 1871–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=26" target="_blank" rel="noopener"><img src="slides/ch17_sp_pd_ro.jpg" alt="Slide-ul 25: Raportul preț/dividend S&P Composite (Shiller), 1871–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 25</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pd-t">Data: <b id="pd-t-v"></b></label><input type="range" id="pd-t" min="0" max="1864" step="1" value="1864"></div><div class="ctl"><label for="pd-L">Durata minimă L (luni): <b id="pd-L-v"></b></label><input type="range" id="pd-L" min="1" max="24" step="1" value="8"></div><button class="btn play" id="pd-play" type="button"></button></div><div class="charts "><div class="chart" id="pd-chart"></div></div><ul class="out" id="pd-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Raportul preț/dividend a atins maximul eșantionului, 91,2, în mai 2026. De ce nu este datat ca episod exploziv?</div>
+  <details><summary>Răspuns</summary><p>Testul caută accelerarea, nu un nivel ridicat. BSADF depășește valoarea critică doar în aug. 1917–iun. 1918 (o scădere accelerată a raportului), nov. 1928–sept. 1929 și mai 1997–aug. 2001. GSADF = 3,41 față de valoarea critică de 95% 2,39, iar ADF pe întregul eșantion (−1,11) nu detectează nimic.</p></details>
+</section>
+<section class="blk" id="bitcoin">
+  <h3>Bitcoin: episoade explozive</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch17_btc_ro.jpg" alt="Slide-ul 27: Bitcoin: episoade explozive" loading="lazy"></a>
+      <figcaption>Slide-ul 27</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bt-cv">Valoarea critică de 95%</label><select id="bt-cv"><option value="mc" selected>Monte Carlo</option><option value="wild">Wild bootstrap</option></select></div><div class="ctl"><label for="bt-t">Data: <b id="bt-t-v"></b></label><input type="range" id="bt-t" min="0" max="625" step="1" value="625"></div><div class="ctl"><label for="bt-L">Durata minimă L (săptămîni): <b id="bt-L-v"></b></label><input type="range" id="bt-L" min="1" max="20" step="1" value="7"></div><button class="btn play" id="bt-play" type="button"></button></div><div class="charts "><div class="chart" id="bt-chart"></div></div><ul class="out" id="bt-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Bitcoin a urcat la noi maxime în 2024–2025. Este și această creștere un episod exploziv?</div>
+  <details><summary>Răspuns</summary><p>Nu. Cu valorile critice Monte Carlo episoadele sînt apr. 2017–iun. 2018 și dec. 2020–mai 2021; cu wild bootstrap, mai 2017–ian. 2018 și dec. 2020–feb. 2021. O creștere constantă nu este o accelerare explozivă. GSADF = 3,85 respinge ipoteza nulă cu ambele valori critice (2,27 și 2,82).</p></details>
+</section>
+<section class="blk" id="family-wise">
+  <h3>Datarea este un test multiplu: Bitcoin</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=31" target="_blank" rel="noopener"><img src="slides/ch17_fwer_btc_ro.jpg" alt="Slide-ul 30: Datarea este un test multiplu: Bitcoin" loading="lazy"></a>
+      <figcaption>Slide-ul 30</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fw-k">Fereastra de monitorizare τ<sub>b</sub> (săptămîni): <b id="fw-k-v"></b></label><input type="range" id="fw-k" min="0" max="5" step="1" value="3"></div><div class="ctl"><label for="fw-l">Nivelul pe familie</label><select id="fw-l"><option value="q90">90%</option><option value="q95" selected>95%</option><option value="q99">99%</option></select></div><button class="btn play" id="fw-play" type="button"></button></div><div class="charts "><div class="chart" id="fw-chart"></div></div><ul class="out" id="fw-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Datarea compară BSADF cu valoarea critică în fiecare dintre cele 626 de săptămîni. Cît de probabilă este cel puțin o alarmă falsă?</div>
+  <details><summary>Răspuns</summary><p>Pe 2 000 de traiectorii random walk, o depășire apare în 95% dintre ele, iar un „episod” în 59%. Valoarea critică pe familie pentru 104 săptămîni este 1,75, față de valori punctuale Monte Carlo de cel mult 0,71; cu ea rămîne un singur episod, oct. 2017–ian. 2018.</p></details>
+</section><h2 class="sec" id="s-lppls">Legea de putere log-periodică (LPPLS)</h2>
+<section class="blk" id="lppls-bitcoin">
+  <h3>LPPLS pe Bitcoin, 2017</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch17_lppls_btc2017_ro.jpg" alt="Slide-ul 36: LPPLS pe Bitcoin, 2017" loading="lazy"></a>
+      <figcaption>Slide-ul 36</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="lp-k">Sfîrșitul ferestrei de estimare t₂: <b id="lp-k-v"></b></label><input type="range" id="lp-k" min="0" max="24" step="1" value="15"></div><button class="btn play" id="lp-play" type="button"></button></div><div class="charts "><div class="chart" id="lp-chart"></div></div><ul class="out" id="lp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ajustarea LPPLS pînă la 15 noiembrie 2017 plasează t<sub>c</sub> pe 21 dec. 2017, la 5 zile de vîrf. Este o ajustare calificată?</div>
+  <details><summary>Răspuns</summary><p>Nu. m = 0,95, ω = 10,54 și B = −2,62 sînt în intervalele cerute, dar eroarea relativă maximă a prețului ajustat este 0,42, peste pragul de 0,15. Nicio ajustare de pe această grilă nu este calificată, iar t<sub>c</sub> estimat se mută cu săptămîni întregi cînd t₂ avansează.</p></details>
+</section>
+<section class="blk" id="critical-time">
+  <h3>Stabilitatea momentului critic</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=39" target="_blank" rel="noopener"><img src="slides/ch17_tc_instability_ro.jpg" alt="Slide-ul 38: Stabilitatea momentului critic" loading="lazy"></a>
+      <figcaption>Slide-ul 38</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="tc-s">Începutul ferestrei t₁</label><select id="tc-s"><option value="0">Cu 6 luni mai devreme (1 iul. 2016; 8 apr. 1998)</option><option value="1" selected>Ca pe slide (1 ian. 2017; 8 oct. 1998)</option><option value="2">Cu 3 luni mai tîrziu (1 apr. 2017; 8 ian. 1999)</option></select></div><div class="ctl"><label for="tc-k">Ajustări afișate (la fiecare 7 zile): <b id="tc-k-v"></b></label><input type="range" id="tc-k" min="1" max="44" step="1" value="44"></div><button class="btn play" id="tc-play" type="button"></button></div><div class="charts "><div class="chart" id="tc-chart"></div></div><ul class="out" id="tc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Dacă LPPLS ar anticipa crahul, t<sub>c</sub> estimat ar trebui să rămînă lîngă vîrf pe măsură ce t₂ avansează. Se întîmplă asta?</div>
+  <details><summary>Răspuns</summary><p>Nu. Pentru Bitcoin, cele 20 de ajustări de dinaintea vîrfului plasează t<sub>c</sub> între oct. 2017 și feb. 2018, cu o eroare absolută medie de 48 de zile; doar 20% sînt la mai puțin de 30 de zile de vîrf. Pentru Nasdaq 100 eroarea medie este 70 de zile, iar t<sub>c</sub> urmează adesea data estimării. Niciuna dintre aceste ajustări nu este calificată.</p></details>
+</section>
+<section class="blk" id="confidence">
+  <h3>Bitcoin: indicatorul de încredere LPPLS</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch17_lppls_ci_price_ro.jpg" alt="Slide-ul 41: Bitcoin: indicatorul de încredere LPPLS" loading="lazy"></a>
+      <figcaption>Slide-ul 41</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ci-f">Scăderea care definește crahul (%): <b id="ci-f-v"></b></label><input type="range" id="ci-f" min="10" max="50" step="5" value="20"></div><div class="ctl"><label for="ci-h">Orizontul (zile)</label><select id="ci-h"><option value="30">30</option><option value="60">60</option><option value="90" selected>90</option><option value="180">180</option></select></div><button class="btn play" id="ci-play" type="button"></button></div><div class="charts "><div class="chart" id="ci-chart"></div></div><ul class="out" id="ci-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> După un semnal LPPLS (indicator pozitiv), urmează mai des o scădere de 20% în 90 de zile decît în lipsa lui?</div>
+  <details><summary>Răspuns</summary><p>Nu. Scăderea urmează după 22% din cele 82 de semnale și după 37% din datele fără semnal (709 date evaluate). Diferența, −15,5 puncte procentuale, are CI bootstrap pe blocuri [−30,0; 1,8]: dovezile sînt slabe, iar semnul este opus celui așteptat.</p></details>
+</section>
+<section class="blk" id="filters">
+  <h3>LPPLS: filtrele de calificare</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=43" target="_blank" rel="noopener"><img src="slides/ch17_lppls_ci_filters_ro.jpg" alt="Slide-ul 42: LPPLS: filtrele de calificare" loading="lazy"></a>
+      <figcaption>Slide-ul 42</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fl-y">Anul datei t₂: <b id="fl-y-v"></b></label><input type="range" id="fl-y" min="0" max="30" step="1" value="0"></div><button class="btn play" id="fl-play" type="button"></button></div><div class="charts "><div class="chart" id="fl-chart"></div></div><ul class="out" id="fl-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care dintre condiții elimină cele mai multe ajustări LPPLS pe Bitcoin?</div>
+  <details><summary>Răspuns</summary><p>Luată separat, eroarea relativă maximă de cel mult 0,15: trece doar în 10% dintre ferestre, față de aproximativ o treime pentru condițiile pe m, ω, t<sub>c</sub> și numărul de oscilații. După testul Lomb rămîn calificate 0,3% dintre ferestre pentru Bitcoin și 3,5% pentru Nasdaq 100, de unde valorile mici ale indicatorului (cel mult 0,18).</p></details>
+</section><h2 class="sec" id="s-ms">Modele cu schimbare de regim</h2>
+<section class="blk" id="ms-nasdaq">
+  <h3>Nasdaq 100: două regimuri</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch17_ms_ndx_ro.jpg" alt="Slide-ul 47: Nasdaq 100: două regimuri" loading="lazy"></a>
+      <figcaption>Slide-ul 47</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ms-p">p₂₂: persistența regimului turbulent: <b id="ms-p-v"></b></label><input type="range" id="ms-p" min="0.8" max="0.995" step="any" value="0.957"></div><div class="ctl"><label for="ms-s">σ₂: volatilitatea regimului turbulent (%): <b id="ms-s-v"></b></label><input type="range" id="ms-s" min="3" max="9" step="any" value="5.4"></div><button class="btn play" id="ms-play" type="button"></button></div><div class="charts "><div class="chart" id="ms-chart"></div></div><ul class="out" id="ms-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Regimul turbulent al Nasdaq 100 are volatilitatea 5,40% pe săptămînă. Cît durează în medie și ce arată probabilitatea filtrată la vîrful din martie 2000?</div>
+  <details><summary>Răspuns</summary><p>Cu p₂₂ = 0,957 durata așteptată este 23,5 săptămîni (regimul calm: 75,4). Probabilitatea filtrată este 0,99 la sfîrșitul lui martie 2000, cînd prețurile încă urcau: modelul semnalează volatilitatea mare, nu direcția. După probabilitatea netezită, episodul turbulent din jurul vîrfului începe în iun. 1998.</p></details>
+</section>
+<section class="blk" id="ms-lr">
+  <h3>Numărul de regimuri: un test LR cu bootstrap</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch17_ms_lr_ro.jpg" alt="Slide-ul 50: Numărul de regimuri: un test LR cu bootstrap" loading="lazy"></a>
+      <figcaption>Slide-ul 50</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="lr-s">Panoul din stînga</label><select id="lr-s"><option value="btc_1v2" selected>Bitcoin: un regim față de două</option><option value="ndx_1v2">Nasdaq 100: un regim față de două</option></select></div><div class="ctl"><label for="lr-B">Replici bootstrap B: <b id="lr-B-v"></b></label><input type="range" id="lr-B" min="19" max="199" step="10" value="199"></div><button class="btn play" id="lr-play" type="button"></button></div><div class="charts "><div class="chart" id="lr-chart"></div></div><ul class="out" id="lr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> De ce nu folosim distribuția χ² pentru testul LR cu un regim față de două?</div>
+  <details><summary>Răspuns</summary><p>Sub H₀ probabilitățile de tranziție p₁₁ și p₂₂ nu sînt identificate, deci LR nu urmează o distribuție χ². Valoarea critică bootstrap de 95% este 11,8 pentru Bitcoin, față de 9,5 din χ²₄. LR observat, 123,2, depășește toate cele 199 de replici, deci p = 1/(B + 1) = 0,005, cel mai mic p-value posibil cu B = 199.</p></details>
+</section><h2 class="sec" id="s-ai">Bule cripto și AI</h2>
+<section class="blk" id="dotcom-ai">
+  <h3>Dot-com și AI</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=54" target="_blank" rel="noopener"><img src="slides/ch17_ai_dotcom_ro.jpg" alt="Slide-ul 53: Dot-com și AI" loading="lazy"></a>
+      <figcaption>Slide-ul 53</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ai-m">Luni de la primul semnal: <b id="ai-m-v"></b></label><input type="range" id="ai-m" min="0" max="96" step="1" value="96"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-chart"></div></div><ul class="out" id="ai-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> După 40 de luni de la primul semnal exploziv, este creșterea Nasdaq 100 din era AI comparabilă cu cea din anii 1990?</div>
+  <details><summary>Răspuns</summary><p>Nu. În episodul AI (primul semnal în mai 2023) nivelul este de 2,1 ori cel de la semnal după 40 de luni; în anii 1990 (primul semnal în iun. 1995) era de 2,6 ori, iar vîrful a venit după 57 de luni, la de 8,2 ori. NVIDIA este la de 9,6 ori după 43 de luni; Cisco a atins vîrful după 16 luni, la de 4,1 ori.</p></details>
+</section><h2 class="sec" id="s-case">Studiu de caz: speculația imobiliară</h2>
+<section class="blk" id="housing">
+  <h3>Studiu de caz (3/5): prețuri și volum, 2000–2011</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol17_bule_crahuri.pdf#page=59" target="_blank" rel="noopener"><img src="slides/ch17_dnz_cycle_ro.jpg" alt="Slide-ul 58: Studiu de caz (3/5): prețuri și volum, 2000–2011" loading="lazy"></a>
+      <figcaption>Slide-ul 58</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="dz-v">Volumul</label><select id="dz-v"><option value="adj" selected>Ajustat pe luna calendaristică</option><option value="raw">Neajustat</option></select></div><div class="ctl"><label for="dz-t">Pînă în luna: <b id="dz-t-v"></b></label><input type="range" id="dz-t" min="0" max="143" step="1" value="143"></div><button class="btn play" id="dz-play" type="button"></button></div><div class="charts "><div class="chart" id="dz-chart"></div></div><ul class="out" id="dz-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce atinge întîi vîrful în boom-ul imobiliar american: volumul sau prețurile?</div>
+  <details><summary>Răspuns</summary><p>Volumul. Vînzările de case noi, ajustate pe luna calendaristică, ating vîrful de 157 în iul. 2005, iar prețurile urcă pînă la 176 în iul. 2006: 12 luni de acalmie, cu vînzările coborîte deja la 110 la vîrful prețurilor. Cu vînzările neajustate acalmia durează 16 luni. În 2011 mediile sînt 35 pentru vînzări și 133 pentru prețuri.</p></details>
+</section>
+<p class="src foot">Prețuri EODHD (Nasdaq 100, BET, Cisco, NVIDIA, Tesla, GameStop, Bitcoin, Ethereum, Dogecoin), pînă la 18 sept. 2026. Raportul preț/dividend S&P Composite: datele publice ale lui Robert J. Shiller, ian. 1871–iun. 2026. 48 de industrii americane: Kenneth French Data Library, iul. 1926–sept. 2026. Locuințe: FRED (CSUSHPINSA, HSN1FNSA). Valorile critice, ajustările LPPLS și modelele Markov-switching sînt calculate cu codul capitolului; în browser se recalculează doar combinațiile lor.</p>
+</main>
+</body>
+</html>

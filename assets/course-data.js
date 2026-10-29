@@ -469,7 +469,7 @@
                 quantinar: 'Go deeper on Quantinar',
                 links: {
                     slides: 'Lecture Slides', seminar: 'Seminar', lectureNb: 'Lecture Notebook',
-                    seminarNb: 'Seminar Notebook', quantlets: 'Quantlets', colab: 'Open in Colab'
+                    seminarNb: 'Seminar Notebook', quantlets: 'Quantlets', interactive: 'Interactive', colab: 'Open in Colab'
                 },
                 projectTitle: 'Team Project and the Use of AI',
                 aiTitle: 'Using AI in this course',
@@ -540,7 +540,7 @@
                 quantinar: 'Aprofundare pe Quantinar',
                 links: {
                     slides: 'Slide-uri curs', seminar: 'Seminar', lectureNb: 'Notebook curs',
-                    seminarNb: 'Notebook seminar', quantlets: 'Quantlets', colab: 'Deschide în Colab'
+                    seminarNb: 'Notebook seminar', quantlets: 'Quantlets', interactive: 'Interactiv', colab: 'Deschide în Colab'
                 },
                 projectTitle: 'Proiectul de echipă și utilizarea AI',
                 aiTitle: 'Utilizarea AI în acest curs',

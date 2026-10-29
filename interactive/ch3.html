@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 3 · Factor Models and Asset Pricing</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'en';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch3_data.js?v=20261029b"></script>
+<script src="ch3_text_en.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch3.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelling Financial Markets</h1><p>Chapter 3 · Factor Models and Asset Pricing</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index.html#chapters">← Course site</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf" target="_blank" rel="noopener">Lecture PDF</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_03" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch3.html" class="lang-btn active">EN</a><a href="ch3_ro.html" class="lang-btn">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
+<p class="toc"><a href="#s-capm">From Markowitz to the CAPM</a> · <a href="#s-beta">Estimating Beta</a> · <a href="#s-test">Testing the CAPM</a> · <a href="#s-multi">Multifactor Models</a> · <a href="#s-fm">Fama–MacBeth Regressions</a> · <a href="#s-pca">Latent Factors: PCA and IPCA</a> · <a href="#s-inv">Factor Investing</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
+<h2 class="sec" id="s-capm">From Markowitz to the CAPM</h2>
+<section class="blk" id="frontier">
+  <h3>The Efficient Frontier of US Sectors</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=11" target="_blank" rel="noopener"><img src="slides/ch3_frontier_en.jpg" alt="Slide 10: The Efficient Frontier of US Sectors" loading="lazy"></a>
+      <figcaption>Slide 10</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fr-t">Sample ends in: <b id="fr-t-v"></b></label><input type="range" id="fr-t" min="60" max="330" step="1" value="330"></div><button class="btn play" id="fr-play" type="button"></button></div><div class="charts "><div class="chart" id="fr-chart"></div><div class="chart" id="fr-w"></div></div><ul class="out" id="fr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> SPY has a Sharpe ratio of 0.49 and the tangency portfolio of the sectors 0.66. Does this distance reject the CAPM?</div>
+  <details><summary>Answer</summary><p>No. With Mkt-RF as the market, the GRS test on the 9 sectors gives 0.53, with p = 0.85. The tangency portfolio is estimated in sample and holds large short positions: −0.37 in XLF and −0.21 in XLB.</p></details>
+</section><h2 class="sec" id="s-beta">Estimating Beta</h2>
+<section class="blk" id="xlk-beta">
+  <h3>The Beta of the Technology ETF (XLK) in the Data</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=17" target="_blank" rel="noopener"><img src="slides/ch3_sem_b1_xlk_en.jpg" alt="Slide 16: The Beta of the Technology ETF (XLK) in the Data" loading="lazy"></a>
+      <figcaption>Slide 16</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="xk-b">Bootstrap block length (months): <b id="xk-b-v"></b></label><input type="range" id="xk-b" min="1" max="36" step="1" value="12"></div><div class="ctl"><label for="xk-L">Newey–West lags, L: <b id="xk-L-v"></b></label><input type="range" id="xk-L" min="0" max="12" step="1" value="5"></div><button class="btn play" id="xk-play" type="button"></button></div><div class="charts "><div class="chart" id="xk-sc"></div><div class="chart" id="xk-boot"></div><div class="chart" id="xk-res"></div></div><ul class="out" id="xk-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The standard error of the XLK beta is 0.041 with the classical formula and 0.082 with Newey–West. Does the estimate beta = 1.277 change as well?</div>
+  <details><summary>Answer</summary><p>No. HAC errors change only the standard errors; the point estimates stay the OLS ones. The annual alpha is 0.33%, with t = 0.13, and the 95% bootstrap interval is [−5.5%, 4.9%], so alpha does not differ from zero.</p></details>
+</section>
+<section class="blk" id="dimson">
+  <h3>Choices That Change an Estimated Beta</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=20" target="_blank" rel="noopener"><img src="slides/ch3_sem_primer_dimson_en.jpg" alt="Slide 19: Choices That Change an Estimated Beta" loading="lazy"></a>
+      <figcaption>Slide 19</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="dm-p">Probability of trading on a day: <b id="dm-p-v"></b></label><input type="range" id="dm-p" min="0.3" max="1" step="0.05" value="0.75"></div><div class="ctl"><label for="dm-b">True beta: <b id="dm-b-v"></b></label><input type="range" id="dm-b" min="0" max="2" step="0.1" value="1"></div><button class="btn play" id="dm-play" type="button"></button></div><div class="charts "><div class="chart" id="dm-chart"></div></div><ul class="out" id="dm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> A stock with a beta of 1 trades on only 75% of the days. What slope does the regression on the same-day market return give?</div>
+  <details><summary>Answer</summary><p>0.77, so beta is underestimated. The slope on the previous-day market return is 0.16, and the Dimson beta, the sum of the three slopes, is 0.93.</p></details>
+</section>
+<section class="blk" id="rolling-beta">
+  <h3>Betas Are Not Constant</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=21" target="_blank" rel="noopener"><img src="slides/ch3_rolling_beta_en.jpg" alt="Slide 20: Betas Are Not Constant" loading="lazy"></a>
+      <figcaption>Slide 20</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rb-w">Window: <b id="rb-w-v"></b></label><input type="range" id="rb-w" min="0" max="4" step="1" value="2"></div><button class="btn play" id="rb-play" type="button"></button></div><div class="charts "><div class="chart" id="rb-chart"></div></div><ul class="out" id="rb-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Between which values did the XLE beta move over 252-day windows?</div>
+  <details><summary>Answer</summary><p>Between −0.31 and 1.49; at the end of the sample it is −0.29, because oil moved against the market. The XLF beta moved between 0.60 and 2.17, with its maximum right after the 2008–2009 banking crisis.</p></details>
+</section><h2 class="sec" id="s-test">Testing the CAPM</h2>
+<section class="blk" id="test-assets">
+  <h3>The Test Assets: 25 Size × B/M Portfolios</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=27" target="_blank" rel="noopener"><img src="slides/ch3_p25_grid_en.jpg" alt="Slide 26: The Test Assets: 25 Size × B/M Portfolios" loading="lazy"></a>
+      <figcaption>Slide 26</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pg-s">Statistic</label><select id="pg-s"><option value="0" selected>Mean annual excess return</option><option value="1">Annual CAPM alpha</option><option value="2">t-statistic of alpha (Newey–West)</option></select></div><div class="ctl"><label for="pg-y">Sample starts in: <b id="pg-y-v"></b></label><input type="range" id="pg-y" min="1963" max="2006" step="1" value="1963"></div><button class="btn play" id="pg-play" type="button"></button></div><div class="charts "><div class="chart" id="pg-heat"></div><div class="chart" id="pg-bar"></div></div><ul class="out" id="pg-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> In each size row, which B/M column has the highest mean return?</div>
+  <details><summary>Answer</summary><p>The value column (BM5). The extreme corners are small growth, with 3.9% a year, and small value, with 13.3% a year. The CAPM alphas keep the same order: −6.3% a year for small growth and +5.7% for small value.</p></details>
+</section>
+<section class="blk" id="sml">
+  <h3>The Security Market Line in the Data</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch3_sml_en.jpg" alt="Slide 27: The Security Market Line in the Data" loading="lazy"></a>
+      <figcaption>Slide 27</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sm-y">Sample starts in: <b id="sm-y-v"></b></label><input type="range" id="sm-y" min="1963" max="2006" step="1" value="1963"></div><button class="btn play" id="sm-play" type="button"></button></div><div class="charts "><div class="chart" id="sm-sml"></div><div class="chart" id="sm-alpha"></div></div><ul class="out" id="sm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The slope of the CAPM line is the market premium, 7.2% a year. What slope does the line fitted on the 25 portfolios have?</div>
+  <details><summary>Answer</summary><p>−4.4% a year: portfolios with a higher beta have lower mean returns. The betas cover only 0.86–1.42, 10 of the 25 alphas have |t| > 1.96, and GRS = 4.20, with p = 8 × 10<sup>−11</sup>.</p></details>
+</section><h2 class="sec" id="s-multi">Multifactor Models</h2>
+<section class="blk" id="factor-returns">
+  <h3>Cumulative Returns of the Six Factors, 1963–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch3_factor_cum_en.jpg" alt="Slide 40: Cumulative Returns of the Six Factors, 1963–2026" loading="lazy"></a>
+      <figcaption>Slide 40</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fc-y">Investment starts in: <b id="fc-y-v"></b></label><input type="range" id="fc-y" min="1963" max="2016" step="1" value="1963"></div><button class="btn play" id="fc-play" type="button"></button></div><div class="charts "><div class="chart" id="fc-chart"></div></div><ul class="out" id="fc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which factor has the highest final value of one unit invested in July 1963?</div>
+  <details><summary>Answer</summary><p>MOM, with 48.0, followed by Mkt-RF with 43.2. HML ends at 6.9 and SMB at 2.9. Momentum lost heavily when the market rebounded in 2009, and the value factor stagnated from about 2007 to 2020.</p></details>
+</section><h2 class="sec" id="s-fm">Fama–MacBeth Regressions</h2>
+<section class="blk" id="fama-macbeth">
+  <h3>Estimated Risk Premia</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch3_fama_macbeth_en.jpg" alt="Slide 45: Estimated Risk Premia" loading="lazy"></a>
+      <figcaption>Slide 45</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fm-se">Standard errors</label><select id="fm-se"><option value="sh" selected>Shanken</option><option value="fm">Fama–MacBeth</option><option value="nw">Newey–West, 6 lags</option></select></div><div class="ctl"><label for="fm-y">Sample starts in: <b id="fm-y-v"></b></label><input type="range" id="fm-y" min="1963" max="2000" step="1" value="1963"></div><button class="btn play" id="fm-play" type="button"></button></div><div class="charts "><div class="chart" id="fm-chart"></div></div><ul class="out" id="fm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> In FF3, the Fama–MacBeth market premium is −6.5% a year, while the mean of the factor is 7.2%. Why are they so far apart?</div>
+  <details><summary>Answer</summary><p>The market betas differ little across the 25 portfolios (0.89–1.14 in FF3), so the market premium is weakly identified and the intercept absorbs the average level of returns. For HML, the estimated premium (4.0%) is close to the factor mean (3.6%).</p></details>
+</section><h2 class="sec" id="s-pca">Latent Factors: PCA and IPCA</h2>
+<section class="blk" id="pca">
+  <h3>PCA of the US Sector ETFs</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch3_pca_en.jpg" alt="Slide 54: PCA of the US Sector ETFs" loading="lazy"></a>
+      <figcaption>Slide 54</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pc-w">Window</label><select id="pc-w"><option value="all" selected>Full sample</option><option value="504">504 days</option><option value="252">252 days</option><option value="126">126 days</option></select></div><div class="ctl"><label for="pc-t">Window ends on: <b id="pc-t-v"></b></label><input type="range" id="pc-t" min="0" max="2072" step="1" value="2072"></div><button class="btn play" id="pc-play" type="button"></button></div><div class="charts "><div class="chart" id="pc-scree"></div><div class="chart" id="pc-load"></div></div><ul class="out" id="pc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> What share of the variance of the 11 sectors does the first principal component explain?</div>
+  <details><summary>Answer</summary><p>66.0%. All its loadings are positive (0.24–0.34), and the correlation of PC1 with SPY is 0.954. PC2 (9.7%) sets defensive sectors, such as utilities (+0.55), against growth sectors, such as technology (−0.40).</p></details>
+</section><h2 class="sec" id="s-inv">Factor Investing</h2>
+<section class="blk" id="factor-etfs">
+  <h3>Factor ETFs versus the Market</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=59" target="_blank" rel="noopener"><img src="slides/ch3_factor_etfs_en.jpg" alt="Slide 58: Factor ETFs versus the Market" loading="lazy"></a>
+      <figcaption>Slide 58</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fe-t">Investment starts on: <b id="fe-t-v"></b></label><input type="range" id="fe-t" min="0" max="2993" step="1" value="0"></div><button class="btn play" id="fe-play" type="button"></button></div><div class="charts "><div class="chart" id="fe-chart"></div></div><ul class="out" id="fe-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which factor ETFs have had a higher compound annual growth rate (CAGR) than SPY since July 2013?</div>
+  <details><summary>Answer</summary><p>Only IWF (16.3%) and MTUM (15.5%), against 14.0% for SPY. QUAL has 13.5%, VLUE 13.1%, IWD 10.7%, USMV 10.5% and IWM 9.3%. Thirteen years are a single historical path, too short to reject the factor premia.</p></details>
+</section><h2 class="sec" id="s-ai">AI for Scientific Discovery</h2>
+<section class="blk" id="momentum-decay">
+  <h3>Mini-Case: Was Momentum Arbitraged Away?</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=68" target="_blank" rel="noopener"><img src="slides/ch3_ai_momentum_en.jpg" alt="Slide 67: Mini-Case: Was Momentum Arbitraged Away?" loading="lazy"></a>
+      <figcaption>Slide 67</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ai-p">Assumed publication date: <b id="ai-p-v"></b></label><input type="range" id="ai-p" min="120" max="600" step="1" value="339"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-per"></div><div class="chart" id="ai-dec"></div></div><ul class="out" id="ai-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> After the 1993 publication, the momentum mean falls by 0.45 percentage points a month. Is the decline significant at 5%?</div>
+  <details><summary>Answer</summary><p>No: t = −1.45, and the 95% interval is [−1.05%, 0.16%]. The decline is 54% of the in-sample mean of 0.82% a month, close to the 58% in McLean and Pontiff (2016). For Mkt-RF (placebo), b₂ = +0.40%, with t = 1.12.</p></details>
+</section>
+<p class="src foot">US ETFs: EODHD prices adjusted for dividends; excess returns use the risk-free rate of the Kenneth French Data Library. Fama–French factors, momentum and the 25 size × B/M portfolios: Kenneth French Data Library. Dimson beta: simulated data.</p>
+</main>
+</body>
+</html>

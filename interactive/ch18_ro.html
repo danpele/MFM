@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capitolul 18 · Risc sistemic și rețele</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'ro';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch18_data.js?v=20261029b"></script>
+<script src="ch18_text_ro.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch18.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelarea piețelor financiare</h1><p>Capitolul 18 · Risc sistemic și rețele</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index_ro.html#chapters">← Site-ul cursului</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf" target="_blank" rel="noopener">PDF-ul cursului</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_18" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch18.html" class="lang-btn">EN</a><a href="ch18_ro.html" class="lang-btn active">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
+<p class="toc"><a href="#s-intro">Riscul sistemic: de la o bancă la sistem</a> · <a href="#s-exp">Expunerea: MES și SRISK</a> · <a href="#s-covar">Contribuția: CoVaR</a> · <a href="#s-conn">Conectivitatea: rețele de spillover</a> · <a href="#s-frm">Rețele în coadă: Financial Risk Meter</a> · <a href="#s-stress">Testarea la stres și riscul climatic</a> · <a href="#s-case">Studiu de caz: conectivitatea cuantilă</a></p>
+<h2 class="sec" id="s-intro">Riscul sistemic: de la o bancă la sistem</h2>
+<section class="blk" id="bank-indices">
+  <h3>Trei sisteme bancare, 2010–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf#page=8" target="_blank" rel="noopener"><img src="slides/ch18_bank_indices_ro.jpg" alt="Slide-ul 7: Trei sisteme bancare, 2010–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 7</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bi-s">Începutul investiției: <b id="bi-s-v"></b></label><input type="range" id="bi-s" min="0" max="180" step="1" value="0"></div><button class="btn play" id="bi-play" type="button"></button></div><div class="charts "><div class="chart" id="bi-chart"></div></div><ul class="out" id="bi-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care dintre cele trei portofolii bancare a avut cel mai mare drawdown din 2010 și cînd a atins minimul?</div>
+  <details><summary>Răspuns</summary><p>Portofoliul european: 61%, cu minimul la 2020-04-21. Portofoliul american a pierdut 51% pînă la 2011-11-23, iar cel românesc 47% pînă la 2012-06-06. Volatilitatea anualizată a portofoliilor bancare este 29%, 30% și 23%, față de 18%, 21% și 18% pentru S&P 500, Euro Stoxx 50 și BET.</p></details>
+</section><h2 class="sec" id="s-exp">Expunerea: MES și SRISK</h2>
+<section class="blk" id="mes">
+  <h3>MES 5% pentru treisprezece bănci</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf#page=11" target="_blank" rel="noopener"><img src="slides/ch18_mes_ro.jpg" alt="Slide-ul 10: MES 5% pentru treisprezece bănci" loading="lazy"></a>
+      <figcaption>Slide-ul 10</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="me-a">Nivelul cozii α (%): <b id="me-a-v"></b></label><input type="range" id="me-a" min="1" max="20" step="1" value="5"></div><button class="btn play" id="me-play" type="button"></button></div><div class="charts "><div class="chart" id="me-chart"></div></div><ul class="out" id="me-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În cele mai rele 5% dintre zilele S&P 500, pierde fiecare bancă americană mai mult decît indicele?</div>
+  <details><summary>Răspuns</summary><p>Da. În acele zile indicele pierde în medie 2,72%, iar băncile americane între 3,22% (JPMorgan) și 4,04% (Morgan Stanley). În Europa, HSBC este excepția: 2,54%, față de 3,16% pentru Euro Stoxx 50.</p></details>
+</section>
+<section class="blk" id="srisk">
+  <h3>SRISK în funcție de leverage</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf#page=16" target="_blank" rel="noopener"><img src="slides/ch18_srisk_ro.jpg" alt="Slide-ul 15: SRISK în funcție de leverage" loading="lazy"></a>
+      <figcaption>Slide-ul 15</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sr-k">Raportul prudențial k: <b id="sr-k-v"></b></label><input type="range" id="sr-k" min="3" max="12" step="0.5" value="8"></div><div class="ctl"><label for="sr-l">Leverage-ul presupus Λ: <b id="sr-l-v"></b></label><input type="range" id="sr-l" min="2" max="20" step="0.5" value="10"></div><button class="btn play" id="sr-play" type="button"></button></div><div class="charts "><div class="chart" id="sr-chart"></div><div class="chart" id="sr-bar"></div></div><ul class="out" id="sr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cu k = 8%, de la ce leverage are nevoie ING de capital nou într-un crah al pieței de 40%? Dar cu k = 5,5%?</div>
+  <details><summary>Răspuns</summary><p>De la Λ* = 5,8 cu k = 8% și de la 8,2 cu k = 5,5%. Pentru HSBC, banca cu cel mai mic LRMES (37%), pragurile sînt 8,3 și 11,9. Un raport prudențial mai mic ridică pragul fiecărei bănci.</p></details>
+</section><h2 class="sec" id="s-covar">Contribuția: CoVaR</h2>
+<section class="blk" id="covar-qr">
+  <h3>Regresia cuantilă: JPMorgan și celelalte bănci americane</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf#page=21" target="_blank" rel="noopener"><img src="slides/ch18_covar_qr_ro.jpg" alt="Slide-ul 20: Regresia cuantilă: JPMorgan și celelalte bănci americane" loading="lazy"></a>
+      <figcaption>Slide-ul 20</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="qr-a">Nivelul cozii α (%): <b id="qr-a-v"></b></label><input type="range" id="qr-a" min="1" max="10" step="1" value="1"></div><div class="ctl"><label for="qr-t">Zile afișate, pînă la: <b id="qr-t-v"></b></label><input type="range" id="qr-t" min="2" max="4000" step="1" value="4000"></div><button class="btn play" id="qr-play" type="button"></button></div><div class="charts "><div class="chart" id="qr-chart"></div></div><ul class="out" id="qr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cînd JPMorgan se află la VaR 1%, cît de mare este pierderea de 1% a celorlalte bănci americane, față de o zi obișnuită pentru JPMorgan?</div>
+  <details><summary>Răspuns</summary><p>CoVaR 1% este 6,64% cu JPMorgan la VaR 1% (4,83%), față de 2,03% cu JPMorgan la mediană. Diferența, ΔCoVaR 1% = 4,62%, este panta 0,94 înmulțită cu distanța dintre cele două cuantile ale lui JPMorgan.</p></details>
+</section>
+<section class="blk" id="dcovar">
+  <h3>ΔCoVaR 1% pentru unsprezece bănci</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch18_dcovar_ro.jpg" alt="Slide-ul 22: ΔCoVaR 1% pentru unsprezece bănci" loading="lazy"></a>
+      <figcaption>Slide-ul 22</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="dc-a">Nivelul cozii α (%): <b id="dc-a-v"></b></label><input type="range" id="dc-a" min="1" max="10" step="1" value="1"></div><button class="btn play" id="dc-play" type="button"></button></div><div class="charts "><div class="chart" id="dc-chart"></div></div><ul class="out" id="dc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Este Wells Fargo, cu cel mai mare ΔCoVaR 1%, semnificativ mai sistemică decît Citigroup, cu cel mai mic?</div>
+  <details><summary>Răspuns</summary><p>Estimările sînt 4,89% și 3,81%, dar niciuna dintre cele 25 de perechi din aceeași regiune nu diferă după corecția Holm. Suprapunerea intervalelor [3,23; 4,74] și [3,68; 5,71] nu este însă testul. Testul Wald comun respinge egalitatea contribuțiilor băncilor americane (p = 0,015). La α = 5% clasamentul se schimbă: corelația Spearman cu clasamentul de 1% este 0,10.</p></details>
+</section>
+<section class="blk" id="var-dcovar">
+  <h3>VaR și ΔCoVaR măsoară lucruri diferite</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf#page=27" target="_blank" rel="noopener"><img src="slides/ch18_var_vs_dcovar_ro.jpg" alt="Slide-ul 26: VaR și ΔCoVaR măsoară lucruri diferite" loading="lazy"></a>
+      <figcaption>Slide-ul 26</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vd-a">Nivelul cozii α (%): <b id="vd-a-v"></b></label><input type="range" id="vd-a" min="1" max="10" step="1" value="1"></div><button class="btn play" id="vd-play" type="button"></button></div><div class="charts "><div class="chart" id="vd-chart"></div></div><ul class="out" id="vd-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Au băncile cu cel mai mare VaR 1% și cel mai mare ΔCoVaR 1%?</div>
+  <details><summary>Răspuns</summary><p>Nu. Deutsche Bank și ING au cele mai mari VaR (7,19% și 7,16%) și doar un ΔCoVaR mediu; JPMorgan are unul dintre cele mai mici VaR (4,83%) și unul dintre cele mai mari ΔCoVaR. Corelația Spearman este 0,16.</p></details>
+</section>
+<section class="blk" id="exposure">
+  <h3>Contribuție față de expunere</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf#page=29" target="_blank" rel="noopener"><img src="slides/ch18_exposure_ro.jpg" alt="Slide-ul 28: Contribuție față de expunere" loading="lazy"></a>
+      <figcaption>Slide-ul 28</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ex-a">Nivelul cozii α (%): <b id="ex-a-v"></b></label><input type="range" id="ex-a" min="1" max="10" step="1" value="1"></div><button class="btn play" id="ex-play" type="button"></button></div><div class="charts "><div class="chart" id="ex-chart"></div></div><ul class="out" id="ex-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Contribuie ING la pierderile celorlalte bănci europene mai mult decît este expusă la ele?</div>
+  <details><summary>Răspuns</summary><p>Nu. Contribuția ING este 4,42%, iar expunerea 6,14%. HSBC este cazul opus: contribuția 4,07%, expunerea 3,17%. Expunerea depășește contribuția la patru dintre cele cinci bănci europene.</p></details>
+</section><h2 class="sec" id="s-conn">Conectivitatea: rețele de spillover</h2>
+<section class="blk" id="spill-table">
+  <h3>Tabelul conectivității pentru treisprezece bănci</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch18_spill_table_ro.jpg" alt="Slide-ul 36: Tabelul conectivității pentru treisprezece bănci" loading="lazy"></a>
+      <figcaption>Slide-ul 36</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="st-h">Orizontul H (zile): <b id="st-h-v"></b></label><input type="range" id="st-h" min="1" max="30" step="1" value="10"></div><button class="btn play" id="st-play" type="button"></button></div><div class="charts "><div class="chart" id="st-chart"></div></div><ul class="out" id="st-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce parte din dispersia erorii de prognoză pe 10 zile a volatilității unei bănci americane vine de la șocurile americane și ce parte din Europa?</div>
+  <details><summary>Răspuns</summary><p>84,0% vine de la băncile americane, inclusiv șocurile proprii, și 15,0% de la băncile europene. O bancă europeană primește 72,7% din Europa și 26,2% din SUA. Conectivitatea totală este 63,9%.</p></details>
+</section>
+<section class="blk" id="spill-network">
+  <h3>Rețeaua de spillover net</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf#page=39" target="_blank" rel="noopener"><img src="slides/ch18_spill_network_ro.jpg" alt="Slide-ul 38: Rețeaua de spillover net" loading="lazy"></a>
+      <figcaption>Slide-ul 38</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sn-q">Săgeți desenate: cele mai mari: <b id="sn-q-v"></b></label><input type="range" id="sn-q" min="0.5" max="0.95" step="0.05" value="0.75"></div><div class="ctl"><label for="sn-h">Orizontul H (zile): <b id="sn-h-v"></b></label><input type="range" id="sn-h" min="1" max="30" step="1" value="10"></div><button class="btn play" id="sn-play" type="button"></button></div><div class="charts "><div class="chart" id="sn-chart"></div></div><ul class="out" id="sn-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care bănci sînt cei mai mari transmițători și receptori neți de șocuri de volatilitate?</div>
+  <details><summary>Răspuns</summary><p>Transmițători: Citigroup (+19,0), Bank of America (+10,9), Morgan Stanley (+9,9) și JPMorgan (+9,8). Receptori: HSBC (−23,6), BRD (−13,0), Deutsche Bank (−12,6) și Banca Transilvania (−12,2). Săgețile arată cele mai mari 25% dintre spillover-urile nete pe perechi, cele de peste 1,57 puncte.</p></details>
+</section>
+<section class="blk" id="spill-rolling">
+  <h3>Conectivitatea în timp</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch18_spill_rolling_ro.jpg" alt="Slide-ul 40: Conectivitatea în timp" loading="lazy"></a>
+      <figcaption>Slide-ul 40</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sp-w">Fereastra</label><select id="sp-w"><option value="100">100 de zile</option><option value="250" selected>250 de zile</option><option value="500">500 de zile</option></select></div><div class="ctl"><label for="sp-h">Orizontul H</label><select id="sp-h"><option value="5">5 zile</option><option value="10" selected>10 zile</option><option value="20">20 de zile</option></select></div><div class="ctl"><label for="sp-t">Pînă la: <b id="sp-t-v"></b></label><input type="range" id="sp-t" min="0" max="9999" step="1" value="9999"></div><button class="btn play" id="sp-play" type="button"></button></div><div class="charts "><div class="chart" id="sp-tot"></div><div class="chart" id="sp-net"></div></div><ul class="out" id="sp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Crește conectivitatea totală în criza COVID-19 și cît de repede scade după aceea?</div>
+  <details><summary>Răspuns</summary><p>Crește de la 61,8% în medie în 2019 la 78,4% în primăvara lui 2020; maximul este 79,3%, la 2020-08-27. Scade după aproximativ 250 de zile, în parte pentru că criza iese din fereastră; cu o fereastră de 100 de zile, maximul este 85,6% la 2020-03-12, iar indicele scade cu 10 puncte pînă la 2020-08-13.</p></details>
+</section><h2 class="sec" id="s-frm">Rețele în coadă: Financial Risk Meter</h2>
+<section class="blk" id="frm">
+  <h3>Financial Risk Meter pentru treisprezece bănci</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch18_frm_rolling_ro.jpg" alt="Slide-ul 45: Financial Risk Meter pentru treisprezece bănci" loading="lazy"></a>
+      <figcaption>Slide-ul 45</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fr-a">Perioada analizată: de la: <b id="fr-a-v"></b></label><input type="range" id="fr-a" min="0" max="389" step="1" value="0"></div><div class="ctl"><label for="fr-b">pînă la: <b id="fr-b-v"></b></label><input type="range" id="fr-b" min="0" max="389" step="1" value="389"></div><button class="btn play" id="fr-play" type="button"></button></div><div class="charts "><div class="chart" id="fr-frm"></div><div class="chart" id="fr-dens"></div></div><ul class="out" id="fr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Urmează penalizarea GACV medie indicele VIX?</div>
+  <details><summary>Răspuns</summary><p>Slab: corelația pe cele 390 de ferestre este 0,35. Proporția predictorilor activi la λ = 2,3 × 10⁻⁴ fix urmează mai îndeaproape VIX (0,62); ea variază de la 31% (2017-11-21) la 68% (2020-06-17).</p></details>
+</section><h2 class="sec" id="s-stress">Testarea la stres și riscul climatic</h2>
+<section class="blk" id="stress">
+  <h3>Șapte scenarii istorice de stres</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf#page=50" target="_blank" rel="noopener"><img src="slides/ch18_stress_hist_ro.jpg" alt="Slide-ul 49: Șapte scenarii istorice de stres" loading="lazy"></a>
+      <figcaption>Slide-ul 49</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ss-l">Lungimea ferestrei (zile de tranzacționare): <b id="ss-l-v"></b></label><input type="range" id="ss-l" min="3" max="20" step="1" value="10"></div><button class="btn play" id="ss-play" type="button"></button></div><div class="charts "><div class="chart" id="ss-chart"></div></div><ul class="out" id="ss-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În episodul taxei bancare din România, care bănci au pierdut cel mai mult?</div>
+  <details><summary>Răspuns</summary><p>Băncile românești: Banca Transilvania −26% și BRD −26% în cele mai rele 10 zile ale portofoliului bancar, în timp ce băncile americane au pierdut între 8% și 14%. Pentru portofoliul bancar, cel mai rău episod rămîne Lehman (pierdere de 37,6%), urmat de COVID-19 (31,9%).</p></details>
+</section><h2 class="sec" id="s-case">Studiu de caz: conectivitatea cuantilă</h2>
+<section class="blk" id="quantile">
+  <h3>Spillover-ul pe cuantile</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol18_risc_sistemic_retele.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch18_case_quantile_index_ro.jpg" alt="Slide-ul 57: Spillover-ul pe cuantile" loading="lazy"></a>
+      <figcaption>Slide-ul 57</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="qc-p">Cuantilele comparate</label><select id="qc-p"><option value="0.01">τ = 0,01 și 0,99</option><option value="0.05" selected>τ = 0,05 și 0,95</option><option value="0.1">τ = 0,10 și 0,90</option></select></div><button class="btn play" id="qc-play" type="button"></button></div><div class="charts "><div class="chart" id="qc-chart"></div></div><ul class="out" id="qc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Descrie indicele de spillover la medie (56,57%) șocurile mari?</div>
+  <details><summary>Răspuns</summary><p>Nu. Indicele este 77,17% la τ = 0,05 și 79,36% la τ = 0,95, respectiv 88,18% și 91,77% la τ = 0,01 și 0,99, iar în centru este de circa 40%. Pe întregul eșantion cozile sînt aproape simetrice: RTD = 2,19 puncte.</p></details>
+</section>
+<p class="src foot">Prețuri zilnice EODHD, ianuarie 2010 – 18 septembrie 2026: șase bănci americane, cinci bănci europene, două bănci românești (BVB), indicii S&P 500, Euro Stoxx 50, BET și VIX. Scenariile istorice pentru băncile internaționale încep în 2007. Studiul de caz: valorile raportate de Ando, Greenwood-Nimmo și Shin (2022).</p>
+</main>
+</body>
+</html>

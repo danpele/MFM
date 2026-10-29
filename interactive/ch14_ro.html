@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capitolul 14 · Deep learning și modele fundaționale</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'ro';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch14_data.js?v=20261029b"></script>
+<script src="ch14_text_ro.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch14.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelarea piețelor financiare</h1><p>Capitolul 14 · Deep learning și modele fundaționale</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index_ro.html#chapters">← Site-ul cursului</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf" target="_blank" rel="noopener">PDF-ul cursului</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_14" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch14.html" class="lang-btn">EN</a><a href="ch14_ro.html" class="lang-btn active">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
+<p class="toc"><a href="#s-sig">Ce prognozăm și unde este semnalul</a> · <a href="#s-att">Atenția și Transformerele</a> · <a href="#s-t1">Testul 1: prognoza randamentelor</a> · <a href="#s-t2">Testul 2: prognoza volatilității realizate</a> · <a href="#s-t3">Testul 3: VaR 1% și ES 2,5%</a> · <a href="#s-kmz">Studiu de caz: avantajele complexității</a> · <a href="#s-ai">AI pentru descoperire științifică</a></p>
+<h2 class="sec" id="s-sig">Ce prognozăm și unde este semnalul</h2>
+<section class="blk" id="signal">
+  <h3>Semnalul: în medie sau în volatilitate</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf#page=5" target="_blank" rel="noopener"><img src="slides/ch14_acf_signal_ro.jpg" alt="Slide-ul 4: Semnalul: în medie sau în volatilitate" loading="lazy"></a>
+      <figcaption>Slide-ul 4</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ac-y">Primul an: <b id="ac-y-v"></b></label><input type="range" id="ac-y" min="1990" max="2020" step="1" value="2000"></div><div class="ctl"><label for="ac-L">Lag-uri: <b id="ac-L-v"></b></label><input type="range" id="ac-L" min="10" max="250" step="10" value="50"></div><div class="ctl"><label for="ac-s">Seria de volatilitate</label><select id="ac-s"><option value="abs" selected>|r|</option><option value="sq">r²</option></select></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-chart"></div></div><ul class="out" id="ac-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care serie are un semnal care poate fi prognozat: randamentele S&P 500 sau valorile lor absolute?</div>
+  <details><summary>Răspuns</summary><p>Valorile absolute. Autocorelația lor este 0,29 la lag-ul 1 și încă 0,13 la lag-ul 50, iar toate cele 50 de lag-uri sînt în afara benzii ±0,024. Randamentele au autocorelația −0,099 la lag-ul 1 și 15 lag-uri în afara benzii, mici și cu semne diferite.</p></details>
+</section><h2 class="sec" id="s-att">Atenția și Transformerele</h2>
+<section class="blk" id="patching">
+  <h3>Împărțirea unui context de 512 zile în patch-uri</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf#page=16" target="_blank" rel="noopener"><img src="slides/ch14_patching_ro.jpg" alt="Slide-ul 15: Împărțirea unui context de 512 zile în patch-uri" loading="lazy"></a>
+      <figcaption>Slide-ul 15</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pa-p">Lungimea patch-ului (panoul de sus): <b id="pa-p-v"></b></label><input type="range" id="pa-p" min="0" max="5" step="1" value="3"></div><div class="ctl"><label for="pa-n">Lungimea contextului (zile): <b id="pa-n-v"></b></label><input type="range" id="pa-n" min="128" max="512" step="32" value="512"></div><button class="btn play" id="pa-play" type="button"></button></div><div class="charts "><div class="chart" id="pa-chart"></div></div><ul class="out" id="pa-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Chronos-2 împarte un context de 512 randamente zilnice în patch-uri de 16 zile. Cîte scoruri de atenție calculează un strat?</div>
+  <details><summary>Răspuns</summary><p>32 de tokeni dau 32² = 1 024 de scoruri, față de 512² = 262 144 dacă fiecare zi ar fi un token, adică de 256 de ori mai puține. TimesFM-2.5 folosește patch-uri de 32 de zile: 16 tokeni și 256 de scoruri.</p></details>
+</section><h2 class="sec" id="s-t1">Testul 1: prognoza randamentelor</h2>
+<section class="blk" id="return-r2">
+  <h3>R² out-of-sample pentru randamente</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch14_return_r2_ro.jpg" alt="Slide-ul 27: R² out-of-sample pentru randamente" loading="lazy"></a>
+      <figcaption>Slide-ul 27</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="r2-w">Evaluarea începe în: <b id="r2-w-v"></b></label><input type="range" id="r2-w" min="0" max="10" step="1" value="0"></div><button class="btn play" id="r2-play" type="button"></button></div><div class="charts "><div class="chart" id="r2-chart"></div></div><ul class="out" id="r2-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe S&P 500, AR(1) și LSTM au un R² out-of-sample pozitiv (0,94% și 0,93%). Bat ele prognoza zero?</div>
+  <details><summary>Răspuns</summary><p>Nu în testul DM bilateral: p = 0,639 pentru AR(1) și 0,090 pentru LSTM. TimesFM-2.5 este semnificativ mai slab decît zero (R² −3,35%, p DM = 0,001). Doar pe BET LSTM trece la 5% (R² +1,15%, p = 0,014), înainte de corecția pentru testele multiple.</p></details>
+</section><h2 class="sec" id="s-t2">Testul 2: prognoza volatilității realizate</h2>
+<section class="blk" id="rv-forecasts">
+  <h3>Prognozele în timpul șocului din aprilie 2025</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf#page=36" target="_blank" rel="noopener"><img src="slides/ch14_rv_forecasts_ro.jpg" alt="Slide-ul 35: Prognozele în timpul șocului din aprilie 2025" loading="lazy"></a>
+      <figcaption>Slide-ul 35</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rv-t">Fereastra de 6 luni: <b id="rv-t-v"></b></label><input type="range" id="rv-t" min="0" max="40" step="1" value="28"></div><button class="btn play" id="rv-play" type="button"></button></div><div class="charts "><div class="chart" id="rv-chart"></div></div><ul class="out" id="rv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Volatilitatea realizată a SPY a atins 107% pe an la 7 aprilie 2025. Care model a anticipat saltul?</div>
+  <details><summary>Răspuns</summary><p>Niciunul. Toate prognozele cresc abia a doua zi: o prognoză la o zi extrapolează trecutul, iar șocul a venit din anunțurile tarifare. Modelele fundaționale și log-HAR revin apoi cu viteze asemănătoare, iar GARCH-t revine mai lent.</p></details>
+</section>
+<section class="blk" id="qlike">
+  <h3>Pierderile QLIKE ale celor opt modele de volatilitate</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch14_qlike_ro.jpg" alt="Slide-ul 36: Pierderile QLIKE ale celor opt modele de volatilitate" loading="lazy"></a>
+      <figcaption>Slide-ul 36</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ql-l">Funcția de pierdere</label><select id="ql-l"><option value="qlike" selected>QLIKE</option><option value="mse">MSE</option></select></div><div class="ctl"><label for="ql-s">Panoul din stînga începe la: <b id="ql-s-v"></b></label><input type="range" id="ql-s" min="0" max="860" step="1" value="0"></div><button class="btn play" id="ql-play" type="button"></button></div><div class="charts "><div class="chart" id="ql-full"></div><div class="chart" id="ql-post"></div></div><ul class="out" id="ql-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Prognozează Chronos-2, fără nicio estimare pe SPY, varianța realizată mai bine decît log-HAR?</div>
+  <details><summary>Răspuns</summary><p>Pierderea QLIKE medie este mai mică (0,231 față de 0,234), dar testul DM nu este semnificativ (p = 0,537), iar mulțimea de încredere a modelelor de 90% păstrează șase din cele opt modele. După 3 noiembrie 2025 cel mai bun este micul LSTM (0,233).</p></details>
+</section><h2 class="sec" id="s-t3">Testul 3: VaR 1% și ES 2,5%</h2>
+<section class="blk" id="breach-rates">
+  <h3>Ratele de depășire ale VaR 1%</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch14_breach_rates_ro.jpg" alt="Slide-ul 43: Ratele de depășire ale VaR 1%" loading="lazy"></a>
+      <figcaption>Slide-ul 43</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="br-w">Evaluarea începe în: <b id="br-w-v"></b></label><input type="range" id="br-w" min="0" max="10" step="1" value="0"></div><button class="btn play" id="br-play" type="button"></button></div><div class="charts "><div class="chart" id="br-chart"></div></div><ul class="out" id="br-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cuantilele directe Chronos-2 dau 45 de depășiri ale VaR 1% în 2 693 de zile pe S&P 500. Este acest număr compatibil cu un model corect?</div>
+  <details><summary>Răspuns</summary><p>Nu. Rata este 1,67% față de 1% așteptat (p Kupiec = 0,001), peste limita de 37 de depășiri a intervalului de 95%. Folosit ca filtru de volatilitate pentru FHS, același model dă 0,93% (p = 0,71).</p></details>
+</section>
+<section class="blk" id="covid-var">
+  <h3>Crahul COVID-19: VaR 1% pentru trei modele</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch14_var_path_ro.jpg" alt="Slide-ul 44: Crahul COVID-19: VaR 1% pentru trei modele" loading="lazy"></a>
+      <figcaption>Slide-ul 44</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vp-t">Fereastra de 5 luni: <b id="vp-t-v"></b></label><input type="range" id="vp-t" min="0" max="120" step="1" value="49"></div><button class="btn play" id="vp-play" type="button"></button></div><div class="charts "><div class="chart" id="vp-chart"></div></div><ul class="out" id="vp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În crahul COVID-19, hibridul FHS cu volatilitatea Chronos-2 are tot atîtea depășiri ca FHS. Este el o prognoză mai bună?</div>
+  <details><summary>Răspuns</summary><p>Nu neapărat. Ambele au 2 depășiri în 104 zile, dar hibridul reacționează excesiv: VaR 1% ajunge la 58,9% la 17.03.2020, față de 26,4% pentru FHS și o pierdere zilnică maximă de 12,8%. Chronos-2 direct are 4 depășiri, iar HS 12.</p></details>
+</section>
+<section class="blk" id="pit">
+  <h3>Transformarea integrală de probabilitate (PIT) și calibrarea</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch14_pit_ro.jpg" alt="Slide-ul 46: Transformarea integrală de probabilitate (PIT) și calibrarea" loading="lazy"></a>
+      <figcaption>Slide-ul 46</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pi-w">Evaluarea începe în: <b id="pi-w-v"></b></label><input type="range" id="pi-w" min="0" max="10" step="1" value="0"></div><button class="btn play" id="pi-play" type="button"></button></div><div class="charts three"><div class="chart" id="pi-sp500"></div><div class="chart" id="pi-btc"></div><div class="chart" id="pi-bet"></div></div><ul class="out" id="pi-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe S&P 500, cît de des cade randamentul realizat sub cuantila de 1% a Chronos-2?</div>
+  <details><summary>Răspuns</summary><p>În 1,67% dintre zile, deci prima bară PIT este de aproximativ 1,7 ori înălțimea așteptată: coada stîngă a distribuției zero-shot este prea subțire. FHS dă 1,11%. Testul Berkowitz respinge Chronos-2 pe S&P 500 (p = 0,019, σ̂ = 1,03) și nu respinge niciodată FHS.</p></details>
+</section>
+<section class="blk" id="mcs">
+  <h3>Compararea prognozelor (VaR 2,5%, ES 2,5%): MCS</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch14_mcs_ro.jpg" alt="Slide-ul 48: Compararea prognozelor (VaR 2,5%, ES 2,5%): MCS" loading="lazy"></a>
+      <figcaption>Slide-ul 48</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mc-w">Evaluarea începe în: <b id="mc-w-v"></b></label><input type="range" id="mc-w" min="0" max="10" step="1" value="0"></div><div class="ctl"><label for="mc-a">Nivelul MCS</label><select id="mc-a"><option value="0.75">75%</option><option value="0.9" selected>90%</option><option value="0.95">95%</option></select></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts "><div class="chart" id="mc-chart"></div></div><ul class="out" id="mc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce modele (VaR 2,5%, ES 2,5%) elimină mulțimea de încredere a modelelor de 90%?</div>
+  <details><summary>Răspuns</summary><p>Doar HS pe BET (p = 0,015). Pe S&P 500, FHS are cea mai mică pierdere FZ0, iar testul DM pe perechi, mai puternic decît MCS, arată că FHS bate hibridul cu Chronos-2 (DM +2,65, p = 0,008).</p></details>
+</section>
+<section class="blk" id="conformal">
+  <h3>VaR 1% conformal adaptiv pe S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf#page=52" target="_blank" rel="noopener"><img src="slides/ch14_conformal_ro.jpg" alt="Slide-ul 51: VaR 1% conformal adaptiv pe S&P 500" loading="lazy"></a>
+      <figcaption>Slide-ul 51</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cf-a">Piața</label><select id="cf-a"><option value="sp500" selected>S&P 500</option><option value="btc">Bitcoin</option><option value="bet">BET</option></select></div><div class="ctl"><label for="cf-g">Pasul γ: <b id="cf-g-v"></b></label><input type="range" id="cf-g" min="0" max="5" step="1" value="2"></div><div class="ctl"><label for="cf-n">Zile de calibrare</label><select id="cf-n"><option value="125">125</option><option value="250" selected>250</option><option value="500">500</option></select></div><button class="btn play" id="cf-play" type="button"></button></div><div class="charts "><div class="chart" id="cf-chart"></div></div><ul class="out" id="cf-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cu γ = 0,001, inferența conformală adaptivă aduce depășirile Chronos-2 pe S&P 500 aproape de 1%. Ce costă această corecție?</div>
+  <details><summary>Răspuns</summary><p>21 de depășiri față de 24,4 așteptate în 2 443 de zile, dar un VaR 1% mediu de 3,36% față de 2,85% pentru FHS în aceleași zile, deci pierderea FZ0 este semnificativ mai mare. Cu γ = 0 (split conformal) sînt 16 depășiri și un VaR mediu de 3,58%.</p></details>
+</section><h2 class="sec" id="s-kmz">Studiu de caz: avantajele complexității</h2>
+<section class="blk" id="complexity">
+  <h3>Studiu de caz: complexitatea pe datele cursului</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch14_kmz_complexity_ro.jpg" alt="Slide-ul 57: Studiu de caz: complexitatea pe datele cursului" loading="lazy"></a>
+      <figcaption>Slide-ul 57</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="kz-z">Penalizarea ridge z: <b id="kz-z-v"></b></label><input type="range" id="kz-z" min="-3" max="3" step="1" value="3"></div><div class="ctl"><label for="kz-c">Complexitatea c (cursorul): <b id="kz-c-v"></b></label><input type="range" id="kz-c" min="0" max="23" step="1" value="23"></div><div class="ctl"><label for="kz-v">Panoul din stînga</label><select id="kz-v"><option value="r2" selected>R²</option><option value="bn">‖β̂‖²</option></select></div><button class="btn play" id="kz-play" type="button"></button></div><div class="charts "><div class="chart" id="kz-r2"></div><div class="chart" id="kz-sr"></div></div><ul class="out" id="kz-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe datele cursului, crește raportul Sharpe al strategiei RFF de market timing odată cu complexitatea, ca în lucrare?</div>
+  <details><summary>Răspuns</summary><p>Nu. Cu z = 10³, raportul Sharpe crește de la 0,14 la c = 1 la 0,26 la c = 20 și scade la 0,07 la c = 1 000 (t = 0,4). Modelul liniar cu aceiași 7 predictori și z = 10³ are 0,32. Complexitatea ajută pînă la c ≈ 20, nu pînă la c = 1 000.</p></details>
+</section><h2 class="sec" id="s-ai">AI pentru descoperire științifică</h2>
+<section class="blk" id="pre-post">
+  <h3>Mini-studiu de caz: un test fără putere</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol14_deep_learning_modele_fundationale.pdf#page=63" target="_blank" rel="noopener"><img src="slides/ch14_ai_prepost_ro.jpg" alt="Slide-ul 62: Mini-studiu de caz: un test fără putere" loading="lazy"></a>
+      <figcaption>Slide-ul 62</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ai-m">Modelul</label><select id="ai-m"><option value="Chronos-2" selected>Chronos-2</option><option value="Chronos-Bolt">Chronos-Bolt</option><option value="TimesFM-2.5">TimesFM-2.5</option></select></div><div class="ctl"><label for="ai-b">Data rupturii: <b id="ai-b-v"></b></label><input type="range" id="ai-b" min="120" max="919" step="1" value="761"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-chart"></div></div><ul class="out" id="ai-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> După publicarea ponderilor Chronos-2, pierderea lui față de log-HAR crește cu 0,0088. Este aceasta o dovadă de memorare?</div>
+  <details><summary>Răspuns</summary><p>Nu. Schimbarea are t HAC = 1,00 și p = 0,32, iar efectul minim detectabil la o putere de 80% este 0,0247, de 4,9 ori diferența dinaintea publicării. Chiar și cu o fereastră infinită după publicare, MDE ar rămîne 0,0169, deci nici concluzia „fără memorare” nu este un rezultat.</p></details>
+</section>
+<p class="src foot">Randamente zilnice S&P 500, Bitcoin și BET și prețuri SPY la 5 minute: EODHD. Prognozele la o zi: Quantlets/Ch_14 (run_forecasts.py). Studiul de caz: SPY (EODHD) și seriile FRED.</p>
+</main>
+</body>
+</html>

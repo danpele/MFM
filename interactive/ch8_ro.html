@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capitolul 8 · Backtesting pentru prognozele de risc</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'ro';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch8_data.js?v=20261029b"></script>
+<script src="ch8_text_ro.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch8.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelarea piețelor financiare</h1><p>Capitolul 8 · Backtesting pentru prognozele de risc</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index_ro.html#chapters">← Site-ul cursului</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf" target="_blank" rel="noopener">PDF-ul cursului</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_08" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch8.html" class="lang-btn">EN</a><a href="ch8_ro.html" class="lang-btn active">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași prognoze. Butonul ▶ modifică parametrul pas cu pas.</p>
+<p class="toc"><a href="#s-role">Rolul backtesting-ului pentru prognozele de risc</a> · <a href="#s-var">Backtesting pentru VaR: acoperire și independență</a> · <a href="#s-basel">Perspectiva reglementatorului: semaforul Basel și FRTB</a> · <a href="#s-es">Backtesting pentru Expected Shortfall</a> · <a href="#s-elicit">Elicitabilitate și funcții de scor</a> · <a href="#s-comp">Backtesting comparativ</a> · <a href="#s-conf">Predicția conformală pentru tail risk (riscul pierderilor extreme)</a> · <a href="#s-case">Studiu de caz: testarea ES din propriile prognoze</a></p>
+<h2 class="sec" id="s-role">Rolul backtesting-ului pentru prognozele de risc</h2>
+<section class="blk" id="four-assets">
+  <h3>Patru piețe, un model de risc</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=8" target="_blank" rel="noopener"><img src="slides/ch8_four_assets_ro.jpg" alt="Slide-ul 7: Patru piețe, un model de risc" loading="lazy"></a>
+      <figcaption>Slide-ul 7</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fa-l">Nivelul VaR (GARCH-EVT)</label><select id="fa-l"><option value="VaR1" selected>VaR 1%</option><option value="VaR2.5">VaR 2,5%</option><option value="VaR5">VaR 5%</option></select></div><div class="ctl"><label for="fa-y">Evaluare pînă la sfîrșitul anului: <b id="fa-y-v"></b></label><input type="range" id="fa-y" min="2007" max="2026" step="1" value="2026"></div><button class="btn play" id="fa-play" type="button"></button></div><div class="charts "><div class="chart" id="fa-chart"></div></div><ul class="out" id="fa-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Rata de depășire a VaR 1% GARCH-EVT este 1,15% pe S&amp;P 500. Este suficientă o rată apropiată de 1% pentru a considera modelul adecvat?</div>
+  <details><summary>Răspuns</summary><p>Nu. Rata verifică doar numărul depășirilor: 57 în 4 959 de zile. Testul Kupiec nu respinge GARCH-EVT pe S&amp;P 500 (p = 0,302), dar testul DQ îl respinge (p &lt; 0,001): depășirile sînt previzibile din nivelul VaR și din depășirile trecute.</p></details>
+</section><h2 class="sec" id="s-var">Backtesting pentru VaR: acoperire și independență</h2>
+<section class="blk" id="sp500-var">
+  <h3>S&P 500: două prognoze VaR, 2007–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch8_sp500_var_ro.jpg" alt="Slide-ul 11: S&P 500: două prognoze VaR, 2007–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 11</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="sv-y">Perioada afișată (la stînga: toată perioada): <b id="sv-y-v"></b></label><input type="range" id="sv-y" min="2006" max="2026" step="1" value="2006"></div><button class="btn play" id="sv-play" type="button"></button></div><div class="charts "><div class="chart" id="sv-chart"></div></div><ul class="out" id="sv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> HS are 83 de depășiri, iar GARCH-t 88, în 4 959 de zile. Care dintre cele două prognoze este mai bună?</div>
+  <details><summary>Răspuns</summary><p>Numărul nu le separă: ratele sînt 1,67% și 1,77%, iar Kupiec le respinge pe amîndouă (p &lt; 0,001). Diferența este în momentul depășirilor: HS are 26 de depășiri în 2008 și 12 în 2020, GARCH-t 8 și 6. Independența este respinsă pentru HS (LR_ind = 15,90, p &lt; 0,001), dar nu pentru GARCH-t (p = 0,095).</p></details>
+</section>
+<section class="blk" id="kupiec">
+  <h3>Numărul acceptabil de depășiri</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch8_kupiec_curve_ro.jpg" alt="Slide-ul 14: Numărul acceptabil de depășiri" loading="lazy"></a>
+      <figcaption>Slide-ul 14</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="kp-a">Nivelul α al VaR</label><select id="kp-a"><option value="0.01" selected>1%</option><option value="0.025">2,5%</option><option value="0.05">5%</option></select></div><div class="ctl"><label for="kp-T">Lungimea eșantionului T (graficul din dreapta): <b id="kp-T-v"></b></label><input type="range" id="kp-T" min="250" max="5000" step="50" value="1000"></div><button class="btn play" id="kp-play" type="button"></button></div><div class="charts "><div class="chart" id="kp-top"></div><div class="chart" id="kp-bot"></div></div><ul class="out" id="kp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Un VaR 1% nu a fost depășit nicio dată într-un an (T = 250). Respinge testul Kupiec modelul?</div>
+  <details><summary>Răspuns</summary><p>Da: LR_uc = −500 ln 0,99 = 5,03 &gt; 3,84, deci VaR este prea conservator. Pe 250 de zile sînt acceptate doar 1–6 depășiri, pe 1 000 de zile 5–16. Regula LR_uc &gt; 3,84 are mărimea efectivă 9,5% la T = 250; P(x = 0) = 8,1% contribuie cel mai mult.</p></details>
+</section>
+<section class="blk" id="pof-power">
+  <h3>Puterea testului POF</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=17" target="_blank" rel="noopener"><img src="slides/ch8_pof_power_ro.jpg" alt="Slide-ul 16: Puterea testului POF" loading="lazy"></a>
+      <figcaption>Slide-ul 16</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pp-T">Lungimea eșantionului T (curbele roșii): <b id="pp-T-v"></b></label><input type="range" id="pp-T" min="100" max="5000" step="50" value="1000"></div><button class="btn play" id="pp-play" type="button"></button></div><div class="charts "><div class="chart" id="pp-chart"></div></div><ul class="out" id="pp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Rata reală de depășire este 2%, dublul țintei de 1%. Cu ce probabilitate respinge testul POF la 5%, pe un an de date?</div>
+  <details><summary>Răspuns</summary><p>24%, după calculul Binomial exact; aproximarea locală χ²₁(λ) dă 36%. Pe 1 000 de zile puterea exactă urcă la 78%. O putere de 50% cere π ≈ 2,67% la T = 250 și π ≈ 1,67% la T = 1 000.</p></details>
+</section>
+<section class="blk" id="breach-rates">
+  <h3>Ratele de depășire pe modele și piețe</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=19" target="_blank" rel="noopener"><img src="slides/ch8_breach_rates_ro.jpg" alt="Slide-ul 18: Ratele de depășire pe modele și piețe" loading="lazy"></a>
+      <figcaption>Slide-ul 18</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="br-l">Nivelul VaR</label><select id="br-l"><option value="VaR1" selected>VaR 1%</option><option value="VaR2.5">VaR 2,5%</option><option value="VaR5">VaR 5%</option></select></div><div class="ctl"><label for="br-y">Evaluarea începe în: <b id="br-y-v"></b></label><input type="range" id="br-y" min="2007" max="2024" step="1" value="2007"></div><button class="btn play" id="br-play" type="button"></button></div><div class="charts "><div class="chart" id="br-chart"></div></div><ul class="out" id="br-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Modelul Normal depășește VaR 1% în 2,70% din zile pe S&amp;P 500. Pe ce piață nu este respins de testul Kupiec?</div>
+  <details><summary>Răspuns</summary><p>Pe EUR/RON: rata este 1,06%, cu p = 0,708. Pe S&amp;P 500 (2,70%), BET (1,90%) și Bitcoin (1,74%) este respins. Pe EUR/RON, HS este prea conservator (0,51%): o criză veche rămîne în fereastra de 1 000 de zile și menține VaR ridicat.</p></details>
+</section>
+<section class="blk" id="timeline">
+  <h3>Momentele depășirilor</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=22" target="_blank" rel="noopener"><img src="slides/ch8_breach_timeline_ro.jpg" alt="Slide-ul 21: Momentele depășirilor" loading="lazy"></a>
+      <figcaption>Slide-ul 21</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="tl-m">Modelul testat</label><select id="tl-m"><option value="HS" selected>HS</option><option value="Normal">Normal</option><option value="Student-t">Student-t</option><option value="GARCH-t">GARCH-t</option><option value="FHS">FHS</option><option value="GARCH-EVT">GARCH-EVT</option></select></div><div class="ctl"><label for="tl-s">Primul an al subeșantionului: <b id="tl-s-v"></b></label><input type="range" id="tl-s" min="2007" max="2023" step="1" value="2007"></div><div class="ctl"><label for="tl-n">Lungimea subeșantionului (ani): <b id="tl-n-v"></b></label><input type="range" id="tl-n" min="1" max="10" step="1" value="4"></div><button class="btn play" id="tl-play" type="button"></button></div><div class="charts "><div class="chart" id="tl-chart"></div></div><ul class="out" id="tl-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru HS pe 2007–2010, π̂₁₁ = 0,0732, aproape dublu față de π̂₀₁ = 0,0393. Respinge testul Christoffersen independența?</div>
+  <details><summary>Răspuns</summary><p>Nu: LR_ind = 0,95, cu p = 0,33. Estimarea π̂₁₁ se sprijină doar pe 3 perechi de depășiri consecutive (n₁₁ = 3, n₁₀ = 38). Pe întregul eșantion 2007–2026, același test respinge independența pentru HS: LR_ind = 15,90, p &lt; 0,001.</p></details>
+</section>
+<section class="blk" id="var-pvalues">
+  <h3>Sinteza testelor VaR</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch8_var_pvalues_ro.jpg" alt="Slide-ul 23: Sinteza testelor VaR" loading="lazy"></a>
+      <figcaption>Slide-ul 23</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vp-s">Pragul de semnificație: <b id="vp-s-v"></b></label><input type="range" id="vp-s" min="0.01" max="0.1" step="0.005" value="0.05"></div><button class="btn play" id="vp-play" type="button"></button></div><div class="charts three"><div class="chart" id="vp-uc"></div><div class="chart" id="vp-cc"></div><div class="chart" id="vp-dur"></div></div><ul class="out" id="vp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Testul Kupiec nu respinge FHS pe S&amp;P 500 (p = 0,116). Îl respinge vreun alt test?</div>
+  <details><summary>Răspuns</summary><p>Da. Testul de acoperire condiționată dă p = 0,040, deci respinge la 5%, iar testul DQ dă p &lt; 0,001. Testul duratelor nu respinge (p = 0,527). Fiecare test verifică o altă consecință a calibrării condiționate.</p></details>
+</section><h2 class="sec" id="s-basel">Perspectiva reglementatorului: semaforul Basel și FRTB</h2>
+<section class="blk" id="traffic-light">
+  <h3>Semaforul de-a lungul timpului</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch8_traffic_light_ro.jpg" alt="Slide-ul 27: Semaforul de-a lungul timpului" loading="lazy"></a>
+      <figcaption>Slide-ul 27</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="tf-a">Piața</label><select id="tf-a"><option value="sp500" selected>S&amp;P 500</option><option value="bet">BET</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option></select></div><div class="ctl"><label for="tf-t">Ziua (sfîrșitul ferestrei de 250 de zile): <b id="tf-t-v"></b></label><input type="range" id="tf-t" min="0" max="4958" step="1" value="4958"></div><button class="btn play" id="tf-play" type="button"></button></div><div class="charts "><div class="chart" id="tf-chart"></div></div><ul class="out" id="tf-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe S&amp;P 500, modelul Normal ajunge la 37 de excepții în 250 de zile. Ce parte din zile petrece fiecare model în zona roșie?</div>
+  <details><summary>Răspuns</summary><p>Normal 22,3%, HS 14,7%, GARCH-t 2,0%, FHS 0,8%. GARCH-t este însă în zona galbenă 46,5% din timp. Maximul pentru Normal (37) și HS (27) cade în fereastra încheiată la 01.12.2008; penalizarea rămîne activă încă un an după criză.</p></details>
+</section><h2 class="sec" id="s-es">Backtesting pentru Expected Shortfall</h2>
+<section class="blk" id="mf-residuals">
+  <h3>Reziduurile de depășire pe S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch8_mf_residuals_ro.jpg" alt="Slide-ul 31: Reziduurile de depășire pe S&P 500" loading="lazy"></a>
+      <figcaption>Slide-ul 31</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mf-a">Piața</label><select id="mf-a"><option value="sp500" selected>S&amp;P 500</option><option value="bet">BET</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option></select></div><div class="ctl"><label for="mf-y">Evaluare pînă la sfîrșitul anului: <b id="mf-y-v"></b></label><input type="range" id="mf-y" min="2008" max="2026" step="1" value="2026"></div><button class="btn play" id="mf-play" type="button"></button></div><div class="charts "><div class="chart" id="mf-chart"></div></div><ul class="out" id="mf-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Media reziduurilor de depășire este 0,100 pentru GARCH-t și 0,104 pentru FHS. De ce este respins GARCH-t la 5%, iar FHS nu?</div>
+  <details><summary>Răspuns</summary><p>GARCH-t are mai multe zile de depășire a VaR 2,5%: 198, față de 128 pentru FHS. Cu medii aproape egale, statistica t crește cu √N: 1,73 pentru GARCH-t, 1,34 pentru FHS. p-value-urile bootstrap sînt 0,025 și 0,072.</p></details>
+</section>
+<section class="blk" id="z2-rolling">
+  <h3>Z₂ pe ferestre rolling de 250 de zile</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch8_z2_rolling_ro.jpg" alt="Slide-ul 34: Z₂ pe ferestre rolling de 250 de zile" loading="lazy"></a>
+      <figcaption>Slide-ul 34</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="z2-a">Piața</label><select id="z2-a"><option value="sp500" selected>S&amp;P 500</option><option value="bet">BET</option></select></div><div class="ctl"><label for="z2-n">Lungimea ferestrei (zile): <b id="z2-n-v"></b></label><input type="range" id="z2-n" min="125" max="1000" step="25" value="250"></div><button class="btn play" id="z2-play" type="button"></button></div><div class="charts "><div class="chart" id="z2-chart"></div></div><ul class="out" id="z2-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît de des este Z₂ al GARCH-t sub pragul −0,70, pe ferestre de 250 de zile?</div>
+  <details><summary>Răspuns</summary><p>În 44,3% din ferestre; sub −1,8 doar în 3,0%. Pragul −0,70 este valoarea critică de 5% pentru T = 250, deci o verificare zilnică produce multe alarme. Minimul GARCH-t este −2,52, în fereastra încheiată la 05.02.2008.</p></details>
+</section>
+<section class="blk" id="es-pvalues">
+  <h3>Sinteza testelor ES</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=36" target="_blank" rel="noopener"><img src="slides/ch8_es_pvalues_ro.jpg" alt="Slide-ul 35: Sinteza testelor ES" loading="lazy"></a>
+      <figcaption>Slide-ul 35</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ep-k">Valorile din celule</label><select id="ep-k"><option value="p" selected>p-value</option><option value="stat">statistica testului</option></select></div><div class="ctl"><label for="ep-s">Pragul de semnificație: <b id="ep-s-v"></b></label><input type="range" id="ep-s" min="0.01" max="0.1" step="0.005" value="0.05"></div><button class="btn play" id="ep-play" type="button"></button></div><div class="charts three"><div class="chart" id="ep-mf"></div><div class="chart" id="ep-z2"></div><div class="chart" id="ep-u"></div></div><ul class="out" id="ep-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe S&amp;P 500, McNeil–Frey nu respinge Student-t (p = 0,173). Ce spune Z₂?</div>
+  <details><summary>Răspuns</summary><p>Z₂ îl respinge: Z₂ = −0,723, cu p = 0,002. McNeil–Frey compară doar mărimea pierderilor în zilele de depășire, iar Z₂ cumulează frecvența și mărimea. Student-t depășește VaR 2,5% în 4,19% din zile.</p></details>
+</section><h2 class="sec" id="s-elicit">Elicitabilitate și funcții de scor</h2>
+<section class="blk" id="elicitability">
+  <h3>Elicitabilitatea, ilustrată grafic</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch8_elicitability_ro.jpg" alt="Slide-ul 41: Elicitabilitatea, ilustrată grafic" loading="lazy"></a>
+      <figcaption>Slide-ul 41</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="el-nu">Gradele de libertate ν ale distribuției Student-t: <b id="el-nu-v"></b></label><input type="range" id="el-nu" min="2.5" max="30" step="0.1" value="4"></div><div class="ctl"><label for="el-a">Nivelul α</label><select id="el-a"><option value="0.01">1%</option><option value="0.025" selected>2,5%</option><option value="0.05">5%</option></select></div><button class="btn play" id="el-play" type="button"></button></div><div class="charts "><div class="chart" id="el-pin"></div><div class="chart" id="el-fz"></div></div><ul class="out" id="el-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pierderile urmează o distribuție Student-t cu ν = 4 și dispersie unitară. Unde își atinge minimul pierderea pinball așteptată?</div>
+  <details><summary>Răspuns</summary><p>În VaR 2,5% adevărat, 1,96: derivata F(v) − (1 − α) se anulează în cuantilă. Pierderea FZ0 așteptată atinge minimul în (1,96; 2,82), perechea (VaR, ES) adevărată, în limita grilei. Nicio funcție de scor care depinde doar de ES nu are această proprietate.</p></details>
+</section><h2 class="sec" id="s-comp">Backtesting comparativ</h2>
+<section class="blk" id="fz0">
+  <h3>Pierderea FZ0 medie pe modele</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch8_fz0_ro.jpg" alt="Slide-ul 44: Pierderea FZ0 medie pe modele" loading="lazy"></a>
+      <figcaption>Slide-ul 44</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="fz-y">Evaluarea începe în: <b id="fz-y-v"></b></label><input type="range" id="fz-y" min="2007" max="2025" step="1" value="2007"></div><button class="btn play" id="fz-play" type="button"></button></div><div class="charts "><div class="chart" id="fz-chart"></div></div><ul class="out" id="fz-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pierderea FZ0 medie a GARCH-t depășește pe cea a FHS cu 0,040 pe S&amp;P 500. Este diferența semnificativă?</div>
+  <details><summary>Răspuns</summary><p>Da: DM = 2,66, cu p = 0,008 și q = 9 laguri Newey–West. GARCH-EVT diferă de FHS doar cu 0,003 (DM = 1,24, p = 0,21). Pe BET, FHS are tot cea mai mică pierdere FZ0 medie.</p></details>
+</section>
+<section class="blk" id="dm-matrix">
+  <h3>Teste Diebold–Mariano pe perechi, S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch8_dm_matrix_ro.jpg" alt="Slide-ul 45: Teste Diebold–Mariano pe perechi, S&P 500" loading="lazy"></a>
+      <figcaption>Slide-ul 45</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="dm-q">Numărul de laguri Newey–West q: <b id="dm-q-v"></b></label><input type="range" id="dm-q" min="0" max="40" step="1" value="9"></div><div class="ctl"><label for="dm-y">Evaluarea începe în: <b id="dm-y-v"></b></label><input type="range" id="dm-y" min="2007" max="2024" step="1" value="2007"></div><button class="btn play" id="dm-play" type="button"></button></div><div class="charts "><div class="chart" id="dm-chart"></div></div><ul class="out" id="dm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Normal minus HS: DM = 2,88. Ce înseamnă semnul pozitiv?</div>
+  <details><summary>Răspuns</summary><p>Modelul Normal are pierderea FZ0 medie mai mare, deci este mai slab, iar diferența este semnificativă la 5%. O cuantilă empirică, deși se ajustează lent, este superioară unei cozi subțiri. 13 din cele 15 perechi diferă semnificativ la 5%; excepțiile sînt Normal–Student-t (1,94) și FHS–GARCH-EVT (−1,24).</p></details>
+</section>
+<section class="blk" id="mcs">
+  <h3>Modelele reținute în MCS</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch8_mcs_ro.jpg" alt="Slide-ul 48: Modelele reținute în MCS" loading="lazy"></a>
+      <figcaption>Slide-ul 48</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mc-a">Nivelul α_MCS: <b id="mc-a-v"></b></label><input type="range" id="mc-a" min="0.01" max="0.3" step="0.01" value="0.1"></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts "><div class="chart" id="mc-chart"></div></div><ul class="out" id="mc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce modele rămîn în MCS de 90% pe S&amp;P 500 și pe BET?</div>
+  <details><summary>Răspuns</summary><p>FHS (p = 1,000 pe ambele piețe) și GARCH-EVT (p = 0,211 pe S&amp;P 500, peste 0,96 pe BET). GARCH-t este exclus pe S&amp;P 500 (p = 0,010) și, la limită, pe BET (p = 0,096): cu α_MCS = 5% ar rămîne în MCS pe BET.</p></details>
+</section><h2 class="sec" id="s-conf">Predicția conformală pentru tail risk (riscul pierderilor extreme)</h2>
+<section class="blk" id="conformal-path">
+  <h3>VaR conformal în perioada COVID-19</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=53" target="_blank" rel="noopener"><img src="slides/ch8_conformal_path_ro.jpg" alt="Slide-ul 52: VaR conformal în perioada COVID-19" loading="lazy"></a>
+      <figcaption>Slide-ul 52</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cp-g">Pasul γ al ACI: <b id="cp-g-v"></b></label><input type="range" id="cp-g" min="0.001" max="0.05" step="0.001" value="0.005"></div><div class="ctl"><label for="cp-a">Nivelul VaR</label><select id="cp-a"><option value="VaR1" selected>VaR 1%</option><option value="VaR2.5">VaR 2,5%</option><option value="VaR5">VaR 5%</option></select></div><button class="btn play" id="cp-play" type="button"></button></div><div class="charts "><div class="chart" id="cp-chart"></div></div><ul class="out" id="cp-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Între 20.02 și 30.04.2020 erau așteptate 0,5 depășiri ale VaR 1%. Cîte depășiri au avut conformal split și ACI?</div>
+  <details><summary>Răspuns</summary><p>Conformal split 6, ACI 4 (8% din cele 50 de zile). ACI a fixat VaR = ∞ în 37 din aceste zile, iar α_t a coborît pînă la 0,09%. Conformal split rămîne apoi în jur de 18% timp de un an, pentru că scorurile din martie 2020 rămîn în mulțimea de calibrare de 250 de zile.</p></details>
+</section>
+<section class="blk" id="conformal-regimes">
+  <h3>Acoperirea în perioade calme și de criză</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch8_conformal_regimes_ro.jpg" alt="Slide-ul 54: Acoperirea în perioade calme și de criză" loading="lazy"></a>
+      <figcaption>Slide-ul 54</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cr-q">Zi de criză: volatilitatea pe 20 de zile peste percentila: <b id="cr-q-v"></b></label><input type="range" id="cr-q" min="0.75" max="0.95" step="0.05" value="0.9"></div><button class="btn play" id="cr-play" type="button"></button></div><div class="charts "><div class="chart" id="cr-chart"></div></div><ul class="out" id="cr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe toate zilele S&amp;P 500, conformal split depășește VaR 5% în 5,34% din cazuri. Cît este rata în zilele de criză?</div>
+  <details><summary>Răspuns</summary><p>7,29%, în cele 713 zile de criză; pe EUR/RON ajunge la 11,43%. ACI coboară rata în criză la 4,49% pe S&amp;P 500 și la 5,38% pe BET. Acoperirea marginală nu garantează acoperirea în criză.</p></details>
+</section><h2 class="sec" id="s-case">Studiu de caz: testarea ES din propriile prognoze</h2>
+<section class="blk" id="case-table3">
+  <h3>Studiu de caz (3/4): cozile contează mai mult decît reestimarea</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch8_bd_table3_ro.jpg" alt="Slide-ul 57: Studiu de caz (3/4): cozile contează mai mult decît reestimarea" loading="lazy"></a>
+      <figcaption>Slide-ul 57</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bd-r">Frecvența reestimării, linia întreruptă (zile): <b id="bd-r-v"></b></label><input type="range" id="bd-r" min="0" max="4" step="1" value="4"></div><button class="btn play" id="bd-play" type="button"></button></div><div class="charts "><div class="chart" id="bd-chart"></div></div><ul class="out" id="bd-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cu inovații Normale, ce parte din cele 200 de acțiuni are prognozele ES 2,5% respinse?</div>
+  <details><summary>Răspuns</summary><p>Între 0,80 și 0,96 în toate cele 50 de celule (5 ferestre × 5 frecvențe ale reestimării × GARCH/GJR-GARCH). Cu inovații Student-t: cel mult 0,12 la ferestre de 250 de zile și cel mult 0,01 la ferestre de cel puțin 1 000 de zile. Coada distribuției contează mai mult decît frecvența reestimării.</p></details>
+</section>
+<p class="src foot">Pierderi zilnice (randamente logaritmice cu semn schimbat) pentru S&amp;P 500, BET și Bitcoin, prețuri EODHD, și pentru EUR/RON, cursul de referință BNR. Prognoze VaR și ES la o zi pe o fereastră rolling de 1 000 de zile, evaluate din ianuarie 2007 (EUR/RON din iunie 2009, Bitcoin din iunie 2017) pînă la 18 septembrie 2026. Studiul de caz: Tabelul 3 din Bayer și Dimitriadis (2022).</p>
+</main>
+</body>
+</html>

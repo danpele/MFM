@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 1 · Stylised Facts of Returns</title>
+<link rel="icon" href="../logos/ida_square.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css?v=20261016e">
+<link rel="stylesheet" href="interactive.css?v=20261029b">
+<script>window.MFM_LANG = 'en';</script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script src="ch1_data.js?v=20261029b"></script>
+<script src="ch1_text_en.js?v=20261029b"></script>
+<script src="common.js?v=20261029b"></script>
+<script src="ch1.js?v=20261029b" defer></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="https://www.ase.ro" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ase_logo.png" alt="ASE"></a>
+    <div class="header-title"><h1>Modelling Financial Markets</h1><p>Chapter 1 · Stylised Facts of Returns</p></div>
+    <a href="https://www.theida.net/" target="_blank" rel="noopener"><img class="header-logo" src="../logos/ida_logo.png" alt="IDA"></a>
+  </div>
+</header>
+<nav><ul>
+  <li><a href="../index.html#chapters">← Course site</a></li>
+  <li><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf" target="_blank" rel="noopener">Lecture PDF</a></li>
+  <li><a href="https://github.com/danpele/MFM/tree/main/Quantlets/Ch_01" target="_blank" rel="noopener">Quantlets</a></li>
+  <li class="lang-switcher"><a href="ch1.html" class="lang-btn active">EN</a><a href="ch1_ro.html" class="lang-btn">RO</a></li>
+</ul></nav>
+<main class="imain">
+<p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
+<p class="toc"><a href="#s-ret">Prices and Returns</a> · <a href="#s-tails">Distribution and Tails</a> · <a href="#s-dep">Dependence and Its Mechanisms</a> · <a href="#s-pers">Persistence and the Limits of Inference</a> · <a href="#s-ohlc">Volatility from Open, High, Low and Close</a> · <a href="#s-risk">Performance and Drawdowns</a> · <a href="#s-cs">Case Study: Volatility Is (Mostly) Path-Dependent</a></p>
+<h2 class="sec" id="s-ret">Prices and Returns</h2>
+<section class="blk" id="prices-returns">
+  <h3>Five Markets: Prices and Daily Log Returns</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=9" target="_blank" rel="noopener"><img src="slides/ch1_prices_returns_en.jpg" alt="Slide 8: Five Markets: Prices and Daily Log Returns" loading="lazy"></a>
+      <figcaption>Slide 8</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pr-th">Threshold for |r<sub>t</sub>|: <b id="pr-th-v"></b></label><input type="range" id="pr-th" min="0.5" max="10" step="0.5" value="1"></div><button class="btn play" id="pr-play" type="button"></button></div><div class="charts "><div class="chart" id="pr-chart"></div></div><ul class="out" id="pr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How often does the EUR/RON rate move by more than 1% in a day?</div>
+  <details><summary>Answer</summary><p>On 1.4% of the days, against 25.5% of the days for the S&amp;P 500 and 60.8% for Bitcoin. The worst Bitcoin day, 12 March 2020, has a log return of −46.5%: the price is multiplied by e<sup>−0.465</sup>, so it falls by 37.2%.</p></details>
+</section><h2 class="sec" id="s-tails">Distribution and Tails</h2>
+<section class="blk" id="heavy-tails">
+  <h3>Fact 2, Heavy Tails: Histograms and Quantile–Quantile (QQ) Plots</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch1_hist_qq_en.jpg" alt="Slide 12: Fact 2, Heavy Tails: Histograms and Quantile–Quantile (QQ) Plots" loading="lazy"></a>
+      <figcaption>Slide 12</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="hq-a">Market</label><select id="hq-a"><option value="sp500" selected>S&amp;P 500</option><option value="bettr">BET-TR</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option><option value="gold">Gold</option></select></div><div class="ctl"><label for="hq-nu">Degrees of freedom ν of the Student-t: <b id="hq-nu-v"></b></label><input type="range" id="hq-nu" min="2.2" max="30" step="0.1" value="3"></div><button class="btn play" id="hq-play" type="button"></button></div><div class="charts "><div class="chart" id="hq-h"></div><div class="chart" id="hq-q"></div></div><ul class="out" id="hq-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The Student-t distribution fits the S&amp;P 500 histogram well. Does it therefore describe the tails correctly?</div>
+  <details><summary>Answer</summary><p>Not necessarily. The histogram is dominated by the centre, where almost all the days lie. The tails are judged separately, on the QQ plot and with the Hill estimator: for the S&amp;P 500, 0.67% of the days have |z| &gt; 4, against 0.006% under the Normal distribution, and the estimated tail index is α̂ = 3.07.</p></details>
+</section>
+<section class="blk" id="hill">
+  <h3>Hill Plots for Five Markets</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=21" target="_blank" rel="noopener"><img src="slides/ch1_hill_plot_en.jpg" alt="Slide 20: Hill Plots for Five Markets" loading="lazy"></a>
+      <figcaption>Slide 20</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="hl-f">Tail fraction k/n (%): <b id="hl-f-v"></b></label><input type="range" id="hl-f" min="0.5" max="10" step="0.25" value="2.5"></div><button class="btn play" id="hl-play" type="button"></button></div><div class="charts "><div class="chart" id="hl-plot"></div><div class="chart" id="hl-ci"></div></div><ul class="out" id="hl-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Is the fourth moment of returns finite?</div>
+  <details><summary>Answer</summary><p>Most likely not. At k = 2.5% of n, α = 4 lies outside every 95% interval except the one for Bitcoin (α̂ = 4.22). The conclusion holds with the block-bootstrap standard errors, which are 1.1–1.6 times the i.i.d. ones.</p></details>
+</section>
+<section class="blk" id="gain-loss">
+  <h3>Fact 3: Gain/Loss Asymmetry in the Data</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=25" target="_blank" rel="noopener"><img src="slides/ch1_gain_loss_en.jpg" alt="Slide 24: Fact 3: Gain/Loss Asymmetry in the Data" loading="lazy"></a>
+      <figcaption>Slide 24</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="gl-a">Market</label><select id="gl-a"><option value="sp500" selected>S&amp;P 500</option><option value="bettr">BET-TR</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option><option value="gold">Gold</option></select></div><div class="ctl"><label for="gl-p">Tail probability p (%): <b id="gl-p-v"></b></label><input type="range" id="gl-p" min="0.1" max="5" step="0.1" value="1"></div><button class="btn play" id="gl-play" type="button"></button></div><div class="charts "><div class="chart" id="gl-s"></div><div class="chart" id="gl-q"></div></div><ul class="out" id="gl-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For the S&amp;P 500, VaR 1% exceeds the 99% quantile of gains. Is the difference significant?</div>
+  <details><summary>Answer</summary><p>No. Δ = 3.15 − 2.97 = 0.18 pp, and the 95% block-bootstrap confidence interval, [−0.12, 0.49] pp, contains 0. The only significant difference is on EUR/RON, with the opposite sign: Δ = −0.17 pp, interval [−0.35, −0.08] pp.</p></details>
+</section><h2 class="sec" id="s-dep">Dependence and Its Mechanisms</h2>
+<section class="blk" id="acf">
+  <h3>Facts 1 and 6: Uncorrelated but Not Independent</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch1_acf_sp500_en.jpg" alt="Slide 27: Facts 1 and 6: Uncorrelated but Not Independent" loading="lazy"></a>
+      <figcaption>Slide 27</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ac-a">Market</label><select id="ac-a"><option value="sp500" selected>S&amp;P 500</option><option value="bettr">BET-TR</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option><option value="gold">Gold</option></select></div><div class="ctl"><label for="ac-y">Sample starts in: <b id="ac-y-v"></b></label><input type="range" id="ac-y" min="1990" max="2020" step="1" value="1990"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts three"><div class="chart" id="ac-r"></div><div class="chart" id="ac-b"></div><div class="chart" id="ac-s"></div></div><ul class="out" id="ac-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How many of the first 100 autocorrelations of S&amp;P 500 returns leave the 95% band?</div>
+  <details><summary>Answer</summary><p>20 leave the i.i.d. band and only 7 the robust band; at 5%, about 5 in 100 leave it by chance. The autocorrelations of |r<sub>t</sub>| and r<sub>t</sub><sup>2</sup> are positive at all 100 lags, so returns are uncorrelated but not independent.</p></details>
+</section>
+<section class="blk" id="rolling-vol">
+  <h3>Fact 5: Intermittency in the Data</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=30" target="_blank" rel="noopener"><img src="slides/ch1_rolling_vol_en.jpg" alt="Slide 29: Fact 5: Intermittency in the Data" loading="lazy"></a>
+      <figcaption>Slide 29</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rv-n">Window (days): <b id="rv-n-v"></b></label><input type="range" id="rv-n" min="10" max="250" step="1" value="63"></div><button class="btn play" id="rv-play" type="button"></button></div><div class="charts "><div class="chart" id="rv-chart"></div></div><ul class="out" id="rv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> What happened to EUR/RON volatility after June 2013?</div>
+  <details><summary>Answer</summary><p>It fell sharply, under the managed float of the BNR. The mean 63-day volatility drops from 5.8% before July 2013 to 2.0% after; the variance-break test dates the change on 27 June 2013.</p></details>
+</section>
+<section class="blk" id="aggregation">
+  <h3>Fact 4: Aggregational Gaussianity</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch1_aggregation_kurtosis_en.jpg" alt="Slide 31: Fact 4: Aggregational Gaussianity" loading="lazy"></a>
+      <figcaption>Slide 31</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ag-a">Market in the histogram</label><select id="ag-a"><option value="sp500" selected>S&amp;P 500</option><option value="bettr">BET-TR</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option><option value="gold">Gold</option></select></div><div class="ctl"><label for="ag-h">Horizon h (days): <b id="ag-h-v"></b></label><input type="range" id="ag-h" min="0" max="8" step="1" value="6"></div><button class="btn play" id="ag-play" type="button"></button></div><div class="charts "><div class="chart" id="ag-k"></div><div class="chart" id="ag-hist"></div></div><ul class="out" id="ag-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Do 60-day returns reach the Normal distribution?</div>
+  <details><summary>Answer</summary><p>Only on some markets. At h = 60, the excess kurtosis falls from 10.9 to 1.6 for the S&amp;P 500 (n<sub>h</sub> = 154, z = 4.1) and from 12.0 to 0.1 for Bitcoin (z = 0.1). Normality is still rejected for the S&amp;P 500, BET-TR (z = 3.0) and EUR/RON (z = 20).</p></details>
+</section>
+<section class="blk" id="leverage">
+  <h3>Fact 9: The Leverage Effect</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=34" target="_blank" rel="noopener"><img src="slides/ch1_leverage_en.jpg" alt="Slide 33: Fact 9: The Leverage Effect" loading="lazy"></a>
+      <figcaption>Slide 33</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="lv-a">Market</label><select id="lv-a"><option value="sp500" selected>S&amp;P 500</option><option value="bettr">BET-TR</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option><option value="gold">Gold</option></select></div><div class="ctl"><label for="lv-k">Lag k (days): <b id="lv-k-v"></b></label><input type="range" id="lv-k" min="1" max="20" step="1" value="1"></div><button class="btn play" id="lv-play" type="button"></button></div><div class="charts "><div class="chart" id="lv-bar"></div><div class="chart" id="lv-bin"></div></div><ul class="out" id="lv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Does S&amp;P 500 volatility rise more after falls than after rises?</div>
+  <details><summary>Answer</summary><p>Yes. L(1) = −0.12, with z = −4.6 using the robust standard error, and it is still −0.07 at k = 10. After the worst 5% of days, |r<sub>t+1</sub>| averages 1.40%; after the best 5%, only 1.04%. On EUR/RON the effect is reversed: L(1) = +0.10 (z = 2.7).</p></details>
+</section>
+<section class="blk" id="volume">
+  <h3>Fact 10: Volume and Volatility Move Together</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch1_volume_volatility_en.jpg" alt="Slide 36: Fact 10: Volume and Volatility Move Together" loading="lazy"></a>
+      <figcaption>Slide 36</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vv-a">Market</label><select id="vv-a"><option value="sp500" selected>S&amp;P 500</option><option value="btc">Bitcoin</option></select></div><div class="ctl"><label for="vv-w">Window of the volume mean (days): <b id="vv-w-v"></b></label><input type="range" id="vv-w" min="20" max="500" step="10" value="250"></div><button class="btn play" id="vv-play" type="button"></button></div><div class="charts "><div class="chart" id="vv-chart"></div></div><ul class="out" id="vv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Are days with unusually high volume also days with large price moves?</div>
+  <details><summary>Answer</summary><p>Yes. The Spearman correlation between abnormal volume and |r<sub>t</sub>| is 0.25 for the S&amp;P 500, interval [0.22, 0.28], and 0.39 for Bitcoin, interval [0.34, 0.44]. For Bitcoin, the volume reported by exchanges includes wash trading.</p></details>
+</section><h2 class="sec" id="s-pers">Persistence and the Limits of Inference</h2>
+<section class="blk" id="acf-abs">
+  <h3>Fact 8: Slow Decay of the ACF of |rₜ|</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=39" target="_blank" rel="noopener"><img src="slides/ch1_acf_abs_assets_en.jpg" alt="Slide 38: Fact 8: Slow Decay of the ACF of |rₜ|" loading="lazy"></a>
+      <figcaption>Slide 38</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="aa-a">Reference curves for</label><select id="aa-a"><option value="sp500" selected>S&amp;P 500</option><option value="bettr">BET-TR</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option><option value="gold">Gold</option></select></div><div class="ctl"><label for="aa-d">Memory parameter d: <b id="aa-d-v"></b></label><input type="range" id="aa-d" min="0.01" max="0.49" step="0.01" value="0.3"></div><button class="btn play" id="aa-play" type="button"></button></div><div class="charts "><div class="chart" id="aa-chart"></div></div><ul class="out" id="aa-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Does the slow decay of the ACF of |r<sub>t</sub>| prove long memory?</div>
+  <details><summary>Answer</summary><p>No. For the S&amp;P 500 the ACF is 0.27 at lag 1, 0.22 at lag 20 and still 0.09 at lag 100, far above an exponential decay. Structural breaks in the level of volatility produce the same pattern, though; the semiparametric estimators give d̂ between 0.35 and 0.50.</p></details>
+</section>
+<section class="blk" id="taylor">
+  <h3>The Taylor Effect</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=43" target="_blank" rel="noopener"><img src="slides/ch1_taylor_effect_en.jpg" alt="Slide 42: The Taylor Effect" loading="lazy"></a>
+      <figcaption>Slide 42</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ty-a">Market</label><select id="ty-a"><option value="sp500" selected>S&amp;P 500</option><option value="bettr">BET-TR</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option><option value="gold">Gold</option></select></div><div class="ctl"><label for="ty-k">Lag k (days): <b id="ty-k-v"></b></label><input type="range" id="ty-k" min="1" max="100" step="1" value="1"></div><button class="btn play" id="ty-play" type="button"></button></div><div class="charts "><div class="chart" id="ty-c"></div><div class="chart" id="ty-m"></div></div><ul class="out" id="ty-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For which power δ is the autocorrelation of |r<sub>t</sub>|<sup>δ</sup> highest on the S&amp;P 500?</div>
+  <details><summary>Answer</summary><p>Below 2 at every lag: δ = 1.75 at lag 1, 1.5 at lag 5 and 1.25 at lag 20. The peak moves towards 1 as the lag grows, but at lag 1 it is closer to 2 than to 1. The position of the peak has no standard error, so the comparison with δ = 1 is descriptive.</p></details>
+</section><h2 class="sec" id="s-ohlc">Volatility from Open, High, Low and Close</h2>
+<section class="blk" id="ohlc">
+  <h3>Open, High, Low and Close (OHLC) Prices of One Day</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch1_sem_a8_ohlc_en.jpg" alt="Slide 47: Open, High, Low and Close (OHLC) Prices of One Day" loading="lazy"></a>
+      <figcaption>Slide 47</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="oh-m">Minute of the day: <b id="oh-m-v"></b></label><input type="range" id="oh-m" min="0" max="389" step="1" value="389"></div><button class="btn play" id="oh-play" type="button"></button><button class="btn" id="oh-new" type="button">Another simulated day</button></div><div class="charts "><div class="chart" id="oh-chart"></div></div><ul class="out" id="oh-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On a given day the close equals the open. Does the range of the day say anything about volatility?</div>
+  <details><summary>Answer</summary><p>Yes. The intraday return is zero, but the range h<sub>t</sub> − l<sub>t</sub> stays large if the price swung widely. For a Brownian motion, E[(h<sub>t</sub> − l<sub>t</sub>)<sup>2</sup>] = 4 ln 2 · σ<sup>2</sup>, and the Parkinson estimator has an efficiency of about 5 relative to close-to-close.</p></details>
+</section>
+<section class="blk" id="vol-estimators">
+  <h3>Volatility Estimators on the S&P 500</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch1_vol_estimators_en.jpg" alt="Slide 50: Volatility Estimators on the S&P 500" loading="lazy"></a>
+      <figcaption>Slide 50</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ve-n">Window (days): <b id="ve-n-v"></b></label><input type="range" id="ve-n" min="5" max="126" step="1" value="21"></div><div class="ctl"><label for="ve-p">Period shown</label><select id="ve-p"><option value="covid" selected>2019-07 – 2021-06</option><option value="gfc">2008 – 2009</option><option value="all">2008 – 2026</option></select></div><button class="btn play" id="ve-play" type="button"></button></div><div class="charts "><div class="chart" id="ve-ts"></div><div class="chart" id="ve-sm"></div></div><ul class="out" id="ve-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Why do the range-based estimators give lower volatilities than close-to-close on the S&amp;P 500?</div>
+  <details><summary>Answer</summary><p>Because they miss the overnight jumps. On 21-day windows, 2008–2026, the mean is 16.4% for close-to-close, 13.9% for Yang–Zhang, 13.0% for Parkinson, 12.4% for Garman–Klass and 12.3% for Rogers–Satchell. The range-based series are 3–4 times smoother, but this does not prove efficiency.</p></details>
+</section><h2 class="sec" id="s-risk">Performance and Drawdowns</h2>
+<section class="blk" id="drawdowns">
+  <h3>Drawdowns Across Markets</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=54" target="_blank" rel="noopener"><img src="slides/ch1_drawdowns_en.jpg" alt="Slide 53: Drawdowns Across Markets" loading="lazy"></a>
+      <figcaption>Slide 53</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="dd-t">Up to month: <b id="dd-t-v"></b></label><input type="range" id="dd-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="dd-play" type="button"></button></div><div class="charts "><div class="chart" id="dd-chart"></div></div><ul class="out" id="dd-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> What gain is needed to recover the S&amp;P 500 drawdown of 2007–2009?</div>
+  <details><summary>Answer</summary><p>+131%. The index fell from 1,565.15 (9 October 2007) to 676.53 (9 March 2009), i.e. by 56.8%, and after a fall x, regaining the peak requires a gain of 1/(1 − x) − 1.</p></details>
+</section>
+<section class="blk" id="risk-return">
+  <h3>Risk and Return Across Markets</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch1_risk_return_en.jpg" alt="Slide 57: Risk and Return Across Markets" loading="lazy"></a>
+      <figcaption>Slide 57</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rr-y">Common start of the samples: <b id="rr-y-v"></b></label><input type="range" id="rr-y" min="1990" max="2022" step="1" value="1990"></div><button class="btn play" id="rr-play" type="button"></button></div><div class="charts "><div class="chart" id="rr-chart"></div></div><ul class="out" id="rr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Does the chart show that BET-TR was the best investment of the five?</div>
+  <details><summary>Answer</summary><p>No. The periods differ, and with r<sub>f</sub> = 0 the BET-TR Sharpe ratio (1.34, SE 0.29) is overstated: the index includes dividends and is in lei, with interest rates far above those in USD. With a common start in 2015, the Sharpe ratio is 1.38 for BET-TR, 1.05 for Bitcoin and 0.72 for the S&amp;P 500, but the standard errors are about 0.3, so the ranking is not reliable.</p></details>
+</section><h2 class="sec" id="s-cs">Case Study: Volatility Is (Mostly) Path-Dependent</h2>
+<section class="blk" id="path-vol">
+  <h3>Case Study (3/4): Observed VIX and VIX Fitted from S&P 500 Returns</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter1_stylised_facts.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch1_cs_pdv_vix_en.jpg" alt="Slide 61: Case Study (3/4): Observed VIX and VIX Fitted from S&P 500 Returns" loading="lazy"></a>
+      <figcaption>Slide 61</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pv-L">Days of returns used: <b id="pv-L-v"></b></label><input type="range" id="pv-L" min="0" max="9" step="1" value="9"></div><button class="btn play" id="pv-play" type="button"></button></div><div class="charts "><div class="chart" id="pv-v"></div><div class="chart" id="pv-r"></div></div><ul class="out" id="pv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> How much of the VIX do past S&amp;P 500 returns alone explain?</div>
+  <details><summary>Answer</summary><p>On the course data, R<sup>2</sup> = 0.947 in training (2000–2018) and 0.863 in the test (2019 – May 2022), with RMSE 0.020 and 0.034. The last 5 days carry 20% of the weight of the volatility kernel, and lags beyond 250 days still 10%.</p></details>
+</section>
+<p class="src foot">Daily closing prices up to 18 September 2026: S&amp;P 500, BET-TR, Bitcoin, spot gold and VIX from EODHD; EUR/RON: the BNR reference rate. Log returns, each series on its own calendar.</p>
+</main>
+</body>
+</html>

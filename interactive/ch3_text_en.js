@@ -1,0 +1,25 @@
+// Readouts of the Chapter 3 interactive page, written by latex/build_interactive_ch3.py.
+window.CH3_TEXT = {
+ play: 'Play', pause: 'Pause',
+ fr: (d, m, s, sr, spy, sh) => `Sample 1999-01 – ${d}: the tangency portfolio has a mean of ${m}, a volatility of ${s} and a Sharpe ratio of ${sr}; SPY has a Sharpe ratio of ${spy}. Short positions: ${sh}.`,
+ fr0: d => `Sample 1999-01 – ${d}: there is no tangency portfolio with a positive Sharpe ratio.`,
+ xk1: (a, b, sc, sw, L, sn, t) => `Annual alpha ${a}, beta ${b}. Standard error of beta: ${sc} classical, ${sw} White, ${sn} Newey–West with L = ${L}; t(alpha) = ${t}.`,
+ xk2: (bl, lo, hi, bs, sn) => `Bootstrap with blocks of ${bl} months, 2000 resamples: the 95% interval for alpha is [${lo}, ${hi}], bootstrap SE ${bs} (Newey–West: ${sn}).`,
+ dm: (p, b, b0, bm, bd) => `The stock trades on ${p} of the days, true beta ${b}. Slope on the previous day: ${bm}; on the same day: ${b0}; Dimson beta: ${bd}.`,
+ days: w => `${w} days`,
+ months: n => `${n} months`,
+ rb: w => `Window of ${w} days: minimum and maximum beta and the last value.`,
+ rbRow: (s, lo, hi, l) => `${s}: between ${lo} and ${hi}; at the end of the sample ${l}.`,
+ pg: (p, n, mg, ag, mv, av, ns) => `${p} (${n}): small growth has a mean of ${mg} and an alpha of ${ag}; small value has a mean of ${mv} and an alpha of ${av}. ${ns} of the 25 alphas have |t| > 1.96.`,
+ sm1: (p, n, pr, sl, b0, b1) => `${p}, T = ${n}: CAPM slope (market premium) ${pr}, slope of the fitted line ${sl} a year. Betas: ${b0}–${b1}.`,
+ sm2: (w, p, ns) => `GRS = ${w}, p = ${p}; ${ns} of the 25 alphas have |t| > 1.96.`,
+ fc: (p, l) => `${p}, final value of one unit and mean annual return: ${l}.`,
+ fcItem: (c, v, m) => `${c} ${v} (${m})`,
+ fmSE: { sh: 'Shanken', fm: 'Fama–MacBeth', nw: 'Newey–West' },
+ fm: (p, se, mk, mkm, h, hm, b0, b1) => `${p}, intervals with ${se} errors. FF3: market premium ${mk}, factor mean ${mkm}; HML: premium ${h}, factor mean ${hm}. Market betas in FF3: ${b0}–${b1}.`,
+ fmCapm: (c, cs, m, ms) => `CAPM: intercept ${c} (SE ${cs}), market premium ${m} (SE ${ms}).`,
+ pc: (p, n, s1, s2, s3, c3, r) => `${p} (${n}): PC1 explains ${s1} of the variance, PC2 ${s2}, PC3 ${s3}; the first three ${c3}. Correlation of PC1 with SPY: ${r}.`,
+ fe: (d0, d1, l) => `From ${d0} to ${d1}, CAGR: ${l}.`,
+ ai1: (pub, a, ta, b2, t2, dec, inc, ti) => `Assumed publication in ${pub}. MOM: in-sample mean ${a} a month (t = ${ta}); decline after publication b₂ = ${b2} (t = ${t2}), i.e. ${dec} of the mean; incremental effect b₂ − b₁ = ${inc} (t = ${ti}).`,
+ ai2: (b, t) => `Placebo Mkt-RF: b₂ = ${b} (t = ${t}).`
+};
