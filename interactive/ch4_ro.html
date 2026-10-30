@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch4_data.js?v=20261029b"></script>
-<script src="ch4_text_ro.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch4.js?v=20261029b" defer></script>
+<script src="ch4_data.js?v=20261030a"></script>
+<script src="ch4_text_ro.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch4.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
-<p class="toc"><a href="#s-mv">Optimizarea medie–varianță</a> · <a href="#s-est">Riscul de estimare</a> · <a href="#s-shr">Shrinkage al covarianței</a> · <a href="#s-bl">Black–Litterman</a> · <a href="#s-rp">Risk parity și Hierarchical Risk Parity</a> · <a href="#s-oos">Evaluarea out-of-sample</a> · <a href="#s-bvb">Un portofoliu de blue chips BVB</a></p>
+<p class="toc"><a href="#s-mv">Optimizarea medie–varianță</a> · <a href="#s-est">Riscul de estimare</a> · <a href="#s-shr">Shrinkage al covarianței</a> · <a href="#s-bl">Black–Litterman</a> · <a href="#s-rp">Risk parity și Hierarchical Risk Parity</a> · <a href="#s-oos">Evaluarea out-of-sample</a> · <a href="#s-bvb">Un portofoliu de blue chips BVB</a> · <a href="#s-cs">Studii de caz: frontiera implementabilă și portofoliile gestionate după volatilitate</a></p>
 <h2 class="sec" id="s-mv">Optimizarea medie–varianță</h2>
 <section class="blk" id="two-asset">
   <h3>Două active: efectul corelației asupra diversificării</h3>
@@ -42,8 +42,8 @@
       <figcaption>Slide-ul 7</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ta-rho">Corelația SPY–TLT: <b id="ta-rho-v"></b></label><input type="range" id="ta-rho" min="-1" max="1" step="0.05" value="-0.1"></div><div class="ctl"><label for="ta-w">Ponderea SPY: <b id="ta-w-v"></b></label><input type="range" id="ta-w" min="0" max="1" step="0.01" value="0.46"></div><button class="btn play" id="ta-play" type="button"></button></div><div class="charts "><div class="chart" id="ta-chart"></div></div><ul class="out" id="ta-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Volatilitățile anuale sînt 14,7% pentru SPY și 13,5% pentru TLT. Poate o combinație a lor să aibă o volatilitate sub 10%?</div>
-  <details><summary>Răspuns</summary><p>Da. Cu o corelație de −0,10, portofoliul de varianță minimă are 46% în SPY și o volatilitate de 9,4%. Volatilitatea portofoliului este media ponderată a volatilităților doar cînd corelația este 1.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Volatilitățile anuale sînt 14,7% pentru SPY și 13,5% pentru TLT. Butonul ▶ scade corelația dintre ele de la 1 la −1. Cum se schimbă volatilitatea portofoliului de varianță minimă?</div>
+  <details><summary>Răspuns</summary><p>Scade de la 13,5% pînă la zero. La corelația 1, portofoliul de varianță minimă este numai TLT; sub corelația 0,92 (raportul 13,5/14,7) include și SPY. La corelația estimată, −0,10, are 46% în SPY și o volatilitate de 9,4%. La −1, cu 48% în SPY, volatilitatea este zero. Volatilitatea portofoliului este media ponderată a volatilităților doar cînd corelația este 1.</p></details>
 </section>
 <section class="blk" id="frontier">
   <h3>Frontiera sectoarelor din SUA</h3>
@@ -52,8 +52,8 @@
       <figcaption>Slide-ul 11</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="fr-n">Sectoare incluse: <b id="fr-n-v"></b></label><input type="range" id="fr-n" min="2" max="9" step="1" value="9"></div><button class="btn play" id="fr-play" type="button"></button></div><div class="charts "><div class="chart" id="fr-chart"></div><div class="chart" id="fr-w"></div></div><ul class="out" id="fr-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Deține portofoliul tangent fiecare sector care are un randament mediu pozitiv?</div>
-  <details><summary>Răspuns</summary><p>Nu. Cu vînzări în lipsă permise, portofoliul tangent este short pe XLB și XLF, deși ambele au medii pozitive. XLB are corelația 0,85 cu XLI, iar XLF are cel mai mic raport Sharpe. Restricția long-only scade raportul Sharpe de la 0,66 la 0,61.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cu vînzări în lipsă permise, deține portofoliul tangent o poziție long în fiecare sector cu randament mediu pozitiv?</div>
+  <details><summary>Răspuns</summary><p>Nu. Portofoliul tangent este short pe XLF (−37%) și XLB (−21%), deși ambele au medii pozitive. Semnul unei ponderi depinde de întregul vector al mediilor și de covarianțe: corelația 0,85 a lui XLB cu XLI sau raportul Sharpe mic al lui XLF nu îl explică singure. Restricția long-only scade raportul Sharpe de la 0,66 la 0,61.</p></details>
 </section><h2 class="sec" id="s-est">Riscul de estimare</h2>
 <section class="blk" id="estimation-error">
   <h3>Maximizarea erorii: frontiere estimate față de frontiere realizate</h3>
@@ -63,7 +63,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ee-T">Lungimea eșantionului (luni)</label><select id="ee-T"><option value="36">36</option><option value="60" selected>60</option><option value="120">120</option><option value="240">240</option></select></div><div class="ctl"><label for="ee-k">Eșantioane desenate: <b id="ee-k-v"></b></label><input type="range" id="ee-k" min="1" max="25" step="1" value="25"></div><button class="btn play" id="ee-play" type="button"></button><button class="btn" id="ee-new" type="button">Alte eșantioane</button></div><div class="charts "><div class="chart" id="ee-chart"></div><div class="chart" id="ee-hist"></div></div><ul class="out" id="ee-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cu 60 de luni de date, cît de des depășește portofoliul tangent estimat regula 1/N?</div>
-  <details><summary>Răspuns</summary><p>În aproximativ 4% dintre eșantioane. Mediana raportului Sharpe realizat este 0,30, față de 0,54 pentru 1/N, iar mediana raportului Sharpe estimat în eșantion este 1,56.</p></details>
+  <details><summary>Răspuns</summary><p>În aproximativ 4% dintre eșantioane. În simularea din pagină, 18 dintre cele 500 de portofolii (3,6%) depășesc 1/N; în cea din curs, cu 2.000 de portofolii, 4%. Mediana raportului Sharpe evaluat cu parametrii adevărați este 0,30, față de 0,54 pentru 1/N. Mediana raportului Sharpe estimat în eșantion este 1,51 în pagină și 1,56 în curs.</p></details>
 </section>
 <section class="blk" id="rolling-weights">
   <h3>Ponderi instabile</h3>
@@ -73,7 +73,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="rw-t">Luna: <b id="rw-t-v"></b></label><input type="range" id="rw-t" min="0" max="270" step="1" value="270"></div><button class="btn play" id="rw-play" type="button"></button></div><div class="charts "><div class="chart" id="rw-w"></div><div class="chart" id="rw-g"></div></div><ul class="out" id="rw-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît de mari devin ponderile medie–varianță estimate lunar pe ultimele 60 de luni?</div>
-  <details><summary>Răspuns</summary><p>Mediana expunerii brute (suma valorilor absolute ale ponderilor) este 4,9 pentru MV și 1,5 pentru GMV-LW. Cea mai mare pondere MV, în valoare absolută, este 26; în 90% dintre luni expunerea brută MV depășește 3.</p></details>
+  <details><summary>Răspuns</summary><p>În iulie 2026, ultima lună, expunerea brută (suma valorilor absolute ale ponderilor) este 7,1 pentru MV și 1,9 pentru GMV-LW: shrinkage nu elimină pozițiile short. Pe toată perioada, medianele sînt 4,9 pentru MV și 1,5 pentru GMV-LW. Cea mai mare pondere MV, în valoare absolută, este 26; în 90% dintre luni expunerea brută MV depășește 3.</p></details>
 </section>
 <section class="blk" id="window-length">
   <h3>Lungimea ferestrei necesară pentru a depăși 1/N</h3>
@@ -82,8 +82,8 @@
       <figcaption>Slide-ul 20</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="wl-t">Fereastra T (luni): <b id="wl-t-v"></b></label><input type="range" id="wl-t" min="0" max="7" step="1" value="1"></div><button class="btn play" id="wl-play" type="button"></button></div><div class="charts "><div class="chart" id="wl-chart"></div><div class="chart" id="wl-hist"></div></div><ul class="out" id="wl-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cîte luni de date sînt necesare ca portofoliul medie–varianță estimat să depășească 1/N?</div>
-  <details><summary>Răspuns</summary><p>În simulare, mediana raportului Sharpe MV depășește valoarea 1/N (0,54) abia la T = 480 de luni, adică 40 de ani. GMV și ERC trec de 1/N mult mai devreme, pentru că nu folosesc mediile estimate.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care este prima fereastră testată la care mediana raportului Sharpe MV depășește 1/N în această simulare?</div>
+  <details><summary>Răspuns</summary><p>Dintre ferestrele testate, prima este de 480 de luni: mediana raportului Sharpe MV este 0,55, față de 0,54 pentru 1/N; la 240 de luni este încă 0,48. GMV trece de 1/N de la 120 de luni, iar ERC este peste 1/N la toate ferestrele, pentru că nu folosesc mediile estimate.</p></details>
 </section><h2 class="sec" id="s-shr">Shrinkage al covarianței</h2>
 <section class="blk" id="noise-band">
   <h3>Valorile proprii de eșantion și banda de zgomot</h3>
@@ -93,7 +93,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="mp-src">Date</label><select id="mp-src"><option value="Combined" selected>Combinat (N = 16)</option><option value="Sectors">Sectoare (N = 9)</option><option value="noise">Zgomot pur, N = 16</option></select></div><div class="ctl"><label for="mp-T">T pentru zgomot: <b id="mp-T-v"></b></label><input type="range" id="mp-T" min="20" max="400" step="10" value="60"></div><button class="btn play" id="mp-play" type="button"></button></div><div class="charts "><div class="chart" id="mp-chart"></div></div><ul class="out" id="mp-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cîte dintre cele 16 valori proprii ale matricei de corelație se află deasupra benzii Marchenko–Pastur?</div>
-  <details><summary>Răspuns</summary><p>Una singură, factorul comun al pieței, care explică 56% din varianța totală. Celelalte 15 sînt în banda pe care o produce și zgomotul pur cu același raport N/T.</p></details>
+  <details><summary>Răspuns</summary><p>Una singură, 9,02: factorul comun al pieței, care explică 56% din varianța totală. Pentru N = 16 și T = 60, banda este [0,23; 2,30]. O singură valoare proprie depășește limita superioară; nouă sînt în bandă, iar șase sînt sub limita inferioară.</p></details>
 </section>
 <section class="blk" id="shrinkage">
   <h3>Shrinkage pe sectoarele din SUA</h3>
@@ -103,7 +103,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="sh-d">Intensitatea δ: <b id="sh-d-v"></b></label><input type="range" id="sh-d" min="0" max="1" step="0.05" value="0.25"></div><button class="btn play" id="sh-play" type="button"></button></div><div class="charts three"><div class="chart" id="sh-ev"></div><div class="chart" id="sh-w"></div><div class="chart" id="sh-roll"></div></div><ul class="out" id="sh-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce se întîmplă cu valorile proprii extreme cînd δ crește?</div>
-  <details><summary>Răspuns</summary><p>Valorile proprii mari scad și cele mici cresc, deci numărul de condiționare scade (de la 52 la 32 pentru δ = 0,24, valoarea Ledoit–Wolf pe ultimele 60 de luni). Ponderile GMV devin mai puțin extreme.</p></details>
+  <details><summary>Răspuns</summary><p>Cea mai mică valoare proprie crește (de la 0,0036 la 0,0058 pentru δ = 0,25), iar numărul de condiționare scade de la 52 la 32,1. Intensitatea Ledoit–Wolf estimată pe ultimele 60 de luni este 0,24, pentru care numărul de condiționare este 32,5. Cea mai mare valoare proprie aproape nu se schimbă (de la 0,1861 la 0,1871). Nici la δ = 1 valorile proprii nu devin egale: ținta cu corelație constantă are numărul de condiționare 21. Ponderile GMV devin mai puțin extreme.</p></details>
 </section><h2 class="sec" id="s-bl">Black–Litterman</h2>
 <section class="blk" id="black-litterman">
   <h3>Black–Litterman pe sectoarele din SUA</h3>
@@ -113,7 +113,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="bl-q">Opinia XLK − XLU, pe an: <b id="bl-q-v"></b></label><input type="range" id="bl-q" min="-5" max="10" step="0.5" value="3"></div><div class="ctl"><label for="bl-c">Incertitudinea opiniei, Ω: <b id="bl-c-v"></b></label><input type="range" id="bl-c" min="-2" max="2" step="0.1" value="0"></div><button class="btn play" id="bl-play" type="button"></button></div><div class="charts "><div class="chart" id="bl-mu"></div><div class="chart" id="bl-w"></div></div><ul class="out" id="bl-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Opinia este că XLK depășește XLU cu 3% pe an. Cum se schimbă ponderile celorlalte șapte sectoare?</div>
-  <details><summary>Răspuns</summary><p>Nu se schimbă. Ponderea XLK crește și ponderea XLU scade cu aceeași cantitate, 3,3 puncte procentuale. Mediile celorlalte sectoare se modifică prin corelațiile cu XLK și XLU, dar ponderile lor rămîn 1/N.</p></details>
+  <details><summary>Răspuns</summary><p>Nu se schimbă. Ponderea XLK crește și ponderea XLU scade cu aceeași cantitate, 3,3 puncte procentuale. Diferența a posteriori XLK − XLU este 2,6% pe an, între media a priori de 2,2% și opinia de 3%. Mediile celorlalte sectoare se modifică prin corelațiile cu XLK și XLU, dar ponderile lor rămîn 1/N.</p></details>
 </section><h2 class="sec" id="s-rp">Risk parity și Hierarchical Risk Parity</h2>
 <section class="blk" id="risk-contributions">
   <h3>Ponderi și contribuții la risc</h3>
@@ -123,7 +123,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="rc-k">Iterația ERC: <b id="rc-k-v"></b></label><input type="range" id="rc-k" min="0" max="30" step="1" value="0"></div><button class="btn play" id="rc-play" type="button"></button></div><div class="charts "><div class="chart" id="rc-it"></div><div class="chart" id="rc-st"></div></div><ul class="out" id="rc-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În portofoliul 1/N, acțiunile și obligațiunile high yield au jumătate din capital. Ce parte din risc generează?</div>
-  <details><summary>Răspuns</summary><p>69%. Contribuțiile egale la risc (ERC) mută capital spre titlurile de stat: IEF primește 25%, iar contribuția fiecărui activ la risc devine 12,5%.</p></details>
+  <details><summary>Răspuns</summary><p>69%. Dacă se folosesc numai varianțele individuale, fără covarianțe, partea lor ar fi 64%. Contribuțiile egale la risc (ERC) mută capital spre titlurile de stat: IEF primește 25,1%, iar contribuția fiecărui activ la risc devine 12,5%.</p></details>
 </section>
 <section class="blk" id="hrp">
   <h3>HRP pe 16 ETF-uri</h3>
@@ -133,7 +133,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="hrp-s">Pasul: <b id="hrp-s-v"></b></label><input type="range" id="hrp-s" min="1" max="6" step="1" value="1"></div><button class="btn play" id="hrp-play" type="button"></button></div><div class="charts "><div class="chart" id="hrp-heat"></div><div class="chart" id="hrp-w"></div></div><ul class="out" id="hrp-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> De ce HRP nu inversează matricea de covarianță?</div>
-  <details><summary>Răspuns</summary><p>HRP ordonează activele după arborele de corelații și împarte ponderile recursiv, după varianța fiecărui grup. Folosește doar varianțe de grup, deci evită inversarea, care amplifică erorile de estimare. GMV long-only pune ponderi nenule pe doar 5 dintre cele 16 ETF-uri.</p></details>
+  <details><summary>Răspuns</summary><p>HRP ordonează activele după arborele de corelații, calculează varianța fiecărui portofoliu de grup cu ponderi inverse varianței individuale și împarte recursiv capitalul între grupuri. Covarianțele intră în calculul acestor varianțe, fără inversarea matricei, care amplifică erorile de estimare. GMV long-only pune ponderi nenule pe doar 5 dintre cele 16 ETF-uri.</p></details>
 </section><h2 class="sec" id="s-oos">Evaluarea out-of-sample</h2>
 <section class="blk" id="oos-growth">
   <h3>Evoluția averii out-of-sample: multi-active</h3>
@@ -143,7 +143,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ow-u">Universul</label><select id="ow-u"><option value="Sectors">Sectoare</option><option value="Multi-asset" selected>Multi-active</option><option value="Combined">Combinat</option></select></div><div class="ctl"><label for="ow-c">Costuri: <b id="ow-c-v"></b></label><input type="range" id="ow-c" min="0" max="50" step="5" value="0"></div><div class="ctl"><label for="ow-t">Pînă în luna: <b id="ow-t-v"></b></label><input type="range" id="ow-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="ow-play" type="button"></button></div><div class="charts "><div class="chart" id="ow-chart"></div></div><ul class="out" id="ow-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care regulă are cel mai mare raport Sharpe out-of-sample în universul multi-active?</div>
-  <details><summary>Răspuns</summary><p>MV-LO, cu 0,80, urmată de 1/N cu 0,52 și ERC cu 0,49. MV fără restricții are −0,22 și turnover lunar mediu de 44.</p></details>
+  <details><summary>Răspuns</summary><p>MV-LO, cu 0,80, urmată de 1/N cu 0,52 și ERC cu 0,49. MV fără restricții este lichidată în septembrie 2025, după o pierdere lunară de peste 100%: averea ei ajunge la zero, deci nu intră în clasament.</p></details>
 </section>
 <section class="blk" id="oos-sharpe">
   <h3>Rapoartele Sharpe în cele trei universuri</h3>
@@ -153,7 +153,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="os-y">Evaluarea începe în: <b id="os-y-v"></b></label><input type="range" id="os-y" min="0" max="15" step="1" value="0"></div><button class="btn play" id="os-play" type="button"></button></div><div class="charts "><div class="chart" id="os-chart"></div></div><ul class="out" id="os-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Rămîne ordinea regulilor aceeași dacă evaluarea începe mai tîrziu?</div>
-  <details><summary>Răspuns</summary><p>Nu. Diferențele dintre 1/N, ERC, HRP și variantele long-only sînt mici și se schimbă cu perioada de evaluare; MV fără restricții rămîne ultimul.</p></details>
+  <details><summary>Răspuns</summary><p>Nu. Ordinea depinde de perioada evaluată. Pe sectoare, HRP depășește 1/N cînd evaluarea începe în 2004 (0,70 față de 0,66), dar rămîne sub 1/N cînd începe în 2019 (0,79 față de 0,80). MV fără restricții lipsește din grafic: averea ei ajunge la zero în toate cele trei universuri.</p></details>
 </section>
 <section class="blk" id="costs">
   <h3>Rapoartele Sharpe după costuri</h3>
@@ -162,18 +162,18 @@
       <figcaption>Slide-ul 45</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="co-u">Universul</label><select id="co-u"><option value="Sectors">Sectoare</option><option value="Multi-asset">Multi-active</option><option value="Combined" selected>Combinat</option></select></div><div class="ctl"><label for="co-c">Cost pe unitate de turnover: <b id="co-c-v"></b></label><input type="range" id="co-c" min="0" max="100" step="5" value="10"></div><button class="btn play" id="co-play" type="button"></button></div><div class="charts "><div class="chart" id="co-chart"></div><div class="chart" id="co-to"></div></div><ul class="out" id="co-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La ce cost pe unitate de turnover pierde MV fără restricții tot raportul Sharpe în universul combinat?</div>
-  <details><summary>Răspuns</summary><p>Raportul Sharpe MV este 0,11 fără costuri și −0,51 la 50 bp, pentru că turnover-ul lunar mediu este 22. Regula 1/N trece de la 0,76 la 0,75.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La ce cost pe unitate de turnover devine negativ raportul Sharpe net al lui GMV în universul combinat?</div>
+  <details><summary>Răspuns</summary><p>La circa 29 bp: costul mediu lunar egalează atunci media randamentului brut în exces al GMV, care tranzacționează în medie 24% din avere pe lună, astfel încît Sharpe-ul net ajunge la zero. GMV-LW trece sub zero la circa 58 bp, iar MV-LO coboară sub 1/N la circa 22 bp. 1/N scade doar de la 0,76 la 0,75 la 50 bp. MV lipsește: este lichidată în ianuarie 2023.</p></details>
 </section>
 <section class="blk" id="sharpe-test">
   <h3>Testul diferenței de Sharpe față de 1/N</h3>
   <div class="pair">
     <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol4_optimizarea_portofoliului.pdf#page=50" target="_blank" rel="noopener"><img src="slides/ch4_sharpe_test_ro.jpg" alt="Slide-ul 49: Testul diferenței de Sharpe față de 1/N" loading="lazy"></a>
       <figcaption>Slide-ul 49</figcaption></figure>
-    <div class="live"><div class="ctls"><div class="ctl"><label for="st-p">Comparația</label><select id="st-p"><option value="Sectors|GMV-LW" selected>Sectoare: GMV-LW − 1/N</option><option value="Multi-asset|ERC">Multi-active: ERC − 1/N</option><option value="Multi-asset|MV">Multi-active: MV − 1/N</option><option value="Combined|MV-LO">Combinat: MV-LO − 1/N</option></select></div><div class="ctl"><label for="st-m">Extrageri bootstrap: <b id="st-m-v"></b></label><input type="range" id="st-m" min="50" max="2000" step="50" value="2000"></div><button class="btn play" id="st-play" type="button"></button></div><div class="charts "><div class="chart" id="st-chart"></div></div><ul class="out" id="st-out"></ul></div>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="st-p">Comparația</label><select id="st-p"><option value="Sectors|GMV-LW" selected>Sectoare: GMV-LW − 1/N</option><option value="Multi-asset|ERC">Multi-active: ERC − 1/N</option><option value="Combined|GMV-LW">Combinat: GMV-LW − 1/N</option><option value="Combined|MV-LO">Combinat: MV-LO − 1/N</option></select></div><div class="ctl"><label for="st-m">Extrageri bootstrap: <b id="st-m-v"></b></label><input type="range" id="st-m" min="50" max="2000" step="50" value="2000"></div><button class="btn play" id="st-play" type="button"></button></div><div class="charts "><div class="chart" id="st-chart"></div></div><ul class="out" id="st-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Este diferența dintre GMV-LW și 1/N pe sectoare semnificativă?</div>
-  <details><summary>Răspuns</summary><p>Nu. Diferența rapoartelor Sharpe este −0,02, cu p = 0,93 (HAC) și p = 0,94 (bootstrap). Niciuna dintre regulile estimate nu bate 1/N semnificativ în cele trei universuri.</p></details>
+  <details><summary>Răspuns</summary><p>Nu. Diferența rapoartelor Sharpe este −0,02, cu p = 0,93 (HAC) și p = 0,94 (bootstrap). Un p-value mare nu este probabilitatea ca diferența să fie reală. Histograma arată diferențe bootstrap centrate; p-value-ul raportat provine din testul bootstrap studentizat. Niciuna dintre regulile estimate nu bate 1/N semnificativ în cele trei universuri.</p></details>
 </section><h2 class="sec" id="s-bvb">Un portofoliu de blue chips BVB</h2>
 <section class="blk" id="bvb">
   <h3>Portofoliile BVB față de BET-TR</h3>
@@ -182,8 +182,18 @@
       <figcaption>Slide-ul 55</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="bv-t">Pînă în luna: <b id="bv-t-v"></b></label><input type="range" id="bv-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="bv-play" type="button"></button></div><div class="charts "><div class="chart" id="bv-chart"></div></div><ul class="out" id="bv-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Bate vreun portofoliu din blue chips BVB indicele BET-TR?</div>
-  <details><summary>Răspuns</summary><p>MV-LO are raportul Sharpe 1,66 față de 1,45 pentru BET-TR, dar diferența nu este semnificativă (p = 0,44, HAC). 1/N are 1,41, iar ERC 1,38.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce susține comparația dintre MV-LO și BET-TR?</div>
+  <details><summary>Răspuns</summary><p>MV-LO are raportul Sharpe 1,66 față de 1,45 pentru BET-TR, dar diferența nu este semnificativă (p = 0,44, HAC). Un test nesemnificativ nu arată că cele două rapoarte Sharpe sînt egale în populație: arată doar că datele nu le separă. 1/N are 1,41, iar ERC 1,38.</p></details>
+</section><h2 class="sec" id="s-cs">Studii de caz: frontiera implementabilă și portofoliile gestionate după volatilitate</h2>
+<section class="blk" id="vol-managed">
+  <h3>Gestionarea după volatilitate pe datele cursului</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol4_optimizarea_portofoliului.pdf#page=61" target="_blank" rel="noopener"><img src="slides/ch4_vmp_ro.jpg" alt="Slide-ul 60: Gestionarea după volatilitate pe datele cursului" loading="lazy"></a>
+      <figcaption>Slide-ul 60</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vm-u">Universul</label><select id="vm-u"><option value="Sectors">Sectoare</option><option value="Multi-asset" selected>Multi-active</option><option value="Combined">Combinat</option><option value="BVB">BVB</option></select></div><div class="ctl"><label for="vm-c">Cost pe unitate de turnover: <b id="vm-c-v"></b></label><input type="range" id="vm-c" min="0" max="100" step="5" value="10"></div><button class="btn play" id="vm-play" type="button"></button></div><div class="charts "><div class="chart" id="vm-single"></div><div class="chart" id="vm-port"></div></div><ul class="out" id="vm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe universul multi-active, gestionarea după volatilitate scade Sharpe-ul la 6 dintre cele 8 ETF-uri luate separat. Poate portofoliul condițional al tuturor activelor (CMV) să depășească totuși portofoliul necondiționat (UMV)?</div>
+  <details><summary>Răspuns</summary><p>Da, dar diferența nu este semnificativă. CMV are Sharpe brut 0,685, față de 0,551 pentru UMV, cu p bootstrap unilateral de 0,25, pentru că ponderile relative ale activelor se schimbă cu volatilitatea pieței. CMV are Sharpe brut mai mare decît UMV în toate cele patru universuri, dar în niciunul diferența nu este semnificativă. CMV tranzacționează 1,08 din avere pe lună, față de 0,21 pentru UMV, iar la 42 bp pe unitate de turnover avantajul dispare.</p></details>
 </section>
 <p class="src foot">ETF-uri din SUA: randamente lunare în exces față de titlurile de stat pe o lună; prețuri EODHD, rata fără risc din Kenneth French Data Library. BVB: prețuri EODHD, în RON.</p>
 </main>

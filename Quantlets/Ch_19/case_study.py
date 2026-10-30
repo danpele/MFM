@@ -28,6 +28,18 @@ HS_WINDOW = 500       # window for HS and for the Normal distribution
 MODELS = ['HS', 'Normal', 'GARCH-t', 'FHS']
 
 
+def hs_es(L, alpha):
+    """Historical ES as in Chapter 7 (Quantlets/Ch_07/risk_measures.hs_es): the integral of the empirical quantile
+    function over the top alpha of the losses. With n alpha = m + f (m integer, 0 <= f < 1): the m largest losses
+    plus f times the next one, divided by n alpha (500 days at 2.5%: 12 losses plus half of the 13th, over 12.5)."""
+    L = np.sort(np.asarray(L, float))[::-1]
+    na = len(L) * alpha
+    m = int(np.floor(na + 1e-9))
+    f = max(na - m, 0.0)
+    tail = L[:m].sum() + (f * L[m] if f > 1e-12 and m < len(L) else 0.0)
+    return float(tail / na)
+
+
 # -----------------------------------------------------------------------------
 # 1. STYLISED FACTS
 # -----------------------------------------------------------------------------
@@ -135,7 +147,7 @@ def rolling_var(r, eval_from, window=WINDOW, refit=REFIT, a=ALPHA, a_es=ALPHA_ES
         z = ((est - mu) / sig.iloc[:window]).values   # standardised residuals of the window
         zq = np.quantile(z, a)
         zq_es = np.quantile(z, a_es)
-        zes = z[z <= zq_es].mean()
+        zes = -hs_es(-z, a_es)                        # tail mean of the residuals, same estimator as HS (Ch. 7)
         for j in range(b0, b1):
             hist = r.iloc[j - HS_WINDOW:j].values
             s = sig.iloc[j - (b0 - window)]
@@ -144,7 +156,7 @@ def rolling_var(r, eval_from, window=WINDOW, refit=REFIT, a=ALPHA, a_es=ALPHA_ES
             q_hs_es = np.quantile(L_hist, 1 - a_es)
             m, sd = hist.mean(), hist.std(ddof=1)
             rows.append(dict(date=idx[j], r=r.iloc[j], L=-r.iloc[j], sigma=s,
-                             HS=q_hs, HS_ES=L_hist[L_hist >= q_hs_es].mean(),
+                             HS=q_hs, HS_ES=hs_es(L_hist, a_es),
                              Normal=-(m + sd * stats.norm.ppf(a)),
                              Normal_ES=-(m - sd * stats.norm.pdf(stats.norm.ppf(a_es)) / a_es),
                              **{'GARCH-t': -(mu + s * t_std_q(nu, a)),
@@ -154,6 +166,23 @@ def rolling_var(r, eval_from, window=WINDOW, refit=REFIT, a=ALPHA, a_es=ALPHA_ES
                              HS_V25=q_hs_es, Normal_V25=-(m + sd * stats.norm.ppf(a_es)),
                              **{'GARCH-t_V25': -(mu + s * t_std_q(nu, a_es))}, FHS_V25=-(mu + s * zq_es)))
     return pd.DataFrame(rows).set_index('date')
+
+
+def refresh_hs_es(fc, r, a=ALPHA, a_es=ALPHA_ES):
+    """Recompute the HS ES column of saved forecasts with hs_es, from the same 500-day windows (the HS VaR column
+    must be reproduced exactly, so the windows are the ones of rolling_var); the other columns are unchanged."""
+    r = r.dropna()
+    pos = r.index.get_indexer(fc.index)
+    assert (pos >= HS_WINDOW).all()
+    hs, es = [], []
+    for j in pos:
+        L_hist = -r.iloc[j - HS_WINDOW:j].values
+        hs.append(np.quantile(L_hist, 1 - a))
+        es.append(hs_es(L_hist, a_es))
+    assert np.allclose(hs, fc['HS'].values, rtol=0, atol=1e-9), 'HS VaR not reproduced'
+    fc = fc.copy()
+    fc['HS_ES'] = es
+    return fc
 
 
 # -----------------------------------------------------------------------------

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch3_factor_momentum'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Lecture 3, second case study (Ehsani and Linnainmaa, 2022, Factor Momentum and the Momentum Factor, Journal of Finance): mean return of seven Kenneth French factors (Mkt-RF, SMB, HML, RMW, CMA, short-term and long-term reversal) in the month after a positive or a negative prior-year return, July 1964 - July 2026; time-series factor momentum (TSFM, long the factors with a positive prior year, short the others) against stock momentum (MOM); spanning regressions with Newey-West errors.'
+
+Keywords: 'factor momentum, momentum factor, time-series momentum, autocorrelation, spanning regression, Fama-French factors, reversal'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Fama-French five factors, momentum, short-term and long-term reversal factors, Kenneth French Data Library'
+
+Output: 'ch3_factor_momentum.pdf'

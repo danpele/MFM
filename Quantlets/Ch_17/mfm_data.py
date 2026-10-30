@@ -8,7 +8,8 @@ mfm_data.py -- Incarcarea datelor pentru Capitolul 17 (MFM): bule si crahuri
                               randamente lunare din Kenneth French Data Library
 
 Conventii (ca in capitolele 0-8):
-  * indicii bursieri: doar zilele lucratoare; zilele cu inchidere identica cu ziua precedenta sunt eliminate;
+  * indicii bursieri: doar zilele lucratoare; o zi care repeta inchiderea precedenta este eliminata doar daca nu arata
+    tranzactii (volum zero, open = high = low = close sau o copie a randului precedent); inchiderile neschimbate reale raman;
   * cripto: 7 zile din 7;
   * actiuni: pretul ajustat (dividende, split-uri); indici si cripto: pretul de inchidere;
   * saptamanal / lunar: ultimul pret al saptamanii (vineri) / al lunii.
@@ -60,15 +61,35 @@ def read_market(symbol):
     return pd.read_csv(src, index_col='date', parse_dates=True).sort_index()
 
 
+def artificial_fill(d):
+    """Rows that repeat the previous close and show no trading: an artificial non-trading-day fill.
+
+    A repeated close is a fill only if the row itself shows no trading: zero volume (for files that report
+    volume), no intraday range (open = high = low = close) or a copy of the previous row in every field. A
+    repeated close on a day with volume and an intraday range is a genuine unchanged close (a zero return)
+    and is kept. Files with closes only (the BET) give no such evidence, so every row is kept.
+    """
+    repeat = d['close'].diff() == 0
+    no_trade = pd.Series(False, index=d.index)
+    if 'volume' in d and (d['volume'] > 0).mean() > 0.5:
+        no_trade |= d['volume'].fillna(0) <= 0
+    if {'open', 'high', 'low'} <= set(d.columns):
+        no_trade |= (d['open'] == d['high']) & (d['high'] == d['low']) & (d['low'] == d['close'])
+        fields = [c for c in ['open', 'high', 'low', 'close', 'volume'] if c in d]
+        no_trade |= (d[fields] == d[fields].shift()).all(axis=1)
+    return repeat & no_trade
+
+
 def price(name, freq='D', start=None, end=END):
     """Price level: 'D' daily (cleaned), 'W' last price of the week, 'M' last price of the month."""
     symbol, _, kind, col, start0 = MARKETS[name]
-    s = read_market(symbol)[col].loc[start or start0:end]
-    s = s[s > 0].dropna()
+    d = read_market(symbol).loc[start or start0:end]
+    d = d[d[col] > 0].dropna(subset=[col])
     if kind != 'crypto':
-        s = s[s.index.dayofweek < 5]          # no weekend quotes
+        d = d[d.index.dayofweek < 5]          # no weekend quotes
     if kind == 'index':
-        s = s[s.diff() != 0]                  # drop holidays filled with the previous price
+        d = d[~artificial_fill(d)]            # non-trading days filled with the previous price
+    s = d[col]
     last = s.index[-1]
     if freq == 'W':
         s = s.resample('W-FRI').last().dropna()

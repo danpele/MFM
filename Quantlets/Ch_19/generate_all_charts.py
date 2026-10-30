@@ -262,6 +262,22 @@ def part_var(full_res):
     save_fig('ch19_lookahead')
 
 
+if __name__ == '__main__' and sys.argv[1:] == ['es']:
+    # HS ES with the fractional estimator of Chapter 7 on the saved forecasts; only RES['es'] and RES['formal'] change
+    from case_study import refresh_hs_es
+    fc = pd.read_csv(os.path.join(HERE, 'ch19_forecasts_bet.csv'), index_col=0, parse_dates=True)
+    fc = refresh_hs_es(fc, r)
+    fc.to_csv(os.path.join(HERE, 'ch19_forecasts_bet.csv'))
+    with open(os.path.join(HERE, 'ch19_results.json')) as f:
+        RES = json.load(f)
+    RES['es'] = {m: float(fc[m + '_ES'].mean()) for m in MODELS}
+    RES['formal'] = formal_eval(fc)
+    with open(os.path.join(HERE, 'ch19_results.json'), 'w') as f:
+        json.dump(RES, f, indent=1, default=float)
+    print('updated HS ES in ch19_forecasts_bet.csv and ch19_results.json')
+    sys.exit(0)
+
+
 if __name__ == '__main__':
     part_facts()
     full = part_garch()

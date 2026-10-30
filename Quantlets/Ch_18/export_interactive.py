@@ -116,6 +116,15 @@ def main():
     # 9. case study: spillover index by quantile, values reported by Ando, Greenwood-Nimmo and Shin (2022)
     d['ags'] = dict(fig4={str(k): v for k, v in g.AGS_FIG4.items()}, mean=g.AGS_MEAN, centre=list(g.AGS_CENTRE))
 
+    # 10. second case study: Treasuries, bank equity and the US 10Y yield (case_rate_risk.py, Jiang et al. 2024)
+    import case_rate_risk as crr
+    Dr = crr.load_data()
+    with open(crr.OUT_JSON) as fj:
+        J = json.load(fj)
+    d['rate'] = dict(dates=days(Dr.index), **{k: ints(Dr[k].values, 10000) for k in ['bank', 'spx', 'ief', 'tlt', 'd10']},
+                     window=crr.WINDOW, lags=crr.NW_LAGS, base=crr.BASE, mtm_end=crr.MTM_END, svb=crr.SVB,
+                     periods=J['periods'], mtm=J['mtm'], svb_week=J['svb_week'])
+
     with open(OUT, 'w') as fo:
         fo.write('// Inputs of the Chapter 18 interactive page, exported by Quantlets/Ch_18/export_interactive.py.\n')
         fo.write('window.CH18_DATA = ' + json.dumps(d, separators=(',', ':')) + ';\n')

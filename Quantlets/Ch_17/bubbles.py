@@ -115,6 +115,49 @@ def wild_cv(y, w0, R=500, seed=42):
     return dict(bsadf95=np.nanquantile(bs, 0.95, axis=0), gsadf95=float(np.quantile(np.nanmax(bs, axis=1), 0.95)))
 
 
+def _lag_design(Y, k):
+    """Regression rows of the lag-augmented ADF, Delta y_t = a + b y_{t-1} + sum_j c_j Delta y_{t-j} + e_t, t = k+1..n,
+    for every path (row of Y): cumulative cross products X'X, X'z and z'z (with a leading zero row)."""
+    Y = np.atleast_2d(np.asarray(Y, float))
+    dy = np.diff(Y, axis=1)
+    n = dy.shape[1]
+    z = dy[:, k:]
+    cols = [np.ones_like(z), Y[:, k:n]] + [dy[:, k - j:n - j] for j in range(1, k + 1)]
+    X = np.stack(cols, axis=2)                                        # (R, m, p)
+    pad = lambda a: np.concatenate([np.zeros((a.shape[0], 1) + a.shape[2:]), np.cumsum(a, axis=1)], axis=1)
+    return pad(X[:, :, :, None] * X[:, :, None, :]), pad(X * z[:, :, None]), pad(z * z)
+
+
+def _adf_lag_end(C, e, s):
+    """t-statistic of b (the coefficient of y_{t-1}) for the windows [s, e] of the lag-augmented regression."""
+    XX, Xz, zz = (c[:, e + 1][:, None] - c[:, s] for c in C)
+    p = XX.shape[-1]
+    nw = (e + 1 - s).astype(float)
+    rhs = np.zeros(XX.shape[:-1] + (2,))
+    rhs[..., 0] = Xz
+    rhs[..., 1] = 0.0
+    rhs[..., 1, 1] = 1.0
+    sol = np.linalg.solve(XX, rhs)
+    beta, inv11 = sol[..., 0], sol[..., 1, 1]
+    ssr = np.maximum(zz - np.einsum('...i,...i->...', beta, Xz), 1e-300)
+    return beta[..., 1] / np.sqrt(ssr / (nw - p) * inv11)
+
+
+def psy_lag(Y, k, w0):
+    """SADF and GSADF of the lag-augmented ADF (k lags of Delta y) for every path (row of Y), minimum window w0
+    regression rows. Returns arrays (one value per path)."""
+    C = _lag_design(Y, k)
+    m = C[2].shape[1] - 1
+    R = C[2].shape[0]
+    sadf = np.full(R, -np.inf)
+    gsadf = np.full(R, -np.inf)
+    for e in range(w0 - 1, m):
+        st = _adf_lag_end(C, e, np.arange(0, e - w0 + 2))
+        sadf = np.maximum(sadf, st[:, 0])
+        gsadf = np.maximum(gsadf, st.max(axis=1))
+    return sadf, gsadf
+
+
 def episodes(stat, cv, index, min_len):
     """Episodes in which stat > cv for at least min_len periods: (start, end) dated in real time."""
     above = np.asarray(stat > cv)
@@ -245,7 +288,9 @@ def lppls_fit(t, y, search=LPPLS_SEARCH, refine=True, grid=(8, 8, 16)):
 
 def lomb_pvalue(fit, wmin=2.0, wmax=25.0, nw=200):
     """Lomb test: the detrended residual r = (tc - t)^(-m) (ln p - A - B (tc - t)^m) as a function of ln(tc - t);
-    probability that the highest peak of the normalised periodogram arises by chance."""
+    probability that the highest peak of the normalised periodogram arises by chance. A heuristic filter with nominal
+    level: M = min(nw, n) independent frequencies is a convention, and the trend is fitted on the same observations,
+    so the p-value is not calibrated; inferential claims need a simulation of the whole fit-and-select procedure."""
     from scipy.signal import lombscargle
     t, y = fit['_t'], fit['_y']
     dt = np.maximum(fit['tc'] - t, 1e-9)
@@ -260,8 +305,9 @@ def lomb_pvalue(fit, wmin=2.0, wmax=25.0, nw=200):
 
 
 def ar1_pass(fit, alpha):
-    """The residual ln(p_hat) - ln(p) is AR(1) (Ornstein-Uhlenbeck): the Dickey-Fuller and Phillips-Perron tests reject
-    a unit root at level alpha."""
+    """Heuristic qualification filter (nominal level alpha): the Dickey-Fuller and Phillips-Perron tests reject a unit
+    root in the residual ln(p_hat) - ln(p). Rejecting a unit root does not establish an AR(1) / Ornstein-Uhlenbeck
+    residual, and the usual p-values are not calibrated for residuals of a nonlinear search on the same data."""
     from statsmodels.tsa.stattools import adfuller
     try:
         from arch.unitroot import PhillipsPerron

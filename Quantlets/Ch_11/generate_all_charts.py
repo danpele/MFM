@@ -23,11 +23,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 import slide_fit
 slide_fit.SIZES.update({'ch11_np_diffusion':[410,155]})
 # noqa: E402,F401  charts drawn at the size they have on the slides
-from mfm_data import LABELS, log_returns, load_close, load_vix, read_fred, periods_per_year, load_spy_5m  # noqa: E402
+from mfm_data import LABELS, log_returns, load_close, load_vix, read_fred, periods_per_year, load_spy_5m, load_spy_5m_bars  # noqa: E402
 from ct_models import (scaled_random_walk, bm_paths, quadratic_variation, total_variation, ito_stratonovich,  # noqa: E402
                        max_prob, convergence_study, slope_ci, slope_boot, gbm_paths, gbm_mle, gbm_simulate_returns,
                        ou_exact_path, ou_mle, merton_logpdf, merton_mle, merton_moments, merton_simulate_returns,
-                       lee_mykland, heston_paths, heston_from_vix, heston_simulate_returns, heston_smile, acf,
+                       lee_mykland, lm_null_max, lm_cn_sn, merton_sandwich, heston_paths, heston_from_vix, heston_simulate_returns, heston_smile, acf,
                        stylised, short_rate_fits, nw_drift_diffusion, hill)
 
 # Chart style: transparent background, legend below the plot
@@ -648,15 +648,32 @@ def fig_merton_density(me):
     save_fig('ch11_merton_density')
 
 
-def fig_jumps():
-    """Jumps detected by the Lee-Mykland test (alpha = 1%) for the S&P 500 and Bitcoin."""
+LM_NSIM = 2000          # i.i.d. Normal samples for the finite-sample Lee-Mykland threshold
+LM_NSIM_HESTON = 200    # Heston samples (no jumps) for the size check
+
+
+def fig_jumps(hp=None, mu=0.0):
+    """Lee-Mykland (K = 16) on daily S&P 500 and Bitcoin returns. The asymptotic Gumbel threshold (alpha = 1%) flags at
+    least one day in most i.i.d. Normal samples of the same length, so its flags are an exploratory filter; the
+    finite-sample threshold is the 99% quantile of the sample maximum of the statistic in LM_NSIM i.i.d. Normal samples of
+    the same length (same window). Size check: share of LM_NSIM_HESTON Heston samples without jumps (S&P 500 length,
+    parameters of the chapter, HESTON_SUBSTEPS Euler steps per day) above each threshold."""
+    rng = np.random.default_rng(SEED + 30)
     fig, axes = plt.subplots(2, 1, figsize=(10, 4.6), sharex=False)
     out = {}
     for ax, k in zip(axes, ['sp500', 'btc']):
         d, crit = lee_mykland(rets[k], K=16, alpha=0.01)
+        M0, F0 = lm_null_max(len(rets[k]), 16, LM_NSIM, rng)
+        cfs = float(np.quantile(M0, 0.99))
+        cn, sn = lm_cn_sn(len(d))
+        fs = d['stat'] > cfs
         ax.plot(d.index, 100 * d['r'], color=MainBlue, lw=0.4, label='Daily log return (%)')
         j = d[d['jump']]
-        ax.scatter(j.index, 100 * j['r'], s=14, color=IDAred, zorder=3, label='Jump detected (Lee-Mykland, 1% level)')
+        ax.scatter(j.index, 100 * j['r'], s=22, facecolors='none', edgecolors=Orange, lw=0.9, zorder=3,
+                   label='Flagged at the asymptotic Gumbel threshold (exploratory filter)')
+        jf = d[fs]
+        ax.scatter(jf.index, 100 * jf['r'], s=16, color=IDAred, zorder=4,
+                   label='Flagged at the finite-sample 1% threshold (i.i.d. Normal null)')
         ax.set_title(LABELS[k], loc='left')
         years = (d.index[-1] - d.index[0]).days / 365.25
         big = d['r'].abs().sort_values(ascending=False).head(10)
@@ -664,9 +681,21 @@ def fig_jumps():
                       share_neg=float((j['r'] < 0).mean()), top10_detected=int(d.loc[big.index, 'jump'].sum()),
                       largest=float(j['r'].abs().max()), smallest=float(j['r'].abs().min()),
                       smallest_date=str(j['r'].abs().idxmin().date()),
-                      dates=[str(x.date()) for x in j.index])
-    fig_legend_bottom(fig, ncol=2, y=0.02)
-    plt.tight_layout(rect=(0, 0.06, 1, 1))
+                      dates=[str(x.date()) for x in j.index],
+                      iid_size=float(np.mean(M0 > crit)), iid_mean_flags=float(F0.mean()), n_sim=LM_NSIM,
+                      crit_fs=cfs, crit_fs_L=float(cn + sn * cfs), crit_L=float(cn + sn * crit),
+                      n_fs=int(fs.sum()), dates_fs=[str(x.date()) for x in jf.index],
+                      p_max_iid=float((1 + np.sum(M0 >= d['stat'].max())) / (LM_NSIM + 1)))
+    if hp is not None:
+        hpp = dict(hp, theta=hp['theta_p'])
+        X = heston_daily_returns(hpp, len(rets['sp500']), DT, LM_NSIM_HESTON, rng, mu=mu)
+        MH = np.array([lee_mykland(X[:, i], K=16)[0]['stat'].max() for i in range(LM_NSIM_HESTON)])
+        o = out['sp500']
+        o.update(heston_size_asym=float(np.mean(MH > o['crit'])), heston_size_fs=float(np.mean(MH > o['crit_fs'])),
+                 heston_q99=float(np.quantile(MH, 0.99)), n_heston=LM_NSIM_HESTON,
+                 n_heston_q99=int(np.sum(lee_mykland(rets['sp500'], K=16)[0]['stat'] > np.quantile(MH, 0.99))))
+    fig_legend_bottom(fig, ncol=2, y=0.0)
+    plt.tight_layout(rect=(0, 0.1, 1, 1))
     save_fig('ch11_jumps')
     return out
 
@@ -739,7 +768,38 @@ def fig_heston_smile(hp):
 # =============================================================================
 # 6. MODELS VS DATA
 # =============================================================================
-def simulate_stats(model, p, n, dt, n_sim, rng, mu=0.0):
+HESTON_SUBSTEPS = 390   # Euler sub-steps per day in the comparison (1-minute steps over a 6.5-hour session)
+
+
+def heston_daily_returns(p, n, dt, n_paths, rng, mu=0.0, burn=500, substeps=HESTON_SUBSTEPS):
+    """Daily log returns from Heston, n_paths independent samples of n days (after a burn-in of burn days):
+    full-truncation Euler scheme (Lord et al., 2010) with substeps steps per day, summed to daily returns.
+    With one step per day the daily return is conditionally Normal given v at the start of the day, so its
+    skewness is zero whatever rho; the sub-steps let the variance move within the day."""
+    kappa, theta, xi, rho = p['kappa'], p['theta'], p['xi'], p['rho']
+    h = dt / substeps
+    c = np.sqrt(1 - rho ** 2)
+    v = np.full(n_paths, theta, dtype=float)
+    R = np.empty((n + burn, n_paths))
+    for d in range(n + burn):
+        Z = rng.standard_normal((substeps, 2, n_paths))
+        r = np.zeros(n_paths)
+        for k in range(substeps):
+            z1 = Z[k, 0]
+            vp = np.maximum(v, 0.0)
+            s = np.sqrt(vp * h)
+            r += (mu - 0.5 * vp) * h + s * z1
+            v = v + kappa * (theta - vp) * h + xi * s * (rho * z1 + c * Z[k, 1])
+        R[d] = r
+    return R[burn:]
+
+
+def simulate_stats(model, p, n, dt, n_sim, rng, mu=0.0, substeps=1):
+    """Stylised facts of n_sim simulated samples. Heston: one Euler step per day (substeps=1, as in Seminar 11)
+    or substeps steps per day, the n_sim samples simulated side by side (heston_daily_returns)."""
+    if model == 'Heston' and substeps > 1:
+        X = heston_daily_returns(p, n, dt, n_sim, rng, mu=mu, substeps=substeps)
+        return [stylised(X[:, j]) for j in range(n_sim)]
     out = []
     for _ in range(n_sim):
         if model == 'GBM':
@@ -753,14 +813,15 @@ def simulate_stats(model, p, n, dt, n_sim, rng, mu=0.0):
 
 
 def fig_models_vs_data(g, me, hp):
-    """ACF of |r|, kurtosis and tail index: S&P 500 vs GBM, Merton, Heston (100 simulations each)."""
+    """ACF of |r|, kurtosis and tail index: S&P 500 vs GBM, Merton, Heston (100 simulations each;
+    Heston with HESTON_SUBSTEPS Euler steps per day, summed to daily returns)."""
     rng = np.random.default_rng(SEED + 11)
     r = rets['sp500'].values
     n = len(r)
     hpp = dict(hp, theta=hp['theta_p'])
     S = {'GBM': simulate_stats('GBM', g['sp500'], n, DT, 100, rng),
          'Merton': simulate_stats('Merton', me['sp500'], n, DT, 100, rng),
-         'Heston': simulate_stats('Heston', hpp, n, DT, 100, rng, mu=g['sp500']['mu'])}
+         'Heston': simulate_stats('Heston', hpp, n, DT, 100, rng, mu=g['sp500']['mu'], substeps=HESTON_SUBSTEPS)}
     d = stylised(r)
     lags = np.arange(1, 51)
     fig, axes = plt.subplots(1, 3, figsize=(11, 3.4), gridspec_kw={'width_ratios': [1.6, 1, 1]})
@@ -956,6 +1017,268 @@ def rough_case():
 
 
 # =============================================================================
+# 9. CASE STUDY 2: DRIFT BURSTS (Christensen, Oomen and Reno, 2022, Journal of Econometrics)
+# =============================================================================
+DB_DT = 5.0          # minutes per bar
+DB_START = 6         # first test at the end of bar 6 (10:00 New York): the volatility estimate needs a few returns
+
+
+def drift_burst_t(R, h, hs=None, start=DB_START):
+    """Drift burst t-statistic of Christensen, Oomen and Reno (2022), Eq. (11)-(14), on a days x bars matrix of
+    5-minute log returns R. Left-sided exponential kernel K(x) = exp(-|x|), x <= 0; drift bandwidth h, volatility
+    bandwidth hs = 5h (minutes, the ratio 5 min / 25 min of the paper). Each day is a separate sample: the kernel sums
+    run from the open: s_j^2 = sum_i u_ij r_i^2 / (dt sum_i u_ij) and T_j = sum_i w_ij r_i / sqrt(s_j^2 dt sum_i w_ij^2),
+    with w = exp(-lag/h), u = exp(-lag/hs). This is a discrete adaptation of the paper's statistic: the denominator is
+    random and computed from the same returns, and with h/dt = 3 the N(0, 1) approximation is not guaranteed, so the
+    critical values are calibrated by simulation. No pre-averaging and no HAC correction."""
+    hs = 5 * h if hs is None else hs
+    n, m = R.shape
+    T = np.full((n, m), np.nan)
+    for j in range(start - 1, m):
+        lag = (j - np.arange(j + 1) + 1) * DB_DT          # minutes from the start of each bar to the end of bar j
+        w, ws = np.exp(-lag / h), np.exp(-lag / hs)
+        s2 = (R[:, :j + 1] ** 2) @ ws / (ws.sum() * DB_DT)
+        T[:, j] = (R[:, :j + 1] @ w) / np.sqrt(s2 * (w ** 2).sum() * DB_DT)
+    return T
+
+
+def drift_burst_spy(h=15.0, B=200, seed=SEED + 21, bars=None):
+    """Daily maximum of |T| on SPY 5-minute bars against a sign-flip null (returns times independent random signs:
+    the volatility path, jumps and the intraday pattern are kept, any local drift is removed); events = days whose
+    maximum exceeds the 95% quantile of the null daily maximum; the reversal regression of Eq. (36) on the
+    15-minute (= h) windows before and after the peak; volume relative to its average at the same time of day."""
+    b = load_spy_5m_bars() if bars is None else bars
+    days = pd.Index(b.index.date).unique()
+    R = b['r'].values.reshape(-1, 78)
+    V = b['volume'].values.reshape(-1, 78)
+    P = b['close'].values.reshape(-1, 78)
+    n, m = R.shape
+    T = drift_burst_t(R, h)
+    A = np.abs(T)
+    M, J = np.nanmax(A, axis=1), np.nanargmax(A, axis=1)
+    S = np.sign(T[np.arange(n), J])
+    rng = np.random.default_rng(seed)
+    NM = np.array([np.nanmax(np.abs(drift_burst_t(R * rng.choice([-1.0, 1.0], size=R.shape), h)), axis=1)
+                   for _ in range(B)])
+    grid = np.round(np.arange(2.0, 4.0001, 0.01), 2)
+    cnt_data = np.array([(M > c).sum() for c in grid])
+    cnt_null = np.array([(NM > c).sum(axis=1) for c in grid])          # len(grid) x B
+    q = {k: float(np.round(np.quantile(NM, p), 2)) for k, p in [('c95', 0.95), ('c99', 0.99), ('c999', 0.999)]}
+    tests = {}
+    for k, c in q.items():
+        nd, nn = int((M > c).sum()), (NM > c).sum(axis=1)
+        tests[k] = dict(c=c, days=nd, null_mean=float(nn.mean()), null_q99=float(np.quantile(nn, 0.99)),
+                        null_max=int(nn.max()), p=float((1 + np.sum(nn >= nd)) / (B + 1)))
+    # Gumbel critical values of Theorem 3, Eq. (21), with m test times per day
+    mt = int(np.sum(~np.isnan(T[0])))
+    am = np.sqrt(2 * np.log(mt))
+    bm = am - np.log(np.pi * np.log(mt)) / (2 * am)
+    gumbel = {lev: float(bm - np.log(-np.log(1 - lev)) / am) for lev in (0.05, 0.01)}
+    gumbel_null = {str(lev): float(np.mean(NM > c)) for lev, c in gumbel.items()}
+    gumbel_days = {str(lev): int((M > c).sum()) for lev, c in gumbel.items()}
+    # largest |T| a single jump can produce: the jump return dominates both kernel sums
+    jb = []
+    for j in range(DB_START - 1, m):
+        lag = (j - np.arange(j + 1) + 1) * DB_DT
+        w, ws = np.exp(-lag / h), np.exp(-lag / (5 * h))
+        jb.append(w[-1] * np.sqrt(ws.sum() * DB_DT) / np.sqrt(ws[-1] * (w ** 2).sum() * DB_DT))
+    # events and the reversal after the peak
+    L = int(round(h / DB_DT))
+    X = np.cumsum(R, axis=1)
+    Vn = V / np.nanmean(V, axis=0)
+    Rm = np.full(n, np.nan)
+    Rp = np.full(n, np.nan)
+    vn = np.full(n, np.nan)
+    for i in range(n):
+        j = J[i]
+        if j + L < m:
+            Rm[i] = X[i, j] - (X[i, j - L] if j - L >= 0 else 0.0)
+            Rp[i] = X[i, j + L] - X[i, j]
+            vn[i] = np.nanmean(Vn[i, max(0, j - L + 1):j + 1])
+    ev = M > q['c95']
+    ok = ev & ~np.isnan(Rp)
+    x, y = Rm[ok], Rp[ok]
+    Xd = np.column_stack([np.ones(len(x)), x])
+    beta = np.linalg.lstsq(Xd, y, rcond=None)[0]
+    e = y - Xd @ beta
+    XtX = np.linalg.inv(Xd.T @ Xd)
+    cov = XtX @ (Xd.T * e ** 2) @ Xd @ XtX * len(x) / (len(x) - 2)       # HC1
+    rev = np.sign(x) != np.sign(y)
+    keep = M[ok] <= np.quantile(M[ok], 0.9)
+    b_trim = float(np.polyfit(x[keep], y[keep], 1)[0])
+    bt = stats.binomtest(int(rev.sum()), len(x), 0.5, alternative='greater')
+    neg = x < 0
+    hv = vn[ok] > np.median(vn[ok])
+    groups = {}
+    for name, msk in [('neg_hi', neg & hv), ('neg_lo', neg & ~hv), ('pos_hi', ~neg & hv), ('pos_lo', ~neg & ~hv)]:
+        groups[name] = dict(n=int(msk.sum()), r_pre=float(1e4 * x[msk].mean()), r_post=float(1e4 * y[msk].mean()),
+                            rev=float(rev[msk].mean()))
+    # unconditional contrast: consecutive non-overlapping 15-minute blocks of every day
+    Rb = R[:, :(m // L) * L].reshape(n, m // L, L).sum(axis=2)
+    ua, ub = Rb[:, :-1].ravel(), Rb[:, 1:].ravel()
+    u_b = float(np.polyfit(ua, ub, 1)[0])
+    tod = [str((pd.Timestamp('2000-01-01 09:30') + pd.Timedelta(minutes=5 * (j + 1))).time())[:5] for j in J]
+    i0 = int(np.argmax(M))
+    top = [dict(day=str(days[i]), max_t=float(M[i]), sign=int(S[i]), time=tod[i], r_window_bp=float(1e4 * (X[i, J[i]] - (X[i, J[i] - L] if J[i] >= L else 0))))
+           for i in np.argsort(-M)[:10]]
+    T_all = T[~np.isnan(T)]
+    return dict(h=h, hs=5 * h, B=B, n_days=n, start=str(days[0]), end=str(days[-1]), m_tests=mt,
+                sd_t=float(T_all.std()), kurt_t=float(stats.kurtosis(T_all, fisher=False)), max_abs_t=float(A[~np.isnan(A)].max()),
+                q=q, tests=tests, gumbel=gumbel, gumbel_null=gumbel_null, gumbel_days=gumbel_days, jump_bound=float(max(jb)),
+                n_events=int(ev.sum()), n_events_neg=int((S[ev] < 0).sum()),
+                neg_p=float(stats.binomtest(int((S[ev] < 0).sum()), int(ev.sum()), 0.5).pvalue), n_events_close=int((ev & np.isnan(Rp)).sum()), n_reg=int(ok.sum()),
+                n_neg=int(neg.sum()), b=float(beta[1]), b_t=float(beta[1] / np.sqrt(cov[1, 1])),
+                r2=float(1 - e.var() / y.var()), b_trim=b_trim, n_trim=int(keep.sum()), rev=float(rev.mean()), rev_p=float(bt.pvalue),
+                r_pre_neg=float(1e4 * x[neg].mean()), r_pre_pos=float(1e4 * x[~neg].mean()),
+                r_post_neg=float(1e4 * y[neg].mean()), r_post_pos=float(1e4 * y[~neg].mean()),
+                vol_ratio=float(np.mean(vn[ok])), groups=groups, uncond_b=u_b, uncond_rev=float(np.mean(np.sign(ua) != np.sign(ub))),
+                top=top, example=dict(day=str(days[i0]), t=T[i0], close=P[i0], peak=int(J[i0])),
+                grid=grid, cnt_data=cnt_data, cnt_null_mean=cnt_null.mean(axis=1),
+                cnt_null_lo=np.quantile(cnt_null, 0.01, axis=1), cnt_null_hi=np.quantile(cnt_null, 0.99, axis=1),
+                M=M, J=J, Rm=Rm, Rp=Rp, vn=vn)
+
+
+def _db_events(R, c, h=15.0):
+    """Days with max |T| > c, the peak bar, and the 15-minute returns before and after the peak (days with a window)."""
+    T = drift_burst_t(R, h)
+    A = np.abs(T)
+    M, J = np.nanmax(A, axis=1), np.nanargmax(A, axis=1)
+    L, m = int(round(h / DB_DT)), R.shape[1]
+    X = np.cumsum(R, axis=1)
+    xs, ys = [], []
+    for i in np.where(M > c)[0]:
+        j = J[i]
+        if j + L < m:
+            xs.append(X[i, j] - (X[i, j - L] if j - L >= 0 else 0.0))
+            ys.append(X[i, j + L] - X[i, j])
+    xs, ys = np.array(xs), np.array(ys)
+    return M, int((M > c).sum()), len(xs), float(np.mean(np.sign(xs) != np.sign(ys))) if len(xs) else np.nan
+
+
+def drift_burst_reversal_null(c, rev_obs, B=1000, seed=SEED + 22, h=15.0):
+    """Share of reversals under the sign-flip null with the same selection: events = days with max |T| > c, the peak
+    chosen retrospectively over the whole day, the 15-minute windows around it."""
+    R = load_spy_5m_bars()['r'].values.reshape(-1, 78)
+    rng = np.random.default_rng(seed)
+    rv = np.array([_db_events(R * rng.choice([-1.0, 1.0], size=R.shape), c, h)[3] for _ in range(B)])
+    return dict(B=B, mean=float(np.nanmean(rv)), q95=float(np.nanquantile(rv, 0.95)),
+                p=float((1 + np.sum(rv >= rev_obs - 1e-12)) / (B + 1)))
+
+
+def simulate_intraday(p, n_days, n_sets, rng, jumps=None, steps=390, bars=78):
+    """5-minute log returns from Heston with leverage (full-truncation Euler, 1-minute steps, variance carried across
+    days), optionally with compound Poisson jumps N(mu_j, s_j^2) at intensity lam per year; no drift: n_sets x n_days x bars."""
+    kappa, theta, xi, rho = p['kappa'], p['theta'], p['xi'], p['rho']
+    dt = DT / steps
+    c = np.sqrt(1 - rho ** 2)
+    v = np.full(n_sets, theta)
+    k = steps // bars
+    out = np.empty((n_sets, n_days, bars))
+    for d in range(n_days + 50):
+        Z = rng.standard_normal((steps, 2, n_sets))
+        rmin = np.empty((steps, n_sets))
+        for t in range(steps):
+            vp = np.maximum(v, 0.0)
+            s = np.sqrt(vp * dt)
+            rmin[t] = -0.5 * vp * dt + s * Z[t, 0]
+            v = v + kappa * (theta - vp) * dt + xi * s * (rho * Z[t, 0] + c * Z[t, 1])
+        if jumps is not None:
+            nj = rng.poisson(jumps['lam'] * dt, size=(steps, n_sets))
+            rmin += nj * jumps['mu_j'] + np.sqrt(nj) * jumps['s_j'] * rng.standard_normal((steps, n_sets))
+        if d >= 50:
+            out[:, d - 50, :] = rmin.reshape(bars, k, n_sets).sum(axis=1).T
+    return out
+
+
+def drift_burst_validation(hp, me, n_sets=50, B=200, seed=SEED + 23, n_days=None, h=15.0):
+    """The case-study procedure (sign-flip null, B draws, c = 95% quantile of the null daily maximum) on data simulated
+    without drift bursts: Heston with leverage (chapter parameters), without and with asymmetric Merton jumps (S&P 500
+    estimates). Per simulated sample: days above c, the null mean, the excess, the Monte Carlo p-value; the reversal
+    share after the peak."""
+    rng = np.random.default_rng(seed)
+    n_days = len(load_spy_5m_bars()) // 78 if n_days is None else n_days
+    hpp = dict(hp, theta=hp['theta_p'])
+    res = {}
+    for name, jm in [('heston', None), ('heston_jumps', dict(lam=me['lam'], mu_j=me['mu_j'], s_j=me['s_j']))]:
+        Xs = simulate_intraday(hpp, n_days, n_sets, rng, jumps=jm)
+        days, nmean, ps, revs = [], [], [], []
+        for X in Xs:
+            M = _db_events(X, np.inf, h)[0]
+            NM = np.array([np.nanmax(np.abs(drift_burst_t(X * rng.choice([-1.0, 1.0], size=X.shape), h)), axis=1)
+                           for _ in range(B)])
+            c = float(np.round(np.quantile(NM, 0.95), 2))
+            nd, nn = int((M > c).sum()), (NM > c).sum(axis=1)
+            days.append(nd); nmean.append(nn.mean()); ps.append((1 + np.sum(nn >= nd)) / (B + 1))
+            revs.append(_db_events(X, c, h)[3])
+        days, nmean, ps = np.array(days), np.array(nmean), np.array(ps)
+        res[name] = dict(n_sets=n_sets, n_days=n_days, days=float(days.mean()), null_mean=float(nmean.mean()),
+                         excess=float((days - nmean).mean()), excess_q95=float(np.quantile(days - nmean, 0.95)),
+                         rej05=float(np.mean(ps <= 0.05)), rej01=float(np.mean(ps <= 0.01)), rev=float(np.nanmean(revs)))
+    return res
+
+
+def fig_drift_burst(db):
+    """Left: the largest drift burst of the sample (SPY close and T_t); middle: days whose maximum |T| exceeds c,
+    data against the sign-flip null; right: return in the 15 minutes after the peak against the 15 minutes before it."""
+    import matplotlib.dates as mdates
+    fig, axes = plt.subplots(1, 3, figsize=(10, 3.4))
+    ex = db['example']
+    tt = pd.date_range(ex['day'] + ' 09:35', periods=78, freq='5min')
+    c = db['q']['c95']
+    ax = axes[0]
+    ax.plot(tt, ex['t'], color=IDAred, lw=1.3, label=r'$T_t$ (left axis)')
+    ax.axhline(c, color=Navy, lw=0.7, ls='--', label=rf'$\pm${c:.2f}: 5% per day under the null')
+    ax.axhline(-c, color=Navy, lw=0.7, ls='--')
+    ax.set_ylim(-4.2, 4.2)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    ax.set_xticks(pd.date_range(ex['day'] + ' 10:00', periods=4, freq='2h'))
+    ax.set_title(f'SPY, {pd.Timestamp(ex["day"]).strftime("%d %b %Y")}', loc='left')
+    ax2 = ax.twinx()
+    ax2.spines['right'].set_visible(True)
+    ax2.plot(tt, ex['close'], color=MainBlue, lw=1.1, label='SPY close (right axis, USD)')
+    h1, l1 = ax.get_legend_handles_labels()
+    h2, l2 = ax2.get_legend_handles_labels()
+    ax.legend(h1 + h2, l1 + l2, loc='upper center', bbox_to_anchor=(0.5, -0.14), ncol=1, frameon=False)
+    ax = axes[1]
+    g = db['grid']
+    ax.fill_between(g, np.maximum(db['cnt_null_lo'], 0.8), np.maximum(db['cnt_null_hi'], 0.8), color=BandBlue, lw=0,
+                    label='Sign-flip null, 1%-99%')
+    ax.plot(g, np.maximum(db['cnt_null_mean'], 0.8), color=Orange, lw=1.3, ls='--', label='Sign-flip null, mean')
+    ax.plot(g, np.maximum(db['cnt_data'], 0.8), color=MainBlue, lw=1.6, label=f'SPY, {db["n_days"]} days')
+    ax.axvline(c, color=Navy, lw=0.6, ls=':')
+    ax.set_yscale('log')
+    ax.set_ylim(0.8, 2000)
+    ax.yaxis.set_major_locator(plt.FixedLocator([1, 10, 100, 1000]))
+    ax.yaxis.set_major_formatter(plt.FixedFormatter(['1', '10', '100', '1000']))
+    ax.minorticks_off()
+    ax.set_xlabel(r'Critical value $c$')
+    ax.set_title(r'Days with max $|T_t| > c$', loc='left')
+    legend_outside_bottom(ax, ncol=1, y=-0.24)
+    ax = axes[2]
+    ok = (db['M'] > c) & ~np.isnan(db['Rp'])
+    x, y = 1e4 * db['Rm'][ok], 1e4 * db['Rp'][ok]
+    ax.scatter(x, y, s=10, color=MainBlue, alpha=0.8, lw=0, label=f'{ok.sum()} days, reversal in {100 * db["rev"]:.0f}%')
+    xs = np.linspace(x.min(), x.max(), 2)
+    a0 = np.mean(y) - db['b'] * np.mean(x)
+    ax.plot(xs, a0 + db['b'] * xs, color=IDAred, lw=1.3, label=f'OLS slope {db["b"]:.2f} (t = {db["b_t"]:.2f})')
+    ax.axhline(0, color=Navy, lw=0.5)
+    ax.axvline(0, color=Navy, lw=0.5)
+    ax.set_xlabel('15 min to the peak (bp)')
+    ax.set_ylabel('Next 15 min (bp)')
+    ax.set_title('After the burst', loc='left')
+    legend_outside_bottom(ax, ncol=1, y=-0.24)
+    plt.tight_layout()
+    save_fig('ch11_case_drift_burst')
+
+
+def drift_burst_case():
+    db = drift_burst_spy()
+    fig_drift_burst(db)
+    return {k: v for k, v in db.items() if k not in ('M', 'J', 'Rm', 'Rp', 'vn', 'grid', 'cnt_data', 'cnt_null_mean',
+                                                    'cnt_null_lo', 'cnt_null_hi', 'example')} | {'example_day': db['example']['day']}
+
+
+# =============================================================================
 if __name__ == '__main__' and sys.argv[1:] == ['extra']:
     # only the new sections (estimating diffusions, change of measure), without recomputing the rest
     with open(os.path.join(HERE, 'ch11_results.json')) as f:
@@ -966,11 +1289,43 @@ if __name__ == '__main__' and sys.argv[1:] == ['extra']:
     with open(os.path.join(HERE, 'ch11_results.json'), 'w') as f:
         json.dump(jsonable(R), f, indent=1)
     print('updated ch11_results.json')
+elif __name__ == '__main__' and sys.argv[1:] == ['compare']:
+    # only the models-vs-data comparison (and its chart), from the stored GBM, Merton and Heston estimates
+    with open(os.path.join(HERE, 'ch11_results.json')) as f:
+        R = json.load(f)
+    R['compare'] = fig_models_vs_data(R['gbm'], R['merton'], R['heston'])
+    with open(os.path.join(HERE, 'ch11_results.json'), 'w') as f:
+        json.dump(jsonable(R), f, indent=1)
+    print('updated ch11_results.json')
 elif __name__ == '__main__' and sys.argv[1:] == ['case']:
     # only the case study (rough and persistent volatility), without recomputing the rest
     with open(os.path.join(HERE, 'ch11_results.json')) as f:
         R = json.load(f)
     R['rough'] = rough_case()
+    with open(os.path.join(HERE, 'ch11_results.json'), 'w') as f:
+        json.dump(jsonable(R), f, indent=1)
+    print('updated ch11_results.json')
+elif __name__ == '__main__' and sys.argv[1:] == ['inference']:
+    # finite-sample Lee-Mykland threshold and size check (chart ch11_jumps), sandwich-HAC SE for Merton, the reversal
+    # share under the sign-flip null and the drift-burst procedure on simulated data without drift bursts
+    with open(os.path.join(HERE, 'ch11_results.json')) as f:
+        R = json.load(f)
+    R['jumps'] = fig_jumps(R['heston'], R['gbm']['sp500']['mu'])
+    for k in ['sp500', 'bet', 'btc']:
+        me = R['merton'][k]
+        th = [me[c] for c in ['m', 'sigma', 'lam', 'mu_j', 's_j']]
+        R['merton'][k]['sandwich'] = merton_sandwich(rets[k].values, DTS[k], th)
+    db = R['drift_burst']
+    db['rev_null'] = drift_burst_reversal_null(db['q']['c95'], db['rev'])
+    db['validation'] = drift_burst_validation(R['heston'], R['merton']['sp500'])
+    with open(os.path.join(HERE, 'ch11_results.json'), 'w') as f:
+        json.dump(jsonable(R), f, indent=1)
+    print('updated ch11_results.json')
+elif __name__ == '__main__' and sys.argv[1:] == ['case2']:
+    # only the second case study (drift bursts), without recomputing the rest
+    with open(os.path.join(HERE, 'ch11_results.json')) as f:
+        R = json.load(f)
+    R['drift_burst'] = drift_burst_case()
     with open(os.path.join(HERE, 'ch11_results.json'), 'w') as f:
         json.dump(jsonable(R), f, indent=1)
     print('updated ch11_results.json')
@@ -997,11 +1352,11 @@ elif __name__ == '__main__':
     me = merton_estimates()
     R['merton'] = me
     fig_merton_density(me)
-    R['jumps'] = fig_jumps()
     print('5. Heston')
     hp = heston_estimates()
     hp['theta_p'] = hp['real_var']
     R['heston'] = hp
+    R['jumps'] = fig_jumps(hp, g['sp500']['mu'])
     R['heston_sim'] = fig_heston_paths(hp, g['sp500'])
     R['smile'] = fig_heston_smile(hp)
     print('6. Models vs data')
@@ -1012,7 +1367,9 @@ elif __name__ == '__main__':
     R['measure'] = measure_change(g, R['vasicek'], hp)
     print('8. Case study: rough and persistent volatility')
     R['rough'] = rough_case()
-    R['data'] = {k: dict(n=len(v), start=str(v.index[0].date()), end=str(v.index[-1].date())) for k, v in rets.items()}
+    print('9. Case study: drift bursts')
+    R['drift_burst'] = drift_burst_case()
+    R['data'] ={k: dict(n=len(v), start=str(v.index[0].date()), end=str(v.index[-1].date())) for k, v in rets.items()}
     with open(os.path.join(HERE, 'ch11_results.json'), 'w') as f:
         json.dump(jsonable(R), f, indent=1)
     print('saved ch11_results.json')

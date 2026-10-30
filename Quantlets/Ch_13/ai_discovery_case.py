@@ -6,8 +6,12 @@ Testăm fiecare pereche (variabilă, orizont) cu o regresie predictivă și core
   * perioada de descoperire: 2001--2015; perioada de verificare (holdout): 2016--2026
   * y_{t,h} = log P_{t+h} - log P_t, h in {1, 5, 20}; x_t standardizat; t Newey--West cu max(h, 5) întârzieri
   * corecții: Holm (FWER 5%), Benjamini--Hochberg (FDR 10%), pragul |t| > 3 (Harvey, Liu & Zhu, 2016)
-  * nulul comun: deplasări circulare ale țintei (păstrează dependența dintre variabile și autocorelația),
-    cuantila de 95% a max |t| pe toate testele
+  * granița purjată: în descoperire intră doar țintele a căror fereastră se încheie pînă la 31.12.2015
+    (label_end <= 2015-12-31)
+  * placebo prin deplasare: ținta deplasată circular față de variabile (păstrează dependența dintre variabile
+    și autocorelația țintei, dar schimbă relațiile cu volatilitatea condiționată); cuantila de 95% a max |t|
+    pe toate testele este un reper euristic, nu un test exact al ipotezei că toate pantele sînt zero
+  * verificarea pe holdout a selecțiilor nominale: Holm la 5% pe numărul de selecții
 Ieșire: ai_discovery_case.json
 """
 
@@ -81,19 +85,22 @@ def main():
     names = list(F.columns)
     res = {}
     rng = np.random.default_rng(SEED)
-    tdisc, thold, maxnull = [], [], []
+    tdisc, thold, maxnull, n_purged = [], [], [], {}
     shifts = rng.integers(250, 3000, size=500)
     for h in HORIZONS:
         y = (lp.shift(-h) - lp)
+        label_end = pd.Series(close.index, index=close.index).shift(-h)
         lags = max(h, 5)
         d = F.loc[DISC[0]:DISC[1]]
+        d = d.loc[label_end.loc[d.index] <= pd.Timestamp(DISC[1])]   # fereastra etichetei se încheie în descoperire
+        n_purged[h] = int(len(F.loc[DISC[0]:DISC[1]]) - len(d))
         yd = y.loc[d.index].values
         Xd = ((d - d.mean()) / d.std()).values
         tdisc.append(nw_tstats(yd, Xd, lags))
         dh = F.loc[HOLD[0]:HOLD[1]]
         yh = y.loc[dh.index].values
         thold.append(nw_tstats(yh, ((dh - dh.mean()) / dh.std()).values, lags))
-        # nul: ținta deplasată circular (fără valorile lipsă de la capăt)
+        # placebo prin deplasare: ținta deplasată circular (fără valorile lipsă de la capăt)
         ok = ~np.isnan(yd)
         mx = []
         for s in shifts:
@@ -125,13 +132,25 @@ def main():
     raw = np.abs(tdisc) > 1.96
     same = raw & (np.sign(thold) == np.sign(tdisc)) & (np.abs(thold) > 1.96)
     best = int(np.argmax(np.abs(tdisc)))
+    # verificarea pe holdout a selecțiilor nominale, cu Holm (FWER 5%) pe numărul de selecții
+    sel = np.where(raw)[0]
+    ph = 2 * (1 - stats.norm.cdf(np.abs(thold[sel])))
+    ph_same = np.where(np.sign(thold[sel]) == np.sign(tdisc[sel]), ph, 1.0)
+    holm_hold = 0
+    for k, i in enumerate(np.argsort(ph_same)):
+        if ph_same[i] <= 0.05 / (len(sel) - k):
+            holm_hold += 1
+        else:
+            break
     res = {
         'n_features': len(names), 'n_tests': int(M), 'horizons': list(HORIZONS),
         'disc': list(DISC), 'hold': list(HOLD),
         'n_raw': int(raw.sum()), 'expected_false': float(0.05 * M),
         'n_holm': int(holm.sum()), 'n_bh': int(bh.sum()), 'n_t3': int((np.abs(tdisc) > 3).sum()),
         'maxt_crit95': crit, 'n_maxt': int((np.abs(tdisc) > crit).sum()),
-        'n_replicate': int(same.sum()),
+        'n_replicate': int(same.sum()), 'n_replicate_holm': int(holm_hold),
+        'min_p_hold_selected': float(ph_same.min()) if len(sel) else None,
+        'n_purged_disc': {str(k): v for k, v in n_purged.items()}, 'null': 'circular-shift placebo',
         'best': labels[best], 'best_t': float(tdisc[best]), 'best_t_hold': float(thold[best]),
         'best_p_raw': float(p[best]),
         'raw_list': [(labels[i], round(float(tdisc[i]), 2), round(float(thold[i]), 2)) for i in np.where(raw)[0]],
@@ -155,11 +174,13 @@ def fig_ai_tstats(res):
     ax = axes[0]
     k = np.arange(1, len(td) + 1)
     ax.bar(k, np.abs(td[order]), color=[MainBlue if abs(t) > 1.96 else Amber for t in td[order]], width=0.85)
-    for y, c, ls, lab in ((1.96, 'black', ':', '|t| = 1.96: 21 of 102 pass'),
-                          (res['bh_t_cut'], Forest, '--', 'BH, FDR 10%: 13 pass'),
-                          (3.0, Purple, '-.', '|t| > 3: 4 pass'),
-                          (res['maxt_crit95'], IDAred, '-', 'joint null, 95%% of max|t| = %.2f: 1 passes' % res['maxt_crit95']),
-                          (res['holm_t_first'], Orange, '--', 'Holm first step, FWER 5%%: |t| > %.2f, none' % res['holm_t_first'])):
+    n_ = len(td)
+    cnt = lambda k: 'none' if k == 0 else ('1 passes' if k == 1 else f'{k} pass')
+    for y, c, ls, lab in ((1.96, 'black', ':', f"|t| = 1.96: {res['n_raw']} of {n_} pass"),
+                          (res['bh_t_cut'], Forest, '--', f"BH, FDR 10%: {cnt(res['n_bh'])}"),
+                          (3.0, Purple, '-.', f"|t| > 3: {cnt(res['n_t3'])}"),
+                          (res['maxt_crit95'], IDAred, '-', 'shift placebo, 95%% of max|t| = %.2f: %s' % (res['maxt_crit95'], cnt(res['n_maxt']))),
+                          (res['holm_t_first'], Orange, '--', 'Holm first step, FWER 5%%: |t| > %.2f, %s' % (res['holm_t_first'], cnt(res['n_holm'])))):
         ax.axhline(y, color=c, ls=ls, lw=1.0, label=lab)
     ax.set_xlabel('test rank (34 features x 3 horizons, ordered by |t|)'); ax.set_ylabel('|Newey-West t|, 2001-2015')
     ax.set_xlim(0, len(td) + 1)
@@ -169,13 +190,13 @@ def fig_ai_tstats(res):
     same = raw & (np.sign(th) == np.sign(td)) & (np.abs(th) > 1.96)
     ax.scatter(td[~raw], th[~raw], s=10, color=Amber, alpha=0.8, label='|t| < 1.96 in discovery')
     ax.scatter(td[raw & ~same], th[raw & ~same], s=16, color=MainBlue, label='discovery |t| > 1.96, fails in holdout')
-    ax.scatter(td[same], th[same], s=26, color=IDAred, marker='D', label='replicates: same sign, |t| > 1.96')
+    ax.scatter(td[same], th[same], s=26, color=IDAred, marker='D', label='nominal replication: same sign, |t| > 1.96')
     lim = 4.0
     ax.plot([-lim, lim], [-lim, lim], color='black', ls=':', lw=0.8)
     for v in (-1.96, 1.96):
         ax.axhline(v, color='black', lw=0.5, ls='--'); ax.axvline(v, color='black', lw=0.5, ls='--')
     ax.set_xlim(-lim, lim); ax.set_ylim(-lim, lim)
-    ax.set_xlabel('t, discovery 2001-2015'); ax.set_ylabel('t, holdout 2016-2026')
+    ax.set_xlabel('t, discovery 2001-2015 (labels ending by 2015)'); ax.set_ylabel('t, holdout 2016-2026')
     ax.set_title('Holdout check', loc='left')
     plt.tight_layout()
     h1, l1 = axes[0].get_legend_handles_labels(); h2, l2 = axes[1].get_legend_handles_labels()

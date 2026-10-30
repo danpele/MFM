@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch14_data.js?v=20261029b"></script>
-<script src="ch14_text_en.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch14.js?v=20261029b" defer></script>
+<script src="ch14_data.js?v=20261030a"></script>
+<script src="ch14_text_en.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch14.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
-<p class="toc"><a href="#s-sig">What We Forecast and Where the Signal Is</a> · <a href="#s-att">Attention and Transformers</a> · <a href="#s-t1">Test 1: Forecasting Returns</a> · <a href="#s-t2">Test 2: Forecasting Realised Volatility</a> · <a href="#s-t3">Test 3: VaR 1% and ES 2.5%</a> · <a href="#s-kmz">Case Study: The Virtue of Complexity</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
+<p class="toc"><a href="#s-sig">What We Forecast and Where the Signal Is</a> · <a href="#s-att">Attention and Transformers</a> · <a href="#s-t1">Test 1: Forecasting Returns</a> · <a href="#s-t2">Test 2: Forecasting Realised Volatility</a> · <a href="#s-t3">Test 3: VaR 1% and ES 2.5%</a> · <a href="#s-kmz">Case Studies: The Virtue of Complexity and the M6 Competition</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
 <h2 class="sec" id="s-sig">What We Forecast and Where the Signal Is</h2>
 <section class="blk" id="signal">
   <h3>Where Is the Signal?</h3>
@@ -83,7 +83,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ql-l">Loss function</label><select id="ql-l"><option value="qlike" selected>QLIKE</option><option value="mse">MSE</option></select></div><div class="ctl"><label for="ql-s">Left panel starts on: <b id="ql-s-v"></b></label><input type="range" id="ql-s" min="0" max="860" step="1" value="0"></div><button class="btn play" id="ql-play" type="button"></button></div><div class="charts "><div class="chart" id="ql-full"></div><div class="chart" id="ql-post"></div></div><ul class="out" id="ql-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Does Chronos-2, with no estimation on SPY, forecast realised variance better than log-HAR?</div>
-  <details><summary>Answer</summary><p>Its mean QLIKE loss is lower (0.231 against 0.234), but the DM test is not significant (p = 0.537), and the 90% model confidence set keeps six of the eight models. After 3 November 2025 the small LSTM is best (0.233).</p></details>
+  <details><summary>Answer</summary><p>Its mean QLIKE loss is lower (0.223 against 0.226), but the DM test is not significant (p = 0.539), and the 90% model confidence set keeps six of the eight models. After 3 November 2025 the small LSTM is best (0.217).</p></details>
 </section><h2 class="sec" id="s-t3">Test 3: VaR 1% and ES 2.5%</h2>
 <section class="blk" id="breach-rates">
   <h3>VaR 1% Breach Rates</h3>
@@ -123,7 +123,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="mc-w">Evaluation starts in: <b id="mc-w-v"></b></label><input type="range" id="mc-w" min="0" max="10" step="1" value="0"></div><div class="ctl"><label for="mc-a">MCS level</label><select id="mc-a"><option value="0.75">75%</option><option value="0.9" selected>90%</option><option value="0.95">95%</option></select></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts "><div class="chart" id="mc-chart"></div></div><ul class="out" id="mc-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Which (VaR 2.5%, ES 2.5%) models does the 90% model confidence set eliminate?</div>
-  <details><summary>Answer</summary><p>Only HS on the BET (p = 0.015). On the S&P 500 FHS has the lowest FZ0 loss, and the pairwise DM test, more powerful than the MCS, shows that FHS beats the Chronos-2 hybrid (DM +2.65, p = 0.008).</p></details>
+  <details><summary>Answer</summary><p>Only HS on the BET (p = 0.015). On the S&P 500 FHS has the lowest FZ0 loss, and the DM test, Holm-adjusted over the five comparisons with FHS, shows that FHS beats the Chronos-2 hybrid (DM +2.65, p = 0.008 before the correction, Holm p = 0.032). On the BET the same test gives Holm p = 0.054.</p></details>
 </section>
 <section class="blk" id="conformal">
   <h3>Adaptive Conformal VaR 1% on the S&P 500</h3>
@@ -133,8 +133,8 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="cf-a">Market</label><select id="cf-a"><option value="sp500" selected>S&P 500</option><option value="btc">Bitcoin</option><option value="bet">BET</option></select></div><div class="ctl"><label for="cf-g">Step γ: <b id="cf-g-v"></b></label><input type="range" id="cf-g" min="0" max="5" step="1" value="2"></div><div class="ctl"><label for="cf-n">Calibration days</label><select id="cf-n"><option value="125">125</option><option value="250" selected>250</option><option value="500">500</option></select></div><button class="btn play" id="cf-play" type="button"></button></div><div class="charts "><div class="chart" id="cf-chart"></div></div><ul class="out" id="cf-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> With γ = 0.001, adaptive conformal inference brings the S&P 500 breaches of Chronos-2 close to 1%. What does the correction cost?</div>
-  <details><summary>Answer</summary><p>21 breaches against 24.4 expected over 2,443 days, but an average VaR 1% of 3.36% against 2.85% for FHS on the same days, so the FZ0 loss is significantly higher. With γ = 0 (split conformal) there are 16 breaches and an average VaR of 3.58%.</p></details>
-</section><h2 class="sec" id="s-kmz">Case Study: The Virtue of Complexity</h2>
+  <details><summary>Answer</summary><p>21 breaches against 24.4 expected over 2,443 days, but an average VaR 1% of 3.36% against 2.85% for FHS on the same days, so the FZ0 loss is significantly higher. With γ = 0 (rolling calibration at a fixed level) there are 16 breaches and an average VaR of 3.58%.</p></details>
+</section><h2 class="sec" id="s-kmz">Case Studies: The Virtue of Complexity and the M6 Competition</h2>
 <section class="blk" id="complexity">
   <h3>Case Study: Complexity on Course Data</h3>
   <div class="pair">
@@ -143,19 +143,29 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="kz-z">Ridge penalty z: <b id="kz-z-v"></b></label><input type="range" id="kz-z" min="-3" max="3" step="1" value="3"></div><div class="ctl"><label for="kz-c">Complexity c (cursor): <b id="kz-c-v"></b></label><input type="range" id="kz-c" min="0" max="23" step="1" value="23"></div><div class="ctl"><label for="kz-v">Left panel</label><select id="kz-v"><option value="r2" selected>R²</option><option value="bn">‖β̂‖²</option></select></div><button class="btn play" id="kz-play" type="button"></button></div><div class="charts "><div class="chart" id="kz-r2"></div><div class="chart" id="kz-sr"></div></div><ul class="out" id="kz-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> On course data, does the Sharpe ratio of the RFF timing strategy keep rising with complexity, as in the paper?</div>
-  <details><summary>Answer</summary><p>No. With z = 10³ it rises from 0.14 at c = 1 to 0.26 at c = 20 and falls to 0.07 at c = 1,000 (t = 0.4). The linear model with the same 7 predictors and z = 10³ has 0.32. Complexity helps up to c ≈ 20, not up to c = 1,000.</p></details>
+  <details><summary>Answer</summary><p>No. With z = 10³ it rises from 0.12 at c = 1 to 0.26 at c = 50 and falls to 0.11 at c = 1,000 (t = 0.6). The linear model with the same 7 predictors and z = 10³ has 0.32. Complexity helps up to c ≈ 50, not up to c = 1,000.</p></details>
+</section>
+<section class="blk" id="m6">
+  <h3>Case Study: M6 on Course Data</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch14_m6_rps_en.jpg" alt="Slide 61: Case Study: M6 on Course Data" loading="lazy"></a>
+      <figcaption>Slide 61</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="m6-w">Confidence w in the forecast (0 = equal probabilities, 1 = the model): <b id="m6-w-v"></b></label><input type="range" id="m6-w" min="0" max="20" step="1" value="10"></div><button class="btn play" id="m6-play" type="button"></button></div><div class="charts "><div class="chart" id="m6-bar"></div><div class="chart" id="m6-cum"></div></div><ul class="out" id="m6-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> In M6, 77% of the teams did not beat equal probabilities. Which forecast lowers the RPS most against the benchmark on the 19 M6 assets of the course data, and where does the gain come from?</div>
+  <details><summary>Answer</summary><p>The volatility-only model: an RPS lower by 2.7% in the M6 year (11 of 12 periods) and by 2.3% since July 2019 (DM −6.35, p < 0.001). Volatile assets get high probabilities for the extreme quintiles. The network lowers the RPS by 1.7% since 2019 (p = 0.016) but cannot be told apart from the volatility model (p = 0.466). The historical mean gives only 0.8% (p = 0.358); with the same 250-day covariance, a zero mean has an RPS 1.7% lower than the estimated mean (p = 0.080). With w = 0.5 the same forecast gives 1.9% (p < 0.001), and with w = 2 the volatility model gains only 0.3%: an overconfident forecast loses.</p></details>
 </section><h2 class="sec" id="s-ai">AI for Scientific Discovery</h2>
 <section class="blk" id="pre-post">
   <h3>Mini-Case: a Test Without Power</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=63" target="_blank" rel="noopener"><img src="slides/ch14_ai_prepost_en.jpg" alt="Slide 62: Mini-Case: a Test Without Power" loading="lazy"></a>
-      <figcaption>Slide 62</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter14_deep_learning_foundation_models.pdf#page=67" target="_blank" rel="noopener"><img src="slides/ch14_ai_prepost_en.jpg" alt="Slide 66: Mini-Case: a Test Without Power" loading="lazy"></a>
+      <figcaption>Slide 66</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ai-m">Model</label><select id="ai-m"><option value="Chronos-2" selected>Chronos-2</option><option value="Chronos-Bolt">Chronos-Bolt</option><option value="TimesFM-2.5">TimesFM-2.5</option></select></div><div class="ctl"><label for="ai-b">Break date: <b id="ai-b-v"></b></label><input type="range" id="ai-b" min="120" max="919" step="1" value="761"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-chart"></div></div><ul class="out" id="ai-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> After the release of the Chronos-2 weights, its loss relative to log-HAR rises by 0.0088. Is this evidence of memorisation?</div>
-  <details><summary>Answer</summary><p>No. The change has a HAC t of 1.00 and p = 0.32, and the minimum detectable effect at 80% power is 0.0247, 4.9 times the pre-release gap. Even an infinite post-release window would leave an MDE of 0.0169, so “no memorisation” is not a finding either.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> After the release of the Chronos-2 weights, its loss relative to log-HAR rises by 0.0074. Is this evidence of memorisation?</div>
+  <details><summary>Answer</summary><p>No. The change has a HAC t of 0.88 and p = 0.38, and the minimum detectable effect at 80% power is 0.0234, 5.3 times the pre-release gap. Even an infinite post-release window would leave an MDE of 0.0157, so “no memorisation” is not a finding either.</p></details>
 </section>
-<p class="src foot">Daily returns of the S&P 500, Bitcoin and the BET and 5-minute SPY prices: EODHD. One-day-ahead forecasts: Quantlets/Ch_14 (run_forecasts.py). Case study: SPY (EODHD) and FRED series.</p>
+<p class="src foot">Daily returns of the S&P 500, Bitcoin and the BET and 5-minute SPY prices: EODHD. One-day-ahead forecasts: Quantlets/Ch_14 (run_forecasts.py). Case studies: SPY and the 19 M6 assets (EODHD), FRED series; M6 forecasts: Quantlets/Ch_14 (m6_case.py).</p>
 </main>
 </body>
 </html>

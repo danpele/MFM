@@ -325,11 +325,26 @@ def leverage_corr(r, K=20):
     return ks, np.array([r.corr(a.shift(-k)) for k in ks])     # corr(r_t, |r_{t+k}|)
 
 
+def nw_lag(T):
+    """Newey-West truncation lag used throughout the chapter and Seminar 1: floor(4 (T/100)^(2/9))."""
+    return int(4 * (T / 100) ** (2 / 9))
+
+
 def leverage_tau(r, k):
-    """Variance of corr(r_t, |r_{t+k}|) under no correlation, robust to volatility clustering."""
+    """Variance of corr(r_t, |r_{t+k}|) under H0 of zero correlation. Under H0 the influence function of the sample
+    correlation is u_t = x_t y_t / (s_x s_y) (x, y demeaned); the products u_t can be autocorrelated even when the
+    correlation is zero (volatility clustering), so the variance is the Newey-West (Bartlett) long-run variance of
+    u_t divided by T, with the chapter's lag nw_lag(T)."""
     df = pd.concat([r - r.mean(), (r.abs() - r.abs().mean()).shift(-k)], axis=1).dropna()
     x, y = df.iloc[:, 0].values, df.iloc[:, 1].values
-    return np.sum(x ** 2 * y ** 2) / (np.sum(x ** 2) * np.sum(y ** 2))
+    T = len(x)
+    u = x * y / np.sqrt(np.mean(x ** 2) * np.mean(y ** 2))
+    u = u - u.mean()
+    L = nw_lag(T)
+    lrv = np.sum(u * u) / T
+    for j in range(1, L + 1):
+        lrv += 2 * (1 - j / (L + 1)) * np.sum(u[j:] * u[:-j]) / T
+    return lrv / T
 
 
 def fig_leverage():

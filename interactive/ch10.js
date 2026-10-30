@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH10_DATA;
-const { LANG, sum, mean, median, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { LANG, sum, mean, median, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH10_TEXT;
 
 // ---------------------------------------------------------------- colours of the chapter charts (generate_all_charts.py)
@@ -387,6 +387,51 @@ function raceTax() {
   out('rt-out', [T.rt(nf(b, 4), nf(median(tax), 2), nf(h, 4), pct(tax.filter(v => v > h).length / tax.length, 0), tax.filter(v => v > RC.hi).length, nf(mx, 2), fday(RT.days[im]), nfi(tax.length))]);
 }
 
+// ================================================================= 13b. market intraday momentum (Baltussen et al., 2021)
+const IM = D.imom;
+const IM_END = c => { const t = +c.slice(0, 2) * 60 + +c.slice(3, 5) + 5; return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; };
+const IM_LEN = c => 16 * 60 - (+c.slice(0, 2) * 60 + +c.slice(3, 5) + 5);   // bar start -> minutes of the last interval
+function nwReg(x, y, L) {                 // OLS of y on (1, x); Newey-West (Bartlett, L lags) as statsmodels HAC; slope and R2 x 100
+  const n = x.length, f = ols(x, y), e = y.map((v, i) => v - f.a - f.b * x[i]), mx = mean(x);
+  let sxx = 0, sx = 0, sx2 = 0, syy = 0; const my = mean(y);
+  for (let i = 0; i < n; i++) { sxx += (x[i] - mx) ** 2; sx += x[i]; sx2 += x[i] * x[i]; syy += (y[i] - my) ** 2; }
+  const g = (l) => { let a = 0, b = 0, c = 0, d = 0; for (let t = l; t < n; t++) { const u0 = e[t], u1 = e[t - l]; a += u0 * u1; b += u0 * u1 * x[t - l]; c += u0 * x[t] * u1; d += u0 * x[t] * u1 * x[t - l]; } return [[a, b], [c, d]]; };
+  let S = g(0);
+  for (let l = 1; l <= L; l++) { const G = g(l), w = 1 - l / (L + 1); S = [[S[0][0] + w * 2 * G[0][0], S[0][1] + w * (G[0][1] + G[1][0])], [S[1][0] + w * (G[1][0] + G[0][1]), S[1][1] + w * 2 * G[1][1]]]; }
+  const det = n * sx2 - sx * sx, Q = [[sx2 / det, -sx / det], [-sx / det, n / det]];       // (X'X)^-1
+  const qs = [Q[1][0] * S[0][0] + Q[1][1] * S[1][0], Q[1][0] * S[0][1] + Q[1][1] * S[1][1]];
+  const v = qs[0] * Q[0][1] + qs[1] * Q[1][1], se = 100 * Math.sqrt(v), b = 100 * f.b;
+  return { n, beta: b, se, t: b / se, lo: b - 1.96 * se, hi: b + 1.96 * se, r2: 100 * (1 - sum(e.map(u => u * u)) / syy), a: f.a };
+}
+function qbins(x, y, k) {                 // pandas qcut(x, k): edges at the numpy quantiles, intervals (e_j, e_j+1], first closed
+  const s = [...x].sort((a, b) => a - b), q = j => { const h = (s.length - 1) * j / k, lo = Math.floor(h); return s[lo] + (h - lo) * ((s[Math.min(lo + 1, s.length - 1)]) - s[lo]); };
+  const E = Array.from({ length: k + 1 }, (_, j) => q(j)), B = Array.from({ length: k }, () => ({ x: [], y: [] }));
+  x.forEach((v, i) => { let j = 0; while (j < k - 1 && v > E[j + 1]) j++; B[j].x.push(v); B[j].y.push(y[i]); });
+  return B.map(b => ({ x: 100 * mean(b.x), y: 1e4 * mean(b.y), se: 1e4 * sdev(b.y) / Math.sqrt(b.y.length) }));
+}
+const { sdev } = window.MFMI;
+function imData(c) { const x = IM.x[c]; return { x, y: IM.close.map((v, i) => v - x[i]) }; }
+function intradayMomentum() {
+  const m = +$('im-m').value, c = IM.cuts.find(k => IM_LEN(k) === m), P = IM.paper;
+  $('im-m-v').textContent = T.im_len(m);
+  const { x, y } = imData(c), R = nwReg(x, y, IM.lags), bins = qbins(x, y, 10);
+  const xs = [Math.min(...bins.map(b => b.x)) - 0.3, Math.max(...bins.map(b => b.x)) + 0.3], mx = 100 * mean(x), my = 1e4 * mean(y);
+  plot('im-scat', [
+    { x: bins.map(b => b.x), y: bins.map(b => b.y), error_y: { type: 'data', array: bins.map(b => 1.96 * b.se), color: K.blue, thickness: 1.2, width: 3 }, mode: 'markers', name: `SPY decile means of the last-${m}-minute return, 95% interval`, marker: { color: K.blue, size: 8 }, hovertemplate: 'rest of day %{x:.2f}%: %{y:.2f} bp<extra></extra>' },
+    { x: xs, y: xs.map(v => 1e4 * R.a + R.beta * v), mode: 'lines', name: `SPY OLS fit: 100 beta = ${nfE(R.beta)} (95% interval ${nfE(R.lo)} to ${nfE(R.hi)})`, line: { color: K.blue, width: 2 }, hoverinfo: 'skip' },
+    { x: xs, y: xs.map(v => my + P.beta_eq * (v - mx)), mode: 'lines', name: 'Paper, equity futures, last 30 minutes: 100 beta = 4.18', line: { color: K.red, width: 2, dash: 'dash' }, hoverinfo: 'skip' }],
+  layout({ title: ttl(`Last ${m} minutes against the rest of the day`), shapes: [hline(0, K.navy)],
+    xaxis: AX(`Rest-of-day return, previous close to ${IM_END(c)} (%)`), yaxis: AX(`Return of the last ${m} minutes (bp)`) }));
+  const yrs = [...new Set(IM.yb)], RY = yrs.map(Y => { const k = IM.yb.map((v, i) => (v === Y ? i : -1)).filter(i => i >= 0); return nwReg(k.map(i => x[i]), k.map(i => y[i]), IM.lags); });
+  plot('im-year', [
+    { x: yrs, y: RY.map(r => r.beta), error_y: { type: 'data', symmetric: false, array: RY.map(r => r.hi - r.beta), arrayminus: RY.map(r => r.beta - r.lo), color: K.blue, thickness: 1.2, width: 3 }, mode: 'markers', name: 'SPY slope by year, Newey-West 95% interval', marker: { color: K.blue, size: 9, symbol: 'square' }, customdata: RY.map(r => r.n), hovertemplate: '%{x}: %{y:.2f} (%{customdata} days)<extra></extra>' },
+    { x: [yrs[0]], y: [null], mode: 'lines', name: 'Paper: 100 beta = 4.18', line: { color: K.red, width: 2, dash: 'dash' }, hoverinfo: 'skip' }],
+  layout({ title: ttl('Slope 100 beta by year'), shapes: [hline(P.beta_eq, K.red, 'dash'), hline(0, K.navy)], xaxis: AX('', { type: 'category' }), yaxis: AX('Slope 100 beta') }));
+  const sg = RY.map((r, i) => [yrs[i], r]).filter(([, r]) => r.lo > 0 || r.hi < 0);
+  out('im-out', [T.im(m, nfi(R.n), nf(R.beta, 2), nf(R.t, 2), nf(R.lo, 2), nf(R.hi, 2), nf(R.r2, 2)),
+    T.im2(sg.map(([Y, r]) => `${Y} (${nf(r.beta, 2)})`), yrs.length)]);
+}
+
 // ================================================================= 14. AI mini-case
 const MC_SET = ['all', 'US', 'BVB', 'Crypto'];
 function miniCase() {
@@ -406,7 +451,7 @@ function miniCase() {
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   $('lob-k').max = NS - 1; $('lob-k').value = NS >> 1; on(['lob-k'], lob); P('lob-play', 'lob-k', range(0, NS - 1, 1), 140);
   on(['wb-q'], walkBook); P('wb-play', 'wb-q', range(1, 80, 1), 90);
   on(['ro-c', 'ro-s', 'ro-n'], roll); P('ro-play', 'ro-c', range(0, 0.15, 0.005), 220);
@@ -420,9 +465,13 @@ function init() {
   on(['ac-l'], almgren); P('ac-play', 'ac-l', range(0, AC_L.length - 1, 1), 500);
   $('fc-t').max = FL.days.length - 1; $('fc-t').value = FL.days.length - 1; on(['fc-t'], flash); P('fc-play', 'fc-t', range(0, FL.days.length - 1, 1), 350);
   on(['rt-h', 'rt-b'], raceTax); P('rt-play', 'rt-h', range(0.2, 1.1, 0.02), 220);
+  on(['im-m'], intradayMomentum); P('im-play', 'im-m', range(10, 60, 10), 1200);
   on(['mc-x'], miniCase); P('mc-play', 'mc-x', range(0, 3, 1), 1500);
-  lob(); walkBook(); roll(); spreadFreq(); spreadCross(); amihudCross(); amihudTime(); intraday(); illiqVix(); kyle(); almgren(); flash(); raceTax(); miniCase();
+  const PFX = { 'order-book': 'lob', 'walk-book': 'wb', 'roll': 'ro', 'spread-frequency': 'sf', 'spread-cross': 'sc', 'amihud': 'am', 'amihud-time': 'at', 'intraday': 'id', 'illiq-vix': 'iv', 'kyle': 'ky', 'almgren-chriss': 'ac', 'flash-crash': 'fc', 'race-tax': 'rt', 'intraday-momentum': 'im', 'mini-case': 'mc' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'] }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  lob(); walkBook(); roll(); spreadFreq(); spreadCross(); amihudCross(); amihudTime(); intraday(); illiqVix(); kyle(); almgren(); flash(); raceTax(); intradayMomentum(); miniCase();
 }
-window.CH10 = { pooled, impactAt, polyslope, sfWindow, rollCov, csSpread, arTerms, edge, spearman, aggregate, acTraj, AC_L, atMed, pearson, ols };
+window.CH10 = { pooled, impactAt, polyslope, sfWindow, rollCov, csSpread, arTerms, edge, spearman, aggregate, acTraj, AC_L, atMed, pearson, ols, nwReg, qbins, imData };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

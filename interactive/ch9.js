@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH9_DATA;
-const { sum, mean, sdev, median, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, rng } = window.MFMI;
+const { sum, mean, sdev, median, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, rng, predict, exitTicket } = window.MFMI;
 const T = window.CH9_TEXT;
 const K = D.col;
 const ANN = { spy: 252, btc: 365 };
@@ -376,11 +376,49 @@ function csvBlock() {
   out('cs-out', [T.cs(lab, T.fam[C.family[sel]], nf(a[0], 3), nf(a[1], 3), nf(a[2], 3), nf(b[0], 3), nf(b[1], 3), nf(b[2], 3), rank)]);
 }
 
+// ================================================================= case study: partial variances (Bollerslev, Medeiros, Patton & Quaedvlieg, 2022)
+const PV = D.partial, PVQ = PV.q, PVCOL = { spy: K.blue, btc: K.amber }, PVLAB = { spy: 'SPY', btc: 'Bitcoin' }, PVTOP = 1.15;
+function pvSet(m) {                                            // forecasts of case_partial.py; target = RV (SPY intraday, Bitcoin 24 hours)
+  const S = PV[m], y = S.pos.map(i => RV[m][i]), order = y.map((v, i) => i).sort((a, b) => y[b] - y[a]);
+  return { S, y, order };
+}
+const PVS = { spy: pvSet('spy'), btc: pvSet('btc') };
+function pvRatios(m, k) {                                      // loss ratios to RV-HAR without the k days with the largest RV
+  const { S, y, order } = PVS[m], drop = new Set(order.slice(0, k)), idx = y.map((v, i) => i).filter(i => !drop.has(i));
+  const L = (mm, kind) => mean(idx.map(i => lossF(kind, y[i], S[mm][i])));
+  const base = { mse: L('RV-HAR', 'mse'), qlike: L('RV-HAR', 'qlike') }, rat = (mm, kind) => L(mm, kind) / base[kind];
+  const se = y.map((v, i) => lossF('mse', v, S['RV-HAR'][i]));
+  const dq = idx.map(i => lossF('qlike', y[i], S['SV-HAR'][i]) - lossF('qlike', y[i], S['RV-HAR'][i]));
+  return { n: idx.length, sv: { mse: rat('SV-HAR', 'mse'), qlike: rat('SV-HAR', 'qlike') }, p3: { mse: rat('PV(3)', 'mse'), qlike: rat('PV(3)', 'qlike') },
+    curve: { mse: PVQ.map(q => rat('PV2_' + q.toFixed(2), 'mse')), qlike: PVQ.map(q => rat('PV2_' + q.toFixed(2), 'qlike')) },
+    share: sum(order.slice(0, k).map(i => se[i])) / sum(se), t: nwT(dq) };
+}
+function partialBlock() {
+  const k = +$('pv-k').value; $('pv-k-v').textContent = k;
+  const R = { spy: pvRatios('spy', k), btc: pvRatios('btc', k) };
+  ['mse', 'qlike'].forEach(kind => {
+    const vals = ['spy', 'btc'].flatMap(m => [...R[m].curve[kind], R[m].sv[kind]]);
+    const top = Math.max(PVTOP, ...vals.filter(v => v <= 1.5)), tr = [], ann = [];
+    for (const m of ['spy', 'btc']) {
+      const c = R[m].curve[kind];
+      tr.push({ x: PVQ, y: c.map(v => Math.min(v, top)), customdata: c, mode: 'lines+markers', name: `${PVLAB[m]}: PV(2)-HAR, one threshold at quantile q`, line: { color: PVCOL[m], width: 1.8 }, marker: { size: 6 }, hovertemplate: PVLAB[m] + ', q = %{x:.2f}: %{customdata:.3f}<extra></extra>' });
+      tr.push({ x: [PVQ[0], PVQ[PVQ.length - 1]], y: [R[m].sv[kind], R[m].sv[kind]], mode: 'lines', name: `${PVLAB[m]}: SV-HAR (threshold at zero)`, line: { color: PVCOL[m], width: 1.4, dash: 'dash' }, hovertemplate: PVLAB[m] + ' SV-HAR: ' + R[m].sv[kind].toFixed(3) + '<extra></extra>' });
+      c.forEach((v, j) => { if (v > top) ann.push({ x: PVQ[j], y: top, text: `${PVLAB[m]}, q = ${PVQ[j].toFixed(2)}: ${v.toFixed(2)}`, showarrow: false, xanchor: 'right', yanchor: 'top', xshift: -6, font: { size: 11, color: PVCOL[m] } }); });
+    }
+    tr.push({ x: [PVQ[0], PVQ[PVQ.length - 1]], y: [1, 1], mode: 'lines', name: 'RV-HAR = 1', line: { color: K.navy, width: 1.2, dash: 'dot' }, hoverinfo: 'skip' });
+    plot(kind === 'mse' ? 'pv-m' : 'pv-q', tr, layout({ title: ttl(kind === 'mse' ? 'MSE relative to RV-HAR' : 'QLIKE relative to RV-HAR'), annotations: ann,
+      xaxis: AX('Threshold: quantile q of standardised returns'), yaxis: AX('Loss ratio', { range: [Math.min(...vals) - 0.01, top + 0.01] }), legend: legendBelow(-0.3) }));
+  });
+  const best = (m, kind) => { const c = R[m].curve[kind], j = c.indexOf(Math.min(...c)); return [nf(PVQ[j], 2), nf(c[j], 3)]; };
+  const line = m => T.pv(PVLAB[m], fint(R[m].n), k, nf(R[m].sv.mse, 3), nf(R[m].sv.qlike, 3), nf(R[m].p3.mse, 3), nf(R[m].p3.qlike, 3), ...best(m, 'mse'), ...best(m, 'qlike'));
+  out('pv-out', [line('spy'), line('btc'), T.pv2(k, pct(R.spy.share, 0), nf(R.spy.t, 2))]);
+}
+
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
-  $('rs-chart').style.height = '480px'; $('jp-chart').style.height = '480px'; $('on-chart').style.height = '400px'; $('ac-chart').style.height = '420px'; $('cs-chart').style.height = '440px';
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
+  $('rs-chart').style.height = '480px'; $('jp-chart').style.height = '480px'; $('on-chart').style.height = '400px'; $('ac-chart').style.height = '420px'; $('cs-chart').style.height = '440px'; $('pv-m').style.height = '400px'; $('pv-q').style.height = '400px';
   on(['id-d', 'id-k'], intraday); P('id-play', 'id-k', range(1, 78, 1), 120);
   on(['rs-k'], rvSeries); P('rs-play', 'rs-k', range(0, 100, 5), 500);
   on(['on-g', 'on-c'], overnight); P('on-play', 'on-c', range(1, 2, 0.05), 300);
@@ -394,8 +432,12 @@ function init() {
   $('oo-t').max = MONTH0.findIndex(d => d >= '2026-01-01'); on(['oo-l', 'oo-t'], oos); P('oo-play', 'oo-t', range(0, +$('oo-t').max, 1), 500);
   on(['ro-a'], rough); P('ro-play', 'ro-a', range(1, 20, 1), 500);
   on(['cs-m'], csvBlock); P('cs-play', 'cs-m', D.csv.models, 1200);
-  intraday(); rvSeries(); overnight(); signature(); jumps(); distributions(); acfBlock(); vixBlock(); oos(); rough(); csvBlock();
+  on(['pv-k'], partialBlock); P('pv-play', 'pv-k', range(0, 30, 1), 450);
+  const PFX = { 'one-day': 'id', 'rv-series': 'rs', 'overnight': 'on', 'signature': 'sg', 'jumps': 'jp', 'distributions': 'ds', 'persistence': 'ac', 'vix': 'vx', 'forecasts': 'oo', 'rough': 'ro', 'ml-vs-har': 'cs', 'partial': 'pv' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'] }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  intraday(); rvSeries(); overnight(); signature(); jumps(); distributions(); acfBlock(); vixBlock(); oos(); rough(); csvBlock(); partialBlock();
 }
-window.CH9 = { acf, moments, nwT, ncdf, nppf, jumpDays, sigCurve, vixPrep, roughFit, dayPath, RVT, CC, DT, RV, FC, lossF, acPrep };
+window.CH9 = { acf, moments, nwT, ncdf, nppf, jumpDays, sigCurve, vixPrep, roughFit, dayPath, RVT, CC, DT, RV, FC, lossF, acPrep, pvRatios };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

@@ -76,6 +76,19 @@ def main():
     d['pdv'] = dict(pos=pos.tolist(), vix=vv.values.tolist(), params=params.to_dict(), table3=list(g.PDV_TABLE3_VIX),
                     train=list(g.PDV_TRAIN), test=list(g.PDV_TEST), lags=g.PDV_LAGS)
 
+    # case study 2: SPY overnight / intraday / dividend components (case_overnight.py); prices as stored
+    import case_overnight as co
+    spy = g.read_market('SPY.US')
+    dsp, res_on = co.analyse()
+    d['on'] = dict(t=days(spy.index), O=spy['open'].tolist(), C=spy['close'].tolist(), A=spy['adjusted_close'].tolist(),
+                   sub=[[p['from'], p['to']] for p in res_on['subperiods']], btc=res_on['btc'],
+                   full={k: res_on['full'][k] for k in ('overnight', 'intraday', 'dividend', 'total')})
+    for k in ('overnight', 'intraday', 'dividend'):      # the page recomputes the components from the prices
+        f = spy['adjusted_close'] / spy['close']
+        comp = dict(overnight=np.log(spy['open'] / spy['close'].shift(1)), intraday=np.log(spy['close'] / spy['open']),
+                    dividend=np.log(f / f.shift(1)))[k].loc[dsp.index]
+        assert np.allclose(comp.values, dsp[k].values, atol=1e-13)
+
     # numbers of the chapter tables used in the readouts
     li = pd.read_csv(os.path.join(HERE, 'ch1_long_memory.csv'), index_col=0)
     hi = pd.read_csv(os.path.join(HERE, 'ch1_hill_inference.csv'), index_col=0)

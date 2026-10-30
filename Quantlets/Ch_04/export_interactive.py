@@ -82,7 +82,11 @@ def main():
     for u, (ret, to, W) in bts.items():
         d['oos'][u] = dict(dates=ym(ret.index), rf=r(ret.attrs['rf'].values, 6),
                            ret={s: r(ret[s].values, 6) for s in g.STRATS},
-                           turnover={s: r(to[s].fillna(0).values, 5) for s in g.STRATS})
+                           turnover={s: r(to[s].fillna(0).values, 5) for s in g.STRATS},
+                           liquidated={s: f'{g.ruin_month(ret, s):%Y-%m}' for s in g.STRATS
+                                       if g.ruin_month(ret, s) is not None})
+    # a rule whose wealth reaches zero is liquidated and left out of the comparisons
+    d['implementable'] = [s for s in g.STRATS if all(s in g.implementable(bts[u][0]) for u in bts)]
     ret, to, W = bts['Sectors']
     d['rolling'] = dict(dates=ym(W['MV'].index), MV=r(W['MV'].values, 4), GMV_LW=r(W['GMV-LW'].values, 4))
     d['tests'] = {u: {s: {k: v[k] for k in ('diff', 'se_hac', 'p_hac', 'p_boot', 'ci_boot', 'block', 't_obs', 'z_star')}
@@ -93,6 +97,19 @@ def main():
     d['bvb'] = dict(dates=ym(ret.index), strategies=list(g.BVB_STRATS), ret={s: r(ret[s].values, 6) for s in g.BVB_STRATS},
                     bench={b: r(bench[b].reindex(ret.index).values, 6) for b in ('BET-TR', 'BET')},
                     tests={s: {k: v[k] for k in ('diff', 'p_hac', 'p_boot', 'ci_boot')} for s, v in res['bvb']['tests'].items()})
+
+    # case study: volatility-managed portfolios (DeMiguel, Martin-Utrera & Uppal 2024), vol_managed_case.py
+    import vol_managed_case as vm
+    vres, vraw = vm.compute()
+    d['vmp'] = dict(cost_bp=vm.COST_BP, universes=list(vraw), single_universe='Multi-asset')
+    for u, (ret, to, lev, single, Xoos, sig_m) in vraw.items():
+        d['vmp'][u] = dict(dates=ym(ret.index), T=len(ret),
+                           ret={s: r(ret[s].values, 6) for s in ret}, turnover={s: r(to[s].fillna(0).values, 5) for s in ret},
+                           leverage={s: round(v, 4) for s, v in lev.items()},
+                           single={c: [round(v['sr_unmanaged'], 4), round(v['sr_managed'], 4), round(v['p_hac'], 4)]
+                                   for c, v in vres[u]['single'].items()},
+                           tests={s: {k: (round(v, 4) if v is not None else None) for k, v in t.items()}
+                                  for s, t in vres[u]['tests'].items()})
 
     with open(OUT, 'w') as f:
         f.write('// Inputs of the Chapter 4 interactive page, exported by Quantlets/Ch_04/export_interactive.py.\n')

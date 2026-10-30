@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH5_DATA;
-const { C, sum, mean, sdev, median, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { C, sum, mean, sdev, median, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH5_TEXT;
 
 // ---------------------------------------------------------------- colours (same as the slides)
@@ -27,6 +27,13 @@ function acf(x, L) {
 const exkurt = x => { const m = mean(x), n = x.length; let m2 = 0, m4 = 0; for (const v of x) { const d = (v - m) ** 2; m2 += d; m4 += d * d; } m2 /= n; m4 /= n; return m4 / (m2 * m2) - 3; };
 const corr = (a, b) => { const ma = mean(a), mb = mean(b); let sab = 0, saa = 0, sbb = 0; for (let i = 0; i < a.length; i++) { const x = a[i] - ma, y = b[i] - mb; sab += x * y; saa += x * x; sbb += y * y; } return sab / Math.sqrt(saa * sbb); };
 const halfLife = p => (p > 0 && p < 1 ? Math.log(0.5) / Math.log(p) : Infinity);
+// E tau_{t+s} - E tau follows an AR(m) recursion, c_1 = l2 + l1/m, c_j = l1/m (j = 2..m): its dominant root
+// (ratio of successive terms of the impulse response after many steps); lambda1 + lambda2 alone is not a half-life
+function slowRoot(l1, l2, m) {
+  const N = 6000, x = new Float64Array(N); x[0] = 1; let run = 1;
+  for (let s = 1; s < N; s++) { x[s] = l2 * x[s - 1] + l1 / m * run; run += x[s]; if (s - m >= 0) run -= x[s - m]; }
+  return x[N - 1] / x[N - 2];
+}
 const days = h => (isFinite(h) && h < 1e4 ? nf(h, 0) : '> 10000');
 
 // special functions: log-gamma, regularised incomplete beta, Student-t and Normal distributions
@@ -373,10 +380,57 @@ function qsd() {
   out('qs-out', [T.qs(lab[k], nf(Q.xi[k], 3), nf(Q.zeta[k], 3), nf(Q.p_xi_zeta[k], 3)), T.qs2(nf(z, 3), nf(qsdW(z, 5), 1), nf(qsdW(Q.xi_beta[k], 5), 1))]);
 }
 
+// ================================================================= MF2-GARCH case study (Conrad & Engle, 2025)
+const MF = D.mf2;
+const MF_DT = calendar(MF);
+const MF_VAR = (() => { const m = mean(MF.r); return mean(MF.r.map(v => (v - m) ** 2)); })();
+function mf2Filter(r, th, m) {                                       // case_mf2garch.mf2_filter: h_0 = 1, tau fixed at var(r) for the first m days
+  const [mu, al, ga, be, l0, l1, l2] = th, phi = al + ga / 2 + be, n = r.length;
+  const sig = new Array(n), tau = new Array(n), V = new Array(n);
+  let h = 1, t = MF_VAR, run = 0;
+  for (let i = 0; i < n; i++) {
+    const e = r[i] - mu; sig[i] = Math.sqrt(h * t); tau[i] = Math.sqrt(t);
+    V[i] = e * e / h; run += V[i]; if (i >= m) run -= V[i - m];
+    const hn = (1 - phi) + (al + (e < 0 ? ga : 0)) * e * e / t + be * h;
+    t = i + 1 >= m ? l0 + l1 * run / m + l2 * t : MF_VAR; h = hn;
+  }
+  return { sig, tau };
+}
+const MF_PER = { pre: '2010–2019', full: '2010–2026' };
+function mf2Block() {
+  const m = +$('mf-m').value, per = $('mf-per').value, th = MF.grid[String(m)], A = Math.sqrt(MF.ppy), B = MF.burn;
+  $('mf-m-v').textContent = m;
+  const F = mf2Filter(MF.r, th, m), sig = F.sig.map(v => v * A), tau = F.tau.map(v => v * A);
+  let k = B; for (let i = B; i < tau.length; i++) if (tau[i] > tau[k]) k = i;
+  let j = B; for (let i = B; i < tau.length; i++) if (tau[i] < tau[j]) j = i;
+  plot('mf-vol', [
+    { x: MF_DT, y: sig, mode: 'lines', name: 'Conditional volatility √(h·τ)', line: { color: K.blue, width: 0.6 }, hovertemplate: '%{x}: %{y:.1f}%<extra></extra>' },
+    { x: MF_DT, y: tau, mode: 'lines', name: `Long-term volatility √τ, m = ${m}`, line: { color: K.red, width: 2 }, hovertemplate: '√τ %{x}: %{y:.1f}%<extra></extra>' },
+    { x: [null], y: [null], mode: 'markers', name: 'NBER recessions', marker: { color: K.band, size: 12, symbol: 'square' }, hoverinfo: 'skip' }
+  ], layout({ title: ttl('S&P 500, MF2-GARCH-rw-m, 1990–2026'), xaxis: AX('', { type: 'date' }), yaxis: AX('Annualised volatility (%)', { range: [0, 80] }), legend: legendBelow(-0.12),
+    shapes: MF.nber.map(([a, b]) => ({ type: 'rect', xref: 'x', x0: a, x1: b, yref: 'paper', y0: 0, y1: 1, fillcolor: K.band, opacity: 0.7, line: { width: 0 }, layer: 'below' })) }));
+  const H = MF.horizons, lab = ['1d', '1w', ...H.slice(2).map((h, i) => 'M' + (i + 1))], tr = [];
+  for (const [mk, col, nm] of [['gjr', K.navy, 'GJR-GARCH'], ['mf2', K.red, 'MF2-GARCH']])
+    for (const [pk, dash, sym] of [['full', 'solid', 'circle'], ['pre', 'dash', 'square']]) {
+      const on = per === 'both' || per === pk;
+      tr.push({ x: lab, y: H.map(h => MF.oos[pk][h][mk + '_ql']), mode: 'lines+markers', name: `${nm}, ${MF_PER[pk].replace('–', '-')}`, opacity: on ? 1 : 0.25,
+        line: { color: col, width: on ? 1.8 : 1, dash }, marker: { color: col, size: 6, symbol: sym }, hovertemplate: `${nm} ${MF_PER[pk]}, %{x}: %{y:.3f}<extra></extra>` });
+    }
+  plot('mf-ql', tr, layout({ title: ttl('Out of sample, 20-year rolling window, m = 63'), margin: { l: 64, r: 12, t: 40, b: 60 }, shapes: [hline(1, K.navy)], legend: legendBelow(-0.3),
+    xaxis: AX('Horizon: next day, next week, forward month M1-M8'), yaxis: AX('Relative QLIKE (historical = 1)') }));
+  const [, al, ga, be, , l1, l2] = th, phi = al + ga / 2 + be, lam = l1 + l2, db = (MF.bic[String(m)] - MF.bic[String(MF.m)]) * MF.n_eff;
+  const lines = [T.mf(m, m === MF.m ? null : nf(db, 1), nf(phi, 3), days(halfLife(phi)), nf(lam, 3), nf(slowRoot(l1, l2, m), 4), days(halfLife(slowRoot(l1, l2, m))), nf(tau[k], 1), MF_DT[k], nf(tau[j], 1), MF_DT[j])];
+  for (const pk of (per === 'both' ? ['pre', 'full'] : [per])) {
+    const o = MF.oos[pk];
+    lines.push(T.mf2(MF_PER[pk], nf(o['1m'].mf2_ql, 3), nf(o['1m'].gjr_ql, 3), nf(o['1m'].dm_ql, 2), nf(o['8m'].mf2_ql, 3), nf(o['8m'].gjr_ql, 3), nf(o['8m'].dm_ql, 2)));
+  }
+  out('mf-out', lines);
+}
+
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   $('cl-chart').style.height = '560px'; $('si-chart').style.height = '470px';
   on(['cl-k'], clustering); P('cl-play', 'cl-k', range(1, 6, 0.5), 700);
   on(['ac-m', 'ac-d'], acfBlock); P('ac-play', 'ac-d', range(0.25, 4, 0.25), 450);
@@ -386,14 +440,19 @@ function init() {
   on(['pe-h'], persistence); P('pe-play', 'pe-h', range(0, 250, 5), 120);
   $('vx-a').value = D.garch_t.sp500.alpha.toFixed(4); on(['vx-a', 'vx-per'], vix); P('vx-play', 'vx-a', range(0.02, 0.125, 0.005), 350);
   $('ni-s').value = String(D.nic.s2bar); on(['ni-e', 'ni-s'], newsImpact); P('ni-play', 'ni-e', range(-6, 6, 0.2), 120);
-  $('in-nu').value = D.innov.nu_t.toFixed(2); on(['in-nu'], innovations); P('in-play', 'in-nu', range(3, 30, 0.5), 250);
+  $('in-nu').value = String(D.innov.nu_t); on(['in-nu'], innovations); P('in-play', 'in-nu', range(3, 30, 0.5), 250);
   on(['oo-l', 'oo-per'], oos); P('oo-play', 'oo-l', range(0.8, 0.995, 0.005), 200);
   on(['ql-loss', 'ql-y'], qlikeBlock); P('ql-play', 'ql-y', range(2016, 2025, 1), 800);
   $('lm-p').value = D.longmem.pers.toFixed(4); on(['lm-r', 'lm-p'], longMemory); P('lm-play', 'lm-p', range(0.95, 0.999, 0.001), 150);
   $('qs-s').addEventListener('input', () => { $('qs-z').value = D.qsd.zeta[D.qsd.tickers.indexOf($('qs-s').value)].toFixed(3); qsd(); });
   $('qs-z').value = D.qsd.zeta[D.qsd.tickers.indexOf($('qs-s').value)].toFixed(3); on(['qs-z'], qsd); P('qs-play', 'qs-z', range(0, 0.3, 0.005), 150);
-  clustering(); acfBlock(); simulation(); deltaMethod(); termStructure(); persistence(); vix(); newsImpact(); innovations(); oos(); qlikeBlock(); longMemory(); qsd();
+  on(['mf-m', 'mf-per'], mf2Block); P('mf-play', 'mf-m', range(5, 160, 1), 120);
+  const PFX = { 'clustering': 'cl', 'acf': 'ac', 'simulation': 'si', 'delta-method': 'dm', 'term-structure': 'ts', 'persistence': 'pe', 'vix': 'vx',
+    'news-impact': 'ni', 'innovations': 'in', 'oos': 'oo', 'qlike': 'ql', 'long-memory': 'lm', 'qsd': 'qs', 'volatility-cycles': 'mf' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  clustering(); acfBlock(); simulation(); deltaMethod(); termStructure(); persistence(); vix(); newsImpact(); innovations(); oos(); qlikeBlock(); longMemory(); qsd(); mf2Block();
 }
-window.CH5 = { acf, exkurt, corr, garchFilter, ewma, hacT, tcdfU, tppfU, nppf, ncdfApprox, tsCurve, nicValue, qsdW, halfLife };
+window.CH5 = { acf, exkurt, corr, garchFilter, ewma, hacT, tcdfU, tppfU, nppf, ncdfApprox, tsCurve, nicValue, qsdW, halfLife, mf2Filter };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

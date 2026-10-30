@@ -111,7 +111,10 @@ def main():
         if len(np.unique(kq[i])) < 6:
             continue
         pb = svi_fit(kq[i], wq[i])
-        boot.append([float(pb[x]) for x in P])
+        pv = [float(pb[x]) for x in P]
+        if not g.svi_admissible(pv):          # butterfly arbitrage or Lee slope > 2: rejected, as in btc_rnd
+            continue
+        boot.append(pv)
     f = tab.loc[e]
     d['rnd'] = dict(expiry=str(pd.Timestamp(e).date()), days=float(f['days']), F=float(f['F']), T=float(f['T']),
                     p=[float(f[x]) for x in P], boot=[r(b, 8) for b in boot], kf_min=float(np.exp(kq.min())),
@@ -139,6 +142,25 @@ def main():
                     i0=int(bd.index.get_loc(x.index[0])),
                     f={str(hh): ints(x[f'f{hh}'], 2) for hh in g.BCK_H}, m={str(hh): ints(x[f'lb_m_{hh}'], 2) for hh in g.BCK_H},
                     paper=g.BCK_TABLE1_RET)
+
+    # second case study, Lochstoer & Muir (2022): monthly series of case_lochstoer_muir.py (the same functions as
+    # the slide) and the 95% bootstrap bands of the VRP response for each sample end; 2026 = the slide's band
+    import case_lochstoer_muir as lm
+    J = json.load(open(os.path.join(HERE, 'ch12_lm_case.json')))
+    m = lm.monthly()
+    m['s2hat'] = lm.har_realtime(m)
+    m['vrp'] = m['vix2'] - m['s2hat']
+    Y = m[['s2hat', 'vrp', 'ex']].dropna()
+    rng = np.random.default_rng(lm.SEED)
+    bands = {}
+    for y in range(2005, 2026):
+        _, lo, hi = lm.irf_boot(Y.loc[:f'{y}-12-31'], rng, B_=500)
+        bands[str(y)] = dict(lo=r(lo[:, 1], 2), hi=r(hi[:, 1], 2))
+    bands['2026'] = dict(lo=r(J['irf']['vrp_lo'], 2), hi=r(J['irf']['vrp_hi'], 2))
+    d['lm'] = dict(dates=[x.strftime('%Y-%m') for x in m.index], rv=r(m['rv'], 6), vix2=r(m['vix2'], 6),
+                   s2hat=r(m['s2hat'], 6), ex=r(m['ex'], 6), bands=bands, J=lm.J_LAGS,
+                   slide=dict(phi_vix=J['phi_full']['vix']['phi'], phi_rv=J['phi_full']['rv']['phi'],
+                              vrp=r(J['irf']['vrp'], 4), s2hat=r(J['irf']['s2hat'], 4)))
 
     with open(OUT, 'w') as fh:
         fh.write('// Inputs of the Chapter 12 interactive page, exported by Quantlets/Ch_12/export_interactive.py.\n')

@@ -149,6 +149,27 @@ def main():
                     family={m: f for f, _, ms in g.CSV_FAMILY for m in ms}, fcol={f: c for f, c, _ in g.CSV_FAMILY},
                     rel={f'{h}|{i}': [float(x) for x in tab.loc[(h, i)].values] for h in ('day', 'week', 'month') for i in ('HAR', 'ALL')})
 
+    # 13. second case study: partial variances (Bollerslev, Medeiros, Patton & Quaedvlieg, 2022); forecasts from
+    # ch9_partial_forecasts_{spy,btc}.csv, written by case_partial.py
+    pres = json.load(open(os.path.join(HERE, 'ch9_partial.json')))
+    pv = {}
+    for key, rv_ in (('spy', RV), ('btc', RVB)):
+        F = pd.read_csv(os.path.join(HERE, f'ch9_partial_forecasts_{key}.csv'), index_col=0, parse_dates=True)
+        pos = rv_.index.get_indexer(F.index)
+        assert (pos >= 0).all(), key
+        assert np.allclose(F['rv'].values, rv_.values[pos], rtol=1e-5), key
+        cols = [c for c in F.columns if c != 'rv']
+        pv[key] = dict(pos=[int(x) for x in pos], models=cols, **{c: [float(f'{v:.5g}') for v in F[c].values] for c in cols})
+        ref = pres[key]
+        for m in ('RV-HAR', 'SV-HAR', 'PV(3)'):
+            close(float(T.qlike(F['rv'], F[m]).mean()), ref[m]['qlike'], 1e-4)
+            close(float(T.mse(F['rv'], F[m]).mean()), ref[m]['mse'], 1e-4)
+        pv[key]['ref'] = {m: {k: ref[m][k] for k in ('mse_ratio', 'qlike_ratio')} for m in ('SV-HAR', 'PV(3)')}
+        pv[key]['dm'] = {k: ref[m][k] for m in ('SV-HAR',) for k in ref[m] if k.startswith('dm_')}
+        pv[key]['dm3'] = {k: ref['PV(3)'][k] for k in ref['PV(3)'] if k.startswith('dm_')}
+    pv['q'] = pres['spy']['curve']['q']
+    d['partial'] = pv
+
     d['num'] = {k: res[k] for k in ('day', 'series', 'overnight', 'sig', 'jumps', 'dist', 'acf', 'vix', 'rough')}
     d['num']['oos_spy'] = res['oos_spy']
     d['num']['oos_btc'] = res['oos_btc']

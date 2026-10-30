@@ -477,8 +477,14 @@ def eval_news(P, rets):
         for grp, sel in (('neg', neg), ('pos', pos)):
             X = P.loc[sel, cols].groupby(level='day').mean()
             car = X.fillna(0).cumsum(axis=1)
-            ev[grp] = {'car': car.mean().tolist(), 'se': (car.std() / np.sqrt(len(car))).tolist(), 'n_days': len(X),
-                       'n': int(sel.sum())}
+            # Newey-West standard errors of the mean over days: the 11-day windows of nearby days overlap, so the
+            # lag is at least the window length
+            L = max(int(np.floor(4 * (len(car) / 100) ** (2 / 9))), len(cols) - 1)
+            se = []
+            for col_ in car.columns:
+                m_, t_ = M.nw_t(car[col_].values, lags=L)
+                se.append(float(abs(m_ / t_)) if t_ != 0 else 0.0)
+            ev[grp] = {'car': car.mean().tolist(), 'se': se, 'se_lags': L, 'n_days': len(X), 'n': int(sel.sum())}
         R['event'][c] = ev
     # the strategy
     days = rets.index[(rets.index >= P.index.get_level_values('day').min())]

@@ -374,11 +374,11 @@ def fig_dcc(T=2500, q12=-0.3, a=0.04, b=0.95, seed=68, win=250):
         ax.plot(h, ab ** h, color=col, lw=1.3, label=f'$a+b$ = {ab}: {hl:.0f} days')
         ax.plot(hl, 0.5, 'o', color=col, ms=3)
     ax.legend(loc='upper right', frameon=False, fontsize=7.0, handlelength=1.2)
-    ax.set_ylim(0, 1.75); ax.set_yticks([0, 0.5, 1])
+    ax.set_ylim(0, 1.95); ax.set_yticks([0, 0.5, 1])
     ax.axhline(0.5, color=Navy, lw=0.5, ls=':')
     ax.set_xlabel('Days after the shock $h$')
-    ax.set_ylabel('Share left')
-    ax.set_title(r'$(a+b)^h$; half-life $\ln 0.5/\ln(a+b)$', loc='left')
+    ax.set_ylabel(r'Factor $(a+b)^h$')
+    ax.set_title(r'Heuristic half-life $\ln 0.5/\ln(a+b)$', loc='left')
     bottom_legend(fig, axes[0], ncol=3)
     save_fig(fig, 'ch6_sem_primer_dcc')
     return dict(rho_min=float(rho.min()), rho_max=float(rho.max()))
@@ -520,6 +520,10 @@ def fig_attainable(s1=0.5):
 # (13) fluctuation test of a constant correlation (Wied-Kraemer-Dehling type), simulated break
 # =============================================================================
 def fig_fluctuation(T=2000, r0=-0.3, r1=0.1, seed=73):
+    """The statistic of inference_ch6.wkd_test, as in the empirical application: D from the full delta-method gradient
+    of the correlation (five moments) with a Bartlett HAC long-run variance, bandwidth floor(T^(1/4))."""
+    with matplotlib.rc_context():   # the import must not change the style of these explainer charts
+        from inference_ch6 import wkd_test
     rng = np.random.default_rng(seed)
     out = {}
     fig, axes = plt.subplots(1, 2, figsize=FULL)
@@ -528,24 +532,18 @@ def fig_fluctuation(T=2000, r0=-0.3, r1=0.1, seed=73):
                                            IDAred))):
         z = rng.standard_normal((T, 2))
         x = z[:, 0]; y = rr * z[:, 0] + np.sqrt(1 - rr ** 2) * z[:, 1]
-        j = np.arange(20, T + 1)
-        cx, cy = np.cumsum(x), np.cumsum(y)
-        cxx, cyy, cxy = np.cumsum(x * x), np.cumsum(y * y), np.cumsum(x * y)
-        jj = j.astype(float)
-        mx, my = cx[j - 1] / jj, cy[j - 1] / jj
-        rj = (cxy[j - 1] / jj - mx * my) / np.sqrt((cxx[j - 1] / jj - mx ** 2) * (cyy[j - 1] / jj - my ** 2))
-        rT = rj[-1]
-        D = np.sqrt(np.mean(((x - x.mean()) * (y - y.mean()) / (x.std() * y.std()) - rT) ** 2))  # simple scale
-        stat = jj / (np.sqrt(T) * D) * np.abs(rj - rT)
+        w = wkd_test(x, y)
+        j = np.arange(1, T + 1)
+        stat = w['path']
         ax.plot(j, stat, color=col, lw=0.9)
         ax.axhline(1.358, color=Navy, lw=0.9, ls='--')
-        jm = int(j[np.argmax(stat)])
-        ax.plot(jm, stat.max(), 'o', color=col, ms=3.5)
-        ax.annotate(f'max = {stat.max():.2f}', (jm, stat.max()), xytext=(0, 9), textcoords='offset points', ha='right' if jm > 0.7 * T else 'center', fontsize=7.0, color=col)
+        jm = int(j[w['j']])
+        ax.plot(jm, w['Q'], 'o', color=col, ms=3.5)
+        ax.annotate(f'max = {w["Q"]:.2f}', (jm, w['Q']), xytext=(0, 9), textcoords='offset points', ha='right' if jm > 0.7 * T else 'center', fontsize=7.0, color=col)
         ax.set_title(ttl, loc='left')
         ax.set_xlabel('Sample size used $j$')
         ax.set_xlim(0, T)
-        out[ttl] = (float(stat.max()), jm)
+        out[ttl] = (float(w['Q']), jm)
     axes[0].set_ylabel(r'$\frac{j}{\sqrt{T}\hat D}\,|\hat\rho_j - \hat\rho_T|$')
     ymax = max(a.get_ylim()[1] for a in axes)
     for a in axes:

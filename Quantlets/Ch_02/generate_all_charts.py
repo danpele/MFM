@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import MARKETS, LABELS, GROUPS, load_close, log_returns, complete_months   # noqa: E402
 from eff_tests import (variance_ratio, chow_denning, runs_test, robust_ljung_box, rs_hurst,  # noqa: E402
-                       lo_modified_rs, dfa_hurst, rolling_stat)
+                       lo_modified_rs, dfa_hurst, rolling_stat, acf_se, acf_se_block_bootstrap)
 
 # Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
@@ -93,6 +93,7 @@ def efficiency_table():
         r = rets[k]
         e = r - r.mean()
         tau1 = (e.values[1:] ** 2 * e.values[:-1] ** 2).sum() / (e ** 2).sum() ** 2
+        _, se_hac = acf_se(r, 1)          # HAC SE of the estimator: intervals around rho1, not test bands
         v2, v5, v10, v20 = (variance_ratio(r, q) for q in (2, 5, 10, 20))
         cd = chow_denning(r)
         rt = runs_test(r)
@@ -102,6 +103,7 @@ def efficiency_table():
         hd, _ = dfa_hurst(r)
         rows.append(dict(market=LABELS[k], group=GROUPS[k], start=r.index[0].date(), end=r.index[-1].date(),
                          N=len(r), rho1=r.autocorr(1), rho1_se_iid=1 / np.sqrt(len(r)), rho1_se_rob=np.sqrt(tau1),
+                         rho1_se_hac=se_hac, rho1_se_mbb=acf_se_block_bootstrap(r, 1),
                          VR2=v2[0], z2=v2[1], zstar2=v2[2], VR5=v5[0], z5=v5[1], zstar5=v5[2],
                          VR10=v10[0], zstar10=v10[2], VR20=v20[0], zstar20=v20[2],
                          CD=cd[0], CD_p=cd[1], runs_z=rt[2], runs_p=rt[3],
@@ -152,25 +154,29 @@ def _two_columns(n, figsize=(7.4, 3.6)):
 
 
 def fig_acf_markets(t):
+    """rho1 with its HAC 95% interval (bars); test bands centred at 0 use the SEs derived under H0."""
     t = t.sort_values('rho1')
     fig, axes, parts, h = _two_columns(len(t))
     for ax, idx in zip(axes, parts):
         for j, i in enumerate(idx):
             row = t.iloc[i]
             c = GROUP_COL[row['group']]
-            ax.errorbar(row['rho1'], j, xerr=1.96 * row['rho1_se_rob'], fmt='o', ms=4, color=c, capsize=2, lw=0.9)
-            ax.plot([row['rho1'] - 1.96 * row['rho1_se_iid'], row['rho1'] + 1.96 * row['rho1_se_iid']], [j + 0.25] * 2,
-                    color=Gray, lw=0.8)
+            b0 = 1.96 * row['rho1_se_rob']
+            ax.fill_between([-b0, b0], j - 0.32, j + 0.32, color=BandBlue, lw=0, zorder=0)
+            ax.plot([-1.96 * row['rho1_se_iid'], 1.96 * row['rho1_se_iid']], [j] * 2, ls='', marker='|', ms=7, mew=0.9,
+                    color=Gray)
+            ax.errorbar(row['rho1'], j, xerr=1.96 * row['rho1_se_hac'], fmt='o', ms=4, color=c, capsize=2, lw=0.9)
         ax.axvline(0, color=Gray, lw=0.6)
         ax.set_yticks(range(len(idx)), [t['market'].iloc[i] for i in idx], fontsize=7.5)
         ax.set_ylim(-0.6, h - 0.4)
         ax.set_xlabel(r'Lag-1 autocorrelation $\hat\rho_1$')
     handles = [plt.Line2D([], [], color=c, marker='o', ls='', label=g) for g, c in GROUP_COL.items()]
-    handles += [plt.Line2D([], [], color=Gray, lw=0.8, label=r'i.i.d. 95% interval $\hat\rho_1 \pm 1.96/\sqrt{T}$'),
-                plt.Line2D([], [], color='k', lw=0.9, label='Robust 95% interval (bars)')]
+    handles += [plt.Line2D([], [], color='k', lw=0.9, label='95% CI, HAC SE (bars)'),
+                plt.Rectangle((0, 0), 1, 1, color=BandBlue, label=r'Test band at 0, robust SE under $H_0$'),
+                plt.Line2D([], [], color=Gray, marker='|', ms=7, mew=0.9, ls='', label=r'Test band at 0, i.i.d. $1/\sqrt{T}$')]
     axes[0].set_title('Lag-1 autocorrelation of daily log returns across markets (full samples)', fontsize=9, loc='left')
     plt.tight_layout()
-    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=3, frameon=False)
+    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=4, frameon=False)
     save_fig('ch2_acf_markets')
 
 
@@ -393,6 +399,7 @@ def crypto_yearly():
             tau1 = (e.values[1:] ** 2 * e.values[:-1] ** 2).sum() / (e ** 2).sum() ** 2
             vr, _, zs = variance_ratio(ry, 5)
             rows.append(dict(asset=LABELS[k], year=y, n=len(ry), rho1=ry.autocorr(1), rho1_se=np.sqrt(tau1),
+                             rho1_se_hac=acf_se(ry, 1)[1],
                              VR5=vr, zstar5=zs))
     d = pd.DataFrame(rows)
     d.to_csv(os.path.join(TABLE_DIR, 'ch2_crypto_yearly.csv'), index=False, float_format='%.6g')
@@ -404,8 +411,8 @@ def fig_crypto_yearly():
     fig, ax = plt.subplots(figsize=(7.0, 3.1))
     for (a, c, off) in [('Bitcoin', Amber, -0.15), ('Ethereum', Purple, 0.15)]:
         s = d[d['asset'] == a]
-        ax.errorbar(s['year'] + off, s['rho1'], yerr=1.96 * s['rho1_se'], fmt='o', ms=4, color=c, capsize=2,
-                    lw=0.9, label=f'{a}: lag-1 autocorrelation, robust 95% interval')
+        ax.errorbar(s['year'] + off, s['rho1'], yerr=1.96 * s['rho1_se_hac'], fmt='o', ms=4, color=c, capsize=2,
+                    lw=0.9, label=f'{a}: lag-1 autocorrelation, HAC 95% interval')
     ax.axhline(0, color=Gray, lw=0.6)
     ax.set_xlabel('Calendar year')
     ax.set_ylabel(r'$\hat\rho_1$ of daily log returns')

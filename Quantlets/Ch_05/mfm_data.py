@@ -7,8 +7,9 @@ mfm_data.py -- data for Chapter 5 (MFM): conditional volatility, GARCH models
   * MARKETS            -- S&P 500, BET, BET-TR, Bitcoin, EUR/RON, gold
 
 Conventions (as in Chapters 1 and 2):
-  * equity indices: weekdays only; days whose close equals the previous close
-    (holidays filled with the last price) are dropped;
+  * equity indices and gold: weekdays only; a row that repeats the previous close is dropped only if it
+    shows no trading (zero volume, open = high = low = close, or a copy of the previous row): an artificial
+    non-trading-day fill; a genuine unchanged close (zero return) is kept;
   * gold (XAU/USD): no weekend quotes; annualised with the actual frequency (about 260 days a year);
   * crypto: 7 days a week;
   * EUR/RON: the official BNR reference rate (the EUR/RON series from EODHD has erroneous quotes).
@@ -74,12 +75,38 @@ def load_close(name, start=None, end=END):
     start = start or start0
     if symbol.startswith('REF:'):
         return read_reference_rate(symbol.split(':')[1], start=start, end=end).rename(name)
-    s = read_market(symbol)['close'].loc[start:end]
-    s = s[s > 0].dropna()
+    d = read_market(symbol).loc[start:end]
+    d = d[d['close'] > 0].dropna(subset=['close'])
     if group != 'Crypto':
-        s = s[s.index.dayofweek < 5]          # no weekend quotes
-        s = s[s.diff() != 0]                  # no holidays filled with the previous price
-    return s.rename(name)
+        d = d[d.index.dayofweek < 5]          # no weekend quotes
+        d = d[~artificial_fill(d)]            # non-trading days filled with the previous price
+    return d['close'].rename(name)
+
+
+def artificial_fill_reasons(d):
+    """Heuristic flags for rows that repeat the previous close and show no sign of trading.
+
+    The flags identify suspect rows; they do not prove that the market was closed: an unchanged close, a flat
+    intraday range or a repeated row can also occur in a genuine session. Each excluded row keeps its reason
+    (columns 'zero_volume', 'flat_range', 'copy_of_previous') so that it can be checked against the exchange
+    calendar or the provider's metadata. A missing volume is unknown, not zero: only a reported volume <= 0 counts.
+    Files with closes only (the BET) give no such evidence, so every row is kept.
+    """
+    repeat = d['close'].diff() == 0
+    out = pd.DataFrame(False, index=d.index, columns=['zero_volume', 'flat_range', 'copy_of_previous'])
+    if 'volume' in d and (d['volume'] > 0).mean() > 0.5:
+        out['zero_volume'] = d['volume'].notna() & (d['volume'] <= 0)
+    if {'open', 'high', 'low'} <= set(d.columns):
+        out['flat_range'] = (d['open'] == d['high']) & (d['high'] == d['low']) & (d['low'] == d['close'])
+        fields = [c for c in ['open', 'high', 'low', 'close', 'volume'] if c in d]
+        out['copy_of_previous'] = (d[fields] == d[fields].shift()).all(axis=1)
+    out = out & repeat.values[:, None]
+    return out[out.any(axis=1)]
+
+
+def artificial_fill(d):
+    """Rows flagged by artificial_fill_reasons (a heuristic for non-trading days filled with the previous price)."""
+    return pd.Series(d.index.isin(artificial_fill_reasons(d).index), index=d.index)
 
 
 def pct_returns(name, start=None, end=END):

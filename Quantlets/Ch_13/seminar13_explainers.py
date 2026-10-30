@@ -257,10 +257,10 @@ def fig_purged(n=30, K=5, h=2, e=1):
                 col = IDAred
             elif i < test[0] and i + h >= t_lo:
                 col = Amber                              # purged before
-            elif test[-1] < i <= test[-1] + e:
-                col = Forest                             # embargo
-            elif test[-1] + e < i <= t_hi:
+            elif test[-1] < i <= t_hi:
                 col = Amber                              # purged after: starts before the test labels end
+            elif t_hi < i <= t_hi + e:
+                col = Forest                             # embargo: the e observations after the last test label ends
             else:
                 col = MainBlue
             ax.add_patch(Rectangle((i, K - 1 - f), 0.9, 0.75, color=col, lw=0))

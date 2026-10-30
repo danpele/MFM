@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH8_DATA;
-const { LANG, sum, mean, sdev, rng, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { LANG, sum, mean, sdev, rng, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH8_TEXT;
 
 // ---------------------------------------------------------------- colours (same as the slides)
@@ -472,7 +472,7 @@ function conformalPath(a, gamma) {                                     // split 
   for (let t = C.i0; t < N; t++) {
     const cal = s.slice(t - n, t).sort((x, y) => x - y);
     const ka = Math.ceil((n + 1) * (1 - at));
-    const vS = k > n ? Infinity : sd[t] * cal[k - 1], vA = ka > n ? Infinity : sd[t] * cal[Math.max(ka, 1) - 1];
+    const vS = k > n ? Infinity : sd[t] * cal[k - 1], vA = ka > n ? Infinity : (ka < 1 ? -Infinity : sd[t] * cal[ka - 1]);   // alpha_t >= 1: threshold -inf, sure breach
     if (t >= w0) { vs.push(vS); va.push(vA); al.push(at); }
     const err = s[t] * sd[t] > vA ? 1 : 0;
     at = at + gamma * (a - err);
@@ -497,8 +497,8 @@ function conformal() {
     xaxis: AX('', { type: 'date', anchor: 'y', domain: [0, 1], showticklabels: false, matches: 'x2' }), yaxis: AX('Loss (%)', { domain: [0.36, 1], range: [Math.min(...P.L) * 1.05, lim] }),
     xaxis2: AX('', { type: 'date', anchor: 'y2', domain: [0, 1] }), yaxis2: AX('α_t (%)', { domain: [0, 0.28], rangemode: 'tozero' }), legend: legendBelow(-0.12) }));
   const c0 = P.dt.indexOf('2020-02-20'), c1 = P.dt.indexOf('2020-04-30'), nC = c1 - c0 + 1; let hs = 0, ha = 0, inf = 0;
-  for (let i = c0; i <= c1; i++) { if (P.L[i] > P.vs[i]) hs++; if (P.L[i] > P.va[i]) ha++; if (!isFinite(P.va[i])) inf++; }
-  const infAll = P.va.filter(v => !isFinite(v)).length;
+  for (let i = c0; i <= c1; i++) { if (P.L[i] > P.vs[i]) hs++; if (P.L[i] > P.va[i]) ha++; if (P.va[i] === Infinity) inf++; }
+  const infAll = P.va.filter(v => v === Infinity).length;
   out('cp-out', [T.cp(levR(a), nC, nf(nC * a, 1), hs, ha, inf), T.cp2(nf(g, 3), nf(100 * Math.min(...P.al), 2), infAll, ni(P.dt.length))]);
 }
 
@@ -523,9 +523,15 @@ function conformalRegimes() {
 }
 
 // ================================================================= case study: Table 3 of Bayer and Dimitriadis (2022)
+function bdCourse(B) {
+  const C = B.course, tab = sh => B.windows.map(w => B.refits.map(r => C[sh][String(w)][String(r)]));
+  return { 'GARCH-N': tab('share_n'), 'GARCH-t': tab('share_t') };
+}
 function bdTable() {
-  const B = D.bd, k = +$('bd-r').value, ref = B.refits[k], x = B.windows.map(String);
+  const B0 = D.bd, k = +$('bd-r').value, ref = B0.refits[k], x = B0.windows.map(String);
   $('bd-r-v').textContent = ref;
+  if ($('bd-s').value === 'course') return bdCourseChart(B0, k, ref, x);
+  const B = B0;
   const tr = [], lay = layout({ margin: { l: 56, r: 12, t: 26, b: 40 }, legend: legendBelow(-0.2), annotations: [], shapes: [] });
   ['GARCH', 'GJR-GARCH'].forEach((fam, p) => {
     const ax = p ? '2' : '', x0 = p ? 0.53 : 0;
@@ -547,10 +553,112 @@ function bdTable() {
   out('bd-out', [T.bd(ref, n1[0], n1[1], t1[0], t1[1]), T.bd2(nf(B.table['GARCH-t'][0][k], 2), nf(Math.max(...B.table['GARCH-t'].slice(2).map(r => r[k]), ...B.table['GJR-GARCH-t'].slice(2).map(r => r[k])), 2))]);
 }
 
+function bdCourseChart(B, k, ref, x) {
+  const tab = bdCourse(B), C = B.course, tr = [];
+  [['N', K.red, 'Normal'], ['t', K.blue, 'Student-t']].forEach(([d, c, l]) => {
+    const t = tab['GARCH-' + d];
+    tr.push({ x, y: t.map(r => r[0]), mode: 'lines+markers', name: `${l} innovations, weekly refit (5 days)`, line: { color: c, width: 1.6 }, marker: { size: 6 }, hovertemplate: 'GARCH, window %{x}: %{y:.2f}<extra></extra>' });
+    tr.push({ x, y: t.map(r => r[k]), mode: 'lines+markers', name: `${l} innovations, refit every ${ref} days`, line: { color: c, width: 1.6, dash: 'dash' }, marker: { size: 6, symbol: 'square' }, hovertemplate: 'GARCH, window %{x}: %{y:.2f}<extra></extra>' });
+  });
+  tr.push({ x: [null], y: [null], mode: 'lines', name: 'Nominal size 5%', line: { color: K.navy, dash: 'dot', width: 1.2 }, hoverinfo: 'skip' });
+  plot('bd-chart', tr, layout({ margin: { l: 56, r: 12, t: 26, b: 40 }, legend: legendBelow(-0.2),
+    title: ttl(`GARCH(1,1), ${C.n_stocks} S&P 500 stocks, course data`),
+    shapes: [{ type: 'line', xref: 'x domain', yref: 'y', x0: 0, x1: 1, y0: 0.05, y1: 0.05, line: { color: K.navy, width: 1.2, dash: 'dot' } }],
+    xaxis: AX('Rolling estimation window (days)', { type: 'category' }), yaxis: AX('Share of stocks rejected', { range: [-0.03, 1.05] }) }));
+  const col = key => tab[key].map(r => r[k]);
+  const mm = a => [nf(Math.min(...a), 2), nf(Math.max(...a), 2)];
+  const n1 = mm(col('GARCH-N')), t1 = mm(col('GARCH-t')), tl = mm(tab['GARCH-t'].slice(2).map(r => r[k]));
+  out('bd-out', [T.bdc(ref, C.n_stocks, ni(C.T), n1[0], n1[1], t1[0], t1[1]), T.bdc2(nf(tab['GARCH-t'][0][k], 2), tl[1])]);
+}
+
+// ================================================================= case study 2: e-backtesting (Wang, Wang & Ziegel, 2026)
+const EB = (() => {
+  const E = D.eb, o = {};
+  for (const n of ['sp500', 'bet']) {
+    const X = E[n], L = Float64Array.from([...X.pre, ...X.L], v => v / 1e7), z = {}, es = {};
+    for (const m of MODELS) {
+      if (!X.z[m]) continue;
+      const zz = new Float64Array(X.L.length); let c = 0;
+      X.z[m].forEach((v, i) => { c += v; zz[i] = c / 1e7; });
+      z[m] = zz; es[m] = Float64Array.from(X.w[m], (v, i) => (Math.round(zz[i] * 1e7) + v) / 1e7);
+    }
+    o[n] = { L, z, es, T: X.L.length };
+  }
+  return o;
+})();
+function lamTaylor(se, se2, nn, g) {           // (sum e - n) / sum (e - 1)^2, truncated to [0, g]
+  if (nn === 0) return 0;
+  const den = se2; if (!(den > 0)) return 0;
+  return Math.min(g, Math.max(0, (se - nn) / den));
+}
+function eProcess(n, m, scale, meth) {
+  const E = D.eb, A = EB[n], a = E.a, W = E.win, g = E.gamma, T = A.T, L = A.L, z = A.z[m], es = A.es[m];
+  const eOf = (l, r, zz) => { const d = a * (r - zz), x = Math.max(l - zz, 0); return d > 0 ? x / d : (x > 0 ? Infinity : 1); };
+  const e = new Float64Array(T);
+  for (let t = 0; t < T; t++) e[t] = eOf(L[t + W], scale * es[t], z[t]);
+  const Mee = new Float64Array(T), Mel = new Float64Array(T);
+  let pe = 1, pl = 1, ce1 = 0, ce2 = 0;
+  for (let t = 0; t < T; t++) {
+    let lee = 0, lel = 0;
+    if (meth !== 'grel') {                    // rolling sums over the past W e-values
+      if (t > 0) { ce1 += e[t - 1]; ce2 += (e[t - 1] - 1) * (e[t - 1] - 1); }
+      if (t > W) { ce1 -= e[t - 1 - W]; ce2 -= (e[t - 1 - W] - 1) * (e[t - 1 - W] - 1); }
+      lee = lamTaylor(ce1, ce2, Math.min(t, W), g);
+    }
+    if (meth !== 'gree') {
+      // past W losses at today's forecast: e = (L - z)_+ / d; days with L <= z give e = 0, i.e. (e - 1)^2 = 1
+      const zz = z[t], d = a * (scale * es[t] - zz);
+      let s1 = 0, s2 = 0, k = 0;
+      for (let s = t; s < t + W; s++) { const x = L[s] - zz; if (x > 0) { const v = d > 0 ? x / d : Infinity; s1 += v; s2 += (v - 1) * (v - 1); k++; } }
+      s2 += W - k;
+      if (!(d > 0)) s1 += W - k, s2 -= W - k;   // d <= 0: e = 1 on the days with L <= z (the paper's 0/0 = 1)
+      lel = lamTaylor(s1, s2, W, g);
+    }
+    pe *= 1 - lee + lee * e[t]; pl *= 1 - lel + lel * e[t];
+    Mee[t] = pe; Mel[t] = pl;
+  }
+  const M = meth === 'gree' ? Mee : meth === 'grel' ? Mel : Mee.map((v, i) => 0.5 * (v + Mel[i]));
+  let me = 0; for (const v of e) me += v;
+  return { M, meanE: me / T };
+}
+function ebSummary(n, m, scale, meth) {
+  const { M, meanE } = eProcess(n, m, scale, meth), dt = DATES[n];
+  let mx = -Infinity, im = 0; M.forEach((v, i) => { if (v > mx) { mx = v; im = i; } });
+  const cross = c => { const i = M.findIndex(v => v >= c); return i < 0 ? null : { day: i + 1, date: dt[i] }; };
+  return { M, meanE, max: mx, argmax: dt[im], final: M[M.length - 1], cross: Object.fromEntries(D.eb.thresh.map(c => [String(c), cross(c)])) };
+}
+const SUP = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
+const bigN = x => { if (x < 100) return nf(x, 2); if (x < 1000) return nf(x, 0); const e = Math.floor(Math.log10(x)); return nf(x / 10 ** e, 1) + '·10' + String(e).replace(/\d/g, d => SUP[d]); };
+function ebBlock() {
+  const meth = $('eb-m').value, s = +$('eb-s').value, ymax = D.eb.ymax;
+  $('eb-s-v').textContent = nf(s, 2);
+  const tr = [], lay = layout({ margin: { l: 60, r: 12, t: 30, b: 40 }, legend: legendBelow(-0.18), annotations: [], shapes: [] });
+  const rows = [];
+  ['sp500', 'bet'].forEach((n, p) => {
+    const ax = p ? '2' : '', x0 = p ? 0.53 : 0;
+    for (const m of MODELS) {
+      if (!EB[n].z[m]) continue;
+      const R = ebSummary(n, m, s, meth);
+      tr.push({ x: DATES[n], y: Array.from(R.M, v => Math.min(v, ymax)), mode: 'lines', name: m, legendgroup: m, showlegend: !p, line: { color: MC[m], width: 1.3 },
+        xaxis: 'x' + ax, yaxis: 'y' + ax, hovertemplate: `${LAB[n]}, ${m}, %{x}: %{y:.3g}<extra></extra>` });
+      const c10 = R.cross['10'];
+      rows.push(T.ebRow(LAB[n], m, bigN(R.max), dmy(R.argmax), c10 ? dmy(c10.date) : T.never, nf(R.meanE, 2)));
+    }
+    lay['xaxis' + ax] = AX('', { anchor: 'y' + ax, domain: [x0, x0 + 0.47] });
+    lay['yaxis' + ax] = AX(p ? '' : 'e-process (log scale)', { type: 'log', range: [-1, 6], anchor: 'x' + ax, exponentformat: 'power' });
+    lay.annotations.push({ text: `${LAB[n]}: ${meth.toUpperCase()}, ES 2.5%`, x: x0 + 0.235, xref: 'paper', y: 1.0, yref: 'paper', yanchor: 'bottom', showarrow: false, font: { size: 12, color: K.navy } });
+    lay.shapes.push({ type: 'rect', xref: (p ? 'x2' : 'x') + ' domain', yref: 'y' + ax, x0: 0, x1: 1, y0: 2, y1: 10, fillcolor: rgba(K.band, 0.45), line: { width: 0 }, layer: 'below' });
+    for (const c of D.eb.thresh) lay.shapes.push({ type: 'line', xref: (p ? 'x2' : 'x') + ' domain', yref: 'y' + ax, x0: 0, x1: 1, y0: c, y1: c, line: { color: K.navy, width: 1, dash: 'dot' } });
+  });
+  tr.push({ x: [null], y: [null], mode: 'lines', name: 'Evidence thresholds 2, 5, 10', line: { color: K.band, width: 8 }, hoverinfo: 'skip' });
+  plot('eb-chart', tr, lay);
+  out('eb-out', [T.eb0(meth.toUpperCase(), nf(s, 2)), ...rows]);
+}
+
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   $('fa-chart').style.height = '560px'; $('cp-chart').style.height = '470px'; $('tl-chart').style.height = '300px'; $('br-chart').style.height = '400px';
   on(['fa-l', 'fa-y'], fourAssets); P('fa-play', 'fa-y', range(2007, 2026, 1), 700);
   on(['sv-y'], spVar); P('sv-play', 'sv-y', range(2007, 2026, 1), 900);
@@ -572,9 +680,14 @@ function init() {
   on(['mc-a'], mcsBlock); P('mc-play', 'mc-a', range(0.01, 0.3, 0.01), 250);
   on(['cp-g', 'cp-a'], conformal); P('cp-play', 'cp-g', range(0.001, 0.05, 0.001), 200);
   on(['cr-q'], conformalRegimes); P('cr-play', 'cr-q', range(0.75, 0.95, 0.05), 900);
-  on(['bd-r'], bdTable); P('bd-play', 'bd-r', range(0, 4, 1), 1000);
-  fourAssets(); spVar(); kupiec(); pofPower(); breachRates(); timeline(); varPvalues(); traffic(); mfRes(); z2Roll(); esPvalues(); elicit(); fz0(); dmMatrix(); mcsBlock(); conformal(); conformalRegimes(); bdTable();
+  on(['bd-r', 'bd-s'], bdTable); P('bd-play', 'bd-r', range(0, 4, 1), 1000);
+  on(['eb-m', 'eb-s'], ebBlock); P('eb-play', 'eb-s', range(1, 1.3, 0.01), 400);
+  $('eb-chart').style.height = '420px';
+  const PFX = { 'four-assets': 'fa', 'sp500-var': 'sv', 'kupiec': 'kp', 'pof-power': 'pp', 'breach-rates': 'br', 'timeline': 'tl', 'var-pvalues': 'vp', 'traffic-light': 'tf', 'mf-residuals': 'mf', 'z2-rolling': 'z2', 'es-pvalues': 'ep', 'elicitability': 'el', 'fz0': 'fz', 'dm-matrix': 'dm', 'mcs': 'mc', 'conformal-path': 'cp', 'conformal-regimes': 'cr', 'case-table3': 'bd', 'ebacktest': 'eb' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'] }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  fourAssets(); spVar(); kupiec(); pofPower(); breachRates(); timeline(); varPvalues(); traffic(); mfRes(); z2Roll(); esPvalues(); elicit(); fz0(); dmMatrix(); mcsBlock(); conformal(); conformalRegimes(); bdTable(); ebBlock();
 }
-window.CH8 = { kupiecLR, christoffersen, durationTest, acceptRange, exactPower, localPower, powerCurve, dmStat, rollCount, rollingZ2, fzMeans, conformalPath, mPlus, tppf, hitVec, DATES, mfBoot };
+window.CH8 = { ebSummary, bdCourse, kupiecLR, christoffersen, durationTest, acceptRange, exactPower, localPower, powerCurve, dmStat, rollCount, rollingZ2, fzMeans, conformalPath, mPlus, tppf, hitVec, DATES, mfBoot };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

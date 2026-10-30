@@ -92,6 +92,9 @@ FILES = {
     ('PRIOR_12_2', 'M'): '10_Portfolios_Prior_12_2_CSV.zip',
     ('PRIOR_1_0', 'M'): '10_Portfolios_Prior_1_0_CSV.zip',
     ('PRIOR_60_13', 'M'): '10_Portfolios_Prior_60_13_CSV.zip',
+    # reversal factors, factor-momentum case study (Ehsani & Linnainmaa, 2022)
+    ('strev', 'M'): 'F-F_ST_Reversal_Factor_CSV.zip',
+    ('ltrev', 'M'): 'F-F_LT_Reversal_Factor_CSV.zip',
 }
 
 

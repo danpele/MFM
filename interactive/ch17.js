@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH17_DATA;
-const { LANG, C, sum, mean, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { LANG, C, sum, mean, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH17_TEXT;
 
 // ---------------------------------------------------------------- colours of the chapter (generate_all_charts.py)
@@ -58,6 +58,7 @@ function rational() {
   const B = new Array(n); B[0] = b0; let col = 0;
   for (let t = 1; t < n; t++) {
     const alive = R.U[t] < pi;
+    if (B[t - 1] <= b0) { B[t] = (1 + r) * B[t - 1] * R.u[t]; continue; }   // small-bubble branch (threshold alpha = delta)
     B[t] = alive ? (b0 + (1 + r) / pi * (B[t - 1] - b0 / (1 + r))) * R.u[t] : b0 * R.u[t];
     if (!alive && B[t - 1] > 25) col++;
   }
@@ -65,7 +66,7 @@ function rational() {
   plot('rb-chart', [
     { x, y: P, mode: 'lines', name: 'Price = fundamental value + bubble', line: { color: K.blue, width: 1.3 }, hovertemplate: 'period %{x}<br>price %{y:.1f}<extra></extra>' },
     { x, y: R.F, mode: 'lines', name: 'Fundamental value D<sub>t</sub> / r', line: { color: K.green, width: 1.6 }, hovertemplate: 'period %{x}<br>F %{y:.1f}<extra></extra>' }
-  ], layout({ title: ttl(`Simulated rational bubble (Evans form): survives with probability ${pi.toFixed(3)}, restarts at δ = ${b0}`),
+  ], layout({ title: ttl(`Simulated rational bubble (Evans form): grows at r below δ = ${b0}, above it survives with probability ${pi.toFixed(3)} or restarts at δ`),
     xaxis: AX('Period'), yaxis: AX('Price') }));
   out('rb-out', [T.rb(pct((1 + r) / pi - 1, 1), nf(1 / (1 - pi), 1), col, nf(mult, 2))]);
 }
@@ -372,10 +373,46 @@ function dnz() {
   out('dz-out', [T.dz(fmtM(x[k]), nf(Z.price[k], 0), nf(v[k], 0), fmtM(x[jv]), nf(v[jv], 0), fmtM(x[jp]), nf(Z.price[jp], 0), quiet, raw)]);
 }
 
+// ================================================================= 17. predictable financial crises (JST Macrohistory)
+function rzone(S, q, qp) {         // R-zone, normal times, crises preceded by an R-zone (the chapter's case_study17_crises.py)
+  const td = quantile(S.debt, q), tp = quantile(S.price, qp), n = S.debt.length;
+  const hd = S.debt.map(v => v > td), hp = S.price.map(v => v > tp), rz = hd.map((v, i) => v && hp[i]), nm = hd.map((v, i) => !v && !hp[i]);
+  const prob = m => S.crisis.map(c => { let a = 0, k = 0; for (let i = 0; i < n; i++) if (m[i]) { a += c[i]; k++; } return k ? a / k : NaN; });
+  const on = new Set(); rz.forEach((v, i) => { if (v) on.add(S.c[i] + '-' + S.y[i]); });
+  const hits = S.onsets.filter(([c, y]) => [1, 2, 3].some(j => on.has(c + '-' + (y - j)))).length;
+  return { td, tp, nrz: rz.filter(Boolean).length, nnm: nm.filter(Boolean).length, prz: prob(rz), pnm: prob(nm), hits, ncr: S.onsets.length, on };
+}
+function ghss() {
+  const G = D.ghss, q = +$('gh-q').value / 100, h = [1, 2, 3, 4];
+  $('gh-q-v').textContent = Math.round(100 * q);
+  const eb = (y, ci, col) => ({ type: 'data', symmetric: false, array: ci.map((v, i) => 100 * v[1] - y[i]), arrayminus: ci.map((v, i) => y[i] - 100 * v[0]), color: col, thickness: 1.2, width: 4 });
+  const tr = [], rows = [], titles = [];
+  ['bus', 'hh'].forEach((s, j) => {
+    const S = G[s], R = rzone(S, q, G.q_price), g = S.grid.find(r => Math.abs(r.q - q) < 1e-9), ax = j ? { xaxis: 'x2', yaxis: 'y2' } : {};
+    const y1 = R.prz.map(v => 100 * v), y2 = R.pnm.map(v => 100 * v), y3 = S.p_all.map(v => 100 * v);
+    tr.push(Object.assign({ x: h.map(v => v - 0.08), y: y1, error_y: eb(y1, g.ci_rzone, K.red), mode: 'lines+markers', name: 'R-zone (95% CI, year-block bootstrap)', showlegend: !j,
+      line: { color: K.red, width: 1.6 }, marker: { size: 7 }, hovertemplate: 'R-zone, h = %{x:.0f}: %{y:.1f}%<extra></extra>' }, ax),
+      Object.assign({ x: h.map(v => v + 0.08), y: y2, error_y: eb(y2, g.ci_normal, K.blue), mode: 'lines+markers', name: 'Normal times (neither growth high)', showlegend: !j,
+        line: { color: K.blue, width: 1.6 }, marker: { size: 7 }, hovertemplate: 'normal times, h = %{x:.0f}: %{y:.1f}%<extra></extra>' }, ax),
+      Object.assign({ x: h, y: y3, error_y: eb(y3, S.ci_all, K.green), mode: 'lines+markers', name: 'All country-years', showlegend: !j,
+        line: { color: K.green, width: 1.6, dash: 'dash' }, marker: { size: 7 }, hovertemplate: 'all country-years, h = %{x:.0f}: %{y:.1f}%<extra></extra>' }, ax),
+      Object.assign({ x: [3.18], y: [100 * G.paper.rzone_3y], mode: 'markers', name: 'Greenwood et al. (2022), 42 countries: R-zone, h = 3', showlegend: !j,
+        marker: { symbol: 'diamond-open', size: 10, color: K.red, line: { width: 1.6 } }, hovertemplate: 'paper (abstract): about 40%<extra></extra>' }, ax),
+      Object.assign({ x: [3.18], y: [100 * G.paper.normal_3y], mode: 'markers', name: 'Greenwood et al. (2022): normal times, h = 3', showlegend: !j,
+        marker: { symbol: 'diamond-open', size: 10, color: K.blue, line: { width: 1.6 } }, hovertemplate: 'paper (abstract): about 7%<extra></extra>' }, ax));
+    titles.push((s === 'bus' ? 'Business credit, stock prices: ' : 'Household credit, house prices: ') + `${R.nrz} R-zone of ${S.debt.length} years`);
+    rows.push(T.gh(T.ghName[s], S.n_countries, Math.round(100 * q), nf(R.td, 1), R.nrz, pct(R.prz[2], 0), pct(g.ci_rzone[2][0], 0), pct(g.ci_rzone[2][1], 0), pct(R.pnm[2], 0), R.hits, R.ncr));
+  });
+  const ya = { range: [0, 80] }, xa = { tickvals: h, range: [0.6, 4.4] };
+  plot('gh-chart', tr, layout(sub2(titles[0], titles[1], { xaxis: AX('Horizon h (years after t)', xa), yaxis: AX('P(crisis begins in t+1 ... t+h), %', ya),
+    xaxis2: AX('Horizon h (years after t)', xa), yaxis2: AX('', ya) })));
+  out('gh-out', rows);
+}
+
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms_) => new Player(btn, $(id), vals, ms_);
+  const players = {}, P = (btn, id, vals, ms_) => (players[btn] = new Player(btn, $(id), vals, ms_));
   on(['rb-pi', 'rb-b'], rational); P('rb-play', 'rb-pi', range(0.9, 0.995, 0.005), 260);
   on(['ep-h', 'ep-sel'], episodesBlk); P('ep-play', 'ep-h', range(0.25, 2, 0.25), 700);
   $('gs-c').value = D.gsy.falls.indexOf(0.4); on(['gs-c'], gsy); P('gs-play', 'gs-c', range(0, D.gsy.falls.length - 1, 1), 800);
@@ -395,8 +432,13 @@ function init() {
   on(['lr-B', 'lr-s'], lrBlk); P('lr-play', 'lr-B', range(19, 199, 10), 300);
   on(['ai-m'], aiBlk); P('ai-play', 'ai-m', range(0, 96, 1), 120);
   $('dz-t').max = D.dnz.dates.length - 1; $('dz-t').value = D.dnz.dates.length - 1; on(['dz-t', 'dz-v'], dnz); P('dz-play', 'dz-t', range(0, D.dnz.dates.length - 1, 1), 70);
-  rational(); episodesBlk(); gsy(); windows(); nullDist(); spPd(); btc(); fwer(); lppls(); tcBlk(); ciPrice(); filters(); msBlk(); lrBlk(); aiBlk(); dnz();
+  on(['gh-q'], ghss); P('gh-play', 'gh-q', range(50, 95, 5), 900);
+  const PFX = { 'rational-bubble': 'rb', 'episodes': 'ep', 'bubbles-for-fama': 'gs', 'windows': 'wi', 'null': 'nu', 'sp-pd': 'pd', 'bitcoin': 'bt', 'family-wise': 'fw',
+    'lppls-bitcoin': 'lp', 'critical-time': 'tc', 'confidence': 'ci', 'filters': 'fl', 'ms-nasdaq': 'ms', 'ms-lr': 'lr', 'dotcom-ai': 'ai', 'housing': 'dz', 'crises': 'gh' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  rational(); episodesBlk(); gsy(); windows(); nullDist(); spPd(); btc(); fwer(); lppls(); tcBlk(); ciPrice(); filters(); msBlk(); lrBlk(); aiBlk(); dnz(); ghss();
 }
-window.CH17 = { episodes, hamilton, quantile, lpplsPath, yrs };
+window.CH17 = { episodes, hamilton, quantile, lpplsPath, yrs, rzone };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

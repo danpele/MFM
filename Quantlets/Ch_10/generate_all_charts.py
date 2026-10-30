@@ -335,12 +335,23 @@ def fig_spread_frequency(E, sp_daily):
     ax.set_ylabel('Estimated relative spread\n(bp, log scale)')
     legend_outside_bottom(ax, ncol=1, y=-0.14)
     save_fig('ch10_spread_frequency')
-    rng = np.random.default_rng(SEED)
+    # interval for the MEAN of the daily EDGE estimates (not for the true spread): moving-block bootstrap over days,
+    # blocks of 20 trading days (serial dependence of the daily estimates); 1-day blocks and 60-day blocks for sensitivity
     ev = E['edge'].clip(lower=0).values
-    eb = [1e4 * ev[rng.integers(0, len(ev), len(ev))].mean() for _ in range(B_BOOT)]
+
+    def mbb(L):
+        rng = np.random.default_rng(SEED)
+        n = len(ev)
+        nb = int(np.ceil(n / L))
+        return [1e4 * ev[np.concatenate([np.arange(st, st + L) for st in rng.integers(0, n - L + 1, nb)])[:n]].mean()
+                for _ in range(B_BOOT)]
+    eb = mbb(20)
+    eb1, eb60 = mbb(1), mbb(60)
     return dict(tick=float(tick), roll5=float(roll5), cs5=float(cs5), ar5=float(ar5), roll_d=float(sp_daily['roll']),
                 cs_d=float(sp_daily['cs']), ar_d=float(sp_daily['ar']), edge5=float(edge5), edge_d=float(sp_daily['edge']),
                 edge5_lo=float(np.percentile(eb, 2.5)), edge5_hi=float(np.percentile(eb, 97.5)),
+                edge5_lo1=float(np.percentile(eb1, 2.5)), edge5_hi1=float(np.percentile(eb1, 97.5)),
+                edge5_lo60=float(np.percentile(eb60, 2.5)), edge5_hi60=float(np.percentile(eb60, 97.5)),
                 share_negcov=float((E['cov'] < 0).mean()), n_days=int(len(E)))
 
 
@@ -648,6 +659,7 @@ def fig_april2025(s):
                 range7=float(100 * (d7['high'].max() / d7['low'].min() - 1)),
                 oc9=float(100 * (d9['close'].iloc[-1] / d9['open'].iloc[0] - 1)),
                 vol_ratio=float(x['volume'].sum() / (typical.sum() * len(days))),
+                vol_ratio9=float(d9['volume'].sum() / typical.sum()),
                 rv7=float(100 * rv.loc['2025-04-07']), rv_med=float(100 * rv.median()))
 
 

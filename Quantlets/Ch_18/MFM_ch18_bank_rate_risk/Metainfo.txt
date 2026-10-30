@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch18_bank_rate_risk'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study of Jiang, Matvos, Piskorski and Seru (2024), mark-to-market losses and US bank fragility in 2023, on the course data: the mark-to-market loss of two US Treasury ETFs (IEF, 7-10 years; TLT, 20+ years) from 31 December 2021 to 31 March 2023, and the rolling 252-day rate beta of the six US banks of the chapter (equal weights) on the daily change of the US 10-year yield, given the S&P 500, with 95% Newey-West intervals.'
+
+Keywords: 'interest rate risk, mark-to-market losses, deposit franchise, uninsured deposits, bank fragility, Silicon Valley Bank, rate beta, Newey-West'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Daily market data (data/market), September 2012 - September 2026: JPMorgan Chase, Bank of America, Citigroup, Goldman Sachs, Morgan Stanley, Wells Fargo; S&P 500; iShares 7-10 Year Treasury (IEF) and 20+ Year Treasury (TLT) ETFs; US 2-year and 10-year Treasury yields'
+
+Output: 'ch18_case_rate_risk.pdf'

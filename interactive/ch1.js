@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH1_DATA;
-const { C, sum, mean, sdev, median, rng, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { C, sum, mean, sdev, median, rng, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH1_TEXT;
 const A = D.assets, LBL = D.labels, COL = D.colors, PER = D.periods, N = a => T.lab[a];
 
@@ -292,7 +292,16 @@ function levData(a) {
   if (lvCache[a]) return lvCache[a];
   const r = M[a].r, ab = r.map(Math.abs), mr = mean(r), ma = mean(ab), xc = r.map(v => v - mr), yc = ab.map(v => v - ma), ks = range(-20, 20, 1);
   const L = ks.map(k => corrPairs(r, shiftBack(ab, k)));
-  const rob = ks.map(k => { let sxy = 0, sx = 0, sy = 0; for (let t = 0; t < r.length; t++) { const u = t + k; if (u < 0 || u >= r.length) continue; sxy += xc[t] * xc[t] * yc[u] * yc[u]; sx += xc[t] * xc[t]; sy += yc[u] * yc[u]; } return Math.sqrt(sxy / (sx * sy)); });
+  // robust SE under H0: L(k) = 0, Newey-West (Bartlett) long-run variance of u_t = x_t y_{t+k} / (s_x s_y),
+  // lag floor(4 (T/100)^(2/9)), divided by T (as Quantlets/Ch_01/generate_all_charts.py, leverage_tau)
+  const rob = ks.map(k => {
+    const xs = [], ys = []; for (let t = 0; t < r.length; t++) { const v = t + k; if (v < 0 || v >= r.length) continue; xs.push(xc[t]); ys.push(yc[v]); }
+    const T = xs.length, sx = Math.sqrt(mean(xs.map(v => v * v))), sy = Math.sqrt(mean(ys.map(v => v * v)));
+    const u0 = xs.map((v, i) => v * ys[i] / (sx * sy)), mu = mean(u0), u = u0.map(v => v - mu), Lag = Math.floor(4 * Math.pow(T / 100, 2 / 9));
+    let lrv = 0; for (let i = 0; i < T; i++) lrv += u[i] * u[i];
+    for (let j = 1; j <= Lag; j++) { let g = 0; for (let i = j; i < T; i++) g += u[i] * u[i - j]; lrv += 2 * (1 - j / (Lag + 1)) * g; }
+    return Math.sqrt(lrv / T / T);
+  });
   return (lvCache[a] = { ks, L, rob, n: r.length });
 }
 function leverage() {
@@ -498,10 +507,54 @@ function pathVol() {
   out('pv-out', [T.pv(L, nf(F.sc[0].r2, 3), nf(F.sc[1].r2, 3), nf(F.sc[2].r2, 3), nf(F.sc[0].rmse, 3), nf(F.sc[1].rmse, 3)), T.pv2(L, pct(F.share, 0))]);
 }
 
+// ================================================================= case study 2: the market return around the clock (SPY)
+let onBase = null;
+function onInit() {
+  const O = D.on.O, Cl = D.on.C, Ad = D.on.A, dates = D.on.t.map(dstr), on = [], id = [], dv = [], dd = [];
+  for (let i = 1; i < Cl.length; i++) {
+    const f1 = Ad[i] / Cl[i], f0 = Ad[i - 1] / Cl[i - 1];
+    on.push(Math.log(O[i] / Cl[i - 1])); id.push(Math.log(Cl[i] / O[i])); dv.push(Math.log(f1 / f0)); dd.push(dates[i]);
+  }
+  onBase = { on, id, dv, d: dd };
+}
+function nwSe(x) {                         // Newey-West (Bartlett) standard error of the mean, L = floor(4 (T/100)^(2/9))
+  const T = x.length, m = mean(x), u = x.map(v => v - m), L = Math.floor(4 * Math.pow(T / 100, 2 / 9));
+  let lrv = 0; for (let t = 0; t < T; t++) lrv += u[t] * u[t];
+  for (let k = 1; k <= L; k++) { let g = 0; for (let t = k; t < T; t++) g += u[t] * u[t - k]; lrv += 2 * (1 - k / (L + 1)) * g; }
+  return Math.sqrt(lrv / T / T);
+}
+function onStats(x) { const m = mean(x), se = nwSe(x); return { ann: 252 * m, t: m / se, lo: 252 * (m - 1.96 * se), hi: 252 * (m + 1.96 * se), vol: sdev(x) * Math.sqrt(252), sr: m / sdev(x) * Math.sqrt(252) }; }
+function onSlice(a, b) {                   // rows with year in [a, b]
+  const B = onBase, ix = []; B.d.forEach((s, i) => { const y = yearOf(s); if (y >= a && y <= b) ix.push(i); });
+  return { on: ix.map(i => B.on[i]), id: ix.map(i => B.id[i]), dv: ix.map(i => B.dv[i]), d: ix.map(i => B.d[i]) };
+}
+function overnight() {
+  if (!onBase) onInit();
+  const y0 = +$('on-y').value, full = y0 === 1993, S = onSlice(y0, 9999);
+  $('on-y-v').textContent = full ? (window.MFM_LANG === 'ro' ? 'eșantionul întreg' : 'full sample') : y0;
+  const cum = x => { let c = 0; return x.map(v => (c += v, 100 * c)); };
+  const tot = S.on.map((v, i) => v + S.id[i] + S.dv[i]);
+  const ln = (y, name, color) => ({ x: S.d, y, mode: 'lines', name, line: { color, width: 1.2 }, hovertemplate: '%{x}: %{y:.1f}%<extra></extra>' });
+  plot('on-c', [ln(cum(tot), 'Close to close, with dividends', K.blue), ln(cum(S.on), 'Overnight: close to next open', K.red),
+    ln(cum(S.id), 'Intraday: open to close', K.green), ln(cum(S.dv), 'Dividends', K.amber)],
+    layout(Object.assign({ title: ttl(`SPY, ${S.d[0].slice(0, 4)}-${S.d[S.d.length - 1].slice(0, 4)}: cumulative log returns`), shapes: [hline(0, K.navy, 'dash')],
+      xaxis: AX('', { type: 'date' }), yaxis: AX('Cumulative log return (%)') }, BOT)));
+  const groups = D.on.sub.map(([a, b]) => ({ lab: `${a}-${b.slice(2)}`, s: onSlice(+a, +b) })).concat([{ lab: full ? 'Full sample' : `From ${y0}`, s: S }]);
+  const st = groups.map(g => ({ lab: g.lab, on: onStats(g.s.on), id: onStats(g.s.id) }));
+  const bar = (k, name, color) => ({ x: st.map(g => g.lab), y: st.map(g => 100 * g[k].ann), type: 'bar', name, marker: { color },
+    error_y: { type: 'data', symmetric: false, array: st.map(g => 100 * (g[k].hi - g[k].ann)), arrayminus: st.map(g => 100 * (g[k].ann - g[k].lo)), color: K.navy, thickness: 1.2, width: 4 },
+    hovertemplate: '%{x}: %{y:.2f}% a year<extra></extra>' });
+  plot('on-b', [bar('on', 'Overnight', K.red), bar('id', 'Intraday', K.green)],
+    layout(Object.assign({ barmode: 'group', bargap: 0.25, title: ttl('Mean, 95% Newey-West interval'), shapes: [hline(0, K.navy)], xaxis: AX('', { type: 'category' }), yaxis: AX('Annualised mean (%)') }, BOT)));
+  const L = st[st.length - 1], cOn = sum(S.on), cId = sum(S.id), b = D.on.btc;
+  out('on-out', [T.on(full ? null : y0, nf(100 * L.on.ann, 1), nf(L.on.t, 2), nf(L.on.sr, 2), nf(100 * L.id.ann, 1), nf(L.id.t, 2), nf(L.id.sr, 2), pct(cOn / (cOn + cId), 0)),
+    T.on2(nf(b.us_session.ann_mean_pct, 1), nf(b.us_session.t_nw, 2), nf(b.outside.ann_mean_pct, 1), nf(b.outside.t_nw, 2))]);
+}
+
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   $('pr-chart').style.height = '640px'; threeCols('ac-r');
   on(['pr-th'], pricesReturns); P('pr-play', 'pr-th', range(0.5, 10, 0.5), 450);
   $('hq-nu').value = D.tfit.sp500.nu.toFixed(1);
@@ -514,7 +567,6 @@ function init() {
   on(['ag-a', 'ag-h'], aggregation); P('ag-play', 'ag-h', range(0, HZ.length - 1, 1), 1000);
   on(['lv-a', 'lv-k'], leverage); P('lv-play', 'lv-k', range(1, 20, 1), 500);
   on(['vv-a', 'vv-w'], volumeVol); P('vv-play', 'vv-w', range(20, 500, 20), 500);
-  
   const aaReset = () => { const a = $('aa-a').value, ac = acfAbsOf(a), lags = KS.filter(k => ac[k - 1] > 0); const [, sl] = fitLine(lags.map(Math.log), lags.map(k => Math.log(ac[k - 1]))); $('aa-d').value = Math.min(0.49, Math.max(0.01, (sl + 1) / 2)).toFixed(2); };
   aaReset(); $('aa-a').addEventListener('input', () => { aaReset(); acfAbs(); }); on(['aa-d'], acfAbs); P('aa-play', 'aa-d', range(0.01, 0.49, 0.02), 250);
   on(['ty-a', 'ty-k'], taylor); P('ty-play', 'ty-k', range(1, 100, 1), 150);
@@ -523,8 +575,13 @@ function init() {
   $('dd-t').max = MONTHS.length - 1; $('dd-t').value = MONTHS.length - 1; on(['dd-t'], drawdowns); P('dd-play', 'dd-t', range(0, MONTHS.length - 1, 2), 60);
   on(['rr-y'], riskReturn); P('rr-play', 'rr-y', range(1990, 2022, 1), 600);
   $('pv-L').value = PL.length - 1; on(['pv-L'], pathVol); P('pv-play', 'pv-L', range(0, PL.length - 1, 1), 1200);
-  pricesReturns(); histQQ(); hill(); gainLoss(); acfThree(); rollingVol(); aggregation(); leverage(); volumeVol(); acfAbs(); taylor(); ohlcDay(); volEst(); drawdowns(); riskReturn(); pathVol();
+  on(['on-y'], overnight); P('on-play', 'on-y', range(1993, 2020, 1), 600);
+  const PFX = { 'prices-returns': 'pr', 'heavy-tails': 'hq', 'hill': 'hl', 'gain-loss': 'gl', 'acf': 'ac', 'rolling-vol': 'rv', 'aggregation': 'ag', 'leverage': 'lv',
+    'volume': 'vv', 'acf-abs': 'aa', 'taylor': 'ty', 'ohlc': 'oh', 'vol-estimators': 've', 'drawdowns': 'dd', 'risk-return': 'rr', 'path-vol': 'pv', 'overnight': 'on' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  pricesReturns(); histQQ(); hill(); gainLoss(); acfThree(); rollingVol(); aggregation(); leverage(); volumeVol(); acfAbs(); taylor(); ohlcDay(); volEst(); drawdowns(); riskReturn(); pathVol(); overnight();
 }
-window.CH1 = { render: { pricesReturns, histQQ, hill, gainLoss, acfThree, rollingVol, aggregation, leverage, volumeVol, acfAbs, taylor, ohlcDay, newDay, volEst, drawdowns, riskReturn, pathVol }, M, moments, quantile, asc, acf, acfData, hillCum, hillK, aggSums, levData, spearman, estimators, riskStats, pvInit: () => pvInit(), pvFit, taylorData, DELTAS, tfit: D.tfit, rollStd, ddOf, tcdf, tinv, ninv };
+window.CH1 = { render: { pricesReturns, histQQ, hill, gainLoss, acfThree, rollingVol, aggregation, leverage, volumeVol, acfAbs, taylor, ohlcDay, newDay, volEst, drawdowns, riskReturn, pathVol, overnight }, M, moments, quantile, asc, acf, acfData, hillCum, hillK, aggSums, levData, spearman, estimators, riskStats, pvInit: () => pvInit(), pvFit, taylorData, DELTAS, tfit: D.tfit, rollStd, ddOf, tcdf, tinv, ninv, onInit: () => onInit(), onSlice, onStats, nwSe };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch1_overnight_returns'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study 2, Bondarenko and Muravyev (2023, Journal of Financial and Quantitative Analysis), Market return around the clock: a puzzle: on E-mini S&P 500 futures the 4 hours around the European open account for the entire average market return. Course replication on daily SPY prices, 1993-2026: overnight (close to next open), intraday (open to close) and dividend components of the total log return; annualised means, volatilities, Sharpe ratios and t statistics with the Newey-West HAC standard error, full sample and subperiods 1993-2004, 2005-2015, 2016-2026; extension to Bitcoin 5-minute bars, US regular session (09:30-16:00 New York) against the rest of the day.'
+
+Keywords: 'overnight return, intraday return, equity premium, time of day, SPY, Bitcoin, Newey-West, HAC standard error, Sharpe ratio, stylised facts'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Daily market data of the course: SPY open, close and adjusted close; Bitcoin 5-minute bars'
+
+Output: 'ch1_cs_overnight.pdf, ch1_overnight.json'

@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch19_data.js?v=20261029b"></script>
-<script src="ch19_text_en.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch19.js?v=20261029b" defer></script>
+<script src="ch19_data.js?v=20261030a"></script>
+<script src="ch19_text_en.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch19.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
-<p class="toc"><a href="#s-bet">Integrated Case Study: BET</a> · <a href="#s-nse">Case Study: Nonstandard Errors</a></p>
+<p class="toc"><a href="#s-bet">Integrated Case Study: BET</a> · <a href="#s-int">Integrated Case Studies: Portfolio, Bitcoin, Romanian Investor</a> · <a href="#s-nse">Case Study: Nonstandard Errors</a></p>
 <h2 class="sec" id="s-bet">Integrated Case Study: BET</h2>
 <section class="blk" id="bet-facts">
   <h3>Step 1: Stylised Facts of the BET</h3>
@@ -43,7 +43,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="bf-y0">First year: <b id="bf-y0-v"></b></label><input type="range" id="bf-y0" min="2000" max="2025" step="1" value="2000"></div><div class="ctl"><label for="bf-y1">Last year: <b id="bf-y1-v"></b></label><input type="range" id="bf-y1" min="2001" max="2026" step="1" value="2026"></div><div class="ctl"><label for="bf-k">Hill: k as a share of the loss days: <b id="bf-k-v"></b></label><input type="range" id="bf-k" min="1" max="10" step="0.5" value="5"></div><button class="btn play" id="bf-play" type="button"></button></div><div class="charts "><div class="chart" id="bf-qq"></div><div class="chart" id="bf-acf"></div></div><ul class="out" id="bf-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> The Hill tail index of BET losses is 2.39. What does this value say about the kurtosis of the returns?</div>
-  <details><summary>Answer</summary><p>Moments of order 2.39 and above are infinite, so the population kurtosis is infinite too. The whole 95% confidence interval [2.12, 3.03] lies below 4, so the sample excess kurtosis (11.1) estimates nothing and the tail index is reported instead. Over the full sample, 51 days lie beyond ±4 standard deviations, against 0.42 expected under the Normal distribution.</p></details>
+  <details><summary>Answer</summary><p>Under a Pareto-type tail, moments of order above 2.39 are infinite. The whole 95% confidence interval [2.12, 3.03] lies below 4: the data are consistent with an infinite kurtosis without proving it, and the sample excess kurtosis (11.1) estimates no finite parameter, so the tail index is reported instead. Over the full sample, 51 days lie beyond ±4 standard deviations, against 0.42 expected under the Normal distribution.</p></details>
 </section>
 <section class="blk" id="bet-garch">
   <h3>Step 2: GARCH(1,1)-t Volatility</h3>
@@ -84,18 +84,48 @@
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> A VaR 1% model in fact breaches at a rate of 2%. How often does the 5% Kupiec test reject it after one Basel year (T = 250)?</div>
   <details><summary>Answer</summary><p>Only 24% of the time. The minimum detectable effect at 80% power is 3.65% at T = 250, 2.05% at T = 1,000 and 1.45% at T = 5,432. A non-rejection with low power means “no evidence”, not “no problem”.</p></details>
+</section><h2 class="sec" id="s-int">Integrated Case Studies: Portfolio, Bitcoin, Romanian Investor</h2>
+<section class="blk" id="int-portfolio">
+  <h3>Multi-Asset Portfolio: Weights, VaR and Risk Contributions</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter19_review_projects.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch19_int_portfolio_en.jpg" alt="Slide 46: Multi-Asset Portfolio: Weights, VaR and Risk Contributions" loading="lazy"></a>
+      <figcaption>Slide 46</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ip-m">VaR 1% model</label><select id="ip-m"><option value="n" selected>DCC-Normal</option><option value="fhs">DCC-FHS</option><option value="hs">HS (500 days)</option></select></div><div class="ctl"><label for="ip-y0">Start of the evaluation: <b id="ip-y0-v"></b></label><input type="range" id="ip-y0" min="2012" max="2025" step="1" value="2012"></div><div class="ctl"><label for="ip-t">Up to: <b id="ip-t-v"></b></label><input type="range" id="ip-t" min="0" max="1000" step="1" value="1000"></div><button class="btn play" id="ip-play" type="button"></button></div><div class="charts "><div class="chart" id="ip-c1"></div><div class="chart" id="ip-c2"></div><div class="chart" id="ip-c3"></div></div><ul class="out" id="ip-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Why does the DCC-FHS VaR fail, although it uses the same conditional covariance as DCC-Normal?</div>
+  <details><summary>Answer</summary><p>Its history applies today's weights to the data they were estimated on: inside the FHS window the standard deviation of the standardised portfolio returns is 0.91, outside it 0.95. The 99% quantile of the standardised loss comes out too small: the mean VaR is 0.55%, against 0.58% for DCC-Normal, and there are 52 breaches against 35.8 expected (Kupiec p 0.011). DCC-Normal has 40 breaches and passes all three tests. The comparison is retrospective: the VaR model is chosen on the same period on which it is evaluated.</p></details>
+</section>
+<section class="blk" id="int-bitcoin">
+  <h3>Bitcoin: Bubbles, Realised-Volatility VaR and Liquidity</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter19_review_projects.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch19_int_bitcoin_en.jpg" alt="Slide 50: Bitcoin: Bubbles, Realised-Volatility VaR and Liquidity" loading="lazy"></a>
+      <figcaption>Slide 50</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ib-a">VaR level α: <b id="ib-a-v"></b></label><input type="range" id="ib-a" min="0.5" max="5" step="0.25" value="1"></div><div class="ctl"><label for="ib-w">HS window (days): <b id="ib-w-v"></b></label><input type="range" id="ib-w" min="250" max="900" step="50" value="500"></div><button class="btn play" id="ib-play" type="button"></button></div><div class="charts "><div class="chart" id="ib-c1"></div><div class="chart" id="ib-c2"></div><div class="chart" id="ib-c3"></div></div><ul class="out" id="ib-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The evaluation has 422 days. How often would the 5% Kupiec test reject a VaR 1% model whose true breach rate is 2%?</div>
+  <details><summary>Answer</summary><p>Only with probability 47%; the minimum detectable effect at 80% power is 2.70%. Both models have 7 breaches against 4.2 expected (p = 0.214), so the practical difference is capital: a mean VaR of 5.29% for log-HAR, against 6.24% for HS.</p></details>
+</section>
+<section class="blk" id="int-romania">
+  <h3>A Romanian Investor: Efficiency, Currency Hedging and ES in Lei</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter19_review_projects.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch19_int_romania_en.jpg" alt="Slide 54: A Romanian Investor: Efficiency, Currency Hedging and ES in Lei" loading="lazy"></a>
+      <figcaption>Slide 54</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ir-w">Window of h* (weeks): <b id="ir-w-v"></b></label><input type="range" id="ir-w" min="52" max="260" step="4" value="156"></div><div class="ctl"><label for="ir-y0">First year of the VR tests: <b id="ir-y0-v"></b></label><input type="range" id="ir-y0" min="2005" max="2020" step="1" value="2005"></div><button class="btn play" id="ir-play" type="button"></button></div><div class="charts "><div class="chart" id="ir-c1"></div><div class="chart" id="ir-c2"></div><div class="chart" id="ir-c3"></div></div><ul class="out" id="ir-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The euro leg loses when the Euro Stoxx 50 falls. Why does a full currency hedge not lower the ES of the portfolio?</div>
+  <details><summary>Answer</summary><p>The leu depreciates in the weeks in which equities fall (β = −0.52, t = −2.61), so the exchange rate offsets part of the loss, and the EUR/RON volatility is 4.6% a year, against 20.9% for the Euro Stoxx 50. Weekly ES 2.5%, Aug 2008 – Sep 2026: 9.60% unhedged, 9.67% with a full hedge; in retrospect, the choice of h mattered little for the risk.</p></details>
 </section><h2 class="sec" id="s-nse">Case Study: Nonstandard Errors</h2>
 <section class="blk" id="nse-multiverse">
   <h3>A Mini-Multiverse on Course Data: 27 Paths per Index</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter19_review_projects.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch19_nse_multiverse_en.jpg" alt="Slide 55: A Mini-Multiverse on Course Data: 27 Paths per Index" loading="lazy"></a>
-      <figcaption>Slide 55</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter19_review_projects.pdf#page=68" target="_blank" rel="noopener"><img src="slides/ch19_nse_multiverse_en.jpg" alt="Slide 67: A Mini-Multiverse on Course Data: 27 Paths per Index" loading="lazy"></a>
+      <figcaption>Slide 67</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="nm-model">Model of the yearly change</label><select id="nm-model"><option value="all" selected>all three</option><option value="Linear trend">Linear trend</option><option value="Log difference">Log difference</option><option value="Relative difference">Relative difference</option></select></div><div class="ctl"><label for="nm-meas">Measure of inefficiency</label><select id="nm-meas"><option value="all" selected>all three</option><option value="|VR(5) - 1|">|VR(5) − 1|</option><option value="|VR(21) - 1|">|VR(21) − 1|</option><option value="AR(1) R$^2$">AR(1) R²</option></select></div><div class="ctl"><label for="nm-ol">Outliers</label><select id="nm-ol"><option value="all" selected>all three</option><option value="None">none</option><option value="Winsorised">winsorised</option><option value="Trimmed">trimmed</option></select></div><div class="ctl"><label for="nm-q">Winsorising and trimming percentile: <b id="nm-q-v"></b></label><input type="range" id="nm-q" min="1" max="10" step="0.5" value="2.5"></div><button class="btn play" id="nm-play" type="button"></button></div><div class="charts "><div class="chart" id="nm-chart"></div></div><ul class="out" id="nm-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Which of the three forks (outliers, measure, model) creates most of the dispersion of the 27 estimates?</div>
-  <details><summary>Answer</summary><p>The model. Over the nine linear-trend paths the IQR is 2.0 pp for the Euro Stoxx 50 and 7.5 pp for the BET, against 22.9 pp and 84.4 pp over all 27. With relative differences the medians rise to +210.4% and +108.7% a year.</p></details>
+  <details><summary>Answer</summary><p>The model. Over the nine linear-trend paths the IQR is 2.6 pp for the Euro Stoxx 50 and 6.7 pp for the BET, against 64.6 pp and 82.6 pp over all 27. With relative differences the medians rise to +98.7% and +80.3% a year.</p></details>
 </section>
-<p class="src foot">BET index: official daily closing values, 6 Jan 2000 – 18 Sep 2026, log returns in %. One-day VaR forecasts: rolling window of 1,000 days (500 for HS and the Normal model), GARCH re-estimated every 21 days, evaluation from 3 Jan 2005. Mini-multiverse: daily closes of the Euro Stoxx 50 (EODHD) and the BET, 2002–2018.</p>
+<p class="src foot">BET index: official daily closing values, 6 Jan 2000 – 18 Sep 2026, log returns in %. One-day VaR forecasts: rolling window of 1,000 days (500 for HS and the Normal model), GARCH re-estimated every 21 days, evaluation from 3 Jan 2005. Mini-multiverse: daily closes of the Euro Stoxx 50 (EODHD) and the BET, 2002–2018. Integrated case studies: eight multi-asset ETFs (adjusted prices, 2007–2026), Bitcoin (daily closes 2014–2026, 5-minute bars 2024–2026), the BET, the Euro Stoxx 50 and the BNR EUR/RON reference rate (2005–2026).</p>
 </main>
 </body>
 </html>

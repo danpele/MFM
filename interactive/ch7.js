@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH7_DATA;
-const { C, sum, mean, nf, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { C, sum, mean, nf, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH7_TEXT;
 
 // ---------------------------------------------------------------- colours (generate_all_charts.py)
@@ -19,7 +19,10 @@ const ni = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, window.MFM_LANG === '
 const day = d => new Date(Date.UTC(2000, 0, 1) + d * 864e5).toISOString().slice(0, 10);
 const sorted = a => Float64Array.from(a).sort();
 function quant(s, p) { const pos = (s.length - 1) * p, lo = Math.floor(pos), hi = Math.min(lo + 1, s.length - 1); return s[lo] + (pos - lo) * (s[hi] - s[lo]); }
-function hsVarEs(s, a) { const v = quant(s, 1 - a); let t = 0, n = 0; for (let i = s.length - 1; i >= 0 && s[i] >= v; i--) { t += s[i]; n++; } return [v, t / n, n]; }
+// historical ES = integral of the empirical quantile function: weight 1 on the floor(n a) largest losses, n a - floor(n a) on the next one
+function hsVarEs(s, a) { const N = s.length, v = quant(s, 1 - a), na = N * a, m = Math.floor(na + 1e-9), fr = Math.max(na - m, 0);
+  let t = 0, nb = 0; for (let i = 0; i < m; i++) t += s[N - 1 - i]; if (fr > 1e-12 && m < N) t += fr * s[N - 1 - m];
+  for (let i = N - 1; i >= 0 && s[i] >= v; i--) nb++; return [v, t / na, nb, na]; }
 const npdf = x => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
 function nppf(p) {                                              // Acklam's rational approximation
   const a = [-39.69683028665376, 220.9460984245205, -275.9285104469687, 138.357751867269, -30.66479806614716, 2.506628277459239];
@@ -57,7 +60,7 @@ function lossDist() {
   const tail = L.filter(x => x > 2), th = Math.max(12, Math.ceil(s[s.length - 1]));
   plot('ld-tail', [
     { x: tail, type: 'histogram', xbins: { start: 2, end: th, size: (th - 2) / 50 }, name: 'Losses above 2%', marker: { color: HISTC }, hovertemplate: '%{x}<br>%{y} days<extra></extra>' },
-    vl(v, K.red, 'solid', 'VaR ' + ap(a)), vl(e, K.red, 'dash', 'ES ' + ap(a) + ' (mean beyond VaR)'), vl(e25, K.amber, 'dashdot', 'ES 2.5% = ' + e25.toFixed(2) + '%')
+    vl(v, K.red, 'solid', 'VaR ' + ap(a)), vl(e, K.red, 'dash', 'ES ' + ap(a) + ' (average of the worst ' + ap(a) + ')'), vl(e25, K.amber, 'dashdot', 'ES 2.5% = ' + e25.toFixed(2) + '%')
   ].map((tr, i) => (i ? Object.assign(tr, { yaxis: 'y2' }) : tr)), layout({ ...legendLow(), bargap: 0, title: ttl('Right tail of the losses'),
     xaxis: AX('Daily loss (%)', { range: [2, th] }), yaxis: AX('Number of days'), yaxis2: { overlaying: 'y', range: [0, 1], visible: false } }));
   out('ld-out', [T.ld(ap(a), p2(v), nb, ni(L.length), p2(100 * nb / L.length), p2(e), p2(vn), p2(en))]);
@@ -119,7 +122,7 @@ function precision() {
   const xmax = Math.max(4.9, ...rows.map(rw => Math.max(...Object.values(rw[2]).map(q => q[1])) + 0.1)), xmin = Math.min(1.4, ...rows.map(rw => Math.min(...Object.values(rw[2]).map(q => q[0])) - 0.1));
   plot('pr-chart', tr, layout({ ...legendLow(-0.16), title: ttl('S&P 500: 95% confidence intervals'), margin: { l: 110, r: 12, t: 30, b: 40 },
     xaxis: AX('Daily loss (%); navy tick = estimate', { range: [xmin, xmax] }), yaxis: AX('', { tickvals: [3, 2, 1, 0], ticktext: rows.map(rw => rw[0]), range: [-0.6, 3.6], zeroline: false }) }));
-  const k = Math.round(hsVarEs(sorted(D.loss.sp500.slice(-n)), 0.025)[2]);
+  const na = hsVarEs(sorted(D.loss.sp500.slice(-n)), 0.025)[3], k = nf(na, Math.abs(na - Math.round(na)) < 1e-9 ? 0 : Math.abs(10 * na - Math.round(10 * na)) < 1e-9 ? 1 : 2);
   const wd = q => nf(q[1] - q[0], 2);
   out('pr-out', [T.pr(ni(n), k, wd(iv(W, 'var')['Asymptotic HAC']), wd(iv(W, 'es')['Asymptotic HAC']), wd(W.blk), wd(iv(F, 'es')['Asymptotic i.i.d.']), wd(iv(F, 'es')['Asymptotic HAC']), wd(F.iid), wd(F.blk))]);
 }
@@ -288,10 +291,12 @@ function components() {
   $('pc-w-v').textContent = Math.round(100 * wb) + '%';
   const z1 = -nppf(0.01), Sw = PCOV.map(r => sum(r.map((v, j) => v * w[j]))), sp = Math.sqrt(sum(w.map((x, i) => x * Sw[i])));
   const varp = z1 * sp, cshare = w.map((x, i) => x * z1 * Sw[i] / sp / varp), vund = sum(w.map((x, i) => z1 * Math.sqrt(PCOV[i][i]) * x));
-  const Lp = PR.map(r => -sum(r.map((v, i) => v * w[i]))), v25 = quant(sorted(Lp), 0.975);
-  const ces = new Array(PN).fill(0); let nt = 0, esp = 0;
-  PR.forEach((r, t) => { if (Lp[t] >= v25) { nt++; esp += Lp[t]; r.forEach((v, i) => (ces[i] -= v * w[i])); } });
-  esp /= nt; const eshare = ces.map(x => x / nt / esp);
+  const Lp = PR.map(r => -sum(r.map((v, i) => v * w[i])));
+  // historical component ES: the portfolio ES tail weights applied to -w_i R_i (the components add up to the portfolio ES)
+  const na = Lp.length * 0.025, m = Math.floor(na + 1e-9), fr = Math.max(na - m, 0), ord = Lp.map((x, t) => t).sort((i, j) => Lp[j] - Lp[i]);
+  const ces = new Array(PN).fill(0); let esp = 0;
+  ord.slice(0, m + (fr > 1e-12 ? 1 : 0)).forEach((t, j) => { const wt = (j < m ? 1 : fr) / na; esp += wt * Lp[t]; PR[t].forEach((v, i) => (ces[i] -= wt * v * w[i])); });
+  const eshare = ces.map(x => x / esp);
   const eund = sum(P.names.map((_, i) => hsVarEs(sorted(PR.map(r => -r[i] * w[i])), 0.025)[1]));
   const lab = ['SPY (US equity)', 'TLT (US Treasuries)', 'GLD (gold)', 'Bitcoin'];
   const bar = (y, name, col) => ({ x: lab, y: y.map(v => 100 * v), type: 'bar', name, marker: { color: col }, text: y.map(v => (100 * v).toFixed(0)), textposition: 'outside', textfont: { size: 10 }, hovertemplate: '%{x}: %{y:.1f}%<extra></extra>' });
@@ -331,6 +336,52 @@ function crk() {
   out('ck-out', [T.ck(s === 0 ? null : CK_SETS[s - 1], flex.filter(v => v >= 1).length, flex.length, deep.filter(v => v < 1).length, deep.length, nf(Math.min(...deep), 3), nf(Math.max(...deep), 3))]);
 }
 
+// ================================================================= second case study: score-driven GPD tail (D'Innocenzo et al., 2024)
+// f_t = (ln xi_t, ln delta_t); f_{t+1} = (1 - B) fbar + A s_t + B f_t, s_t = L_t' grad_t (0 without an exceedance); case_tailshape.py
+function tailFilter(aXi) {
+  const TS = D.tail, th = TS.theta, n = TS.tau.length, X = new Float64Array(n);
+  TS.exc_i.forEach((i, j) => { X[i] = TS.exc_x[j]; });
+  const xi = new Float64Array(n), de = new Float64Array(n), v1 = new Float64Array(n), e25 = new Float64Array(n);
+  const ax = aXi, ad = th.a_delta, bx = th.b_xi, bd = th.b_delta, ox = (1 - bx) * th.fbar_xi, od = (1 - bd) * th.fbar_delta;
+  let f1 = th.fbar_xi, f2 = th.fbar_delta, ll = 0, cnt = 0;
+  const risk = (t, k, d, p, a) => { const v = TS.tau[t] + d / k * (Math.pow(a / p, -k) - 1); return [v, (v + d - k * TS.tau[t]) / (1 - k)]; };
+  for (let t = 0; t < n; t++) {
+    f1 = Math.min(Math.max(f1, -6), 1.5); f2 = Math.min(Math.max(f2, -6), 4);
+    const k = Math.exp(f1), d = Math.exp(f2); xi[t] = k; de[t] = d;
+    const p = cnt > 0 ? cnt / t : 0.1;
+    v1[t] = risk(t, k, d, p, 0.01)[0]; e25[t] = risk(t, k, d, p, 0.025)[1];
+    let s1 = 0, s2 = 0; const x = X[t];
+    if (x > 0) {
+      const z = 1 + k * x / d; ll += -Math.log(d) - (1 + 1 / k) * Math.log(z);
+      const g1 = Math.log(z) / k - (1 + 1 / k) * k * x / (d + k * x), g2 = (x - d) / (d + k * x);
+      s1 = (1 + 1 / k) * g1 - g2; s2 = Math.sqrt(1 + 2 * k) * g2; cnt++;
+    }
+    f1 = ox + ax * s1 + bx * f1; f2 = od + ad * s2 + bd * f2;
+  }
+  return { xi, de, v1, e25, ll };
+}
+const SPDATE = D.sp_days.map(day);
+function tailShape() {
+  const TS = D.tail, m = +$('ts-m').value, aXi = m * TS.theta.a_xi, F = tailFilter(aXi), L = D.loss.sp500, n = L.length;
+  $('ts-m-v').innerHTML = nf(m, 2) + ' (a<sub>ξ</sub> = ' + nf(aXi, 3) + ')';
+  const hit = []; let vmax = 0, vd = 0, xmin = Infinity, xmax = 0;
+  for (let t = 0; t < n; t++) { if (L[t] > F.v1[t]) hit.push(t); if (F.v1[t] > vmax) { vmax = F.v1[t]; vd = t; } xmin = Math.min(xmin, F.xi[t]); xmax = Math.max(xmax, F.xi[t]); }
+  plot('ts-risk', [
+    { x: SPDATE, y: Array.from(L, v => Math.max(v, 0)), mode: 'lines', name: 'Daily loss (gains set to 0)', line: { color: FILL, width: 0.5 }, fill: 'tozeroy', fillcolor: FILL, hovertemplate: '%{x}: loss %{y:.2f}%<extra></extra>' },
+    { x: SPDATE, y: TS.tau, mode: 'lines', name: 'Threshold τ<sub>t</sub> (90% quantile)', line: { color: K.green, width: 1 }, hovertemplate: '%{x}: τ %{y:.2f}%<extra></extra>' },
+    { x: SPDATE, y: Array.from(F.v1), mode: 'lines', name: 'VaR 1%', line: { color: K.blue, width: 1.4 }, hovertemplate: '%{x}: VaR 1% %{y:.2f}%<extra></extra>' },
+    { x: SPDATE, y: Array.from(F.e25), mode: 'lines', name: 'ES 2.5%', line: { color: K.red, width: 1, dash: 'dot' }, hovertemplate: '%{x}: ES 2.5% %{y:.2f}%<extra></extra>' },
+    { x: hit.map(t => SPDATE[t]), y: hit.map(t => L[t]), mode: 'markers', name: 'Loss above VaR 1%', marker: { color: K.orange, size: 5 }, hovertemplate: '%{x}: %{y:.2f}%<extra></extra>' }
+  ], layout({ ...legendLow(-0.12), title: ttl('S&P 500 losses, VaR and ES'), xaxis: AX('', { type: 'date' }), yaxis: AX('Daily loss (%)', { range: [0, 14] }) }));
+  plot('ts-xi', [
+    { x: [SPDATE[0], SPDATE[n - 1], SPDATE[n - 1], SPDATE[0]], y: [TS.paper_xi[0], TS.paper_xi[0], TS.paper_xi[1], TS.paper_xi[1]], fill: 'toself', fillcolor: 'rgba(197,210,232,0.6)', line: { width: 0 }, mode: 'lines', name: "Paper's range, 1962-2020", hoverinfo: 'skip' },
+    { x: SPDATE, y: Array.from(F.xi), mode: 'lines', name: 'Score-driven ξ<sub>t</sub>', line: { color: K.blue, width: 1.4 }, hovertemplate: '%{x}: ξ %{y:.3f}<extra></extra>' },
+    { x: [SPDATE[0], SPDATE[n - 1]], y: [TS.static.xi, TS.static.xi], mode: 'lines', name: 'Static GPD, same thresholds', line: { color: K.navy, width: 1, dash: 'dash' }, hoverinfo: 'skip' },
+    { x: [SPDATE[0], SPDATE[n - 1]], y: [TS.xi_const, TS.xi_const], mode: 'lines', name: 'Constant ξ, score-driven δ<sub>t</sub>', line: { color: K.orange, width: 1.4, dash: 'dashdot' }, hoverinfo: 'skip' }
+  ], layout({ ...legendLow(-0.12), title: ttl('Tail shape ξ<sub>t</sub>'), xaxis: AX('', { type: 'date' }), yaxis: AX('ξ<sub>t</sub>') }));
+  out('ts-out', [T.ts(nf(aXi, 3), nf(F.ll, 2), nf(F.ll - TS.loglik_const, 2), nf(xmin, 3), nf(xmax, 3), hit.length, p2(100 * hit.length / n), p2(vmax), SPDATE[vd])]);
+}
+
 // ================================================================= AI mini case: FZ0 scores and Diebold-Mariano tests
 let aiPre = null;
 function aiPrep() {
@@ -339,10 +390,10 @@ function aiPrep() {
   const S = { FHS: fz(c.fv, c.fe), cEVT: fz(c.cv, c.ce), 'GARCH-N': fz(c.nv, c.ne) };
   return { S, d1: S.FHS.map((x, j) => x - S['GARCH-N'][j]), d2: S.cEVT.map((x, j) => x - S.FHS[j]), year: RDATE.map(d => +d.slice(0, 4)) };
 }
-function dm(x) {                                     // OLS on a constant, HAC (Bartlett, 5 lags), small-sample correction n/(n-1)
+function dm(x) {                                     // OLS on a constant, HAC (Bartlett, 5 lags), as statsmodels cov_type='HAC'
   const n = x.length, m = mean(x), e = x.map(v => v - m); let s = sum(e.map(v => v * v)) / n;
   for (let j = 1; j <= 5; j++) { let g = 0; for (let t = j; t < n; t++) g += e[t] * e[t - j]; s += 2 * (1 - j / 6) * g / n; }
-  const se = Math.sqrt(s * n / (n - 1) / n); return { m, se, t: m / se, n };
+  const se = Math.sqrt(s / n); return { m, se, t: m / se, n };
 }
 function aiCase() {
   if (!aiPre) aiPre = aiPrep();
@@ -372,7 +423,7 @@ function aiCase() {
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const PL = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, PL = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   on(['ld-a'], lossDist); PL('ld-play', 'ld-a', range(0, ALPHA_LD.length - 1, 1), 700);
   on(['sa-p'], subadd); PL('sa-play', 'sa-p', range(0.1, 2, 0.1), 450);
   $('vl-a').max = D.levels.alpha.length - 1; $('vl-a').value = D.levels.alpha.length - 1; on(['vl-a'], varLevels); PL('vl-play', 'vl-a', range(0, D.levels.alpha.length - 1, 1), 160);
@@ -387,9 +438,13 @@ function init() {
   on(['pc-w'], components); PL('pc-play', 'pc-w', range(0, 30, 1), 250);
   on(['bs-a'], basel); PL('bs-play', 'bs-a', range(1, 5, 0.25), 400);
   on(['ck-s'], crk); PL('ck-play', 'ck-s', range(0, CK_SETS.length, 1), 1200);
+  on(['ts-m'], tailShape); PL('ts-play', 'ts-m', range(0, 2, 0.1), 700);
   on(['ai-y'], aiCase); PL('ai-play', 'ai-y', range(2008, 2024, 1), 600);
-  lossDist(); subadd(); varLevels(); precision(); hsFhs(); caviar(); gev(); meanExcess(); gpdTail(); condEvt(); horizon(); components(); basel(); crk(); aiCase();
+  const PFX = { 'loss-distribution': 'ld', 'subadditivity': 'sa', 'var-levels': 'vl', 'precision': 'pr', 'hs-fhs': 'hf', 'caviar': 'cv', 'gev': 'gv', 'mean-excess': 'me', 'gpd-tail': 'gt', 'cond-evt': 'ce', 'horizon': 'hz', 'components': 'pc', 'basel': 'bs', 'deep-quantile': 'ck', 'tail-shape': 'ts', 'fz0-ranking': 'ai' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'] }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  lossDist(); subadd(); varLevels(); precision(); hsFhs(); caviar(); gev(); meanExcess(); gpdTail(); condEvt(); horizon(); components(); basel(); crk(); tailShape(); aiCase();
 }
-window.CH7 = { hsVarEs, sorted, nppf, cond, rollHS, caviarPath, dm, aiPrep, discreteVarEs, gpdVarEs };
+window.CH7 = { hsVarEs, sorted, nppf, cond, rollHS, caviarPath, dm, aiPrep, discreteVarEs, gpdVarEs, tailFilter };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

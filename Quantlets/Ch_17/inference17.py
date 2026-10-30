@@ -31,7 +31,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import price   # noqa: E402
-from bubbles import psy, psy_cv, wild_cv, episodes, min_window, _bsadf_paths   # noqa: E402
+from bubbles import psy, psy_cv, wild_cv, episodes, min_window, _bsadf_paths, psy_lag   # noqa: E402
 from generate_all_charts import (plt, MainBlue, IDAred, Forest, Purple, Orange, Teal, Amber, Gray, SEED, save_fig,  # noqa: E402
                                  legend_outside_bottom, fig_legend, jsonable, d2s, ci_evaluation, gsy_events, HERE, _chg)
 
@@ -145,6 +145,10 @@ def fwer_bitcoin(R=2000):
     last = slice(n - TAU_B, n)
     any_last = np.nanmax(bs[:, last] - q95[last], axis=1) > 0
     ps = ps_fwer_cv(y.values, w0)
+    # the Phillips-Shi threshold is calibrated on a window of TAU_B dates; applied to the whole history (n dates) it
+    # does not control the family-wise rate there: exceedance and confirmed-episode rates under H0 (same paths)
+    ps_full_any = float((np.nanmax(bs, axis=1) > ps['q95']).mean())
+    ps_full_ep = float(np.mean([len(episodes(b, np.full(n, ps['q95']), np.arange(n), L)) > 0 for b in bs]))
     wc = wild_cv(y.values, w0, 1000, SEED)
     cvmc = psy_cv(n, w0, 2000, SEED)
     ep_ps = episodes(res['bsadf'], np.full(n, ps['q95']), idx, L)
@@ -156,16 +160,17 @@ def fwer_bitcoin(R=2000):
     ax.plot(idx, res['bsadf'], color=IDAred, lw=0.9, label='BSADF statistic, Bitcoin weekly')
     ax.plot(idx, cvmc['bsadf95'], color=Forest, lw=1.0, ls='--', label='95% pointwise critical value, Monte Carlo')
     ax.plot(idx, wc['bsadf95'], color=Purple, lw=1.0, ls='-.', label='95% pointwise critical value, wild bootstrap')
-    ax.axhline(ps['q95'], color=Orange, lw=1.2, label=f'Family-wise 95% critical value over {TAU_B} weeks (Phillips-Shi)')
+    ax.axhline(ps['q95'], color=Orange, lw=1.2,
+               label=f'Phillips-Shi threshold (calibrated on {TAU_B} weeks), applied to the full sample: sensitivity check')
     for s, e_, _ in ep_ps:
         ax.axvspan(s, e_ if e_ is not None else idx[-1], color=Amber, alpha=0.25, lw=0)
-    ax.fill_between([], [], color=Amber, alpha=0.25, label='Episodes with the family-wise critical value')
+    ax.fill_between([], [], color=Amber, alpha=0.25, label=f'Episodes above the Phillips-Shi threshold ({L} consecutive weeks)')
     ax.set_ylabel('Statistic')
-    ax.set_title('Bitcoin, weekly 2014-2026: pointwise vs family-wise critical values for date-stamping', fontsize=9, loc='left')
+    ax.set_title('Bitcoin, weekly 2014-2026: pointwise critical values vs a stricter threshold (sensitivity analysis)', fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=2, y=-0.18)
     save_fig('ch17_fwer_btc')
     return dict(T=n, w0=w0, L=L, R=R, tau_b=TAU_B, B=PS_B, fwer_any=float(any_exc.mean()), fwer_ep=float(ep_any.mean()),
-                fwer_last_tau=float(any_last.mean()), cv_ps=ps, cv_mc_max=float(np.nanmax(cvmc['bsadf95'])),
+                fwer_last_tau=float(any_last.mean()), cv_ps=ps, ps_full_any=ps_full_any, ps_full_ep=ps_full_ep, cv_mc_max=float(np.nanmax(cvmc['bsadf95'])),
                 cv_mc_last=float(cvmc['bsadf95'][-1]), cv_w_max=float(np.nanmax(wc['bsadf95'])),
                 episodes_ps=fmt(ep_ps), episodes_mc=fmt(ep_mc), episodes_wild=fmt(ep_w), gsadf=res['gsadf'])
 
@@ -219,13 +224,21 @@ def lppls_test():
         bd = circular_block_ci(s, h, block)
         hac = hac_lpm(s, h, block)
         n_on = int(s.sum())
+        # sensitivity to the block length: the signal itself uses long overlapping windows, so the dependence can last
+        # longer than the 90-day outcome horizon (blocks of 1, 2 and 4 horizons, same replications and seed)
+        sens = {}
+        for mult in (1, 2, 4):
+            bb = block * mult
+            dd = circular_block_ci(s, h, bb)
+            sens[str(bb)] = dict(ci_lo=float(np.quantile(dd, 0.025)), ci_hi=float(np.quantile(dd, 0.975)),
+                                 hac_p=hac_lpm(s, h, bb)['p'])
         # effective size: the number of independent 90-day blocks containing signals
         out[key] = dict(n=int(len(d)), n_on=n_on, p_on=float(h[s == 1].mean()), p_off=float(h[s == 0].mean()),
                         diff=float(diff), block=block, gap_days=gap, ci_lo=float(np.quantile(bd, 0.025)),
                         ci_hi=float(np.quantile(bd, 0.975)), boot_se=float(bd.std()),
                         naive_se=float(np.sqrt(h[s == 1].mean() * (1 - h[s == 1].mean()) / max(n_on, 1)
                                                + h[s == 0].mean() * (1 - h[s == 0].mean()) / (len(d) - n_on))),
-                        hac=hac, first=d2s(d.index[0]), last=d2s(d.index[-1]))
+                        hac=hac, block_sens=sens, first=d2s(d.index[0]), last=d2s(d.index[-1]))
         print('lppls', key, out[key])
     return out
 
@@ -288,44 +301,102 @@ def ms_params(res, k):
                 sd=[float(np.sqrt(par[f'sigma2[{j}]'])) for j in range(k)], P=P.tolist())
 
 
+MS_RETRY_REPS = (100, 200)       # extra searches (more starting points, new seeds) when a fit fails or LR < 0
+MS_BOUND_P = 1e-4                # a transition probability below this is on the boundary of the parameter space
+MS_BOUND_SD = 0.05               # a regime volatility below 5% of the sample volatility is (close to) degenerate
+
+
+def ms_diag(res, k, x):
+    """Diagnostics of one Markov-switching fit: convergence flag, smallest transition probability, smallest regime
+    volatility relative to the sample volatility, and whether the maximum lies on (or next to) the boundary."""
+    if res is None:
+        return dict(ok=False, converged=False, p_min=np.nan, sd_ratio_min=np.nan, boundary=True)
+    par = ms_params(res, k)
+    P = np.asarray(par['P'])
+    retv = getattr(res, 'mle_retvals', None) or {}
+    conv = bool(retv.get('converged', True))
+    p_min, sd_min = float(P.min()), float(min(par['sd']) / np.std(x))
+    return dict(ok=bool(np.isfinite(res.llf)), converged=conv, p_min=p_min, sd_ratio_min=sd_min,
+                boundary=bool(p_min < MS_BOUND_P or sd_min < MS_BOUND_SD))
+
+
+def ms_best(x, k, seed):
+    """Fit with MS_REPS random starting points; refit with more starting points (MS_RETRY_REPS, new seeds) if the
+    optimiser did not converge. Returns the best log-likelihood, the fit and its diagnostics."""
+    l, res = ms_llf(x, k, seed=seed)
+    d = ms_diag(res, k, x)
+    tries = 1
+    if not d['converged'] or not np.isfinite(l):
+        for j, reps in enumerate(MS_RETRY_REPS):
+            l2, res2 = ms_llf(x, k, reps=reps, seed=seed + 100000 * (j + 1))
+            tries += 1
+            if np.isfinite(l2) and (not np.isfinite(l) or l2 > l):
+                l, res = l2, res2
+        d = ms_diag(res, k, x)
+    d['tries'] = tries
+    return l, res, d
+
+
+def lr_pair(x, k0, seed):
+    """LR = 2 (l_{k0+1} - l_{k0}) with the same search rule for the observed series and every bootstrap sample:
+    both fits as in ms_best; if LR < 0 (the larger model, which nests the smaller one, was not maximised), the larger
+    model is refitted with more starting points and the best value is kept."""
+    if k0 == 1:
+        l0, res0, d0 = ms_llf(x, 1)[0], None, dict(ok=True, converged=True, boundary=False, tries=1)
+    else:
+        l0, res0, d0 = ms_best(x, k0, seed)
+    l1, res1, d1 = ms_best(x, k0 + 1, seed)
+    refit = False
+    if np.isfinite(l0) and np.isfinite(l1) and l1 < l0:
+        refit = True
+        for j, reps in enumerate(MS_RETRY_REPS):
+            l2, res2 = ms_llf(x, k0 + 1, reps=reps, seed=seed + 200000 * (j + 1))
+            if np.isfinite(l2) and l2 > l1:
+                l1, res1 = l2, res2
+        d1 = dict(ms_diag(res1, k0 + 1, x), tries=d1['tries'] + len(MS_RETRY_REPS))
+    return dict(lr=float(2 * (l1 - l0)), l0=float(l0), l1=float(l1), refit_neg=refit, conv0=bool(d0['converged']),
+                conv1=bool(d1['converged']), boundary0=bool(d0['boundary']), boundary1=bool(d1['boundary']),
+                p_min1=float(d1.get('p_min', np.nan)), sd_ratio_min1=float(d1.get('sd_ratio_min', np.nan))), res0, res1
+
+
 def _lr_worker(args):
     k0, params, n, i = args
     rng = np.random.default_rng([SEED, k0, i])
     x = ms_simulate(params, n, rng)
-    l0, _ = ms_llf(x, k0, seed=i)
-    l1, _ = ms_llf(x, k0 + 1, seed=i)
-    return 2 * (l1 - l0)
+    return lr_pair(x, k0, i)[0]
 
 
 def lr_boot(r, k0, B=MS_B):
-    l0, res0 = ms_llf(r, k0, seed=SEED)
-    l1, _ = ms_llf(r, k0 + 1, seed=SEED)
-    lr = 2 * (l1 - l0)
+    obs, res0, res1 = lr_pair(r, k0, SEED)
+    l0, l1, lr = obs['l0'], obs['l1'], obs['lr']
     if k0 == 1:
         params = dict(mu=[float(np.mean(r))], sd=[float(np.std(r))], P=[[1.0]])
     else:
         params = ms_params(res0, k0)
     with Pool(PROCS) as pool:
-        lrs = np.array(pool.map(_lr_worker, [(k0, params, len(r), i) for i in range(B)], chunksize=2))
-    lrs = lrs[np.isfinite(lrs)]
+        reps = pool.map(_lr_worker, [(k0, params, len(r), i) for i in range(B)], chunksize=2)
+    lrs = np.array([d['lr'] for d in reps])
+    ok = np.isfinite(lrs)
+    diag = dict(n_refit_neg=int(sum(d['refit_neg'] for d in reps)), n_neg=int((lrs[ok] < 0).sum()),
+                neg_min=float(lrs[ok].min()), n_nonconv=int(sum(not (d['conv0'] and d['conv1']) for d in reps)),
+                n_boundary1=int(sum(d['boundary1'] for d in reps)), n_failed=int((~ok).sum()))
+    lrs = lrs[ok]
     from scipy import stats
     df = 4 if k0 == 1 else 6          # extra parameters: 1 vs 2: mu, sigma, p11, p22; 2 vs 3: mu, sigma + 4 transition probabilities
     return dict(k0=k0, llf0=l0, llf1=l1, lr=float(lr), B=int(len(lrs)), p_boot=float((1 + (lrs >= lr).sum()) / (len(lrs) + 1)),
                 q95=float(np.quantile(lrs, 0.95)), q99=float(np.quantile(lrs, 0.99)), lr_max=float(lrs.max()),
-                chi2_df=df, chi2_95=float(stats.chi2.ppf(0.95, df)), lrs=lrs.tolist())
+                chi2_df=df, chi2_95=float(stats.chi2.ppf(0.95, df)), observed=obs, boot_diag=diag,
+                params1=ms_params(res1, k0 + 1) if res1 is not None else None, lrs=lrs.tolist())
 
 
 def regimes_test(out=None):
     out = dict(out or {})
     for key, start in [('btc', '2014-09-17'), ('ndx', '1990-01-01')]:
-        if f'{key}_1v2' in out:
-            continue
         r = (100 * np.log(price(key, 'W', start)).diff().dropna()).values
         out[f'{key}_1v2'] = lr_boot(r, 1)
-        print('regimes', key, '1v2', {k: v for k, v in out[f'{key}_1v2'].items() if k != 'lrs'})
+        print('regimes', key, '1v2', {k: v for k, v in out[f'{key}_1v2'].items() if k != 'lrs'}, flush=True)
     r = (100 * np.log(price('btc', 'W')).diff().dropna()).values
-    if 'btc_2v3' not in out:
-        out['btc_2v3'] = lr_boot(r, 2)
+    out['btc_2v3'] = lr_boot(r, 2)
     print('regimes btc 2v3', {k: v for k, v in out['btc_2v3'].items() if k != 'lrs'})
     # chart: bootstrap distributions of LR and the chi-square quantile
     fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.9))
@@ -343,6 +414,46 @@ def regimes_test(out=None):
     fig.tight_layout()
     fig_legend(fig, axes, ncol=2, y=0.0)
     save_fig('ch17_ms_lr')
+    return out
+
+
+# =============================================================================
+# 4b. SERIAL DEPENDENCE: LAG-AUGMENTED SADF / GSADF
+# =============================================================================
+DF_LAGS = 1
+DF_R = 2000
+
+
+def dflags(R=DF_R, k=DF_LAGS):
+    """The chapter's ADF regressions have no lagged differences. Diagnostics of serial dependence in Delta y
+    (first-order autocorrelation, Ljung-Box with 12 lags, plain and on squared returns) and the SADF / GSADF statistics
+    with k lagged differences, with Monte Carlo critical values recomputed for the same lag-augmented statistic
+    (same null as PSY 2015: random walk with drift 1/T, i.i.d. N(0, 1) shocks, same T and w0)."""
+    from statsmodels.stats.diagnostic import acorr_ljungbox
+    out = {}
+    for key, freq, start in [('ndx', 'M', None), ('btc', 'W', None), ('bet', 'M', None)]:
+        y = np.log(price(key, freq)).values
+        dy = np.diff(y)
+        n = len(dy)
+        w0, r0 = min_window(n)
+        lb = acorr_ljungbox(dy, lags=[12])
+        lb2 = acorr_ljungbox((dy - dy.mean()) ** 2, lags=[12])
+        res0 = psy(y)
+        s1, g1 = psy_lag(y[None, :], k, w0)
+        rng = np.random.default_rng(SEED)
+        e = rng.standard_normal((R, n))
+        Y = np.concatenate([np.zeros((R, 1)), np.cumsum(1.0 / n + e, axis=1)], axis=1)
+        with Pool(PROCS) as pool:
+            parts = pool.starmap(psy_lag, [(Y[i:i + 50], k, w0) for i in range(0, R, 50)])
+        S = np.concatenate([p_[0] for p_ in parts])
+        G = np.concatenate([p_[1] for p_ in parts])
+        out[key] = dict(T=n, w0=w0, k=k, R=R, rho1=float(np.corrcoef(dy[1:], dy[:-1])[0, 1]),
+                        lb_q=float(lb['lb_stat'].iloc[0]), lb_p=float(lb['lb_pvalue'].iloc[0]),
+                        lb2_p=float(lb2['lb_pvalue'].iloc[0]),
+                        sadf0=res0['sadf'], gsadf0=res0['gsadf'], sadf_k=float(s1[0]), gsadf_k=float(g1[0]),
+                        cv_sadf_k=float(np.quantile(S, 0.95)), cv_gsadf_k=float(np.quantile(G, 0.95)),
+                        p_sadf_k=float((1 + (S >= s1[0]).sum()) / (R + 1)), p_gsadf_k=float((1 + (G >= g1[0]).sum()) / (R + 1)))
+        print('dflags', key, out[key], flush=True)
     return out
 
 
@@ -380,7 +491,7 @@ def gsy_ess(thr=1.0, B=2000):
 
 
 def main():
-    what = sys.argv[1:] or ['size', 'fwer', 'lppls', 'regimes', 'gsy']
+    what = sys.argv[1:] or ['size', 'fwer', 'lppls', 'regimes', 'gsy', 'dflags']
     path = os.path.join(HERE, 'inference17.json')
     OUT = json.load(open(path)) if os.path.exists(path) else {}
     if 'gsy' in what:
@@ -393,6 +504,8 @@ def main():
         OUT['lppls'] = lppls_test()
     if 'size' in what:
         OUT['size'] = size_study()
+    if 'dflags' in what:
+        OUT['dflags'] = dflags()
     if 'regimes' in what:
         OUT['regimes'] = regimes_test(OUT.get('regimes'))
     with open(path, 'w') as f:

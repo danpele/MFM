@@ -547,7 +547,12 @@ def tail_sampler(df, model, tails, U):
 
 
 def z_pvalues(df, model, tails, M=2000, seed=1, a=A_ES):
-    """Simulated p-values under H0 (the model's forecast distribution) for Z1 and Z2."""
+    """Simulated p-values under H0 (the model's forecast distribution) for Z1 and Z2.
+
+    Calibration with the forecast distributions held fixed: the observed paths of F_t, VaR_t and ES_t are kept and
+    only the losses are redrawn, from independent uniforms U_t (the independence assumption of Acerbi & Szekely).
+    This is not the law of a GARCH system re-estimated recursively: parameter estimation risk and refitting are
+    ignored. Validating the size of the test would require simulating the whole forecasting mechanism."""
     L, var, es = df['L'].values, df['VaR2.5'].values, df['ES2.5'].values
     z1, z2 = acerbi_szekely(L, var, es, a)
     rng = np.random.default_rng(seed)
@@ -652,7 +657,9 @@ def conformal_var(r, a=0.01, n_cal=250, n_sd=250, gamma=0.005, eval_from=EVAL_FR
 
     Nonconformity score: s_t = L_t / sd_t, sd_t = standard deviation of the previous n_sd returns.
     VaR_t = sd_t * the order statistic k = ceil((n+1)(1-a)) of the last n_cal scores (+inf if k > n).
-    ACI: a_{t+1} = a_t + gamma (a - err_t); if the required rank exceeds n, VaR = +inf.
+    ACI: a_{t+1} = a_t + gamma (a - err_t); if the required rank exceeds n, VaR = +inf; if it is not positive
+    (a_t >= 1), VaR = -inf, so a breach is certain. With both conventions the long-run bound of Gibbs & Candes
+    holds for any sequence: |mean(err) - a| <= (max(a_1, 1 - a_1) + gamma) / (gamma T).
     Rolling-standardised scores are only approximately exchangeable, even for i.i.d. returns."""
     r = r.dropna()
     L = -r.values
@@ -668,7 +675,8 @@ def conformal_var(r, a=0.01, n_cal=250, n_sd=250, gamma=0.005, eval_from=EVAL_FR
         k = int(np.ceil((n_cal + 1) * (1 - a)))
         var_s[i] = np.inf if k > n_cal else sd[t] * cal[k - 1]
         ka = int(np.ceil((n_cal + 1) * (1 - at)))
-        var_a[i] = np.inf if ka > n_cal else sd[t] * cal[max(ka, 1) - 1]
+        # extended lower quantile: rank > n -> +inf (no breach possible); rank <= 0 (alpha_t >= 1) -> -inf (sure breach)
+        var_a[i] = np.inf if ka > n_cal else (-np.inf if ka < 1 else sd[t] * cal[ka - 1])
         a_path[i] = at
         err = float(L[t] > var_a[i])
         at = at + gamma * (a - err)

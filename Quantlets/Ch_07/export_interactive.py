@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 import generate_all_charts as g
 import estimation_risk as er
-from risk_measures import hs_var_es, gpd_fit, gpd_se, gpd_var_es, garch_filter, garch_next, fhs_mc, mean_excess
+from risk_measures import hs_var_es, hs_es, gpd_fit, gpd_se, gpd_var_es, garch_filter, garch_next, fhs_mc, mean_excess
 from mfm_data import joint_returns
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -62,6 +62,8 @@ def main():
     for k in g.ORDER:
         for c in ('HS|VaR 1%', 'HS|ES 2.5%', 'HS|ES 1%', 'HS|VaR 2.5%'):
             d['table'][k][c] = t[k][c]
+    for k in g.ORDER:                                          # historical ES = integral of the empirical quantile function
+        assert abs(hs_var_es(g.loss[k].values, 0.025)[1] - t[k]['HS|ES 2.5%']) < 1e-9
     d['loss_dist'] = res['loss_dist']
     d['bonds'] = res['bonds']
 
@@ -77,6 +79,7 @@ def main():
             cur[m][1].append(e)
     for m in g.METHODS:
         assert abs(cur[m][0][-1] - res['levels'][m]['var0_1']) < 1e-9
+        assert abs(cur[m][1][-1] - res['levels'][m]['es0_1']) < 1e-9
     d['levels'] = dict(alpha=r(levels, 6), var={m: r(cur[m][0]) for m in g.METHODS}, es={m: r(cur[m][1]) for m in g.METHODS})
 
     # precision: asymptotic and bootstrap 95% intervals, full sample and the last n days
@@ -108,13 +111,15 @@ def main():
         mu_all.append(mu.loc[dd].values)
         sig_all.append(sig.loc[dd].values)
         q = [float(np.quantile(nz, 1 - a)) for a in A_GRID]
-        years.append(dict(year=y, n=len(dd), fhs_q=r(q, 6), fhs_e=r([nz[nz >= qq].mean() for qq in q], 6),
+        years.append(dict(year=y, n=len(dd), fhs_q=r(q, 6), fhs_e=r([hs_es(nz, a) for a in A_GRID], 6),
                           gpd=dict(u=round(fz['u'], 8), xi=round(fz['xi'], 8), beta=round(fz['beta'], 8), nu=fz['nu'], n=fz['n'])))
     mu_all, sig_all = np.concatenate(mu_all), np.concatenate(sig_all)
     assert len(mu_all) == len(csv) and np.allclose(csv['sigma'].values, sig_all, atol=1e-9)
     k1 = A_GRID.index(0.01)
     q1 = np.concatenate([[yy['fhs_q'][k1]] * yy['n'] for yy in years])
     assert np.abs(-mu_all + sig_all * q1 - csv['fhs_var'].values).max() < 1e-4
+    e1 = np.concatenate([[yy['fhs_e'][k1]] * yy['n'] for yy in years])      # FHS ES 1%: fractional-weight tail mean
+    assert np.abs(-mu_all + sig_all * e1 - csv['fhs_es'].values).max() < 1e-4
     d['roll'] = dict(start=int(np.searchsorted(g.loss['sp500'].index, csv.index[0])), mu=r(mu_all, 5), sigma=r(sig_all, 5),
                      years=years, alphas=A_GRID, check=dict(fhs_var=r(csv['fhs_var'].values[:5], 6), cevt_var=r(csv['cevt_var'].values[:5], 6),
                                                             cevt_es=r(csv['cevt_es'].values[:5], 6), hs_var=r(csv['hs_var'].values[:5], 6)))
@@ -194,6 +199,20 @@ def main():
     d['basel'] = res['basel']
     d['crk'] = dict(methods=g.CRK_METHODS, table=g.CRK_TABLE6_1PCT)
     d['ai'] = ai
+
+    # second case study: score-driven GPD tail (case_tailshape.py, ch7_tailshape.json); the filter is re-run with the
+    # chapter's own function at the estimated parameters and checked against the saved series
+    import case_tailshape as ct
+    ts = json.load(open(os.path.join(HERE, 'ch7_tailshape.json')))
+    ser = pd.read_csv(os.path.join(HERE, 'ch7_tailshape_series.csv'), index_col='date', parse_dates=True)
+    y = g.loss['sp500'].values.astype(float)
+    assert len(ser) == len(y) and (ser.index == g.loss['sp500'].index).all()
+    F = ct.run(y, ts['tau'], [ts['theta'][k] for k in ct.NAMES])
+    assert np.abs(F['xi'] - ser['xi'].values).max() < 1e-5 and abs(F['ll'] - ts['loglik']) < 1e-6
+    ix = np.where(F['x'] > 0)[0]
+    d['tail'] = dict(tau=r(F['tau'], 5), exc_i=ix.tolist(), exc_x=r(F['x'][ix], 8), theta=ts['theta'],
+                     static=ts['static'], xi_const=ts['xi_const_shape'], loglik=ts['loglik'],
+                     loglik_const=ts['loglik_const_shape'], paper_xi=ts['paper']['xi_range'], n_exc_var1=ts['n_exc_var1'])
 
     with open(OUT, 'w') as fo:
         fo.write('// Inputs of the Chapter 7 interactive page, exported by Quantlets/Ch_07/export_interactive.py.\n')

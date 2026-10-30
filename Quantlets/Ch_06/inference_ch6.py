@@ -116,6 +116,7 @@ def fig_corr_hac():
     sig_h = (P['lo_h'] > 0) | (P['hi_h'] < 0)
     N.update(hac_ratio_med=ratio.median(), hac_ratio_q90=ratio.quantile(0.9), hac_ratio_max=ratio.max(),
              hac_share_flip=(sig_f & ~sig_h).mean(), hac_share_sig_f=sig_f.mean(), hac_share_sig_h=sig_h.mean(),
+             hac_share_narrow=(ratio < 1).mean(),
              hac_nwin=len(P))
     last = P.iloc[-1]
     N.update(hac_last_rho=last['rho'], hac_last_lo_f=last['lo_f'], hac_last_hi_f=last['hi_f'], hac_last_lo_h=last['lo_h'],

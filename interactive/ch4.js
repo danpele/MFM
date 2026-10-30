@@ -3,7 +3,7 @@
 'use strict';
 const D = window.CH4_DATA;
 const { C, dot, mv, quad, scale, sum, sub, solve, chol, eigSym, cov2corr, wEW, wTan, wGMV, wLOmv, wGMVLO, wTanLO, ercStep, wERC, riskContrib, frontierUnc,
-  leaves, hrpLevels, rng, sampleMoments, median, mean, sharpe, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+  leaves, hrpLevels, rng, sampleMoments, median, mean, sharpe, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH4_TEXT;
 
 // ---------------------------------------------------------------- colours (same as the slides)
@@ -235,6 +235,10 @@ function hrp() {
 }
 
 // ================================================================= out-of-sample growth
+// a rule whose wealth reaches zero (total return of -100% or worse in a month) is liquidated and not ranked
+function ruinAt(O, s, cbp) {
+  return O.ret[s].findIndex((r, t) => r - cbp / 1e4 * O.turnover[s][t] + O.rf[t] <= -1);
+}
 function wealthPath(ret, rf, to, cbp, upto) {
   let w = 1, alive = true; const y = [];
   for (let t = 0; t <= upto; t++) {
@@ -248,25 +252,29 @@ function oosCum() {
   const u = $('ow-u').value, O = D.oos[u], c = +$('ow-c').value, last = O.dates.length - 1;
   $('ow-t').max = last; if (+$('ow-t').value > last) $('ow-t').value = last;
   const k = +$('ow-t').value; $('ow-c-v').textContent = c + ' bp'; $('ow-t-v').textContent = O.dates[k];
-  plot('ow-chart', D.strategies.map(s => ({ x: O.dates.slice(0, k + 1), y: wealthPath(O.ret[s], O.rf, O.turnover[s], c, k), mode: 'lines', name: s,
+  const ruin = Object.fromEntries(D.strategies.map(s => [s, ruinAt(O, s, c)]));
+  const dead = s => ruin[s] >= 0 && ruin[s] <= k, alive = D.strategies.filter(s => !dead(s));
+  plot('ow-chart', D.strategies.map(s => ({ x: O.dates.slice(0, k + 1), y: wealthPath(O.ret[s], O.rf, O.turnover[s], c, k), mode: 'lines',
+    name: dead(s) ? `${s} (liquidated ${O.dates[ruin[s]]})` : s,
     line: { color: SCOL[s], width: ['1/N', 'GMV-LW', 'ERC', 'HRP'].includes(s) ? 2.2 : 1.2 }, hovertemplate: s + ' %{x}: %{y:.2f}<extra></extra>' })),
     layout({ title: ttl(u + ': wealth relative to T-bills, 60-month window, monthly rebalancing'), xaxis: AX('', { type: 'category', nticks: 8, range: [-0.5, last + 0.5] }), yaxis: AX('Wealth (log scale)', { type: 'log' }) }));
-  const sr = D.strategies.map(s => sharpe(O.ret[s].slice(0, k + 1).map((r, t) => r - c / 1e4 * O.turnover[s][t]))), best = D.strategies[sr.indexOf(Math.max(...sr))];
-  out('ow-out', [T.ow(O.dates[k], c, best, nf(Math.max(...sr), 2), nf(sr[0], 2))]);
+  const sr = alive.map(s => sharpe(O.ret[s].slice(0, k + 1).map((r, t) => r - c / 1e4 * O.turnover[s][t]))), best = alive[sr.indexOf(Math.max(...sr))];
+  out('ow-out', [T.ow(O.dates[k], c, best, nf(Math.max(...sr), 2), nf(sr[alive.indexOf('1/N')], 2))]);
 }
 
 // ================================================================= Sharpe ratios across universes
 function oosSharpe() {
-  const k = +$('os-y').value, U = Object.keys(D.oos), cols = [C.blue, C.green, C.amber];
+  const k = +$('os-y').value, U = Object.keys(D.oos), cols = [C.blue, C.green, C.amber], S = D.implementable;
+  const gone = D.strategies.filter(s => !S.includes(s));
   const y0 = String(+D.oos.Sectors.dates[0].slice(0, 4) + k);
   $('os-y-v').textContent = y0;
   const first = O => Math.max(0, O.dates.findIndex(d => d >= y0));
   plot('os-chart', U.map((u, j) => {
     const O = D.oos[u], i0 = first(O);
-    return { x: D.strategies, y: D.strategies.map(s => sharpe(O.ret[s].slice(i0))), type: 'bar', name: `${u} (${O.dates[i0]} – ${O.dates[O.dates.length - 1]})`, marker: { color: cols[j], line: { color: '#fff', width: 2 } }, hovertemplate: u + ', %{x}: %{y:.2f}<extra></extra>' };
-  }), layout({ barmode: 'group', bargap: 0.2, title: ttl('Out-of-sample Sharpe ratios before costs, evaluation from ' + y0), xaxis: AX(''), yaxis: AX('Sharpe ratio (annualised)', { range: [-0.6, 1.2] }) }));
-  const O = D.oos.Sectors, i0 = first(O);
-  out('os-out', [T.os(y0, nf(sharpe(O.ret['1/N'].slice(i0)), 2), nf(sharpe(O.ret.MV.slice(i0)), 2))]);
+    return { x: S, y: S.map(s => sharpe(O.ret[s].slice(i0))), type: 'bar', name: `${u} (${O.dates[i0]} – ${O.dates[O.dates.length - 1]})`, marker: { color: cols[j], line: { color: '#fff', width: 2 } }, hovertemplate: u + ', %{x}: %{y:.2f}<extra></extra>' };
+  }), layout({ barmode: 'group', bargap: 0.2, title: ttl('Out-of-sample Sharpe ratios before costs, evaluation from ' + y0 + (gone.length ? ` (${gone.join(', ')} not shown: liquidated in every universe)` : '')), xaxis: AX(''), yaxis: AX('Sharpe ratio (annualised)', { range: [-0.6, 1.2] }) }));
+  const O = D.oos.Sectors, i0 = first(O), v = S.map(s => sharpe(O.ret[s].slice(i0))), best = S[v.indexOf(Math.max(...v))];
+  out('os-out', [T.os(y0, nf(v[S.indexOf('1/N')], 2), best, nf(Math.max(...v), 2))]);
 }
 
 // ================================================================= Sharpe ratios after costs
@@ -274,13 +282,15 @@ function costs() {
   const u = $('co-u').value, O = D.oos[u], c = +$('co-c').value, cs = range(0, 100, 5);
   $('co-c-v').textContent = c + ' bp';
   const net = (s, cc) => sharpe(O.ret[s].map((r, t) => r - cc / 1e4 * O.turnover[s][t]));
-  plot('co-chart', D.strategies.map(s => ({ x: cs, y: cs.map(cc => net(s, cc)), mode: 'lines', name: s, line: { color: SCOL[s], width: 2 }, hovertemplate: s + ', %{x} bp: %{y:.2f}<extra></extra>' })),
-    layout({ title: ttl(u + ': Sharpe ratio after costs'), shapes: [vline(c, C.navy, 'dot')], xaxis: AX('Cost per unit of turnover (basis points)'), yaxis: AX('Net Sharpe ratio (annualised)') }));
-  const tv = D.strategies.map(s => mean(O.turnover[s].slice(1)));
-  plot('co-to', [{ y: D.strategies, x: tv, type: 'bar', orientation: 'h', marker: { color: D.strategies.map(s => SCOL[s]), line: { color: '#fff', width: 2 } }, hovertemplate: '%{y}: %{x:.3f}<extra></extra>' }],
+  const L = O.liquidated || {}, S = D.strategies.filter(s => !(s in L));
+  const note = Object.keys(L).length ? ' (' + Object.entries(L).map(([s, d]) => `${s} liquidated ${d}`).join('; ') + ')' : '';
+  plot('co-chart', S.map(s => ({ x: cs, y: cs.map(cc => net(s, cc)), mode: 'lines', name: s, line: { color: SCOL[s], width: 2 }, hovertemplate: s + ', %{x} bp: %{y:.2f}<extra></extra>' })),
+    layout({ title: ttl(u + ': Sharpe after costs' + note), shapes: [vline(c, C.navy, 'dot')], xaxis: AX('Cost per unit of turnover (basis points)'), yaxis: AX('Net Sharpe ratio (annualised)') }));
+  const tv = S.map(s => mean(O.turnover[s].slice(1)));
+  plot('co-to', [{ y: S, x: tv, type: 'bar', orientation: 'h', marker: { color: S.map(s => SCOL[s]), line: { color: '#fff', width: 2 } }, hovertemplate: '%{y}: %{x:.3f}<extra></extra>' }],
     layout({ title: ttl('Mean monthly turnover'), showlegend: false, xaxis: AX('Turnover (log scale)', { type: 'log' }), yaxis: AX('', { autorange: 'reversed' }) }));
-  const v = D.strategies.map(s => net(s, c)), best = D.strategies[v.indexOf(Math.max(...v))];
-  out('co-out', [T.co(c, best, nf(Math.max(...v), 2), nf(net('MV', c), 2), nf(v[0], 2))]);
+  const v = S.map(s => net(s, c)), best = S[v.indexOf(Math.max(...v))];
+  out('co-out', [T.co(c, best, nf(Math.max(...v), 2), nf(v[S.indexOf('1/N')], 2))]);
 }
 
 // ================================================================= Sharpe difference test (block bootstrap)
@@ -320,10 +330,37 @@ function bvb() {
   out('bv-out', [T.bv(B.dates[k], best, nf(Math.max(...sr), 2), nf(bt, 2))]);
 }
 
+// ================================================================= case study: volatility-managed portfolios
+const VM_COL = { unmanaged: '#1A3A6E', managed: '#CD0000', UMV: '#1A3A6E', CFW: '#2E7D32', CMV: '#CD0000' };
+const VM_LABEL = { 'Sectors': 'Sectors', 'Multi-asset': 'Multi-asset', 'Combined': 'Combined', 'BVB': 'BVB (RON, Rf = 0)' };
+function vmNet(u, s, c) { const V = D.vmp[u]; return sharpe(V.ret[s].map((r, t) => r - c / 1e4 * V.turnover[s][t])); }
+function vmBreakeven(u) {
+  for (let k = 0; k <= 400; k++) { const c = k / 2; if (vmNet(u, 'CMV', c) - vmNet(u, 'UMV', c) <= 0) return c; }
+  return null;
+}
+function volManaged() {
+  const V = D.vmp, u = $('vm-u').value, c = +$('vm-c').value, U = V.universes, P = ['UMV', 'CFW', 'CMV'];
+  $('vm-c-v').textContent = c + ' bp';
+  const sg = V[u].single, names = Object.keys(sg);
+  const htS = '%{x}: %{y:.2f}<br>p (HAC) %{customdata:.3f}<extra></extra>';
+  plot('vm-single', [
+    { x: names, y: names.map(n => sg[n][0]), type: 'bar', name: 'Unmanaged asset', marker: { color: VM_COL.unmanaged, line: { color: '#fff', width: 1 } }, hovertemplate: '%{x}: %{y:.2f}<extra></extra>' },
+    { x: names, y: names.map(n => sg[n][1]), customdata: names.map(n => sg[n][2]), type: 'bar', name: 'Managed: MV mix of r<sub>k</sub> and r<sub>k</sub>/σ²<sub>k</sub> (eq. 1)', marker: { color: VM_COL.managed, line: { color: '#fff', width: 1 } }, hovertemplate: htS }
+  ], layout({ barmode: 'group', bargap: 0.25, title: ttl(u + ': one asset at a time, ' + V[u].dates[0] + ' - ' + V[u].dates[V[u].T - 1]), xaxis: AX(''), yaxis: AX('Out-of-sample Sharpe ratio') }));
+  const wd = 0.26, xs = k => U.map((_, i) => i + (k - 1) * wd);
+  const tr = P.map((s, k) => ({ x: xs(k), y: U.map(v => sharpe(V[v].ret[s])), width: wd, type: 'bar', name: s, marker: { color: VM_COL[s], line: { color: '#fff', width: 1 } },
+    customdata: U.map(v => VM_LABEL[v]), hovertemplate: s + ', %{customdata}: gross %{y:.3f}<extra></extra>' }));
+  P.forEach((s, k) => tr.push({ x: xs(k), y: U.map(v => vmNet(v, s, c)), mode: 'markers', name: 'Net of ' + c + ' bp', showlegend: k === 2, legendgroup: 'net',
+    marker: { symbol: 'line-ew-open', size: 22, color: C.navy, line: { color: C.navy, width: 3 } }, customdata: U.map(v => VM_LABEL[v]), hovertemplate: s + ', %{customdata}: net %{y:.3f}<extra></extra>' }));
+  plot('vm-port', tr, layout({ title: ttl('All assets together, gamma = 5'), xaxis: AX('', { tickvals: U.map((_, i) => i), ticktext: U.map(v => VM_LABEL[v]) }), yaxis: AX('Out-of-sample Sharpe ratio') }));
+  const be = vmBreakeven(u);
+  out('vm-out', [T.vm(T.vmU[u], c, nf(vmNet(u, 'CMV', c), 3), nf(vmNet(u, 'UMV', c), 3), nf(vmNet(u, 'CFW', c), 3), be === null ? '—' : nf(be, be % 1 ? 1 : 0))]);
+}
+
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   $('ta-rho').value = D.two.rho.toFixed(2); on(['ta-rho', 'ta-w'], twoAsset); P('ta-play', 'ta-rho', range(1, -1, -0.05), 160);
   on(['fr-n'], frontier); P('fr-play', 'fr-n', range(2, 9, 1), 900);
   on(['ee-k'], estimationError); $('ee-T').addEventListener('input', () => { eeCache = null; estimationError(); }); P('ee-play', 'ee-k', range(1, 25, 1), 350);
@@ -341,8 +378,13 @@ function init() {
   on(['co-u', 'co-c'], costs); P('co-play', 'co-c', range(0, 100, 5), 300);
   on(['st-p', 'st-m'], sharpeTest); P('st-play', 'st-m', range(50, 2000, 50), 120);
   $('bv-t').max = 999; $('bv-t').value = 999; on(['bv-t'], bvb); P('bv-play', 'bv-t', range(0, D.bvb.dates.length - 1, 1), 110);
-  twoAsset(); frontier(); estimationError(); rolling(); windowLength(); mpBand(); shrinkage(); blackLitterman(); riskContribs(); hrp(); oosCum(); oosSharpe(); costs(); sharpeTest(); bvb();
+  on(['vm-u', 'vm-c'], volManaged); P('vm-play', 'vm-c', range(0, 100, 5), 300);
+  const PFX = { 'two-asset': 'ta', 'frontier': 'fr', 'estimation-error': 'ee', 'rolling-weights': 'rw', 'window-length': 'wl', 'noise-band': 'mp', 'shrinkage': 'sh',
+    'black-litterman': 'bl', 'risk-contributions': 'rc', 'hrp': 'hrp', 'oos-growth': 'ow', 'oos-sharpe': 'os', 'costs': 'co', 'sharpe-test': 'st', 'bvb': 'bv', 'vol-managed': 'vm' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  twoAsset(); frontier(); estimationError(); rolling(); windowLength(); mpBand(); shrinkage(); blackLitterman(); riskContribs(); hrp(); oosCum(); oosSharpe(); costs(); sharpeTest(); bvb(); volManaged();
 }
-window.CH4 = { wTan, wTanLO, wGMVLO, wERC, riskContrib, leaves, hrpLevels, eigSym, solve };
+window.CH4 = { vmNet, vmBreakeven, wTan, wTanLO, wGMVLO, wERC, riskContrib, leaves, hrpLevels, eigSym, solve };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

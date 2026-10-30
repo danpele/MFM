@@ -125,6 +125,19 @@ D_SPY = M.daily_returns('spy', start='2000-01-01')
 D_BTC = M.daily_returns('btc', start='2014-09-17')
 
 
+def grid_quality():
+    """Bars filled with the previous price and the sensitivity to dropping the incomplete days."""
+    out = {}
+    for name, P, v, ppy in (('spy', P_SPY, RV_SPY, 252), ('btc', P_BTC, RV_BTC, 365)):
+        im = M.IMPUTED[name].reindex(P.index)
+        bad = im.any(axis=1)
+        out[name] = {'days': int(len(P)), 'filled_bars': int(im.values.sum()), 'incomplete_days': int(bad.sum()),
+                     'vol_all': float(np.sqrt(ppy * v.mean())), 'vol_complete': float(np.sqrt(ppy * v[~bad.values].mean()))}
+    r = R_SPY.notna().sum(axis=1)
+    out['spy']['short_days'] = int((r == 42).sum())
+    return out
+
+
 def ann(v, ppy):
     """Annualised volatility (%) from a daily variance (%^2)."""
     return np.sqrt(ppy * v)
@@ -332,13 +345,16 @@ def fig_signature():
     plt.tight_layout(rect=(0, 0.08, 1, 1))
     save_fig('ch9_signature')
     nz_s, nz_b = T.noise_var(R_SPY), T.noise_var(R_BTC)
-    ts_adj = T.tsrv(P_SPY, 6, adjust=True)
-    rk, H = T.realized_kernel(R_SPY, P_SPY)
+    ts_adj = T.tsrv(P_SPY, 6, adjust=True)                      # standard shifted grids
+    ts_ends = T.tsrv(P_SPY, 6, adjust=True, keep_ends=True)     # every grid keeps the day's first and last price
+    rk, H = T.realized_kernel(R_SPY, P_SPY)                     # jittered end points (m = 2)
+    rk_raw, _ = T.realized_kernel(R_SPY, P_SPY, m=1)            # raw end prices
     return {'spy5': float(ss['sparse'].iloc[0]), 'spy30': float(ss['subsampled'].loc[6]), 'spy130': float(ss['subsampled'].iloc[-1]),
             'spy_range': float(ss.values.max() - ss.values.min()),
             'btc5': float(sb['sparse'].iloc[0]), 'btc60': float(sb['subsampled'].loc[12]), 'btc360': float(sb['subsampled'].iloc[-1]),
             'spy_rho1': nz_s['rho1'], 'btc_rho1': nz_b['rho1'], 'spy_om2rv': nz_s['omega2_rv'],
             'tsrv_ratio': float(ts_adj.mean() / RV_SPY.mean()), 'rk_ratio': float(rk.mean() / RV_SPY.mean()),
+            'tsrv_ends_ratio': float(ts_ends.mean() / RV_SPY.mean()), 'rk_raw_ratio': float(rk_raw.mean() / RV_SPY.mean()),
             'rk_H_med': float(H.median()), 'corr_rk_rv': float(np.corrcoef(rk, RV_SPY)[0, 1]),
             'corr_ts_rv': float(np.corrcoef(ts_adj, RV_SPY)[0, 1])}
 
@@ -458,8 +474,11 @@ def fig_vix():
     fig_legend_bottom(fig, ncol=3, y=0.02)
     plt.tight_layout(rect=(0, 0.1, 1, 1))
     save_fig('ch9_vix')
-    mz = T.mz_test(df['fvol'] ** 2, df['vix'] ** 2)
-    return {'vix_mean': float(df['vix'].mean()), 'fvol_mean': float(df['fvol'].mean()),
+    # 21-day targets overlap: Newey-West with 20 lags (h - 1) for the main result; 7 (the default rule) and 42 lags
+    # as the bandwidth sensitivity
+    mz = T.mz_test(df['fvol'] ** 2, df['vix'] ** 2, lags=20)
+    mz_bw = {str(L): T.mz_test(df['fvol'] ** 2, df['vix'] ** 2, lags=L)['se_b'] for L in (7, 20, 42)}
+    return {'mz_lags': 20, 'mz_se_b_lags': mz_bw, 'vix_mean': float(df['vix'].mean()), 'fvol_mean': float(df['fvol'].mean()),
             'vrp_mean': float(vrp.mean()), 'vrp_pos': float((vrp > 0).mean()), 'corr': float(df['vix'].corr(df['fvol'])),
             'mz_b': mz['b'], 'mz_se_b': mz['se_b'], 'mz_r2': mz['r2'], 'N': int(len(df)),
             'vrp_min_date': str(vrp.idxmin().date()), 'vrp_min': float(vrp.min()),
@@ -575,7 +594,7 @@ def fig_mz(F, y):
     for ax, c in zip(axes, ['logHAR', 'GARCH-t']):
         ax.scatter(F[c], y, s=4, color=MODEL_COL[c], alpha=0.5, label=f'{MODEL_LABEL[c]}: forecast vs realised variance')
         lim = [min(F[c].min(), y.min()), max(F[c].max(), y.max())]
-        ax.plot(lim, lim, color=Black, lw=0.8, ls='--', label='45-degree line (unbiased forecast)')
+        ax.plot(lim, lim, color=Black, lw=0.8, ls='--', label='45-degree line (calibrated forecast)')
         mz = T.mz_test(y, F[c])
         xx = np.linspace(F[c].min(), F[c].max(), 50)
         ax.plot(xx, mz['a'] + mz['b'] * xx, color='black', lw=1.0, label='Mincer-Zarnowitz fitted line')
@@ -622,7 +641,9 @@ def fig_rough():
     fig_legend_bottom(fig, ncol=4, y=0.02)
     plt.tight_layout(rect=(0, 0.12, 1, 1))
     save_fig('ch9_rough')
-    return {'H_spy': ro['H'], 'H_btc': rb['H'], 'zeta2_spy': float(ro['zeta'][2.0]), 'zeta1_spy': float(ro['zeta'][1.0])}
+    ri = rough_H(0.5 * np.log(RV_BTC.asfreq('D').interpolate().values))   # missing days linearly interpolated
+    return {'H_spy': ro['H'], 'H_btc': rb['H'], 'zeta2_spy': float(ro['zeta'][2.0]), 'zeta1_spy': float(ro['zeta'][1.0]),
+            'H_btc_interp': ri['H']}
 
 
 # =============================================================================
@@ -727,6 +748,7 @@ def fig_csv_ranking():
 # =============================================================================
 if __name__ == '__main__':
     res = {}
+    res['grid'] = grid_quality()
     print('1. intraday day');   res['day'] = fig_intraday_day()
     print('2. rv series');      res['series'] = fig_rv_series()
     print('   overnight');      res['overnight'] = fig_overnight()

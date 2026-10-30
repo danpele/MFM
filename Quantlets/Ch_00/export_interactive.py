@@ -1,6 +1,6 @@
 """Export the inputs of the Chapter 0 interactive page (MFM/interactive/ch0_data.js).
 
-Uses the series and functions of generate_all_charts.py and ai_discovery_case.py, so the page starts from the
+Uses the series and functions of generate_all_charts.py, ai_discovery_case.py and case_pflueger.py, so the page starts from the
 same data and numbers as the slides. The chart functions are called with save_fig replaced by plt.close, so the
 slide charts are not rewritten; their return values are exported as reference numbers ('ref').
 Dates are exported as days since 1970-01-01; date arrays named t are delta-encoded (tdelta).
@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 
 import generate_all_charts as g
 import ai_discovery_case as ai
+import case_pflueger as pf
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', '..', 'interactive', 'ch0_data.js')
@@ -132,6 +133,14 @@ def main():
 
     # concentration premium: d_t = r_SPY - r_RSP (ai_discovery_case.py)
     d['ai'] = dict(t=tdelta(ai.d.index), d=r(ai.d.values, 9), ref=json.load(open(os.path.join(HERE, 'ai_discovery_case.json'))))
+
+    # Pflueger (2025): bond-stock betas (case_pflueger.py); daily panel from June 2017 (windows ending in 2018)
+    res, q, _, dd, _, _ = pf.fig_pflueger_betas(save=False)
+    qt = q.index.to_timestamp(how='end').normalize()
+    dd = dd.loc['2017-06-01':]
+    d['pflueger'] = dict(q=dict(t=tdelta(qt), lab=[str(x) for x in q.index], eq=r(q['eq'], 7), bond=r(q['bond'], 7)),
+                         d=dict(t=tdelta(dd.index), eq=r(dd['eq'], 7), nom=r(dd['nom'], 7), tips=r(dd['tips'], 7)),
+                         ref=res)
 
     with open(OUT, 'w') as f:
         f.write('// Inputs of the Chapter 0 interactive page, exported by Quantlets/Ch_00/export_interactive.py.\n')

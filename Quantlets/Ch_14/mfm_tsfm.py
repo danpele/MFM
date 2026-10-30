@@ -32,6 +32,15 @@ A_VAR, A_ES = 0.01, 0.025  # VaR 1%, ES 2.5%
 FM_NAMES = {'chronos2': 'Chronos-2', 'bolt': 'Chronos-Bolt', 'timesfm': 'TimesFM-2.5'}
 FM_REPO = {'chronos2': 'amazon/chronos-2', 'bolt': 'amazon/chronos-bolt-small',
            'timesfm': 'google/timesfm-2.5-200m-pytorch'}
+# Hugging Face revisions actually used (commit SHA) and the SHA-256 of their model.safetensors; the weights file
+# first appears in the repository on the date shown, before POST_FROM (see checkpoint_record)
+FM_REVISION = {'chronos2': '29ec3766d36d6f73f0696f85560a422f50e8498c',
+               'bolt': '772f3d25d38aec6d914c8949dab4462e2d46f5d8',
+               'timesfm': '1d952420fba87f3c6dee4f240de0f1a0fbc790e3'}
+FM_WEIGHTS_SHA256 = {'chronos2': 'ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42',
+                     'bolt': '06a6a19bbe74bc10a9cd193bd4bf2bf638ae07f7e0d51653ae7ab8ea968a21dd',
+                     'timesfm': '2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8'}
+FM_WEIGHTS_FIRST = {'chronos2': '2025-10-30', 'bolt': '2024-11-13', 'timesfm': '2025-10-01'}
 C2_LEVELS = [0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5,
              0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 0.99]
 DEC_LEVELS = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
@@ -57,16 +66,27 @@ def load_returns(name):
 
 
 def load_rv():
-    """Daily realised variance of SPY (regular session, 5-minute returns, %^2)."""
+    """Daily realised variance of SPY (%^2): regular session on the New York clock, 5-minute bars starting
+    09:30, 09:35, ..., 15:55 (exactly 78 bars, so the day runs from the 09:30 open to the 16:00 close).
+    The first return is log(close/open) of the 09:30 bar, the next 77 are close-to-close; days without
+    the full grid (shortened sessions, missing bars) are dropped; off-grid prints (16:00 bar, irregular
+    time stamps) are ignored."""
     fname = 'intraday/SPY.US_5m.csv'
     path = os.path.join(MARKET_DIR, fname)
     d = pd.read_csv(path if os.path.exists(path) else REPO_RAW + fname, parse_dates=['datetime_utc'])
-    d['day'] = d['datetime_utc'].dt.normalize()
-    d['r'] = 100 * np.log(d['close']).groupby(d['day']).diff()
-    rv = (d['r'] ** 2).groupby(d['day']).sum()
+    utc = d['datetime_utc'].dt.tz_localize('UTC') if d['datetime_utc'].dt.tz is None else d['datetime_utc']
+    ny = utc.dt.tz_convert('America/New_York')
+    sec = ny.dt.hour * 3600 + ny.dt.minute * 60 + ny.dt.second
+    on_grid = (sec >= 9 * 3600 + 30 * 60) & (sec <= 15 * 3600 + 55 * 60) & (sec % 300 == 0)
+    d = d[on_grid.values].copy()
+    d['day'] = ny[on_grid].dt.tz_localize(None).dt.normalize().values
     n = d.groupby('day').size()
-    rv = rv[n >= 70]                       # drop shortened trading days
-    rv.index = rv.index.tz_localize(None) if rv.index.tz is not None else rv.index
+    d = d[d['day'].isin(n[n == 78].index)]
+    r = 100 * np.log(d['close']).groupby(d['day']).diff()
+    first = ~d['day'].duplicated()
+    r[first] = 100 * np.log(d['close'] / d['open'])[first]
+    rv = (r ** 2).groupby(d['day']).sum()
+    rv.index.name = 'day'
     rv.name = 'RV'
     return rv
 
@@ -90,10 +110,11 @@ def load_fm(name):
     import torch
     if name in ('chronos2', 'bolt'):
         from chronos import BaseChronosPipeline
-        _FM[name] = BaseChronosPipeline.from_pretrained(FM_REPO[name], device_map='cpu', torch_dtype=torch.float32)
+        _FM[name] = BaseChronosPipeline.from_pretrained(FM_REPO[name], revision=FM_REVISION[name], device_map='cpu',
+                                                         torch_dtype=torch.float32)
     elif name == 'timesfm':
         import timesfm
-        m = timesfm.TimesFM_2p5_200M_torch.from_pretrained(FM_REPO[name])
+        m = timesfm.TimesFM_2p5_200M_torch.from_pretrained(FM_REPO[name], revision=FM_REVISION[name])
         m.compile(timesfm.ForecastConfig(max_context=1024, max_horizon=128, normalize_inputs=True,
                                          use_continuous_quantile_head=True, force_flip_invariance=True,
                                          infer_is_positive=False, fix_quantile_crossing=True,
@@ -102,6 +123,26 @@ def load_fm(name):
     else:
         raise ValueError(name)
     return _FM[name]
+
+
+def checkpoint_record():
+    """Revision, SHA-256 of the local weights file and library versions for the three foundation models:
+    the evidence that the checkpoint used predates POST_FROM (no hashing of the weights if the cache is absent)."""
+    import hashlib
+    from importlib.metadata import version
+    from huggingface_hub import hf_hub_download
+    rec = {}
+    for k, repo in FM_REPO.items():
+        f = hf_hub_download(repo, 'model.safetensors', revision=FM_REVISION[k], local_files_only=True)
+        h = hashlib.sha256()
+        with open(f, 'rb') as fh:
+            for chunk in iter(lambda: fh.read(1 << 24), b''):
+                h.update(chunk)
+        rec[k] = {'repo': repo, 'revision': FM_REVISION[k], 'weights_sha256': h.hexdigest(),
+                  'weights_match': h.hexdigest() == FM_WEIGHTS_SHA256[k],
+                  'weights_first_commit': FM_WEIGHTS_FIRST[k], 'before_post_from': FM_WEIGHTS_FIRST[k] < POST_FROM}
+    rec['libraries'] = {p: version(p) for p in ('chronos-forecasting', 'timesfm', 'torch', 'transformers')}
+    return rec
 
 
 def fm_forecast(name, contexts, batch=256):
@@ -486,9 +527,25 @@ def block_bootstrap_ci(stat, arrays, B=2000, block=20, seed=0, level=0.95):
 
 
 def sign_test(y, f):
-    """Share of correct signs and the two-sided binomial p-value (H0: 50%)."""
+    """Share of correct signs, compared with the forecast "always positive" on the same days.
+    A 50% null ignores that up days are more frequent than down days (a constant positive forecast scores the
+    share of up days) and ignores serial dependence. p: two-sided test that the mean of
+    d_t = 1{sign correct} - 1{y_t > 0} is zero, with Newey-West variance (directional skill beyond "always up");
+    pt, p_pt: Pesaran-Timmermann (1992) statistic of independence between forecast and realised signs
+    (undefined, NaN, when the forecast sign never changes)."""
     y, f = np.asarray(y), np.asarray(f)
     keep = (y != 0) & (f != 0)
-    k = int(np.sum(np.sign(y[keep]) == np.sign(f[keep])))
+    up_y, up_f = y[keep] > 0, f[keep] > 0
+    hit = (up_y == up_f).astype(float)
     n = int(keep.sum())
-    return dict(rate=k / n, n=n, p=float(stats.binomtest(k, n, 0.5).pvalue))
+    d = hit - up_y.astype(float)
+    v = nw_var(d)
+    p = float(2 * stats.norm.sf(abs(d.mean() / np.sqrt(v / n)))) if v > 0 else float('nan')
+    py, pf = up_y.mean(), up_f.mean()
+    ps = py * pf + (1 - py) * (1 - pf)
+    var_ps = ((2 * py - 1) ** 2 * pf * (1 - pf) + (2 * pf - 1) ** 2 * py * (1 - py)) / n \
+        + 4 * py * pf * (1 - py) * (1 - pf) / n ** 2
+    var_p = ps * (1 - ps) / n
+    pt = (hit.mean() - ps) / np.sqrt(var_p - var_ps) if var_p - var_ps > 0 else float('nan')
+    return dict(rate=float(hit.mean()), n=n, up=float(py), p=p, pt=float(pt),
+                p_pt=float(stats.norm.sf(pt)) if np.isfinite(pt) else float('nan'))

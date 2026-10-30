@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch18_data.js?v=20261029b"></script>
-<script src="ch18_text_en.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch18.js?v=20261029b" defer></script>
+<script src="ch18_data.js?v=20261030a"></script>
+<script src="ch18_text_en.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch18.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
-<p class="toc"><a href="#s-intro">Systemic Risk: from One Bank to the System</a> · <a href="#s-exp">Exposure: MES and SRISK</a> · <a href="#s-covar">Contribution: CoVaR</a> · <a href="#s-conn">Connectedness: Spillover Networks</a> · <a href="#s-frm">Tail Networks: the Financial Risk Meter</a> · <a href="#s-stress">Stress Testing and Climate Risk</a> · <a href="#s-case">Case Study: Quantile Connectedness</a></p>
+<p class="toc"><a href="#s-intro">Systemic Risk: from One Bank to the System</a> · <a href="#s-exp">Exposure: MES and SRISK</a> · <a href="#s-covar">Contribution: CoVaR</a> · <a href="#s-conn">Connectedness: Spillover Networks</a> · <a href="#s-frm">Tail Networks: the Financial Risk Meter</a> · <a href="#s-stress">Stress Testing and Climate Risk</a> · <a href="#s-case">Case Studies: Quantile Connectedness and Bank Fragility</a></p>
 <h2 class="sec" id="s-intro">Systemic Risk: from One Bank to the System</h2>
 <section class="blk" id="bank-indices">
   <h3>Three Banking Systems, 2010–2026</h3>
@@ -53,7 +53,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="me-a">Tail level α (%): <b id="me-a-v"></b></label><input type="range" id="me-a" min="1" max="20" step="1" value="5"></div><button class="btn play" id="me-play" type="button"></button></div><div class="charts "><div class="chart" id="me-chart"></div></div><ul class="out" id="me-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> On the worst 5% of days for the S&P 500, does every US bank lose more than the index?</div>
-  <details><summary>Answer</summary><p>Yes. On those days the index loses 2.72% on average and the US banks between 3.22% (JPMorgan) and 4.04% (Morgan Stanley). In Europe, HSBC is the exception: 2.54%, against 3.16% for the Euro Stoxx 50.</p></details>
+  <details><summary>Answer</summary><p>Yes. On those days the index loses 2.72% on average and the US banks between 3.21% (JPMorgan) and 4.03% (Morgan Stanley). In Europe, HSBC is the exception: 2.53%, against 3.16% for the Euro Stoxx 50.</p></details>
 </section>
 <section class="blk" id="srisk">
   <h3>SRISK as a Function of Leverage</h3>
@@ -73,7 +73,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="qr-a">Tail level α (%): <b id="qr-a-v"></b></label><input type="range" id="qr-a" min="1" max="10" step="1" value="1"></div><div class="ctl"><label for="qr-t">Days shown, up to: <b id="qr-t-v"></b></label><input type="range" id="qr-t" min="2" max="4000" step="1" value="4000"></div><button class="btn play" id="qr-play" type="button"></button></div><div class="charts "><div class="chart" id="qr-chart"></div></div><ul class="out" id="qr-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> With JPMorgan at its VaR 1%, how large is the 1% loss of the other US banks, compared with a normal day for JPMorgan?</div>
-  <details><summary>Answer</summary><p>CoVaR 1% is 6.64% with JPMorgan at its VaR 1% (4.83%), against 2.03% with JPMorgan at its median. The difference, ΔCoVaR 1% = 4.62%, is the slope 0.94 times the distance between the two JPMorgan quantiles.</p></details>
+  <details><summary>Answer</summary><p>CoVaR 1% is 6.64% with JPMorgan at its VaR 1% (4.83%), against 2.03% with JPMorgan at its median. The difference, ΔCoVaR 1% = 4.62%, is the slope 0.94 times the distance between the two JPMorgan quantiles. 0.94 × 4.83 = 4.5% omits the intercept −2.10 of the 1% line; 5.07% is the unconditional system VaR 1%.</p></details>
 </section>
 <section class="blk" id="dcovar">
   <h3>ΔCoVaR 1% of Eleven Banks</h3>
@@ -83,7 +83,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="dc-a">Tail level α (%): <b id="dc-a-v"></b></label><input type="range" id="dc-a" min="1" max="10" step="1" value="1"></div><button class="btn play" id="dc-play" type="button"></button></div><div class="charts "><div class="chart" id="dc-chart"></div></div><ul class="out" id="dc-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Is Wells Fargo, with the largest ΔCoVaR 1%, significantly more systemic than Citigroup, with the smallest?</div>
-  <details><summary>Answer</summary><p>The estimates are 4.89% and 3.81%, but none of the 25 within-region pairs differs after the Holm correction. The overlap of the intervals [3.23, 4.74] and [3.68, 5.71] is not the test. The joint Wald test rejects equal contributions of the US banks (p = 0.015). At α = 5% the ranking changes: its Spearman correlation with the 1% ranking is 0.10.</p></details>
+  <details><summary>Answer</summary><p>The estimates are 4.89% and 3.81%, but none of the 25 within-region pairs differs after the Holm correction. The overlap of the intervals [3.27, 4.79] and [3.68, 5.73] is not the test. The joint Wald test rejects equal contributions of the US banks (p = 0.011). At α = 5% the ranking changes: its Spearman correlation with the 1% ranking is 0.13.</p></details>
 </section>
 <section class="blk" id="var-dcovar">
   <h3>VaR and ΔCoVaR Measure Different Things</h3>
@@ -93,7 +93,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="vd-a">Tail level α (%): <b id="vd-a-v"></b></label><input type="range" id="vd-a" min="1" max="10" step="1" value="1"></div><button class="btn play" id="vd-play" type="button"></button></div><div class="charts "><div class="chart" id="vd-chart"></div></div><ul class="out" id="vd-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Do the banks with the largest VaR 1% also have the largest ΔCoVaR 1%?</div>
-  <details><summary>Answer</summary><p>No. Deutsche Bank and ING have the largest VaR (7.19% and 7.16%) and only an average ΔCoVaR; JPMorgan has one of the smallest VaR (4.83%) and one of the largest ΔCoVaR. The Spearman correlation is 0.16.</p></details>
+  <details><summary>Answer</summary><p>No. Deutsche Bank and ING have the largest VaR (7.19% and 7.16%) and only an average ΔCoVaR; JPMorgan has one of the smallest VaR (4.83%) and one of the largest ΔCoVaR. The Spearman correlation between VaR 1% and ΔCoVaR 1% is 0.13; at α = 5% it is −0.51.</p></details>
 </section>
 <section class="blk" id="exposure">
   <h3>Contribution versus Exposure</h3>
@@ -103,7 +103,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ex-a">Tail level α (%): <b id="ex-a-v"></b></label><input type="range" id="ex-a" min="1" max="10" step="1" value="1"></div><button class="btn play" id="ex-play" type="button"></button></div><div class="charts "><div class="chart" id="ex-chart"></div></div><ul class="out" id="ex-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Does ING contribute more to the losses of the other European banks than it is exposed to them?</div>
-  <details><summary>Answer</summary><p>No. Its contribution is 4.42% and its exposure 6.14%. HSBC is the opposite case: contribution 4.07%, exposure 3.17%. Exposure exceeds contribution for four of the five European banks.</p></details>
+  <details><summary>Answer</summary><p>No. Its contribution is 4.41% and its exposure 6.14%. HSBC is the opposite case: contribution 4.07%, exposure 3.17%. Exposure exceeds contribution for four of the five European banks.</p></details>
 </section><h2 class="sec" id="s-conn">Connectedness: Spillover Networks</h2>
 <section class="blk" id="spill-table">
   <h3>The Connectedness Table of Thirteen Banks</h3>
@@ -113,7 +113,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="st-h">Horizon H (days): <b id="st-h-v"></b></label><input type="range" id="st-h" min="1" max="30" step="1" value="10"></div><button class="btn play" id="st-play" type="button"></button></div><div class="charts "><div class="chart" id="st-chart"></div></div><ul class="out" id="st-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> What share of the 10-day forecast error variance of a US bank's volatility comes from US shocks, and what share from Europe?</div>
-  <details><summary>Answer</summary><p>84.0% comes from US banks, own shocks included, and 15.0% from European banks. A European bank receives 72.7% from Europe and 26.2% from the US. Total connectedness is 63.9%.</p></details>
+  <details><summary>Answer</summary><p>84.0% comes from US banks, own shocks included, and 15.0% from European banks. A European bank receives 72.7% from Europe and 26.2% from the US. Total connectedness, 63.9%, is the average over all banks of the share coming from the other banks, not a split by region.</p></details>
 </section>
 <section class="blk" id="spill-network">
   <h3>The Net Spillover Network</h3>
@@ -133,7 +133,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="sp-w">Window</label><select id="sp-w"><option value="100">100 days</option><option value="250" selected>250 days</option><option value="500">500 days</option></select></div><div class="ctl"><label for="sp-h">Horizon H</label><select id="sp-h"><option value="5">5 days</option><option value="10" selected>10 days</option><option value="20">20 days</option></select></div><div class="ctl"><label for="sp-t">Up to: <b id="sp-t-v"></b></label><input type="range" id="sp-t" min="0" max="9999" step="1" value="9999"></div><button class="btn play" id="sp-play" type="button"></button></div><div class="charts "><div class="chart" id="sp-tot"></div><div class="chart" id="sp-net"></div></div><ul class="out" id="sp-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Does total connectedness rise in the COVID-19 crisis, and how quickly does it fall afterwards?</div>
-  <details><summary>Answer</summary><p>It rises from 61.8% on average in 2019 to 78.4% in spring 2020; the maximum is 79.3%, on 2020-08-27. It falls about 250 days later, partly because the crisis leaves the window; with a 100-day window the maximum is 85.6% on 2020-03-12 and the index is 10 points lower by 2020-08-13.</p></details>
+  <details><summary>Answer</summary><p>It rises from 61.8% on average in 2019 to 78.4% in spring 2020; the maximum is 79.3%, on 2020-08-27. It falls about 250 days later, partly because the crisis leaves the window; with a 100-day window the maximum is 85.6% on 2020-03-12, and the index first falls more than 10 points below it on 2020-08-13 (73.4%).</p></details>
 </section><h2 class="sec" id="s-frm">Tail Networks: the Financial Risk Meter</h2>
 <section class="blk" id="frm">
   <h3>The Financial Risk Meter of Thirteen Banks</h3>
@@ -143,18 +143,18 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="fr-a">Period analysed: from: <b id="fr-a-v"></b></label><input type="range" id="fr-a" min="0" max="389" step="1" value="0"></div><div class="ctl"><label for="fr-b">to: <b id="fr-b-v"></b></label><input type="range" id="fr-b" min="0" max="389" step="1" value="389"></div><button class="btn play" id="fr-play" type="button"></button></div><div class="charts "><div class="chart" id="fr-frm"></div><div class="chart" id="fr-dens"></div></div><ul class="out" id="fr-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Does the average GACV penalty follow the VIX?</div>
-  <details><summary>Answer</summary><p>Weakly: the correlation over the 390 windows is 0.35. The share of active predictors at the fixed λ = 2.3 × 10⁻⁴ follows the VIX more closely (0.62); it ranges from 31% (2017-11-21) to 68% (2020-06-17).</p></details>
+  <details><summary>Answer</summary><p>Weakly: the correlation over the 390 windows is 0.34. The share of active predictors at the fixed λ = 2.3 × 10⁻⁴ follows the VIX more closely (0.65); it ranges from 32% (2017-11-20) to 67% (2020-06-16), with a mean of 42%.</p></details>
 </section><h2 class="sec" id="s-stress">Stress Testing and Climate Risk</h2>
 <section class="blk" id="stress">
   <h3>Seven Historical Stress Scenarios</h3>
   <div class="pair">
     <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter18_systemic_risk_networks.pdf#page=50" target="_blank" rel="noopener"><img src="slides/ch18_stress_hist_en.jpg" alt="Slide 49: Seven Historical Stress Scenarios" loading="lazy"></a>
       <figcaption>Slide 49</figcaption></figure>
-    <div class="live"><div class="ctls"><div class="ctl"><label for="ss-l">Window length (trading days): <b id="ss-l-v"></b></label><input type="range" id="ss-l" min="3" max="20" step="1" value="10"></div><button class="btn play" id="ss-play" type="button"></button></div><div class="charts "><div class="chart" id="ss-chart"></div></div><ul class="out" id="ss-out"></ul></div>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ss-l">Window length (trading days): <b id="ss-l-v"></b></label><input type="range" id="ss-l" min="3" max="18" step="1" value="10"></div><button class="btn play" id="ss-play" type="button"></button></div><div class="charts "><div class="chart" id="ss-chart"></div></div><ul class="out" id="ss-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> In the Romanian bank-tax episode, which banks lost the most?</div>
   <details><summary>Answer</summary><p>The Romanian banks: Banca Transilvania −26% and BRD −26% over the worst 10 days of the bank portfolio, while the US banks lost between 8% and 14%. For the bank portfolio the worst episode is still Lehman (a loss of 37.6%), followed by COVID-19 (31.9%).</p></details>
-</section><h2 class="sec" id="s-case">Case Study: Quantile Connectedness</h2>
+</section><h2 class="sec" id="s-case">Case Studies: Quantile Connectedness and Bank Fragility</h2>
 <section class="blk" id="quantile">
   <h3>Spillovers across Quantiles</h3>
   <div class="pair">
@@ -165,7 +165,17 @@
   <div class="ask"><span class="ask-tag">Question for the room</span> Does the mean spillover index (56.57%) describe large shocks?</div>
   <details><summary>Answer</summary><p>No. The index is 77.17% at τ = 0.05 and 79.36% at τ = 0.95, and 88.18% and 91.77% at τ = 0.01 and 0.99, while in the centre it is about 40%. Over the full sample the tails are almost symmetric: RTD = 2.19 points.</p></details>
 </section>
-<p class="src foot">Daily EODHD prices, January 2010 to 18 September 2026: six US banks, five European banks, two Romanian banks (BVB), the S&P 500, Euro Stoxx 50, BET and VIX indices. The historical scenarios for the international banks start in 2007. Case study: values reported by Ando, Greenwood-Nimmo and Shin (2022).</p>
+<section class="blk" id="rate-risk">
+  <h3>Treasuries and Bank Equity, 2022–2023</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter18_systemic_risk_networks.pdf#page=61" target="_blank" rel="noopener"><img src="slides/ch18_case_rate_risk_en.jpg" alt="Slide 60: Treasuries and Bank Equity, 2022–2023" loading="lazy"></a>
+      <figcaption>Slide 60</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="rr-w">Rolling window (days): <b id="rr-w-v"></b></label><input type="range" id="rr-w" min="63" max="504" step="21" value="252"></div><button class="btn play" id="rr-play" type="button"></button></div><div class="charts "><div class="chart" id="rr-mtm"></div><div class="chart" id="rr-beta"></div></div><ul class="out" id="rr-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> With a 252-day window, how much did the six US bank stocks gain beyond the market for a 100 bp rise in the 10-year yield, at the end of 2021 and on 10 March 2023?</div>
+  <details><summary>Answer</summary><p>+12.8% at the end of 2021 and +1.08% on 10 March 2023, with the 95% interval [−0.40, 2.56], which contains zero. Over the same period IEF lost 7.8% per +100 bp. From 31 December 2021 to 31 March 2023, the IEF price fell by 13.8% and the TLT price by 28.2% (total returns: −11.8% and −26.2%).</p></details>
+</section>
+<p class="src foot">Daily EODHD prices, January 2010 to 18 September 2026: six US banks, five European banks, two Romanian banks (BVB), the S&P 500, Euro Stoxx 50, BET and VIX indices. The historical scenarios for the international banks start in 2007. First case study: values reported by Ando, Greenwood-Nimmo and Shin (2022). Second case study: the IEF and TLT ETFs and the US 10-year Treasury yield (EODHD), from September 2012.</p>
 </main>
 </body>
 </html>

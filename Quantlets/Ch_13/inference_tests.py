@@ -149,7 +149,10 @@ def case_study_section():
         lo, hi = np.percentile(boots, [2.5, 97.5])
         print(f'  {name:18s}: acc {P:.3f}, P* {Ps:.3f}, PT {s:.2f} (p {pv:.2f}), HAC t {hac_slope_t(y, x):.2f}; '
               f'pooled AUC {A:.3f}, DeLong CI [{A - 1.96 * se:.3f}, {A + 1.96 * se:.3f}], block bootstrap CI [{lo:.3f}, {hi:.3f}]')
-    # walk-forward 2010-2026
+    # walk-forward 2010-2026: d al caracteristicii FFD ales doar pe datele pina in 2009 (inainte de test)
+    _, d_pre = g.find_min_d(g.log_spx.loc[:g.D_FROZEN_END])
+    df = g.modelling_frame(d_pre)
+    print(f'  walk-forward frame: d frozen on data up to 2009 = {d_pre}')
     wf = pd.DataFrame(index=df.index)
     for yr in range(2010, df.index[-1].year + 1):
         test = df.index[df.index.year == yr]; train = df.index[df['t1'] < test[0]]
@@ -190,23 +193,21 @@ def case_study_section():
         S, pgw = giacomini_white(llr(wr[k].values) - llr(wr['const'].values))
         print(f'  rolling 8-year window, {k:5s}: log loss {llr(wr[k].values).mean():.4f} vs constant '
               f'{llr(wr["const"].values).mean():.4f}; GW = {S:.2f} (p {pgw:.4f})')
-    # sensibilitatea backtestului la alegerea lui d (ales pe tot esantionul)
-    for lab, dfx, cols_ in (('d frozen on data up to 2009', g.modelling_frame(0.15), feat),
-                            ('without ffd_price', df, [c for c in feat if c != 'ffd_price'])):
-        sig = pd.Series(np.nan, index=dfx.index)
-        for yr in range(2010, dfx.index[-1].year + 1):
-            test = dfx.index[dfx.index.year == yr]; train = dfx.index[dfx['t1'] < test[0]]
-            mdl = HistGradientBoostingClassifier(max_depth=3, learning_rate=0.03, max_iter=200,
-                                                 min_samples_leaf=100, random_state=SEED)
-            mdl.fit(dfx.loc[train, cols_], dfx.loc[train, 'y'])
-            sig.loc[test] = (mdl.predict_proba(dfx.loc[test, cols_])[:, 1] > 0.5).astype(float)
-        ps = sig.dropna(); r1 = np.log(g.spx).diff().shift(-1).reindex(ps.index)
-        st = (ps * r1 - ps.diff().abs().fillna(ps.iloc[0]) * 5 / 1e4).dropna()
-        print(f'  walk-forward, {lab}: SR {sharpe_ratio(st):.2f}, exposure {ps.mean():.0%}')
-    ret1 = np.log(g.spx).diff().shift(-1).reindex(wf.index)
-    pos = (wf['gbm'] > 0.5).astype(float)
-    strat = (pos * ret1 - pos.diff().abs().fillna(pos.iloc[0]) * 5 / 1e4).dropna()
-    bh = ret1.loc[strat.index]
+    # sensibilitatea backtestului: d = 0,25 ales pe tot esantionul (contaminat), fara FFD, executie la aceeasi inchidere
+    df25 = g.modelling_frame(0.25)
+    for lab, dfx, cols_, nxt in (('d = 0.25 chosen on the full sample', df25, feat, True),
+                                 ('without ffd_price (d = 0.25 frame)', df25, [c for c in feat if c != 'ffd_price'], True),
+                                 ('d frozen, same-close execution (idealised)', df, feat, False)):
+        prob_ = g.walk_forward_signal(dfx, cols_)
+        if nxt:
+            st, _, ps = g.long_cash_returns(prob_)
+        else:
+            ps = (prob_.dropna() > 0.5).astype(float); r1 = np.log(g.spx).diff().shift(-1).reindex(ps.index)
+            st = (ps * r1 - ps.diff().abs().fillna(ps.iloc[0]) * 5 / 1e4).dropna()
+        print(f'  walk-forward, {lab}: SR {sharpe_ratio(st):.4f}, exposure {ps.mean():.1%}')
+    strat, bh, pos = g.long_cash_returns(wf['gbm'])
+    print(f'  headline walk-forward (d frozen, next-close execution): SR {sharpe_ratio(strat):.4f}, '
+          f'B&H {sharpe_ratio(bh):.4f}, exposure {pos.mean():.1%}, n = {len(strat)}')
     for lab, rr in (('strategy', strat), ('buy-and-hold', bh)):
         sr = rr.mean() / rr.std(ddof=1)
         print(f'  {lab}: SR {sr * np.sqrt(252):.2f}, Lo (2002) iid SE {np.sqrt((1 + sr ** 2 / 2) / len(rr)) * np.sqrt(252):.2f}')
@@ -218,6 +219,20 @@ def case_study_section():
         bs.append((a[i].mean() / a[i].std() - b[i].mean() / b[i].std()) * np.sqrt(252))
     print(f'  Sharpe difference {diff:.2f}, Ledoit-Wolf HAC SE {se:.3f}, p = {p:.3f}; '
           f'block bootstrap 95% CI {np.round(np.percentile(bs, [2.5, 97.5]), 2)}; corr = {np.corrcoef(a, b)[0, 1]:.3f}')
+
+
+def no_ffd_cv_section():
+    """Studiul de caz fara log-pretul FFD: aceleasi pliuri purjate, mediile pe pliuri ale acuratetei si AUC."""
+    print('== 2b. Purged CV without ffd_price ==')
+    df = g.modelling_frame(0.25)
+    feat = [c for c in df.columns if c not in ('fwd', 'y', 't1', 'ffd_price')]
+    X, y = df[feat].values, df['y'].values
+    for name, model in g.get_models().items():
+        acc, auc = [], []
+        for tr, te in PurgedKFold(5, t1=df['t1'], pct_embargo=0.01).split(X):
+            p = model.fit(X[tr], y[tr]).predict_proba(X[te])[:, 1]
+            acc.append(accuracy_score(y[te], p > 0.5)); auc.append(roc_auc_score(y[te], p))
+        print(f'  {name:18s}: fold-mean accuracy {np.mean(acc):.4f}, AUC {np.mean(auc):.4f}')
 
 
 # =============================================================================
@@ -261,7 +276,10 @@ def btc_grid_section():
     M = g.btc_grid_returns()                     # semnale valide pentru toate regulile, start comun
     is_mask = M.index < '2021-01-01'
     Mis = M[is_mask]
-    Mis = Mis.loc[:, (Mis.std() > 0) & (M[~is_mask].std() > 0)]
+    n_grid = Mis.shape[1]
+    Mis = Mis.loc[:, Mis.std() > 0]                 # familia fixata doar din IS
+    n_undef = int((M.loc[~is_mask, Mis.columns].std() == 0).sum())
+    print(f'  grid {n_grid} rules; non-zero IS variance {Mis.shape[1]}; of these, zero OOS variance (always in cash OOS): {n_undef}')
     bh = r.reindex(Mis.index)
     print(f'  {Mis.shape[1]} rules, in-sample {Mis.index[0].date()} - {Mis.index[-1].date()}, n = {len(Mis)}')
     # DSR al celei mai bune reguli (exemplul lucrat din curs)
@@ -377,13 +395,14 @@ def campbell_thompson_section():
     sr = m.mean() / m.std()
     print(f'  S&P 500 monthly log returns {m.index[0].date()} - {m.index[-1].date()}: SR {sr:.3f} ({sr * np.sqrt(12):.2f} annualised)')
     for R2 in (0.005, 0.01):
-        s2 = np.sqrt((sr ** 2 + R2) / (1 - R2))
-        print(f'  R2_OOS = {R2:.1%}: SR* = {s2 * np.sqrt(12):.2f} annualised (+{s2 / sr - 1:.0%})')
+        s2 = np.sqrt((sr ** 2 + R2) / (1 - R2))     # sqrt(E[SR_t^2]): media patratului Sharpe-ului conditionat
+        print(f'  R2_OOS = {R2:.1%}: sqrt(E[SR_t^2]) = {s2 * np.sqrt(12):.2f} annualised (+{s2 / sr - 1:.0%})')
 
 
 if __name__ == '__main__':
     memory_section()
     case_study_section()
+    no_ffd_cv_section()
     btc_grid_section()
     dml_section()
     campbell_thompson_section()

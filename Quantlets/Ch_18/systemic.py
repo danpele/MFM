@@ -15,9 +15,9 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from statsmodels.regression.quantile_regression import QuantReg
+from statsmodels.tools.sm_exceptions import IterationLimitWarning
 from sklearn.linear_model import QuantileRegressor
 import warnings
-warnings.filterwarnings('ignore')
 
 
 # =============================================================================
@@ -52,9 +52,22 @@ def breakeven_leverage(lrm, k=0.08):
 # =============================================================================
 # CoVaR
 # =============================================================================
+QR_TOL = 1e-10        # convergence tolerance of the IRLS solver: with 1e-6 it can stop before the minimum of the
+                      # check loss (Deutsche Bank, 5%: 2.42446 instead of the linear-programming solution 2.42816)
+
+
 def qreg(y, X, q):
-    """Quantile regression (Koenker-Bassett); returns the coefficients [intercept, slopes]."""
-    return QuantReg(np.asarray(y), sm.add_constant(np.asarray(X), has_constant='add')).fit(q=q, max_iter=5000).params
+    """Quantile regression (Koenker-Bassett); returns the coefficients [intercept, slopes].
+
+    IRLS with a tight tolerance; if it hits the iteration limit, the exact linear-programming solution (HiGHS) is used."""
+    y, Xc = np.asarray(y, float), sm.add_constant(np.asarray(X), has_constant='add')
+    with warnings.catch_warnings():
+        warnings.simplefilter('error', IterationLimitWarning)
+        try:
+            return QuantReg(y, Xc).fit(q=q, max_iter=20000, p_tol=QR_TOL).params
+        except IterationLimitWarning:
+            m = QuantileRegressor(quantile=q, alpha=0.0, fit_intercept=False, solver='highs').fit(Xc, y)
+            return m.coef_
 
 
 def covar_static(x_sys, x_i, alpha=0.01):
@@ -187,7 +200,12 @@ def check_loss(u, tau):
 
 
 def lasso_qr_gacv(y, X, tau=0.05, lambdas=None):
-    """L1-penalized quantile regression; lambda chosen by the generalized approximate cross-validation criterion GACV = sum rho_tau(res) / (n - df)."""
+    """L1-penalized quantile regression; lambda chosen by the generalized approximate cross-validation criterion
+    GACV = sum rho_tau(res) / (n - df), df = effective dimension = number of interpolated observations (zero residuals).
+
+    For the L1 quantile fit with an intercept this count equals 1 + the number of non-zero slopes (checked on the
+    windows used in the course); the intercept is part of the model dimension. The number of active slopes (the links
+    of the network) is returned separately in 'df' and 'df_sel'."""
     y, X = np.asarray(y, float), np.asarray(X, float)
     n = len(y)
     lambdas = np.logspace(-4, -0.5, 15) if lambdas is None else lambdas
@@ -195,9 +213,11 @@ def lasso_qr_gacv(y, X, tau=0.05, lambdas=None):
     for lam in lambdas:
         m = QuantileRegressor(quantile=tau, alpha=lam, solver='highs').fit(X, y)
         res = y - m.predict(X)
-        df = int(np.sum(np.abs(m.coef_) > 1e-8))
+        n_act = int(np.sum(np.abs(m.coef_) > 1e-8))           # active slopes (links)
+        df = int(np.sum(np.abs(res) < 1e-8))                  # interpolated observations (= 1 + n_act here)
         g = check_loss(res, tau).sum() / max(n - df, 1)
-        rows.append((lam, g, df, m.coef_.copy()))
+        rows.append((lam, g, n_act, m.coef_.copy(), df))
     i = int(np.argmin([r[1] for r in rows]))
     return {'lambda': rows[i][0], 'gacv': [r[1] for r in rows], 'df': [r[2] for r in rows],
-            'lambdas': list(lambdas), 'coef': rows[i][3], 'df_sel': rows[i][2]}
+            'lambdas': list(lambdas), 'coef': rows[i][3], 'df_sel': rows[i][2],
+            'df_gacv': [r[4] for r in rows], 'df_gacv_sel': rows[i][4]}

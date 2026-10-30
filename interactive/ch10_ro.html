@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch10_data.js?v=20261029b"></script>
-<script src="ch10_text_ro.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch10.js?v=20261029b" defer></script>
+<script src="ch10_data.js?v=20261030a"></script>
+<script src="ch10_text_ro.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch10.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
-<p class="toc"><a href="#s-lob">Registrul de ordine limită</a> · <a href="#s-spr">Spread-ul bid-ask</a> · <a href="#s-ill">Ilichiditatea și tiparele intrazilnice</a> · <a href="#s-inf">Informația și prețurile</a> · <a href="#s-exe">Impactul asupra prețului și execuția optimă</a> · <a href="#s-hft">Tranzacționarea de înaltă frecvență și stresul pe piață</a> · <a href="#s-race">Studiu de caz: costul competiției pentru viteză</a> · <a href="#s-ai">AI pentru descoperire științifică</a></p>
+<p class="toc"><a href="#s-lob">Registrul de ordine limită</a> · <a href="#s-spr">Spread-ul bid-ask</a> · <a href="#s-ill">Ilichiditatea și tiparele intrazilnice</a> · <a href="#s-inf">Informația și prețurile</a> · <a href="#s-exe">Impactul asupra prețului și execuția optimă</a> · <a href="#s-hft">Tranzacționarea de înaltă frecvență și stresul pe piață</a> · <a href="#s-race">Studii de caz: competiția pentru viteză și momentum-ul intrazilnic</a> · <a href="#s-ai">AI pentru descoperire științifică</a></p>
 <h2 class="sec" id="s-lob">Registrul de ordine limită</h2>
 <section class="blk" id="order-book">
   <h3>Un registru de ordine simulat</h3>
@@ -73,7 +73,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="sf-y">Perioada: <b id="sf-y-v"></b></label><input type="range" id="sf-y" min="0" max="7" step="1" value="0"></div><button class="btn play" id="sf-play" type="button"></button></div><div class="charts "><div class="chart" id="sf-chart"></div></div><ul class="out" id="sf-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Un pas de cotare înseamnă 0,21 pb din prețul SPY. Care estimator se apropie cel mai mult de această valoare?</div>
-  <details><summary>Răspuns</summary><p>EDGE pe barele de 5 minute: 0,46 pb, cu intervalul de 95% [0,42; 0,49]. Pe bare zilnice toate estimările sînt cu două ordine de mărime peste un pas (Roll 64,3, Corwin–Schultz 26,5, Abdi–Ranaldo 55,1 și EDGE 40,1 pb), pentru că intervalul zilnic este dominat de volatilitate.</p></details>
+  <details><summary>Răspuns</summary><p>EDGE pe barele de 5 minute: 0,46 pb; intervalul de 95% pentru media estimatorului, din bootstrap pe blocuri de 20 de zile, este [0,41; 0,51]. Pe bare zilnice toate estimările sînt cu două ordine de mărime peste un pas (Roll 64,3, Corwin–Schultz 26,5, Abdi–Ranaldo 55,1 și EDGE 40,1 pb), pentru că intervalul zilnic este dominat de volatilitate.</p></details>
 </section>
 <section class="blk" id="spread-cross">
   <h3>Estimări ale spread-ului pentru 25 de active</h3>
@@ -93,7 +93,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="am-s">Fereastra începe în: <b id="am-s-v"></b></label><input type="range" id="am-s" min="0" max="23" step="1" value="0"></div><button class="btn play" id="am-play" type="button"></button></div><div class="charts "><div class="chart" id="am-chart"></div></div><ul class="out" id="am-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> De cîte ori este mai mare raportul Amihud al Băncii Transilvania, cea mai lichidă acțiune BVB, decît cel al SPY?</div>
-  <details><summary>Răspuns</summary><p>De circa 15 500 de ori: 24,7 pb față de 0,0016 pb la 1 milion USD tranzacționat. Bitcoin are 0,0037 pb, aproape de SPY, iar Transelectrica 1 024,0 pb. Raportul Amihud separă cele trei piețe prin ordine de mărime, ceea ce estimatorii de spread din bare zilnice nu fac.</p></details>
+  <details><summary>Răspuns</summary><p>De circa 17 600 de ori: 28,0 pb față de 0,0016 pb la 1 milion USD tranzacționat. Bitcoin are 0,0037 pb, aproape de SPY, iar Transelectrica 1 024,0 pb. Raportul Amihud separă cele trei piețe prin ordine de mărime, ceea ce estimatorii de spread din bare zilnice nu fac.</p></details>
 </section>
 <section class="blk" id="amihud-time">
   <h3>Ilichiditatea în timp: trei piețe</h3>
@@ -154,7 +154,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît a scăzut SPY pe 6 mai 2010, la minimul zilei și la închidere?</div>
   <details><summary>Răspuns</summary><p>Minimul, 105,00 USD, a fost cu 10,1% sub închiderea anterioară (116,82 USD), dar închiderea a fost doar cu 3,3% mai jos. Volumul zilei a fost de 3,0 ori mediana zilelor anterioare. Barele zilnice arată intervalul, nu și căderea și revenirea din cursul zilei.</p></details>
-</section><h2 class="sec" id="s-race">Studiu de caz: costul competiției pentru viteză</h2>
+</section><h2 class="sec" id="s-race">Studii de caz: competiția pentru viteză și momentum-ul intrazilnic</h2>
 <section class="blk" id="race-tax">
   <h3>Studiu de caz: taxa zilnică implicită pentru SPY</h3>
   <div class="pair">
@@ -164,12 +164,22 @@
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În cîte zile depășește taxa implicită pentru SPY cel mai pesimist scenariu al autorilor, 0,74 pb?</div>
   <details><summary>Răspuns</summary><p>În 2 din cele 1 244 de zile. Maximul, 1,04 pb, apare pe 7 aprilie 2025, cu o volatilitate realizată de 106,7%. Mediana taxei este 0,40 pb, apropiată de cei 0,419 pb măsurați la Londra, iar în 30% din zile taxa depășește 0,4213 pb.</p></details>
+</section>
+<section class="blk" id="intraday-momentum">
+  <h3>Studiu de caz: momentum-ul intrazilnic al SPY, 2020–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch10_intraday_momentum_ro.jpg" alt="Slide-ul 61: Studiu de caz: momentum-ul intrazilnic al SPY, 2020–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 61</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="im-m">Lungimea ultimului interval (minute): <b id="im-m-v"></b></label><input type="range" id="im-m" min="10" max="60" step="10" value="30"></div><button class="btn play" id="im-play" type="button"></button></div><div class="charts "><div class="chart" id="im-scat"></div><div class="chart" id="im-year"></div></div><ul class="out" id="im-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Continuă ultima jumătate de oră a SPY mișcarea din restul zilei, ca în contractele futures din lucrare?</div>
+  <details><summary>Răspuns</summary><p>Nu identificăm momentum pozitiv semnificativ. Pe cele 1 460 de zile din oct. 2020 – sept. 2026, panta este 100β = −0,32 (t = −0,33), cu intervalul de 95% [−2,22; 1,58]: panta lucrării, 4,18, este în afara lui. Singura perioadă cu un interval care exclude 0 este 2020-21, cu panta −4,81, de semn opus (p = 0,019; după corecția Holm pentru șase subperioade, p = 0,11). Pentru ultimele 10 minute panta este −1,48 (p = 0,043): un coeficient negativ, nesemnificativ după corecția Holm pentru șase intervale (p = 0,26).</p></details>
 </section><h2 class="sec" id="s-ai">AI pentru descoperire științifică</h2>
 <section class="blk" id="mini-case">
   <h3>Mini studiu de caz: cost sau volatilitate?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch10_sem_cross_ro.jpg" alt="Slide-ul 61: Mini studiu de caz: cost sau volatilitate?" loading="lazy"></a>
-      <figcaption>Slide-ul 61</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol10_microstructura_pietei.pdf#page=67" target="_blank" rel="noopener"><img src="slides/ch10_sem_cross_ro.jpg" alt="Slide-ul 66: Mini studiu de caz: cost sau volatilitate?" loading="lazy"></a>
+      <figcaption>Slide-ul 66</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="mc-x">Activele incluse: <b id="mc-x-v"></b></label><input type="range" id="mc-x" min="0" max="3" step="1" value="0"></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts three"><div class="chart" id="mc-1"></div><div class="chart" id="mc-2"></div><div class="chart" id="mc-3"></div></div><ul class="out" id="mc-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Urmează rangurile Corwin–Schultz din bare zilnice costul tranzacționării sau volatilitatea?</div>

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch8_ebacktest'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Wang, Wang and Ziegel (2026), E-backtesting (Management Science 72(6), 4952-4973): e-values and e-processes for Expected Shortfall (ES) 2.5% forecasts of six models (HS, Normal, Student-t, GARCH-t, FHS, GARCH-EVT; rolling window of 1000 days) on the S&P 500 and BET, January 2007 - September 2026. Betting fractions GREE, GREL and GREM (Taylor approximation, 500-day window, lambda in [0, 1/2]); evidence thresholds 2, 5 and 10 (type I error at most 50%, 20%, 10% by Ville inequality); first day each threshold is reached, peak of the e-process, and the same with ES forecasts raised by 10%. Bitcoin and EUR/RON are left out because their GARCH forecasts are withheld.'
+
+Keywords: 'expected shortfall, e-backtesting, e-value, e-process, anytime-valid test, Ville inequality, backtesting, GARCH, filtered historical simulation, extreme value theory'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Daily closes (data/market): GSPC.INDX (S&P 500), BET'
+
+Output: 'ch8_ebacktest.pdf'

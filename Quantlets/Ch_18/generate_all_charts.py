@@ -129,7 +129,10 @@ def region_of(k):
 # 1. Regional bank indices
 # =============================================================================
 def fig_bank_indices():
-    """Equal-weighted bank portfolios (US, Europe, Romania), base 100 at the start of 2010."""
+    """Equal-weighted bank portfolios (US, Europe, Romania), base 100 at the start of 2010.
+
+    Synthetic indices of local-currency returns: HSBC is in GBP, the other European banks in EUR, and there is no
+    currency conversion; the banks are the ones listed today (survivors chosen with hindsight)."""
     fig, ax = plt.subplots(figsize=(7.2, 3.1))
     out = {}
     for reg, mem in [('US', US), ('EU', EU), ('RO', RO)]:
@@ -139,7 +142,7 @@ def fig_bank_indices():
         out[reg] = {'last': s.iloc[-1], 'maxdd': dd.min(), 'maxdd_date': dd.idxmin(),
                     'vol': R[mem].mean(axis=1).std() * np.sqrt(252), 'peak_date': s.idxmax()}
     ax.axhline(100, color=Gray, lw=0.5)
-    ax.set_ylabel('Value of 100 invested\nin January 2010 (daily rebalancing)')
+    ax.set_ylabel('Synthetic index of local-currency\nreturns (January 2010 = 100)')
     ax.set_xlim(R.index[0], R.index[-1])
     mark_events(ax)
     legend_outside_bottom(ax, ncol=3, y=-0.13)

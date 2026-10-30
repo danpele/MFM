@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch6_data.js?v=20261029b"></script>
-<script src="ch6_text_ro.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch6.js?v=20261029b" defer></script>
+<script src="ch6_data.js?v=20261030a"></script>
+<script src="ch6_text_ro.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch6.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
-<p class="toc"><a href="#s-why">Cînd se mișcă piețele împreună?</a> · <a href="#s-meas">Măsurarea covarianței și a incertitudinii ei</a> · <a href="#s-dcc">GARCH multivariat și DCC</a> · <a href="#s-crisis">Corelații în criză și distorsiunea Forbes–Rigobon</a> · <a href="#s-cop">Copule și dependență în cozi</a> · <a href="#s-app">Aplicații: Europa, România și bănci</a> · <a href="#s-ai">AI pentru descoperire științifică</a></p>
+<p class="toc"><a href="#s-why">Cînd se mișcă piețele împreună?</a> · <a href="#s-meas">Măsurarea covarianței și a incertitudinii ei</a> · <a href="#s-dcc">GARCH multivariat și DCC</a> · <a href="#s-crisis">Corelații în criză și distorsiunea Forbes–Rigobon</a> · <a href="#s-cop">Copule și dependență în cozi</a> · <a href="#s-app">Aplicații: Europa, România și bănci</a> · <a href="#s-case">Studii de caz: volatilitatea comună globală și DCC în dimensiuni mari</a> · <a href="#s-ai">AI pentru descoperire științifică</a></p>
 <h2 class="sec" id="s-why">Cînd se mișcă piețele împreună?</h2>
 <section class="blk" id="rolling">
   <h3>Acțiuni și obligațiuni: o corelație care și-a schimbat semnul</h3>
@@ -63,7 +63,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ha-m">Fereastra rolling (zile)</label><select id="ha-m"><option value="126">126</option><option value="252" selected>252</option><option value="504">504</option></select></div><div class="ctl"><label for="ha-L">Laguri Bartlett, L: <b id="ha-L-v"></b></label><input type="range" id="ha-L" min="0" max="20" step="1" value="4"></div><button class="btn play" id="ha-play" type="button"></button></div><div class="charts "><div class="chart" id="ha-chart"></div><div class="chart" id="ha-ratio"></div></div><ul class="out" id="ha-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Este intervalul Fisher de 95% potrivit pentru corelația a două serii de randamente zilnice?</div>
-  <details><summary>Răspuns</summary><p>Nu. Formula Fisher presupune perechi i.i.d. cu distribuția Normală bivariată. Cu cozi groase și volatility clustering, intervalul HAC este mai larg (mediana raportului lățimilor este 1,24), iar concluzia testului se schimbă în 8,2% din ferestre. Diferența vine mai ales din momentele de ordinul patru, nu din autocorelație.</p></details>
+  <details><summary>Răspuns</summary><p>Nu. Formula Fisher presupune perechi i.i.d. cu distribuția Normală bivariată. Cu cozi groase și volatility clustering, intervalul HAC este mai larg (mediana raportului lățimilor este 1,24), iar concluzia testului se schimbă în 8,2% din ferestre. Diferența vine mai ales din momentele de ordinul patru, nu din autocorelație. Și intervalul HAC cere momente de ordinul patru finite, pe care Capitolul 1 le pune sub semnul întrebării: HAC tratează dependența, dar nu compensează lipsa momentelor.</p></details>
 </section>
 <section class="blk" id="ewma">
   <h3>EWMA față de ferestre rolling, SPY–TLT din 2019</h3>
@@ -72,8 +72,8 @@
       <figcaption>Slide-ul 18</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ew-l">Factorul de descreștere λ: <b id="ew-l-v"></b></label><input type="range" id="ew-l" min="0.8" max="0.995" step="0.005" value="0.94"></div><div class="ctl"><label for="ew-m">Fereastra rolling m (zile): <b id="ew-m-v"></b></label><input type="range" id="ew-m" min="20" max="500" step="10" value="60"></div><button class="btn play" id="ew-play" type="button"></button></div><div class="charts "><div class="chart" id="ew-chart"></div></div><ul class="out" id="ew-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care dintre estimatori a semnalat primul corelația pozitivă din 2022?</div>
-  <details><summary>Răspuns</summary><p>EWMA cu λ = 0,94: semnalul de 20 de zile consecutive cu corelație pozitivă apare pe 10 mai 2022, iar la fereastra de 250 de zile abia pe 8 decembrie 2022. Viteza are un preț: abaterea standard a variației zilnice a corelației este 0,060 pentru EWMA cu λ = 0,94 și 0,0088 pentru fereastra de 250 de zile.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care a semnalat primul corelația pozitivă din 2022: EWMA cu λ = 0,94 sau fereastra rolling de 250 de zile?</div>
+  <details><summary>Răspuns</summary><p>EWMA cu λ = 0,94: secvența de 20 de zile consecutive cu corelație pozitivă începe la 12 aprilie 2022 și se confirmă la 10 mai; la fereastra de 250 de zile începe la 10 noiembrie și se confirmă abia la 8 decembrie 2022. Viteza are un preț: abaterea standard a variației zilnice a corelației este 0,060 pentru EWMA cu λ = 0,94 și 0,0088 pentru fereastra de 250 de zile.</p></details>
 </section><h2 class="sec" id="s-dcc">GARCH multivariat și DCC</h2>
 <section class="blk" id="dcc">
   <h3>Corelația DCC dintre SPY și TLT, 2002–2026</h3>
@@ -83,7 +83,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="dc-a">Reacția a: <b id="dc-a-v"></b></label><input type="range" id="dc-a" min="0" max="0.15" step="any" value="0.0522"></div><div class="ctl"><label for="dc-b">Memoria b: <b id="dc-b-v"></b></label><input type="range" id="dc-b" min="0.8" max="0.999" step="any" value="0.9335"></div><button class="btn play" id="dc-play" type="button"></button></div><div class="charts "><div class="chart" id="dc-chart"></div></div><ul class="out" id="dc-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Estimările DCC sînt a = 0,052 și b = 0,934. Ce spune suma lor?</div>
-  <details><summary>Răspuns</summary><p>Este persistența corelației: a + b = 0,986, deci un șoc asupra lui Q_t se înjumătățește în aproximativ 48 de zile. Testul LR față de corelația constantă dă 533,4; bootstrap-ul sub CCC dă p = 0,005, cea mai mică valoare posibilă cu B = 199.</p></details>
+  <details><summary>Răspuns</summary><p>Este persistența corelației: a + b = 0,986; indicatorul euristic ln 0,5 / ln(a + b) dă aproximativ 48 de zile, nu timpul exact de înjumătățire al lui Q_t, deoarece E_t[ε_{t+1}ε_{t+1}′] = R_{t+1}, nu Q_{t+1}. Testul LR față de corelația constantă dă 533,4; bootstrap-ul sub CCC dă p = 0,005, cea mai mică valoare posibilă cu B = 199. Sînt estimări DCC standard, o ilustrare a metodei: cu correlation targeting, ele sînt în general inconsistente.</p></details>
 </section>
 <section class="blk" id="minvar">
   <h3>Aplicație: ponderi de varianță minimă cu DCC</h3>
@@ -204,18 +204,28 @@
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Prin ce muchie se leagă băncile românești de restul rețelei?</div>
   <details><summary>Răspuns</summary><p>Prin BNP–BRD, cu o corelație de 0,35. Celelalte muchii sînt JPM–BAC (0,86), DBK–BNP (0,75), JPM–BNP (0,65) și TLV–BRD (0,65). Arborele este neorientat și contemporan, deci nu arată direcția transmiterii.</p></details>
+</section><h2 class="sec" id="s-case">Studii de caz: volatilitatea comună globală și DCC în dimensiuni mari</h2>
+<section class="blk" id="vast-dcc">
+  <h3>Estimările DCC cînd crește numărul de active</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch6_vast_dcc_ro.jpg" alt="Slide-ul 61: Estimările DCC cînd crește numărul de active" loading="lazy"></a>
+      <figcaption>Slide-ul 61</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vd-k">Numărul de active K (ordinea alfabetică): <b id="vd-k-v"></b></label><input type="range" id="vd-k" min="0" max="10" step="1" value="10"></div><button class="btn play" id="vd-play" type="button"></button></div><div class="charts "><div class="chart" id="vd-ab"></div><div class="chart" id="vd-path"></div></div><ul class="out" id="vd-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> De ce scade â al verosimilității complete cînd adăugăm active, iar â al verosimilității compuse nu?</div>
+  <details><summary>Răspuns</summary><p>Ținta Q̄ are K(K − 1)/2 corelații estimate înaintea lui (a, b), adică 1 128 la K = 48. Erorile lor se acumulează în verosimilitatea completă și o împing spre corelații aproape constante: â = 0,0077 la K = 48, față de 0,0362 cu CL pe toate perechile. Fiecare termen CL folosește doar un bloc 2 × 2 al țintei. Cu estimările complete, corelația medie a celor 48 de active are abaterea standard în timp 0,034, față de 0,058 cu CL, iar indicatorul euristic de persistență ln 0,5 / ln(a + b) este 99 de zile, față de 31. Datele singure nu arată care estimare este cea adevărată. Simulările lui Pakel, Shephard, Sheppard și Engle (2021), pentru scalar BEKK și cDCC, susțin avantajul CL în modelele și configurațiile analizate; ele nu demonstrează absența deplasării în această adaptare pe DCC standard.</p></details>
 </section><h2 class="sec" id="s-ai">AI pentru descoperire științifică</h2>
 <section class="blk" id="ai-inflation">
   <h3>Mini-studiu de caz: inflația și corelația acțiuni–obligațiuni</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch6_ai_inflation_ro.jpg" alt="Slide-ul 61: Mini-studiu de caz: inflația și corelația acțiuni–obligațiuni" loading="lazy"></a>
-      <figcaption>Slide-ul 61</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol6_dependenta_multivariata.pdf#page=66" target="_blank" rel="noopener"><img src="slides/ch6_ai_inflation_ro.jpg" alt="Slide-ul 65: Mini-studiu de caz: inflația și corelația acțiuni–obligațiuni" loading="lazy"></a>
+      <figcaption>Slide-ul 65</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ai-t">Eșantionul se termină în: <b id="ai-t-v"></b></label><input type="range" id="ai-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-chart"></div><div class="chart" id="ai-ci"></div></div><ul class="out" id="ai-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Este nivelul inflației cel care explică corelația pozitivă dintre SPY și TLT?</div>
-  <details><summary>Răspuns</summary><p>Pe tot eșantionul panta este 0,055 pe punct procentual de inflație (t = 2,96), dar pe 2002–2021, cînd inflația a variat fără schimbare de regim, este 0,002 (t = 0,06). Panta vine din episodul de după 2022, iar o singură schimbare de regim nu separă nivelul inflației de regimul politicii monetare.</p></details>
+  <details><summary>Răspuns</summary><p>Pe tot eșantionul panta este 0,056 pe punct procentual de inflație (t = 2,97). Pe 2002–2021 este 0,002 (t = 0,07), cu intervalul HAC de 95% [−0,062; 0,067], care include și panta pe tot eșantionul. Nu găsim dovezi ale unei asocieri pozitive înainte de 2022, dar estimarea este imprecisă, deci ipoteza nu este infirmată. O singură schimbare de regim nu separă nivelul inflației de regimul politicii monetare.</p></details>
 </section>
-<p class="src foot">Prețuri zilnice EODHD: SPY, TLT, S&P 500, Euro Stoxx 50, BET și acțiunile JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania și BRD. Inflația CPI din SUA: U.S. Bureau of Labor Statistics, prin FRED.</p>
+<p class="src foot">Prețuri zilnice EODHD: SPY, TLT, S&P 500, Euro Stoxx 50, BET și acțiunile JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania și BRD; pentru al doilea studiu de caz, cele 48 de acțiuni și ETF-uri listate în SUA din datele cursului cu istoric complet din iulie 2013. Inflația CPI din SUA: U.S. Bureau of Labor Statistics, prin FRED.</p>
 </main>
 </body>
 </html>

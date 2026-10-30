@@ -523,7 +523,7 @@ def validate_conformal_frame(frame,calendar,losses):
     if (frame['sd']<=0).any():raise ValueError('Nonpositive conformal scale')
     for column in ['VaR_split','VaR_aci']:
         a=frame[column].values
-        if np.isnan(a).any() or np.isneginf(a).any():raise ValueError('Invalid conformal quantile')
+        if np.isnan(a).any() or (column=='VaR_split' and np.isneginf(a).any()):raise ValueError('Invalid conformal quantile')   # ACI: -inf when alpha_t >= 1
     return frame
 
 
@@ -1174,12 +1174,23 @@ def sim_garch_t(par, n, reps, rng, burn=500):
     return r[:, burn:], S[:, burn:]
 
 
-def mc_size_power(reps=1000, seed=8, Ts=(250, 1000, 5000), a=0.01, w=1000):
+MC_CANON = os.path.join(HERE, 'ch8_mc_validated.json')   # single source of the Monte Carlo parameters and results
+
+
+def mc_validated_par():
+    """DGP parameters of the validated Monte Carlo run (ch8_mc_validated.json), as a tuple (mu, omega, a, b, nu)."""
+    p = json.load(open(MC_CANON))['par']
+    return (p['mu'], p['omega'], p['alpha'], p['beta'], p['nu'])
+
+
+def mc_size_power(reps=1000, seed=8, Ts=(250, 1000, 5000), a=0.01, w=1000, par=None):
     """Monte Carlo: GARCH(1,1)-t DGP with the parameters estimated on the S&P 500, 1990-2026.
     VaR 1% forecasts: correct model (true parameters), Normal-GARCH (true sigma, Normal tail), HS (1000 days).
-    Rejection rate at 5% for POF, CC, durations (Weibull) and DQ; undefined p (too few breaches) = no rejection."""
-    r = M.load_returns('sp500').values
-    par = M.garch_fit(r)
+    Rejection rate at 5% for POF, CC, durations (Weibull) and DQ; undefined p (too few breaches) = no rejection.
+    par=None re-estimates the DGP; the course uses the validated parameters (mc_validated_par()), so that a rerun
+    reproduces ch8_mc_validated.json exactly."""
+    if par is None:
+        par = M.garch_fit(M.load_returns('sp500').values)
     mu, om, al, be, nu = par
     rng = np.random.default_rng(seed)
     Tmax = max(Ts)
@@ -1209,6 +1220,27 @@ def mc_size_power(reps=1000, seed=8, Ts=(250, 1000, 5000), a=0.01, w=1000):
         out[m] = {str(T): dict({k: v / reps for k, v in rej[T].items()}, dur_nan=nan_dur[T] / reps) for T in Ts}
     out['par'] = dict(mu=mu, omega=om, alpha=al, beta=be, nu=nu)
     out['reps'] = reps
+    return out
+
+
+def dq_null_calibration(reps=1000, seed=8, T=4959, a=0.01, w=1000, models=('FHS', 'GARCH-EVT')):
+    """Simulated null distribution of the DQ statistic under the validated Monte Carlo DGP (correct VaR 1%),
+    over T days (the S&P 500 evaluation sample). Returns the 95% quantile and, for the observed S&P 500 statistics,
+    the simulated exceedance frequency (b + 1) / (B + 1). A reference under the teaching DGP, not a bootstrap
+    p-value for the empirical data."""
+    par = mc_validated_par()
+    mu, nu = par[0], par[4]
+    rng = np.random.default_rng(seed)
+    R_, S_ = sim_garch_t(par, T + w, reps, rng)
+    L = -R_[:, w:]
+    q = M.t_std_q(nu, a)
+    dq = np.array([dq_test((L[i] > -mu + S_[i, w:] * q).astype(int), -mu + S_[i, w:] * q, a)['DQ'] for i in range(reps)])
+    obs = json.load(open(os.path.join(HERE, 'ch8_results.json')))['dq']
+    out = dict(reps=reps, seed=seed, T=T, q95=float(np.quantile(dq, 0.95)), chi2_q95=float(stats.chi2.ppf(0.95, 6)),
+               size_asymptotic=float(np.mean(stats.chi2.sf(dq, 6) < 0.05)))
+    for m in models:
+        d = obs['sp500|' + m]['result']['DQ']
+        out[m] = dict(DQ=d, p_sim=float((np.sum(dq >= d) + 1) / (reps + 1)), p_asy=obs['sp500|' + m]['result']['p'])
     return out
 
 
@@ -1455,7 +1487,9 @@ def extras(R):
     except ComparisonUnavailable as e:
         R['murphy_btc'] = dict(status='withheld', plan=e.plan)
     R['multinomial'] = multinomial_table()
-    R['mc'] = mc_size_power()
+    R['mc'] = mc_size_power(par=mc_validated_par())
+    R['mc']['id'] = json.load(open(MC_CANON))['id']
+    R['dq_calibration'] = dq_null_calibration()
     R['estrisk'] = mc_estimation_risk()
     return R
 

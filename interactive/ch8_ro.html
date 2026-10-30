@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch8_data.js?v=20261029b"></script>
-<script src="ch8_text_ro.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch8.js?v=20261029b" defer></script>
+<script src="ch8_data.js?v=20261030a"></script>
+<script src="ch8_text_ro.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch8.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași prognoze. Butonul ▶ modifică parametrul pas cu pas.</p>
-<p class="toc"><a href="#s-role">Rolul backtesting-ului pentru prognozele de risc</a> · <a href="#s-var">Backtesting pentru VaR: acoperire și independență</a> · <a href="#s-basel">Perspectiva reglementatorului: semaforul Basel și FRTB</a> · <a href="#s-es">Backtesting pentru Expected Shortfall</a> · <a href="#s-elicit">Elicitabilitate și funcții de scor</a> · <a href="#s-comp">Backtesting comparativ</a> · <a href="#s-conf">Predicția conformală pentru tail risk (riscul pierderilor extreme)</a> · <a href="#s-case">Studiu de caz: testarea ES din propriile prognoze</a></p>
+<p class="toc"><a href="#s-role">Rolul backtesting-ului pentru prognozele de risc</a> · <a href="#s-var">Backtesting pentru VaR: acoperire și independență</a> · <a href="#s-basel">Perspectiva reglementatorului: semaforul Basel și FRTB</a> · <a href="#s-es">Backtesting pentru Expected Shortfall</a> · <a href="#s-elicit">Elicitabilitate și funcții de scor</a> · <a href="#s-comp">Backtesting comparativ</a> · <a href="#s-conf">Predicția conformală pentru tail risk (riscul pierderilor extreme)</a> · <a href="#s-case">Studii de caz: testarea ES din propriile prognoze și e-backtesting</a></p>
 <h2 class="sec" id="s-role">Rolul backtesting-ului pentru prognozele de risc</h2>
 <section class="blk" id="four-assets">
   <h3>Patru piețe, un model de risc</h3>
@@ -43,7 +43,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="fa-l">Nivelul VaR (GARCH-EVT)</label><select id="fa-l"><option value="VaR1" selected>VaR 1%</option><option value="VaR2.5">VaR 2,5%</option><option value="VaR5">VaR 5%</option></select></div><div class="ctl"><label for="fa-y">Evaluare pînă la sfîrșitul anului: <b id="fa-y-v"></b></label><input type="range" id="fa-y" min="2007" max="2026" step="1" value="2026"></div><button class="btn play" id="fa-play" type="button"></button></div><div class="charts "><div class="chart" id="fa-chart"></div></div><ul class="out" id="fa-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Rata de depășire a VaR 1% GARCH-EVT este 1,15% pe S&amp;P 500. Este suficientă o rată apropiată de 1% pentru a considera modelul adecvat?</div>
-  <details><summary>Răspuns</summary><p>Nu. Rata verifică doar numărul depășirilor: 57 în 4 959 de zile. Testul Kupiec nu respinge GARCH-EVT pe S&amp;P 500 (p = 0,302), dar testul DQ îl respinge (p &lt; 0,001): depășirile sînt previzibile din nivelul VaR și din depășirile trecute.</p></details>
+  <details><summary>Răspuns</summary><p>Nu. Rata verifică doar numărul depășirilor: 57 în 4 959 de zile. Testul Kupiec nu respinge GARCH-EVT pe S&amp;P 500 (p = 0,302), dar testul DQ îl respinge (p asimptotic &lt; 0,001; frecvența simulată sub procesul Monte Carlo al capitolului: 0,5%): depășirile sînt previzibile din nivelul VaR și din depășirile trecute.</p></details>
 </section><h2 class="sec" id="s-var">Backtesting pentru VaR: acoperire și independență</h2>
 <section class="blk" id="sp500-var">
   <h3>S&P 500: două prognoze VaR, 2007–2026</h3>
@@ -103,7 +103,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="vp-s">Pragul de semnificație: <b id="vp-s-v"></b></label><input type="range" id="vp-s" min="0.01" max="0.1" step="0.005" value="0.05"></div><button class="btn play" id="vp-play" type="button"></button></div><div class="charts three"><div class="chart" id="vp-uc"></div><div class="chart" id="vp-cc"></div><div class="chart" id="vp-dur"></div></div><ul class="out" id="vp-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Testul Kupiec nu respinge FHS pe S&amp;P 500 (p = 0,116). Îl respinge vreun alt test?</div>
-  <details><summary>Răspuns</summary><p>Da. Testul de acoperire condiționată dă p = 0,040, deci respinge la 5%, iar testul DQ dă p &lt; 0,001. Testul duratelor nu respinge (p = 0,527). Fiecare test verifică o altă consecință a calibrării condiționate.</p></details>
+  <details><summary>Răspuns</summary><p>Da. Testul de acoperire condiționată dă p = 0,040, deci respinge la 5%, iar testul DQ dă p asimptotic &lt; 0,001 (frecvența simulată: 0,6%). Testul duratelor nu respinge (p = 0,527). Fiecare test verifică o altă consecință a calibrării condiționate.</p></details>
 </section><h2 class="sec" id="s-basel">Perspectiva reglementatorului: semaforul Basel și FRTB</h2>
 <section class="blk" id="traffic-light">
   <h3>Semaforul de-a lungul timpului</h3>
@@ -204,18 +204,28 @@
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe toate zilele S&amp;P 500, conformal split depășește VaR 5% în 5,34% din cazuri. Cît este rata în zilele de criză?</div>
   <details><summary>Răspuns</summary><p>7,29%, în cele 713 zile de criză; pe EUR/RON ajunge la 11,43%. ACI coboară rata în criză la 4,49% pe S&amp;P 500 și la 5,38% pe BET. Acoperirea marginală nu garantează acoperirea în criză.</p></details>
-</section><h2 class="sec" id="s-case">Studiu de caz: testarea ES din propriile prognoze</h2>
+</section><h2 class="sec" id="s-case">Studii de caz: testarea ES din propriile prognoze și e-backtesting</h2>
 <section class="blk" id="case-table3">
   <h3>Studiu de caz (3/4): cozile contează mai mult decît reestimarea</h3>
   <div class="pair">
     <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch8_bd_table3_ro.jpg" alt="Slide-ul 57: Studiu de caz (3/4): cozile contează mai mult decît reestimarea" loading="lazy"></a>
       <figcaption>Slide-ul 57</figcaption></figure>
-    <div class="live"><div class="ctls"><div class="ctl"><label for="bd-r">Frecvența reestimării, linia întreruptă (zile): <b id="bd-r-v"></b></label><input type="range" id="bd-r" min="0" max="4" step="1" value="4"></div><button class="btn play" id="bd-play" type="button"></button></div><div class="charts "><div class="chart" id="bd-chart"></div></div><ul class="out" id="bd-out"></ul></div>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="bd-s">Sursa</label><select id="bd-s"><option value="paper" selected>Tabelul 3 din lucrare (200 de acțiuni)</option><option value="course">datele cursului (11 acțiuni)</option></select></div><div class="ctl"><label for="bd-r">Frecvența reestimării, linia întreruptă (zile): <b id="bd-r-v"></b></label><input type="range" id="bd-r" min="0" max="4" step="1" value="4"></div><button class="btn play" id="bd-play" type="button"></button></div><div class="charts "><div class="chart" id="bd-chart"></div></div><ul class="out" id="bd-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cu inovații Normale, ce parte din cele 200 de acțiuni are prognozele ES 2,5% respinse?</div>
   <details><summary>Răspuns</summary><p>Între 0,80 și 0,96 în toate cele 50 de celule (5 ferestre × 5 frecvențe ale reestimării × GARCH/GJR-GARCH). Cu inovații Student-t: cel mult 0,12 la ferestre de 250 de zile și cel mult 0,01 la ferestre de cel puțin 1 000 de zile. Coada distribuției contează mai mult decît frecvența reestimării.</p></details>
 </section>
-<p class="src foot">Pierderi zilnice (randamente logaritmice cu semn schimbat) pentru S&amp;P 500, BET și Bitcoin, prețuri EODHD, și pentru EUR/RON, cursul de referință BNR. Prognoze VaR și ES la o zi pe o fereastră rolling de 1 000 de zile, evaluate din ianuarie 2007 (EUR/RON din iunie 2009, Bitcoin din iunie 2017) pînă la 18 septembrie 2026. Studiul de caz: Tabelul 3 din Bayer și Dimitriadis (2022).</p>
+<section class="blk" id="ebacktest">
+  <h3>E-backtesting: e-procesele ES 2,5% pe S&P 500 și BET</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol8_backtesting_risc.pdf#page=61" target="_blank" rel="noopener"><img src="slides/ch8_ebacktest_ro.jpg" alt="Slide-ul 60: E-backtesting: e-procesele ES 2,5% pe S&P 500 și BET" loading="lazy"></a>
+      <figcaption>Slide-ul 60</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="eb-m">Alegerea lui λ</label><select id="eb-m"><option value="grem" selected>GREM (media GREE și GREL)</option><option value="gree">GREE (e-values trecute)</option><option value="grel">GREL (pierderi trecute)</option></select></div><div class="ctl"><label for="eb-s">Factorul aplicat prognozei ES (1 = prognoza modelului): <b id="eb-s-v"></b></label><input type="range" id="eb-s" min="1" max="1.3" step="0.01" value="1"></div><button class="btn play" id="eb-play" type="button"></button></div><div class="charts "><div class="chart" id="eb-chart"></div></div><ul class="out" id="eb-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe S&amp;P 500, e-procesul GREM al FHS are maximul 8,55. Respinge e-backtesting-ul prognozele ES 2,5% ale FHS?</div>
+  <details><summary>Răspuns</summary><p>La pragul 10, adică cu o eroare de tip I de cel mult 10%, nu: maximul 8,55 este atins la 29.09.2008, iar valoarea finală este 3,31. Pragul 5 (cel mult 20%) este atins la 01.11.2007. Cu ES majorat cu 10%, maximul scade la 3,38: aici, prognoza mai prudentă produce mai puține dovezi împotriva ei, deși e-procesul adaptiv nu este garantat monoton în ES.</p></details>
+</section>
+<p class="src foot">Pierderi zilnice (randamente logaritmice cu semn schimbat) pentru S&amp;P 500, BET și Bitcoin, prețuri EODHD, și pentru EUR/RON, cursul de referință BNR. Prognoze VaR și ES la o zi pe o fereastră rolling de 1 000 de zile, evaluate din ianuarie 2007 (EUR/RON din iunie 2009, Bitcoin din iunie 2017) pînă la 18 septembrie 2026. Studiile de caz: Tabelul 3 din Bayer și Dimitriadis (2022) și replicarea lui pe 11 acțiuni din S&amp;P 500; e-procesele din Wang, Wang și Ziegel (2026), calculate din prognozele ES 2,5% ale capitolului.</p>
 </main>
 </body>
 </html>

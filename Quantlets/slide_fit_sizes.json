@@ -3271,5 +3271,48 @@
 "ch9_vix": [
 408.2,
 160.5
-]
+],
+"ch18_case_rate_risk": [
+408.2,
+160.9
+],
+"ch16_pagnotta_hashrate": [
+408.2,
+160.5
+],
+"ch17_ghss_rzone": [
+408.2,
+195.0
+],
+"ch20_leadlag": [
+395.9,
+118.0
+],
+"ch13_dlrz_oos": [
+408.2,
+160.5
+],
+"ch15_colour_words": [
+408.2,
+160.5
+],
+"ch14_m6_rps": [
+408.2,
+160.5
+],
+ "ch4_vmp": [408.2, 160.5],
+ "ch11_case_drift_burst": [408.2, 160.2],
+ "ch9_partial_q": [408.2, 160.5],
+ "ch12_lm_vrp_irf": [408.2, 160.5],
+ "ch10_intraday_momentum": [408.2, 125.0],
+ "ch3_factor_momentum": [408.2, 160.5],
+ "ch1_cs_overnight": [408.2, 160.2],
+ "ch0_pflueger_betas": [408.2, 160.5],
+ "ch2_case_crypto_tsmom": [408.2, 150.0],
+ "ch8_ebacktest": [408.2, 150.0],
+ "ch5_mf2_garch": [408.2, 160.7],
+ "ch6_vast_dcc": [408.2, 160.5],
+ "ch19_int_portfolio": [408.2, 163.7],
+ "ch19_int_bitcoin": [408.2, 163.7],
+ "ch19_int_romania": [408.2, 163.7]
 }

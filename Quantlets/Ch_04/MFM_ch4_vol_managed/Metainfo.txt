@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch4_vol_managed'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, DeMiguel, Martin-Utrera and Uppal (2024, Journal of Finance), A multifactor perspective on volatility-managed portfolios: volatility management of one asset at a time (Moreira and Muir 2017) and of the whole mean-variance portfolio, unconditional (UMV), conditional fixed-weight (CFW) and conditional mean-variance with weights a + b / market volatility (CMV), gamma = 5, weights >= 0, expanding window (first window 60 months, 36 for BVB), on US sector ETFs, multi-asset ETFs, the combined universe and eight BVB blue chips; out-of-sample Sharpe ratios gross and net of 10 bp per unit of turnover, break-even costs, stationary-bootstrap and HAC tests of the Sharpe difference.'
+
+Keywords: 'volatility-managed portfolios, volatility timing, realised volatility, conditional mean-variance, multifactor portfolio, out-of-sample, turnover, trading costs, Sharpe ratio test, stationary bootstrap'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Daily market data (course data): nine sector ETFs, eight multi-asset ETFs, SPY, eight BVB stocks and the BET-TR index; risk-free rate from the Kenneth French Data Library'
+
+Output: 'ch4_vmp.pdf, vol_managed_case.json'

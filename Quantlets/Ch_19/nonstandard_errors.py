@@ -5,7 +5,8 @@ A mini-multiverse for the hypothesis "market efficiency has not changed over tim
 the Euro Stoxx 50 index and the BET (daily closes from the course data), 2002-2018, the period of the paper.
 Forks of Table V that daily data allow (Seminar 19, C3):
   * outliers: none; winsorised; trimmed (2.5 and 97.5 percentiles of the annual measure m_t, Table V)
-  * annual measure m_t: |VR(5) - 1|, |VR(21) - 1| (variance ratio, overlapping q-day returns),
+  * annual measure m_t: |VR(5) - 1|, |VR(21) - 1| (variance ratio of Chapter 2: overlapping q-day returns with the
+    Lo-MacKinlay bias corrections),
     R^2 of an AR(1) for daily returns
   * model of the average yearly change (in %): linear trend 100 b / mean(m); mean of 100 dln m_t;
     mean of 100 (m_t / m_{t-1} - 1)
@@ -28,7 +29,7 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
-from mfm_data import read_market, drop_duplicate_records  # noqa: E402
+from mfm_data import read_market, artificial_fill  # noqa: E402
 
 # Chart style: transparent background, legend below the plot
 plt.rcParams['figure.facecolor'] = 'none'
@@ -76,18 +77,25 @@ def save_nse_fig(name):
 
 
 def index_returns(symbol):
-    """Daily log returns (closes, weekdays, no duplicate records), 2002-2018."""
+    """Daily log returns (closes, weekdays, no artificial non-trading-day fills), 2002-2018."""
     df = read_market(symbol).loc['2001-12-01':f'{NSE_END}-12-31']
-    df = drop_duplicate_records(df[df.index.dayofweek < 5])
+    df = df[df.index.dayofweek < 5]
+    df = df[~artificial_fill(df)]
     s = df['close']
     s = s[s > 0].dropna()
     return np.log(s).diff().dropna().loc[NSE_START:NSE_END]
 
 
 def variance_ratio(x, q):
-    """VR(q) = Var(overlapping q-day return) / (q Var(daily return))."""
-    xq = pd.Series(x).rolling(q).sum().dropna().values
-    return np.var(xq, ddof=1) / (q * np.var(x, ddof=1))
+    """Overlapping VR(q) with the Lo-MacKinlay (1988) bias corrections, the estimator of Chapter 2
+    (Quantlets/Ch_02/eff_tests.variance_ratio, first output)."""
+    x = np.asarray(x, dtype=float)
+    T = len(x)
+    mu = x.mean()
+    var_a = ((x - mu) ** 2).sum() / (T - 1)
+    agg = np.convolve(x, np.ones(q), mode='valid') - q * mu        # overlapping q-period sums
+    m = q * (T - q + 1) * (1 - q / T)
+    return ((agg ** 2).sum() / m) / var_a
 
 
 def annual_measure(r, outlier, measure):

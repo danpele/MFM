@@ -1,8 +1,10 @@
 """
 inference18.py -- Inferenta pentru masurile de risc sistemic din Capitolul 18 (MFM)
 ==================================================================================
-  * covar_tests         -- bootstrap comun pe blocuri: H0 Delta-CoVaR = 0, H0 b_alpha = b_50%, egalitatea contributiilor
-                           (teste pe perechi, corectie Holm), erori standard kernel pentru regresia cuantila
+  * covar_tests         -- bootstrap comun pe blocuri: H0 b_alpha = 0 (eroarea standard bootstrap a pantei, Holm pe
+                           cele 11 banci), H0 b_alpha = b_50%, egalitatea contributiilor (teste pe perechi, corectie
+                           Holm); erorile standard kernel ale pantei, valide doar pentru scoruri necorelate serial,
+                           sunt pastrate pentru comparatie (acelasi obiect: panta)
   * euler_check         -- ES al portofoliului = suma ponderata a MES doar cand conditionam pe portofoliul insusi
   * ge_covar            -- CoVaR in definitia Girardi-Ergun (X_i <= -VaR_i), istoric, la 5%
   * srisk_simulation    -- LRMES prin simulare GJR-GARCH + DCC cu inovatii reesantionate (Brownlees & Engle, 2017,
@@ -11,7 +13,11 @@ inference18.py -- Inferenta pentru masurile de risc sistemic din Capitolul 18 (M
   * spill_bootstrap     -- intervale bootstrap (reziduuri pe blocuri) pentru conectivitatea totala si neta
   * enet_connectedness  -- VAR cu elastic net adaptiv (esantion complet) si elastic net pe ferestre de 150 de zile
                            (Demirer, Diebold, Liu & Yilmaz, 2018, ecuatia (9), Sectiunile 4-5)
-  * granger_fdr         -- retea de cauzalitate Granger pe perechi: 156 de teste, Holm si Benjamini-Hochberg
+  * granger_fdr         -- retea de cauzalitate Granger pe perechi: 156 de teste, covarianta HAC (Newey-West),
+                           Holm, Benjamini-Hochberg (nivel nominal) si Benjamini-Yekutieli; HC0 pentru comparatie
+  * diagnostics         -- autocorelarea reziduurilor VAR (teste auxiliare HAC, Holm) si ordine VAR mai mari;
+                           calendarul comun (intervale cu mai multe sedinte), calendare regionale, date saptamanale;
+                           sensibilitatea conectivitatii la tratarea zilelor Parkinson cu interval nul
 
 Ruleaza dupa generate_all_charts.py; scrie ch18_inference.json si graficele ch18_lrmes_models, ch18_spill_ci,
 ch18_spill_enet. Modelarea Pietelor Financiare - Daniel Traian PELE
@@ -82,21 +88,39 @@ def covar_tests(alpha=0.01, B=B, block=20, seed=SEED):
     rng = np.random.default_rng(seed)
     D = np.zeros((B, len(banks)))
     DB = np.zeros((B, len(banks)))
+    BB = np.zeros((B, len(banks)))                             # slope b_alpha in the same joint draws
     for r in range(B):
         idx = block_bootstrap_idx(n, block, rng)
         for j, k in enumerate(banks):
             c = covar_static(sysr[k][idx], x[k][idx], alpha)
             D[r, j] = c['dcovar']
+            BB[r, j] = c['b']
             DB[r, j] = c['b'] - qreg(sysr[k][idx], x[k][idx], 0.5)[1]
     res = {'alpha': alpha, 'n': n, 'n_tail': n * alpha, 'banks': {}}
     for j, k in enumerate(banks):
-        fit = QuantReg(sysr[k], sm.add_constant(x[k])).fit(q=alpha, max_iter=5000)     # kernel standard error (sandwich)
+        # kernel standard error (sandwich): valid only for serially uncorrelated scores, kept for comparison
+        fit = QuantReg(sysr[k], sm.add_constant(x[k])).fit(q=alpha, max_iter=20000, p_tol=1e-10)
         dpt = point[k]['b'] - b50[k]
         se_db = DB[:, j].std(ddof=1)
+        se_bb = BB[:, j].std(ddof=1)
         res['banks'][k] = {'dcovar': point[k]['dcovar'], 'b': point[k]['b'], 'b50': b50[k], 'se_b_kernel': fit.bse[1],
-                           'se_b_boot': None, 'lo': np.percentile(D[:, j], 2.5), 'hi': np.percentile(D[:, j], 97.5),
+                           't_kernel': point[k]['b'] / fit.bse[1],
+                           'se_b_boot': se_bb, 'z_b_boot': point[k]['b'] / se_bb,
+                           'p_b_boot': 2 * stats.norm.sf(abs(point[k]['b']) / se_bb),
+                           'b_lo': np.percentile(BB[:, j], 2.5), 'b_hi': np.percentile(BB[:, j], 97.5),
+                           'ratio_se_b': se_bb / fit.bse[1],
+                           'lo': np.percentile(D[:, j], 2.5), 'hi': np.percentile(D[:, j], 97.5),
                            'se_dcovar_boot': D[:, j].std(ddof=1), 'db': dpt, 'se_db': se_db,
                            'p_db': 2 * stats.norm.sf(abs(dpt) / se_db)}
+    ph_b = holm([res['banks'][k]['p_b_boot'] for k in banks])
+    for j, k in enumerate(banks):
+        res['banks'][k]['p_b_boot_holm'] = ph_b[j]
+    res['n_b_sig_holm'] = int((ph_b < 0.05).sum())
+    res['z_b_boot_min'] = min(v['z_b_boot'] for v in res['banks'].values())
+    res['z_b_boot_max'] = max(v['z_b_boot'] for v in res['banks'].values())
+    res['ratio_se_b_median'] = float(np.median([v['ratio_se_b'] for v in res['banks'].values()]))
+    res['ratio_se_b_min'] = min(v['ratio_se_b'] for v in res['banks'].values())
+    res['ratio_se_b_max'] = max(v['ratio_se_b'] for v in res['banks'].values())
     # equal contributions by pair, within each region: t = difference / bootstrap standard deviation of the difference
     pairs = []
     for mem in (US, EU):
@@ -441,9 +465,29 @@ def fig_spill_ci(point_net, net_draws):
 # =============================================================================
 # 6. Regularised VAR (Demirer et al., 2018): adaptive elastic net (full sample), elastic net on 150 days
 # =============================================================================
-def aenet_eq(X, y, w, lambdas, folds=10, seed=SEED):
-    """min sum (y - Xb)^2 + lam sum w_i (|b_i|/2 + b_i^2/2)  (equation (9)); lambda by 10-fold cross-validation."""
-    def fit(X, y, lam):
+def blocked_folds(n, folds=10, gap=20):
+    """Time-ordered validation: contiguous test blocks; the `gap` observations on each side of a test block are
+    removed from the training sample, so that serially dependent neighbours do not leak into the validation."""
+    edges = np.linspace(0, n, folds + 1).astype(int)
+    out = []
+    for f in range(folds):
+        a, b = edges[f], edges[f + 1]
+        te = np.arange(a, b)
+        tr = np.r_[np.arange(0, max(a - gap, 0)), np.arange(min(b + gap, n), n)]
+        out.append((tr, te))
+    return out
+
+
+def ols_weights(X, y):
+    """Adaptive weights w = 1/|b_OLS| (OLS with an intercept), estimated on the sample passed in."""
+    return 1 / np.abs(np.linalg.lstsq(np.column_stack([np.ones(len(X)), X]), y, rcond=None)[0][1:])
+
+
+def aenet_eq(X, y, w, lambdas, folds=10, seed=SEED, gap=20):
+    """min sum (y - Xb)^2 + lam sum w_i (|b_i|/2 + b_i^2/2)  (equation (9)); lambda by blocked time-ordered
+    cross-validation (10 contiguous folds, `gap` days removed around each test fold). The adaptive weights are
+    re-estimated on each training sample (w = None: w = 1/|b_OLS| of that sample), then on the full sample."""
+    def fit(X, y, lam, wt):
         Xc, yc = X - X.mean(0), y - y.mean()
         z = (Xc ** 2).sum(0)
         b = np.zeros(X.shape[1])
@@ -453,23 +497,22 @@ def aenet_eq(X, y, w, lambdas, folds=10, seed=SEED):
             for j in range(len(b)):
                 r += Xc[:, j] * b[j]
                 rho = Xc[:, j] @ r
-                b[j] = np.sign(rho) * max(abs(rho) - lam * w[j] / 4, 0) / (z[j] + lam * w[j] / 2)
+                b[j] = np.sign(rho) * max(abs(rho) - lam * wt[j] / 4, 0) / (z[j] + lam * wt[j] / 2)
                 r -= Xc[:, j] * b[j]
             if np.max(np.abs(b - b_old)) < 1e-7:
                 break
         return y.mean() - X.mean(0) @ b, b
-    rng = np.random.default_rng(seed)
-    fid = rng.permutation(len(y)) % folds
+    splits = blocked_folds(len(y), folds, gap)
+    wf = [ols_weights(X[tr], y[tr]) if w is None else w for tr, _ in splits]
     cv = []
     for lam in lambdas:
         err = 0
-        for f in range(folds):
-            tr, te = fid != f, fid == f
-            c0, b = fit(X[tr], y[tr], lam)
+        for (tr, te), wtr in zip(splits, wf):
+            c0, b = fit(X[tr], y[tr], lam, wtr)
             err += ((y[te] - c0 - X[te] @ b) ** 2).sum()
         cv.append(err)
     lam = lambdas[int(np.argmin(cv))]
-    return fit(X, y, lam), lam
+    return fit(X, y, lam, ols_weights(X, y) if w is None else w), lam
 
 
 def var_aenet(Y, p, lambdas=None):
@@ -483,8 +526,7 @@ def var_aenet(Y, p, lambdas=None):
     c = np.zeros(k)
     nz, lam_sel = 0, []
     for i in range(k):
-        bols = np.linalg.lstsq(np.column_stack([np.ones(len(X)), X]), Yt[:, i], rcond=None)[0][1:]
-        (c[i], Bm[:, i]), lam = aenet_eq(X, Yt[:, i], 1 / np.abs(bols), lambdas)
+        (c[i], Bm[:, i]), lam = aenet_eq(X, Yt[:, i], None, lambdas)     # weights re-estimated in each training fold
         nz += int((np.abs(Bm[:, i]) > 1e-10).sum())
         lam_sel.append(lam)
     E = Yt - c - X @ Bm
@@ -503,8 +545,9 @@ def var_enet_window(Y, p):
     # Same 30-point regularization path on both old and new scikit-learn APIs.
     from inspect import signature
     grid_kw = {'n_alphas': 30} if 'n_alphas' in signature(ElasticNetCV).parameters else {'alphas': 30}
+    splits = blocked_folds(len(Yt), 10, 5)                     # time-ordered folds, 5 days removed on each side
     for i in range(k):
-        m = ElasticNetCV(l1_ratio=1 / 3, cv=10, max_iter=5000, **grid_kw).fit(X, Yt[:, i])
+        m = ElasticNetCV(l1_ratio=1 / 3, cv=splits, max_iter=5000, **grid_kw).fit(X, Yt[:, i])
         Bm[:, i], c[i] = m.coef_, m.intercept_
     E = Yt - c - X @ Bm
     S = E.T @ E / (len(Yt) - 1)
@@ -536,7 +579,7 @@ def fig_spill_enet(rc):
     fig, ax = plt.subplots(figsize=(7.2, 3.0))
     ax.plot(rc.index, rc['ols250_p2'], color=Purple, lw=1.0, label='OLS VAR(2), 250-day windows (baseline index)')
     ax.plot(rc.index, rc['ols150'], color=Orange, lw=0.8, label='OLS VAR(1), 150-day windows')
-    ax.plot(rc.index, rc['enet150'], color=Forest, lw=1.0, label='Elastic-net VAR(1), 150-day windows, 10-fold CV')
+    ax.plot(rc.index, rc['enet150'], color=Forest, lw=1.0, label='Elastic-net VAR(1), 150-day windows, 10 time-ordered validation blocks')
     ax.set_ylabel('Total connectedness (%)')
     ax.set_xlim(rc.index[0], rc.index[-1])
     legend_outside_bottom(ax, ncol=1, y=-0.15)
@@ -546,9 +589,15 @@ def fig_spill_enet(rc):
 # =============================================================================
 # 7. Granger-causality networks: 156 pairwise tests, multiple-testing control
 # =============================================================================
-def granger_pairs(Y, p=1, extra=0):
-    """Robust (HC0) Wald test for j -> i: regression of y_i on p (+extra) lags of y_i and y_j;
-    extra = 1 gives the lag-augmented test (Toda-Yamamoto), valid also for highly persistent series."""
+def nw_lags(T):
+    """Newey-West rule of thumb for the number of HAC lags: floor(4 (T/100)^(2/9))."""
+    return int(np.floor(4 * (T / 100) ** (2 / 9)))
+
+
+def granger_pairs(Y, p=1, extra=0, cov='HAC', lags=None):
+    """Wald test for j -> i: regression of y_i on p (+extra) lags of y_i and y_j; covariance HAC (Newey-West,
+    `lags` lags, default: the rule of thumb) or HC0 (heteroscedasticity only, for comparison).
+    extra = 1 adds one untested lag (Toda-Yamamoto); its validity needs a correct lag order p."""
     Y = pd.DataFrame(Y)
     L = p + extra
     out = []
@@ -560,22 +609,124 @@ def granger_pairs(Y, p=1, extra=0):
             d['y'] = Y[i]
             d = d.dropna()
             X = sm.add_constant(d.drop(columns='y'))
-            f = sm.OLS(d['y'], X).fit(cov_type='HC0')
+            if cov == 'HC0':
+                f = sm.OLS(d['y'], X).fit(cov_type='HC0')
+            else:
+                f = sm.OLS(d['y'], X).fit(cov_type='HAC', cov_kwds={'maxlags': lags or nw_lags(len(d))})
             names = [f'{j}{l}' for l in range(1, p + 1)]
             w = f.wald_test(' , '.join(f'{nm} = 0' for nm in names), scalar=True)
             out.append((j, i, float(w.pvalue)))
     return out
 
 
+def by(p, q=0.05):
+    """Benjamini-Yekutieli: BH at level q / sum_{i<=m} 1/i, valid under arbitrary dependence."""
+    m = len(p)
+    return bh(p, q / np.sum(1 / np.arange(1, m + 1)))
+
+
 def granger_fdr():
     res = {}
     for lab, Y, p, ex in [('ret', R[ALL], 1, 0), ('vol', V, 1, 1)]:
-        g = granger_pairs(Y, p, ex)
-        pv = np.array([x[2] for x in g])
-        res[lab] = {'m': len(pv), 'raw': int((pv < 0.05).sum()), 'bonf': int((pv < 0.05 / len(pv)).sum()),
-                    'holm': int((holm(pv) < 0.05).sum()), 'bh': int(bh(pv, 0.05).sum()),
-                    'expected_false_raw': 0.05 * len(pv)}
+        res[lab] = {}
+        for spec, cov, L in [('main', 'HAC', None), ('hac5', 'HAC', 5), ('hac20', 'HAC', 20), ('hc0', 'HC0', None)]:
+            g = granger_pairs(Y, p, ex, cov, L)
+            pv = np.array([x[2] for x in g])
+            r = {'m': len(pv), 'raw': int((pv < 0.05).sum()), 'bonf': int((pv < 0.05 / len(pv)).sum()),
+                 'holm': int((holm(pv) < 0.05).sum()), 'bh': int(bh(pv, 0.05).sum()), 'by': int(by(pv, 0.05).sum()),
+                 'expected_false_raw': 0.05 * len(pv)}
+            if spec == 'main':
+                r['lags'] = nw_lags(len(Y) - p - ex)
+                res[lab].update(r)
+            else:
+                res[lab][spec] = r
     return res
+
+
+# =============================================================================
+# 8. Diagnostics: VAR residuals, calendar, regional calendars, weekly data, zero-range Parkinson days
+# =============================================================================
+def var_resid_test(Y, p, L=20):
+    """For each equation: regression of the VAR(p) residual on the VAR regressors and L own residual lags;
+    HAC(L) Wald test that the L lag coefficients are zero; Holm across the equations."""
+    Y = np.asarray(Y, float)
+    T, k = Y.shape
+    X = np.hstack([np.ones((T - p, 1))] + [Y[p - l - 1:T - l - 1] for l in range(p)])
+    Bc = np.linalg.lstsq(X, Y[p:], rcond=None)[0]
+    E = Y[p:] - X @ Bc
+    pv = []
+    for i in range(k):
+        e = E[:, i]
+        lags = np.column_stack([e[L - l - 1:len(e) - l - 1] for l in range(L)])
+        Z = np.hstack([X[L:], lags])
+        f = sm.OLS(e[L:], Z).fit(cov_type='HAC', cov_kwds={'maxlags': L})
+        R_ = np.zeros((L, Z.shape[1]))
+        R_[:, X.shape[1]:] = np.eye(L)
+        pv.append(float(f.wald_test(R_, scalar=True).pvalue))
+    pv = np.array(pv)
+    return {'p': p, 'pvalues': pv, 'n_rej': int((pv < 0.05).sum()), 'n_rej_holm': int((holm(pv) < 0.05).sum()),
+            'total': spillover_table(gfevd(*var_fit(Y, p), 10), list(range(k)))['total']}
+
+
+def diagnostics():
+    from mfm_data import prices, read_market, joint_returns, bank_range_vol, INDICES, REGION_INDEX as RI
+    from systemic import var_bic
+    out = {}
+    # (a) VAR residual dependence and longer lag orders, log Parkinson volatility
+    pb = var_bic(V.values, 5)
+    out['var_resid'] = {str(p): var_resid_test(V.values, p) for p in sorted({pb, 5, 10, 22})}
+    out['var_resid']['p_bic'] = pb
+    # (b) calendar: common dates, sessions spanned by each return
+    P = prices(ALL + ['SPX', 'SX5E', 'BET', 'VIX'])
+    cal = {'n_prices': len(P), 'n_returns': len(P) - 1}
+    for k in ['SPX', 'SX5E', 'BET']:
+        own = read_market(INDICES[k][0]).loc[P.index[0]:P.index[-1]].index
+        cnt = pd.Series(np.searchsorted(own, P.index, side='right'), index=P.index).diff().iloc[1:]
+        cal[k] = {'multi': int((cnt > 1).sum()), 'max': int(cnt.max())}
+    out['calendar'] = cal
+    # (c) regional calendars: MES 5% and Delta-CoVaR on the days common to the region only
+    reg = {}
+    for rg, mem in (('US', US), ('EU', EU), ('RO', RO)):
+        Rr = joint_returns(mem + [RI[rg]])
+        for k in mem:
+            d = {'n': len(Rr), 'mes5': mes(Rr[k].values, Rr[RI[rg]].values, 0.05),
+                 'mes5_common': mes(R[k].values, R[RI[rg]].values, 0.05)}
+            if rg != 'RO':
+                xs = Rr[[j for j in mem if j != k]].mean(axis=1).values
+                for a in (0.01, 0.05):
+                    d[f'dcovar{int(a * 100)}'] = covar_static(xs, Rr[k].values, a)['dcovar']
+                    d[f'dcovar{int(a * 100)}_common'] = covar_static(system_ex(k, mem).values, R[k].values, a)['dcovar']
+            reg[k] = d
+    df = pd.DataFrame(reg).T
+    out['regional'] = {'banks': reg, 'n': {rg: int(df.loc[mem[0], 'n']) for rg, mem in (('US', US), ('EU', EU), ('RO', RO))}}
+    for c in ['mes5', 'dcovar1', 'dcovar5']:
+        s_ = df[[c, c + '_common']].dropna().astype(float)
+        out['regional'][c] = {'max_abs_diff': float((s_[c] - s_[c + '_common']).abs().max()),
+                              'spearman': float(stats.spearmanr(s_[c], s_[c + '_common']).correlation)}
+    # (d) weekly data: total connectedness of weekly log returns against daily returns
+    P13 = prices(ALL)
+    W = 100 * np.log(P13.resample('W-FRI').last().dropna()).diff().dropna()
+    pw = var_bic(W.values, 5)
+    pr = var_bic(R[ALL].values, 5)
+    out['weekly'] = {'n': len(W), 'p': pw,
+                     'total_weekly': spillover_table(gfevd(*var_fit(W.values, pw), 10), ALL)['total'],
+                     'total_daily': spillover_table(gfevd(*var_fit(R[ALL].values, pr), 10), ALL)['total']}
+    # (e) zero-range Parkinson days: count, and connectedness with those days removed
+    zr = {}
+    for k in ALL:
+        from mfm_data import bank_frame
+        d = bank_frame(k)
+        d = d.loc[V.index[0]:V.index[-1]]
+        z = ~(d['high'] > d['low'])
+        zr[k] = {'zero_range': int(z.sum()), 'zero_range_volume': int((z & (d['volume'] > 0)).sum())}
+    Vd = np.log(bank_range_vol(ALL, zero_range='drop'))
+    pd_ = var_bic(Vd.values, 5)
+    out['parkinson'] = {'banks': zr, 'n_floor': len(V), 'n_drop': len(Vd), 'p_drop': pd_,
+                        'total_floor': spillover_table(gfevd(*var_fit(V.values, 2), 10), ALL)['total'],
+                        'total_drop': spillover_table(gfevd(*var_fit(Vd.values, pd_), 10), ALL)['total'],
+                        'net_floor': spillover_table(gfevd(*var_fit(V.values, 2), 10), ALL)['net'].to_dict(),
+                        'net_drop': spillover_table(gfevd(*var_fit(Vd.values, pd_), 10), ALL)['net'].to_dict()}
+    return out
 
 
 # =============================================================================
@@ -614,6 +765,8 @@ def run_stage(stage):
         wA, wS = var_fit(V.values[end - 250:end], 2)
         out['spill_boot_window'] = {'date': dmax, 'total': spillover_table(gfevd(wA, wS, 10), ALL)['total'],
                                     'lo': np.percentile(tw, 2.5), 'hi': np.percentile(tw, 97.5), 'mean_boot': tw.mean()}
+    elif stage == 'diag':
+        out['diag'] = diagnostics()
     elif stage == 'enet':
         p = var_bic(V.values, 5)
         A, S, share = var_aenet(V.values, p)
@@ -634,7 +787,7 @@ def run_stage(stage):
     print('done', stage)
 
 
-STAGES = ['covar1', 'covar5', 'misc', 'srisk', 'spill', 'window', 'enet']
+STAGES = ['covar1', 'covar5', 'misc', 'srisk', 'spill', 'window', 'enet', 'diag']
 
 
 if __name__ == '__main__':

@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch15_data.js?v=20261029b"></script>
-<script src="ch15_text_en.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch15.js?v=20261029b" defer></script>
+<script src="ch15_data.js?v=20261030a"></script>
+<script src="ch15_text_en.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch15.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
-<p class="toc"><a href="#s-dict">Dictionaries</a> · <a href="#s-eval">Labelled Data and Evaluation</a> · <a href="#s-llm">Language Models: FinBERT and LLMs</a> · <a href="#s-emb">Embeddings as Features</a> · <a href="#s-look">Look-Ahead Bias and Memorisation</a> · <a href="#s-sig">From Sentiment to a Trading Signal</a> · <a href="#s-est">Sentiment Scores Are Estimates</a> · <a href="#s-case">Case Study: Can ChatGPT Forecast Stock Returns?</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
+<p class="toc"><a href="#s-dict">Dictionaries</a> · <a href="#s-eval">Labelled Data and Evaluation</a> · <a href="#s-llm">Language Models: FinBERT and LLMs</a> · <a href="#s-emb">Embeddings as Features</a> · <a href="#s-look">Look-Ahead Bias and Memorisation</a> · <a href="#s-sig">From Sentiment to a Trading Signal</a> · <a href="#s-est">Sentiment Scores Are Estimates</a> · <a href="#s-case">Case Studies: ChatGPT and the Colour of Finance Words</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
 <h2 class="sec" id="s-dict">Dictionaries</h2>
 <section class="blk" id="dict-words">
   <h3>Negative for a Psychologist, Neutral for an Accountant</h3>
@@ -73,7 +73,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="em-t">Projection direction in the PC1–PC2 plane: <b id="em-t-v"></b></label><input type="range" id="em-t" min="0" max="180" step="5" value="0"></div><button class="btn play" id="em-play" type="button"></button></div><div class="charts "><div class="chart" id="em-sc"></div><div class="chart" id="em-h"></div></div><ul class="out" id="em-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Do the first two principal components of the MiniLM vectors separate positive from negative headlines?</div>
-  <details><summary>Answer</summary><p>No. PCA keeps the directions of largest variance, not those related to the label: the best direction in the plane of the first two components gives an AUC of only 0.64 between positive and negative headlines. A logistic regression on all 384 dimensions reaches 78.6% accuracy on Twitter.</p></details>
+  <details><summary>Answer</summary><p>No. PCA keeps the directions of largest variance, not those related to the label: the best direction in the plane of the first two components gives an AUC of only 0.636 between positive and negative headlines (0.630 on the first component). A logistic regression on all 384 dimensions reaches 78.6% accuracy on Twitter.</p></details>
 </section>
 <section class="blk" id="learning-curve">
   <h3>How Many Labels Do You Need?</h3>
@@ -133,8 +133,8 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="pp-n">Human-labelled headlines, n: <b id="pp-n-v"></b></label><input type="range" id="pp-n" min="0" max="6" step="1" value="1"></div><button class="btn play" id="pp-play" type="button"></button></div><div class="charts "><div class="chart" id="pp-w"></div><div class="chart" id="pp-c"></div></div><div class="charts "><div class="chart" id="pp-h"></div></div><ul class="out" id="pp-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> The mean FinBERT score on the Twitter headlines is −0.014, while the mean human tone is 0.054. Does a larger sample remove this difference?</div>
-  <details><summary>Answer</summary><p>No: it is a bias, not noise. PPI subtracts the mean bias estimated on the labelled texts and keeps nominal coverage (94.3% at n = 100). The interval narrows only a little: 0.204 with PPI against 0.229 with human labels only.</p></details>
-</section><h2 class="sec" id="s-case">Case Study: Can ChatGPT Forecast Stock Returns?</h2>
+  <details><summary>Answer</summary><p>No: it is a bias, not noise. PPI subtracts the mean bias estimated on the labelled texts and keeps nominal coverage (94.3% at n = 100). The interval narrows only a little: in the lecture, at n = 100, the mean width is 0.204 with PPI and FinBERT against 0.229 with human labels only (0.203 and 0.229 in the browser simulation).</p></details>
+</section><h2 class="sec" id="s-case">Case Studies: ChatGPT and the Colour of Finance Words</h2>
 <section class="blk" id="llt-models">
   <h3>Which Models Read the News Right, and Which Earn the Drift</h3>
   <div class="pair">
@@ -144,18 +144,28 @@
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Is it enough for a model to get the initial market reaction right in order to earn the drift?</div>
   <details><summary>Answer</summary><p>No. FinBERT gets the reaction right on 90% of the days, but the Sharpe ratio of its drift is −0.33. Of the seven models with hit rates of 86–93%, only GPT-4 (2.97) and GPT-3.5 (1.66) also have a large Sharpe ratio. The models with hit rates of 53–66% have negative Sharpe ratios.</p></details>
+</section>
+<section class="blk" id="colour-words">
+  <h3>Word Lists Learned from Returns, on the FNSPID Headlines</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch15_colour_words_en.jpg" alt="Slide 57: Word Lists Learned from Returns, on the FNSPID Headlines" loading="lazy"></a>
+      <figcaption>Slide 57</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cw-c">Cut-off on |D+| (net share of subsamples): <b id="cw-c-v"></b></label><input type="range" id="cw-c" min="50" max="95" step="5" value="80"></div><button class="btn play" id="cw-play" type="button"></button></div><div class="charts "><div class="chart" id="cw-r2"></div><div class="chart" id="cw-b"></div></div><ul class="out" id="cw-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The LM words were chosen by researchers, on 10-K reports. Does a list chosen by the returns of 2009–2019 explain more of the 4-day returns of 2020–2023?</div>
+  <details><summary>Answer</summary><p>Yes, but little in absolute terms. On the test texts, the 94 ML words that are not in LM give an R² of 0.77%, against 0.20% for all LM words: the difference is +0.58 percentage points, 95% CI [0.14; 1.02] (bootstrap over blocks of 10 days). FinBERT (1.49%) and Qwen2.5-7B (1.73%) explain more than any list. Many ML words ("jumped", "slumped", "gainers") describe the price move itself, so this is an association within the same window, not a forecast.</p></details>
 </section><h2 class="sec" id="s-ai">AI for Scientific Discovery</h2>
 <section class="blk" id="spec-curve">
   <h3>The Specification Curve: Is It Different from Noise?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=61" target="_blank" rel="noopener"><img src="slides/ch15_spec_curve_en.jpg" alt="Slide 60: The Specification Curve: Is It Different from Noise?" loading="lazy"></a>
-      <figcaption>Slide 60</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=65" target="_blank" rel="noopener"><img src="slides/ch15_spec_curve_en.jpg" alt="Slide 64: The Specification Curve: Is It Different from Noise?" loading="lazy"></a>
+      <figcaption>Slide 64</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="sc-c">Critical value of t: <b id="sc-c-v"></b></label><input type="range" id="sc-c" min="1" max="3.5" step="0.01" value="1.96"></div><div class="ctl"><label for="sc-b">Draws under the null: <b id="sc-b-v"></b></label><input type="range" id="sc-b" min="100" max="2000" step="100" value="2000"></div><button class="btn play" id="sc-play" type="button"></button></div><div class="charts "><div class="chart" id="sc-curve"></div><div class="chart" id="sc-null"></div></div><ul class="out" id="sc-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Three of the 36 specifications have t > 1.96. Is that more than noise would produce?</div>
-  <details><summary>Answer</summary><p>No. Under the joint null, with the signs of the positions flipped at random in blocks of 10 days, the probability of at least 3 specifications with t > 1.96 is 0.113, and that of a median t at least as high as 0.50 is 0.207. No specification passes the Bonferroni cut-off, |t| > 3.20.</p></details>
+  <details><summary>Answer</summary><p>No. Under the joint null, with the signs of the positions flipped at random in blocks of 10 days, the probability of at least 3 specifications with t > 1.96 is 0.113, and that of a median t at least as high as 0.50 is 0.207 (in the lecture, 2,000 draws); the browser draws give 0.103 and 0.217. No specification passes the Bonferroni cut-off, |t| > 3.20.</p></details>
 </section>
-<p class="src foot">Labelled texts: Financial PhraseBank (Malo et al., 2014) and Twitter Financial News (2022). Dated headlines: FNSPID (Dong, Fan and Peng, 2024), 16 US stocks, 2009–2023; EODHD daily prices. The scores of the dictionaries, FinBERT, the Qwen2.5 models, MiniLM and TF-IDF are those computed in the chapter. Case study: Lopez-Lira and Tang (2026), Table 5.</p>
+<p class="src foot">Labelled texts: Financial PhraseBank (Malo et al., 2014) and Twitter Financial News (2022). Dated headlines: FNSPID (Dong, Fan and Peng, 2024), 16 US stocks, 2009–2023; EODHD daily prices. The scores of the dictionaries, FinBERT, the Qwen2.5 models, MiniLM and TF-IDF are those computed in the chapter. Case studies: Lopez-Lira and Tang (2026), Table 5; Garcia, Hu and Rohrer (2023), replicated on the FNSPID headlines.</p>
 </main>
 </body>
 </html>

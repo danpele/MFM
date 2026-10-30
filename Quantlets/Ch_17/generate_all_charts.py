@@ -128,12 +128,15 @@ def d2s(d):
 # 1. SIMULATED RATIONAL BUBBLES (Blanchard-Watson; Evans)
 # =============================================================================
 def fig_rational_bubble():
-    """Price = fundamental value (random-walk dividends, r = 1% per period) + a rational bubble that collapses
-    and restarts at a positive value, in the Evans (1991) form: with probability pi = 0.97 it survives,
-    B_t = [b0 + (1+r)/pi * (B_{t-1} - b0/(1+r))] u_t; otherwise B_t = b0 u_t, with E[u_t] = 1 exactly.
-    The term -b0/(1+r) pays for the restart, so E_{t-1}[B_t] = (1+r) B_{t-1} exactly."""
+    """Price = fundamental value (random-walk dividends, r = 1% per period) + a periodically collapsing rational bubble
+    in the Evans (1991) form, with its small-bubble branch: while B_{t-1} <= alpha the bubble grows at (1+r), B_t =
+    (1+r) B_{t-1} u_t; above alpha it survives with probability pi = 0.97, B_t = [b0 + (1+r)/pi * (B_{t-1} - b0/(1+r))] u_t,
+    otherwise it restarts, B_t = b0 u_t. E[u_t] = 1 exactly, so E_{t-1}[B_t] = (1+r) B_{t-1} in both branches.
+    Positivity: with 0 < b0 < (1+r) alpha (here alpha = b0), the surviving branch is applied only to B_{t-1} > alpha,
+    above the value b0 (1 - pi)/(1 + r) at which it would turn negative."""
     rng = np.random.default_rng(48)
     T, r, pi, b0, su = 400, 0.01, 0.97, 5.0, 0.03
+    alpha = b0                                          # threshold of the small-bubble branch: b0 < (1+r) alpha
     D = 1 + np.cumsum(0.01 * rng.standard_normal(T))
     F = D / r                                           # E_t sum D_{t+i}/(1+r)^i with random-walk dividends
     Bb = np.empty(T)
@@ -141,19 +144,23 @@ def fig_rational_bubble():
     alive = rng.random(T) < pi
     u = np.exp(rng.normal(-su ** 2 / 2, su, T))         # lognormal with E[u] = 1 exactly
     for t in range(1, T):
-        Bb[t] = (b0 + (1 + r) / pi * (Bb[t - 1] - b0 / (1 + r))) * u[t] if alive[t] else b0 * u[t]
+        if Bb[t - 1] <= alpha:
+            Bb[t] = (1 + r) * Bb[t - 1] * u[t]
+        else:
+            Bb[t] = (b0 + (1 + r) / pi * (Bb[t - 1] - b0 / (1 + r))) * u[t] if alive[t] else b0 * u[t]
+    assert Bb.min() > 0
     Pp = F + Bb
-    collapses = int(sum(1 for t in range(1, T) if not alive[t] and Bb[t - 1] > 25))   # visible collapses (bubble > 25)
+    collapses = int(sum(1 for t in range(1, T) if not alive[t] and Bb[t - 1] > 25))   # visible collapses (bubble > 25; above alpha)
     fig, ax = plt.subplots(figsize=(7.2, 3.0))
     ax.plot(Pp, color=MainBlue, lw=1.0, label='Price = fundamental value + bubble')
     ax.plot(F, color=Forest, lw=1.2, label='Fundamental value $D_t / r$')
     ax.set_xlabel('Period')
     ax.set_ylabel('Price')
-    ax.set_title('Simulated rational bubble (Evans form): survives with probability 0.97, restarts at a small positive value',
+    ax.set_title('Simulated rational bubble (Evans form): grows at r below δ = 5, above it survives with probability 0.97 or restarts at δ',
                  fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=2, y=-0.25)
     save_fig('ch17_rational_bubble')
-    return dict(T=T, r=r, pi=pi, b0=b0, growth=(1 + r) / pi - 1, life=1 / (1 - pi), collapses=collapses,
+    return dict(T=T, r=r, pi=pi, b0=b0, alpha=alpha, growth=(1 + r) / pi - 1, life=1 / (1 - pi), collapses=collapses,
                 max_share=float(np.max(Bb / Pp)), max_mult=float(np.max(Pp / F)))
 
 

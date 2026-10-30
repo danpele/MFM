@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch12_vol_expectations'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Lochstoer and Muir (2022), Volatility expectations and returns (Journal of Finance): does the VIX react too slowly to volatility shocks? Monthly S&P 500 realised variance and month-end VIX, January 1990 - August 2026. Equation 4 of the paper: VIX^2 and next month realised variance on a weighted sum of the last 12 monthly realised variances with weights phi^j (grid NLS, moving block bootstrap standard errors with 18-month blocks), on the paper sample (to April 2020) and up to 2026; Table 3: next month realised variance, VIX^2 and the realised variance risk premium on real-time HAR expected variance and the weighted average of its last 6 values (Newey-West, 12 lags); Figure 2: monthly VAR(1) of expected variance, the variance risk premium (VIX^2 minus expected variance) and the excess return of the price index, responses to a one-standard-deviation shock to expected variance with 95% residual-bootstrap bands.'
+
+Keywords: 'VIX, variance risk premium, volatility expectations, underreaction, HAR, realised variance, VAR, impulse response, block bootstrap, S&P 500'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'S&P 500 and VIX daily closes (data/market); daily risk-free rate (Kenneth French Data Library)'
+
+Output: 'ch12_lm_vrp_irf.pdf'

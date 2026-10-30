@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH0_DATA;
-const { sdev, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { sdev, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH0_TEXT;
 
 // ---------------------------------------------------------------- colours (generate_all_charts.py)
@@ -261,6 +261,46 @@ function elasticity() {
   out('hh-out', [T.hh(p + '%', nf(relE(0, al), 2), nf(relE(chi, al), 2), nf(chi, 2), nf(relE(10, al), 2)), T.hh2(nf(chi, 2), nf(al, 2), nf(1 / (1 + chi * al), 2))]);
 }
 
+// ================================================================= Pflueger (2025): Treasury bond-stock betas
+function rollBeta(y, x, w) {        // pandas y.rolling(w).cov(x) / x.rolling(w).var() on complete windows
+  const n = x.length, b = new Array(n).fill(null);
+  let sx = 0, sy = 0, sxx = 0, sxy = 0;
+  for (let i = 0; i < n; i++) {
+    sx += x[i]; sy += y[i]; sxx += x[i] * x[i]; sxy += x[i] * y[i];
+    if (i >= w) { const a = x[i - w], c = y[i - w]; sx -= a; sy -= c; sxx -= a * a; sxy -= a * c; }
+    if (i >= w - 1) b[i] = (sxy - sx * sy / w) / (sxx - sx * sx / w);
+  }
+  return b;
+}
+function bondBeta() {
+  const qw = +$('bb-q').value, dw = +$('bb-d').value, Q = decode(D.pflueger.q), Dd = decode(D.pflueger.d), R = D.pflueger.ref;
+  $('bb-q-v').textContent = qw; $('bb-d-v').textContent = dw;
+  const bq = rollBeta(Q.bond, Q.eq, qw), bn = rollBeta(Dd.nom, Dd.eq, dw), bt = rollBeta(Dd.tips, Dd.eq, dw);
+  const iq = bq.findIndex(v => v !== null), brk = Q.lab.indexOf('2001Q2');
+  let mx = iq, mn = brk;
+  for (let i = iq; i < brk; i++) if (bq[i] > bq[mx]) mx = i;
+  for (let i = brk; i < bq.length; i++) if (bq[i] < bq[mn]) mn = i;
+  const nq = bq.length - 1;
+  plot('bb-a', [
+    { x: Q._x.slice(iq), y: bq.slice(iq), mode: 'lines', name: 'Nominal 10y Treasury beta', showlegend: true, line: { color: K.blue, width: 1.4 },
+      text: Q.lab.slice(iq), hovertemplate: '%{text}: %{y:.2f}<extra></extra>' }
+  ], layout({ title: ttl(`A: quarterly, ${qw}-quarter windows, ${Q.lab[iq].slice(0, 4)}-${Q.lab[nq].slice(0, 4)}`),
+    shapes: [hline(0, K.navy), vline('2001-04-01', K.navy, 'dot'), vline('2020-01-01', K.navy, 'dot')],
+    xaxis: AX('', { type: 'date' }), yaxis: AX('Bond-stock beta', { zeroline: false }) }));
+  const i18 = firstAt(Dd._t, dayOf('2018-01-01')), ic = firstAt(Dd._t, dayOf('2020-03-11')), nd = Dd._t.length - 1;
+  let below = 0, k = 0;
+  for (let i = ic; i <= nd; i++) if (bn[i] !== null && bt[i] !== null) { k++; if (bn[i] < bt[i]) below++; }
+  plot('bb-b', [
+    { x: Dd._x.slice(i18), y: bn.slice(i18), mode: 'lines', name: 'Nominal 10y Treasury beta', line: { color: K.blue, width: 1.1 }, hovertemplate: '%{x}: %{y:.2f}<extra></extra>' },
+    { x: Dd._x.slice(i18), y: bt.slice(i18), mode: 'lines', name: 'Inflation-indexed 10y (TIPS) beta', line: { color: K.amber, width: 1.1 }, hovertemplate: '%{x}: %{y:.2f}<extra></extra>' }
+  ], layout({ title: ttl(`B: daily, ${dw}-day windows, 2018-2026`), shapes: [hline(0, K.navy), vline('2020-03-11', K.navy, 'dot')],
+    xaxis: AX('', { type: 'date' }), yaxis: AX('Bond-stock beta', { zeroline: false }) }));
+  const sp = R.subperiods, keys = Object.keys(sp).filter(s => !s.startsWith('TIPS'));
+  out('bb-out', [T.bb(qw, nf(bq[mx], 2), Q.lab[mx], nf(bq[mn], 2), Q.lab[mn], nf(bq[nq], 2), Q.lab[nq]),
+    T.bb2(dw, pct(below / k, 0), fd(Dd._t[nd]), nf(bn[nd], 2), nf(bt[nd], 2)),
+    T.bb3(...keys.map(s => nf(Math.abs(sp[s].beta) < 0.005 ? 0 : sp[s].beta, 2) + ' (SE ' + nf(sp[s].se, 2) + ')'))]);
+}
+
 // ================================================================= concentration premium: d_t = r_SPY - r_RSP
 function nwMean(x) {                // ai_discovery_case.nw_mean: Newey-West t, Bartlett, L = floor(4 (T/100)^(2/9))
   const n = x.length, L = Math.floor(4 * Math.pow(n / 100, 2 / 9));
@@ -297,7 +337,7 @@ function premium() {
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   on(['hi-y'], history); P('hi-play', 'hi-y', [...range(1300, 2020, 10), 2026], 140);
   on(['rr-y', 'rr-a'], riskReturn); P('rr-play', 'rr-y', range(2015, 2024, 1), 900);
   $('dd-chart').style.height = '470px';
@@ -309,9 +349,14 @@ function init() {
   on(['us-b', 'us-p'], usdt); P('us-play', 'us-b', range(0.1, 2, 0.1), 300);
   on(['cc-y'], concentration); P('cc-play', 'cc-y', range(2003, 2025, 1), 700);
   on(['hh-chi', 'hh-p'], elasticity); P('hh-play', 'hh-chi', range(0, 10, 0.25), 180);
+  on(['bb-q', 'bb-d'], bondBeta); P('bb-play', 'bb-d', range(20, 250, 10), 500);
   on(['ai-y'], premium); P('ai-play', 'ai-y', range(2005, 2024, 1), 800);
-  history(); riskReturn(); drawdowns(); vix(); correlations(); bet(); usdt(); concentration(); elasticity(); premium();
+  const PFX = { 'history': 'hi', 'risk-return': 'rr', 'drawdowns': 'dd', 'vix': 'vx', 'correlations': 'co', 'bet': 'bt', 'usdt': 'us',
+    'concentration': 'cc', 'elasticity': 'hh', 'bond-beta': 'bb', 'premium': 'ai' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  history(); riskReturn(); drawdowns(); vix(); correlations(); bet(); usdt(); concentration(); elasticity(); bondBeta(); premium();
 }
-window.CH0 = { annStats, rollCorr, meanOn, nwMean, relE, decode, firstAt, dayOf };
+window.CH0 = { annStats, rollCorr, rollBeta, meanOn, nwMean, relE, decode, firstAt, dayOf };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

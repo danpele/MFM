@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch19_integrated_bitcoin'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Integrated case study on Bitcoin (daily closes 2014-2026 and 5-minute bars on UTC days 2024-2026): Hill tail index and volatility clustering (Chapter 1), realised variance from 5-minute bars and expanding-window log-HAR forecasts (Chapter 9), a one-day VaR 1% from the forecast against historical simulation with Kupiec and Christoffersen backtests (Chapter 8), spread estimators and Amihud illiquidity (Chapter 10), and the PSY GSADF bubble test with BSADF date-stamping (Chapter 17).'
+
+Keywords: 'Bitcoin, stylised facts, realised variance, HAR, value-at-risk, backtesting, liquidity, Amihud, bubbles, GSADF, BSADF, risk limit'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Daily and 5-minute Bitcoin prices (course data: BTC-USD.CC.csv, intraday/BTC-USD.CC_5m.csv), SPY'
+
+Output: 'ch19_int_bitcoin.pdf, ch19_int_bitcoin.png, ch19_integrated.json'

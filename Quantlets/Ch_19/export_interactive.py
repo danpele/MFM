@@ -17,6 +17,74 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', '..', 'interactive', 'ch19_data.js')
 sys.path.insert(0, HERE)
 
+
+# =============================================================================
+# --only int: the three integrated case studies (29 Oct 2026). Reads the series written by integrated_cases.py
+# (ch19_int_*.csv, ch19_integrated.json) and the daily Bitcoin returns through the Chapter 9 loader; adds the keys
+# ip, ib, ir to interactive/ch19_data.js and keeps every other key unchanged. Runs before the imports below, which
+# load the BET case study.
+# =============================================================================
+def export_integrated():
+    import integrated_cases as IC
+    js_path = OUT
+    text = open(js_path).read()
+    head, body = text.split('window.CH19_DATA = ', 1)
+    d = json.loads(body.rstrip().rstrip(';'))
+    old = {k: v for k, v in d.items() if k not in ('ip', 'ib', 'ir')}
+    R = json.load(open(os.path.join(HERE, 'ch19_integrated.json')))
+    rd = lambda f: pd.read_csv(os.path.join(HERE, f), index_col=0, parse_dates=True)   # noqa: E731
+    cal = lambda idx: dict(d0=f'{idx[0]:%Y-%m-%d}', gaps=np.diff(idx.values.astype('datetime64[D]').astype(np.int64)).tolist())  # noqa: E731
+    I = lambda x, k: [None if not np.isfinite(v) else int(v) for v in np.round(np.asarray(x, float) * 10 ** k)]   # noqa: E731
+    # 1. portfolio
+    F = rd('ch19_int_pf.csv')
+    M = F[list(IC.CLASSES)].resample('ME').mean()
+    P = R['pf']
+    d['ip'] = dict(cal=cal(F.index), ret=I(F['ret'], 5), sig=I(F['sig'], 6), var_fhs=I(F['var_fhs'], 5),
+                   var_hs=I(F['var_hs'], 5), vol_gmv=I(F['vol_gmv'], 4), vol_lw=I(F['vol_lw'], 4),
+                   months=[f'{t:%Y-%m}' for t in M.index], shares={c: I(M[c], 4) for c in IC.CLASSES},
+                   choice=P['step1']['choice'], ref={k: {c: P['step3'][k][c] for c in ('x', 'p_uc', 'p_ind', 'p_cc')}
+                                                     for k in P['step3']},
+                   vol=P['step1']['vol'], shares_mean=P['shares']['mean'])
+    # 2. Bitcoin: forecast days, losses (UTC days), log-HAR variance forecasts; daily returns for the HS window
+    D = rd('ch19_int_btc.csv').dropna(subset=['var_har'])
+    M9 = IC.chapter(9, 'mfm_data')
+    daily = M9.daily_returns('btc', start='2014-09-17')
+    daily = daily.loc[D.index[0] - pd.Timedelta(days=900):D.index[-1]]
+    fc_var = (D['var_har'] / IC.stats.norm.ppf(0.99)) ** 2
+    W = rd('ch19_int_btc_weekly.csv').dropna(subset=['bsadf'])
+    Mi = rd('ch19_int_btc_illiq.csv')
+    B = R['btc']
+    d['ib'] = dict(cal=cal(D.index), loss=I(D['loss'], 5), fvar=I(fc_var, 5), dcal=cal(daily.index), daily=I(daily, 5),
+                   wcal=cal(W.index), bsadf=I(W['bsadf'], 4), cv95=I(W['cv95'], 4), episodes=B['step5']['episodes'],
+                   months=[f'{t:%Y-%m}' for t in Mi.index], ill_btc=I(Mi['ill_btc'], 7), ill_spy=I(Mi['ill_spy'], 7),
+                   ref={k: {c: B['step3'][k][c] for c in ('x', 'p_uc', 'p_ind', 'p_cc')} for k in ('har', 'hs')},
+                   var_mean={'har': B['step3']['var_har_mean'], 'hs': B['step3']['var_hs_mean']},
+                   gsadf=B['step5']['gsadf'], cv_gsadf=B['step5']['cv95'], amihud=B['step4']['amihud'],
+                   amihud_spy=B['step4']['amihud_spy'])
+    # 3. Romanian investor: daily log returns (variance ratios) and weekly log returns (hedge, ES)
+    M2 = IC.chapter(2, 'mfm_data')
+    dd = {}
+    for k in ('eurron', 'bet', 'stoxx'):
+        r = np.log(M2.load_close(k, start='2005-07-01')).diff().dropna()
+        dd[k] = dict(cal=cal(r.index), r=I(r, 8))
+    Wr = rd('ch19_int_ron.csv')
+    Rr = R['ron']
+    d['ir'] = dict(daily=dd, wcal=cal(Wr.index), stoxx=I(Wr['stoxx'], 8), bet=I(Wr['bet'], 8), fx=I(Wr['fx'], 8),
+                   periods=Rr['periods'], window=Rr['window'],
+                   ref=dict(z={k: Rr['step1'][k]['z'] for k in Rr['step1']},
+                            es={p: {k: v['es'] for k, v in Rr['step5'][p].items()} for p in Rr['step5']},
+                            h_full=Rr['step4']['h_full'], h_last=Rr['step4']['h_last']))
+    assert all(d[k] == v for k, v in old.items())
+    js = json.dumps(d, separators=(',', ':'), default=float).replace('NaN', 'null').replace('Infinity', 'null')
+    with open(js_path, 'w') as fh:
+        fh.write(head + 'window.CH19_DATA = ' + js + ';\n')
+    print('wrote', js_path, os.path.getsize(js_path) // 1024, 'KB (keys ip, ib, ir; other keys unchanged)')
+
+
+if __name__ == '__main__' and sys.argv[1:] == ['--only', 'int']:
+    export_integrated()
+    sys.exit(0)
+
 import matplotlib                                   # noqa: E402
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt                     # noqa: E402

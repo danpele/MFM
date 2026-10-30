@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH19_DATA;
-const { LANG, sum, mean, sdev, median, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { LANG, sum, mean, sdev, median, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH19_TEXT;
 
 // ---------------------------------------------------------------- colours of the chapter charts (generate_all_charts.py)
@@ -230,9 +230,10 @@ const NX = {}; IDX.forEach(lab => {
   S.n.forEach(c => { g.push(x.slice(i, i + c)); i += c; });
   NX[lab] = g;
 });
-function varianceRatio(x, q) {
-  const xq = []; let s = 0; for (let i = 0; i < x.length; i++) { s += x[i]; if (i >= q) s -= x[i - q]; if (i >= q - 1) xq.push(s); }
-  return sdev(xq) ** 2 / (q * sdev(x) ** 2);
+function varianceRatio(x, q) {                                       // Chapter 2, eff_tests.variance_ratio: Lo-MacKinlay corrections
+  const T0 = x.length, mu = mean(x); let s2 = 0; for (const v of x) s2 += (v - mu) ** 2;
+  let s = 0, vc = 0; for (let i = 0; i < T0; i++) { s += x[i]; if (i >= q) s -= x[i - q]; if (i >= q - 1) vc += (s - q * mu) ** 2; }
+  return vc / (q * (T0 - q + 1) * (1 - q / T0)) / (s2 / (T0 - 1));
 }
 function corr(a, b) { const ma = mean(a), mb = mean(b); let sab = 0, saa = 0, sbb = 0; for (let i = 0; i < a.length; i++) { const u = a[i] - ma, v = b[i] - mb; sab += u * v; saa += u * u; sbb += v * v; } return sab / Math.sqrt(saa * sbb); }
 const measureOf = { '|VR(5) - 1|': x => Math.abs(varianceRatio(x, 5) - 1), '|VR(21) - 1|': x => Math.abs(varianceRatio(x, 21) - 1), 'AR(1) R$^2$': x => corr(x.slice(1), x.slice(0, -1)) ** 2 };
@@ -299,10 +300,158 @@ function nseBlock() {
   out('nm-out', lines);
 }
 
+// ================================================================= integrated case studies (Quantlets/Ch_19/integrated_cases.py)
+const Z99 = 2.3263478740408408;                                      // scipy.stats.norm.ppf(0.99)
+const dec = (a, k) => a.map(v => (v === null ? NaN : v / 10 ** k));
+function christoffersen(hit, dates) {                                // LR_ind (Chapter 8, mfm_data.christoffersen); with dates: consecutive calendar days only
+  let n00 = 0, n01 = 0, n10 = 0, n11 = 0;
+  for (let t = 1; t < hit.length; t++) { if (dates && Date.parse(dates[t]) - Date.parse(dates[t - 1]) !== 864e5) continue; const a = hit[t - 1], b = hit[t]; if (!a && !b) n00++; else if (!a && b) n01++; else if (a && !b) n10++; else n11++; }
+  const xl = (n, q) => (n > 0 ? n * Math.log(q) : 0);
+  const p01 = n01 / (n00 + n01), p11 = n10 + n11 > 0 ? n11 / (n10 + n11) : 0, pi = (n01 + n11) / (n00 + n01 + n10 + n11);
+  const lind = -2 * (xl(n00 + n10, 1 - pi) + xl(n01 + n11, pi) - (xl(n00, 1 - p01) + xl(n01, p01) + xl(n10, 1 - p11) + xl(n11, p11)));
+  return lind;
+}
+function backtest(loss, v, a, dates) {
+  const hit = loss.map((l, i) => (l > v[i] ? 1 : 0)), x = sum(hit), n = hit.length;
+  const luc = kupiecLR(x, n, a), lind = christoffersen(hit, dates);
+  return { x, n, rate: x / n, p_uc: chi2sf1(luc), p_ind: chi2sf1(lind), p_cc: Math.exp(-(luc + lind) / 2), hit };
+}
+function hsVaR(L, a) { return quantile([...L].sort((x, y) => x - y), 1 - a); }          // numpy 'linear'
+function hsES(L, a) {                                                // risk_measures.hs_es: fractional weight on the last loss
+  const s = [...L].sort((x, y) => y - x), na = s.length * a, m = Math.floor(na + 1e-9), fr = Math.max(na - m, 0);
+  let t = 0; for (let i = 0; i < m; i++) t += s[i];
+  if (fr > 1e-12 && m < s.length) t += fr * s[m];
+  return t / na;
+}
+const sharesCol = { Equities: K.purple, Treasuries: K.teal, Credit: K.amber, Gold: '#795548' };
+
+// ---------------------------------------------------------------- 1. multi-asset portfolio
+const IP = D.ip, IPD = calendar(IP.cal), IPR = dec(IP.ret, 5), IPS = dec(IP.sig, 6), IPL = IPR.map(v => -v);
+const IPV = { n: IPS.map(s => Z99 * s), fhs: dec(IP.var_fhs, 5), hs: dec(IP.var_hs, 5) };
+const IPVG = dec(IP.vol_gmv, 4), IPVL = dec(IP.vol_lw, 4);
+const IPLAB = { n: 'VaR 1%, DCC-Normal', fhs: 'VaR 1%, DCC-FHS', hs: 'VaR 1%, HS 500 days' };
+const IPCOL = { n: K.red, fhs: K.green, hs: K.orange };
+function portfolioBlock() {
+  const m = $('ip-m').value, y0 = +$('ip-y0').value, f = +$('ip-t').value / 1000;
+  const a = firstYear(IPD, y0), b = a + Math.round(f * (IPD.length - 1 - a));
+  $('ip-y0-v').textContent = y0; $('ip-t-v').textContent = dfmt(IPD[b]);
+  const dd = IPD.slice(a, b + 1), L = IPL.slice(a, b + 1), V = IPV[m].slice(a, b + 1), bt = backtest(L, V, 0.01);
+  const hd = dd.filter((_, i) => bt.hit[i]), hl = L.filter((_, i) => bt.hit[i]);
+  plot('ip-c1', [
+    { x: dd, y: IPVG.slice(a, b + 1), mode: 'lines', name: 'GMV, sample covariance', line: { color: K.orange, width: 1.3 }, hovertemplate: '%{x}: %{y:.2f}%<extra></extra>' },
+    { x: dd, y: IPVL.slice(a, b + 1), mode: 'lines', name: 'GMV, Ledoit-Wolf shrinkage', line: { color: K.blue, width: 1.3 }, hovertemplate: '%{x}: %{y:.2f}%<extra></extra>' }
+  ], layout({ title: ttl('(a) Ch. 4: GMV risk'), legend: legendBelow(-0.18), xaxis: AX('', { range: [IPD[a], IPD[IPD.length - 1]] }), yaxis: AX('1-year volatility (%)') }));
+  plot('ip-c2', [
+    { x: dd, y: L.map(v => Math.max(v, 0)), type: 'bar', name: `Daily loss of ${IP.choice}`, marker: { color: K.band }, hovertemplate: '%{x}: loss %{y:.2f}%<extra></extra>' },
+    { x: dd, y: V, mode: 'lines', name: IPLAB[m], line: { color: IPCOL[m], width: 1.2 }, hovertemplate: '%{x}: VaR %{y:.2f}%<extra></extra>' },
+    { x: hd, y: hl, mode: 'markers', name: `Loss above ${IPLAB[m].replace('VaR 1%, ', '')} VaR`, marker: { color: K.navy, size: 6 }, hovertemplate: '%{x}: loss %{y:.2f}%<extra></extra>' }
+  ], layout({ title: ttl('(b) Ch. 6-8: VaR 1%'), bargap: 0, legend: legendBelow(-0.18), xaxis: AX('', { range: [IPD[a], IPD[IPD.length - 1]] }), yaxis: AX('Loss, VaR (%)', { rangemode: 'tozero' }) }));
+  const m1 = IPD[b].slice(0, 7), mi = IP.months.filter(x => x >= IPD[a].slice(0, 7) && x <= m1);
+  const j0 = IP.months.indexOf(mi[0]), j1 = IP.months.indexOf(m1);
+  plot('ip-c3', Object.keys(IP.shares).map(c => ({ x: mi.map(s => s + '-15'), y: dec(IP.shares[c], 4).slice(j0, j1 + 1).map(v => 100 * v), mode: 'lines', name: c, line: { color: sharesCol[c], width: 1.4 }, hovertemplate: '%{x|%b %Y}: ' + c + ' %{y:.0f}%<extra></extra>' })),
+    layout({ title: ttl('(c) Ch. 7: Euler shares'), legend: legendBelow(-0.18), shapes: [hline(0, K.navy)], xaxis: AX('', { range: [IPD[a], IPD[IPD.length - 1]] }), yaxis: AX('Share of risk (%)') }));
+  const sh = Object.keys(IP.shares).map(c => `${T.cls[c]} ${pct(IP.shares[c][j1] / 1e4, 0)}`).join(', ');
+  out('ip-out', [T.ip(dfmt(IPD[a]), dfmt(IPD[b]), ni(bt.n), nf(0.01 * bt.n, 1)),
+    T.ip2(T.ipm[m], bt.x, pct(bt.rate, 2), pv(bt.p_uc), pv(bt.p_ind), pv(bt.p_cc)),
+    T.ip3(MON[+m1.slice(5) - 1] + ' ' + m1.slice(0, 4), sh)]);
+}
+
+// ---------------------------------------------------------------- 2. Bitcoin
+const IB = D.ib, IBD = calendar(IB.cal), IBL = dec(IB.loss, 5), IBF = dec(IB.fvar, 5);
+const IBDD = calendar(IB.dcal), IBR = dec(IB.daily, 5), IBW = calendar(IB.wcal);
+const IBpos = IBD.map(d => { let lo = 0, hi = IBDD.length; while (lo < hi) { const mid = (lo + hi) >> 1; if (IBDD[mid] < d) lo = mid + 1; else hi = mid; } return lo; });  // daily returns before day d
+function bitcoinBlock() {
+  const a = +$('ib-a').value / 100, w = +$('ib-w').value;
+  $('ib-a-v').textContent = pct(a, 2); $('ib-w-v').textContent = ni(w);
+  const z = Math.abs(ninv(a)), vh = IBF.map(v => (Math.abs(a - 0.01) < 1e-12 ? Z99 : z) * Math.sqrt(v));
+  const vs = IBpos.map(p => hsVaR(IBR.slice(Math.max(0, p - w), p).map(v => -v), a));
+  const bh = backtest(IBL, vh, a, IBD), bs = backtest(IBL, vs, a, IBD);
+  const ep = IB.episodes.map(e => ({ type: 'rect', xref: 'x', yref: 'paper', x0: e.start, x1: e.end || IBW[IBW.length - 1], y0: 0, y1: 1, fillcolor: K.band, opacity: 0.8, line: { width: 0 }, layer: 'below' }));
+  plot('ib-c1', [
+    { x: IBW, y: dec(IB.bsadf, 4), mode: 'lines', name: 'BSADF statistic (weekly)', line: { color: K.blue, width: 1.2 }, hovertemplate: '%{x}: %{y:.2f}<extra></extra>' },
+    { x: IBW, y: dec(IB.cv95, 4), mode: 'lines', name: '95% critical value, wild bootstrap', line: { color: K.red, width: 1.2, dash: 'dash' }, hovertemplate: '%{x}: %{y:.2f}<extra></extra>' },
+    { x: [null], y: [null], type: 'bar', name: 'Explosive episode', marker: { color: K.band }, hoverinfo: 'skip' }
+  ], layout({ title: ttl('(a) Ch. 17: BSADF'), shapes: ep, legend: legendBelow(-0.18), xaxis: AX(''), yaxis: AX('ADF statistic') }));
+  const lab = levChart(a);
+  plot('ib-c2', [
+    { x: IBD, y: IBL.map(v => Math.max(v, 0)), type: 'bar', name: 'Daily loss (UTC day)', marker: { color: K.band }, hovertemplate: '%{x}: loss %{y:.2f}%<extra></extra>' },
+    { x: IBD, y: vh, mode: 'lines', name: `VaR ${lab}, log-HAR forecast`, line: { color: K.red, width: 1.2 }, connectgaps: false, hovertemplate: '%{x}: %{y:.2f}%<extra></extra>' },
+    { x: IBD, y: vs, mode: 'lines', name: `VaR ${lab}, HS ${w} days`, line: { color: K.green, width: 1.2 }, hovertemplate: '%{x}: %{y:.2f}%<extra></extra>' },
+    { x: IBD.filter((_, i) => bh.hit[i]), y: IBL.filter((_, i) => bh.hit[i]), mode: 'markers', name: 'Loss above log-HAR VaR', marker: { color: K.navy, size: 7 }, hovertemplate: '%{x}: loss %{y:.2f}%<extra></extra>' }
+  ], layout({ title: ttl(`(b) Ch. 8-9: VaR ${lab}`), bargap: 0, legend: legendBelow(-0.18), xaxis: AX(''), yaxis: AX('Loss, VaR (%)', { rangemode: 'tozero' }) }));
+  plot('ib-c3', [
+    { x: IB.months.map(s => s + '-15'), y: dec(IB.ill_btc, 7), mode: 'lines', name: 'Bitcoin', line: { color: K.orange, width: 1.4 }, hovertemplate: '%{x|%b %Y}: %{y:.4f}<extra></extra>' },
+    { x: IB.months.map(s => s + '-15'), y: dec(IB.ill_spy, 7), mode: 'lines', name: 'SPY', line: { color: K.blue, width: 1.4 }, hovertemplate: '%{x|%b %Y}: %{y:.4f}<extra></extra>' }
+  ], layout({ title: ttl('(c) Ch. 10: Amihud'), legend: legendBelow(-0.18), xaxis: AX(''), yaxis: AX('bp per USD 1M (log)', { type: 'log', dtick: 1, exponentformat: 'power' }) }));
+  out('ib-out', [T.ib(dfmt(IBD[0]), dfmt(IBD[IBD.length - 1]), ni(bh.n), levTxt(a), nf(a * bh.n, 1)),
+    T.ib2(bh.x, pv(bh.p_uc), pv(bh.p_ind), nf(mean(vh), 2) + '%'),
+    T.ib3(ni(w), bs.x, pv(bs.p_uc), pv(bs.p_ind), nf(mean(vs), 2) + '%'),
+    T.ib4(nf(IB.gsadf, 2), nf(IB.cv_gsadf, 2), nf(IB.amihud, 4), nf(IB.amihud_spy, 4))]);
+}
+
+// ---------------------------------------------------------------- 3. a Romanian investor
+const IR = D.ir, IRW = calendar(IR.wcal), IRS = dec(IR.stoxx, 8), IRB = dec(IR.bet, 8), IRF = dec(IR.fx, 8);
+const IRDAILY = {}; for (const k in IR.daily) IRDAILY[k] = { d: calendar(IR.daily[k].cal), r: dec(IR.daily[k].r, 8) };
+const QS = range(2, 20, 1);
+function vrz(x, q) {                                                 // Chapter 2, eff_tests.variance_ratio: robust z*
+  const T0 = x.length, mu = mean(x), e = x.map(v => v - mu), s2 = sum(e.map(v => v * v)), varA = s2 / (T0 - 1);
+  let s = 0, vc = 0; for (let i = 0; i < T0; i++) { s += x[i]; if (i >= q) s -= x[i - q]; if (i >= q - 1) vc += (s - q * mu) ** 2; }
+  const vr = vc / (q * (T0 - q + 1) * (1 - q / T0)) / varA;
+  let th = 0; for (let j = 1; j < q; j++) { let c = 0; for (let t = j; t < T0; t++) c += e[t] ** 2 * e[t - j] ** 2; th += (2 * (q - j) / q) ** 2 * T0 * c / (s2 * s2); }
+  return { vr, z: Math.sqrt(T0) * (vr - 1) / Math.sqrt(th) };
+}
+const vrCache = {};
+function vrProfile(k, y0) {
+  const key = k + y0; if (vrCache[key]) return vrCache[key];
+  const S = IRDAILY[k], i = firstYear(S.d, y0), x = S.r.slice(i);
+  vrCache[key] = { z: QS.map(q => vrz(x, q).z), vr2: vrz(x, 2).vr, n: x.length };
+  return vrCache[key];
+}
+function hedgeRatio(W) {                                             // rolling Cov(s_ron, f) / Var(f), known at the start of the week
+  const sr = IRS.map((v, i) => v + IRF[i]), h = new Array(IRW.length).fill(NaN);
+  for (let t = W; t < IRW.length; t++) {
+    const a = sr.slice(t - W, t), f = IRF.slice(t - W, t), ma = mean(a), mf = mean(f);
+    let c = 0, v = 0; for (let i = 0; i < W; i++) { c += (a[i] - ma) * (f[i] - mf); v += (f[i] - mf) ** 2; }
+    h[t] = c / v;
+  }
+  return h;
+}
+const IRCH = ['Unhedged', 'Min-variance hedge', 'Hedged'], IRCOL = { 'Unhedged': K.orange, 'Min-variance hedge': K.purple, 'Hedged': K.blue };
+function romaniaBlock() {
+  const W = +$('ir-w').value, y0 = +$('ir-y0').value;
+  $('ir-w-v').textContent = ni(W); $('ir-y0-v').textContent = y0;
+  const SER = [['eurron', K.red, 'EUR/RON (BNR)'], ['bet', K.blue, 'BET'], ['stoxx', K.green, 'Euro Stoxx 50']];
+  const P = SER.map(([k]) => vrProfile(k, y0));
+  plot('ir-c1', SER.map(([k, c, lab], j) => ({ x: QS, y: P[j].z, mode: 'lines+markers', name: lab, line: { color: c, width: 1.4 }, marker: { size: 5 }, hovertemplate: `${lab}, q = %{x}: z* = %{y:.2f}<extra></extra>` }))
+    .concat([{ x: [null], y: [null], type: 'bar', name: '|z*| < 1.96', marker: { color: K.band }, hoverinfo: 'skip' }]),
+    layout({ title: ttl('(a) Ch. 2: variance ratios'), legend: legendBelow(-0.24), shapes: [{ type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: -1.96, y1: 1.96, fillcolor: K.band, opacity: 0.7, line: { width: 0 }, layer: 'below' }, hline(0, K.navy)],
+      xaxis: AX('Horizon q (days)', { tickvals: [2, 5, 10, 15, 20] }), yaxis: AX('z*(q)') }));
+  const h = hedgeRatio(W), sr = IRS.map((v, i) => v + IRF[i]);
+  // exact simple return of the 50/50 portfolio with a forward on h times the euro leg (zero carry), then the log return
+  const pr = (i, hh) => Math.log1p(0.5 * Math.expm1(IRB[i]) + 0.5 * (Math.expm1(sr[i]) - hh * Math.expm1(IRF[i])));
+  const port = { 'Unhedged': IRB.map((_, i) => pr(i, 0)), 'Hedged': IRB.map((_, i) => pr(i, 1)), 'Min-variance hedge': IRB.map((_, i) => pr(i, h[i])) };
+  const firstH = h.findIndex(v => isFinite(v)), start = IRW.findIndex(d => d >= IR.periods.full[0]), i0 = Math.max(firstH, start);
+  plot('ir-c2', [
+    { x: IRW, y: h, mode: 'lines', name: `h*: min-variance, ${W}-week rolling`, line: { color: K.purple, width: 1.4 }, hovertemplate: '%{x}: h* = %{y:.2f}<extra></extra>' },
+    { x: [null], y: [null], mode: 'lines', name: 'Full hedge (h = 1)', line: { color: K.navy, width: 1.2, dash: 'dash' }, hoverinfo: 'skip' }
+  ], layout({ title: ttl('(b) Ch. 3, 6: hedge ratio'), legend: legendBelow(-0.18), shapes: [hline(1, K.navy, 'dash'), hline(0, K.navy)], xaxis: AX(''), yaxis: AX('Hedge ratio h') }));
+  const PER = [['full', '2008-26'], ['2008', '2008-12'], ['2020', '2020-26']], es = {};
+  for (const [p] of PER) {
+    const [a, b] = IR.periods[p], idx = []; for (let i = i0; i < IRW.length; i++) if (IRW[i] >= a && IRW[i] <= b) idx.push(i);
+    es[p] = {}; for (const c of IRCH) es[p][c] = hsES(idx.map(i => -100 * port[c][i]), 0.025);
+  }
+  plot('ir-c3', IRCH.map(c => ({ x: PER.map(([, l]) => l), y: PER.map(([p]) => es[p][c]), type: 'bar', name: T.irlab[c], marker: { color: IRCOL[c] }, hovertemplate: '%{x}: ES %{y:.2f}%<extra></extra>' })),
+    layout({ title: ttl('(c) Ch. 7: ES in RON'), barmode: 'group', legend: legendBelow(-0.18), xaxis: AX('', { type: 'category' }), yaxis: AX('Weekly ES 2.5% (%)', { rangemode: 'tozero' }) }));
+  const hv = h.filter(v => isFinite(v)), dmax = Math.max(...PER.map(([p]) => Math.max(...IRCH.map(c => es[p][c])) - Math.min(...IRCH.map(c => es[p][c]))));
+  out('ir-out', [T.ir(y0, SER.map(([k, , lab], j) => `${lab} ${nf(P[j].z[0], 2)}`).join(', ')),
+    T.ir2(ni(W), nf(Math.min(...hv), 2), nf(Math.max(...hv), 2), nf(hv[hv.length - 1], 2)),
+    T.ir3(PER.map(([p, l]) => `${T.irper[p]}: ${IRCH.map(c => nf(es[p][c], 2) + '%').join(' / ')}`).join('; '), nf(dmax, 2))]);
+}
+
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   on(['bf-y0', 'bf-y1', 'bf-k'], facts); P('bf-play', 'bf-y1', range(2001, 2026, 1), 700);
   $('bf-play').addEventListener('click', () => { if (+$('bf-y0').value >= 2001) { $('bf-y0').value = 2000; } }, true);
   on(['bg-a', 'bg-p'], garch); P('bg-play', 'bg-p', range(0.9, 1, 0.0025), 300);
@@ -311,8 +460,15 @@ function init() {
   on(['kp-T', 'kp-pi', 'kp-a'], kupiecPowerBlock); P('kp-play', 'kp-T', [100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 5432, 6000], 600);
   on(['nm-model', 'nm-meas', 'nm-ol', 'nm-q'], nseBlock); P('nm-play', 'nm-model', ['all', ...NF.models], 1500);
   $('nm-chart').style.height = '480px';
-  facts(); garch(); varPath(); breachRates(); kupiecPowerBlock(); nseBlock();
+  on(['ip-m', 'ip-y0', 'ip-t'], portfolioBlock); P('ip-play', 'ip-t', range(0, 1000, 10), 90);
+  on(['ib-a', 'ib-w'], bitcoinBlock); P('ib-play', 'ib-a', range(0.5, 5, 0.25), 600);
+  on(['ir-w', 'ir-y0'], romaniaBlock); P('ir-play', 'ir-w', range(52, 260, 8), 500);
+  const PFX = { 'bet-facts': 'bf', 'bet-garch': 'bg', 'bet-var': 'bv', 'breach-rates': 'br', 'kupiec-power': 'kp', 'nse-multiverse': 'nm',
+    'int-portfolio': 'ip', 'int-bitcoin': 'ib', 'int-romania': 'ir' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  facts(); garch(); varPath(); breachRates(); kupiecPowerBlock(); nseBlock(); portfolioBlock(); bitcoinBlock(); romaniaBlock();
 }
-window.CH19 = { hillAlpha, acf, ljungBox, kupiecLR, chi2sf1, binomPpf, holm, bhReject, powerCurve, multiverse, DATES, R, EDATES, LOSS, VAR };
+window.CH19 = { portfolioBlock, bitcoinBlock, romaniaBlock, backtest, hsES, hsVaR, vrz, hedgeRatio, IPV, IPL, IBF, IBL, IBR, IBpos, Z99, hillAlpha, acf, ljungBox, kupiecLR, chi2sf1, binomPpf, holm, bhReject, powerCurve, multiverse, DATES, R, EDATES, LOSS, VAR };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

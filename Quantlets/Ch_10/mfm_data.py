@@ -3,7 +3,7 @@ mfm_data.py -- Data loading for Chapter 10 (MFM): market microstructure
 =======================================================================
   * read_market(symbol)     -- daily price file of one symbol (local copy or repository)
   * ohlc(key, start, end)   -- ADJUSTED open, high, low, close (dividends, splits)
-  * dollar_volume(key, ...) -- daily traded value in USD (split-adjusted price x volume)
+  * dollar_volume(key, ...) -- daily traded value in USD (unadjusted close x volume, on one share-count basis)
   * returns(key, ...)       -- daily log returns from the adjusted price
   * intraday_spy()          -- SPY 5-minute bars, regular session 09:30-16:00 (New York time)
   * intraday_btc()          -- Bitcoin 5-minute bars, 24/7 (UTC)
@@ -12,7 +12,10 @@ mfm_data.py -- Data loading for Chapter 10 (MFM): market microstructure
 Conventions:
   * stocks and ETFs: weekdays only; days without trading are dropped (high = low or zero volume);
   * crypto: 7 days a week; the daily volume of crypto-assets is already in USD;
-  * stock volume is in number of shares, on the same basis as the split-adjusted price.
+  * stock volume is in number of shares adjusted by the provider for splits and bonus shares up to the end of the
+    snapshot; the traded value divides the unadjusted close by the product of the documented share-count events
+    after each day (SPLITS), computed over the whole snapshot before any window is selected, so that the value of a
+    past trading day does not depend on the end of the window.
 
 Modelling Financial Markets - Daniel Traian PELE
 """
@@ -44,10 +47,30 @@ ASSETS = {
 }
 GROUPS = {g: [k for k, v in ASSETS.items() if v[2] == g] for g in ('US', 'BVB', 'Crypto')}
 LABELS = {k: v[1] for k, v in ASSETS.items()}
-# large adjustment events that are cash dividends, not splits (issuer announcement):
-#   SNN.RO 2018-12-21: gross dividend of 1.61 lei per share, ex-date 21 December 2018
-#   (https://www.nuclearelectrica.ro/wp-content/uploads/2018/12/SNN_Comunicat-plata-dividende-suplimentare_EN.pdf)
-CASH_DIVIDENDS = {'SNN.RO': ['2018-12-21']}
+# Share-count events (splits, consolidations, bonus shares) from the snapshot start (19 Sep 2016) onwards:
+# (provider ex-date, shares after / shares before). The ratio is the provider's adjustment factor on that date;
+# split_adjusted_close checks it against the data, so a wrong date or ratio stops the run.
+#   AAPL 4-for-1 (31 Aug 2020); NVDA 4-for-1 (20 Jul 2021) and 10-for-1 (10 Jun 2024); GME 4-for-1 (22 Jul 2022);
+#   MSTR 10-for-1 (8 Aug 2024): issuer announcements.
+#   TLV.RO, Banca Transilvania: bonus shares every year (AGM resolutions, bancatransilvania.ro, investor relations),
+#     e.g. 2023: 91,000,000 new shares on 707,658,233 (ratio 1.1286); 2026: 157,264,425 new shares (ratio 1.1442);
+#     consolidation of the nominal value 10 to 1 on 16 Aug 2022 (ratio 0.1).
+#   TGN.RO, Transgaz: bonus shares, 15 new for each share (2 May 2023, ratio 16).
+#   SNG.RO, Romgaz: split 1 to 10 (28 May 2024).
+#   DIGI.RO, Digi Communications: bonus shares raising the share count to 300 million (7 Apr 2026, ratio 3).
+# All other adjustment days of the provider (cash dividends) leave the share count unchanged.
+SPLITS = {
+    'AAPL.US': [('2020-08-31', 4.0)],
+    'NVDA.US': [('2021-07-20', 4.0), ('2024-06-10', 10.0)],
+    'GME.US': [('2022-07-22', 4.0)],
+    'MSTR.US': [('2024-08-08', 10.0)],
+    'TLV.RO': [('2017-08-03', 1.2157), ('2018-08-02', 1.1085), ('2019-08-01', 1.0833), ('2020-10-14', 1.0999),
+               ('2021-09-09', 1.1000), ('2022-07-12', 1.1211), ('2022-08-16', 0.1), ('2023-07-20', 1.1286),
+               ('2024-07-18', 1.1480), ('2025-07-17', 1.1892), ('2026-07-13', 1.1442)],
+    'TGN.RO': [('2023-05-02', 16.0)],
+    'SNG.RO': [('2024-05-28', 10.0)],
+    'DIGI.RO': [('2026-04-07', 3.0)],
+}
 
 _CACHE = {}
 
@@ -103,13 +126,17 @@ def ohlc(key, start='2016-09-19', end=END):
 
 
 def split_adjusted_close(d, symbol=None):
-    """Close price adjusted ONLY for splits and bonus shares (same basis as the volume in number of shares);
-    the large cash dividends in CASH_DIVIDENDS are not treated as splits."""
-    k = (d['close'].shift(1) / d['close']) / (d['adjusted_close'].shift(1) / d['adjusted_close'])
-    k = k.where(np.abs(np.log(k)) > 0.15, 1.0).fillna(1.0)      # split days: the split ratio
-    for day in CASH_DIVIDENDS.get(symbol, []):
-        k.loc[k.index == pd.Timestamp(day)] = 1.0
-    back = k[::-1].cumprod()[::-1].shift(-1).fillna(1.0)          # product of the splits after each day
+    """Close price on the share-count basis of the end of the snapshot (the basis of the volume): the unadjusted close
+    divided by the product of the documented events in SPLITS after each day. d must be the whole snapshot."""
+    k = pd.Series(1.0, index=d.index)
+    f = (d['close'].shift(1) / d['close']) / (d['adjusted_close'].shift(1) / d['adjusted_close'])
+    for day, ratio in SPLITS.get(symbol, []):
+        t = pd.Timestamp(day)
+        if t < d.index[0] or t > d.index[-1]:
+            continue
+        assert t in d.index and abs(np.log(f.loc[t] / ratio)) < 0.005, (symbol, day, ratio)
+        k.loc[t] = ratio
+    back = k[::-1].cumprod()[::-1].shift(-1).fillna(1.0)          # product of the events after each day
     return d['close'] / back
 
 
@@ -121,15 +148,15 @@ def returns(key, start='2016-09-19', end=END):
 
 
 def dollar_volume(key, start='2016-09-19', end=END):
-    """Daily traded value, in USD."""
-    d = read_market(ASSETS[key][0]).loc[:end]
+    """Daily traded value, in USD; the price-volume basis is fixed on the whole snapshot, then the window is selected."""
+    d = read_market(ASSETS[key][0])
     grp = ASSETS[key][2]
     if grp == 'Crypto':
         dv = d['volume']                                          # already in USD
     else:
         dv = split_adjusted_close(d, ASSETS[key][0]) * d['volume']
         if grp == 'BVB':                                          # RON -> USD at the BNR reference rate
-            fx = read_reference_rate('USD', start='2014-01-01', end=end)
+            fx = read_reference_rate('USD', start='2014-01-01', end=END)
             dv = dv / fx.reindex(dv.index).ffill()
     d = _clean(key, d.assign(dv=dv))
     return d['dv'].loc[start:end].dropna().rename(key)

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch20_leadlag'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Signature lead-lag metric of Bennett, Cucuringu and Reinert (2022, Machine Learning 111(12), 4497-4538) on intraday paths: five-minute bars of SPY and Bitcoin on the New York session grid 09:30-16:00 (489 trading days with all 78 bars for both assets, September 2024 to September 2026), returns normalised within each day; mean cross-correlations of SPY at t - l with BTC at t for lags -6 to 6 with pointwise Newey-West 95% intervals, the Newey-West t-statistic of the mean daily Levy area for windows from 10 minutes to the whole session, and Holm-adjusted p-values over the 20 exploratory tests.'
+
+Keywords: 'path signature, Levy area, lead-lag, cross-correlation, intraday, Bitcoin, SPY, Newey-West, price discovery'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'data/market/intraday/SPY.US_5m.csv, data/market/intraday/BTC-USD.CC_5m.csv (five-minute bars, EODHD)'
+
+Output: 'ch20_leadlag.pdf, ch20_leadlag.png'

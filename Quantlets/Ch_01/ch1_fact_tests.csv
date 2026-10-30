@@ -1,14 +1,14 @@
 fact,asset,stat,se,lo,hi,z
 acf_sp500_lags1to100,S&P 500,20,,,,7
-leverage_L1,S&P 500,-0.1212,0.02644,,,-4.583
+leverage_L1,S&P 500,-0.1212,0.02254,,,-5.376
 gainloss_delta_pct,S&P 500,0.1797,0.1492,-0.1193,0.4941,
-leverage_L1,BET-TR (Romania),-0.1184,0.0423,,,-2.798
+leverage_L1,BET-TR (Romania),-0.1184,0.05018,,,-2.359
 gainloss_delta_pct,BET-TR (Romania),0.3294,0.3725,-0.09123,1.173,
-leverage_L1,Bitcoin,-0.0735,0.02681,,,-2.741
+leverage_L1,Bitcoin,-0.0735,0.03121,,,-2.355
 gainloss_delta_pct,Bitcoin,0.6427,0.491,-0.7225,1.301,
-leverage_L1,EUR/RON,0.09986,0.03726,,,2.68
+leverage_L1,EUR/RON,0.09986,0.04065,,,2.456
 gainloss_delta_pct,EUR/RON,-0.174,0.07489,-0.3536,-0.07499,
-leverage_L1,Gold,-0.0153,0.01693,,,-0.904
+leverage_L1,Gold,-0.0153,0.01918,,,-0.7975
 gainloss_delta_pct,Gold,0.1856,0.1492,-0.08097,0.4947,
 tail_diff_loss_minus_gain,S&P 500,-0.1119,0.1898,-0.5526,0.2333,-0.5893
 tail_diff_loss_minus_gain,BET-TR (Romania),-0.8572,0.3225,-1.525,-0.1959,-2.658

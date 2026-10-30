@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch16_pagnotta'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Pagnotta (2022, Review of Financial Studies), Decentralizing money: Bitcoin prices and blockchain security: Lemma 1 (hashrate proportional to the expected USD block reward) tested on the course data. Bitcoin closing price (course data), hashrate and daily issuance (Coin Metrics Community Data), August 2010 - September 2026: monthly log hashrate on the log USD block reward and a linear trend (Newey-West errors, Engle-Granger test), in the paper's window (August 2010 - January 2020) and out of sample (February 2020 - August 2026); hashrate around the four halvings (2012, 2016, 2020, 2024), against the -50% predicted at a constant price.'
+
+Keywords: 'Bitcoin, hashrate, blockchain security, proof of work, halving, block reward, cointegration, replication'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Bitcoin daily closing price (course data, data/market/BTC-USD.CC.csv); Bitcoin hashrate and daily issuance from Coin Metrics Community Data'
+
+Output: 'ch16_pagnotta_hashrate.pdf, ch16_pagnotta.json'

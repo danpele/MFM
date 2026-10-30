@@ -54,7 +54,43 @@ def read_fred(series):
     return s
 
 
-def kmz_data():
+CPI_RT = os.path.join(HERE, 'kmz_cpi_realtime.csv')
+
+
+def read_alfred(series, vintage):
+    """One ALFRED vintage of a FRED series (the data as published on `vintage`), no API key."""
+    url = f'https://alfred.stlouisfed.org/graph/alfredgraph.csv?id={series}&vintage_date={vintage}'
+    raw = urllib.request.urlopen(url, timeout=120).read().decode()
+    df = pd.read_csv(io.StringIO(raw), index_col=0, parse_dates=True, na_values='.')
+    s = pd.to_numeric(df.iloc[:, 0], errors='coerce')
+    s.index = s.index.to_period('M')
+    return s
+
+
+def cpi_realtime(months):
+    """Real-time CPI inflation without revision look-ahead: for each month t, the CPIAUCSL vintage in effect on the
+    last day of month t (ALFRED), and the inflation between the last two months of that vintage (normally t-2 to
+    t-1: the CPI of t-1 is released in the middle of month t). NaN if either month is missing in that vintage.
+    The vintages are saved once in kmz_cpi_realtime.csv (reproducible snapshot) and read from there afterwards."""
+    if os.path.exists(CPI_RT):
+        snap = pd.read_csv(CPI_RT, dtype={'month': str})
+        snap.index = pd.PeriodIndex(snap['month'], freq='M')
+        if set(months) <= set(snap.index):
+            return snap
+    rows = []
+    for t in months:
+        v = t.to_timestamp(how='end').strftime('%Y-%m-%d')
+        s = read_alfred('CPIAUCSL', v)
+        last = s.dropna().index.max()
+        c1, c0 = s.get(last, np.nan), s.get(last - 1, np.nan)
+        rows.append(dict(month=str(t), vintage=v, last_obs=str(last), cpi_last=c1, cpi_prev=c0, infl=c1 / c0 - 1))
+    snap = pd.DataFrame(rows)
+    snap.to_csv(CPI_RT, index=False)
+    snap.index = pd.PeriodIndex(snap['month'], freq='M')
+    return snap
+
+
+def kmz_data(realtime=True):
     """Monthly excess returns R_{t+1} and predictors G_t, standardised as in Section V.A of the paper."""
     spy = M.read_market('SPY.US')['adjusted_close']
     last = spy.index[-1]
@@ -74,7 +110,12 @@ def kmz_data():
     df['tms'] = df['lty'] - df['tbl']
     df['dfy'] = ((f['BAA'] - f['AAA']) / 100).reindex(df.index)
     cpi = f['CPIAUCSL'].reindex(pd.period_range(f['CPIAUCSL'].index.min(), f['CPIAUCSL'].index.max(), freq='M'))
-    df['infl'] = cpi.pct_change(fill_method=None).shift(1).reindex(df.index)  # CPI released with a one-month delay
+    if realtime:
+        # inflation as known at the end of month t (ALFRED vintages): no revision look-ahead
+        df['infl'] = cpi_realtime(list(df.index))['infl'].reindex(df.index)
+    else:
+        # current (revised) vintage, CPI released with a one-month delay: pseudo-out-of-sample on revised data
+        df['infl'] = cpi.pct_change(fill_method=None).shift(1).reindex(df.index)
     df['svar'] = svar.reindex(df.index)
     df['lag_ret'] = df['ex']
     df = df.reindex(pd.period_range(df.index.min(), df.index.max(), freq='M'))
@@ -183,13 +224,37 @@ def kmz_linear(G, R, tidx, T):
     return lin
 
 
-def _alpha_ir(tr, bench):
-    """Annualised information ratio (alpha over residual volatility) of tr against bench, and the alpha t-statistic."""
+HAC_LAGS = (3, 6, 12)
+
+
+def _alpha_ir(tr, bench, hac=False):
+    """Annualised information ratio (alpha over residual volatility) of tr against bench, and the alpha t-statistic
+    (homoskedastic OLS standard error, as in the table of the paper). hac=True also returns the alpha t-statistics
+    with Newey-West (Bartlett) standard errors for the lags in HAC_LAGS."""
     X = np.column_stack([np.ones_like(bench), bench])
     b = np.linalg.lstsq(X, tr, rcond=None)[0]
     u = tr - X @ b
-    se = np.sqrt(u.var(ddof=2) * np.linalg.inv(X.T @ X)[0, 0])
-    return np.sqrt(12) * b[0] / u.std(ddof=2), b[0] / se
+    XtXi = np.linalg.inv(X.T @ X)
+    se = np.sqrt(u.var(ddof=2) * XtXi[0, 0])
+    out = (np.sqrt(12) * b[0] / u.std(ddof=2), b[0] / se)
+    if not hac:
+        return out
+    ts = {}
+    n = len(tr)
+    for L in HAC_LAGS:
+        g = X * u[:, None]
+        S = g.T @ g
+        for j in range(1, L + 1):
+            G = g[j:].T @ g[:-j]
+            S += (1 - j / (L + 1)) * (G + G.T)
+        V = XtXi @ S @ XtXi * n / (n - 2)
+        ts[L] = b[0] / np.sqrt(V[0, 0])
+    return out + (ts,)
+
+
+def _mean_t_hac(x):
+    """t-statistics of the mean of x with Newey-West (Bartlett) standard errors, lags HAC_LAGS."""
+    return {L: float(x.mean() / np.sqrt(M.nw_var(x, L) / len(x))) for L in HAC_LAGS}
 
 
 def kmz_row(f_, Rt, lin_tr=None):
@@ -198,12 +263,19 @@ def kmz_row(f_, Rt, lin_tr=None):
     in standard deviations of the strategy return, skewness."""
     r2, sr, t = kmz_stats(f_[:, None], Rt)
     tr = f_ * Rt
-    ir, ir_t = _alpha_ir(tr, Rt)
+    ir, ir_t, ir_th = _alpha_ir(tr, Rt, hac=True)
     sd = tr.std(ddof=1)
+    # t: t-statistic of the mean strategy return, sqrt(n) mean / sd (i.i.d.); t_hac{L}: Newey-West, L lags
     row = dict(r2=100 * r2[0], sr=sr[0], t=t[0], ir=ir, ir_t=ir_t, maxloss=-tr.min() / sd,
                skew=float(np.mean((tr - tr.mean()) ** 3) / tr.std() ** 3))
+    for L, v in _mean_t_hac(tr).items():
+        row[f't_hac{L}'] = v
+    for L, v in ir_th.items():
+        row[f'ir_t_hac{L}'] = v
     if lin_tr is not None:
-        row['ir_lin'], row['ir_lin_t'] = _alpha_ir(tr, lin_tr)
+        row['ir_lin'], row['ir_lin_t'], th = _alpha_ir(tr, lin_tr, hac=True)
+        for L, v in th.items():
+            row[f'ir_lin_t_hac{L}'] = v
     return row
 
 

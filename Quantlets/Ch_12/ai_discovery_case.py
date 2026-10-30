@@ -21,6 +21,7 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 MARKET = os.path.join(HERE, '..', '..', 'data', 'market')
 H = 3
+END = '2026-09-18'   # the course data end (mfm_data.END)
 
 
 def read(sym):
@@ -55,7 +56,11 @@ def monthly_data():
     """Date lunare BTZ (2009): IV = VIX^2/12, RV = suma randamentelor zilnice (%) la patrat, VRP = IV - RV (ex ante),
     randamentul in exces = randamentul log lunar S&P 500 minus TB3MS/12 (FRED)."""
     spx, vix = read('GSPC.INDX'), read('VIX.INDX')
-    px = pd.concat([spx, vix], axis=1, keys=['spx', 'vix']).dropna()
+    px = pd.concat([spx, vix], axis=1, keys=['spx', 'vix']).dropna().sort_index()
+    cutoff = min(pd.Timestamp(END), px.index.max())
+    px = px.loc[:cutoff]
+    # the last calendar month is kept only if the data reach its last business day (same rule as generate_all_charts)
+    last_full = cutoff + pd.offsets.MonthEnd(0) if cutoff >= cutoff + pd.offsets.BMonthEnd(0) else cutoff - pd.offsets.MonthEnd(1)
     r = 100 * np.log(px['spx']).diff().dropna()
     rv = (r ** 2).resample('ME').sum()
     iv = (px['vix'] ** 2 / 12).resample('ME').last()
@@ -63,9 +68,10 @@ def monthly_data():
     tb = pd.read_csv('https://fred.stlouisfed.org/graph/fredgraph.csv?id=TB3MS', index_col=0, parse_dates=True).iloc[:, 0]
     tb.index = tb.index + pd.offsets.MonthEnd(0)
     df = pd.DataFrame({'iv': iv, 'rv': rv, 'rm': rm, 'rf': tb / 12}).dropna()
-    df = df[df.index >= '1990-01-31']
+    df = df[(df.index >= '1990-01-31') & (df.index <= last_full)]
     df['vrp'] = df['iv'] - df['rv']
     df['ex'] = df['rm'] - df['rf']
+    df['ex_next'] = df['ex'].shift(-1)   # built on the full sample, before any restriction of the estimation window
     return df
 
 
@@ -82,9 +88,9 @@ def main():
         d = d.dropna()
         X = np.column_stack([np.ones(len(d)), d['vrp'].values])
         yv = d['y'].values
-        # reziduurile pe o perioadă sub H0 (fără predictibilitate): ex_{t+1} - media, scalate cu 12/h
-        e1 = (12 / H) * (d['ex'].shift(-1).reindex(d.index).values - np.nanmean(d['ex'].shift(-1).values))
-        e1 = np.nan_to_num(e1)
+        # reziduurile pe o perioadă sub H0 (fără predictibilitate): ex_{t+1} - media, scalate cu 12/h;
+        # ex_{t+1} vine din eșantionul complet, deci ultima lună a ferestrei are randamentul următor real
+        e1 = (12 / H) * (d['ex_next'].values - np.mean(d['ex_next'].values))
         b, t = hodrick_t(yv, X, e1, H)
         res = yv - X @ b
         r2 = 1 - res.var() / yv.var()

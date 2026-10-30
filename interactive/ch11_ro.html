@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch11_data.js?v=20261029b"></script>
-<script src="ch11_text_ro.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch11.js?v=20261029b" defer></script>
+<script src="ch11_data.js?v=20261030a"></script>
+<script src="ch11_text_ro.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch11.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
-<p class="toc"><a href="#s-bm">De la random walk la mișcarea browniană</a> · <a href="#s-qv">Variația pătratică și calculul Itô</a> · <a href="#s-gbm">Mișcarea browniană geometrică</a> · <a href="#s-ou">Revenirea la medie: procesul Ornstein–Uhlenbeck</a> · <a href="#s-jump">Salturi: modelul Merton</a> · <a href="#s-cmp">Modelele confruntate cu datele</a> · <a href="#s-rough">Studiu de caz: rough volatility și persistență</a></p>
+<p class="toc"><a href="#s-bm">De la random walk la mișcarea browniană</a> · <a href="#s-qv">Variația pătratică și calculul Itô</a> · <a href="#s-gbm">Mișcarea browniană geometrică</a> · <a href="#s-ou">Revenirea la medie: procesul Ornstein–Uhlenbeck</a> · <a href="#s-jump">Salturi: modelul Merton</a> · <a href="#s-cmp">Modelele confruntate cu datele</a> · <a href="#s-rough">Studii de caz: rough volatility, persistență și drift bursts</a></p>
 <h2 class="sec" id="s-bm">De la random walk la mișcarea browniană</h2>
 <section class="blk" id="donsker">
   <h3>De la random walk la mișcarea browniană: teorema lui Donsker</h3>
@@ -43,7 +43,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="dk-a">Nivelul a: <b id="dk-a-v"></b></label><input type="range" id="dk-a" min="0.25" max="2.5" step="0.05" value="1"></div><button class="btn play" id="dk-play" type="button"></button></div><div class="charts "><div class="chart" id="dk-paths"></div><div class="chart" id="dk-p"></div></div><ul class="out" id="dk-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Maximul unei traiectorii observate doar la închiderile zilnice este mai mic sau mai mare decît maximul traiectoriei continue?</div>
-  <details><summary>Răspuns</summary><p>Mai mic, în medie. Pe o grilă rară, maximul atins între observații se pierde: P(max W_n > 1) este 0,220 cu n = 5 și 0,316 cu n = 2 000, față de limita browniană 2(1 − Φ(1)) = 0,3173. Diferența scade lent, de ordinul 1/√n.</p></details>
+  <details><summary>Răspuns</summary><p>Mai mic, în medie. Pe o grilă rară, maximul atins între observații se pierde: P(max W_n > 1) este 0,220 cu n = 5 și 0,316 cu n = 2 000, față de limita browniană 2(1 − Φ(1)) = 0,3173. Teorema lui Donsker este un rezultat la limită: diferența scade lent, de ordinul 1/√n.</p></details>
 </section><h2 class="sec" id="s-qv">Variația pătratică și calculul Itô</h2>
 <section class="blk" id="quadratic-variation">
   <h3>Variația pătratică: simulare și date</h3>
@@ -63,7 +63,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="dp-w">Fereastra rolling (ani): <b id="dp-w-v"></b></label><input type="range" id="dp-w" min="1" max="20" step="1" value="10"></div><button class="btn play" id="dp-play" type="button"></button></div><div class="charts "><div class="chart" id="dp-ci"></div><div class="chart" id="dp-roll"></div></div><ul class="out" id="dp-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe 10 ani de date zilnice, cît de precis este estimat driftul S&P 500?</div>
-  <details><summary>Răspuns</summary><p>Intervalul de 95% are o semilățime de circa ±11 puncte procentuale, oricît de deasă este grila, pentru că eroarea standard este σ/√T. Pe ferestre de 10 ani, driftul logaritmic variază între −6,0% (2009-03) și 15,8% (2000-09), în mare parte zgomot; o precizie de ±1 punct ar cere 1 243 de ani de date.</p></details>
+  <details><summary>Răspuns</summary><p>Intervalul de 95% are o semilățime de circa ±11 puncte procentuale (1,96 erori standard; eroarea standard σ/√T este 5,7 puncte), oricît de deasă este grila: cele 2 520 de randamente zilnice nu o reduc. Pe ferestre de 10 ani, driftul logaritmic variază între −6,0% (2009-03) și 15,8% (2000-09); cu această precizie, oscilațiile nu pot fi atribuite sigur unor schimbări ale driftului; o precizie de ±1 punct ar cere 1 243 de ani de date.</p></details>
 </section>
 <section class="blk" id="gbm-vs-data">
   <h3>Adecvarea GBM pentru S&P 500</h3>
@@ -73,7 +73,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="gd-k">Pragul k (abateri standard): <b id="gd-k-v"></b></label><input type="range" id="gd-k" min="2" max="6" step="0.25" value="4"></div><div class="ctl"><label for="gd-s">Seria pentru ACF</label><select id="gd-s"><option value="abs" selected>|r|</option><option value="sq">r²</option><option value="raw">r</option></select></div><button class="btn play" id="gd-play" type="button"></button></div><div class="charts "><div class="chart" id="gd-qq"></div><div class="chart" id="gd-acf"></div></div><ul class="out" id="gd-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cîte zile dincolo de ±4 abateri standard ar trebui să apară în 9 245 de zile, dacă randamentele ar avea distribuția Normală?</div>
-  <details><summary>Răspuns</summary><p>Circa 0,59. În date sînt 62, iar cea mai rea zi este la −11,3 abateri standard; excesul de kurtosis este 10,9. ACF a lui |r| este 0,27 la lagul 1 și 0,14 la lagul 50, în timp ce banda GBM rămîne sub 0,024.</p></details>
+  <details><summary>Răspuns</summary><p>Circa 0,59 = 9 245 · 2(1 − Φ(4)), cu ambele cozi; o singură coadă ar da 0,29. În date sînt 62, iar cea mai rea zi este la −11,3 abateri standard; excesul de kurtosis este 10,9. ACF a lui |r| este 0,27 la lagul 1 și 0,14 la lagul 50, în timp ce banda GBM rămîne sub 0,024.</p></details>
 </section><h2 class="sec" id="s-ou">Revenirea la medie: procesul Ornstein–Uhlenbeck</h2>
 <section class="blk" id="vasicek">
   <h3>Vasicek pe randamentul titlurilor de stat pe 3 luni</h3>
@@ -83,7 +83,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="va-a">Începutul eșantionului: <b id="va-a-v"></b></label><input type="range" id="va-a" min="1954" max="2021" step="1" value="1954"></div><div class="ctl"><label for="va-b">Sfîrșitul eșantionului: <b id="va-b-v"></b></label><input type="range" id="va-b" min="1959" max="2026" step="1" value="2026"></div><button class="btn play" id="va-play" type="button"></button></div><div class="charts "><div class="chart" id="va-rate"></div><div class="chart" id="va-k"></div></div><ul class="out" id="va-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Dovedește un κ̂ pozitiv pe 1954–2026 că rata pe termen scurt revine la medie?</div>
-  <details><summary>Răspuns</summary><p>Nu. κ̂ = 0,101 (SE 0,051) corespunde unui timp de înjumătățire de 6,8 ani, iar coeficientul AR(1) zilnic este 0,99960, aproape o rădăcină unitară. Pe subperioade, κ̂ este −0,034, 0,213 și 0,032, iar două dintre cele trei intervale includ zero. Testul bootstrap al ipotezei random walk dă p-value = 0,287.</p></details>
+  <details><summary>Răspuns</summary><p>Nu. κ̂ = 0,101 (SE 0,051) corespunde unui timp de înjumătățire de 6,8 ani, iar coeficientul AR(1) zilnic este 0,99960, aproape o rădăcină unitară. Pe subperioade, κ̂ este −0,034, 0,213 și 0,032, iar două dintre cele trei intervale includ zero. Intervalul asimptotic pe 1954–2026 exclude zero la limită (0,101 − 1,96 · 0,051 = 0,001), dar lîngă o rădăcină unitară distribuția lui κ̂ nu este Normală și este deplasată în sus; testul bootstrap al ipotezei random walk dă p-value = 0,287.</p></details>
 </section><h2 class="sec" id="s-jump">Salturi: modelul Merton</h2>
 <section class="blk" id="merton-density">
   <h3>Estimarea Merton pentru distribuția randamentelor</h3>
@@ -93,7 +93,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="mj-l">Intensitatea salturilor λ: <b id="mj-l-v"></b></label><input type="range" id="mj-l" min="0" max="1.15" step="0.05" value="1"></div><button class="btn play" id="mj-play" type="button"></button></div><div class="charts "><div class="chart" id="mj-sp"></div><div class="chart" id="mj-btc"></div></div><ul class="out" id="mj-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Modelul Merton estimat pentru S&P 500 are circa 102 salturi pe an. Sînt acestea crahuri?</div>
-  <details><summary>Răspuns</summary><p>Nu. Salturile sînt mici (abatere standard 1,44%) și explică 71% din dispersie; modelul le folosește pentru a imita volatilitatea variabilă. Excesul de kurtosis implicat este 3,7, față de 10,9 în date, iar zilele cele mai extreme rămîn dincolo de ambele curbe.</p></details>
+  <details><summary>Răspuns</summary><p>Nu. Salturile sînt mici (abatere standard 1,44%) și explică 71% din dispersie; modelul le folosește pentru a imita volatilitatea variabilă. Excesul de kurtosis implicat este 3,7, față de 10,9 în date, iar zilele cele mai extreme rămîn dincolo de ambele curbe. Salturile îmbunătățesc totuși ajustarea: cu λ = 0, log-verosimilitatea S&P 500 scade de la 29 500 la 28 291.</p></details>
 </section><h2 class="sec" id="s-cmp">Modelele confruntate cu datele</h2>
 <section class="blk" id="models-vs-data">
   <h3>Capacitatea modelelor de a reproduce S&P 500</h3>
@@ -103,8 +103,8 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="mv-k">Simulări incluse: <b id="mv-k-v"></b></label><input type="range" id="mv-k" min="1" max="100" step="1" value="100"></div><div class="ctl"><label for="mv-m">Simulările individuale</label><select id="mv-m"><option value="none" selected>Ascunse</option><option value="GBM">GBM</option><option value="Merton">Merton</option><option value="Heston">Heston</option></select></div><button class="btn play" id="mv-play" type="button"></button></div><div class="charts three"><div class="chart" id="mv-acf"></div><div class="chart" id="mv-ku"></div><div class="chart" id="mv-hi"></div></div><ul class="out" id="mv-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care dintre cele trei modele reproduce volatility clustering din S&P 500?</div>
-  <details><summary>Răspuns</summary><p>Doar Heston, cu parametrii din VIX: ACF simulată a lui |r| urmează datele, în timp ce GBM și Merton dau autocorelații în jur de zero. Merton reproduce statistica Hill (2,70 față de 2,56) și asimetria, dar niciun model nu atinge excesul de kurtosis din date, 10,88.</p></details>
-</section><h2 class="sec" id="s-rough">Studiu de caz: rough volatility și persistență</h2>
+  <details><summary>Răspuns</summary><p>Doar Heston, cu parametrii din VIX: ACF simulată a lui |r| urmează datele, în timp ce GBM și Merton dau autocorelații în jur de zero: salturile Poisson sînt independente în timp, deci cozile groase ale lui Merton nu se grupează. Merton reproduce statistica Hill (2,70 față de 2,56) și asimetria (−0,32 față de −0,36). Heston, simulat cu 390 de pași pe zi, dă o asimetrie de −0,21. Niciun model nu atinge excesul de kurtosis din date, 10,88.</p></details>
+</section><h2 class="sec" id="s-rough">Studii de caz: rough volatility, persistență și drift bursts</h2>
 <section class="blk" id="rough-volatility">
   <h3>Studiu de caz: replicare pe SPY, Δ = o zi</h3>
   <div class="pair">
@@ -112,10 +112,20 @@
       <figcaption>Slide-ul 55</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ro-m">Laguri pentru OLS, k = 1..m: <b id="ro-m-v"></b></label><input type="range" id="ro-m" min="2" max="30" step="1" value="6"></div><div class="ctl"><label for="ro-H">Laguri pentru ajustarea ACF, h = 1..H: <b id="ro-H-v"></b></label><input type="range" id="ro-H" min="4" max="60" step="1" value="12"></div><button class="btn play" id="ro-play" type="button"></button></div><div class="charts "><div class="chart" id="ro-vg"></div><div class="chart" id="ro-acf"></div></div><ul class="out" id="ro-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Poate un proces OU, cu memorie scurtă, să reproducă autocorelația log-volatilității SPY la lagul 100?</div>
-  <details><summary>Răspuns</summary><p>Nu. Ajustat pe primele 12 laguri, OU are un timp de înjumătățire de 11 zile și implică o autocorelație de 0,002 la lagul 100, față de 0,13 în date. Clasa Cauchy dă β̂ = 0,26 și β̂* = 0,24, ambele sub 1, în acord cu memoria lungă; variograma dă α̂ = −0,32 (OLS) și −0,35 (NLLS), deci o traiectorie mai rugoasă decît cea browniană.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ajustat pe primele 12 laguri, poate un proces OU, cu memorie scurtă, să reproducă autocorelația log-volatilității SPY la lagul 100?</div>
+  <details><summary>Răspuns</summary><p>Nu. Ajustat pe primele 12 laguri, OU are un timp de înjumătățire de 11 zile; 100 de zile înseamnă circa 9 timpi de înjumătățire, deci autocorelația implicată la lagul 100 este 0,002, față de 0,13 în date. Clasa Cauchy dă β̂ = 0,26 și β̂* = 0,24, ambele sub 1, în acord cu memoria lungă; variograma dă α̂ = −0,32 (OLS) și −0,35 (NLLS), deci o traiectorie mai rugoasă decît cea browniană. Cu ▶, ajustarea pe 60 de laguri dă un timp de înjumătățire de 36 de zile și o autocorelație OU de 0,149 la lagul 100, dar curba ajustată dă 0,48 la lagul 1, față de 0,73 în date: o singură exponențială nu urmărește și scăderea rapidă de la primele laguri, și coada lentă.</p></details>
 </section>
-<p class="src foot">Randamente logaritmice zilnice pînă la 18 septembrie 2026: S&amp;P 500 (din 1990) și Bitcoin (din 2014), prețuri EODHD. Randamentul titlurilor de stat SUA pe 3 luni: FRED, seria DTB3, 1954–2026. Studiul de caz: bare SPY de 5 minute, EODHD, octombrie 2020 – septembrie 2026. Simulările (random walk, mișcare browniană, GBM, Merton, Heston) folosesc aceleași seed-uri ca graficele din curs.</p>
+<section class="blk" id="drift-burst">
+  <h3>Al doilea studiu de caz (2/6): drift bursts pe SPY, bare de 5 minute</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol11_timp_continuu.pdf#page=59" target="_blank" rel="noopener"><img src="slides/ch11_case_drift_burst_ro.jpg" alt="Slide-ul 58: Al doilea studiu de caz (2/6): drift bursts pe SPY, bare de 5 minute" loading="lazy"></a>
+      <figcaption>Slide-ul 58</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="db-h">Lățimea de bandă a driftului h (minute): <b id="db-h-v"></b></label><input type="range" id="db-h" min="5" max="60" step="5" value="15"></div><div class="ctl"><label for="db-d">Ziua din stînga</label><select id="db-d"><option value="2023-12-20" selected>2023-12-20</option><option value="2021-06-14">2021-06-14</option><option value="2024-04-04">2024-04-04</option><option value="2024-05-31">2024-05-31</option><option value="2025-05-21">2025-05-21</option><option value="2021-11-22">2021-11-22</option><option value="2024-09-30">2024-09-30</option><option value="2025-10-15">2025-10-15</option><option value="2025-10-14">2025-10-14</option><option value="2023-06-12">2023-06-12</option></select></div><button class="btn play" id="db-play" type="button"></button></div><div class="charts three"><div class="chart" id="db-day"></div><div class="chart" id="db-cnt"></div><div class="chart" id="db-rev"></div></div><ul class="out" id="db-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Dintre cele 109 zile cu max |T_t| > 2,91, cîte sînt drift bursts?</div>
+  <details><summary>Răspuns</summary><p>Procedura nu răspunde la această întrebare. Sub ipoteza nulă cu semne aleatoare, care păstrează modulele randamentelor, dar elimină driftul, asimetria salturilor și efectul de levier, sînt așteptate în medie 73,84 astfel de zile (cel mult 100 în 200 de replicări). Excesul de 35,16 zile este descriptiv și nu estimează numărul de drift bursts adevărate; nici 5% nu este proporția alarmelor false printre zilele marcate, ci probabilitatea ca o zi fără drift să depășească pragul. Revenirea, prezentă în 65% din cele 80 de zile cu fereastră completă după vîrf, este tot descriptivă: vîrful este ales retrospectiv, iar sub ipoteza nulă, cu aceeași selecție, proporția medie este 56,5%; panta este doar 0,03, iar pe tranzacțiile E-mini S&P 500 articolul găsește −0,26.</p></details>
+</section>
+<p class="src foot">Randamente logaritmice zilnice pînă la 18 septembrie 2026: S&amp;P 500 (din 1990) și Bitcoin (din 2014), prețuri EODHD. Randamentul titlurilor de stat SUA pe 3 luni: FRED, seria DTB3, 1954–2026. Studiile de caz: bare SPY de 5 minute, EODHD, octombrie 2020 – septembrie 2026. Simulările (random walk, mișcare browniană, GBM, Merton, Heston) folosesc aceleași seed-uri ca graficele din curs.</p>
 </main>
 </body>
 </html>

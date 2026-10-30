@@ -57,6 +57,31 @@ def runs(flag):
     return [[int(a), int(b) - 1] for a, b in zip(np.flatnonzero(d == 1), np.flatnonzero(d == -1))]
 
 
+def ebacktest_data():
+    """Losses (500 days before the evaluation plus the evaluation days) and the VaR 2.5% / ES 2.5% forecasts, in
+    units of 1e-7, for the e-processes of the case study (Quantlets/Ch_08/case_ebacktest.py, ch8_ebacktest.json)."""
+    import case_ebacktest as C
+    S = json.load(open(os.path.join(HERE, 'ch8_ebacktest.json')))
+    u = lambda x: [int(v) for v in np.round(np.asarray(x, float) * 1e7)]   # noqa: E731
+    out = dict(win=C.WIN, gamma=C.GAMMA, a=C.P_TAIL, thresh=list(C.THRESH), ymax=C.YMAX, res=S['assets'])
+    for n in C.ASSETS:
+        F = g.fc(n)[0]
+        Lh = -M.load_returns(n).dropna()
+        cal = F['HS'].index
+        assert cal.equals(g.canonical_sample(n)[0])
+        p0 = Lh.index.get_loc(cal[0])
+        assert p0 >= C.WIN and Lh.index[p0:].equals(cal)
+        # z: VaR 2.5% as first value + daily differences; w: ES 2.5% minus VaR 2.5% (None where withheld)
+        def dz(x):
+            q = u(x) if np.isfinite(x).all() else None
+            return None if q is None else [q[0]] + [b - a for a, b in zip(q[:-1], q[1:])]
+        out[n] = dict(pre=u(Lh.values[p0 - C.WIN:p0]), L=u(Lh.values[p0:]),
+                      z={m: dz(F[m]['VaR2.5'].values) for m in C.MODELS},
+                      w={m: (u(F[m]['ES2.5'].values) and [b - a for a, b in zip(u(F[m]['VaR2.5'].values), u(F[m]['ES2.5'].values))])
+                         if np.isfinite(F[m]['ES2.5'].values).all() else None for m in C.MODELS})
+    return out
+
+
 def main():
     R = json.load(open(os.path.join(HERE, 'ch8_results.json')))
     d = dict(assets=M.ASSETS, labels=M.LABELS, models=M.MODELS, mcol=g.MCOL)
@@ -142,6 +167,11 @@ def main():
 
     # ------------------------------------------------------------------ case study: Table 3 of Bayer and Dimitriadis (2022)
     d['bd'] = dict(windows=list(g.BD_WINDOWS), refits=list(g.BD_REFITS), table=g.BD_TABLE3)
+    # the same chart on the course data (replication in Further Topics, ch8_results.json 'bd')
+    d['bd']['course'] = {k: R['bd'][k] for k in ('n_stocks', 'T', 'share_n', 'share_t')}
+
+    # ------------------------------------------------------------------ case study 2: e-backtesting (Wang, Wang & Ziegel, 2026)
+    d['eb'] = ebacktest_data()
 
     js = json.dumps(d, separators=(',', ':'), default=float).replace('NaN', 'null')
     with open(OUT, 'w') as fh:

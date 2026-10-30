@@ -1,0 +1,32 @@
+{
+ "chronos2": {
+  "repo": "amazon/chronos-2",
+  "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+  "weights_sha256": "ddcda3c7508bf2528087723e98a20707cc04b7f370ae275a9fd88078ddba4f42",
+  "weights_match": true,
+  "weights_first_commit": "2025-10-30",
+  "before_post_from": true
+ },
+ "bolt": {
+  "repo": "amazon/chronos-bolt-small",
+  "revision": "772f3d25d38aec6d914c8949dab4462e2d46f5d8",
+  "weights_sha256": "06a6a19bbe74bc10a9cd193bd4bf2bf638ae07f7e0d51653ae7ab8ea968a21dd",
+  "weights_match": true,
+  "weights_first_commit": "2024-11-13",
+  "before_post_from": true
+ },
+ "timesfm": {
+  "repo": "google/timesfm-2.5-200m-pytorch",
+  "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+  "weights_sha256": "2f776efe6245e42b24bc4153ffdf61810140210e4bd3b01fb21f7aa779ab6ce8",
+  "weights_match": true,
+  "weights_first_commit": "2025-10-01",
+  "before_post_from": true
+ },
+ "libraries": {
+  "chronos-forecasting": "2.3.2",
+  "timesfm": "3.0.2",
+  "torch": "2.13.0",
+  "transformers": "5.17.0"
+ }
+}

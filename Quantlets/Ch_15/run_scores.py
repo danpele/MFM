@@ -107,7 +107,9 @@ def texts_block():
                          'tfidf_acc': M.acc(tw['label'], b), 'tfidf_f1': M.macro_f1(tw['label'], b)})
     pd.DataFrame(rows).to_csv(os.path.join(HERE, 'ch15_learning_curve.csv'), index=False)
     for k, name in (('pb', 'ch15_phrasebank_scores.csv'), ('tw', 'ch15_twitter_scores.csv')):
-        out[k].round(6).to_csv(os.path.join(HERE, name), index_label='id')
+        # full precision: rounding to 6 decimals turns small class probabilities into exact zeros, which the
+        # temperature scaling of valid_inference.py can then only replace by a numerical floor
+        out[k].to_csv(os.path.join(HERE, name), index_label='id', float_format='%.17g')
     times = {**out['tw'].attrs}
     pd.Series(times).to_csv(os.path.join(HERE, 'ch15_llm_time.csv'), header=['sec_per_text'])
     tick('texts done', t0)

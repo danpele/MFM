@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch9_data.js?v=20261029b"></script>
-<script src="ch9_text_en.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch9.js?v=20261029b" defer></script>
+<script src="ch9_data.js?v=20261030a"></script>
+<script src="ch9_text_en.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch9.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
-<p class="toc"><a href="#s-rv">Realised Variance</a> · <a href="#s-noise">Microstructure Noise</a> · <a href="#s-jump">Jumps</a> · <a href="#s-facts">Stylised Facts of Realised Volatility</a> · <a href="#s-fc">Forecasting: HAR vs GARCH</a> · <a href="#s-rough">Rough Volatility</a> · <a href="#s-case">Case Study: Machine Learning vs HAR</a></p>
+<p class="toc"><a href="#s-rv">Realised Variance</a> · <a href="#s-noise">Microstructure Noise</a> · <a href="#s-jump">Jumps</a> · <a href="#s-facts">Stylised Facts of Realised Volatility</a> · <a href="#s-fc">Forecasting: HAR vs GARCH</a> · <a href="#s-rough">Rough Volatility</a> · <a href="#s-case">Case Studies: Machine Learning and Partial Variances</a></p>
 <h2 class="sec" id="s-rv">Realised Variance</h2>
 <section class="blk" id="one-day">
   <h3>One Day, 78 Returns: 7 April 2025</h3>
@@ -73,7 +73,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="sg-y">Period</label><select id="sg-y"><option value="all" selected>Whole sample</option><option value="2020">2020</option><option value="2021">2021</option><option value="2022">2022</option><option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option></select></div><div class="ctl"><label for="sg-w">Added i.i.d. noise, standard deviation ω: <b id="sg-w-v"></b></label><input type="range" id="sg-w" min="0" max="0.05" step="0.001" value="0"></div><button class="btn play" id="sg-play" type="button"></button></div><div class="charts "><div class="chart" id="sg-s"></div><div class="chart" id="sg-b"></div></div><ul class="out" id="sg-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> How much i.i.d. noise would have to be added to the SPY prices for the 5-minute volatility to rise from 12.9% to above 14%?</div>
-  <details><summary>Answer</summary><p>About ω = 0.027%: the bias 2nω² = 2 × 78 × 0.027² = 0.11 %² a day raises the 5-minute volatility to 14.0%, while at 130 minutes, with n = 3 returns a day, it changes almost nothing. The actual signature plot stays flat, between 12.6% and 13.1%, so the noise at 5 minutes is much smaller.</p></details>
+  <details><summary>Answer</summary><p>About ω = 0.027%: the bias 2nω² = 2 × 78 × 0.027² = 0.11 %² a day raises the 5-minute volatility to 14.0%, while at 130 minutes, with n = 3 returns a day, it changes almost nothing. The actual signature plot stays approximately flat, between 12.6% and 13.1%: compatible with a much smaller noise bias at 5 minutes, without ruling out noise.</p></details>
 </section><h2 class="sec" id="s-jump">Jumps</h2>
 <section class="blk" id="jumps">
   <h3>Jump Days: SPY and Bitcoin</h3>
@@ -83,7 +83,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="jp-a">Test level α: <b id="jp-a-v"></b></label><input type="range" id="jp-a" min="0" max="6" step="1" value="4"></div><div class="ctl"><label for="jp-m">Multiple testing</label><select id="jp-m"><option value="none" selected>No correction</option><option value="bh">Benjamini–Hochberg, FDR = α</option></select></div><button class="btn play" id="jp-play" type="button"></button></div><div class="charts "><div class="chart" id="jp-chart"></div></div><ul class="out" id="jp-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> How many jump days would the test give at the 5% level for SPY if there were no jumps?</div>
-  <details><summary>Answer</summary><p>About 74 of 1,489; the test gives 235. At 0.1%, 35 days remain, against 1.5 expected without jumps, and with FDR at 5% (Benjamini–Hochberg) 42 remain.</p></details>
+  <details><summary>Answer</summary><p>About 74 of 1,489; the test gives 236. At 0.1%, 36 days remain, against 1.5 expected without jumps, and with FDR at 5% (Benjamini–Hochberg) 43 remain.</p></details>
 </section><h2 class="sec" id="s-facts">Stylised Facts of Realised Volatility</h2>
 <section class="blk" id="distributions">
   <h3>Distributions: log RV and Standardised Returns</h3>
@@ -93,7 +93,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ds-m">Asset</label><select id="ds-m"><option value="spy" selected>SPY</option><option value="btc">Bitcoin</option></select></div><div class="ctl"><label for="ds-lam">Box–Cox parameter λ (0: log, 1: level): <b id="ds-lam-v"></b></label><input type="range" id="ds-lam" min="0" max="1" step="0.05" value="0"></div><button class="btn play" id="ds-play" type="button"></button></div><div class="charts "><div class="chart" id="ds-l"></div><div class="chart" id="ds-r"></div></div><ul class="out" id="ds-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Why do we model log RV and not RV?</div>
-  <details><summary>Answer</summary><p>RV for SPY has skewness 20.0 and kurtosis 550, while log RV has 0.29 and 3.20, close to the values of the Normal distribution (0 and 3). At λ = 0.5 (the square root) the skewness is still 3.9.</p></details>
+  <details><summary>Answer</summary><p>RV for SPY has skewness 20.0 and kurtosis 550, while log RV has 0.29 and 3.21, close to the values of the Normal distribution (0 and 3). At λ = 0.5 (the square root) the skewness is still 3.9.</p></details>
 </section>
 <section class="blk" id="persistence">
   <h3>Persistence of Realised Volatility</h3>
@@ -113,7 +113,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="vx-h">Horizon of the realised volatility (trading days): <b id="vx-h-v"></b></label><input type="range" id="vx-h" min="5" max="63" step="1" value="21"></div><div class="ctl"><label for="vx-t">Date: <b id="vx-t-v"></b></label><input type="range" id="vx-t" min="0" max="1468" step="1" value="1467"></div><button class="btn play" id="vx-play" type="button"></button></div><div class="charts "><div class="chart" id="vx-l"></div><div class="chart" id="vx-r"></div></div><ul class="out" id="vx-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> On what share of the days was the VIX above the realised volatility over the next 21 trading days?</div>
-  <details><summary>Answer</summary><p>On 88% of the 1,468 days, by 4.37 percentage points on average (19.52% against 15.15%). The gap stays positive on average for other horizons too: 4.84 percentage points at 5 days, 4.06 at 63 days.</p></details>
+  <details><summary>Answer</summary><p>On 88% of the 1,468 days, by 4.36 percentage points on average (19.52% against 15.15%). The gap stays positive on average for other horizons too: 4.84 percentage points at 5 days, 4.06 at 63 days.</p></details>
 </section><h2 class="sec" id="s-fc">Forecasting: HAR vs GARCH</h2>
 <section class="blk" id="forecasts">
   <h3>Forecasts over Time</h3>
@@ -134,7 +134,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> How does Ĥ for SPY change if the regression uses only the lags from 5 to 30 days?</div>
   <details><summary>Answer</summary><p>It falls, from 0.106 (lags 1–30) to 0.089. Under i.i.d. measurement error, Ĥ should rise when the small lags are dropped, so this result does not support the i.i.d.-error explanation. For Bitcoin, Ĥ goes from 0.071 to 0.068.</p></details>
-</section><h2 class="sec" id="s-case">Case Study: Machine Learning vs HAR</h2>
+</section><h2 class="sec" id="s-case">Case Studies: Machine Learning and Partial Variances</h2>
 <section class="blk" id="ml-vs-har">
   <h3>Case Study: Gains by Horizon</h3>
   <div class="pair">
@@ -145,7 +145,17 @@
   <div class="ask"><span class="ask-tag">Question for the room</span> With all 12 predictors, which model has the lowest one-month error, and by how much does it beat HAR?</div>
   <details><summary>Answer</summary><p>Random forest, with 0.604 of the HAR MSE, followed by bagging (0.621). HAR-X, i.e. OLS with the same predictors, has 1.290 and HARQ 1.569: linearity and overfitting hurt the long-horizon forecasts.</p></details>
 </section>
-<p class="src foot">SPY: 5-minute bars of the regular US session (09:30–16:00, New York time), October 2020 – September 2026, and adjusted daily returns; Bitcoin: 5-minute bars on complete UTC days, September 2024 – September 2026; the VIX index. EODHD prices. Case study: Tables 2–7 of Christensen, Siggaard and Veliyev (2023).</p>
+<section class="blk" id="partial">
+  <h3>Case Study: Loss as a Function of the Threshold, SPY and Bitcoin</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=63" target="_blank" rel="noopener"><img src="slides/ch9_partial_q_en.jpg" alt="Slide 62: Case Study: Loss as a Function of the Threshold, SPY and Bitcoin" loading="lazy"></a>
+      <figcaption>Slide 62</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pv-k">Most volatile days left out of the evaluation: <b id="pv-k-v"></b></label><input type="range" id="pv-k" min="0" max="30" step="1" value="0"></div><button class="btn play" id="pv-play" type="button"></button></div><div class="charts "><div class="chart" id="pv-m"></div><div class="chart" id="pv-q"></div></div><ul class="out" id="pv-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For SPY, SV-HAR has an MSE of 0.908 of that of RV-HAR. What do you think: what is left of this gain if the 10 days with the largest RV are left out of the evaluation?</div>
+  <details><summary>Answer</summary><p>It disappears: without them, SV-HAR has an MSE of 1.240 of that of RV-HAR, because those 10 days bring 89% of the squared error of RV-HAR. The QLIKE gain remains: 0.937, against 0.954 over the whole sample. QLIKE weighs the errors relative to the level of volatility, so it is not dominated by a few extreme days.</p></details>
+</section>
+<p class="src foot">SPY: 5-minute bars of the regular US session (09:30–16:00, New York time), October 2020 – September 2026, and adjusted daily returns; Bitcoin: 5-minute bars on complete UTC days, September 2024 – September 2026; the VIX index. EODHD prices. First case study: Tables 2–7 of Christensen, Siggaard and Veliyev (2023); second case study: the SPY and Bitcoin 5-minute bars of the course.</p>
 </main>
 </body>
 </html>

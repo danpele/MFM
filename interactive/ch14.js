@@ -3,7 +3,7 @@
 (function () {
 'use strict';
 const D = window.CH14_DATA;
-const { C, sum, mean, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { C, sum, mean, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH14_TEXT;
 
 // ---------------------------------------------------------------- colours (generate_all_charts.py)
@@ -257,7 +257,7 @@ function aci(y, q, alpha, gamma, nCal) {     // inference_tests.aci (Gibbs & Can
 }
 function cfBlock() {
   const a = $('cf-a').value, g = GAMMAS[+$('cf-g').value], nCal = +$('cf-n').value, R = D.risk[a], dd = RISK_DATES[a];
-  $('cf-g-v').textContent = g === 0 ? '0 (split conformal)' : String(g);
+  $('cf-g-v').textContent = g === 0 ? '0 (rolling calibration, fixed level)' : String(g);
   const { shift, al } = aci(R.y, R.q1, 0.01, g, nCal), keep = range(nCal, R.y.length - 1, 1), x = keep.map(i => dd[i]);
   const vA = keep.map(i => -(R.q1[i] - shift[i])), vR = keep.map(i => -R.q1[i]), vF = keep.map(i => R.fhs[i]), L = keep.map(i => -R.y[i]);
   const fin = v => (Number.isFinite(v) ? v : null);
@@ -298,6 +298,55 @@ function kzBlock() {
   out('kz-out', [T.kz1(cfmt(c[ci]), sup(ze), nf(Z.curve[ze].r2[ci], 1), nf(sr[ci], 2), nf(Z.lin_sr, 2)), T.kz2(sup(ze), nf(sr[jb], 2), cfmt(c[jb]))]);
 }
 
+// ================================================================= 11b. the M6 competition on course data (m6_case.py)
+const M6M = ['HM', 'VOL', 'NN'];
+const M6L = { HM: 'Historical mean and covariance', VOL: 'Volatility only (EWMA, zero mean)', NN: 'Small network (4, 8, 5)' };
+const M6C = { HM: K.amber, VOL: K.blue, NN: K.green };
+function m6Rps(q5, f) {                       // mean RPS over the assets of one period (eq. 1), q in fifths
+  let s = 0;
+  for (let i = 0; i < q5.length; i++) { let cq = 0, cf = 0, r = 0;
+    for (let k = 0; k < 5; k++) { cq += q5[i][k] / 5; cf += f[i][k]; r += (cq - cf) ** 2; } s += r / 5; }
+  return s / q5.length;
+}
+function m6Scale(f10k, w) {                   // 0.2 + w (f - 0.2), negative probabilities set to zero, rows renormalised
+  return f10k.map(row => { const p = row.map(v => Math.max(0, 0.2 + w * (v / 10000 - 0.2))), s = sum(p); return p.map(v => v / s); });
+}
+function m6Eval(w) {
+  const Z = D.m6, U = Z.q5.map(q => m6Rps(q, q.map(() => [0.2, 0.2, 0.2, 0.2, 0.2])));
+  const R = {}; M6M.forEach(m => { R[m] = Z.q5.map((q, t) => m6Rps(q, m6Scale(Z.f10k[m][t], w))); });
+  const sel = key => Z[key].map((b, t) => (b ? t : -1)).filter(t => t >= 0);
+  const st = {};
+  ['m6', 'ext'].forEach(key => { const I = sel(key), u = I.map(t => U[t]);
+    st[key] = { n: I.length, U: mean(u) };
+    M6M.forEach(m => { const r = I.map(t => R[m][t]), d = dm(r, u);
+      st[key][m] = { gain: 100 * (1 - mean(r) / mean(u)), DM: d.DM, p: d.p, better: I.filter(t => R[m][t] < U[t] - 1e-12).length }; }); });
+  return { U, R, st, ext: sel('ext') };
+}
+function m6Block() {
+  const w = +$('m6-w').value / 10, E = m6Eval(w), Z = D.m6, st = E.st;
+  $('m6-w-v').textContent = nf(w, 1);
+  const med = 100 * (1 - Z.paper.median / Z.paper.bench);
+  const xl = [`M6 year (${st.m6.n} periods)`, `2019–2026 (${st.ext.n} periods)`];
+  const bars = M6M.map(m => { const v = ['m6', 'ext'].map(k => st[k][m].gain);
+    return { x: xl, y: v, type: 'bar', name: M6L[m], marker: { color: M6C[m] }, text: v.map(z => z.toFixed(1)), textposition: 'outside', cliponaxis: false,
+      textfont: { color: '#000', size: 10 }, hovertemplate: M6L[m] + ', %{x}: %{y:.2f}%<extra></extra>' }; });
+  bars.push({ x: xl, y: [med, med], mode: 'lines', line: { color: K.red, dash: 'dot', width: 1.6 }, name: 'Paper: median M6 team (100 assets)', hovertemplate: 'median M6 team: %{y:.2f}%<extra></extra>' });
+  const all = M6M.flatMap(m => ['m6', 'ext'].map(k => st[k][m].gain)).concat([med]);
+  const lg = { orientation: 'h', x: 0, y: -0.14, yanchor: 'top' }, mg = { l: 64, r: 12, t: 30, b: 150, autoexpand: false };
+  plot('m6-bar', bars, layout({ barmode: 'group', legend: lg, margin: mg, title: ttl('RPS gain over equal probabilities'), shapes: [hline(0, K.navy)],
+    xaxis: AX(''), yaxis: AX('RPS gain (%)', { range: [Math.min(...all) - 1, Math.max(...all) + 1] }) }));
+  const ends = E.ext.map(t => Z.end[t]);
+  const lines = M6M.map(m => { let c = 0; return { x: ends, y: E.ext.map(t => (c += E.U[t] - E.R[m][t])), mode: 'lines', name: M6L[m], line: { color: M6C[m], width: 2 },
+    hovertemplate: M6L[m] + ', %{x}: %{y:.3f}<extra></extra>' }; });
+  const i0 = Z.m6.indexOf(true), i1 = Z.m6.lastIndexOf(true);
+  plot('m6-cum', lines, layout({ legend: lg, margin: mg, title: ttl('Cumulative RPS gain over equal probabilities'),
+    shapes: [{ type: 'rect', xref: 'x', yref: 'paper', x0: Z.start[i0], x1: Z.end[i1], y0: 0, y1: 1, fillcolor: K.band, opacity: 0.6, line: { width: 0 }, layer: 'below' }, hline(0, K.navy)],
+    xaxis: AX('', { type: 'date' }), yaxis: AX('Cumulative RPS gain') }));
+  const V = st.ext.VOL, pp = p => (p < 0.001 ? '< ' + nf(0.001, 3) : '= ' + nf(p, 3));
+  out('m6-out', [T.m61(nf(w, 1), nf(st.m6.VOL.gain, 1), st.m6.VOL.better, st.m6.n, nf(V.gain, 1), sgn(V.DM, 2), pp(V.p)),
+    T.m62(nf(st.ext.HM.gain, 1), pp(st.ext.HM.p), nf(st.ext.NN.gain, 1), pp(st.ext.NN.p))]);
+}
+
 // ================================================================= 12. a test without power
 function lrv(x, L) { const m = mean(x), d = x.map(v => v - m), n = d.length; let s = 0; for (const v of d) s += v * v; s /= n;
   for (let l = 1; l <= L; l++) { let g = 0; for (let t = l; t < n; t++) g += d[t] * d[t - l]; s += 2 * (1 - l / (L + 1)) * g / n; } return s; }
@@ -335,7 +384,7 @@ function aiBlock() {
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   on(['ac-y', 'ac-L', 'ac-s'], acfBlock); P('ac-play', 'ac-L', range(10, 250, 10), 350);
   sz('pa-chart', 440); on(['pa-p', 'pa-n'], patchBlock); P('pa-play', 'pa-p', range(0, PATCH.length - 1, 1), 1100);
   sz('r2-chart', 420); $('r2-w').max = D.years.length; on(['r2-w'], r2Block); P('r2-play', 'r2-w', range(0, D.years.length, 1), 900);
@@ -348,10 +397,15 @@ function init() {
   $('mc-w').max = D.years.length; on(['mc-w', 'mc-a'], mcsBlock); P('mc-play', 'mc-w', range(0, D.years.length, 1), 900);
   sz('cf-chart', 460); on(['cf-a', 'cf-g', 'cf-n'], cfBlock); P('cf-play', 'cf-g', range(0, GAMMAS.length - 1, 1), 1100);
   on(['kz-z', 'kz-c', 'kz-v'], kzBlock); P('kz-play', 'kz-c', range(0, D.kmz.c.length - 1, 1), 450);
+  on(['m6-w'], m6Block); P('m6-play', 'm6-w', range(0, 20, 1), 450);
   const b0 = RV_DATES.findIndex(s => s >= D.post), bmax = D.rv.RV.length - 60;
   $('ai-b').max = bmax; $('ai-b').value = b0; on(['ai-b', 'ai-m'], aiBlock); P('ai-play', 'ai-b', range(120, bmax, 21), 300);
-  acfBlock(); patchBlock(); r2Block(); rvBlock(); qlBlock(); brBlock(); vpBlock(); pitBlock(); mcsBlock(); cfBlock(); kzBlock(); aiBlock();
+  const PFX = { 'signal': 'ac', 'patching': 'pa', 'return-r2': 'r2', 'rv-forecasts': 'rv', 'qlike': 'ql', 'breach-rates': 'br', 'covid-var': 'vp',
+    'pit': 'pi', 'mcs': 'mc', 'conformal': 'cf', 'complexity': 'kz', 'm6': 'm6', 'pre-post': 'ai' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  acfBlock(); patchBlock(); r2Block(); rvBlock(); qlBlock(); brBlock(); vpBlock(); pitBlock(); mcsBlock(); cfBlock(); kzBlock(); m6Block(); aiBlock();
 }
-window.CH14 = { acfOf, nwVar, dm, kupiec, binomPpf, aci, prepost, qlike };
+window.CH14 = { acfOf, nwVar, dm, kupiec, binomPpf, aci, prepost, qlike, m6Eval };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

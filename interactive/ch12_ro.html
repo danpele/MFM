@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch12_data.js?v=20261029b"></script>
-<script src="ch12_text_ro.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch12.js?v=20261029b" defer></script>
+<script src="ch12_data.js?v=20261030a"></script>
+<script src="ch12_text_ro.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch12.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
-<p class="toc"><a href="#s-bs">Black–Scholes și senzitivitățile</a> · <a href="#s-dh">Delta hedging în practică</a> · <a href="#s-iv">Volatilitatea implicită și zîmbetul</a> · <a href="#s-btc">Opțiunile Bitcoin și suprafața de volatilitate</a> · <a href="#s-vix">VIX și prima de risc a varianței</a> · <a href="#s-odte">Opțiuni cu zero zile pînă la scadență</a> · <a href="#s-case">Studiu de caz: sînt limitele din opțiuni valide și strînse?</a></p>
+<p class="toc"><a href="#s-bs">Black–Scholes și senzitivitățile</a> · <a href="#s-dh">Delta hedging în practică</a> · <a href="#s-iv">Volatilitatea implicită și zîmbetul</a> · <a href="#s-btc">Opțiunile Bitcoin și suprafața de volatilitate</a> · <a href="#s-vix">VIX și prima de risc a varianței</a> · <a href="#s-odte">Opțiuni cu zero zile pînă la scadență</a> · <a href="#s-case">Studii de caz: limitele din opțiuni și așteptările de volatilitate</a></p>
 <h2 class="sec" id="s-bs">Black–Scholes și senzitivitățile</h2>
 <section class="blk" id="greeks">
   <h3>Senzitivitățile: o identitate, toate derivatele</h3>
@@ -42,8 +42,8 @@
       <figcaption>Slide-ul 11</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="gk-sig">Volatilitatea σ (%): <b id="gk-sig-v"></b></label><input type="range" id="gk-sig" min="5" max="60" step="1" value="20"></div><div class="ctl"><label for="gk-S">Prețul suportului S: <b id="gk-S-v"></b></label><input type="range" id="gk-S" min="60" max="140" step="1" value="100"></div><button class="btn play" id="gk-play" type="button"></button></div><div class="charts "><div class="chart" id="gk-d"></div><div class="chart" id="gk-g"></div><div class="chart" id="gk-v"></div><div class="chart" id="gk-t"></div></div><ul class="out" id="gk-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care scadență are cea mai mare gamma la prețul de exercitare și care are cea mai mare vega?</div>
-  <details><summary>Răspuns</summary><p>Call-ul pe o lună are cea mai mare gamma și cea mai mare theta la K = 100, iar call-ul pe un an are cea mai mare vega. Pentru o scadență dată, vega = ΓS²στ: la S = 100 și σ = 20%, call-ul pe trei luni are vega 0,197 pe punct de volatilitate.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pornim ▶: volatilitatea σ crește de la 10% la 50%. Ce se întîmplă cu gamma call-ului pe trei luni la S = K = 100?</div>
+  <details><summary>Răspuns</summary><p>Scade de la 0,078 la 0,016, aproape ca 1/σ, în timp ce vega rămîne aproape constantă (0,194 la σ = 10%, 0,197 la σ = 50%). La K = 100 și σ = 20%, call-ul pe o lună are cea mai mare gamma (0,069, față de 0,039 pe trei luni și 0,019 pe un an) și cel mai rapid time decay (theta −0,043 pe zi), iar call-ul pe un an are cea mai mare vega (0,381 pe punct de volatilitate). Pentru o scadență dată, vega = ΓS²στ: la S = 100 și σ = 20%, call-ul pe trei luni are vega 0,197 pe punct de volatilitate.</p></details>
 </section><h2 class="sec" id="s-dh">Delta hedging în practică</h2>
 <section class="blk" id="hedge-error">
   <h3>Delta hedging discret: algoritm și eroare</h3>
@@ -53,7 +53,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="he-n">Numărul de reechilibrări N: <b id="he-n-v"></b></label><input type="range" id="he-n" min="0" max="7" step="1" value="5"></div><button class="btn play" id="he-play" type="button"></button></div><div class="charts "><div class="chart" id="he-hist"></div><div class="chart" id="he-sd"></div></div><ul class="out" id="he-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cu reechilibrare zilnică, abaterea standard a erorii este 9,5% din primă. De cîte ori mai des trebuie ajustată acoperirea ca eroarea să scadă la jumătate?</div>
-  <details><summary>Răspuns</summary><p>De aproximativ patru ori, pentru că abaterea standard scade ca 1/√N (panta estimată pe axele logaritmice este −0,48). Cu N = 252, adică de patru ori pe zi, abaterea standard este 4,8% din primă. Costurile de tranzacționare cresc însă proporțional cu N.</p></details>
+  <details><summary>Răspuns</summary><p>De aproximativ patru ori, pentru că abaterea standard scade ca 1/√N (panta estimată pe axele logaritmice este −0,48). Cu N = 252, adică de patru ori pe zi, abaterea standard este 4,8% din primă. Costurile de tranzacționare cresc însă cu N: proporțional cu N la un cost fix pe reechilibrare, aproximativ ca √N la costuri proporționale cu valoarea tranzacționată.</p></details>
 </section>
 <section class="blk" id="vol-mismatch">
   <h3>Vînzarea volatilității la 20%: trei rezultate</h3>
@@ -62,8 +62,8 @@
       <figcaption>Slide-ul 17</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="vm-s">Volatilitatea realizată: <b id="vm-s-v"></b></label><input type="range" id="vm-s" min="10" max="30" step="1" value="20"></div><button class="btn play" id="vm-play" type="button"></button></div><div class="charts "><div class="chart" id="vm-chart"></div></div><ul class="out" id="vm-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Un call pe trei luni este vîndut la volatilitatea implicită de 20% și acoperit zilnic. Ce rezultat mediu are vînzătorul dacă volatilitatea realizată este 25%?</div>
-  <details><summary>Răspuns</summary><p>−0,99 pe opțiune, iar rezultatul este pozitiv doar pe 2,2% dintre traiectorii. Media este aproape de vega × 5 puncte de volatilitate = 0,197 × 5. Cu volatilitatea realizată de 15%, media este +0,98, pozitivă pe 99,8% dintre traiectorii.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Un call pe trei luni este vîndut la volatilitatea implicită de 20% și acoperit zilnic. Pe ce parte din traiectorii cîștigă vînzătorul dacă volatilitatea realizată este 25%?</div>
+  <details><summary>Răspuns</summary><p>Doar pe 2,2% dintre traiectorii. Rezultatul mediu este −0,99 pe opțiune, cu abaterea standard 0,68. Media este aproape de vega × 5 puncte de volatilitate = 0,197 × 5. Cu volatilitatea realizată de 15%, media este +0,98, pozitivă pe 99,8% dintre traiectorii.</p></details>
 </section><h2 class="sec" id="s-iv">Volatilitatea implicită și zîmbetul</h2>
 <section class="blk" id="smile-models">
   <h3>Trei surse ale zîmbetului</h3>
@@ -72,8 +72,8 @@
       <figcaption>Slide-ul 22</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="sm-rho">Heston: corelația ρ preț–varianță: <b id="sm-rho-v"></b></label><input type="range" id="sm-rho" min="-0.9" max="0.9" step="0.1" value="-0.7"></div><div class="ctl"><label for="sm-j">Merton: saltul mediu (log): <b id="sm-j-v"></b></label><input type="range" id="sm-j" min="-20" max="10" step="1" value="-8"></div><button class="btn play" id="sm-play" type="button"></button></div><div class="charts "><div class="chart" id="sm-chart"></div></div><ul class="out" id="sm-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care dintre cele trei surse dă cea mai abruptă aripă stîngă la K/S = 0,8?</div>
-  <details><summary>Răspuns</summary><p>Salturile Merton: 31,0%, față de 16,3% ATM, aproape de distribuția istorică (30,6%, față de 13,9% ATM). Heston cu ρ = −0,7 dă 28,6%, iar aripa lui dreaptă este cea mai joasă (15,0% la K/S = 1,2), pentru că o corelație negativă înclină zîmbetul spre stînga.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pornim ▶: corelația Heston ρ trece de la −0,9 la +0,9. Ce se întîmplă cu zîmbetul Heston?</div>
+  <details><summary>Răspuns</summary><p>Înclinarea se inversează: la ρ = +0,9, volatilitatea implicită Heston este 19,8% la K/S = 0,8 și 28,2% la K/S = 1,2; la ρ = 0, zîmbetul este aproape simetric (23,7% și 22,4%). Pe slide (ρ = −0,7), cea mai mare volatilitate implicită la K/S = 0,8 o dau salturile Merton: 31,0%, față de 16,3% ATM, aproape de distribuția istorică (30,6%, față de 13,9% ATM). Măsurată față de nivelul ATM, aripa istorică urcă cel mai mult: 16,7 puncte, față de 14,7 la Merton și 12,0 la Heston. Heston cu ρ = −0,7 dă 28,6%, iar aripa lui dreaptă este cea mai joasă (15,0% la K/S = 1,2), pentru că o corelație negativă înclină zîmbetul spre stînga.</p></details>
 </section><h2 class="sec" id="s-btc">Opțiunile Bitcoin și suprafața de volatilitate</h2>
 <section class="blk" id="btc-smile">
   <h3>Zîmbetul Bitcoin</h3>
@@ -82,8 +82,8 @@
       <figcaption>Slide-ul 27</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="bs-e">Scadența: <b id="bs-e-v"></b></label><input type="range" id="bs-e" min="0" max="8" step="1" value="4"></div><div class="ctl"><label for="bs-rho">Înclinarea ρ: <b id="bs-rho-v"></b></label><input type="range" id="bs-rho" min="-0.95" max="0.95" step="0.01" value="-0.26"></div><div class="ctl"><label for="bs-b">Panta aripilor b, față de estimare: <b id="bs-b-v"></b></label><input type="range" id="bs-b" min="0.5" max="1.5" step="0.05" value="1"></div><button class="btn play" id="bs-play" type="button"></button></div><div class="charts "><div class="chart" id="bs-chart"></div><div class="chart" id="bs-w"></div></div><ul class="out" id="bs-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Este zîmbetul Bitcoin un skew, ca la indicii bursieri?</div>
-  <details><summary>Răspuns</summary><p>Nu. Ambele aripi cresc, pentru că Bitcoin poate sări atît în sus, cît și în jos. Opțiunile put sînt totuși mai scumpe decît call-urile la același |k|: skew-ul este negativ la toate cele 9 scadențe. Eroarea pătratică medie a ajustărilor SVI este de cel mult 0,70 puncte de volatilitate.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pornim ▶ prin cele 9 scadențe Bitcoin. Trec toate ajustările SVI testul butterfly, g(k) ≥ 0?</div>
+  <details><summary>Răspuns</summary><p>Nu. g(k) < 0 în unele puncte la 2 scadențe: 2 octombrie 2026 (minimul −0,017) și 27 noiembrie 2026 (minimul −0,009), deși erorile acestor ajustări sînt mici (0,23 și 0,12 puncte de volatilitate). Ca formă, este un zîmbet, nu un skew: ambele aripi cresc, pentru că Bitcoin poate sări atît în sus, cît și în jos. Opțiunile put sînt totuși puțin mai scumpe decît call-urile la |k| = 0,15: skew-ul IV(k = +0,15) − IV(k = −0,15) este negativ la toate cele 9 scadențe, de la −0,1 puncte (10 zile) la −2,4 puncte (66 de zile). Eroarea pătratică medie a ajustărilor SVI este de cel mult 0,70 puncte de volatilitate.</p></details>
 </section>
 <section class="blk" id="btc-rnd">
   <h3>Distribuția neutră la risc a Bitcoin</h3>
@@ -93,7 +93,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="rn-x">Pragul de scădere, S<sub>T</sub>/F: <b id="rn-x-v"></b></label><input type="range" id="rn-x" min="0.5" max="0.95" step="0.01" value="0.7"></div><button class="btn play" id="rn-play" type="button"></button></div><div class="charts "><div class="chart" id="rn-chart"></div></div><ul class="out" id="rn-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît de probabilă este, după prețurile opțiunilor, o scădere a Bitcoin cu peste 30% în 38 de zile?</div>
-  <details><summary>Răspuns</summary><p>1,21%, cu intervalul bootstrap 1,08–1,24%, de aproximativ 8 ori mai mult decît 0,14% sub o distribuție log-normală cu volatilitatea ATM de 36,4%. 0,13 din cele 1,21 puncte se află sub cel mai mic preț de exercitare cotat (0,47F), unde densitatea este o extrapolare SVI.</p></details>
+  <details><summary>Răspuns</summary><p>1,24%, cu intervalul bootstrap 1,16–1,27%, de aproximativ 9 ori mai mult decît 0,14% sub o distribuție log-normală cu volatilitatea ATM de 36,4%. 0,16 din cele 1,24 puncte se află sub cel mai mic preț de exercitare cotat (0,47F), unde densitatea este o extrapolare SVI.</p></details>
 </section><h2 class="sec" id="s-vix">VIX și prima de risc a varianței</h2>
 <section class="blk" id="vix-history">
   <h3>VIX, 1990–2026</h3>
@@ -103,7 +103,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="vh-l">Nivelul VIX: <b id="vh-l-v"></b></label><input type="range" id="vh-l" min="10" max="80" step="1" value="30"></div><button class="btn play" id="vh-play" type="button"></button></div><div class="charts "><div class="chart" id="vh-chart"></div></div><ul class="out" id="vh-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît de des a fost VIX peste 30 între 1990 și 2026?</div>
-  <details><summary>Răspuns</summary><p>În 7,9% dintre zile. Media este 19,4, iar maximul, 82,7, a fost atins pe 16 martie 2020. Vîrfurile apar brusc și scad încet, ca în modelele GARCH.</p></details>
+  <details><summary>Răspuns</summary><p>În 7,9% dintre zile; peste 20, în 37,0%, iar peste 50, în 0,8%. Media este 19,4, iar maximul, 82,7, a fost atins pe 16 martie 2020. Vîrfurile apar brusc și scad încet, ca în modelele GARCH.</p></details>
 </section>
 <section class="blk" id="vrp">
   <h3>Volatilitatea implicită față de cea realizată, S&P 500</h3>
@@ -113,7 +113,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="vr-y">Eșantionul începe în: <b id="vr-y-v"></b></label><input type="range" id="vr-y" min="1990" max="2020" step="1" value="1990"></div><button class="btn play" id="vr-play" type="button"></button></div><div class="charts "><div class="chart" id="vr-chart"></div></div><ul class="out" id="vr-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În ce proporție din zile este VIX peste volatilitatea realizată în următoarele 21 de zile de tranzacționare?</div>
-  <details><summary>Răspuns</summary><p>În 86% dintre zile. Prima medie este 4,09 puncte de volatilitate (eroarea standard Newey–West 0,27), adică 113 %² în varianță, cu t = 5,5. Excepțiile sînt crash-urile: cea mai slabă fereastră, începută pe 20 februarie 2020, are −72,0 puncte.</p></details>
+  <details><summary>Răspuns</summary><p>În 86% dintre zile. Prima medie este 4,09 puncte de volatilitate (eroarea standard Newey–West 0,27), adică 113 %² în varianță, cu t = 5,5. Excepțiile sînt crash-urile: cea mai slabă fereastră, începută pe 20 februarie 2020, are −72,0 puncte. Cu eșantionul început în 2020, prima medie este tot 3,82 puncte, dar t = 0,9: eșantionul scurt nu o mai separă de zgomot.</p></details>
 </section>
 <section class="blk" id="mincer-zarnowitz">
   <h3>Calitatea VIX ca prognoză</h3>
@@ -134,7 +134,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> De cîte ori este mai mare gamma ATM cu o zi de tranzacționare înainte de scadență decît cu o lună înainte?</div>
   <details><summary>Răspuns</summary><p>De 4,6 ori (0,396 față de 0,086), adică √21, pentru că gamma ATM este proporțională cu 1/√τ. O mișcare de 1% în ultima zi schimbă delta cu aproximativ 0,4. Time decay-ul este 0,167 în ultima zi calendaristică, față de 0,030 cu 30 de zile rămase.</p></details>
-</section><h2 class="sec" id="s-case">Studiu de caz: sînt limitele din opțiuni valide și strînse?</h2>
+</section><h2 class="sec" id="s-case">Studii de caz: limitele din opțiuni și așteptările de volatilitate</h2>
 <section class="blk" id="bounds">
   <h3>Studiu de caz: limita și prima realizată</h3>
   <div class="pair">
@@ -143,9 +143,19 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="bk-h">Orizontul: <b id="bk-h-v"></b></label><input type="range" id="bk-h" min="0" max="3" step="1" value="3"></div><button class="btn play" id="bk-play" type="button"></button></div><div class="charts "><div class="chart" id="bk-chart"></div></div><ul class="out" id="bk-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Randamentul în exces realizat pe 12 luni este sub limita Martin la 33% dintre date. Contrazice acest lucru validitatea limitei?</div>
-  <details><summary>Răspuns</summary><p>Nu. Limita restricționează media condiționată E_t[R^e], nu fiecare realizare. Lucrarea nu respinge validitatea (D₁ = 0 la toate orizonturile), dar respinge strîngerea: diferența medie dintre prima realizată și limită este de 4,8–5,2 puncte pe an. Corelația dintre limită și randamentul realizat este doar 0,15.</p></details>
+  <details><summary>Răspuns</summary><p>Nu. Limita restricționează media condiționată E_t[R^e], nu fiecare realizare. Lucrarea nu respinge validitatea (D₁ = 0 la toate orizonturile), dar respinge strîngerea: în lucrare, cu dividende, diferența medie dintre prima realizată și limită este de 4,8–5,2 puncte pe an (pe indicele de preț din figură: 2,91 puncte la 12 luni). Corelația dintre limită și randamentul realizat este doar 0,15.</p></details>
 </section>
-<p class="src foot">S&amp;P 500 și VIX: închideri zilnice EODHD, 1990–2026. Opțiuni Bitcoin: instantaneul lanțului Deribit din 22 septembrie 2026, 07:51 UTC. Delta hedging: 20&nbsp;000 de traiectorii ale mișcării browniene geometrice. Studiul de caz: limitele zilnice din pachetul de replicare Back, Crotty și Kazempour (2022); rata fără risc din Kenneth French Data Library.</p>
+<section class="blk" id="vol-expectations">
+  <h3>Răspunsul VIX la un șoc al varianței așteptate</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol12_optiuni_suprafata_volatilitate.pdf#page=52" target="_blank" rel="noopener"><img src="slides/ch12_lm_vrp_irf_ro.jpg" alt="Slide-ul 51: Răspunsul VIX la un șoc al varianței așteptate" loading="lazy"></a>
+      <figcaption>Slide-ul 51</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="lm-y">Eșantionul se termină în: <b id="lm-y-v"></b></label><input type="range" id="lm-y" min="2005" max="2026" step="1" value="2026"></div><button class="btn play" id="lm-play" type="button"></button></div><div class="charts "><div class="chart" id="lm-irf"></div><div class="chart" id="lm-w"></div></div><ul class="out" id="lm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> După un șoc al varianței așteptate, VIX² crește doar cu 55% din șoc. Pornim ▶: eșantionul se termină tot mai tîrziu, din 2005 pînă în august 2026. Ce semn are răspunsul VRP în luna șocului?</div>
+  <details><summary>Răspuns</summary><p>Negativ în toate eșantioanele: −69 %² pînă în 2005, −254 %² pînă în 2008; banda de 95% conține zero doar pentru eșantionul pînă în 2006. Nu este deci momentul cel mai bun pentru a vinde volatilitate. Pe întregul eșantion, în luna șocului răspunsul VRP este −169 %² (banda punctuală de 95%: −300; −27): VIX crește mai puțin decît varianța așteptată, deci prima vînzătorului de volatilitate scade exact cînd riscul este cel mai mare. Răspunsul VRP devine pozitiv din luna 2 și este maxim în luna 3 (+30 %²), după ce volatilitatea a început să scadă. Așteptările lente se văd și în ponderi: φ̂ = 0,49 pentru VIX², față de 0,11 pentru varianța realizată a lunii următoare.</p></details>
+</section>
+<p class="src foot">S&amp;P 500 și VIX: închideri zilnice EODHD, 1990–2026. Opțiuni Bitcoin: instantaneul lanțului Deribit din 22 septembrie 2026, 07:51 UTC. Delta hedging: 20&nbsp;000 de traiectorii ale mișcării browniene geometrice. Studiul de caz: limitele zilnice din pachetul de replicare Back, Crotty și Kazempour (2022); rata fără risc din Kenneth French Data Library. Al doilea studiu de caz: S&amp;P 500 și VIX lunar, ianuarie 1990 – august 2026.</p>
 </main>
 </body>
 </html>

@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH6_DATA;
-const { rng, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { rng, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH6_TEXT;
 
 // ---------------------------------------------------------------- colours (generate_all_charts.py)
@@ -676,10 +676,55 @@ function aiInflation() {
     T.ai2(nf(meanA(hi), 2), hi.length, nf(meanA(lo), 2), lo.length), T.ai3(nf(P.b, 3), nf(P.t, 2))]);
 }
 
+// ---------------------------------------------------------------- case study 2: DCC in vast dimensions (Pakel et al., 2021)
+function vdZ() { const V = D.vd; if (!V._z) V._z = V.z.map(c => Float64Array.from(c, v => v * 1e-3)); return V._z; }
+function vdAvgCorr(k, a, b) {         // dep_tools.dcc_path on the first k series; each day the mean of the k(k-1)/2 correlations
+  const Z = vdZ().slice(0, k), n = Z[0].length, Qb = new Float64Array(k * k), Q = new Float64Array(k * k), r = new Float64Array(n);
+  const mu = Z.map(c => meanA(c)), c0 = 1 - a - b, np = k * (k - 1) / 2;
+  for (let i = 0; i < k; i++) for (let j = i; j < k; j++) { let s = 0; for (let t = 0; t < n; t++) s += (Z[i][t] - mu[i]) * (Z[j][t] - mu[j]); Qb[i * k + j] = Qb[j * k + i] = s / n; }
+  Q.set(Qb);
+  for (let t = 0; t < n; t++) {
+    if (t > 0) for (let i = 0; i < k; i++) { const zi = Z[i][t - 1]; for (let j = i; j < k; j++) Q[i * k + j] = c0 * Qb[i * k + j] + a * zi * Z[j][t - 1] + b * Q[i * k + j]; }
+    let s = 0; for (let i = 0; i < k; i++) for (let j = i + 1; j < k; j++) s += Q[i * k + j] / Math.sqrt(Q[i * k + i] * Q[j * k + j]);
+    r[t] = s / np;
+  }
+  return r;
+}
+const halfLife = (a, b) => Math.log(0.5) / Math.log(a + b);
+function vastDcc() {
+  const V = D.vd, ix = +$('vd-k').value, k = V.K[ix], d = dates(V);
+  $('vd-k-v').textContent = String(k);
+  const tint = { ml: 'rgba(205,0,0,0.25)', cc: 'rgba(26,58,110,0.22)' };
+  const tr = [];
+  [['a', 'x', 'y'], ['b', 'x2', 'y2']].forEach(([p, xa, ya], s) => {
+    [['ml', 'Full likelihood, 10 random orders (range)'], ['cc', 'Composite, contiguous pairs, 10 random orders (range)']].forEach(([m, name]) => {
+      tr.push({ x: V.rK, y: V.rmin[m + '_' + p], xaxis: xa, yaxis: ya, mode: 'lines', line: { width: 0 }, showlegend: false, hoverinfo: 'skip', legendgroup: m });
+      tr.push({ x: V.rK, y: V.rmax[m + '_' + p], xaxis: xa, yaxis: ya, mode: 'lines', line: { width: 0 }, fill: 'tonexty', fillcolor: tint[m], name, showlegend: s === 0, legendgroup: m, hoverinfo: 'skip' });
+    });
+    [['ml', 'Full likelihood', K.red, 'circle', 'solid'], ['ca', 'Composite, all pairs', K.blue, 'square', 'solid'], ['cc', 'Composite, contiguous pairs', K.green, 'triangle-up', 'dash']].forEach(([m, name, col, sym, dash]) => {
+      tr.push({ x: V.K, y: V[m + '_' + p], xaxis: xa, yaxis: ya, mode: 'lines+markers', name, legendgroup: m + 'l', showlegend: s === 0, line: { color: col, width: 2, dash }, marker: { color: col, size: 6, symbol: sym }, hovertemplate: `${name}, K = %{x}: ${p} = %{y:.4f}<extra></extra>` });
+    });
+  });
+  const sh = ['x', 'x2'].map(xa => ({ type: 'line', xref: xa, yref: xa === 'x' ? 'y domain' : 'y2 domain', x0: k, x1: k, y0: 0, y1: 1, line: { color: K.navy, width: 1.5, dash: 'dot' } }));
+  plot('vd-ab', tr, LY({ shapes: sh, grid: { rows: 1, columns: 2, pattern: 'independent' },
+    xaxis: AX('Number of assets K', { domain: [0, 0.4] }), yaxis: AX('â (news coefficient)'),
+    xaxis2: AX('Number of assets K', { domain: [0.6, 1], anchor: 'y2' }), yaxis2: AX('b̂ (persistence)', { anchor: 'x2' }),
+    legend: { y: -0.3 } }));
+  const pm = vdAvgCorr(k, V.ml_a[ix], V.ml_b[ix]), pc = vdAvgCorr(k, V.ca_a[ix], V.ca_b[ix]);
+  plot('vd-path', [
+    { x: d, y: Array.from(pc), mode: 'lines', name: `Composite, all pairs (a = ${V.ca_a[ix].toFixed(4)}, b = ${V.ca_b[ix].toFixed(4)})`, line: { color: K.blue, width: 1.2 }, hovertemplate: '%{x}: %{y:.3f}<extra></extra>' },
+    { x: d, y: Array.from(pm), mode: 'lines', name: `Full likelihood (a = ${V.ml_a[ix].toFixed(4)}, b = ${V.ml_b[ix].toFixed(4)})`, line: { color: K.red, width: 1.2 }, hovertemplate: '%{x}: %{y:.3f}<extra></extra>' }],
+  LY({ title: ttl(`Mean DCC correlation of the first ${k} assets`), shapes: crisisShapes(), xaxis: AX('', { range: [d[0], d[d.length - 1]] }), yaxis: AX('Mean pairwise conditional correlation') }));
+  const sd = a => sdA(Array.from(a)), mn = a => Math.min(...a), mx = a => Math.max(...a);
+  out('vd-out', [T.vd1(k, nf(V.ml_a[ix], 4), nf(V.ml_b[ix], 4), nf(V.ca_a[ix], 4), nf(V.ca_b[ix], 4), nf(V.cc_a[ix], 4), nf(V.cc_b[ix], 4)),
+    T.vd2(nf(halfLife(V.ml_a[ix], V.ml_b[ix]), 0), nf(halfLife(V.ca_a[ix], V.ca_b[ix]), 0)),
+    T.vd3(nf(sd(pm), 3), nf(mn(pm), 2), nf(mx(pm), 2), nf(sd(pc), 3), nf(mn(pc), 2), nf(mx(pc), 2))]);
+}
+
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   const n = D.st.t.length, R = D.ref.num;
   $('ro-t').max = n - 1; $('ro-t').value = n - 1; on(['ro-m', 'ro-t'], rolling); P('ro-play', 'ro-t', range(251, n - 1, 25), 70);
   on(['as-k'], asyncCorr); P('as-play', 'as-k', range(1, 20, 1), 600);
@@ -701,10 +746,16 @@ function init() {
   ['bh', 'bm'].forEach(p => $(p + '-play').addEventListener('click', () => { if ($(p + '-w').value === 'all') $(p + '-w').value = '104'; }, true));
   P('bh-play', 'bh-t', range(103, nb - 1, 4), 120); P('bm-play', 'bm-t', range(103, nb - 1, 4), 160);
   on(['ba-w'], banksAvg); P('ba-play', 'ba-w', range(26, 156, 4), 250);
+  $('vd-k').max = D.vd.K.length - 1; $('vd-k').value = D.vd.K.length - 1; on(['vd-k'], vastDcc); P('vd-play', 'vd-k', range(0, D.vd.K.length - 1, 1), 900);
   const na = D.ai.m.length; $('ai-t').max = na - 1; $('ai-t').min = 59; $('ai-t').value = na - 1; on(['ai-t'], aiInflation); P('ai-play', 'ai-t', range(59, na - 1, 3), 150);
+  const PFX = { 'rolling': 'ro', 'async': 'as', 'hac': 'ha', 'ewma': 'ew', 'dcc': 'dc', 'minvar': 'mv', 'fr-bias': 'fb', 'forbes-rigobon': 'fr',
+    'exceedance': 'ex', 'copula-zoo': 'cz', 'pseudo-obs': 'po', 'copula-fit': 'cf', 'tail-dep': 'td', 'integration': 'in', 'banks-heatmap': 'bh',
+    'banks-avgcorr': 'ba', 'banks-mst': 'bm', 'vast-dcc': 'vd', 'ai-inflation': 'ai' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'] }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
   rolling(); asyncCorr(); hac(); ewma(); dcc(); minvar(); frBias(); forbesRigobon(); exceedance(); copulaZoo(); pseudoObs(); copulaFit(); tailDepBlock();
-  integration(); banksHeat(); banksAvg(); banksMst(); aiInflation();
+  integration(); banksHeat(); banksAvg(); banksMst(); vastDcc(); aiInflation();
 }
-window.CH6 = { rollCorr, hacPath, ewmaCorr, dccPath, mvPrep, frW, exceed, thetaFromTau, tailDep, tLogLik, qt, pt, qnorm, pnorm, kendall, nwOls, mst, bankCorr, firstPositive, diffSd, simCopula, rng };
+window.CH6 = { vdAvgCorr, halfLife, rollCorr, hacPath, ewmaCorr, dccPath, mvPrep, frW, exceed, thetaFromTau, tailDep, tLogLik, qt, pt, qnorm, pnorm, kendall, nwOls, mst, bankCorr, firstPositive, diffSd, simCopula, rng };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

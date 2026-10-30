@@ -63,7 +63,7 @@ def delta_method():
     """Delta method from the robust covariance of (omega, alpha, beta), GARCH(1,1)-t, S&P 500."""
     f = fit_garch(rets['sp500'], 'GARCH', 't')
     p = f.params
-    V = f.res.param_cov.loc[['omega', 'alpha[1]', 'beta[1]'], ['omega', 'alpha[1]', 'beta[1]']].values / f.c ** 2
+    V = f.cov.loc[['omega', 'alpha[1]', 'beta[1]'], ['omega', 'alpha[1]', 'beta[1]']].values   # original units (Jacobian)
     om, a, b = p['omega'], p['alpha[1]'], p['beta[1]']
     pers = a + b
     se_p = float(np.sqrt(V[1:, 1:].sum()))
@@ -100,30 +100,56 @@ def moments_garch_n():
 
 
 def li_mak(M=10):
-    """Autocorrelations of the squared standardised residuals after Gaussian QMLE (S&P 500, GARCH-N).
-    sqrt(n) r_hat -> N(0, C), C = I - H' J^{-1} H / (kappa_z - 1), with J = E[g g'], H_k = E[g_t (z_{t-k}^2 - 1)],
-    g_t = d ln sigma_t^2 / d(omega, alpha, beta) (Li & Mak, 1994, derivation for the variance parameters)."""
+    """Autocorrelations of the squared standardised residuals after Gaussian QMLE (S&P 500, GARCH-N, constant mean).
+    Li & Mak (1994): sqrt(n) r_hat -> N(0, C). All four parameters theta = (mu, omega, alpha, beta) are estimated, so
+    the correction uses the joint expansion
+        n^{-1} sum u_t u_{t-k} (estimated) = n^{-1} sum u_t u_{t-k} - H_k' (theta_hat - theta),  theta_hat - theta = A^{-1} s_bar,
+    with u_t = z_t^2 - 1, g_t = d ln sigma_t^2 / d theta (the mu-component included), H_k = E[g_t u_{t-k}],
+    the Gaussian quasi-score s_t = g_t u_t / 2 + (z_t / sigma_t) d_t, d_t = (1, 0, 0, 0)', and A = E[g g']/2 + E[d d'/sigma^2].
+    Under the null (z_t i.i.d., mean 0, variance 1), with s_u^2 = E u^2 = kappa_z - 1 and k3 = E z^3:
+        Var = s_u^4 I - E[u U s'] A^{-1} H' - H A^{-1} E[s u U'] + H A^{-1} E[s s'] A^{-1} H',
+        E[u U s'] = s_u^2 H / 2 + k3 E[U / sigma_t] d',  E[s s'] = s_u^2 E[g g'] / 4 + k3 E[(g d' + d g') / sigma] / 2 + E[d d'/sigma^2],
+    and C = Var / s_u^4. The cross terms with the mean score (through k3, residual skewness) are included.
+    'c11_var', 'q_lm_var': the variance-parameters-only version C = I - H' J^{-1} H / (kappa_z - 1), for comparison."""
     f = fit_garch(rets['sp500'], 'GARCH', 'normal')
     p = f.params
     e = (rets['sp500'] - p['mu']).values
     s2 = (f.sigma ** 2).values
     n = len(e)
+    a, b = p['alpha[1]'], p['beta[1]']
     e2l = np.concatenate(([np.mean(e ** 2)], e[:-1] ** 2))
     s2l = np.concatenate(([np.mean(e ** 2)], s2[:-1]))
-    D = np.column_stack([lfilter([1.0], [1.0, -p['beta[1]']], x) for x in (np.ones(n), e2l, s2l)])
+    el = np.concatenate(([0.0], e[:-1]))
+    # d sigma_t^2 / d(mu, omega, alpha, beta): sigma_t^2 = omega + alpha e_{t-1}^2 + beta sigma_{t-1}^2, e = r - mu
+    D = np.column_stack([lfilter([1.0], [1.0, -b], x) for x in (-2 * a * el, np.ones(n), e2l, s2l)])
     g = D / s2[:, None]
-    z2 = e ** 2 / s2
-    u = z2 - 1
+    sig = np.sqrt(s2)
+    z = e / sig
+    u = z ** 2 - 1
     s2u = np.mean(u ** 2)
-    J = g.T @ g / n
-    H = np.array([(g[k:] * u[:-k, None]).mean(axis=0) for k in range(1, M + 1)])     # M x 3
-    C = np.eye(M) - H @ np.linalg.solve(J, H.T) / s2u
+    k3 = float(np.mean(z ** 3))
+    dv = np.zeros((n, 4)); dv[:, 0] = 1.0
+    G = g.T @ g / n
+    Dd = (dv / sig[:, None]).T @ (dv / sig[:, None]) / n
+    Ai = np.linalg.inv(0.5 * G + Dd)
+    H = np.array([(g[k:] * u[:-k, None]).mean(axis=0) for k in range(1, M + 1)])     # M x 4
+    U = np.column_stack([np.concatenate((np.zeros(k), u[:-k])) for k in range(1, M + 1)])
+    EUd = (U[M:] / sig[M:, None]).mean(axis=0)                                          # E[u_{t-k} / sigma_t]
+    EUs = 0.5 * s2u * H + k3 * np.outer(EUd, dv[0])
+    Egd = (g / sig[:, None]).mean(axis=0)
+    Ess = 0.25 * s2u * G + 0.5 * k3 * (np.outer(Egd, dv[0]) + np.outer(dv[0], Egd)) + Dd
+    C = (s2u ** 2 * np.eye(M) - EUs @ Ai @ H.T - H @ Ai @ EUs.T + H @ Ai @ Ess @ Ai @ H.T) / s2u ** 2
+    H3, G3 = H[:, 1:], G[1:, 1:]
+    C3 = np.eye(M) - H3 @ np.linalg.solve(G3, H3.T) / s2u
     rh = np.array([np.sum(u[k:] * u[:-k]) / np.sum(u ** 2) for k in range(1, M + 1)])
     q_lb = n * (n + 2) * np.sum(rh ** 2 / (n - np.arange(1, M + 1)))
     q_lm = n * rh @ np.linalg.solve(C, rh)
+    q3 = n * rh @ np.linalg.solve(C3, rh)
     INF['limak'] = {'M': M, 'c11': float(C[0, 0]), 'c55': float(C[4, 4]), 'cMM': float(C[M - 1, M - 1]),
                     'q_lb': float(q_lb), 'p_lb': float(stats.chi2.sf(q_lb, M)), 'q_lm': float(q_lm),
-                    'p_lm': float(stats.chi2.sf(q_lm, M)), 'r1': float(rh[0]), 'trace_loss': float(M - np.trace(C))}
+                    'p_lm': float(stats.chi2.sf(q_lm, M)), 'r1': float(rh[0]), 'trace_loss': float(M - np.trace(C)),
+                    'joint_mu': True, 'skew_z': k3, 'c11_var': float(C3[0, 0]), 'q_lm_var': float(q3),
+                    'p_lm_var': float(stats.chi2.sf(q3, M))}
 
 
 def gjr_skew_persistence():

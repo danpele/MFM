@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH15_DATA;
-const { LANG, sum, mean, median, rng, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { LANG, sum, mean, median, rng, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH15_TEXT;
 
 // ---------------------------------------------------------------- colours (generate_all_charts.py)
@@ -369,6 +369,32 @@ function lltModels() {
   out('lt-out', [T.lt(a.length, h, a.length ? nf(median(a), 2) : '—', b.length ? nf(median(b), 2) : '—', b.length)]);
 }
 
+// ================================================================= 11b. Garcia, Hu and Rohrer (2023) on the FNSPID headlines
+function colourWords() {
+  const c = +$('cw-c').value, C = D.colour, R = C.by_cut[String(c)];
+  $('cw-c-v').textContent = c + '%';
+  const sp = [['lm_all', 'LM, all words', K.orange], ['lm_only', 'LM words not in ML', K.orange], ['ml_only', 'ML words not in LM', K.teal],
+    ['overlap', 'Words in LM and ML', K.teal], ['joint', 'All three lists', K.teal], ['finbert', 'FinBERT', K.blue], ['qwen', 'Qwen2.5-7B', K.blue]].reverse();
+  const v = sp.map(([k]) => 100 * R.r2[k]);
+  plot('cw-r2', [{ y: sp.map(x => x[1]), x: v, type: 'bar', orientation: 'h', marker: { color: sp.map(x => x[2]) }, text: v.map(x => x.toFixed(2)), textposition: 'outside',
+    cliponaxis: false, showlegend: false, hovertemplate: '%{y}: R² = %{x:.2f}%<extra></extra>' }],
+  layout({ title: ttl('How much of the 4-day return is explained?'), margin: { l: 130, r: 20, t: 30, b: 40 }, xaxis: AX('R² on the 2020–2023 test texts (%)', { range: [0, 2.2] }),
+    yaxis: AX('', { type: 'category' }) }));
+  const g = [['lm_only', 'LM not in ML'], ['ml_only', 'ML not in LM'], ['overlap', 'LM and ML']];
+  const tr = [[0, 'Positive words (95% CI, Driscoll-Kraay)', K.green], [1, 'Negative words (95% CI, Driscoll-Kraay)', K.red]].map(([j, name, col]) => ({
+    x: g.map(x => x[1]), y: g.map(([k]) => R.b[k][j]), type: 'bar', name, marker: { color: col },
+    error_y: { type: 'data', array: g.map(([k]) => (R.se[k][j] == null ? 0 : 1.96 * R.se[k][j])), color: K.navy, thickness: 1.2, width: 4 },
+    hovertemplate: '%{x}: %{y:.3f}%<extra></extra>' }));
+  plot('cw-b', tr, layout({ barmode: 'group', legend: BOT(-0.15), title: ttl('Positive and negative lists'), shapes: [hline(0, K.navy)],
+    xaxis: AX(''), yaxis: AX('Excess return per 1 s.d. of the word share (%)', { range: [-0.45, 0.5] }) }));
+  const bt = R.boot['ml_only-lm_all'];
+  const top = c >= 95 ? 101 : c + 5, adm = C.dplus.filter(([, d]) => Math.abs(d) >= c && Math.abs(d) < top);
+  const ap = adm.filter(([, d]) => d > 0).slice(-6).map(x => x[0]), an = adm.filter(([, d]) => d < 0).slice(0, 6).map(x => x[0]);
+  out('cw-out', [T.cw1(c, R.n_ml_pos, R.n_ml_neg, R.n_ov_pos, R.n_ov_neg),
+    T.cw2(nf(100 * R.r2.lm_all, 2), nf(100 * R.r2.ml_only, 2), nf(bt.diff, 2), nf(bt.lo, 2), nf(bt.hi, 2), nf(100 * R.r2.qwen, 2)),
+    T.cw3(c, Math.min(top, 100), ap.join(', ') || '—', an.join(', ') || '—')]);
+}
+
 // ================================================================= 12. specification curve
 let SPEC = null;
 function specSeries() {                  // valid_inference.spec_curve: the 36 daily series, indexed by the signal day
@@ -413,7 +439,7 @@ function specCurve() {
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   on(['dw-l', 'dw-k'], dictWords); P('dw-play', 'dw-k', range(5, 30, 1), 300);
   on(['ac-m', 'ac-a'], accuracy); P('ac-play', 'ac-a', [0, 1, 2, 3], 1300);
   on(['ls-m', 'ls-p'], llmSize); P('ls-play', 'ls-p', [1, 2, 3], 1300);
@@ -425,8 +451,13 @@ function init() {
   $('sg-t').max = PN.nd - 1; $('sg-t').value = PN.nd - 1; on(['sg-l', 'sg-c', 'sg-t'], strategy); P('sg-play', 'sg-c', range(0, 10, 0.5), 300);
   on(['pp-n'], ppi); P('pp-play', 'pp-n', range(0, PPI_N.length - 1, 1), 1200);
   on(['lt-h'], lltModels); P('lt-play', 'lt-h', range(50, 95, 1), 200);
+  on(['cw-c'], colourWords); P('cw-play', 'cw-c', range(50, 95, 5), 900);
   on(['sc-c', 'sc-b'], specCurve); P('sc-play', 'sc-b', range(100, 2000, 100), 500);
-  dictWords(); accuracy(); llmSize(); embeddings(); learningCurve(); memory(); newsHours(); contempNext(); strategy(); ppi(); lltModels(); specCurve();
+  const PFX = { 'dict-words': 'dw', 'accuracy': 'ac', 'llm-size': 'ls', 'embeddings': 'em', 'learning-curve': 'lc', 'memory': 'ma',
+    'news-hours': 'nh', 'reaction': 'cn', 'strategy': 'sg', 'ppi': 'pp', 'llt-models': 'lt', 'colour-words': 'cw', 'spec-curve': 'sc' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  dictWords(); accuracy(); llmSize(); embeddings(); learningCurve(); memory(); newsHours(); contempNext(); strategy(); ppi(); lltModels(); colourWords(); specCurve();
 }
 window.CH15 = { PN, TX, clusterOLS, stratGross, nwT, sharpeD, aucOf, specSeries, ppiSim, evalSet, f1Macro, accOf, mcnemarP };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

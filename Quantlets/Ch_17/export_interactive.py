@@ -1,6 +1,7 @@
 """Export the inputs of the Chapter 17 interactive page (MFM/interactive/ch17_data.js).
 
-Calls the chapter's own code (generate_all_charts.py, bubbles.py, inference17.py, case_study17.py) with the figure
+Calls the chapter's own code (generate_all_charts.py, bubbles.py, inference17.py, case_study17.py,
+case_study17_crises.py with case17_crises.json) with the figure
 saving switched off, so the page starts from the same series and numbers as the slides. Heavy computations (BSADF
 critical values, LPPLS fits, Markov-switching estimation) are done here; the page only recombines their outputs.
 The LPPLS confidence indicator is read from the chapter's precomputed tables (ch17_lppls_ci_*.csv); the LR bootstrap
@@ -21,6 +22,7 @@ sys.path.insert(0, HERE)
 import generate_all_charts as g             # noqa: E402
 import inference17 as inf                   # noqa: E402
 import case_study17 as cs                   # noqa: E402
+import case_study17_crises as gh            # noqa: E402
 from bubbles import psy, psy_cv, lppls_fit, lppls_conditions, lppls_qualified   # noqa: E402
 
 OUT = os.path.join(HERE, '..', '..', 'interactive', 'ch17_data.js')
@@ -33,7 +35,7 @@ def _capture(name):
     FIGS[name] = g.plt.gcf()
 
 
-for mod in (g, inf, cs):
+for mod in (g, inf, cs, gh):
     mod.save_fig = _capture
 g.plt.savefig = lambda *a, **k: None
 
@@ -78,7 +80,10 @@ def main():
     B = np.empty(T)
     B[0] = b0
     for t in range(1, T):
-        B[t] = (b0 + (1 + rr) / 0.97 * (B[t - 1] - b0 / (1 + rr))) * u[t] if U[t] < 0.97 else b0 * u[t]
+        if B[t - 1] <= b0:                                  # small-bubble branch, threshold alpha = b0
+            B[t] = (1 + rr) * B[t - 1] * u[t]
+        else:
+            B[t] = (b0 + (1 + rr) / 0.97 * (B[t - 1] - b0 / (1 + rr))) * u[t] if U[t] < 0.97 else b0 * u[t]
     assert np.allclose(F + B, Pp)
     D['rational'] = dict(F=r(F, 4), U=r(U, 6), u=r(u, 6), r=rr, pi=0.97, b0=b0, collapses=out['collapses'], max_mult=out['max_mult'])
 
@@ -241,6 +246,24 @@ def main():
     D['dnz'] = dict(dates=ds(pd.DatetimeIndex(pi_[0]), '%Y-%m'), price=r(pi_[1], 2), vol=r(vi_[1], 2),
                     vol_raw=r(100 * sales.values / sales.loc['2000'].mean(), 2), summary=cyc)
     assert abs(max(vi_[1]) - cyc['vol_peak_idx']) < 1e-9
+
+    # 17. second case study: Greenwood, Hanson, Shleifer & Sorensen (2022) on the JST Macrohistory data
+    G = json.load(open(os.path.join(HERE, 'case17_crises.json')))
+    p = gh.panel()
+    countries = sorted(p['country'].unique())
+    gd = dict(countries=countries, q_grid=gh.Q_GRID, q_price=gh.Q_PRICE, paper=G['paper'], sample=G['sample'])
+    for s_ in gh.SECTORS:
+        x = gh.sector_sample(p, s_).reset_index(drop=True)
+        o = G[s_]
+        gd[s_] = dict(c=[countries.index(c) for c in x['country']], y=x['year'].astype(int).tolist(),
+                      debt=r(x['debt'], 4), price=r(x['price'], 4),
+                      crisis=[x[f'c{h}'].astype(int).tolist() for h in range(1, gh.HMAX + 1)],
+                      onsets=[[countries.index(c['country']), c['year']] for c in o['crises']],
+                      p_all=o['p_all'], ci_all=o['ci_all'], n_countries=o['n_countries'],
+                      grid=G['grid'][s_])
+        k = gh.Q_GRID.index(gh.Q_DEBT)
+        assert gd[s_]['grid'][k]['p_rzone'] == o['p_rzone'] and gd[s_]['grid'][k]['ci_rzone'] == o['ci_rzone']
+    D['ghss'] = gd
 
     with open(OUT, 'w') as f:
         f.write('// Inputs of the Chapter 17 interactive page, exported by Quantlets/Ch_17/export_interactive.py.\n')

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch10_intraday_momentum'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Baltussen, Da, Lammers and Martens (2021, JFE): market intraday momentum. The return of the last half hour before the close (15:30-16:00) is regressed on the return of the rest of the day (previous close to 15:30, dividend added on ex-dividend dates), their equation (7), with Newey-West standard errors (5 lags); SPY 5-minute bars of the regular session, days with all 78 bars and a complete previous day, October 2020 - September 2026; slope by year, on down and up days, for last intervals of 10 to 60 minutes, the Gao, Han, Li and Zhou (2018) predictor (previous close to 10:00), the timing strategy and the next-day reversal; the paper's pooled equity futures slope (100 beta = 4.18) as reference.'
+
+Keywords: 'intraday momentum, gamma hedging, leveraged ETF, last half hour, rest of day, Newey-West, out-of-sample replication, SPY'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'SPY 5-minute bars (regular session); SPY daily open, high, low, close, adjusted close and volume'
+
+Output: 'ch10_intraday_momentum.pdf'

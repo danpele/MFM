@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch14_m6_competition'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Makridakis, Spiliotis, Hollyman, Petropoulos, Swanson and Gaba (2025), The M6 forecasting competition: bridging the gap between forecasting and investment decisions, on course data: the 19 M6 assets available in data/market (AMZN, JPM, META, HYG, IEF, IWM, LQD, SHY, TLT and the ten XL* sector ETFs), four-week periods on the M6 calendar (the 12 competition periods, March 2022 to February 2023, and 93 periods from July 2019), probabilities that the total return of each asset falls in each quintile of the universe (fractional quintiles for 19 assets), ranked probability score (RPS) against equal probabilities of 0.2; forecasters: historical mean and covariance over 250 days, volatility only (EWMA covariance, lambda = 0.94, zero mean), both by 20,000 Normal simulations of the return vector, and a small network (4, 8, 5) trained on all earlier periods from 2004 with the RPS as loss; Diebold-Mariano tests on the per-period RPS differences.'
+
+Keywords: 'M6 competition, ranked probability score, quintile forecasts, volatility, neural network, forecast evaluation'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Daily adjusted closes of AMZN, JPM, META, HYG, IEF, IWM, LQD, SHY, TLT, XLB, XLC, XLE, XLF, XLI, XLK, XLP, XLU, XLV, XLY (data/market)'
+
+Output: 'ch14_m6_rps.pdf'

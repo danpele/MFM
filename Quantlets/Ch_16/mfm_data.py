@@ -6,6 +6,7 @@ mfm_data.py -- Data loading for Chapter 16 (MFM): digital assets and DeFi
   * log_returns(key, ...)    -- log returns on the series' own calendar
   * joint_prices(keys, ...)  -- prices on COMMON days (align prices first, then compute returns)
   * coin_supply(asset)       -- current supply of a crypto-asset (Coin Metrics Community Data)
+  * coin_metrics(asset, m)   -- daily network metrics, e.g. hashrate and new issuance (Coin Metrics Community Data)
   * defi_tvl()               -- total value locked in DeFi (DefiLlama)
   * stablecoin_chart(id)     -- circulating supply and its USD value for a stablecoin (DefiLlama)
   * stablecoin_list()        -- today's stablecoins with their peg mechanism (DefiLlama)
@@ -14,7 +15,8 @@ mfm_data.py -- Data loading for Chapter 16 (MFM): digital assets and DeFi
 Conventions (as in Chapters 0-8):
   * crypto: 7 days a week, closing price;
   * ETFs and shares: weekdays only, adjusted price (dividends, splits);
-  * stock indices: weekdays only, days with a close identical to the previous day removed;
+  * stock indices: weekdays only; a day that repeats the previous close is removed only if it shows no trading
+    (zero volume, open = high = low = close, or a copy of the previous row); genuine unchanged closes are kept;
   * gold and FX: weekend quotes removed;
   * joint analyses (correlations, regressions): align PRICES on common days first, then compute returns.
 
@@ -150,13 +152,32 @@ def price(key, start=None, end=END, col=None):
     symbol, _, kind, _ = ASSETS[key]
     d = read_market(symbol)
     col = col or ('adjusted_close' if kind == 'etf' else 'close')
-    s = d[col].loc[start:end]
-    s = s[s > 0].dropna()
+    d = d.loc[start:end]
+    d = d[d[col] > 0].dropna(subset=[col])
     if kind != 'crypto':
-        s = s[s.index.dayofweek < 5]
+        d = d[d.index.dayofweek < 5]
     if kind == 'index':
-        s = s[s.diff() != 0]
-    return s.rename(key)
+        d = d[~artificial_fill(d)]            # non-trading days filled with the previous price
+    return d[col].rename(key)
+
+
+def artificial_fill(d):
+    """Rows that repeat the previous close and show no trading: an artificial non-trading-day fill.
+
+    A repeated close is a fill only if the row itself shows no trading: zero volume (for files that report
+    volume), no intraday range (open = high = low = close) or a copy of the previous row in every field. A
+    repeated close on a day with volume and an intraday range is a genuine unchanged close (a zero return)
+    and is kept. Files with closes only (the BET) give no such evidence, so every row is kept.
+    """
+    repeat = d['close'].diff() == 0
+    no_trade = pd.Series(False, index=d.index)
+    if 'volume' in d and (d['volume'] > 0).mean() > 0.5:
+        no_trade |= d['volume'].fillna(0) <= 0
+    if {'open', 'high', 'low'} <= set(d.columns):
+        no_trade |= (d['open'] == d['high']) & (d['high'] == d['low']) & (d['low'] == d['close'])
+        fields = [c for c in ['open', 'high', 'low', 'close', 'volume'] if c in d]
+        no_trade |= (d[fields] == d[fields].shift()).all(axis=1)
+    return repeat & no_trade
 
 
 def log_returns(key, start=None, end=END):
@@ -197,6 +218,25 @@ def coin_supply(asset, start='2017-01-01', end=END):
     s = pd.Series({pd.Timestamp(r['time'][:10]): float(r['SplyCur']) for r in rows}).sort_index()
     _CACHE[key] = s.rename(asset)
     return _CACHE[key]
+
+
+def coin_metrics(asset, metrics, start='2010-01-01', end=END):
+    """Daily network metrics of a crypto-asset from Coin Metrics Community Data, e.g. HashRate (TH/s, estimated from
+    block times and difficulty) and IssTotNtv (new coins issued that day = block rewards, in native units)."""
+    key = ('cm', asset, tuple(metrics), start, end)
+    if key in _CACHE:
+        return _CACHE[key]
+    url = ('https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=' + asset + '&metrics=' +
+           ','.join(metrics) + f'&frequency=1d&start_time={start}&end_time={end}&page_size=10000')
+    rows = []
+    while url:
+        js = _get_json(url)
+        rows += js.get('data', [])
+        url = js.get('next_page_url')
+    df = pd.DataFrame({m: {pd.Timestamp(r['time'][:10]): float(r[m]) for r in rows if r.get(m) is not None}
+                       for m in metrics}).sort_index()
+    _CACHE[key] = df
+    return df
 
 
 def market_values(keys=CRIX_UNIVERSE, start='2018-01-01', end=END):
@@ -288,10 +328,11 @@ def symbol_returns(symbol, start=None, end=END):
     """Daily log returns of a symbol from CLASS_ASSETS, on its own calendar."""
     _, _, kind = CLASS_ASSETS[symbol]
     d = read_market(symbol)
-    s = d['adjusted_close' if kind == 'etf' else 'close'].loc[:end]
-    s = s[s > 0].dropna()
+    col = 'adjusted_close' if kind == 'etf' else 'close'
+    d = d.loc[:end]
+    d = d[d[col] > 0].dropna(subset=[col])
     if kind != 'crypto':
-        s = s[s.index.dayofweek < 5]
+        d = d[d.index.dayofweek < 5]
     if kind == 'index':
-        s = s[s.diff() != 0]
-    return np.log(s).diff().dropna().loc[start:end]
+        d = d[~artificial_fill(d)]            # non-trading days filled with the previous price
+    return np.log(d[col]).diff().dropna().loc[start:end]

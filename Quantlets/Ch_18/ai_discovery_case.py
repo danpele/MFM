@@ -9,6 +9,10 @@ stresul viitor al bancilor dincolo de nivelul curent al volatilitatii.
   H0: beta_TCI = 0 in y_t = a + beta_TCI * TCI_t (+ gamma * RV_t) + e_t
   * observatii saptamanale cu orizonturi suprapuse: erori standard Newey-West cu 13 decalaje
   * a doua variabila-tinta: cea mai mare scadere cumulata a portofoliului cu ponderi egale in urmatoarele 63 de zile
+  * asociere predictiva estimata retrospectiv: ferestrele TCI folosesc doar date pana la t, dar ordinul VAR p = 2 este
+    ales pe intregul esantion si regresia predictiva este estimata pe toate observatiile; o evaluare out-of-sample ar
+    fixa specificatia in perioada de antrenare si ar reestima succesiv. 13 decalaje HAC acopera suprapunerea tintelor,
+    fara sa garanteze ca sunt suficiente (rezultatul nu se schimba cu 26, 50 sau 100 de decalaje)
 Iesire: ai_discovery_case.json
 """
 
@@ -26,8 +30,8 @@ from mfm_data import ALL, bank_range_vol, joint_returns  # noqa: E402
 H, SHORT, LAGS = 63, 20, 13
 
 
-def ols(y, X, names):
-    m = sm.OLS(y, sm.add_constant(X)).fit(cov_type='HAC', cov_kwds={'maxlags': LAGS})
+def ols(y, X, names, lags=LAGS):
+    m = sm.OLS(y, sm.add_constant(X)).fit(cov_type='HAC', cov_kwds={'maxlags': lags})
     return {n: dict(b=float(m.params[n]), t=float(m.tvalues[n])) for n in names} | dict(r2=float(m.rsquared), n=int(m.nobs))
 
 
@@ -56,6 +60,7 @@ def main():
         vol_rv=ols(z.y, z[['rv']], ['rv']),
         mdd_tci=ols(z.mdd, z[['tci']], ['tci']),
         mdd_both=ols(z.mdd, z[['tci', 'rv']], ['tci', 'rv']),
+        lag_sens={str(L): ols(z.y, z[['tci', 'rv']], ['tci'], L)['tci']['t'] for L in (26, 50, 100)},
     )
     with open(os.path.join(HERE, 'ai_discovery_case.json'), 'w') as f:
         json.dump(res, f, indent=2)

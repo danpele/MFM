@@ -1,215 +1,215 @@
 {
  "ad_crit5": 1.9434183976444794,
  "Euro Stoxx 50": {
-  "N": 4358,
+  "N": 4352,
   "years": 17,
   "start": "2002-01-02",
   "end": "2018-12-31",
-  "median": -0.8149795938232658,
-  "iqr": 22.85430322884217,
-  "p10_90": 444.2239013861835,
-  "med_se": 19.14933525583359,
+  "median": -0.31589883952570147,
+  "iqr": 64.58685243079819,
+  "p10_90": 313.4604169254274,
+  "med_se": 30.56288651798716,
   "ad": {
-   "outlier": -1.3642754118360354,
-   "measure": 2.7559130512202814,
-   "model": 8.913343475602142
+   "outlier": -1.2339932790822161,
+   "measure": 2.6857839398085486,
+   "model": 8.410720507580336
   },
   "median_by_model": {
-   "Linear trend": -1.0497003390458886,
-   "Log difference": -2.3236166236947673,
-   "Relative difference": 210.44533408324634
+   "Linear trend": -1.1782658126005081,
+   "Log difference": -2.437631875345403,
+   "Relative difference": 98.65097838219705
   },
-  "iqr_trend": 2.0238363150365615,
-  "max_rel": 46822.91019133423,
+  "iqr_trend": 2.574529423460981,
+  "max_rel": 48414.668352306115,
   "table": [
    {
     "outlier": "None",
     "measure": "|VR(5) - 1|",
     "model": "Linear trend",
-    "est": -1.2148,
-    "se": 3.0849
+    "est": -0.3159,
+    "se": 3.1573
    },
    {
     "outlier": "None",
     "measure": "|VR(5) - 1|",
     "model": "Log difference",
-    "est": -2.3236,
-    "se": 44.5133
+    "est": -0.8341,
+    "se": 32.8752
    },
    {
     "outlier": "None",
     "measure": "|VR(5) - 1|",
     "model": "Relative difference",
-    "est": 347.3975,
-    "se": 262.5898
+    "est": 98.651,
+    "se": 58.7236
    },
    {
     "outlier": "None",
     "measure": "|VR(21) - 1|",
     "model": "Linear trend",
-    "est": -0.8117,
-    "se": 1.9235
+    "est": -1.1866,
+    "se": 2.5425
    },
    {
     "outlier": "None",
     "measure": "|VR(21) - 1|",
     "model": "Log difference",
-    "est": -1.8112,
-    "se": 19.1493
+    "est": -2.4376,
+    "se": 33.676
    },
    {
     "outlier": "None",
     "measure": "|VR(21) - 1|",
     "model": "Relative difference",
-    "est": 25.5519,
-    "se": 24.4029
+    "est": 127.5154,
+    "se": 115.5854
    },
    {
     "outlier": "None",
     "measure": "AR(1) R$^2$",
     "model": "Linear trend",
-    "est": -2.8893,
-    "se": 5.7303
+    "est": -2.9388,
+    "se": 5.7418
    },
    {
     "outlier": "None",
     "measure": "AR(1) R$^2$",
     "model": "Log difference",
     "est": -16.8099,
-    "se": 94.3556
+    "se": 95.4885
    },
    {
     "outlier": "None",
     "measure": "AR(1) R$^2$",
     "model": "Relative difference",
-    "est": 46822.9102,
-    "se": 46357.1218
+    "est": 48414.6684,
+    "se": 47945.774
    },
    {
     "outlier": "Winsorised",
     "measure": "|VR(5) - 1|",
     "model": "Linear trend",
-    "est": -1.0497,
-    "se": 2.8538
+    "est": -0.132,
+    "se": 2.9231
    },
    {
     "outlier": "Winsorised",
     "measure": "|VR(5) - 1|",
     "model": "Log difference",
-    "est": -2.3236,
-    "se": 39.2244
+    "est": -0.8341,
+    "se": 32.0984
    },
    {
     "outlier": "Winsorised",
     "measure": "|VR(5) - 1|",
     "model": "Relative difference",
-    "est": 210.4453,
-    "se": 143.497
+    "est": 95.7912,
+    "se": 58.1269
    },
    {
     "outlier": "Winsorised",
     "measure": "|VR(21) - 1|",
     "model": "Linear trend",
-    "est": -0.815,
-    "se": 1.7905
+    "est": -1.1783,
+    "se": 2.3927
    },
    {
     "outlier": "Winsorised",
     "measure": "|VR(21) - 1|",
     "model": "Log difference",
-    "est": -1.8112,
-    "se": 15.5059
+    "est": -2.4376,
+    "se": 22.8548
    },
    {
     "outlier": "Winsorised",
     "measure": "|VR(21) - 1|",
     "model": "Relative difference",
-    "est": 15.5095,
-    "se": 16.5703
+    "est": 37.3843,
+    "se": 30.5629
    },
    {
     "outlier": "Winsorised",
     "measure": "AR(1) R$^2$",
     "model": "Linear trend",
-    "est": -2.8355,
-    "se": 5.676
+    "est": -2.8904,
+    "se": 5.6939
    },
    {
     "outlier": "Winsorised",
     "measure": "AR(1) R$^2$",
     "model": "Log difference",
     "est": -16.8099,
-    "se": 74.065
+    "se": 75.4465
    },
    {
     "outlier": "Winsorised",
     "measure": "AR(1) R$^2$",
     "model": "Relative difference",
-    "est": 3233.6388,
-    "se": 2794.1038
+    "est": 3332.5944,
+    "se": 2888.9919
    },
    {
     "outlier": "Trimmed",
     "measure": "|VR(5) - 1|",
     "model": "Linear trend",
-    "est": -0.2258,
-    "se": 2.2966
+    "est": 0.7458,
+    "se": 2.4003
    },
    {
     "outlier": "Trimmed",
     "measure": "|VR(5) - 1|",
     "model": "Log difference",
-    "est": 7.803,
-    "se": 34.2189
+    "est": 14.2794,
+    "se": 28.3392
    },
    {
     "outlier": "Trimmed",
     "measure": "|VR(5) - 1|",
     "model": "Relative difference",
-    "est": 133.1606,
-    "se": 119.9667
+    "est": 86.9141,
+    "se": 61.8799
    },
    {
     "outlier": "Trimmed",
     "measure": "|VR(21) - 1|",
     "model": "Linear trend",
-    "est": -0.6296,
-    "se": 1.4402
+    "est": -0.92,
+    "se": 1.9603
    },
    {
     "outlier": "Trimmed",
     "measure": "|VR(21) - 1|",
     "model": "Log difference",
-    "est": -1.8411,
-    "se": 11.9409
+    "est": -2.4701,
+    "se": 16.7589
    },
    {
     "outlier": "Trimmed",
     "measure": "|VR(21) - 1|",
     "model": "Relative difference",
-    "est": 7.3401,
-    "se": 14.109
+    "est": 16.0043,
+    "se": 21.5192
    },
    {
     "outlier": "Trimmed",
     "measure": "AR(1) R$^2$",
     "model": "Linear trend",
-    "est": -3.393,
-    "se": 5.8154
+    "est": -3.4715,
+    "se": 5.8537
    },
    {
     "outlier": "Trimmed",
     "measure": "AR(1) R$^2$",
     "model": "Log difference",
-    "est": -4.0865,
-    "se": 59.6508
+    "est": 0.3272,
+    "se": 59.6152
    },
    {
     "outlier": "Trimmed",
     "measure": "AR(1) R$^2$",
     "model": "Relative difference",
-    "est": 580.2875,
-    "se": 512.1678
+    "est": 584.4983,
+    "se": 511.7226
    }
   ]
  },
@@ -218,64 +218,64 @@
   "years": 17,
   "start": "2002-01-03",
   "end": "2018-12-31",
-  "median": -1.8458264793760317,
-  "iqr": 84.35359515416528,
-  "p10_90": 153.49461008749776,
-  "med_se": 37.647722211678726,
+  "median": -3.72153643759462,
+  "iqr": 82.63570675886126,
+  "p10_90": 97.71339718662493,
+  "med_se": 32.12190336072799,
   "ad": {
-   "outlier": -1.0152128060062646,
-   "measure": 2.331683914022132,
-   "model": 9.163791302182723
+   "outlier": -1.0281211214037556,
+   "measure": 1.156723581391282,
+   "model": 9.774965019675463
   },
   "median_by_model": {
-   "Linear trend": -2.398861927394826,
-   "Log difference": -5.212469645689531,
-   "Relative difference": 108.7347441742948
+   "Linear trend": -3.72153643759462,
+   "Log difference": -6.6469146419638,
+   "Relative difference": 80.25050866835852
   },
-  "iqr_trend": 7.458170311880485,
-  "max_rel": 233.05309108633696,
+  "iqr_trend": 6.717047247258455,
+  "max_rel": 196.08724003155356,
   "table": [
    {
     "outlier": "None",
     "measure": "|VR(5) - 1|",
     "model": "Linear trend",
-    "est": -1.1682,
-    "se": 3.8705
+    "est": -1.568,
+    "se": 3.764
    },
    {
     "outlier": "None",
     "measure": "|VR(5) - 1|",
     "model": "Log difference",
-    "est": -5.2125,
-    "se": 33.9318
+    "est": -4.7933,
+    "se": 32.1219
    },
    {
     "outlier": "None",
     "measure": "|VR(5) - 1|",
     "model": "Relative difference",
-    "est": 108.7347,
-    "se": 71.0272
+    "est": 101.7198,
+    "se": 65.447
    },
    {
     "outlier": "None",
     "measure": "|VR(21) - 1|",
     "model": "Linear trend",
-    "est": -0.5842,
-    "se": 4.0981
+    "est": -1.8628,
+    "se": 4.0067
    },
    {
     "outlier": "None",
     "measure": "|VR(21) - 1|",
     "model": "Log difference",
-    "est": -4.3881,
-    "se": 45.3558
+    "est": -6.6469,
+    "se": 29.0548
    },
    {
     "outlier": "None",
     "measure": "|VR(21) - 1|",
     "model": "Relative difference",
-    "est": 233.0531,
-    "se": 143.9513
+    "est": 80.2505,
+    "se": 61.9069
    },
    {
     "outlier": "None",
@@ -302,43 +302,43 @@
     "outlier": "Winsorised",
     "measure": "|VR(5) - 1|",
     "model": "Linear trend",
-    "est": -1.5579,
-    "se": 3.4614
+    "est": -1.9094,
+    "se": 3.3978
    },
    {
     "outlier": "Winsorised",
     "measure": "|VR(5) - 1|",
     "model": "Log difference",
-    "est": -5.2125,
-    "se": 30.528
+    "est": -4.7933,
+    "se": 31.0326
    },
    {
     "outlier": "Winsorised",
     "measure": "|VR(5) - 1|",
     "model": "Relative difference",
-    "est": 87.0521,
-    "se": 60.2082
+    "est": 91.7114,
+    "se": 59.5187
    },
    {
     "outlier": "Winsorised",
     "measure": "|VR(21) - 1|",
     "model": "Linear trend",
-    "est": -0.6922,
-    "se": 4.0004
+    "est": -1.981,
+    "se": 3.9003
    },
    {
     "outlier": "Winsorised",
     "measure": "|VR(21) - 1|",
     "model": "Log difference",
-    "est": -4.3881,
-    "se": 42.1534
+    "est": -6.6469,
+    "se": 28.6338
    },
    {
     "outlier": "Winsorised",
     "measure": "|VR(21) - 1|",
     "model": "Relative difference",
-    "est": 172.106,
-    "se": 97.7772
+    "est": 75.9921,
+    "se": 58.3019
    },
    {
     "outlier": "Winsorised",
@@ -365,43 +365,43 @@
     "outlier": "Trimmed",
     "measure": "|VR(5) - 1|",
     "model": "Linear trend",
-    "est": -3.5128,
-    "se": 2.8001
+    "est": -3.8354,
+    "se": 2.7683
    },
    {
     "outlier": "Trimmed",
     "measure": "|VR(5) - 1|",
     "model": "Log difference",
-    "est": -4.8934,
-    "se": 30.0162
+    "est": -4.6648,
+    "se": 32.9039
    },
    {
     "outlier": "Trimmed",
     "measure": "|VR(5) - 1|",
     "model": "Relative difference",
-    "est": 53.8482,
-    "se": 46.9887
+    "est": 75.446,
+    "se": 63.6372
    },
    {
     "outlier": "Trimmed",
     "measure": "|VR(21) - 1|",
     "model": "Linear trend",
-    "est": -2.3989,
-    "se": 3.5385
+    "est": -3.7215,
+    "se": 3.4598
    },
    {
     "outlier": "Trimmed",
     "measure": "|VR(21) - 1|",
     "model": "Log difference",
-    "est": -1.8458,
-    "se": 42.9186
+    "est": -15.5366,
+    "se": 28.432
    },
    {
     "outlier": "Trimmed",
     "measure": "|VR(21) - 1|",
     "model": "Relative difference",
-    "est": 122.7225,
-    "se": 94.8374
+    "est": 30.1166,
+    "se": 35.1511
    },
    {
     "outlier": "Trimmed",

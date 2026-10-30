@@ -16,10 +16,12 @@ import mfm_data
 
 import generate_all_charts as g          # noqa: E402
 import case_study_race as cr             # noqa: E402
+import case_intraday_momentum as cim    # noqa: E402
 
 g.read_market = mfm_data.read_market
 g.save_fig = lambda name: g.plt.close()
 cr.save_fig = g.save_fig
+cim.save_fig = g.save_fig
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', '..', 'interactive', 'ch10_data.js')
@@ -128,6 +130,15 @@ def main():
     rd = cr.race_daily(spy)
     d['race'] = dict(days=days(rd.index), sigma=r(rd['sigma'], 3), V=r(rd['V'] / 1e9, 3), coef=cr.ABO, res=race['tax'],
                      prize={y: {k: v[k] for k in ('col2', 'col6', 'lo', 'hi', 'sigma_mean')} for y, v in race['prize'].items()})
+
+    # 11b. second case study, market intraday momentum (Baltussen et al., 2021): the daily inputs of
+    # case_intraday_momentum.py (log prices at the cut points relative to the previous close, dividend added)
+    im = cim.momentum_days()
+    imr = json.load(open(os.path.join(HERE, 'case_intraday_momentum.json')))
+    d['imom'] = dict(days=days(im.index), yb=[('2020-21' if y <= 2021 else str(y)) for y in im['year']],
+                     close=r(im['close'], 8), x={c: r(im['x' + c.replace(':', '')], 8) for c in cim.CUTS},
+                     cuts=cim.CUTS, lags=cim.LAGS, paper=cim.BDLM,
+                     res={k: imr[k] for k in ('n', 'rod', 'years', 'cuts', 'eta', 'bins', 'mean_rod', 'mean_lh_bp')})
 
     # 12. AI mini-case: leave-one-market-out values of ai_discovery_case.json
     ai = json.load(open(os.path.join(HERE, 'ai_discovery_case.json')))

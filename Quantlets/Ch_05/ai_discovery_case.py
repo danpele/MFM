@@ -4,8 +4,11 @@ ai_discovery_case.py -- Capitolul 5, sectiunea "AI for Scientific Discovery": mi
 Ipoteza H1: asimetria (GJR-t) imbunatateste prognoza QLIKE pe o zi fata de GARCH-t (S&P 500, 2016-2026).
 Pasul 1 (replicare): aceleasi prognoze OOS ca in capitol (parametri reestimati la inceputul fiecarui an,
 fereastra in expansiune din 2000); statistica Diebold-Mariano pe QLIKE, HAC cu 5 decalaje.
-Pasul 2 (implicatie testabila): daca H1 vine din efectul de levier, castigul d_t = QLIKE(GJR) - QLIKE(GARCH)
-trebuie sa fie concentrat in zilele de dupa un randament negativ (r_{t-1} < 0).
+Pasul 2 (ipoteza auxiliara, nu implicatie necesara a mecanismului): castigul d_t = QLIKE(GJR) - QLIKE(GARCH)
+este concentrat in zilele de dupa un randament negativ (r_{t-1} < 0)? Regresie pe tot calendarul,
+d_t = a + b 1(r_{t-1} < 0) + u_t, cu erori HAC (5 decalaje calendaristice); b = diferenta dintre categorii.
+Mediile pe subesantioane (after_neg / after_pos) sint doar descriptive: HAC aplicat dupa eliminarea zilelor
+din cealalta categorie ar numara decalajele in evenimente selectate, nu in zile.
 Pasul 3 (robustete pre-inregistrata): fara 2020; subperioadele 2016-2020 si 2021-2026.
 Date: data/market/GSPC.INDX.csv (prin mfm_data). Iesire: ai_discovery_case.json.
 Modelarea Pietelor Financiare - Daniel Traian PELE
@@ -23,6 +26,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from mfm_data import pct_returns            # noqa: E402
 from garch_tools import fit_garch, qlike, dm_test   # noqa: E402
+import statsmodels.api as sm                        # noqa: E402
 
 FIRST = 2016
 MODELS = [('GARCH', 't', 'GARCH-t'), ('GJR', 't', 'GJR-t')]
@@ -62,6 +66,12 @@ res = {
     'y2016_2020': dm(pd.Series(yrs <= 2020, index=f1.index)),
     'y2021_2026': dm(pd.Series(yrs >= 2021, index=f1.index)),
 }
+# regresia pe tot calendarul: d_t = a + b 1(r_{t-1} < 0) + u_t, HAC cu 5 decalaje
+dd = (LJ - LG).values
+X = sm.add_constant((prev < 0).astype(float).values)
+ols = sm.OLS(dd, X).fit(cov_type='HAC', cov_kwds={'maxlags': 5})
+res['neg_reg'] = {'n': int(len(dd)), 'a': float(ols.params[0]), 'b': float(ols.params[1]),
+                  'se_b': float(ols.bse[1]), 't_b': float(ols.tvalues[1]), 'p_b': float(ols.pvalues[1])}
 with open(os.path.join(HERE, 'ai_discovery_case.json'), 'w') as f:
     json.dump(res, f, indent=1)
 print(json.dumps(res, indent=1))

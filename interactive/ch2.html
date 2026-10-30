@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch2_data.js?v=20261029b"></script>
-<script src="ch2_text_en.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch2.js?v=20261029b" defer></script>
+<script src="ch2_data.js?v=20261030a"></script>
+<script src="ch2_text_en.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch2.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
-<p class="toc"><a href="#s-info">Returns and Information</a> · <a href="#s-vr">Autocorrelation and Variance Ratios</a> · <a href="#s-oos">Out-of-Sample Predictability</a> · <a href="#s-ev">Event Studies</a> · <a href="#s-mt">Multiple Testing and Anomalies</a></p>
+<p class="toc"><a href="#s-info">Returns and Information</a> · <a href="#s-vr">Autocorrelation and Variance Ratios</a> · <a href="#s-oos">Out-of-Sample Predictability</a> · <a href="#s-ev">Event Studies</a> · <a href="#s-mt">Multiple Testing and Anomalies</a> · <a href="#s-case">Case Study: Time-Series Momentum in Bitcoin</a></p>
 <h2 class="sec" id="s-info">Returns and Information</h2>
 <section class="blk" id="random-walk-game">
   <h3>A Game: Which Series Is the Real Market?</h3>
@@ -52,8 +52,8 @@
       <figcaption>Slide 11</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cr-a">GARCH α (reaction to yesterday's shock): <b id="cr-a-v"></b></label><input type="range" id="cr-a" min="0" max="0.2" step="0.005" value="0.08"></div><div class="ctl"><label for="cr-b">GARCH β (persistence of the variance): <b id="cr-b-v"></b></label><input type="range" id="cr-b" min="0" max="0.97" step="0.01" value="0.9"></div><div class="ctl"><label for="cr-s">RW2 volatility after day 450: <b id="cr-s-v"></b></label><input type="range" id="cr-s" min="1" max="5" step="0.5" value="3"></div><button class="btn play" id="cr-play" type="button"></button></div><div class="charts "><div class="chart" id="cr-chart"></div></div><ul class="out" id="cr-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> The RW2 series is turbulent after day 450, as the GARCH series is after large shocks. How do the two differ?</div>
-  <details><summary>Answer</summary><p>In RW2 volatility rises at a date fixed in advance and the returns stay independent. In GARCH today's volatility depends on yesterday's shock (α = 0.08) and on yesterday's volatility (β = 0.90), so the returns are dependent. The chart of returns alone does not tell them apart.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> RW2 has independent returns, with standard deviation 1% up to day 450 and 3% after; GARCH has turbulent periods after large shocks. What is the kurtosis of RW2 in this simulation?</div>
+  <details><summary>Answer</summary><p>Clearly above 3: 4.8, against 3.0 for RW1 and 4.1 for GARCH. Mixing a calm period with a turbulent one gives fat tails without any dependence, so neither the chart of returns nor the kurtosis tells RW2 from GARCH. The difference lies elsewhere: in RW2 volatility rises at a date fixed in advance and the returns stay independent; in GARCH today's volatility depends on yesterday's shock (α = 0.08) and on yesterday's volatility (β = 0.90), so the returns are dependent.</p></details>
 </section>
 <section class="blk" id="garch-acf">
   <h3>GARCH: returns versus squared returns</h3>
@@ -62,8 +62,8 @@
       <figcaption>Slide 12</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cs-a">GARCH α (reaction to yesterday's shock): <b id="cs-a-v"></b></label><input type="range" id="cs-a" min="0" max="0.2" step="0.005" value="0.08"></div><div class="ctl"><label for="cs-b">GARCH β (persistence of the variance): <b id="cs-b-v"></b></label><input type="range" id="cs-b" min="0" max="0.97" step="0.01" value="0.9"></div><div class="ctl"><label for="cs-T">Series length T (days)</label><select id="cs-T"><option value="900" selected>900</option><option value="2000">2000</option><option value="5000">5000</option><option value="10000">10000</option></select></div><button class="btn play" id="cs-play" type="button"></button></div><div class="charts "><div class="chart" id="cs-r"></div><div class="chart" id="cs-s"></div></div><ul class="out" id="cs-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> GARCH returns have near-zero autocorrelations. Are they independent?</div>
-  <details><summary>Answer</summary><p>No. The lag-1 autocorrelation of the squares is 0.22 in the 900-day series, and the autocorrelations of the squares stay positive up to lag 20. The series satisfies RW3 but violates RW2: the size of today's move depends on past shocks.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> GARCH returns have near-zero autocorrelations. The ▶ button raises α, the reaction to yesterday's shock, up to 0.095, with β = 0.90. How does the lag-1 autocorrelation of the squares change?</div>
+  <details><summary>Answer</summary><p>It rises: in the 900-day series it is 0.05 at α = 0, 0.22 at α = 0.08 and 0.27 at α = 0.095. The largest absolute autocorrelation of the returns stays between 0.064 and 0.074, and those of the squares stay positive up to lag 20. The returns are not independent: the series satisfies RW3 but violates RW2, because the size of today's move depends on past shocks.</p></details>
 </section><h2 class="sec" id="s-vr">Autocorrelation and Variance Ratios</h2>
 <section class="blk" id="acf-markets">
   <h3>Lag-1 Autocorrelation Across Markets</h3>
@@ -73,7 +73,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ac-k">Lag k: <b id="ac-k-v"></b></label><input type="range" id="ac-k" min="1" max="10" step="1" value="1"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-chart"></div></div><ul class="out" id="ac-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> For the S&P 500, ρ̂₁ = −0.099. Would the test reject ρ₁ = 0 with the i.i.d. standard error but not with the robust one?</div>
-  <details><summary>Answer</summary><p>No, it rejects with both. The robust standard error (0.027) is more than twice the i.i.d. one (0.012), but −0.099 lies outside both intervals. The difference matters for markets such as the Euro Stoxx 50 or the Nikkei 225, where the i.i.d. interval excludes zero and the robust one contains it.</p></details>
+  <details><summary>Answer</summary><p>No, it rejects with both. The robust standard error under H₀ (0.027) is more than twice the i.i.d. one (0.012), but −0.099 lies outside both test bands around zero. The difference matters for markets such as the Euro Stoxx 50 or the Nikkei 225, where ρ̂₁ falls outside the i.i.d. band but inside the robust one. The bars around the estimates are confidence intervals with the HAC standard error of the estimator (S&P 500: 0.030); they serve for comparisons, not for the test of ρ₁ = 0.</p></details>
 </section>
 <section class="blk" id="vr-profile">
   <h3>Variance-Ratio Profiles</h3>
@@ -82,8 +82,8 @@
       <figcaption>Slide 22</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="vr-set">Markets</label><select id="vr-set"><option value="slide" selected>S&P 500, BET, Bitcoin, EUR/RON (slide)</option><option value="cee">BET, WIG20, BUX, PX</option><option value="dev">S&P 500, Euro Stoxx 50, Nikkei 225, Hang Seng</option><option value="em">BIST 100, Bovespa, IPC, Ethereum</option></select></div><div class="ctl"><label for="vr-q">Horizon q (days): <b id="vr-q-v"></b></label><input type="range" id="vr-q" min="2" max="60" step="1" value="5"></div><button class="btn play" id="vr-play" type="button"></button></div><div class="charts "><div class="chart" id="vr-chart"></div></div><ul class="out" id="vr-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> For the S&P 500, the 20-day variance ratio is 0.753. Why is the null not rejected, although it is rejected at 10 days (0.767)?</div>
-  <details><summary>Answer</summary><p>The null band widens with q: its lower edge is 0.817 at 10 days and 0.740 at 20 days. At 20 days the value 0.753 stays inside. With fewer independent 20-day periods, the same deviation from 1 is measured less precisely.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For the S&P 500, the 20-day variance ratio is 0.754. Why is the null not rejected, although it is rejected at 10 days (0.767)?</div>
+  <details><summary>Answer</summary><p>The null band widens with q: its lower edge is 0.817 at 10 days and 0.740 at 20 days. At 20 days the value 0.754 stays inside. With fewer independent 20-day periods, the same deviation from 1 is measured less precisely.</p></details>
 </section><h2 class="sec" id="s-oos">Out-of-Sample Predictability</h2>
 <section class="blk" id="oos-dp">
   <h3>The Dividend–Price Ratio: Out-of-Sample Forecasts</h3>
@@ -103,7 +103,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ev-L">Estimation window (days): <b id="ev-L-v"></b></label><input type="range" id="ev-L" min="60" max="240" step="10" value="240"></div><div class="ctl"><label for="ev-a">CAR from day τ₁: <b id="ev-a-v"></b></label><input type="range" id="ev-a" min="-10" max="5" step="1" value="0"></div><div class="ctl"><label for="ev-b">CAR up to day τ₂: <b id="ev-b-v"></b></label><input type="range" id="ev-b" min="0" max="5" step="1" value="5"></div><button class="btn play" id="ev-play" type="button"></button></div><div class="charts "><div class="chart" id="ev-ar"></div><div class="chart" id="ev-car"></div></div><ul class="out" id="ev-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> On the announcement day, the abnormal return of TLV was −8.3%. What does a CAR of only −1.1% over days 0 to +5 indicate?</div>
-  <details><summary>Answer</summary><p>That the day-0 fall was almost fully recovered within a week: the CAR over days +1 to +5 is +7.2% (t = 3.82). It may be an overreaction, the effect of later news, or the rebound of the bank-dominated BET index. A single event cannot separate the three explanations.</p></details>
+  <details><summary>Answer</summary><p>That the abnormal component of TLV's fall, measured against the BET, is almost offset over the next five sessions: the CAR over days +1 to +5 is +7.2% (t = 3.82). This does not show that the share price recovered its loss: over days 0 to +5 the log return is −15.6% for TLV and −12.7% for the BET benchmark. It may be an overreaction, the effect of later news, or a benchmark effect: the bank-dominated BET fell with TLV (−11.9% on day 0) and did not rebound (−0.8% over days +1 to +5). A single event cannot separate the three explanations.</p></details>
 </section><h2 class="sec" id="s-mt">Multiple Testing and Anomalies</h2>
 <section class="blk" id="multiple-testing">
   <h3>How Many “Anomalies” Does Pure Chance Produce?</h3>
@@ -113,7 +113,17 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="mt-n">Rules tried: <b id="mt-n-v"></b></label><input type="range" id="mt-n" min="20" max="2000" step="20" value="2000"></div><div class="ctl"><label for="mt-p">Share of "good days"</label><select id="mt-p"><option value="0.05">5%</option><option value="0.1">10%</option><option value="0.2" selected>20%</option><option value="0.5">50%</option></select></div><button class="btn play" id="mt-play" type="button"></button><button class="btn" id="mt-new" type="button">New rules</button></div><div class="charts "><div class="chart" id="mt-chart"></div></div><ul class="out" id="mt-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> We try 2,000 trading rules with no economic content. How many of them will be "significant" at 5%?</div>
-  <details><summary>Answer</summary><p>About 5%: 4.9% in the simulation, i.e. 98 rules. The best one has |t| = 3.19 and would even pass the 3.0 threshold if reported alone. The more rules are tried, the larger the largest |t| obtained by chance.</p></details>
+  <details><summary>Answer</summary><p>About 5%: 5.2% in the simulation, i.e. 104 rules. Six rules have |t| > 3.0; the best one has |t| = 3.30 and would pass the 3.0 threshold if reported alone. The more rules are tried, the larger the largest |t| obtained by chance.</p></details>
+</section><h2 class="sec" id="s-case">Case Study: Time-Series Momentum in Bitcoin</h2>
+<section class="blk" id="crypto-momentum">
+  <h3>Bitcoin: The Momentum Slope in the Paper's Sample and After</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=67" target="_blank" rel="noopener"><img src="slides/ch2_case_crypto_tsmom_en.jpg" alt="Slide 66: Bitcoin: The Momentum Slope in the Paper's Sample and After" loading="lazy"></a>
+      <figcaption>Slide 66</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="cm-asset">Cryptocurrency</label><select id="cm-asset"><option value="btc" selected>Bitcoin</option><option value="eth">Ethereum</option></select></div><div class="ctl"><label for="cm-m">End of the first period: <b id="cm-m-v"></b></label><input type="range" id="cm-m" min="24" max="164" step="1" value="88"></div><div class="ctl"><label for="cm-w">Rolling window (weeks): <b id="cm-w-v"></b></label><input type="range" id="cm-w" min="52" max="208" step="4" value="104"></div><button class="btn play" id="cm-play" type="button"></button></div><div class="charts "><div class="chart" id="cm-b"></div><div class="chart" id="cm-roll"></div></div><ul class="out" id="cm-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> After May 2018, the Bitcoin slope b₁ is 0.115, with NW t = 2.61. Does this mean that a strategy that buys Bitcoin after a good week is profitable?</div>
+  <details><summary>Answer</summary><p>It does not follow. One more standard deviation today adds only 0.96% to next week's return, against 2.98% over the paper's sample period (up to May 2018, with the course data). The calculation has no trading costs, no risk adjustment and no out-of-sample forecasts, and over rolling two-year windows b₁ is significant in only 13% of the windows.</p></details>
 </section>
 <p class="src foot">Stock indices, Bitcoin, Ethereum, TLV, BRD and BET: EODHD daily prices up to 18 September 2026. EUR/RON: the NBR reference rate. Monthly S&P 500 with dividends: Robert J. Shiller's public data, extended with daily S&P 500 prices; 3-month Treasury bill rate from FRED (TB3MS).</p>
 </main>

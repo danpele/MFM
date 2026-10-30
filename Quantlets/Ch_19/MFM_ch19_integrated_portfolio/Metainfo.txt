@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch19_integrated_portfolio'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Integrated case study on eight multi-asset ETFs (SPY, EFA, EEM, TLT, IEF, LQD, HYG, GLD; daily adjusted prices 2007-2026): monthly global minimum-variance weights from a 60-month window with the sample covariance or Ledoit-Wolf shrinkage (Chapter 4), GARCH(1,1) and DCC conditional covariance re-estimated every January (Chapter 6), one-day portfolio VaR 1% from DCC-Normal, DCC-FHS and historical simulation with Euler risk contributions (Chapter 7), Kupiec and Christoffersen backtests (Chapter 8), and a decision rule fixed before the evaluation.'
+
+Keywords: 'portfolio optimisation, global minimum variance, Ledoit-Wolf shrinkage, DCC, GARCH, value-at-risk, filtered historical simulation, Euler allocation, risk contributions, backtesting, Kupiec, Christoffersen'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Daily market data (course data): SPY, EFA, EEM, TLT, IEF, LQD, HYG, GLD; monthly risk-free rate (Kenneth French Data Library)'
+
+Output: 'ch19_int_portfolio.pdf, ch19_int_portfolio.png, ch19_integrated.json'

@@ -24,7 +24,7 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
-from mfm_data import load_close, log_returns, spy_open_close, deribit_chain, dvol_history, read_market, _get  # noqa: E402
+from mfm_data import load_close, log_returns, spy_open_close, deribit_chain, dvol_history, read_market, _get, END  # noqa: E402
 from option_tools import (bs_price, bs_greeks, implied_vol, newton_iv, crr_price, merton_price,  # noqa: E402
                           heston_price, svi_w, svi_fit, variance_from_strip, delta_hedge)
 
@@ -673,7 +673,8 @@ def fig_vrp(d):
     ax = axes[1]
     ax.plot(d.index, d['vrp_vol'], color=Forest, lw=0.5, label='Premium in volatility points: VIX $-\\sqrt{RV}$')
     ax.axhline(0, color=Gray, lw=0.6)
-    ax.set_ylabel('Volatility points'); ax.set_ylim(-45, 30)
+    lo_, hi_ = float(d['vrp_vol'].min()), float(d['vrp_vol'].max())
+    ax.set_ylabel('Volatility points'); ax.set_ylim(5 * np.floor(lo_ / 5) - 2, 5 * np.ceil(hi_ / 5) + 2)   # full range
     h1, l1 = axes[0].get_legend_handles_labels(); h2, l2 = axes[1].get_legend_handles_labels()
     fig.legend(h1 + h2, l1 + l2, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=2, frameon=False)
     plt.tight_layout()
@@ -681,7 +682,9 @@ def fig_vrp(d):
     m, se = nw_mean(d['vrp'], 21)
     mv, sev = nw_mean(d['vrp_vol'], 21)
     w = d['vrp_vol'].idxmin()
-    return dict(n=int(len(d)), start=str(d.index[0].date()), end=str(d.index[-1].date()), mean=m, se=se, t=m / se,
+    # bandwidth sensitivity of the Newey-West standard error (overlap of 21 days is a lower bound for the lag length)
+    bw = {str(L): dict(se_vol=float(nw_mean(d['vrp_vol'], L)[1]), se=float(nw_mean(d['vrp'], L)[1])) for L in (21, 42, 63, 126)}
+    return dict(se_bw=bw, n_below_m45=int((d['vrp_vol'] < -45).sum()), n=int(len(d)), start=str(d.index[0].date()), end=str(d.index[-1].date()), mean=m, se=se, t=m / se,
                 mean_vol=mv, se_vol=sev, share_pos=float((d['vrp'] > 0).mean()), vix=float(d['vix'].mean()),
                 rv=float(np.sqrt(d['rv']).mean()), worst=float(d['vrp_vol'].min()), worst_date=str(w.date()),
                 median_vol=float(d['vrp_vol'].median()))
@@ -793,9 +796,12 @@ def fig_0dte_straddle(d, phi):
     axes[0].axhline(0, color=Gray, lw=0.5)
     axes[0].set_ylabel('Cumulative P&L (%)')
     legend_outside_bottom(axes[0], ncol=1, y=-0.14)
-    axes[1].hist(d['pnl'], bins=np.linspace(-3, 0.6, 73), color=Purple, alpha=0.85, label='Daily P&L of the seller')
+    lo_, hi_ = float(d['pnl'].min()), float(d['pnl'].max())
+    axes[1].hist(d['pnl'], bins=np.linspace(np.floor(lo_), np.ceil(hi_), 97), color=Purple, alpha=0.85,
+                 label=f'Daily P&L of the seller, all {len(d):,} days')
     axes[1].axvline(0, color=Gray, lw=0.6)
-    axes[1].set_xlabel('Daily P&L (% of the price)'); axes[1].set_ylabel('Days')
+    axes[1].set_yscale('log')
+    axes[1].set_xlabel('Daily P&L (% of the price)'); axes[1].set_ylabel('Days (log scale)')
     legend_outside_bottom(axes[1], ncol=1, y=-0.22)
     plt.tight_layout()
     save_fig('ch12_0dte_straddle')
@@ -846,12 +852,42 @@ def svi_no_arbitrage(tab):
                 n_cal_viol=int(sum(c['min_dw'] < 0 for c in cal)), n_pairs=len(cal))
 
 
-def rnd_from_svi(p, F, T, K):
-    """Risk-neutral density (Breeden-Litzenberger) from SVI parameters on the strike grid K."""
+def svi_parts(p, F, K):
+    """SVI quantities on the strike grid K: k = ln(K/F), w(k), sqrt(w), w'(k), d2 and g(k) (Gatheral-Jacquier, 2014)."""
+    a, b, rho, m, s = p
     k = np.log(K / F)
-    sig = np.sqrt(np.clip(svi_w(k, *p), 1e-10, None) / T)
-    C = bs_price(F, K, T, 0.0, sig, 'call')
-    return np.clip(np.gradient(np.gradient(C, K), K), 0, None)
+    w = svi_w(k, a, b, rho, m, s)
+    sw = np.sqrt(w)
+    w1 = b * (rho + (k - m) / np.sqrt((k - m) ** 2 + s ** 2))
+    d2 = -k / sw - sw / 2
+    return k, w, sw, w1, d2, svi_gk(k, a, b, rho, m, s)
+
+
+def svi_cdf(p, F, K):
+    """Risk-neutral CDF from the analytic strike derivative of the undiscounted call price (Breeden-Litzenberger):
+    F_Q(K) = 1 + dC/dK = N(-d2) + phi(d2) w'(k) / (2 sqrt(w)). No truncation, no renormalisation."""
+    k, w, sw, w1, d2, g = svi_parts(p, F, K)
+    return stats.norm.cdf(-d2) + stats.norm.pdf(d2) * w1 / (2 * sw)
+
+
+def rnd_from_svi(p, F, T, K):
+    """Risk-neutral density from SVI parameters on the strike grid K, analytic second derivative of the call price:
+    q(K) = phi(d2) g(k) / (K sqrt(w)). Negative where g(k) < 0 (butterfly arbitrage); no clipping."""
+    k, w, sw, w1, d2, g = svi_parts(p, F, K)
+    return stats.norm.pdf(d2) * g / (K * sw)
+
+
+def svi_admissible(p, kg=np.linspace(-1.5, 1.5, 3001)):
+    """True if the SVI slice has w > 0 and g(k) >= 0 on the grid and wing slopes b(1 +- rho) <= 2 (Lee, 2004)."""
+    a, b, rho, m, s = p
+    return bool(svi_w(kg, *p).min() > 0 and svi_gk(kg, *p).min() >= 0 and b * (1 + abs(rho)) <= 2)
+
+
+def svi_checks(p, F):
+    """Total mass and first moment of the SVI risk-neutral distribution (wide strike grid): should be 1 and F."""
+    Kw = F * np.exp(np.linspace(-12, 8, 400001))
+    c = svi_cdf(p, F, Kw)
+    return dict(mass=float(c[-1] - c[0]), mean_over_F=float((integrate.trapezoid(1 - c, Kw) + Kw[0]) / F))
 
 
 def btc_rnd(tab, c=None, days=30, B=300):
@@ -865,29 +901,35 @@ def btc_rnd(tab, c=None, days=30, B=300):
     atm = np.sqrt(svi_w(0.0, *p0) / T)
     ln = stats.lognorm.pdf(K, s=atm * np.sqrt(T), scale=F * np.exp(-0.5 * atm ** 2 * T))
     area = integrate.trapezoid(q, K)
-    below_q = lambda qq, x: float(integrate.trapezoid(qq[K <= x * F], K[K <= x * F]) / integrate.trapezoid(qq, K))
-    below = lambda x: below_q(q, x)
+    below_p = lambda pp, x: float(svi_cdf(pp, F, x * F))
+    below = lambda x: below_p(p0, x)
     lnb = lambda x: float(stats.lognorm.cdf(x * F, s=atm * np.sqrt(T), scale=F * np.exp(-0.5 * atm ** 2 * T)))
     out = dict(expiry=str(pd.Timestamp(e).date()), days=float(f['days']), F=float(F), atm=float(100 * atm), area=float(area),
-               p80=below(0.8), p120=1 - below(1.2), ln80=lnb(0.8), ln120=1 - lnb(1.2), p70=below(0.7), ln70=lnb(0.7))
+               p80=below(0.8), p120=1 - below(1.2), ln80=lnb(0.8), ln120=1 - lnb(1.2), p70=below(0.7), ln70=lnb(0.7),
+               admissible=svi_admissible(p0), **svi_checks(p0, F))
     band = None
     if c is not None:
         g = c[c['expiry'] == e]
         kq, wq = g['k'].values, g['w'].values
         rng = np.random.default_rng(SEED)
         Q, P70, P80 = [], [], []
+        n_rej = 0                               # refits with butterfly arbitrage (g < 0) or Lee slope > 2: rejected
         while len(Q) < B:
             i = rng.integers(0, len(kq), len(kq))
             if len(np.unique(kq[i])) < 6:
                 continue
             pb = svi_fit(kq[i], wq[i])
-            qb = rnd_from_svi([pb[x] for x in ['a', 'b', 'rho', 'm', 's']], F, T, K)
-            Q.append(qb); P70.append(below_q(qb, 0.7)); P80.append(below_q(qb, 0.8))
+            pbv = [pb[x] for x in ['a', 'b', 'rho', 'm', 's']]
+            if not svi_admissible(pbv):
+                n_rej += 1
+                continue
+            qb = rnd_from_svi(pbv, F, T, K)
+            Q.append(qb); P70.append(below_p(pbv, 0.7)); P80.append(below_p(pbv, 0.8))
         Q = np.array(Q)
         band = (np.quantile(Q, 0.025, axis=0), np.quantile(Q, 0.975, axis=0))
         kmin, kmax = float(np.exp(kq.min())), float(np.exp(kq.max()))
         out.update(ext70=below(kmin), ext70_share=below(kmin) / out['p70'])   # mass below the last quote (SVI extrapolation)
-        out.update(B=int(B), p70_lo=float(np.quantile(P70, 0.025)), p70_hi=float(np.quantile(P70, 0.975)),
+        out.update(B=int(B), n_rejected=int(n_rej), p70_lo=float(np.quantile(P70, 0.025)), p70_hi=float(np.quantile(P70, 0.975)),
                    p80_lo=float(np.quantile(P80, 0.025)), p80_hi=float(np.quantile(P80, 0.975)),
                    kf_min=kmin, kf_max=kmax, n_quotes=int(len(kq)),
                    width_centre=float((band[1] - band[0])[np.argmin(np.abs(K / F - 1))] / q[np.argmin(np.abs(K / F - 1))]),
@@ -1032,6 +1074,7 @@ def vix_forecast_inference():
     idx = d.index
     start = np.searchsorted(idx, pd.Timestamp('2000-01-03'))
     F_raw, F_mz, F_har, RV = [], [], [], []
+    F_mz_sm, F_har_sm = [], []                  # smearing retransformation (Duan, 1983), training residuals only
     b_mz = b_har = None
     Xh_all = sm.add_constant(d[['lhar_d', 'lhar_w', 'lhar_m']]).values
     Xm_all = sm.add_constant(lx.rename('liv2')).values
@@ -1042,12 +1085,25 @@ def vix_forecast_inference():
             b_mz = np.linalg.lstsq(Xm_all[tr], ly.values[tr], rcond=None)[0]
             s2h = np.var(ly.values[tr] - Xh_all[tr] @ b_har)
             s2m = np.var(ly.values[tr] - Xm_all[tr] @ b_mz)
+            smh = np.mean(np.exp(ly.values[tr] - Xh_all[tr] @ b_har))
+            smm = np.mean(np.exp(ly.values[tr] - Xm_all[tr] @ b_mz))
         F_raw.append(d['iv2'].values[i])
         F_mz.append(np.exp(Xm_all[i] @ b_mz + 0.5 * s2m))   # level forecast from the log regression
         F_har.append(np.exp(Xh_all[i] @ b_har + 0.5 * s2h))
+        F_mz_sm.append(np.exp(Xm_all[i] @ b_mz) * smm)
+        F_har_sm.append(np.exp(Xh_all[i] @ b_har) * smh)
         RV.append(d['rv'].values[i])
     F_raw, F_mz, F_har, RV = map(np.array, (F_raw, F_mz, F_har, RV))
+    F_mz_sm, F_har_sm = np.array(F_mz_sm), np.array(F_har_sm)
     oos = dict(start=str(idx[start].date()), n=int(len(RV)))
+    # smearing: both forecasts retransformed by the mean of exp(residual) on the training data
+    for lname, lf in [('qlike', qlike), ('mse', lambda y, f: (y - f) ** 2)]:
+        for name, Fc in [('raw', F_raw), ('mz', F_mz_sm)]:
+            dl = lf(RV, Fc) - lf(RV, F_har_sm)
+            se = hac_se(dl, L)
+            oos[f'smear_{name}_{lname}'] = dict(loss=float(lf(RV, Fc).mean()), loss_har=float(lf(RV, F_har_sm).mean()),
+                                                ratio=float(lf(RV, Fc).mean() / lf(RV, F_har_sm).mean()),
+                                                dm=float(dl.mean() / se), p=float(2 * (1 - stats.norm.cdf(abs(dl.mean() / se)))))
     for name, Fc in [('raw', F_raw), ('mz', F_mz)]:
         for lname, lf in [('qlike', qlike), ('mse', lambda y, f: (y - f) ** 2)]:
             dl = lf(RV, Fc) - lf(RV, F_har)          # < 0: VIX better than HAR
@@ -1068,6 +1124,8 @@ def vrp_monthly():
         raise ValueError('Expected timezone-naive daily market dates')
     cutoff = min(pd.Timestamp(END), px.index.max())
     px = px.loc[:cutoff]
+    # the last calendar month is kept only if the data reach its last business day
+    last_full = cutoff + pd.offsets.MonthEnd(0) if cutoff >= cutoff + pd.offsets.BMonthEnd(0) else cutoff - pd.offsets.MonthEnd(1)
     r = 100 * np.log(px['spx']).diff().dropna()
     rv = (r ** 2).resample('ME').sum()
     iv = (px['vix'] ** 2 / 12).resample('ME').last()
@@ -1076,7 +1134,7 @@ def vrp_monthly():
     tb.index = tb.index + pd.offsets.MonthEnd(0)
     df = pd.DataFrame({'iv': iv, 'rv': rv, 'rm': rm, 'rf': tb / 12}).dropna()
     # Resampling labels a partial final month at its calendar month-end.
-    df = df[(df.index >= '1990-01-31') & (df.index <= cutoff)]
+    df = df[(df.index >= '1990-01-31') & (df.index <= last_full)]
     df['vrp'] = df['iv'] - df['rv']
     df['ex'] = df['rm'] - df['rf']
     return df
@@ -1285,6 +1343,33 @@ if __name__ == '__main__':
         with open(os.path.join(HERE, 'ch12_results.json'), 'w') as f:
             json.dump(jsonable(RES), f, indent=1)
         print('saved ch12_results.json (case study)')
+        sys.exit(0)
+    if {'vrp', 'odte', 'pred', 'qlike'} & set(sys.argv[1:]):
+        # targeted reruns (charts with the full range, bandwidth sensitivity, predictive regressions, smearing)
+        with open(os.path.join(HERE, 'ch12_results.json')) as f:
+            RES = json.load(f)
+        if 'vrp' in sys.argv[1:]:
+            RES['vrp'] = fig_vrp(vrp_sp500())
+        if 'odte' in sys.argv[1:]:
+            od, phi = odte_straddle()
+            RES['odte'] = fig_0dte_straddle(od, phi)
+        if 'qlike' in sys.argv[1:]:
+            RES['vix_inf'] = vix_forecast_inference()
+        if 'pred' in sys.argv[1:]:
+            RES['vrp_pred'] = vrp_predict()
+        with open(os.path.join(HERE, 'ch12_results.json'), 'w') as f:
+            json.dump(jsonable(RES), f, indent=1)
+        print('saved ch12_results.json', sys.argv[1:])
+        sys.exit(0)
+    if 'rnd' in sys.argv[1:]:
+        # only the risk-neutral density of the 38-day expiry (analytic CDF); other numbers unchanged
+        with open(os.path.join(HERE, 'ch12_results.json')) as f:
+            RES = json.load(f)
+        c, tab, t0 = btc_surface()
+        RES['btc_rnd'] = btc_rnd(tab, c)
+        with open(os.path.join(HERE, 'ch12_results.json'), 'w') as f:
+            json.dump(jsonable(RES), f, indent=1)
+        print('saved ch12_results.json (btc_rnd)', RES['btc_rnd'])
         sys.exit(0)
     RES = {}
     RES['payoffs'] = fig_payoffs()

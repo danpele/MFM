@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch2_crypto_momentum'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Liu and Tsyvinski (2021), Risks and returns of cryptocurrency (Review of Financial Studies 34(6), 2689-2727): time-series momentum in weekly Bitcoin returns. Simple weekly returns from Sunday close to Sunday close (UTC); predictive regressions of the return h = 1 to 4 weeks ahead on the return of the current week, with Newey-West (NW) standard errors, in the sample of the paper (January 2011 to May 2018), from 2013, and after the sample (June 2018 to September 2026); quintile sorts on the return of the current week; the one-week slope over rolling 104-week windows. Ethereum from 2016 for comparison.'
+
+Keywords: 'market efficiency, time-series momentum, cryptocurrency, Bitcoin, predictive regression, Newey-West, post-publication decay, rolling window'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Daily market data provided with the course: Bitcoin (from January 2011) and Ethereum (from January 2016), closing prices in USD'
+
+Output: 'ch2_case_crypto_tsmom.pdf, ch2_crypto_tsmom.json, ch2_crypto_tsmom_weekly.csv, ch2_crypto_tsmom_rolling.csv'

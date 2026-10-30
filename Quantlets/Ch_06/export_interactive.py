@@ -63,13 +63,70 @@ def ai_inflation_frame():
     R = joint_returns(['spy', 'tlt'])
     gr = R.groupby(R.index.to_period('M'))
     rho_m = gr.apply(lambda x: x['spy'].corr(x['tlt']) if len(x) >= 15 else np.nan).dropna()
-    rho_m = rho_m.iloc[1:-1] if rho_m.index[-1] >= pd.Period('2026-09', 'M') else rho_m.iloc[1:]
+
+    def covered(m, idx):   # complete month: the data cover its first and last business days
+        first = pd.offsets.BMonthBegin().rollforward(m.start_time)
+        last = pd.offsets.BMonthEnd().rollback(m.end_time.normalize())
+        return idx[0] <= first and idx[-1] >= last
+
+    rho_m = rho_m[[covered(m, R.index) for m in rho_m.index]]
     z_m = np.arctanh(rho_m)
     cpi = pd.read_csv('https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL', index_col=0, parse_dates=True).iloc[:, 0]
     cpi.index = cpi.index.to_period('M')
     infl = 100 * (cpi / cpi.shift(12) - 1)
     x = infl.shift(2).reindex(z_m.index)
     return pd.DataFrame({'z': z_m, 'rho': rho_m, 'infl': x}).dropna()
+
+
+def vast_dcc():
+    """Second case study (case_vast_dcc.py, Pakel et al., 2021): the estimates of ch6_vast_dcc.json and the GARCH
+    standardised residuals of the 48 series (units of 1e-3), from which ch6.js recomputes the DCC paths."""
+    import case_vast_dcc as cv
+    V = json.load(open(os.path.join(HERE, 'ch6_vast_dcc.json')))
+    tick = cv.universe()
+    assert tick == V['tickers']
+    _, _, Z = cv.residuals(tick)
+    assert len(Z) == V['T']
+    E = V['expand']
+    rnd = pd.DataFrame([dict(K=x['K'], ml_a=x['ml']['a'], ml_b=x['ml']['b'], cc_a=x['cl_contig']['a'],
+                             cc_b=x['cl_contig']['b']) for x in V['random']]).groupby('K')
+    return dict(t=tdelta(Z.index), tick=tick, z=[q(Z[c].values, 1e-3) for c in tick],
+                K=[x['K'] for x in E],
+                ml_a=[x['ml']['a'] for x in E], ml_b=[x['ml']['b'] for x in E],
+                ca_a=[x['cl_all']['a'] for x in E], ca_b=[x['cl_all']['b'] for x in E],
+                cc_a=[x['cl_contig']['a'] for x in E], cc_b=[x['cl_contig']['b'] for x in E],
+                rK=[int(k) for k in rnd.min().index], rmin={c: rnd.min()[c].tolist() for c in rnd.min().columns},
+                rmax={c: rnd.max()[c].tolist() for c in rnd.max().columns}, ref=V['avg_corr'], hl=V['half_life'])
+
+
+def write(d):
+    with open(OUT, 'w') as f:
+        f.write('// Inputs of the Chapter 6 interactive page, exported by Quantlets/Ch_06/export_interactive.py.\n')
+        f.write('window.CH6_DATA = ' + json.dumps(jsonable(d), separators=(',', ':')) + ';\n')
+    print('wrote', OUT, os.path.getsize(OUT) // 1024, 'KB')
+
+
+def only_vast_dcc():
+    """Replace only the 'vd' key of the existing ch6_data.js (the other blocks are left byte for byte as exported)."""
+    s = open(OUT).read()
+    head = 'window.CH6_DATA = '
+    i = s.index(head) + len(head)
+    d = json.loads(s[i:s.rindex(';')])
+    d['vd'] = vast_dcc()
+    write(d)
+
+
+def only_ai():
+    """Replace only the AI mini-case ('ai' and the copy of ai_discovery_case.json under 'ref') in ch6_data.js."""
+    s = open(OUT).read()
+    head = 'window.CH6_DATA = '
+    i = s.index(head) + len(head)
+    d = json.loads(s[i:s.rindex(';')])
+    df = ai_inflation_frame()
+    d['ai'] = dict(m=[str(p) for p in df.index], rho=r(df['rho'], 8), infl=r(df['infl'], 8))
+    d['ref']['ai'] = json.load(open(os.path.join(HERE, 'ai_discovery_case.json')))
+    write(d)
+    print('ai months:', len(df), df.index[0], df.index[-1])
 
 
 def main():
@@ -143,13 +200,13 @@ def main():
     df = ai_inflation_frame()
     d['ai'] = dict(m=[str(p) for p in df.index], rho=r(df['rho'], 8), infl=r(df['infl'], 8))
 
+    # second case study: DCC in vast dimensions
+    d['vd'] = vast_dcc()
+
     keep_inf = {k: v for k, v in INF.items() if k.startswith('hac_')}
     d['ref'] = dict(num=NUM, inf=keep_inf, ai=AI)
 
-    with open(OUT, 'w') as f:
-        f.write('// Inputs of the Chapter 6 interactive page, exported by Quantlets/Ch_06/export_interactive.py.\n')
-        f.write('window.CH6_DATA = ' + json.dumps(jsonable(d), separators=(',', ':')) + ';\n')
-    print('wrote', OUT, os.path.getsize(OUT) // 1024, 'KB')
+    write(d)
     # checks against the results files
     print('dcc a, b, ll:', dc['a'], dc['b'], dc['loglik'], '| json:', NUM['dcc_a'], NUM['dcc_b'], NUM['dcc_ll'])
     print('t copula:', ft['par'], ft['loglik'], '| csv:', tb.loc['t', 'par1'], tb.loc['t', 'par2'], tb.loc['t', 'loglik'])
@@ -160,4 +217,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+    if sys.argv[1:] == ['--only', 'vdcc']:
+        only_vast_dcc()
+    elif sys.argv[1:] == ['--only', 'ai']:
+        only_ai()
+    else:
+        main()

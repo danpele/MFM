@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch5_mf2_garch'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Lecture case study (Conrad and Engle, 2025, Journal of Applied Econometrics): the MF2-GARCH (multiplicative factor multi-frequency GARCH) with a short-term GJR-GARCH(1,1) component and a long-term component driven by the m-day average of the short-term component's standardised forecast errors, estimated by Gaussian quasi-maximum likelihood on daily S&P 500 log returns, 3 January 1990 to 18 September 2026; the window m chosen by the BIC (m = 5 to 160), Bollerslev-Wooldridge robust standard errors, the conditional and long-term volatility, and out-of-sample forecasts 2010-2026 (rolling 20-year window, re-estimated every 21 trading days) for one day, one week and the forward variance of months 1 to 8, evaluated by QLIKE and RMSE relative to the historical forecast and by Diebold-Mariano tests against the GJR-GARCH.'
+
+Keywords: 'MF2-GARCH, GJR-GARCH, volatility components, long-term volatility, volatility cycles, multiplicative error model, QLIKE, Diebold-Mariano, long-horizon volatility forecasting'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Daily market data (course data): S&P 500 index (GSPC.INDX)'
+
+Output: 'ch5_mf2_garch.pdf, ch5_mf2_case.json'

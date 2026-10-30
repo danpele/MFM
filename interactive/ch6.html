@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch6_data.js?v=20261029b"></script>
-<script src="ch6_text_en.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch6.js?v=20261029b" defer></script>
+<script src="ch6_data.js?v=20261030a"></script>
+<script src="ch6_text_en.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch6.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
-<p class="toc"><a href="#s-why">When Do Markets Move Together?</a> · <a href="#s-meas">Measuring Covariance and Its Uncertainty</a> · <a href="#s-dcc">Multivariate GARCH and DCC</a> · <a href="#s-crisis">Crisis Correlations and the Forbes–Rigobon Bias</a> · <a href="#s-cop">Copulas and Tail Dependence</a> · <a href="#s-app">Applications: Europe, Romania and Banks</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
+<p class="toc"><a href="#s-why">When Do Markets Move Together?</a> · <a href="#s-meas">Measuring Covariance and Its Uncertainty</a> · <a href="#s-dcc">Multivariate GARCH and DCC</a> · <a href="#s-crisis">Crisis Correlations and the Forbes–Rigobon Bias</a> · <a href="#s-cop">Copulas and Tail Dependence</a> · <a href="#s-app">Applications: Europe, Romania and Banks</a> · <a href="#s-case">Case Studies: Global Common Volatility and DCC in Vast Dimensions</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
 <h2 class="sec" id="s-why">When Do Markets Move Together?</h2>
 <section class="blk" id="rolling">
   <h3>Stocks and Bonds: A Correlation That Changed Sign</h3>
@@ -63,7 +63,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ha-m">Rolling window (days)</label><select id="ha-m"><option value="126">126</option><option value="252" selected>252</option><option value="504">504</option></select></div><div class="ctl"><label for="ha-L">Bartlett lags, L: <b id="ha-L-v"></b></label><input type="range" id="ha-L" min="0" max="20" step="1" value="4"></div><button class="btn play" id="ha-play" type="button"></button></div><div class="charts "><div class="chart" id="ha-chart"></div><div class="chart" id="ha-ratio"></div></div><ul class="out" id="ha-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Is the 95% Fisher interval adequate for the correlation of two daily return series?</div>
-  <details><summary>Answer</summary><p>No. The Fisher formula assumes i.i.d. pairs from the bivariate Normal distribution. With fat tails and volatility clustering the HAC interval is wider (the median ratio of the widths is 1.24), and the conclusion of the test changes in 8.2% of the windows. Most of the difference comes from the fourth moments, not from autocorrelation.</p></details>
+  <details><summary>Answer</summary><p>No. The Fisher formula assumes i.i.d. pairs from the bivariate Normal distribution. With fat tails and volatility clustering the HAC interval is wider (the median ratio of the widths is 1.24), and the conclusion of the test changes in 8.2% of the windows. Most of the difference comes from the fourth moments, not from autocorrelation. The HAC interval itself needs finite fourth moments, which Chapter 1 puts in doubt: HAC handles the dependence but does not compensate for missing moments.</p></details>
 </section>
 <section class="blk" id="ewma">
   <h3>EWMA versus Rolling Windows, SPY–TLT since 2019</h3>
@@ -72,8 +72,8 @@
       <figcaption>Slide 18</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ew-l">Decay factor λ: <b id="ew-l-v"></b></label><input type="range" id="ew-l" min="0.8" max="0.995" step="0.005" value="0.94"></div><div class="ctl"><label for="ew-m">Rolling window m (days): <b id="ew-m-v"></b></label><input type="range" id="ew-m" min="20" max="500" step="10" value="60"></div><button class="btn play" id="ew-play" type="button"></button></div><div class="charts "><div class="chart" id="ew-chart"></div></div><ul class="out" id="ew-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Which estimator was the first to signal the positive correlation of 2022?</div>
-  <details><summary>Answer</summary><p>EWMA with λ = 0.94: the signal of 20 consecutive days of positive correlation comes on 10 May 2022, and for the 250-day window only on 8 December 2022. Speed has a price: the standard deviation of the daily change of the correlation is 0.060 for EWMA with λ = 0.94 and 0.0088 for the 250-day window.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Which was the first to signal the positive correlation of 2022: EWMA with λ = 0.94 or the 250-day rolling window?</div>
+  <details><summary>Answer</summary><p>EWMA with λ = 0.94: the run of 20 consecutive days of positive correlation begins on 12 April 2022 and is confirmed on 10 May; for the 250-day window it begins on 10 November and is confirmed only on 8 December 2022. Speed has a price: the standard deviation of the daily change of the correlation is 0.060 for EWMA with λ = 0.94 and 0.0088 for the 250-day window.</p></details>
 </section><h2 class="sec" id="s-dcc">Multivariate GARCH and DCC</h2>
 <section class="blk" id="dcc">
   <h3>DCC Correlation of SPY and TLT, 2002–2026</h3>
@@ -83,7 +83,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="dc-a">Reaction a: <b id="dc-a-v"></b></label><input type="range" id="dc-a" min="0" max="0.15" step="any" value="0.0522"></div><div class="ctl"><label for="dc-b">Memory b: <b id="dc-b-v"></b></label><input type="range" id="dc-b" min="0.8" max="0.999" step="any" value="0.9335"></div><button class="btn play" id="dc-play" type="button"></button></div><div class="charts "><div class="chart" id="dc-chart"></div></div><ul class="out" id="dc-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> The DCC estimates are a = 0.052 and b = 0.934. What does their sum tell us?</div>
-  <details><summary>Answer</summary><p>It is the persistence of the correlation: a + b = 0.986, so a shock to Q_t halves in about 48 days. The LR test against constant correlation gives 533.4; the bootstrap under CCC gives p = 0.005, the smallest possible value with B = 199.</p></details>
+  <details><summary>Answer</summary><p>It is the persistence of the correlation: a + b = 0.986; the heuristic measure ln 0.5 / ln(a + b) gives about 48 days, not the exact half-life of Q_t, since E_t[ε_{t+1}ε_{t+1}′] = R_{t+1}, not Q_{t+1}. The LR test against constant correlation gives 533.4; the bootstrap under CCC gives p = 0.005, the smallest possible value with B = 199. These are standard DCC estimates, an illustration of the method: with correlation targeting they are inconsistent in general.</p></details>
 </section>
 <section class="blk" id="minvar">
   <h3>Application: Minimum-Variance Weights with DCC</h3>
@@ -204,18 +204,28 @@
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Through which edge are the Romanian banks connected to the rest of the network?</div>
   <details><summary>Answer</summary><p>Through BNP–BRD, with a correlation of 0.35. The other edges are JPM–BAC (0.86), DBK–BNP (0.75), JPM–BNP (0.65) and TLV–BRD (0.65). The tree is undirected and contemporaneous, so it does not show the direction of transmission.</p></details>
+</section><h2 class="sec" id="s-case">Case Studies: Global Common Volatility and DCC in Vast Dimensions</h2>
+<section class="blk" id="vast-dcc">
+  <h3>DCC Estimates as the Number of Assets Grows</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch6_vast_dcc_en.jpg" alt="Slide 61: DCC Estimates as the Number of Assets Grows" loading="lazy"></a>
+      <figcaption>Slide 61</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="vd-k">Number of assets K (alphabetical order): <b id="vd-k-v"></b></label><input type="range" id="vd-k" min="0" max="10" step="1" value="10"></div><button class="btn play" id="vd-play" type="button"></button></div><div class="charts "><div class="chart" id="vd-ab"></div><div class="chart" id="vd-path"></div></div><ul class="out" id="vd-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Why does the full-likelihood â fall as assets are added, while the composite-likelihood â does not?</div>
+  <details><summary>Answer</summary><p>The target Q̄ has K(K − 1)/2 correlations estimated before (a, b), i.e. 1,128 at K = 48. Their errors accumulate in the full likelihood and push it towards almost constant correlations: â = 0.0077 at K = 48, against 0.0362 with CL over all pairs. Each CL term uses only a 2 × 2 block of the target. With the full-likelihood estimates the mean correlation of the 48 assets has a standard deviation over time of 0.034, against 0.058 with CL, and the heuristic persistence measure ln 0.5 / ln(a + b) is 99 days, against 31. The data alone do not show which estimate is the true one. The simulations of Pakel, Shephard, Sheppard and Engle (2021), for scalar BEKK and cDCC, support the advantage of CL in the models and settings they study; they do not show the absence of bias in this adaptation on the standard DCC.</p></details>
 </section><h2 class="sec" id="s-ai">AI for Scientific Discovery</h2>
 <section class="blk" id="ai-inflation">
   <h3>Mini-Case: Does Inflation Drive the Stock–Bond Correlation?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch6_ai_inflation_en.jpg" alt="Slide 61: Mini-Case: Does Inflation Drive the Stock–Bond Correlation?" loading="lazy"></a>
-      <figcaption>Slide 61</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter6_multivariate_dependence.pdf#page=66" target="_blank" rel="noopener"><img src="slides/ch6_ai_inflation_en.jpg" alt="Slide 65: Mini-Case: Does Inflation Drive the Stock–Bond Correlation?" loading="lazy"></a>
+      <figcaption>Slide 65</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ai-t">Sample ends in: <b id="ai-t-v"></b></label><input type="range" id="ai-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-chart"></div><div class="chart" id="ai-ci"></div></div><ul class="out" id="ai-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Does the level of inflation explain the positive SPY–TLT correlation?</div>
-  <details><summary>Answer</summary><p>On the full sample the slope is 0.055 per percentage point of inflation (t = 2.96), but on 2002–2021, when inflation varied without a change of regime, it is 0.002 (t = 0.06). The slope comes from the episode after 2022, and a single change of regime cannot separate the level of inflation from the monetary-policy regime.</p></details>
+  <details><summary>Answer</summary><p>On the full sample the slope is 0.056 per percentage point of inflation (t = 2.97). On 2002–2021 it is 0.002 (t = 0.07), with the 95% HAC interval [−0.062; 0.067], which also contains the full-sample slope. We find no evidence of a positive association before 2022, but the estimate is imprecise, so the hypothesis is not refuted. A single change of regime cannot separate the level of inflation from the monetary-policy regime.</p></details>
 </section>
-<p class="src foot">EODHD daily prices: SPY, TLT, S&P 500, Euro Stoxx 50, BET and the shares of JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania and BRD. US CPI inflation: U.S. Bureau of Labor Statistics, via FRED.</p>
+<p class="src foot">EODHD daily prices: SPY, TLT, S&P 500, Euro Stoxx 50, BET and the shares of JPMorgan Chase, Bank of America, Deutsche Bank, BNP Paribas, Banca Transilvania and BRD; for the second case study, the 48 US-listed stocks and ETFs of the course data with a complete history from July 2013. US CPI inflation: U.S. Bureau of Labor Statistics, via FRED.</p>
 </main>
 </body>
 </html>

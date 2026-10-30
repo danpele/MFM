@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import MARKETS, LABELS, log_returns, joint_returns, periods_per_year  # noqa: E402
-from risk_measures import (hs_var_es, normal_var_es, t_fit, t_var_es, cf_var_es, cf_quantile, gpd_fit,  # noqa: E402
+from risk_measures import (hs_var_es, hs_es, hs_es_weights, normal_var_es, t_fit, t_var_es, cf_var_es, cf_quantile, gpd_fit,  # noqa: E402
                            gpd_var_es, gpd_se, mean_excess, garch_filter, garch_next, fhs_mc,
                            rolling_conditional)
 
@@ -153,7 +153,7 @@ def fig_loss_distribution():
     tail = L[L > 2]
     ax.hist(tail, bins=np.linspace(2, max(12, np.ceil(L.max())), 51), color=MainBlue, alpha=0.55, label='Losses above 2%')
     ax.axvline(v, color=IDAred, lw=1.3, label='VaR 1%')
-    ax.axvline(e, color=IDAred, lw=1.3, ls='--', label='ES 1% (mean beyond VaR)')
+    ax.axvline(e, color=IDAred, lw=1.3, ls='--', label='ES 1% (average of the worst 1%)')
     ax.axvline(e2, color=Amber, lw=1.3, ls='-.', label=f'ES 2.5% = {e2:.2f}%')
     ax.set_xlabel('Daily loss (%)')
     ax.set_ylabel('Number of days')
@@ -318,7 +318,7 @@ def conditional_now():
         for a, tag in [(0.01, '1'), (0.025, '2_5')]:
             q = np.quantile(nz, 1 - a)
             row[f'fhs_var{tag}'] = -m1 + s1 * q
-            row[f'fhs_es{tag}'] = -m1 + s1 * nz[nz >= q].mean()
+            row[f'fhs_es{tag}'] = -m1 + s1 * hs_es(nz, a)
             v, e = gpd_var_es(fz, a)
             row[f'cevt_var{tag}'] = -m1 + s1 * v
             row[f'cevt_es{tag}'] = -m1 + s1 * e
@@ -409,10 +409,9 @@ def portfolio_components():
     cvar = W * mvar                      # component VaR; the sum equals the portfolio VaR
     var_p = z1 * sp
     var_ind = z1 * np.sqrt(np.diag(S)) * W
-    # historical component ES: E[-w_i R_i | L_p >= VaR_p]
+    # historical component ES: the same tail weights as the portfolio ES, applied to -w_i R_i (sum = portfolio ES)
     v_hs, es_hs = hs_var_es(Lp, 0.025)
-    tail = Lp >= v_hs
-    ces = -(R.values[tail] * W).mean(axis=0)
+    ces = -(hs_es_weights(Lp, 0.025) @ (R.values * W))
     es_ind = np.array([hs_var_es(-R.values[:, i] * W[i], 0.025)[1] for i in range(len(W))])
     corr = np.corrcoef(R.values.T)
     return dict(start=str(lr.index[0].date()), N=len(lr), sd=np.sqrt(np.diag(S)), corr=corr, sigma_p=sp, var_p=var_p,

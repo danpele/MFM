@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH20_DATA;
-const { mean, median, nf, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { mean, median, nf, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH20_TEXT;
 const K = D.col, M = D.models, H = D.horizons;
 const SHORT = { HAR: 'HAR', logHAR: 'log-HAR', HARQ: 'HARQ', SHAR: 'SHAR', 'logHAR-K': 'log-HAR-K', 'Sig-L': 'Sig-L', 'Sig-LK': 'Sig-LK' };
@@ -111,6 +111,9 @@ function covid() {
     line: { color: '#000000', width: 1.6 }, hovertemplate: 'Realised %{x}: %{y:.1f}%<extra></extra>' }];
   M.forEach(m => tr.push({ x, y: C.f[m].slice(0, t + 1), mode: 'lines', name: LABEL[m] + ' forecast', visible: CV_SHOW.includes(m) ? true : 'legendonly',
     line: { color: K[m], width: 1.3 }, hovertemplate: SHORT[m] + ' %{x}: %{y:.1f}%<extra></extra>' }));
+  const rep = (C.har_rep || []).filter(i => i <= t);              // raw HAR forecast <= 0, replaced by the training mean
+  if (rep.length) tr.push({ x: rep.map(i => C.dates[i]), y: rep.map(i => C.f.HAR[i]), mode: 'markers', name: 'Raw HAR forecast ≤ 0, replaced by the training mean',
+    marker: { color: K.HAR, symbol: 'x', size: 8 }, hovertemplate: 'HAR replaced %{x}: %{y:.1f}%<extra></extra>' });
   plot('cv-chart', tr, layout({ title: ttl(`JPM, ${hTitle(h)} ahead: forecasts made at each origin`), legend: { orientation: 'h', x: 0, y: -0.14, yanchor: 'top', font: { size: 11 } },
     xaxis: AX('', { type: 'date', range: [C.dates[0], C.dates[n - 1]] }), yaxis: AX('Annualised volatility, %', { range: [0, 1.08 * Math.max(...C.y, ...CV_SHOW.flatMap(m => C.f[m]))] }) }));
   const q = m => nf(mean(C.ql[m].slice(0, t + 1)), 3);
@@ -205,10 +208,56 @@ function ablation() {
   out('ab-out', [T.ab1(left || T.none, T.cls[g], f('logHAR-K'), f('Sig-L'), f('Sig-LK')), T.ab2(hs, D.assets[idx[top]], nf(rr[top], 2))]);
 }
 
+// ================================================================= 8. case study: signature lead-lag, SPY and Bitcoin
+function nwSE(v) {                                             // Newey-West standard error of the mean (sigvol.nw_var, lag ceil(T^(1/3)))
+  const T = v.length, m = mean(v), d = v.map(x => x - m), lag = Math.max(1, Math.ceil(Math.pow(T, 1 / 3)));
+  let lv = d.reduce((s, x) => s + x * x, 0) / T;
+  for (let j = 1; j <= lag; j++) {
+    let c = 0; for (let i = j; i < T; i++) c += d[i] * d[i - j];
+    lv += 2 * (1 - j / (lag + 1)) * c / T;
+  }
+  return Math.sqrt(lv / T);
+}
+const nwT = v => mean(v) / nwSE(v);                            // Newey-West t of the mean
+function leadlagStats(period) {
+  const G = D.leadlag, keep = G.years.map(y => period === 'all' || y === +period);
+  const C = G.ccf.filter((_, i) => keep[i]), A = G.area.filter((_, i) => keep[i]), n = C.length;
+  const col = (X, j) => X.map(r => r[j]);
+  const cm = G.lags.map((_, j) => mean(col(C, j)));
+  const cse = G.lags.map((_, j) => nwSE(col(C, j)));           // pointwise 95% bars use the NW standard error of the tests
+  const ct = G.lags.map((_, j) => nwT(col(C, j)));
+  const at = G.windows.map((_, j) => nwT(col(A, j)));
+  const share = G.windows.map((_, j) => col(A, j).filter(x => x > 0).length / n);
+  return { n, cm, cse, ct, at, share };
+}
+function leadlag() {
+  const G = D.leadlag, per = $('ll-p').value, k = +$('ll-m').value, R = leadlagStats(per);
+  const mins = G.windows.map(m => 5 * m), wl = k === G.windows.length - 1 ? T.llSession : `${mins[k]} min`;
+  $('ll-m-v').textContent = wl;
+  const L = G.lags, nz = L.map((l, j) => j).filter(j => L[j] !== 0), i0 = L.indexOf(0), i1 = L.indexOf(1), im1 = L.indexOf(-1);
+  const bars = (sel, name, color) => ({ x: sel.map(j => L[j]), y: sel.map(j => R.cm[j]), type: 'bar', name, marker: { color }, width: 0.7,
+    error_y: { type: 'data', array: sel.map(j => 1.96 * R.cse[j]), color: K.navy, thickness: 1, width: 3 },
+    customdata: sel.map(j => R.ct[j]), hovertemplate: 'lag %{x}: %{y:.3f} (NW t = %{customdata:.2f})<extra></extra>' });
+  plot('ll-ccf', [bars(nz.filter(j => L[j] > 0), 'Lag l > 0: SPY moves first', K.blue), bars(nz.filter(j => L[j] < 0), 'Lag l < 0: Bitcoin moves first', K.red)],
+    layout({ title: ttl(`SPY at t − l vs BTC at t (lag 0: ${R.cm[i0].toFixed(2)})`), barmode: 'overlay', shapes: [hline(0, K.navy)],
+      legend: { orientation: 'h', x: 0, y: -0.25, yanchor: 'top' },
+      xaxis: AX('Lag l (five-minute steps)', { tickvals: nz.map(j => L[j]) }), yaxis: AX('Correlation') }));
+  plot('ll-t', [
+    { x: mins, y: R.at, mode: 'lines+markers', name: 'Mean daily Lévy area (SPY, BTC)', line: { color: K.green, width: 2 }, marker: { size: 7 },
+      customdata: R.share.map(v => 100 * v), hovertemplate: '%{x} min: t = %{y:.2f}, area > 0 on %{customdata:.0f}% of days<extra></extra>' },
+    { x: [mins[k]], y: [R.at[k]], mode: 'markers', name: 'Window on the readout', marker: { color: K.red, size: 12, symbol: 'circle-open', line: { width: 2 } }, hoverinfo: 'skip' },
+    { x: [mins[0], mins[mins.length - 1]], y: [1.96, 1.96], mode: 'lines', name: 't = 1.96 (pointwise)', line: { color: K.navy, width: 1, dash: 'dash' }, hoverinfo: 'skip' }
+  ], layout({ title: ttl('Signature lead-lag metric'), legend: { orientation: 'h', x: 0, y: -0.25, yanchor: 'top' },
+    xaxis: AX('Window length (minutes)', { type: 'log', tickvals: mins, ticktext: mins.map((m, j) => j === mins.length - 1 ? '390<br>(session)' : String(m)) }),
+    yaxis: AX('NW t-statistic', { range: [Math.min(0, ...R.at) - 0.3, Math.max(...R.at) * 1.1] }) }));
+  out('ll-out', [T.ll1(per === 'all' ? T.llAll : per, R.n, nf(R.cm[i1], 3), nf(R.ct[i1], 1), nf(R.cm[im1], 3), nf(R.ct[im1], 2), nf(R.cm[i0], 2)),
+    T.ll2(wl, nf(R.at[k], 2), nf(100 * R.share[k], 0), nf(R.at[0], 1), nf(R.at[R.at.length - 1], 2))]);
+}
+
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   on(['vr-k', 'vr-s'], volare); P('vr-play', 'vr-k', range(1, 13, 1), 600);
   on(['qr-b', 'qr-g', 'qr-k'], qlikeRatio); P('qr-play', 'qr-k', range(0, 10, 1), 600);
   on(['mc-l', 'mc-g', 'mc-a'], mcs); P('mc-play', 'mc-a', range(75, 99, 1), 300);
@@ -217,8 +266,12 @@ function init() {
   $('kw-c').max = D.weights.grid.length - 1; $('kw-c').value = D.weights.grid.indexOf(D.weights.c_lect);
   on(['kw-c', 'kw-N', 'kw-k'], weights); P('kw-play', 'kw-c', range(0, D.weights.grid.length - 1, 1), 700); P('kw-play2', 'kw-k', range(2, 22, 1), 300);
   $('ab-x').max = D.assets.length; on(['ab-g', 'ab-x', 'ab-h'], ablation); P('ab-play', 'ab-x', range(0, D.assets.length, 1), 400);
-  volare(); qlikeRatio(); mcs(); covid(); subperiod(); weights(); ablation();
+  $('ll-m').max = D.leadlag.windows.length - 1; on(['ll-p', 'll-m'], leadlag); P('ll-play', 'll-m', range(0, D.leadlag.windows.length - 1, 1), 900);
+  const PFX = { volare: 'vr', qlike: 'qr', mcs: 'mc', covid: 'cv', subperiods: 'sp', weights: 'kw', ablation: 'ab', leadlag: 'll' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  volare(); qlikeRatio(); mcs(); covid(); subperiod(); weights(); ablation(); leadlag();
 }
-window.CH20 = { smooth, ratios, levyArea, subRatio };
+window.CH20 = { smooth, ratios, levyArea, subRatio, nwT, leadlagStats };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

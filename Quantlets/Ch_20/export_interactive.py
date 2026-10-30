@@ -8,7 +8,8 @@ replaced by a no-op: no chart or results file of the chapter is rewritten.
 VOLARE values are licensed for research use and are not redistributed, so the page receives summaries only:
 per-asset mean losses and MCS p-values, kernel distances and weights, the cross-sectional mean volatility of the
 40 stocks, weekly (non-overlapping 5-day) means of the volatility of the six assets on the data slide, and the
-excerpt of the JPM forecasts of February-May 2020 shown on the COVID-19 slide.
+excerpt of the JPM forecasts of February-May 2020 shown on the COVID-19 slide. The second case study adds per-day
+statistics of the public five-minute SPY and Bitcoin bars (data/market/intraday, leadlag_case.py).
 """
 import json
 import os
@@ -119,7 +120,9 @@ def main():
         y = fc.y.values
         cov[h] = dict(dates=[f'{t:%Y-%m-%d}' for t in fc.index], y=r(np.sqrt(252 * y) * 100, 1),
                       f={m: r(np.sqrt(252 * fc[m].values) * 100, 1) for m in M},
-                      ql={m: r(S.qlike(y, fc[m].values), 4) for m in M})
+                      ql={m: r(S.qlike(y, fc[m].values), 4) for m in M},
+                      # origins where the raw HAR forecast was <= 0 and the positivity rule used the training mean
+                      har_rep=[int(i) for i in np.where(fc['HAR'].values == fc['mu'].values)[0]])
     d['covid'] = cov
 
     # ---------------------------------------------------------------- 5. kernel weights at the origin 16 March 2020
@@ -177,6 +180,18 @@ def main():
                         dist_jpm=jpm, vol40=r(100 * rv.values, 2), paths=paths, n=int(len(dates_tr)),
                         corr=res['weights']['2020-03-16']['corr_w_logvol'],
                         levy_origin=res['sig_demo']['2020-03-16']['levy'])
+
+    # ---------------------------------------------------------------- 8. second case study: signature lead-lag, SPY and BTC
+    # per-day statistics from leadlag_case.py (data/market/intraday, public); the page recomputes means and NW t-statistics
+    import leadlag_case as LL
+    resll, C, A, dates = LL.compute()
+    saved = json.load(open(LL.OUT_JSON))
+    for m in LL.WINDOWS:
+        close(resll['area'][str(m)]['t'], saved['area'][str(m)]['t'])
+    close(resll['ccf_mean'][LL.LAGS.index(1)], saved['ccf_mean'][LL.LAGS.index(1)])
+    d['leadlag'] = dict(lags=LL.LAGS, windows=LL.WINDOWS, years=[int(t.year) for t in dates],
+                        start=resll['start'], end=resll['end'], nw_lag=resll['nw_lag'],
+                        ccf=r(C, 5), area=r(A, 6))
 
     # ---------------------------------------------------------------- results quoted on the slides
     d['res'] = dict(pooled={h: {g_: {m: res['pooled'][str(h)][g_][m]['rq_mean'] for m in M} for g_ in ('all',) + tuple(CLS)}

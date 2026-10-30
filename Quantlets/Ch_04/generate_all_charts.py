@@ -289,6 +289,19 @@ def backtest(R, Rex, window=WINDOW, strategies=STRATS):
     return ret, to, Wd
 
 
+def ruin_month(ret, s):
+    """First month in which the total return of rule s is -100% or worse (its wealth reaches zero), else None."""
+    tot = np.asarray(ret[s] + ret.attrs.get('rf', 0.0), float)
+    k = np.flatnonzero(tot <= -1)
+    return ret.index[k[0]] if len(k) else None
+
+
+def implementable(ret, strategies=STRATS):
+    """Backtest rule: a strategy whose wealth reaches zero is liquidated; its later returns are not an
+    investment outcome, so it is left out of the Sharpe comparisons, the cost analysis and the tests."""
+    return [s for s in strategies if ruin_month(ret, s) is None]
+
+
 def sharpe(r, periods=12):
     r = np.asarray(r)
     return r.mean() / r.std(ddof=1) * np.sqrt(periods)
@@ -897,8 +910,10 @@ def fig_oos_cum(bts, universe='Multi-asset'):
         ruin = np.flatnonzero(total.values <= -1)                 # a loss >= 100% wipes out wealth
         if len(ruin):
             wealth.iloc[ruin[0]:] = np.nan                        # the path stops at ruin
+        lab = (f'{s} (liquidated {ret.index[ruin[0]]:%b %Y})' if len(ruin)
+               else f'{s} (Sharpe {sharpe(ret[s]):.2f})')
         ax.plot(ret.index, wealth, color=SCOL[s], lw=1.6 if s in ('1/N', 'GMV-LW', 'ERC', 'HRP') else 0.8,
-                label=f'{s} (Sharpe {sharpe(ret[s]):.2f})')
+                label=lab)
     ax.set_yscale('log')
     ax.set_ylabel('Wealth relative to T-bills (log scale)')
     ax.set_xlabel('Paths stop after a monthly loss of 100% or more')
@@ -909,17 +924,21 @@ def fig_oos_cum(bts, universe='Multi-asset'):
     save_fig('ch4_oos_cum')
 
 
-def fig_oos_sharpe(tabs):
+def fig_oos_sharpe(tabs, rules=STRATS):
+    """rules: the strategies that stay solvent in every universe (see implementable)."""
     fig, ax = plt.subplots(figsize=(7.4, 4.0))
-    x = np.arange(len(STRATS))
+    x = np.arange(len(rules))
     wd = 0.27
     for k, (u, c) in enumerate(zip(UNIVERSES, [MainBlue, Forest, Amber])):
-        v = tabs[u].loc[STRATS, 'sharpe'].values
+        v = tabs[u].loc[rules, 'sharpe'].values
         ax.bar(x + (k - 1) * wd, v, wd, color=c, label=f'{u} (OOS {tabs[u].attrs["start"]} - {tabs[u].attrs["end"]})')
     ax.axhline(0, color=Gray, lw=0.5)
-    ax.set_xticks(x, STRATS)
+    ax.set_xticks(x, rules)
     ax.set_ylabel('Out-of-sample Sharpe ratio (annualised)')
-    ax.set_title('Out-of-sample Sharpe ratios, before costs', fontsize=9, loc='left')
+    out = [s for s in STRATS if s not in rules]
+    ax.set_title('Out-of-sample Sharpe ratios, before costs'
+                 + (f' ({", ".join(out)} not shown: liquidated in every universe)' if out else ''),
+                 fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=2, y=-0.1)
     plt.tight_layout()
     save_fig('ch4_oos_sharpe')
@@ -927,17 +946,18 @@ def fig_oos_sharpe(tabs):
 
 def fig_costs(bts, universe='Combined'):
     ret, to, W = bts[universe]
+    rules = implementable(ret)                                    # liquidated rules are not shown
     c = np.arange(0, 101, 5)
     fig, axes = plt.subplots(1, 2, figsize=(7.6, 3.8), gridspec_kw={'width_ratios': [1.3, 1]})
-    for s in STRATS:
+    for s in rules:
         axes[0].plot(c, [sharpe(ret[s] - cc / 1e4 * to[s].fillna(0)) for cc in c], color=SCOL[s], label=s)
     axes[0].set_xlabel('Cost per unit of turnover (basis points)')
     axes[0].set_ylabel('Net Sharpe ratio (annualised)')
     axes[0].set_title(f'{universe}: Sharpe after costs', fontsize=9, loc='left')
     axes[0].axhline(0, color=Gray, lw=0.5)
     legend_outside_bottom(axes[0], ncol=4, y=-0.18)
-    tv = to[STRATS].mean()
-    axes[1].barh(STRATS, tv.values, color=[SCOL[s] for s in STRATS])
+    tv = to[rules].mean()
+    axes[1].barh(rules, tv.values, color=[SCOL[s] for s in rules])
     axes[1].set_xscale('log')
     axes[1].invert_yaxis()
     axes[1].set_xlabel('Mean monthly turnover (log scale)')
@@ -971,11 +991,13 @@ def run_tests(pairs, n_jobs=1, blocks=None):
 
 
 def sharpe_tests(bts, bench='1/N', n_jobs=1, blocks=None):
-    """All rules against 1/N in the three universes; returns the results and the bootstrap statistics.
+    """Every implementable rule against 1/N in the three universes (liquidated rules are left out);
+    returns the results and the bootstrap statistics.
     blocks: {(universe, rule): block} from an earlier calibration (optional)."""
-    pairs = {(u, s): (bts[u][0][s], bts[u][0][bench]) for u in bts for s in STRATS if s != bench}
+    rules = {u: [s for s in implementable(bts[u][0]) if s != bench] for u in bts}
+    pairs = {(u, s): (bts[u][0][s], bts[u][0][bench]) for u in bts for s in rules[u]}
     res = run_tests(pairs, n_jobs, blocks)
-    out = {u: {s: res[(u, s)][0] for s in STRATS if s != bench} for u in bts}
+    out = {u: {s: res[(u, s)][0] for s in rules[u]} for u in bts}
     draws = {k: v[1] for k, v in res.items()}
     return out, draws
 
@@ -995,7 +1017,7 @@ def holm(pvals):
 
 
 def holm_sharpe(tests):
-    """Holm adjustment over all rule-minus-1/N tests (3 universes x 7 rules), HAC and bootstrap."""
+    """Holm adjustment over all rule-minus-1/N tests (3 universes x 6 implementable rules), HAC and bootstrap."""
     out = {}
     for kind in ['p_hac', 'p_boot']:
         adj = holm({f'{u}: {s}': tests[u][s][kind] for u in tests for s in tests[u]})
@@ -1185,7 +1207,13 @@ def lo_sharpe(r, q=12):
 
 def deflated_sharpe(rets):
     """Bailey & Lopez de Prado (2014): deflated Sharpe ratio of the best rule out of N trials.
-    rets: dict {name: series of monthly excess returns}."""
+    rets: dict {name: pd.Series of monthly excess returns indexed by date}. The series are aligned on their common
+    calendar (inner join on dates) before ranking, so every trial is evaluated over the same months.
+    Illustrative: the effective number of trials (n_eff) treats the dependence between configurations, not the
+    autocorrelation of returns; the DSR is a calibrated probability only under the formula's assumptions."""
+    al = pd.concat({k: pd.Series(np.asarray(v, float), index=getattr(v, 'index', None)) for k, v in rets.items()},
+                   axis=1, join='inner').dropna()
+    rets = {k: al[k].values for k in al.columns}
     names = list(rets)
     srs = np.array([np.mean(rets[k]) / np.std(rets[k], ddof=1) for k in names])
     N = len(srs)
@@ -1204,6 +1232,7 @@ def deflated_sharpe(rets):
         zz = (s - s0) * np.sqrt(T - 1) / np.sqrt(1 - g3 * s + (g4 - 1) / 4 * s ** 2)
         sens[n_eff] = dict(sr0_ann=float(s0 * np.sqrt(12)), dsr=float(stats.norm.cdf(zz)))
     return dict(N=N, best=names[k], sr_best_ann=float(s * np.sqrt(12)), sr0_ann=float(sr0 * np.sqrt(12)), n_eff=sens,
+                start=f'{al.index[0]:%Y-%m}', end=f'{al.index[-1]:%Y-%m}',
                 T=T, skew=float(g3), kurt=float(g4), dsr=float(stats.norm.cdf(z)), psr0=float(psr0),
                 sd_sr_ann=float(np.sqrt(srs.var(ddof=1)) * np.sqrt(12)))
 
@@ -1373,8 +1402,10 @@ def jkmp_replication():
                     Turn=a[:, 2].mean(), Lev=a[:, 3].mean(), n=len(a)), net
 
     def util_flow(pis, months_eval):
+        # monthly utility flows whose mean equals U of evaluate() (variance with ddof = 1)
         _, net = evaluate(pis, months_eval)
-        return 12 * net - GAMMA / 2 * 12 * (net - net.mean()) ** 2
+        n = len(net)
+        return 12 * net - GAMMA / 2 * 12 * (net - net.mean()) ** 2 * n / (n - 1)
 
     test = [t for t in dec if t.year >= JKMP_TEST_START]
     val_all = [t for t in dec if t.year >= JKMP_VAL_START]
@@ -1488,14 +1519,33 @@ def jkmp_replication():
                     ('Minimum variance', mv), ('1/N', ew)]:
         res[name], _ = evaluate(d, test)
         flows[name] = util_flow(d, test)
-    prob = {}
+    # prob: Normal i.i.d. plug-in approximation, Phi(mean / (sd / sqrt(T))) of the utility-flow difference,
+    # conditional on the estimated procedure (not an exact posterior probability)
+    # hac: utility difference with a Newey-West (Bartlett) standard error and 95% interval
+    prob, hac = {}, {}
     for a_ in flows:
         for b_ in flows:
             if a_ != b_:
                 dd = flows[a_] - flows[b_]
                 prob[f'{a_} > {b_}'] = float(stats.norm.cdf(dd.mean() / (dd.std(ddof=1) / np.sqrt(len(dd)))))
+                se = nw_se_mean(dd)
+                hac[f'{a_} - {b_}'] = dict(diff=float(dd.mean()), se_hac=se, ci=[float(dd.mean() - 1.96 * se),
+                                                                                  float(dd.mean() + 1.96 * se)],
+                                            p_hac=float(2 * stats.norm.sf(abs(dd.mean()) / se)))
     return dict(start=f'{nxt[test[0]]:%Y-%m}', end=f'{nxt[test[-1]]:%Y-%m}', n_months=len(test), res=res,
-                prob=prob, choice={y: [float(v) for v in h] for y, h in choice.items()})
+                prob=prob, hac=hac, choice={y: [float(v) for v in h] for y, h in choice.items()})
+
+
+def nw_se_mean(x, lags=None):
+    """Newey-West (Bartlett kernel) standard error of a sample mean; lag floor(4 (T/100)^(2/9))."""
+    x = np.asarray(x, float)
+    T = len(x)
+    L = int(np.floor(4 * (T / 100) ** (2 / 9))) if lags is None else lags
+    e = x - x.mean()
+    v = e @ e / T
+    for k in range(1, L + 1):
+        v += 2 * (1 - k / (L + 1)) * (e[k:] @ e[:-k]) / T
+    return float(np.sqrt(v / T))
 
 
 def fig_jkmp_paper():
@@ -1597,10 +1647,14 @@ if __name__ == '__main__':
         tabs[u] = t
         print(u, t.attrs)
         print(t.round(3))
-    R['oos'] = {u: dict(table=t.round(4).to_dict(orient='index'), **t.attrs, T=len(bts[u][0])) for u, t in tabs.items()}
+    R['oos'] = {u: dict(table=t.round(4).to_dict(orient='index'), **t.attrs, T=len(bts[u][0]),
+                        liquidated={s: f'{ruin_month(bts[u][0], s):%Y-%m}' for s in STRATS
+                                    if ruin_month(bts[u][0], s) is not None})
+                for u, t in tabs.items()}
+    IMPL = [s for s in STRATS if all(s in implementable(bts[u][0]) for u in bts)]
     R['rolling_weights'] = fig_rolling_weights(bts['Sectors'])
     fig_oos_cum(bts)
-    fig_oos_sharpe(tabs)
+    fig_oos_sharpe(tabs, IMPL)
     fig_costs(bts)
     NJ = max(1, (os.cpu_count() or 2) - 2)
     R['sharpe_tests'], draws = sharpe_tests(bts, n_jobs=NJ)
@@ -1615,7 +1669,8 @@ if __name__ == '__main__':
     R['mp'] = fig_mp()
     R['gmv_nl'] = gmv_nl_backtests()
     R['lo_sharpe'] = {u: lo_sharpe(bts[u][0]['1/N']) for u in bts}
-    R['deflated_sharpe'] = deflated_sharpe({f'{u}: {s}': bts[u][0][s].values for u in bts for s in STRATS})
+    R['deflated_sharpe'] = deflated_sharpe({f'{u}: {s}': bts[u][0][s] for u in bts
+                                            for s in implementable(bts[u][0])})
     R['jkmp_paper'] = fig_jkmp_paper()
     R['jkmp'] = jkmp_replication()
     R['jkmp']['chart'] = fig_jkmp_replication(R['jkmp'])

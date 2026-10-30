@@ -3,6 +3,7 @@ eff_tests.py -- Teste de eficienta slaba pentru Capitolul 2 (MFM)
 ===============================================================
   * variance_ratio      -- Lo & MacKinlay (1988): VR(q), z omoscedastic, z* robust la heteroscedasticitate
   * chow_denning        -- testul multiplu Chow & Denning (1993): max |z*(q_i)|
+  * acf_se              -- erorile standard ale lui rho_k: sub H0 (banda de test in jurul lui 0) si HAC (interval in jurul estimatiei)
   * runs_test           -- testul secventelor (Wald & Wolfowitz, 1940) pe semnele randamentelor
   * robust_ljung_box    -- Q(m) clasic si Q~(m) robust (varianta robusta a autocorelatiilor)
   * rs_hurst            -- R/S clasic (Hurst, 1951) si corectia Anis & Lloyd (1976)
@@ -177,3 +178,54 @@ def rolling_stat(r, func, window=500, step=21):
         idx.append(r.index[end - 1])
         out.append(func(x[end - window:end]))
     return pd.Series(out, index=idx)
+
+
+# =============================================================================
+# ERORILE STANDARD ALE AUTOCORELATIEI
+# =============================================================================
+def nw_lags(T):
+    """Newey-West rule-of-thumb bandwidth floor(4 (T/100)^(2/9))."""
+    return int(np.floor(4 * (T / 100) ** (2 / 9)))
+
+
+def acf_se(r, k=1, lags=None):
+    """Two standard errors of the lag-k sample autocorrelation rho_k = sum e_t e_{t-k} / sum e_t^2.
+
+    se_null: sqrt(sum e_t^2 e_{t-k}^2) / sum e_t^2, derived under H0 (unpredictable mean, rho_k = 0);
+             robust to conditional heteroskedasticity; use it ONLY for test bands centred at 0.
+    se_hac : Newey-West (Bartlett) long-run variance of the influence function of the estimator,
+             psi_t = (e_t e_{t-k} - rho_k e_t^2) / gamma_0, valid also when rho_k != 0;
+             use it for confidence intervals around the estimate and for comparisons between periods.
+    """
+    x = np.asarray(r, dtype=float)
+    e = x - x.mean()
+    T = len(e)
+    s2 = (e ** 2).sum()
+    se_null = np.sqrt((e[k:] ** 2 * e[:-k] ** 2).sum() / s2 ** 2)
+    rho = (e[k:] * e[:-k]).sum() / s2
+    psi = (e[k:] * e[:-k] - rho * e[k:] ** 2) / (s2 / T)
+    psi = psi - psi.mean()
+    n = len(psi)
+    L = nw_lags(T) if lags is None else lags
+    lrv = (psi ** 2).sum() / n
+    for j in range(1, L + 1):
+        lrv += 2 * (1 - j / (L + 1)) * (psi[j:] * psi[:-j]).sum() / n
+    return float(se_null), float(np.sqrt(lrv / n))
+
+
+def acf_se_block_bootstrap(r, k=1, n_boot=999, block=None, seed=42):
+    """Moving-block bootstrap standard error of rho_k (cross-check of se_hac); block length T^(1/3)."""
+    x = np.asarray(r, dtype=float)
+    T = len(x)
+    b = block or int(round(T ** (1 / 3)))
+    rng = np.random.default_rng(seed)
+    nb = T // b + 1
+    keep = (np.arange(k, T) % b) >= k          # pairs (t, t-k) inside the same block
+    out = np.empty(n_boot)
+    for i in range(n_boot):
+        st = rng.integers(0, T - b + 1, nb)
+        y = x[(st[:, None] + np.arange(b)).ravel()[:T]]
+        e = y - y.mean()
+        prod = (e[k:] * e[:-k])[keep]
+        out[i] = prod.mean() / (e ** 2).mean()
+    return float(out.std(ddof=1))

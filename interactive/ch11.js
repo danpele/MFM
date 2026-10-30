@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH11_DATA;
-const { sum, mean, median, nf, pct, $, AX, layout, ttl, plot, out, Player, range } = window.MFMI;
+const { sum, mean, median, nf, pct, $, AX, layout, ttl, plot, out, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH11_TEXT;
 
 // ---------------------------------------------------------------- colours (generate_all_charts.py)
@@ -312,10 +312,59 @@ function rough() {
   out('ro-out', [T.ro(m, nf(aOls, 3), nf(R.alpha_nlls, 2)), T.ro2(H, nf(bPlain, 2), nf(bStar, 2), nf(hl, 1), nf(RHO[99], 2), nf(Math.exp(-lamOU * 100), 3))]);
 }
 
+// ================================================================= drift bursts, SPY (second case study)
+const DBD = D.drift_burst, DB_DT = 5, DB_START = 6;
+function dbT(r, h) {                                                 // as generate_all_charts.drift_burst_t, one day
+  const hs = 5 * h, T = r.map(() => null);
+  for (let j = DB_START - 1; j < r.length; j++) {
+    let num = 0, sw2 = 0, s2n = 0, sws = 0;
+    for (let k = 0; k <= j; k++) {
+      const lag = (j - k + 1) * DB_DT, w = Math.exp(-lag / h), ws = Math.exp(-lag / hs);
+      num += w * r[k]; sw2 += w * w; s2n += ws * r[k] * r[k]; sws += ws;
+    }
+    T[j] = num / Math.sqrt(s2n / (sws * DB_DT) * sw2 * DB_DT);
+  }
+  return T;
+}
+const hhmm = j => { const m = 570 + 5 * (j + 1); return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+function driftBurst() {
+  const h = +$('db-h').value, day = $('db-d').value, B = DBD.by_h[String(h)], c = B.c95, dd = DBD.days[day];
+  $('db-h-v').textContent = h;
+  const tt = dd.r.map((_, j) => hhmm(j)), Tt = dbT(dd.r, h);
+  let jm = DB_START - 1; for (let j = DB_START - 1; j < Tt.length; j++) if (Math.abs(Tt[j]) > Math.abs(Tt[jm])) jm = j;
+  const leg = { orientation: 'h', x: 0, y: -0.22, yanchor: 'top', font: { size: 11 } };
+  plot('db-day', [
+    { x: tt, y: Tt, mode: 'lines', name: 'T_t (left axis)', line: { color: K.red, width: 1.8 }, hovertemplate: '%{x}: T = %{y:.2f}<extra></extra>' },
+    { x: tt, y: dd.close, mode: 'lines', name: 'SPY close (right axis, USD)', yaxis: 'y2', line: { color: K.blue, width: 1.5 }, hovertemplate: '%{x}: %{y:.2f} USD<extra></extra>' },
+    { x: [tt[0], tt[tt.length - 1]], y: [c, c], mode: 'lines', name: `±${c.toFixed(2)}: 5% per day under the null`, line: { color: K.navy, width: 1, dash: 'dash' }, hoverinfo: 'skip' },
+    { x: [tt[0], tt[tt.length - 1]], y: [-c, -c], mode: 'lines', showlegend: false, line: { color: K.navy, width: 1, dash: 'dash' }, hoverinfo: 'skip' }
+  ], layout({ title: ttl(`SPY, ${day}`), xaxis: AX('', { tickvals: ['10:00', '12:00', '14:00', '16:00'], tickangle: 0 }), yaxis: AX('T_t', { range: [-4.6, 4.6] }),
+    yaxis2: AX('', { overlaying: 'y', side: 'right', showgrid: false }), legend: leg }));
+  const G = B.grid, cl = a => a.map(v => Math.max(v, 0.8));
+  plot('db-cnt', [
+    { x: G, y: cl(B.null_lo), mode: 'lines', line: { width: 0, color: K.band }, showlegend: false, hoverinfo: 'skip' },
+    { x: G, y: cl(B.null_hi), mode: 'lines', fill: 'tonexty', fillcolor: K.band, line: { width: 0, color: K.band }, name: 'Sign-flip null, 1%-99%', hoverinfo: 'skip' },
+    { x: G, y: cl(B.null_mean), mode: 'lines', name: 'Sign-flip null, mean', line: { color: K.orange, width: 1.8, dash: 'dash' }, hovertemplate: 'c = %{x:.2f}: %{y:.1f} days<extra></extra>' },
+    { x: G, y: cl(B.data), mode: 'lines', name: `SPY, ${DBD.ref.n_days} days`, line: { color: K.blue, width: 2.2 }, hovertemplate: 'c = %{x:.2f}: %{y} days<extra></extra>' }
+  ], layout({ title: ttl('Days with max |T_t| > c'), xaxis: AX('Critical value c'), yaxis: AX('', { type: 'log', range: [Math.log10(0.8), Math.log10(2000)], tickvals: [1, 10, 100, 1000] }),
+    shapes: [{ type: 'line', xref: 'x', yref: 'paper', x0: c, x1: c, y0: 0, y1: 1, line: { color: K.navy, width: 1, dash: 'dot' } }], legend: leg }));
+  const x = B.rm, y = B.rp, [b, a] = polyfit1(x, y), rev = x.filter((v, i) => Math.sign(v) !== Math.sign(y[i])).length / x.length;
+  const xs = [Math.min(...x), Math.max(...x)];
+  plot('db-rev', [
+    { x, y, mode: 'markers', name: `${x.length} days, reversal in ${(100 * rev).toFixed(0)}%`, marker: { color: K.blue, size: 6, opacity: 0.8 }, hovertemplate: 'before: %{x:.1f} bp<br>after: %{y:.1f} bp<extra></extra>' },
+    { x: xs, y: xs.map(v => a + b * v), mode: 'lines', name: `OLS slope ${b.toFixed(2)}`, line: { color: K.red, width: 1.8 }, hoverinfo: 'skip' }
+  ], layout({ title: ttl('After the burst'), xaxis: AX(`${h} min to the peak (bp)`, { zeroline: true, zerolinecolor: K.navy }),
+    yaxis: AX(`Next ${h} min (bp)`, { zeroline: true, zerolinecolor: K.navy }), legend: leg }));
+  const t = B.tests.c95;
+  out('db-out', [T.db(h, 5 * h, nf(c, 2), t.days, nf(t.null_mean, 1), t.null_max, nf(t.p, 3), nf(B.jump_bound, 2)),
+    T.db2(day, nf(Tt[jm], 2), hhmm(jm)),
+    T.db3(x.length, nf(100 * rev, 0), nf(b, 2), B.n_events_neg, B.n_events, B.n_close, h)]);
+}
+
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   on(['dk-a'], donsker); P('dk-play', 'dk-a', range(0.25, 2.5, 0.05), 160);
   on(['qv-p', 'qv-c'], quadVar); P('qv-play', 'qv-p', range(0.5, 3, 0.1), 350);
   on(['dp-w'], drift); P('dp-play', 'dp-w', range(1, 20, 1), 500);
@@ -324,8 +373,13 @@ function init() {
   on(['mj-l'], merton); P('mj-play', 'mj-l', range(0, 1.15, 0.05), 300);
   on(['mv-k', 'mv-m'], modelsData); P('mv-play', 'mv-k', range(1, 100, 1), 90);
   on(['ro-m', 'ro-H'], rough); P('ro-play', 'ro-H', range(4, 60, 2), 300);
-  donsker(); quadVar(); drift(); gbmData(); vasicek(); merton(); modelsData(); rough();
+  on(['db-h', 'db-d'], driftBurst); P('db-play', 'db-h', range(5, 60, 5), 900);
+  const PFX = { 'donsker': 'dk', 'quadratic-variation': 'qv', 'drift-precision': 'dp', 'gbm-vs-data': 'gd', 'vasicek': 'va',
+    'merton-density': 'mj', 'models-vs-data': 'mv', 'rough-volatility': 'ro', 'drift-burst': 'db' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  donsker(); quadVar(); drift(); gbmData(); vasicek(); merton(); modelsData(); rough(); driftBurst();
 }
-window.CH11 = { ouMle, acf, mertonDens, ncdf, nppf, TBD, TBY, donsker, quadVar, drift, gbmData, vasicek, merton, modelsData, rough };
+window.CH11 = { ouMle, acf, mertonDens, ncdf, nppf, TBD, TBY, donsker, quadVar, drift, gbmData, vasicek, merton, modelsData, rough, dbT, driftBurst };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

@@ -400,11 +400,39 @@ def merton_mle(r, dt, starts=None, sigma_min=0.0):
     H = numerical_hessian(nll_orig, theta)
     try:
         cov = np.linalg.inv(H)
-        se = np.sqrt(np.maximum(np.diag(cov), 0))
+        dg = np.diag(cov)
+        se = np.where(dg > 0, np.sqrt(np.abs(dg)), np.nan)      # a negative diagonal: invalid Hessian, no SE
     except np.linalg.LinAlgError:
         se = np.full(5, np.nan)
     return dict(m=m, sigma=sigma, lam=lam, mu_j=mu_j, s_j=s_j, se=dict(zip(['m', 'sigma', 'lam', 'mu_j', 's_j'], se)),
                 loglik=-best.fun, n=len(r))
+
+
+def merton_sandwich(r, dt, theta, lags=None, rel=1e-4):
+    """Sandwich covariance H^-1 S H^-1 of the Merton estimates (m, sigma, lam, mu_j, s_j) at theta: H = numerical Hessian
+    of the negative log-likelihood, S = Newey-West (Bartlett) long-run covariance of the per-observation scores,
+    lags = floor(4 (n/100)^(2/9)) by default. Valid for the pseudo-true parameters under volatility clustering and a
+    misspecified mixture; the Hessian-only SE are conditional on the i.i.d. Merton model."""
+    r = np.asarray(r)
+    theta = np.asarray(theta, dtype=float)
+    n, k = len(r), len(theta)
+    lags = int(np.floor(4 * (n / 100) ** (2 / 9))) if lags is None else lags
+    h = rel * np.maximum(np.abs(theta), 1e-3)
+    G = np.empty((n, k))
+    for i in range(k):
+        e = np.zeros(k)
+        e[i] = h[i]
+        G[:, i] = (merton_logpdf(r, dt, *(theta + e)) - merton_logpdf(r, dt, *(theta - e))) / (2 * h[i])
+    G = G - G.mean(axis=0)
+    S = G.T @ G
+    for l in range(1, lags + 1):
+        C = G[l:].T @ G[:-l]
+        S += (1 - l / (lags + 1)) * (C + C.T)
+    H = numerical_hessian(lambda th: -merton_logpdf(r, dt, *th).sum(), theta)
+    Hi = np.linalg.inv(H)
+    cov = Hi @ S @ Hi
+    dg = np.diag(cov)
+    return dict(se=dict(zip(['m', 'sigma', 'lam', 'mu_j', 's_j'], np.where(dg > 0, np.sqrt(np.abs(dg)), np.nan))), lags=lags)
 
 
 def numerical_hessian(f, x, rel=1e-4):
@@ -475,9 +503,11 @@ def lr_bootstrap(r, dt, n_boot, rng, sigma_min=0.05, n_jobs=1):
 # =============================================================================
 # THE LEE-MYKLAND JUMP TEST
 # =============================================================================
-def lee_mykland(r, K=16, alpha=0.01):
+def lee_mykland(r, K=16, alpha=0.01, crit=None):
     """Statistic L_t = r_t / sigma_t, with sigma_t^2 = bipower variation over the previous K-1 returns;
-    a jump is detected if (|L_t| - C_n) / S_n exceeds the 1 - alpha quantile of the Gumbel distribution (Lee & Mykland, 2008)."""
+    a day is flagged if (|L_t| - C_n) / S_n exceeds the 1 - alpha quantile of the Gumbel distribution (Lee & Mykland, 2008).
+    The Gumbel threshold is asymptotic; with daily data and K = 16 the local scale is noisy and the threshold is far too
+    low in finite samples (lm_null_max). crit: a threshold for the normalised statistic in place of the Gumbel one."""
     r = pd.Series(r).dropna()
     a = r.abs()
     bpv = (a * a.shift(1)).rolling(K - 2).sum().shift(1) / (K - 2)
@@ -487,9 +517,30 @@ def lee_mykland(r, K=16, alpha=0.01):
     ln = np.log(n)
     Cn = np.sqrt(2 * ln) / c - (np.log(np.pi) + np.log(ln)) / (2 * c * np.sqrt(2 * ln))
     Sn = 1 / (c * np.sqrt(2 * ln))
-    crit = -np.log(-np.log(1 - alpha))
+    crit = -np.log(-np.log(1 - alpha)) if crit is None else crit
     stat = (L.abs() - Cn) / Sn
     return pd.DataFrame({'r': r.reindex(L.index), 'L': L, 'stat': stat, 'jump': stat > crit}), crit
+
+
+def lm_cn_sn(n):
+    """C_n and S_n of the Lee-Mykland normalisation, for n tested days."""
+    c = np.sqrt(2 / np.pi)
+    ln = np.log(n)
+    return (np.sqrt(2 * ln) / c - (np.log(np.pi) + np.log(ln)) / (2 * c * np.sqrt(2 * ln)), 1 / (c * np.sqrt(2 * ln)))
+
+
+def lm_null_max(n, K, n_sim, rng, sim=None):
+    """Finite-sample null of the Lee-Mykland test: the sample maximum of the normalised statistic over n_sim samples
+    of n returns, i.i.d. standard Normal (the statistic is scale-free) or drawn by sim(rng) (e.g. Heston without jumps);
+    the same window K and the same normalisation as for the data. Also the number of flagged days per sample at the
+    asymptotic Gumbel threshold (alpha = 1%)."""
+    g = -np.log(-np.log(0.99))
+    M, F = np.empty(n_sim), np.empty(n_sim)
+    for i in range(n_sim):
+        x = rng.standard_normal(n) if sim is None else sim(rng)
+        d, _ = lee_mykland(x, K=K)
+        M[i], F[i] = d['stat'].max(), (d['stat'] > g).sum()
+    return M, F
 
 
 # =============================================================================
@@ -497,7 +548,9 @@ def lee_mykland(r, K=16, alpha=0.01):
 # =============================================================================
 def heston_paths(S0, v0, mu, kappa, theta, xi, rho, T, n_steps, n_paths, rng, antithetic=False):
     """Full-truncation Euler scheme (Lord et al., 2010) for log S and v.
-    d ln S = (mu - v/2) dt + sqrt(v) dW1;  dv = kappa (theta - v) dt + xi sqrt(v) dW2;  corr(dW1, dW2) = rho."""
+    d ln S = (mu - v/2) dt + sqrt(v) dW1;  dv = kappa (theta - v) dt + xi sqrt(v) dW2;  corr(dW1, dW2) = rho.
+    The latent Euler state v~ is kept even when negative: v~_{k+1} = v~_k + kappa (theta - v~_k^+) dt + xi sqrt(v~_k^+ dt) Z2,
+    with the positive part v~^+ = max(v~, 0) in the drift, in the diffusion and in the price step; V reports v~^+."""
     dt = T / n_steps
     m = n_paths // 2 if antithetic else n_paths
     x = np.full(n_paths, np.log(S0))

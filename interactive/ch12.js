@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH12_DATA;
-const { C, sum, mean, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, LANG } = window.MFMI;
+const { C, sum, mean, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, LANG, predict, exitTicket } = window.MFMI;
 const T = window.CH12_TEXT;
 
 // ---------------------------------------------------------------- colours (generate_all_charts.py)
@@ -220,18 +220,18 @@ function btcSmile(e) {
 let RN = null;
 function rnPrep() {
   const R = D.rnd, F = R.F, t = R.T, n = 2201, k = range(0, n - 1, 1).map(j => -1.2 + 2.2 * j / (n - 1)), Kg = k.map(v => F * Math.exp(v));
-  const dens = p => k.map((kk, j) => { const w = Math.max(svi(kk, p), 1e-10), dm = -kk / Math.sqrt(w) - Math.sqrt(w) / 2; return Math.max(sviG(kk, p), 0) * Math.exp(-dm * dm / 2) / (Kg[j] * Math.sqrt(2 * Math.PI * w)); });
-  const cum = q => { const c = [0]; for (let j = 1; j < n; j++) c.push(c[j - 1] + 0.5 * (q[j] + q[j - 1]) * (Kg[j] - Kg[j - 1])); return c; };
-  const q0 = dens(R.p), c0 = cum(q0), atm = Math.sqrt(svi(0, R.p) / t), sl = atm * Math.sqrt(t), mu = Math.log(F) - 0.5 * atm * atm * t;
+  const dens = p => k.map((kk, j) => { const w = Math.max(svi(kk, p), 1e-10), dm = -kk / Math.sqrt(w) - Math.sqrt(w) / 2; return sviG(kk, p) * Math.exp(-dm * dm / 2) / (Kg[j] * Math.sqrt(2 * Math.PI * w)); });   // analytic, no clipping
+  const q0 = dens(R.p), atm = Math.sqrt(svi(0, R.p) / t), sl = atm * Math.sqrt(t), mu = Math.log(F) - 0.5 * atm * atm * t;
   const ln = Kg.map(x => Math.exp(-((Math.log(x) - mu) ** 2) / (2 * sl * sl)) / (x * sl * Math.sqrt(2 * Math.PI)));
-  const boots = R.boot.map(p => { const q = dens(p); return { q, c: cum(q) }; });
+  const boots = R.boot.map(p => ({ q: dens(p), c: p }));
   const lo = [], hi = [];
   for (let j = 0; j < n; j++) { const v = Float64Array.from(boots.map(b => b.q[j])).sort(); lo.push(quantile(v, 0.025)); hi.push(quantile(v, 0.975)); }
-  RN = { F, t, k, Kg, q0, c0, ln, atm, sl, mu, boots, lo, hi };
+  RN = { F, t, k, Kg, q0, c0: R.p, ln, atm, sl, mu, boots, lo, hi };
 }
-function rnBelow(c, x) {                   // share of the density at K <= x F (trapezoid on the grid points, as in btc_rnd)
-  const R = RN; let j = -1; while (j + 1 < R.Kg.length && R.Kg[j + 1] <= x * R.F) j++;
-  return j < 0 ? 0 : c[j] / c[c.length - 1];
+function rnBelow(p, x) {                   // risk-neutral CDF at K = x F: 1 + dC/dK, analytic in SVI (as in btc_rnd)
+  const k = Math.log(x), w = svi(k, p), sw = Math.sqrt(w), d2 = -k / sw - sw / 2;
+  const w1 = p[1] * (p[2] + (k - p[3]) / Math.sqrt((k - p[3]) ** 2 + p[4] ** 2));
+  return ncdf(-d2) + Math.exp(-d2 * d2 / 2) / Math.sqrt(2 * Math.PI) * w1 / (2 * sw);
 }
 function rndBlock() {
   if (!RN) rnPrep();
@@ -292,7 +292,7 @@ function vrpBlock() {
     { x: dt, y: vx, mode: 'lines', name: 'VIX at day t (implied, next 30 days)', line: { color: K.blue, width: 0.8 }, hovertemplate: '%{x}: VIX %{y:.1f}<extra></extra>' },
     { x: dt, y: rv, mode: 'lines', name: 'Realised volatility over the next 21 trading days', line: { color: K.red, width: 0.8 }, hovertemplate: '%{x}: RV %{y:.1f}<extra></extra>' },
     { x: dt, y: pv, mode: 'lines', name: 'Premium in volatility points: VIX − √RV', line: { color: K.green, width: 0.7 }, xaxis: 'x', yaxis: 'y2', hovertemplate: '%{x}: %{y:.1f}<extra></extra>' }
-  ], layout({ xaxis: AX('', { type: 'date', anchor: 'y2' }), yaxis: AX('Annualised %', { domain: [0.46, 1] }), yaxis2: AX('Volatility points', { domain: [0, 0.38], range: [-45, 30], anchor: 'x' }),
+  ], layout({ xaxis: AX('', { type: 'date', anchor: 'y2' }), yaxis: AX('Annualised %', { domain: [0.46, 1] }), yaxis2: AX('Volatility points', { domain: [0, 0.38], range: [-75, 35], anchor: 'x' }),
     shapes: [{ type: 'line', xref: 'paper', yref: 'y2', x0: 0, x1: 1, y0: 0, y1: 0, line: { color: K.navy, width: 1.2 } }], legend: { orientation: 'h', x: 0, y: -0.12, yanchor: 'top' } }));
   const a = nwMean(pv, 21), b = nwMean(pvar, 21), w = pv.indexOf(Math.min(...pv));
   out('vr-out', [T.vr1(y0, fmtInt(pv.length), nf(mean(vx), 1), nf(mean(rv), 1)), T.vr2(nf(a.m, 2), nf(a.se, 2), nf(b.m, 0), nf(b.m / b.se, 1)),
@@ -366,10 +366,95 @@ function bckStatic() {                      // statistics of the top panel (they
   return T.bk3(nf(med, 1), nf(mx, 1), BK.dates[i], pct(ab, 2));
 }
 
+// ================================================================= case study 2: volatility expectations (Lochstoer & Muir)
+let LM = null;
+const LM_H = 12;
+function lmPrep() {
+  const L = D.lm; LM = { dates: L.dates, year: L.dates.map(x => +x.slice(0, 4)), rv: L.rv, vix2: L.vix2, s2: L.s2hat, ex: L.ex };
+}
+function lmFitPhi(y, rv, last) {            // NLS of y_t = a + b sum_{j<12} phi^j rv_{t-j}: grid over phi, OLS for (a, b)
+  let best = null;
+  for (let k = 0; k <= 316; k++) {
+    const p = -0.6 + k * (1.58 / 316), xs = [], ys = [];
+    for (let t = D.lm.J - 1; t <= last; t++) {
+      if (y[t] === null || y[t] === undefined) continue;
+      let x = 0; for (let j = 0; j < D.lm.J; j++) x += p ** j * rv[t - j];
+      xs.push(x); ys.push(y[t]);
+    }
+    const mx = mean(xs), my = mean(ys);
+    let sxy = 0, sxx = 0; for (let i = 0; i < xs.length; i++) { sxy += (xs[i] - mx) * (ys[i] - my); sxx += (xs[i] - mx) ** 2; }
+    const b = sxy / sxx, a = my - b * mx;
+    let ssr = 0; for (let i = 0; i < xs.length; i++) ssr += (ys[i] - a - b * xs[i]) ** 2;
+    if (!best || ssr < best.ssr) best = { ssr, phi: p };
+  }
+  return best.phi;
+}
+function lmIrf(rows) {                      // VAR(1) with intercept, Cholesky; responses to a 1-s.d. shock to the first variable
+  const n = rows.length, k = 3, m = k + 1;
+  const XtX = Array.from({ length: m }, () => new Array(m).fill(0)), XtY = Array.from({ length: m }, () => new Array(k).fill(0));
+  for (let t = 1; t < n; t++) {
+    const x = [1, ...rows[t - 1]];
+    for (let i = 0; i < m; i++) { for (let j = 0; j < m; j++) XtX[i][j] += x[i] * x[j]; for (let j = 0; j < k; j++) XtY[i][j] += x[i] * rows[t][j]; }
+  }
+  const inv = matInv(XtX), B = inv.map(r => [0, 1, 2].map(j => r.reduce((s, v, i) => s + v * XtY[i][j], 0)));
+  const S = Array.from({ length: k }, () => new Array(k).fill(0));
+  for (let t = 1; t < n; t++) {
+    const x = [1, ...rows[t - 1]], e = [0, 1, 2].map(j => rows[t][j] - x.reduce((s, v, i) => s + v * B[i][j], 0));
+    for (let i = 0; i < k; i++) for (let j = 0; j < k; j++) S[i][j] += e[i] * e[j];
+  }
+  const dof = (n - 1) - m; for (let i = 0; i < k; i++) for (let j = 0; j < k; j++) S[i][j] /= dof;
+  const p0 = Math.sqrt(S[0][0]), c = [p0, S[1][0] / p0, S[2][0] / p0];   // first column of the Cholesky factor
+  const A = [0, 1, 2].map(i => [0, 1, 2].map(j => B[j + 1][i]));
+  const out = [c];
+  for (let h = 0; h < LM_H; h++) { const v = out[out.length - 1]; out.push(A.map(r => r[0] * v[0] + r[1] * v[1] + r[2] * v[2])); }
+  return out;
+}
+function matInv(M) {                        // Gauss-Jordan
+  const n = M.length, a = M.map((r, i) => [...r, ...Array.from({ length: n }, (_, j) => +(i === j))]);
+  for (let c = 0; c < n; c++) {
+    let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(a[r][c]) > Math.abs(a[p][c])) p = r;
+    [a[c], a[p]] = [a[p], a[c]];
+    const d = a[c][c]; for (let j = 0; j < 2 * n; j++) a[c][j] /= d;
+    for (let r = 0; r < n; r++) if (r !== c) { const f = a[r][c]; for (let j = 0; j < 2 * n; j++) a[r][j] -= f * a[c][j]; }
+  }
+  return a.map(r => r.slice(n));
+}
+function lmCompute(y0) {
+  if (!LM) lmPrep();
+  let last = LM.year.lastIndexOf(y0);
+  const rows = [];
+  let first = null;
+  for (let t = 0; t <= last; t++) if (LM.s2[t] !== null) { if (first === null) first = t; rows.push([LM.s2[t], LM.vix2[t] - LM.s2[t], LM.ex[t]]); }
+  const next = LM.rv.map((v, t) => (t + 1 <= last ? LM.rv[t + 1] : null));
+  return { irf: lmIrf(rows), phiV: lmFitPhi(LM.vix2, LM.rv, last), phiR: lmFitPhi(next, LM.rv, last), n: rows.length, first, last };
+}
+function lmBlock() {
+  const y0 = +$('lm-y').value, R = lmCompute(y0), b = D.lm.bands[y0], h = range(0, LM_H, 1);
+  $('lm-y-v').textContent = y0 === 2026 ? (LANG === 'ro' ? 'aug. 2026' : 'Aug 2026') : (LANG === 'ro' ? 'dec. ' : 'Dec ') + y0;
+  const s2 = R.irf.map(v => v[0]), vrp = R.irf.map(v => v[1]), vx = R.irf.map(v => v[0] + v[1]), j = range(0, D.lm.J - 1, 1);
+  const span = `${LM.year[R.first]}-${y0}`;
+  plot('lm-irf', [
+    { x: h, y: b.hi, mode: 'lines', line: { width: 0 }, showlegend: false, hoverinfo: 'skip' },
+    { x: h, y: b.lo, mode: 'lines', fill: 'tonexty', fillcolor: 'rgba(205,0,0,0.15)', line: { width: 0 }, name: 'VRP: 95% bootstrap band', hoverinfo: 'skip' },
+    { x: h, y: s2, mode: 'lines+markers', name: 'Expected variance (real-time HAR)', line: { color: K.blue, width: 2 }, marker: { size: 5 }, hovertemplate: 'month %{x}: %{y:.0f}<extra></extra>' },
+    { x: h, y: vx, mode: 'lines', name: 'VIX² = expected variance + VRP', line: { color: K.teal, width: 1.8, dash: 'dash' }, hovertemplate: 'month %{x}: %{y:.0f}<extra></extra>' },
+    { x: h, y: vrp, mode: 'lines+markers', name: 'VRP = VIX² − expected variance', line: { color: K.red, width: 2 }, marker: { size: 5 }, hovertemplate: 'month %{x}: %{y:.0f}<extra></extra>' }
+  ], layout({ title: ttl(`Response to a 1-s.d. shock to expected variance, VAR(1), ${span}`), xaxis: AX('Months after the shock', { dtick: 2 }), yaxis: AX('Response (annualised %²)'),
+    shapes: [hline(0, K.navy)], legend: LEG }));
+  plot('lm-w', [
+    { x: j.map(v => v - 0.19), y: j.map(v => R.phiV ** v), type: 'bar', width: 0.36, name: `VIX²: φ̂ = ${R.phiV.toFixed(2)}`, marker: { color: K.purple }, hovertemplate: 'lag %{x:.0f}: %{y:.3f}<extra></extra>' },
+    { x: j.map(v => v + 0.19), y: j.map(v => (v === 0 ? 1 : R.phiR ** v)), type: 'bar', width: 0.36, name: `Next month realised variance: φ̂ = ${R.phiR.toFixed(2)}`, marker: { color: K.green }, hovertemplate: 'lag %{x:.0f}: %{y:.3f}<extra></extra>' }
+  ], layout({ title: ttl(`Weight on past realised variance, ${LM.year[0]}-${y0}`), xaxis: AX('Lag j of monthly realised variance', { dtick: 2 }), yaxis: AX('Weight φ^j'), legend: LEG, barmode: 'overlay' }));
+  const pos = vrp.findIndex(v => v > 0), mx = Math.max(...vrp);
+  out('lm-out', [T.lm1(y0 === 2026 ? (LANG === 'ro' ? 'august 2026' : 'August 2026') : y0, fmtInt(R.n), nf(R.phiV, 2), nf(R.phiR, 2)),
+    T.lm2(nf(s2[0], 0), nf(vx[0], 0), pct(vx[0] / s2[0], 0), nf(vrp[0], 0), nf(b.lo[0], 0), nf(b.hi[0], 0)),
+    T.lm3(pos, nf(mx, 0), vrp.indexOf(mx))]);
+}
+
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   on(['gk-sig', 'gk-S'], greeksBlock); P('gk-play', 'gk-sig', range(10, 50, 2), 250);
   on(['he-n'], hedgeBlock); P('he-play', 'he-n', range(0, 7, 1), 900);
   on(['vm-s'], mismatchBlock); P('vm-play', 'vm-s', range(10, 30, 1), 450);
@@ -381,10 +466,15 @@ function init() {
   on(['mz-c'], mzBlock); P('mz-play', 'mz-c', range(20, 90, 2), 400);
   on(['od-sig', 'od-d'], odteBlock); P('od-play', 'od-d', range(21, 1, -1), 400);
   sz('bk-chart', 500); on(['bk-h'], () => { bckBlock(); }); P('bk-play', 'bk-h', range(0, 3, 1), 1300);
-  greeksBlock(); hedgeBlock(); mismatchBlock(); smileBlock(); btcSmile(); rndBlock(); vixBlock(); vrpBlock(); mzBlock(); odteBlock(); bckBlock();
+  on(['lm-y'], lmBlock); P('lm-play', 'lm-y', range(2005, 2026, 1), 700);
+  const PFX = { 'greeks': 'gk', 'hedge-error': 'he', 'vol-mismatch': 'vm', 'smile-models': 'sm', 'btc-smile': 'bs', 'btc-rnd': 'rn',
+    'vix-history': 'vh', 'vrp': 'vr', 'mincer-zarnowitz': 'mz', 'odte': 'od', 'bounds': 'bk', 'vol-expectations': 'lm' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  greeksBlock(); hedgeBlock(); mismatchBlock(); smileBlock(); btcSmile(); rndBlock(); vixBlock(); vrpBlock(); mzBlock(); odteBlock(); bckBlock(); lmBlock();
   const o = $('bk-out'), st = bckStatic(), redraw = () => { if (!o.querySelector('.bk3')) o.insertAdjacentHTML('beforeend', `<li class="bk3">${st}</li>`); };
   redraw(); $('bk-h').addEventListener('input', redraw);
 }
-window.CH12 = { bs, greeks, impliedVol, hestonCalls, mertonPrice, svi, sviG, olsHAC, nwMean, rnPrep, rnBelow, get RN() { return RN; } };
+window.CH12 = { lmCompute, bs, greeks, impliedVol, hestonCalls, mertonPrice, svi, sviG, olsHAC, nwMean, rnPrep, rnBelow, get RN() { return RN; } };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

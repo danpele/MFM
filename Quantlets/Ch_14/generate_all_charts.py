@@ -281,7 +281,8 @@ def eval_returns():
             dm = M.diebold_mariano(e1, e0)
             st = M.sign_test(y, f)
             res[k] = dict(r2=100 * M.r2_oos(y, f), lo=100 * lo, hi=100 * hi, dm=dm['DM'], p=dm['p'],
-                          hit=100 * st['rate'], hit_p=st['p'], r2_post=100 * M.r2_oos(y[post], f[post]),
+                          hit=100 * st['rate'], hit_up=100 * st['up'], hit_p=st['p'], hit_pt=st['pt'],
+                          hit_p_pt=st['p_pt'], r2_post=100 * M.r2_oos(y[post], f[post]),
                           sd_f=float(f.std()))
         res['lstm_seeds'] = [100 * M.r2_oos(y, d[f'lstm_s{s}'].values) for s in range(5)]
         out[a] = res
@@ -475,10 +476,31 @@ def eval_risk():
             v10[m] = dict(rate=100 * k['rate'], p_uc=k['p'], p_ind=c['p_ind'],
                           pin=float(np.mean(M.pinball(-L, -d[col].values, 0.10))))
         res['v10'] = v10
+        # family declared before the comparison: the five DM tests against FHS on this market (Holm)
+        others = [m for m in RISK_MODELS if m != 'FHS']
+        adj = holm([res[m]['p_dm_fhs'] for m in others])
+        for m, q in zip(others, adj):
+            res[m]['p_dm_fhs_holm5'] = float(q)
         out[a] = res
         series[a] = d
+    # wider family: the 15 DM tests against FHS on the three markets (Holm)
+    keys = [(a, m) for a in M.ASSETS for m in RISK_MODELS if m != 'FHS']
+    adj = holm([out[a][m]['p_dm_fhs'] for a, m in keys])
+    for (a, m), q in zip(keys, adj):
+        out[a][m]['p_dm_fhs_holm15'] = float(q)
     RES['risk'] = out
     return series
+
+
+def holm(p):
+    """Holm step-down adjusted p-values."""
+    p = np.asarray(p, float)
+    order = np.argsort(p)
+    adj, run = np.empty(len(p)), 0.0
+    for i, k in enumerate(order):
+        run = max(run, min(1.0, (len(p) - i) * p[k]))
+        adj[k] = run
+    return adj
 
 
 def fig_breaches():

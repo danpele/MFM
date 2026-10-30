@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch15_colour_words'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Second case study of Lecture 15, Garcia, Hu and Rohrer (2023, Journal of Financial Economics): positive and negative word lists learned from price reactions with the robust multinomial inverse regression (500 subsamples, cut-off 80% on the net share of positive loadings), trained on FNSPID headlines of 16 US stocks up to 2019 and compared out of sample (2020-2023) with the Loughran-McDonald lists and the FinBERT and Qwen2.5-7B scores: R2 of the 4-day excess return and the return per standard deviation of each word list.'
+
+Keywords: 'textual analysis, sentiment dictionary, multinomial inverse regression, Loughran-McDonald, news, stock returns, case study'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'FNSPID financial news headlines (Dong, Fan & Peng, 2024; CC BY-NC 4.0) for 16 US stocks (ch15_c3_headlines.csv.gz) and the saved daily FinBERT and Qwen2.5-7B scores of the chapter (ch15_news_daily.csv); daily adjusted closes of the same stocks and SPY (data/market); Loughran-McDonald word lists (pysentiment2)'
+
+Output: 'ch15_colour_words.pdf, ch15_colour_results.json'

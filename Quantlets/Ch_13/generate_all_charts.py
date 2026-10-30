@@ -304,15 +304,15 @@ def fig_purged_cv_scheme():
     fig, ax = plt.subplots(figsize=(7.0, 2.6))
     for fold, (train, test) in enumerate(cv.split(idx)):
         y = k - fold
-        stop = test[-1]
+        stop, end = test[-1], t1.iloc[test].max()
         colours = []
         for t in range(n):
             if t in test:
                 colours.append(IDAred)
             elif t in train:
                 colours.append(MainBlue)
-            elif stop < t <= stop + emb:
-                colours.append(Amber)     # embargo: the emb observations right after the test block
+            elif t > stop and t1.index[t] > end:
+                colours.append(Amber)     # embargo: emb observations after the end of the last test label
             else:
                 colours.append(Purple)    # purged: label interval overlaps the test labels
         start = 0                         # one rectangle per run of equal colour (no seams in the PDF)
@@ -329,7 +329,7 @@ def fig_purged_cv_scheme():
     handles = [mpatches.Patch(color=MainBlue, label='Train'),
                mpatches.Patch(color=IDAred, label='Test'),
                mpatches.Patch(color=Purple, label='Purged (label overlaps test)'),
-               mpatches.Patch(color=Amber, label='Embargo (after test)')]
+               mpatches.Patch(color=Amber, label='Embargo (after the last test label)')]
     ax.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.25), ncol=4, frameon=False)
     plt.tight_layout()
     save_fig('ch13_purged_cv_scheme')
@@ -400,6 +400,56 @@ def modelling_frame(d_star):
     return df
 
 
+class PurgedEarlyStoppingMLP:
+    """MLP cu oprire timpurie pe o validare interna cronologica si purjata.
+    Validarea: ultimele 10% observatii ale setului de antrenare (in ordine cronologica); se elimina
+    cele `purge` observatii dinaintea ei, ale caror etichete se suprapun cu validarea. Scalerul se
+    estimeaza doar pe partea de antrenare. Criteriul de oprire: log loss pe validare
+    (n_iter_no_change epoci fara imbunatatire >= tol); se pastreaza ponderile epocii cu log loss minim."""
+
+    def __init__(self, hidden_layer_sizes=(32, 16), alpha=1e-2, max_iter=500, val_frac=0.1, purge=H_LABEL,
+                 n_iter_no_change=10, tol=1e-4, random_state=SEED):
+        self.hidden_layer_sizes, self.alpha, self.max_iter = hidden_layer_sizes, alpha, max_iter
+        self.val_frac, self.purge, self.n_iter_no_change, self.tol = val_frac, purge, n_iter_no_change, tol
+        self.random_state = random_state
+
+    def get_params(self, deep=False):
+        return dict(hidden_layer_sizes=self.hidden_layer_sizes, alpha=self.alpha, max_iter=self.max_iter,
+                    val_frac=self.val_frac, purge=self.purge, n_iter_no_change=self.n_iter_no_change,
+                    tol=self.tol, random_state=self.random_state)
+
+    def fit(self, X, y):
+        import copy
+        from sklearn.metrics import log_loss
+        X, y = np.asarray(X, float), np.asarray(y)
+        n_val = max(int(len(y) * self.val_frac), 1)
+        fit_end = len(y) - n_val - self.purge
+        Xf, yf, Xv, yv = X[:fit_end], y[:fit_end], X[len(y) - n_val:], y[len(y) - n_val:]
+        self.scaler_ = StandardScaler().fit(Xf)
+        Xf, Xv = self.scaler_.transform(Xf), self.scaler_.transform(Xv)
+        self.classes_ = np.unique(y)
+        net = MLPClassifier(hidden_layer_sizes=self.hidden_layer_sizes, alpha=self.alpha,
+                            random_state=self.random_state)
+        best, best_net, bad = np.inf, None, 0
+        for _ in range(self.max_iter):
+            net.partial_fit(Xf, yf, classes=self.classes_)
+            loss = log_loss(yv, net.predict_proba(Xv)[:, 1], labels=self.classes_)
+            if loss < best - self.tol:
+                best, best_net, bad = loss, copy.deepcopy(net), 0
+            else:
+                bad += 1
+                if bad >= self.n_iter_no_change:
+                    break
+        self.net_, self.val_loss_ = best_net or net, best
+        return self
+
+    def predict_proba(self, X):
+        return self.net_.predict_proba(self.scaler_.transform(np.asarray(X, float)))
+
+    def predict(self, X):
+        return self.classes_[(self.predict_proba(X)[:, 1] > 0.5).astype(int)]
+
+
 def get_models():
     return {
         'Logistic (L2)': make_pipeline(StandardScaler(), LogisticRegression(C=0.1, max_iter=2000)),
@@ -408,10 +458,8 @@ def get_models():
         'Gradient Boosting': HistGradientBoostingClassifier(max_depth=3, learning_rate=0.03,
                                                             max_iter=200, min_samples_leaf=100,
                                                             random_state=SEED),
-        'Neural net (MLP)': make_pipeline(StandardScaler(),
-                                          MLPClassifier(hidden_layer_sizes=(32, 16), alpha=1e-2,
-                                                        early_stopping=True, max_iter=500,
-                                                        random_state=SEED)),
+        'Neural net (MLP)': PurgedEarlyStoppingMLP(hidden_layer_sizes=(32, 16), alpha=1e-2, max_iter=500,
+                                                   random_state=SEED),
     }
 
 
@@ -583,25 +631,44 @@ def fig_feature_importance(df):
 # =============================================================================
 # FIG 10: Backtest walk-forward al unui semnal ML (cu costuri)
 # =============================================================================
-def fig_walk_forward_backtest(df, cost_bp=5):
-    feat_cols = [c for c in df.columns if c not in ('fwd', 'y', 't1')]
-    ret1 = np.log(spx).diff().shift(-1).reindex(df.index)      # randamentul zilei urmatoare
-    signal = pd.Series(np.nan, index=df.index)
-    years = range(2010, df.index[-1].year + 1)
-    for yr in years:
+D_FROZEN_END = '2009-12-31'      # d al caracteristicii FFD ales doar pe date anterioare testului (2010-)
+
+
+def next_close_return(index):
+    """Decizia la inchiderea t, tranzactia la inchiderea t+1: pozitia cistiga randamentul log
+    dintre inchiderile t+1 si t+2."""
+    return np.log(spx).diff().shift(-2).reindex(index)
+
+
+def walk_forward_signal(df, feat_cols, start=2010):
+    """GBM reestimat anual; antrenare doar pe etichete cunoscute inainte de inceputul anului de test."""
+    prob = pd.Series(np.nan, index=df.index)
+    for yr in range(start, df.index[-1].year + 1):
         test = df.index[df.index.year == yr]
-        train = df.index[df['t1'] < test[0]]                    # purjare: etichete cunoscute inainte de test
+        train = df.index[df['t1'] < test[0]]
         model = HistGradientBoostingClassifier(max_depth=3, learning_rate=0.03, max_iter=200,
                                                min_samples_leaf=100, random_state=SEED)
         model.fit(df.loc[train, feat_cols], df.loc[train, 'y'])
-        prob = model.predict_proba(df.loc[test, feat_cols])[:, 1]
-        signal.loc[test] = np.where(prob > 0.5, 1.0, 0.0)       # long / cash
-    oos = signal.dropna().index
-    pos = signal.loc[oos]
+        prob.loc[test] = model.predict_proba(df.loc[test, feat_cols])[:, 1]
+    return prob
+
+
+def long_cash_returns(prob, cost_bp=5):
+    """Long / cash dupa P(sus) > 0,5; executie la inchiderea urmatoare; cost cost_bp la fiecare schimbare."""
+    pos = (prob.dropna() > 0.5).astype(float)
     turnover = pos.diff().abs().fillna(pos.iloc[0])
-    strat = pos * ret1.loc[oos] - turnover * cost_bp / 1e4
-    bh = ret1.loc[oos]
-    strat, bh = strat.dropna(), bh.dropna()
+    r = next_close_return(pos.index)
+    strat = (pos * r - turnover * cost_bp / 1e4).dropna()
+    return strat, r.loc[strat.index], pos
+
+
+def fig_walk_forward_backtest(df=None, cost_bp=5):
+    """Rezultatul principal: d inghetat pe datele pina in 2009 (inainte de test), executie la inchiderea urmatoare."""
+    if df is None:
+        _, d_pre = find_min_d(log_spx.loc[:D_FROZEN_END])
+        df = modelling_frame(d_pre)
+    feat_cols = [c for c in df.columns if c not in ('fwd', 'y', 't1')]
+    strat, bh, pos = long_cash_returns(walk_forward_signal(df, feat_cols), cost_bp)
 
     fig, ax = plt.subplots(figsize=(7.0, 3.0))
     ax.plot(bh.index, np.exp(bh.cumsum()), color=Amber, lw=0.9,
@@ -613,7 +680,7 @@ def fig_walk_forward_backtest(df, cost_bp=5):
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f'{v:g}'))
     ax.yaxis.set_minor_formatter(plt.NullFormatter())
     ax.set_ylabel('Growth of 1 USD (log scale)')
-    ax.set_title('Walk-forward backtest 2010-2026: yearly refit, purged training window',
+    ax.set_title('Walk-forward backtest 2010-2026: yearly refit, purged training, trade at the next close',
                  fontsize=9, loc='left')
     legend_outside_bottom(ax, ncol=2, y=-0.13)
     plt.tight_layout()
@@ -656,10 +723,12 @@ def fig_expected_max_sharpe():
 # FIG 12: Backtest overfitting: Sharpe in-sample vs out-of-sample
 # =============================================================================
 def btc_grid_returns():
-    """Randamentele log zilnice ale celor 1 279 de reguli long/cash (MA rapida, MA lenta, banda) pe BTC.
+    """Randamentele log zilnice ale celor 1 284 de reguli long/cash (MA rapida, MA lenta, banda) pe BTC.
+    Decizia la inchiderea t, tranzactia la inchiderea t+1: pozitia cistiga randamentul dintre inchiderile
+    t+1 si t+2 (semnal decalat cu doua zile fata de randamentul r_t = x_t - x_{t-1}).
     Semnalul lipseste (NaN) pana cand ambele medii exista; toate regulile incep in prima zi in care
-    semnalul celei mai lente reguli este disponibil (dupa decalajul de o zi), deci nicio regula nu
-    primeste o perioada artificiala in numerar."""
+    semnalul celei mai lente reguli este disponibil, deci nicio regula nu primeste o perioada
+    artificiala in numerar."""
     r = np.log(btc).diff()
     lp = np.log(btc)
     cols = {}
@@ -669,21 +738,31 @@ def btc_grid_returns():
                 continue
             for band in (0.0, 0.01, 0.03):
                 gap = lp.rolling(fast).mean() - lp.rolling(slow).mean()
-                sig = (gap > band).astype(float).where(gap.notna()).shift(1)
+                sig = (gap > band).astype(float).where(gap.notna()).shift(2)
                 cols[(fast, slow, band)] = sig * r
     M = pd.DataFrame(cols)
     return M.loc[M.dropna().index[0]:].dropna()
 
 
+def btc_grid_family(split='2021-01-01'):
+    """Familia testata: regulile cu varianta nenula in esantion (IS), fara nicio conditie pe perioada OOS."""
+    M = btc_grid_returns()
+    return M.loc[:, M[M.index < split].std() > 0]
+
+
 def fig_is_vs_oos():
     """Cautare de parametri pentru o strategie de medii mobile pe BTC: IS 15.05.2015-2020, OOS 2021-2026.
     Toate regulile se evalueaza din aceeasi zi: prima zi cu semnal valid pentru cea mai lenta medie (240 de zile)."""
-    M = btc_grid_returns()
+    M = btc_grid_family()
     is_mask = M.index < '2021-01-01'
     rows = []
     for (fast, slow, band), x in M.items():
         rows.append((fast, slow, band, sharpe_ratio(x[is_mask], 365), sharpe_ratio(x[~is_mask], 365)))
-    res = pd.DataFrame(rows, columns=['fast', 'slow', 'band', 'sr_is', 'sr_oos']).dropna()
+    res = pd.DataFrame(rows, columns=['fast', 'slow', 'band', 'sr_is', 'sr_oos'])
+    # familia se fixeaza doar din IS; o regula mereu in numerar OOS are randament zero si Sharpe OOS nedefinit,
+    # inclus cu valoarea 0 in statisticile agregate
+    res['oos_undefined'] = res['sr_oos'].isna()
+    res['sr_oos'] = res['sr_oos'].fillna(0.0)
     best = res.loc[res['sr_is'].idxmax()]
     rank_corr = stats.spearmanr(res['sr_is'], res['sr_oos'])[0]
     top = res.nlargest(int(len(res) * 0.1), 'sr_is')
@@ -715,7 +794,7 @@ def fig_deflated_sharpe():
     fig, ax = plt.subplots(figsize=(6.8, 3.0))
     for sr_ann, c in zip([1.0, 1.5, 2.0, 2.5], [IDAred, Amber, Forest, MainBlue]):
         sr = sr_ann / np.sqrt(252)
-        dsr = deflated_sharpe_ratio(sr, T, np.maximum(N, 1.0001), sr_std, skew=-0.5, kurt=6.0)
+        dsr = deflated_sharpe_ratio(sr, T, N, sr_std, skew=-0.5, kurt=6.0)   # N = 1: SR_0 = 0, DSR = PSR(0)
         ax.plot(N, dsr, color=c, label=f'observed SR = {sr_ann}')
     ax.axhline(0.95, color=Gray, ls='--', lw=0.8)
     ax.text(0.03, 0.12, 'Dashed line: 95% confidence', transform=ax.transAxes, fontsize=8, color='black', bbox=dict(facecolor='white', edgecolor='none', pad=1))
@@ -863,7 +942,7 @@ if __name__ == '__main__':
     print(fig_model_comparison(df))
     mdi, mda, shp = fig_feature_importance(df)
     print(pd.DataFrame({'mdi': mdi, 'mda': mda, 'shap': shp}).round(4))
-    print('   walk-forward SR strat / B&H / exposure:', fig_walk_forward_backtest(df))
+    print('   walk-forward SR strat / B&H / exposure:', fig_walk_forward_backtest())
     fig_expected_max_sharpe()
     res, best, rho, top_oos = fig_is_vs_oos()
     print('   IS/OOS best:', best.to_dict(), 'rho', round(rho, 3), 'top10 median OOS', round(top_oos, 3),

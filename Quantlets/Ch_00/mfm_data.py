@@ -9,6 +9,7 @@ Surse:
                    citite local, altfel din repo-ul GitHub MFM.
   * 'fred'      -- FRED (CSV public: randamente Treasury SUA, rata Fed Funds
   * 'defillama' -- DefiLlama (JSON public: oferta de stablecoins legate de USD
+  * 'french'    -- Kenneth French Data Library (zip public: factori Fama-French lunari)
   * 'bnr'       -- BNR (arhive XML anuale publice:
                    cursul oficial de referinta EUR/RON
 
@@ -71,6 +72,11 @@ SERIES = {
     'ETF equities':       ('fred', 'BOGZ1LM563064100Q', None),   # Financial Accounts of the US, trimestrial, mil. USD
     'All equities':       ('fred', 'BOGZ1LM893064105Q', None),
     'Stablecoins':        ('defillama', 'stablecoincharts/all', None),
+    # Kenneth French Data Library (lunar, zecimal): piata SUA ponderata dupa capitalizare (CRSP) si T-bill 1 luna
+    'US market excess (FF)': ('french', 'F-F_Research_Data_Factors', 'Mkt-RF'),
+    'T-bill 1m (FF)':        ('french', 'F-F_Research_Data_Factors', 'RF'),
+    'DFII10':             ('fred', 'DFII10', None),     # randamentul TIPS la 10 ani (indexat la inflatie)
+    'DTB3':               ('fred', 'DTB3', None),       # T-bill la 3 luni (piata secundara)
 }
 
 
@@ -108,6 +114,23 @@ def fetch_daily(symbol, source='market', field='close', start=START, end=END):
                 if m:
                     rows.append((d, float(m.group(1))))
         s = pd.Series(dict(rows))
+    elif source == 'french':
+        # Kenneth French Data Library (public zip): monthly Fama-French factors, in percent
+        import zipfile
+        url = f'https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/{symbol}_CSV.zip'
+        raw = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'}),
+                                     timeout=120).read()
+        z = zipfile.ZipFile(io.BytesIO(raw))
+        lines = z.read(z.namelist()[0]).decode('latin-1').splitlines()
+        i = next(k for k, l in enumerate(lines) if l.startswith(',') and len(l.split(',')) > 1)
+        cols = [c.strip() for c in lines[i].split(',')[1:]]
+        rows = {}
+        for l in lines[i + 1:]:
+            parts = [x.strip() for x in l.split(',')]
+            if len(parts[0]) != 6 or not parts[0].isdigit():
+                break                                                     # end of the monthly table
+            rows[pd.Timestamp(parts[0] + '01') + pd.offsets.MonthEnd(0)] = float(parts[1 + cols.index(field)])
+        s = pd.Series(rows) / 100.0                                       # percent -> decimal
     else:
         raise ValueError(f'unknown source: {source}')
     s = pd.to_numeric(s, errors='coerce')

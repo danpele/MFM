@@ -1,0 +1,103 @@
+{
+ "id": "ch8-mc-size-power-v1",
+ "description": "Monte Carlo size and power of the VaR 1% backtests (mc_size_power in generate_all_charts.py): GARCH(1,1)-t DGP with the parameters below, estimated once on the S&P 500 1990-2026; seed 8, 1000 paths, 1000-day burn window. Single source for the lecture, the seminar and the code.",
+ "seed": 8,
+ "reps": 1000,
+ "window": 1000,
+ "par": {
+  "mu": 0.0007491948629249627,
+  "omega": 1.2150554550787898e-06,
+  "alpha": 0.10233288283518951,
+  "beta": 0.8921131492412178,
+  "nu": 6.145100526572755
+ },
+ "results": {
+  "Correct": {
+   "250": {
+    "POF": 0.097,
+    "CC": 0.011,
+    "DUR": 0.15,
+    "DQ": 0.086,
+    "dur_nan": 0.281
+   },
+   "1000": {
+    "POF": 0.064,
+    "CC": 0.033,
+    "DUR": 0.08,
+    "DQ": 0.11,
+    "dur_nan": 0.0
+   },
+   "5000": {
+    "POF": 0.049,
+    "CC": 0.034,
+    "DUR": 0.046,
+    "DQ": 0.088,
+    "dur_nan": 0.0
+   }
+  },
+  "Normal-GARCH": {
+   "250": {
+    "POF": 0.106,
+    "CC": 0.048,
+    "DUR": 0.148,
+    "DQ": 0.188,
+    "dur_nan": 0.128
+   },
+   "1000": {
+    "POF": 0.302,
+    "CC": 0.199,
+    "DUR": 0.082,
+    "DQ": 0.302,
+    "dur_nan": 0.0
+   },
+   "5000": {
+    "POF": 0.837,
+    "CC": 0.772,
+    "DUR": 0.073,
+    "DQ": 0.707,
+    "dur_nan": 0.0
+   }
+  },
+  "HS": {
+   "250": {
+    "POF": 0.515,
+    "CC": 0.17,
+    "DUR": 0.12,
+    "DQ": 0.325,
+    "dur_nan": 0.486
+   },
+   "1000": {
+    "POF": 0.464,
+    "CC": 0.469,
+    "DUR": 0.683,
+    "DQ": 0.738,
+    "dur_nan": 0.042
+   },
+   "5000": {
+    "POF": 0.571,
+    "CC": 0.866,
+    "DUR": 1.0,
+    "DQ": 0.995,
+    "dur_nan": 0.0
+   }
+  }
+ },
+ "dq_calibration": {
+  "reps": 1000,
+  "seed": 8,
+  "T": 4959,
+  "q95": 14.212700411403706,
+  "chi2_q95": 12.591587243743977,
+  "size_asymptotic": 0.078,
+  "FHS": {
+   "DQ": 27.014147190111267,
+   "p_sim": 0.005994005994005994,
+   "p_asy": 0.00014392651600189633
+  },
+  "GARCH-EVT": {
+   "DQ": 27.537533537920545,
+   "p_sim": 0.004995004995004995,
+   "p_asy": 0.00011480098132044106
+  }
+ }
+}

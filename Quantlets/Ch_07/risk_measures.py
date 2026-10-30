@@ -4,7 +4,7 @@ risk_measures.py -- Risk measures of Chapter 7 (MFM): VaR and Expected Shortfall
 Level convention (tail probability alpha, e.g. alpha = 1%):
   VaR_alpha(X) = -inf{x : P(X <= x) > alpha} = -q_alpha(X), the loss exceeded with probability alpha;
   ES_alpha(X)  = -(1/alpha) * integral_0^alpha q_u(X) du = -E[X | X <= q_alpha(X)] (continuous distributions).
-The code works with the loss L = -X (in %): VaR_alpha = q_{1-alpha}(L), ES_alpha = E[L | L >= VaR_alpha];
+The code works with the loss L = -X (in %): VaR_alpha = q_{1-alpha}(L), ES_alpha = (1/alpha) int_{1-alpha}^1 q_u(L) du;
 VaR and ES are POSITIVE numbers when they are losses.
 
 Methods: historical (HS), Normal distribution, Student-t, Cornish-Fisher, FHS (GARCH-filtered),
@@ -19,11 +19,34 @@ from scipy import stats, integrate, signal
 from arch import arch_model
 
 
+def hs_es_weights(L, alpha):
+    """Weights of the historical ES: the integral of the empirical quantile function over the top alpha of the losses.
+    With L_(1) <= ... <= L_(n) and m = floor(n alpha): weight 1/(n alpha) on L_(n), ..., L_(n-m+1) and
+    (n alpha - m)/(n alpha) on L_(n-m); the weights sum to 1 and are returned in the order of L."""
+    L = np.asarray(L, float)
+    n = len(L)
+    na = n * alpha
+    m = int(np.floor(na + 1e-9))
+    frac = max(na - m, 0.0)
+    order = np.argsort(-L, kind='stable')          # largest loss first
+    w = np.zeros(n)
+    w[order[:m]] = 1.0 / na
+    if frac > 1e-12 and m < n:
+        w[order[m]] = frac / na
+    return w
+
+
+def hs_es(L, alpha):
+    """Historical ES: ES_alpha = (1/(n alpha)) [sum_{i=1}^{m} L_(n-i+1) + (n alpha - m) L_(n-m)], m = floor(n alpha)."""
+    return float(hs_es_weights(L, alpha) @ np.asarray(L, float))
+
+
 def hs_var_es(L, alpha):
-    """Historical simulation: VaR alpha = empirical (1 - alpha)-quantile of the loss; ES = mean of the losses beyond it."""
-    L = np.asarray(L)
+    """Historical simulation: VaR alpha = empirical (1 - alpha)-quantile of the loss (linear interpolation);
+    ES alpha = integral of the empirical quantile function over the top alpha (fractional weight on the last loss)."""
+    L = np.asarray(L, float)
     v = np.quantile(L, 1 - alpha)
-    return v, L[L >= v].mean()
+    return v, hs_es(L, alpha)
 
 
 def normal_var_es(L, alpha):
@@ -38,10 +61,21 @@ def t_fit(L):
     return stats.t.fit(np.asarray(L))
 
 
+def _check_level(alpha):
+    if not (0 < alpha < 1):
+        raise ValueError(f'tail probability alpha must lie in (0, 1), got {alpha}')
+
+
 def t_var_es(L, alpha, params=None):
-    """Student-t on losses: VaR = m + s t_{1-alpha}, ES = m + s g(t_alpha)/alpha (nu + t_alpha^2)/(nu - 1)."""
+    """Student-t on losses: VaR = m + s t_{1-alpha}, ES = m + s g(t_alpha)/alpha (nu + t_alpha^2)/(nu - 1).
+    ES exists only for nu > 1 (finite mean); for nu <= 1 the tail mean is infinite and ES is returned as +inf."""
+    _check_level(alpha)
     nu, m, s = params if params is not None else t_fit(L)
+    if not (nu > 0 and s > 0):
+        raise ValueError(f'Student-t needs nu > 0 and scale > 0, got nu={nu}, scale={s}')
     q = stats.t.ppf(1 - alpha, nu)
+    if nu <= 1:
+        return m + s * q, np.inf
     return m + s * q, m + s * stats.t.pdf(q, nu) / alpha * (nu + q ** 2) / (nu - 1)
 
 
@@ -69,10 +103,25 @@ def gpd_fit(L, tail=0.05):
     return dict(u=u, xi=xi, beta=beta, nu=len(ex), n=len(L))
 
 
+XI_ZERO = 1e-8      # |xi| below this: the exponential limit (xi = 0) of the GPD formulas
+
+
 def gpd_var_es(fit, alpha):
-    """VaR and ES at tail probability alpha from the GPD tail (Smith-type estimator)."""
+    """VaR and ES at tail probability alpha from the GPD tail (Smith-type estimator).
+    The level must lie in the modelled tail: alpha <= N_u/n (up to one observation). xi = 0 (|xi| < XI_ZERO) uses the exponential limit
+    VaR = u + beta log((N_u/n)/alpha), ES = VaR + beta; for xi >= 1 the tail mean is infinite and ES is +inf."""
+    _check_level(alpha)
     u, xi, beta, nu, n = fit['u'], fit['xi'], fit['beta'], fit['nu'], fit['n']
+    if not beta > 0:
+        raise ValueError(f'GPD scale must be positive, got {beta}')
+    if alpha > (nu + 1) / n:      # one observation of slack: u is itself an empirical quantile
+        raise ValueError(f'alpha = {alpha} lies outside the modelled tail (N_u/n = {nu / n})')
+    if abs(xi) < XI_ZERO:
+        var = u + beta * np.log((nu / n) / alpha)
+        return var, var + beta
     var = u + beta / xi * (((n / nu) * alpha) ** (-xi) - 1)
+    if xi >= 1:
+        return var, np.inf
     return var, var / (1 - xi) + (beta - xi * u) / (1 - xi)
 
 
@@ -255,7 +304,7 @@ def rolling_conditional(r, first_year, window_hs=500, alpha=0.01, tail_evt=0.10)
         nz = -z.values
         fz = gpd_fit(nz, tail_evt)
         q_fhs, q_evt_v = np.quantile(nz, 1 - alpha), gpd_var_es(fz, alpha)[0]
-        es_fhs = nz[nz >= q_fhs].mean()
+        es_fhs = hs_es(nz, alpha)
         es_evt = gpd_var_es(fz, alpha)[1]
         days = r.loc[f'{y}-01-01':f'{y}-12-31'].index
         for d in days:

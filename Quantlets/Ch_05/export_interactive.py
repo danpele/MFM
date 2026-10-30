@@ -131,11 +131,41 @@ def main():
     sp_grid = grid[grid.market == 'sp500']
     d['dbic'] = {f'{a}|{b}': float(v) for a, b, v in zip(sp_grid.vol, sp_grid.dist, sp_grid.dbic)}
 
+    # MF2-GARCH case study
+    d['mf2'] = mf2_block()
+
     with open(OUT, 'w') as fh:
         fh.write('// Inputs of the Chapter 5 interactive page, exported by Quantlets/Ch_05/export_interactive.py.\n')
         fh.write('window.CH5_DATA = ' + json.dumps(d, separators=(',', ':'), default=float).replace('NaN', 'null') + ';\n')
     print('wrote', OUT, os.path.getsize(OUT) // 1024, 'KB')
 
 
+def mf2_block():
+    """MF2-GARCH case study (case_mf2garch.py, ch5_mf2_case.json): daily S&P 500 returns 1990-2026, the estimates for
+    every window m of the BIC grid (the page re-runs the filter), and the out-of-sample loss ratios."""
+    J = json.load(open(os.path.join(HERE, 'ch5_mf2_case.json')))
+    import case_mf2garch as cm
+    rr = cm.pct_returns('sp500', start=cm.START, end=cm.END)
+    assert len(rr) == J['n'] and str(rr.index[0].date()) == J['start']
+    ev = {per: {h: dict(gjr_ql=J['oos'][per][h]['gjr']['qlike_rel'], mf2_ql=J['oos'][per][h]['mf2']['qlike_rel'],
+                        gjr_rmse=J['oos'][per][h]['gjr']['rmse_rel'], mf2_rmse=J['oos'][per][h]['mf2']['rmse_rel'],
+                        dm_ql=J['oos'][per][h]['dm_ql'], dm_se=J['oos'][per][h]['dm_se'], n=J['oos'][per][h]['n'])
+                for h in J['horizons']} for per in ('pre', 'full')}
+    return dict(calendar(rr.index), r=r(rr.values, 6), ppy=float(J['ppy']), burn=cm.BURN, m=J['m'],
+                grid={k: r(v, 8) for k, v in J['grid_theta'].items()}, bic={str(d['m']): float(d['bic']) for d in J['bic_grid']},
+                n_eff=J['n_eff'], bic_gjr=float(J['bic_gjr']), gjr=J['gjr'], horizons=J['horizons'], oos=ev,
+                tau_max=J['tau_max'], tau_min=J['tau_min'], nber=cm.NBER)
+
+
 if __name__ == '__main__':
-    main()
+    import sys
+    if sys.argv[1:] == ['--only', 'mf2']:
+        txt = open(OUT).read()
+        head, js = txt.split('window.CH5_DATA = ', 1)
+        d = json.loads(js.rstrip().rstrip(';'))
+        d['mf2'] = mf2_block()
+        with open(OUT, 'w') as fh:
+            fh.write(head + 'window.CH5_DATA = ' + json.dumps(d, separators=(',', ':'), default=float).replace('NaN', 'null') + ';\n')
+        print('wrote', OUT, '(key mf2)', os.path.getsize(OUT) // 1024, 'KB')
+    else:
+        main()

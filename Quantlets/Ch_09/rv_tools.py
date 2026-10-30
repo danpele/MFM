@@ -109,16 +109,37 @@ def signature(P, ks, scale):
         'subsampled': [np.sqrt(scale * subsampled_rv(P, k).mean()) for k in ks]}, index=list(ks))
 
 
-def tsrv(P, K=6, adjust=False):
-    """Two-scale realised variance (Zhang, Mykland and Ait-Sahalia): average over K grids minus the noise correction.
-    Grilele pastreaza deschiderea si inchiderea, deci nbar = numarul mediu EFECTIV de randamente pe grila
-    (the noise bias of the average is 2 nbar omega^2); adjust=True divides by 1 - nbar/n (small samples)."""
-    R = 100 * np.log(P).diff(axis=1).iloc[:, 1:]
-    n = nret(R)
-    nbar = pd.concat([pd.Series({d: len(x) - 1 for d, x in sparse_points(P, K, o).items()}) for o in range(K)],
-                     axis=1).mean(axis=1)
-    ts = subsampled_rv(P, K) - nbar / n * rv(R)
-    return ts / (1 - nbar / n) if adjust else ts
+def tsrv(P, K=6, adjust=False, keep_ends=False):
+    """Two-scale realised variance (Zhang, Mykland and Ait-Sahalia) on the standard shifted grids.
+
+    Grid k (k = 0..K-1) uses the log prices k, k+K, k+2K, ... <= n; the day's first and last prices are NOT added
+    to every grid (adding the same two end points to all grids leaves a common noise term that does not vanish).
+    n_k = number of returns on grid k, nbar = mean of n_k (= (n - K + 1)/K when K divides n); the noise bias of
+    the grid average is 2 nbar omega^2. TSRV = RV_avg - nbar/n RV_all; adjust=True divides by 1 - nbar/n.
+    keep_ends=True: practical variant that adds the first and the last price to every grid (each grid covers the
+    whole day; nbar counts the returns actually used, e.g. 83/6 for n = 78, K = 6); the common end-point noise
+    then does not vanish asymptotically, so this variant is a finite-sample approximation, not the consistent TSRV."""
+    if keep_ends:
+        R = 100 * np.log(P).diff(axis=1).iloc[:, 1:]
+        n = nret(R)
+        nbar = pd.concat([pd.Series({d: len(x) - 1 for d, x in sparse_points(P, K, o).items()}) for o in range(K)],
+                         axis=1).mean(axis=1)
+        ts = subsampled_rv(P, K) - nbar / n * rv(R)
+        return ts / (1 - nbar / n) if adjust else ts
+    out = {}
+    X = np.log(P.values)
+    for i, day in enumerate(P.index):
+        x = 100 * X[i][np.isfinite(X[i])]
+        n = len(x) - 1
+        rvs, nks = [], []
+        for k in range(K):
+            g = x[k::K]
+            rvs.append(np.sum(np.diff(g) ** 2))
+            nks.append(len(g) - 1)
+        nbar = np.mean(nks)
+        ts = np.mean(rvs) - nbar / n * np.sum(np.diff(x) ** 2)
+        out[day] = ts / (1 - nbar / n) if adjust else ts
+    return pd.Series(out)
 
 
 def noise_var(R):
@@ -134,17 +155,28 @@ def parzen(x):
     return np.where(x <= 0.5, 1 - 6 * x ** 2 + 6 * x ** 3, np.where(x <= 1, 2 * (1 - x) ** 3, 0.0))
 
 
-def realized_kernel(R, P, c=3.5134):
-    """Parzen realised kernel (Barndorff-Nielsen, Hansen, Lunde and Shephard); bandwidth H from their rule."""
+def realized_kernel(R, P, c=3.5134, m=2):
+    """Parzen realised kernel (Barndorff-Nielsen, Hansen, Lunde and Shephard) with jittered end points.
+
+    Jittering (BNHLS, "Realised kernels in practice", 2009): the first and the last log price of the day are
+    replaced by the average of the first m and of the last m prices, so the end-point noise is averaged down
+    (m = 1: no jittering, the raw end prices).
+    Bandwidth H = c xi^(4/5) n^(3/5), xi^2 = omega^2 / sqrt(IQ). Pilot (a practical substitute, not the
+    theoretical quantity): omega^2 = RV/(2n) from all 5-minute returns, and IV from the 20-minute RV in place of
+    sqrt(IQ)."""
     out, Hs = {}, {}
-    iv20 = sparse_rv(P, 4)                                  # variance on the 20-minute grid, for xi
+    iv20 = sparse_rv(P, 4)                                  # variance on the 20-minute grid, pilot for IV
     for i, day in enumerate(R.index):
-        r = R.iloc[i].dropna().values
-        n = len(r)
-        om2 = np.sum(r ** 2) / (2 * n)
+        r0 = R.iloc[i].dropna().values
+        n = len(r0)
+        x = np.r_[0.0, np.cumsum(r0)]                        # log price (x 100) relative to the open
+        xj = np.r_[x[:m].mean(), x[m:n + 1 - m], x[n + 1 - m:].mean()]   # jittered end points
+        r = np.diff(xj)
+        nj = len(r)
+        om2 = np.sum(r0 ** 2) / (2 * n)
         xi2 = om2 / max(iv20[day], 1e-12)
-        H = max(1, int(np.ceil(c * xi2 ** 0.4 * n ** 0.6)))
-        g = [np.sum(r[h:] * r[:n - h]) for h in range(H + 1)]
+        H = max(1, int(np.ceil(c * xi2 ** 0.4 * nj ** 0.6)))
+        g = [np.sum(r[h:] * r[:nj - h]) for h in range(H + 1)]
         out[day] = g[0] + 2 * sum(parzen(h / (H + 1)) * g[h] for h in range(1, H + 1))
         Hs[day] = H
     return pd.Series(out), pd.Series(Hs)
@@ -289,9 +321,11 @@ def dm_test(l1, l2):
     return {'mean_diff': float(d.mean()), 't': float(t), 'p': float(2 * stats.norm.sf(abs(t))), 'T': len(d)}
 
 
-def mz_test(v, f):
-    """Mincer-Zarnowitz regression v = a + b f + e; joint Wald test of (a, b) = (0, 1) with the NW covariance."""
-    res = ols_nw(v.values, f.values[:, None])
+def mz_test(v, f, lags=None):
+    """Mincer-Zarnowitz regression v = a + b f + e; joint Wald test of (a, b) = (0, 1) with the NW covariance.
+    lags: Newey-West bandwidth (default: the rule floor(4 (T/100)^(2/9))); with overlapping h-day targets choose
+    lags >= h - 1 and report the sensitivity to the bandwidth."""
+    res = ols_nw(v.values, f.values[:, None], lags)
     dlt = res['b'] - np.array([0.0, 1.0])
     W = float(dlt @ np.linalg.inv(res['V']) @ dlt)
     return {'a': res['b'][0], 'b': res['b'][1], 'se_a': res['se'][0], 'se_b': res['se'][1], 'r2': res['r2'],
@@ -330,10 +364,14 @@ def block_bootstrap_blocks(x, stat, block=60, B=300, seed=42):
 # ROUGH VOLATILITY
 # =============================================================================
 def roughness(logsig, qs=(0.5, 1.0, 1.5, 2.0, 3.0), lags=range(1, 31)):
-    """m(q, D) = mean |log sigma_{t+D} - log sigma_t|^q ~ D^{q H}: slope zeta_q = q H on the log-log scale."""
+    """m(q, D) = mean |log sigma_{t+D} - log sigma_t|^q ~ D^{q H}: slope zeta_q = q H on the log-log scale;
+    H = least-squares slope of zeta_q on q through the origin (H_icept: the same with an intercept)."""
     x = np.asarray(logsig, dtype=float)             # 1D: one series (NaN = missing day); 2D: blocks, increments only within a block
     lags = np.array(list(lags))
     M = {q: np.array([np.nanmean(np.abs(x[..., l:] - x[..., :-l]) ** q) for l in lags]) for q in qs}
     zeta = {q: np.polyfit(np.log(lags), np.log(M[q]), 1)[0] for q in qs}
-    H = np.polyfit(list(qs), [zeta[q] for q in qs], 1)[0] if len(qs) > 1 else zeta[qs[0]] / qs[0]
-    return {'lags': lags, 'm': M, 'zeta': zeta, 'H': float(H)}
+    q = np.array(list(qs), dtype=float)
+    z = np.array([zeta[v] for v in qs])
+    H = float(np.sum(q * z) / np.sum(q * q))        # course convention: zeta_q = q H, line through the origin
+    H_icept = float(np.polyfit(q, z, 1)[0]) if len(qs) > 1 else H   # slope with an intercept (not used in the course)
+    return {'lags': lags, 'm': M, 'zeta': zeta, 'H': H, 'H_icept': H_icept}

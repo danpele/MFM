@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch6_vast_dcc'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Pakel, Shephard, Sheppard and Engle (2021, JBES): DCC in vast dimensions. GARCH(1,1) standardised residuals of the 48 US-listed stocks and ETFs of the course data with a complete history from July 2013; DCC dynamic parameters (a, b) with correlation targeting, estimated for an expanding cross-section (alphabetical order of the tickers) by the full likelihood and by the composite likelihood over all pairs and over contiguous pairs, with the range over 10 random orders of the assets; mean pairwise DCC correlation implied by the full-likelihood and the composite-likelihood estimates.'
+
+Keywords: 'DCC, composite likelihood, correlation targeting, incidental parameters, vast dimensions, multivariate GARCH, Pakel, Shephard, Sheppard and Engle'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Daily market data (data/market): AAPL, AGG, AMZN, BAC, C, CSCO, DBC, EEM, EFA, GLD, GME, GOOGL, GS, HYG, IEF, IWD, IWF, IWM, JPM, LQD, META, MS, MSFT, MSTR, MTUM, NVDA, QQQ, QUAL, RSP, SHY, SPY, TIP, TLT, TSLA, UNG, USMV, USO, VLUE, WFC, XLB, XLE, XLF, XLI, XLK, XLP, XLU, XLV, XLY'
+
+Output: 'ch6_vast_dcc.pdf, ch6_vast_dcc.json'

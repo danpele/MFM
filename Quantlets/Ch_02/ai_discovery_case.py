@@ -3,8 +3,9 @@ ai_discovery_case.py -- Capitolul 2, sectiunea "AI for Scientific Discovery": mi
 =====================================================================================
 Ipoteza: ETF-urile spot pe Bitcoin (tranzactionate din 11 ian. 2024) au facut Bitcoin mai eficient (forma slaba).
 H0: rho1_post = rho1_pre si VR(5)_post = VR(5)_pre; ferestre simetrice de aceeasi lungime in jurul datei.
-Statistici ca in capitol: rho1 cu eroare standard robusta la heteroscedasticitate, VR(5) cu z* (Lo-MacKinlay).
-Test de diferenta: z = (rho_post - rho_pre) / sqrt(se_pre^2 + se_post^2).
+Statistici ca in capitol: rho1 cu eroarea standard HAC a estimatorului (Newey-West; valabila si cind rho1 != 0),
+VR(5) cu z* (Lo-MacKinlay). Eroarea standard derivata sub H0 (se0) se pastreaza doar pentru testul rho1 = 0.
+Test de diferenta: z = (rho_post - rho_pre) / sqrt(se_pre^2 + se_post^2), cu erorile HAC.
 Placebo: aceeasi statistica la date false (11 ianuarie 2016-2023, ferestre de aceeasi lungime).
 Iesire: ai_discovery_case.json
 Modelarea Pietelor Financiare - Daniel Traian PELE
@@ -21,17 +22,16 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 import slide_fit  # noqa: E402,F401  charts drawn at the size they have on the slides
 from mfm_data import log_returns  # noqa: E402
-from eff_tests import variance_ratio  # noqa: E402
+from eff_tests import variance_ratio, acf_se  # noqa: E402
 
 BREAK = pd.Timestamp('2024-01-11')
 
 
 def stats_win(x):
-    e = x - x.mean()
-    tau1 = (e.values[1:] ** 2 * e.values[:-1] ** 2).sum() / (e ** 2).sum() ** 2
+    se0, se_hac = acf_se(x, 1)
     vr, _, zs = variance_ratio(x, 5)
     return dict(start=str(x.index[0].date()), end=str(x.index[-1].date()), n=len(x),
-                rho1=float(x.autocorr(1)), se=float(np.sqrt(tau1)), vr5=float(vr), zstar5=float(zs))
+                rho1=float(x.autocorr(1)), se=se_hac, se0=se0, vr5=float(vr), zstar5=float(zs))
 
 
 def split(r, date):
@@ -94,7 +94,7 @@ def fig_ai_etf(o):
     ax.set_xticklabels(yrs + ['2024\n(ETF)'], fontsize=7.5)
     ax.set_ylabel(r'$z$ of the change in $\hat\rho_1$')
     ax.set_title('Placebo dates (11 January) and the ETF date', fontsize=8.5, loc='left')
-    h = [plt.Line2D([], [], marker='o', ls='', color='black', label='Estimate with robust 95% interval'),
+    h = [plt.Line2D([], [], marker='o', ls='', color='black', label='Estimate with HAC 95% interval'),
          plt.Line2D([], [], color=Purple, lw=1.6, label=f"Minimum detectable change $\\pm${o['mde_rho']:.2f}"),
          plt.Rectangle((0, 0), 1, 1, color=Amber, label='Placebo z'), plt.Rectangle((0, 0), 1, 1, color=IDAred, label='ETF z'),
          plt.Line2D([], [], color=Gray, ls='--', label=r'$\pm 1.96$')]

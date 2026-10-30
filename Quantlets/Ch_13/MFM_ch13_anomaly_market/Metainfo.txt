@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch13_anomaly_market'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study Dong, Li, Rapach and Zhou (2022), Anomalies and the Expected Market Return: recursive out-of-sample forecasts of the monthly market excess return (Mkt-RF) from 15 long-short anomaly returns of the Kenneth French Data Library (SMB, HML, RMW, CMA, momentum, short- and long-term reversal, extreme-decile spreads for accruals, net share issues, beta, variance, residual variance, E/P, CF/P, D/P). Methods: OLS on all predictors, elastic net (ENet), the simple combination of univariate forecasts (Comb) and the combination elastic net (C-ENet); training 1970-1979, validation 1980-1984, out-of-sample 1985 to the latest month. Campbell-Thompson out-of-sample R2 against the historical mean and the Clark-West test; chart of the cumulative gain in squared errors.'
+
+Keywords: 'return predictability, anomalies, forecast combination, elastic net, out-of-sample R2, Clark-West test, Fama-French factors, replication'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Kenneth French Data Library: Fama-French 5 factors, momentum, short- and long-term reversal factors and univariate decile sorts (AC, NI, BETA, VAR, RESVAR, E-P, CF-P, D-P), monthly value-weighted (1969-2026)'
+
+Output: 'ch13_dlrz_oos.pdf'

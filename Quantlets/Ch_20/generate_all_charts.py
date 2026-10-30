@@ -193,8 +193,11 @@ def holm_bh_counts(p):
             'n': int(len(p))}
 
 
-def panel_dm(h, kinds, m, b, loss='ql'):
-    """DM on the cross-sectional average loss differential (one series per date, all assets of the group)."""
+def panel_dm(h, kinds, m, b, loss='ql', balanced=False):
+    """DM on the cross-sectional average loss differential (one series per date).
+    balanced=False: the mean over the assets available on each date (unbalanced panel: the composition changes,
+    e.g. futures and FX start earlier than the stocks). balanced=True: only the dates on which every asset of the
+    group has a forecast, so the same assets enter every date (common calendar)."""
     ds = []
     for k, s in assets():
         if k not in kinds:
@@ -205,9 +208,24 @@ def panel_dm(h, kinds, m, b, loss='ql'):
         if loss == 'se':
             d = d / (f(fc.y, fc[b]).mean())
         ds.append(d.rename(s))
-    D = pd.concat(ds, axis=1).mean(axis=1).dropna()
+    P = pd.concat(ds, axis=1)
+    if balanced:
+        P = P.dropna()
+    D = P.mean(axis=1).dropna()
     t, p1, _ = S.dm_test(D.values, np.zeros(len(D)), h)
-    return {'t': float(t), 'p': float(p1), 'T': int(len(D)), 'start': str(D.index[0].date())}
+    return {'t': float(t), 'p': float(p1), 'T': int(len(D)), 'start': str(D.index[0].date()),
+            'end': str(D.index[-1].date()), 'n_assets': int(P.shape[1])}
+
+
+PANEL_COMPS = [('Sig-LK', 'logHAR'), ('Sig-LK', 'HAR'), ('Sig-L', 'logHAR'), ('logHAR-K', 'logHAR'),
+               ('Sig-LK', 'Sig-L'), ('logHAR', 'HAR')]
+
+
+def panel_dm_balanced():
+    """Balanced panel (same assets on a common calendar), for all assets and for each class."""
+    groups = {'stocks': ['stocks'], 'futures': ['futures'], 'forex': ['forex'], 'all': list(S.CLASSES)}
+    return {h: {g: {f'{m}|{b}': panel_dm(h, ks, m, b, balanced=True) for m, b in PANEL_COMPS}
+                for g, ks in groups.items()} for h in H}
 
 
 def aggregate(ev):
@@ -248,9 +266,7 @@ def aggregate(ev):
                     qq = pd.DataFrame(vals)
                     rr[tag] = {m: (qq[m].values / q['HAR'].values).mean() for m in ['Sig-L', 'Sig-LK']}
             rob[h][g] = rr
-            pdm[h][g] = {f'{m}|{b}': panel_dm(h, ks, m, b) for m, b in
-                         [('Sig-LK', 'logHAR'), ('Sig-LK', 'HAR'), ('Sig-L', 'logHAR'), ('logHAR-K', 'logHAR'),
-                          ('Sig-LK', 'Sig-L'), ('logHAR', 'HAR')]}
+            pdm[h][g] = {f'{m}|{b}': panel_dm(h, ks, m, b) for m, b in PANEL_COMPS}
         # wins over assets, with a multiple-testing correction (family: the 50 assets)
         wins[h] = {}
         for comp in ['Sig-LK|logHAR', 'Sig-LK|HAR', 'Sig-L|logHAR', 'logHAR-K|logHAR', 'logHAR|HAR', 'HARQ|HAR',
@@ -523,7 +539,13 @@ def chart_covid_forecasts():
     fig, ax = plt.subplots(figsize=(9, 3.4))
     ax.plot(fc.index, np.sqrt(252 * fc.y) * 100, color='black', lw=1.1, label='Realised (5-minute RV), next day')
     for m in ['HAR', 'logHAR', 'Sig-LK']:
-        ax.plot(fc.index, np.sqrt(252 * fc[m]) * 100, color=COL[m], lw=0.9, label=f'{S.LABEL[m]} forecast')
+        ax.plot(fc.index, np.sqrt(252 * fc[m]) * 100, color=COL[m], lw=0.9,
+                label=f'{S.LABEL[m]} forecast' + (' (after the positivity rule)' if m == 'HAR' else ''))
+    # the positivity rule (sigvol.run_forecasts) replaces a raw forecast <= 0 by the training mean (column mu):
+    # the HAR line shows the forecast after the rule; the replaced origins are marked
+    rep = fc.index[fc['HAR'] == fc['mu']]
+    ax.plot(rep, np.sqrt(252 * fc.loc[rep, 'HAR']) * 100, 'x', color=COL['HAR'], ms=5, mew=1.2,
+            label='Raw HAR forecast ≤ 0, replaced by the training mean')
     ax.set_ylabel('Annualised volatility, %')
     legend_outside_bottom(ax, ncol=2, y=-0.12)
     save_fig('ch20_covid_forecasts')
@@ -592,6 +614,16 @@ def chart_selection(E):
 
 
 # -----------------------------------------------------------------------------
+if __name__ == '__main__' and '--update' in sys.argv:
+    # partial update: balanced-panel DM tests and the COVID chart, written into the existing ch20_results.json
+    with open(os.path.join(HERE, 'ch20_results.json')) as f:
+        RES = json.load(f)
+    RES['panel_dm_bal'] = panel_dm_balanced()
+    chart_covid_forecasts()
+    with open(os.path.join(HERE, 'ch20_results.json'), 'w') as f:
+        json.dump(RES, f, indent=1, default=float)
+    raise SystemExit(0)
+
 if __name__ == '__main__':
     import time
     T0 = time.time()
@@ -602,6 +634,7 @@ if __name__ == '__main__':
     E = pd.DataFrame(ev)
     A = aggregate(ev)
     RES.update(A)
+    RES['panel_dm_bal'] = panel_dm_balanced()
     chart_qlike_ratio(E)
     chart_mcs(A)
     chart_dm_heat(E)
@@ -609,6 +642,9 @@ if __name__ == '__main__':
     chart_ablation(A)
     chart_covid_forecasts()
     chart_robustness(A)
+    # second case study: signature lead-lag of intraday SPY and Bitcoin paths (leadlag_case.py -> ch20_leadlag.json)
+    import leadlag_case
+    leadlag_case.main(save_fig, (MainBlue, IDAred, Forest, Navy))
     RES['selection'] = chart_selection(E)
     RES['weights'] = {'2020-03-16': weights_chart('2020-03-16', 'ch20_weights_2020'),
                       '2025-04-07': weights_chart('2025-04-07', 'ch20_weights_2025')}

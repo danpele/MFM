@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH16_DATA;
-const { C, sum, mean, sdev, median, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { C, sum, mean, sdev, median, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH16_TEXT;
 
 // ---------------------------------------------------------------- colours (same as the slides, generate_all_charts.py)
@@ -424,11 +424,54 @@ function zscan() {
     zE === null ? T.az0 : T.az2(nf(zE, 2), pct(share, 0))]);
 }
 
+// ================================================================= Pagnotta (2022): price, hashrate, halvings
+const HR = D.hr, HR_COL = { '2012-11-28': K.Teal, '2016-07-09': K.Forest, '2020-05-11': K.Purple, '2024-04-20': K.IDAred };
+const HR_S = (() => { const a = []; HR.months.forEach((m, i) => { if (m >= '2013-12' && m <= '2024-12') a.push(i); }); return a; })();
+function olsTrend(y, x) {               // y = a + b x + c t, t in years from the first month; returns b and R^2
+  const n = y.length, X = y.map((_, i) => [1, x[i], i / 12]);
+  const A = [0, 1, 2].map(r => [0, 1, 2].map(c => sum(X.map(row => row[r] * row[c]))));
+  const v = [0, 1, 2].map(r => sum(X.map((row, i) => row[r] * y[i])));
+  const beta = window.MFMI.solve(A, v), my = mean(y);
+  const e = y.map((yi, i) => yi - beta[0] - beta[1] * x[i] - beta[2] * i / 12);
+  return { b: beta[1], r2: 1 - sum(e.map(u => u * u)) / sum(y.map(u => (u - my) ** 2)) };
+}
+function hrLevels(a, b) {               // monthly log H on log B, months a..b (YYYY-MM, inclusive)
+  const y = [], x = [];
+  HR.months.forEach((m, i) => { if (m >= a && m <= b) { y.push(Math.log(HR.H[i])); x.push(Math.log(HR.B[i])); } });
+  const t = olsTrend(y, x), o = ols(y, x);
+  return { b: t.b, b0: o.b, r20: o.r2, n: y.length };
+}
+function hashrate() {
+  const j = HR_S[+$('hr-e').value], m = HR.months[j], nx = HR.months[j + 1], k = +$('hr-k').value;
+  sliderV('hr-e', fm(m)); sliderV('hr-k', String(k));
+  const x = HR.months.map(monthEnd).map(s => s.slice(0, 8) + '15');
+  const shapes = HR.halvings.map(h => ({ type: 'line', xref: 'x', yref: 'paper', x0: h, x1: h, y0: 0, y1: 1, line: { color: K.Navy, width: 1, dash: 'dot' } }));
+  shapes.push({ type: 'line', xref: 'x', yref: 'paper', x0: monthEnd(m), x1: monthEnd(m), y0: 0, y1: 1, line: { color: K.Navy, width: 1.6, dash: 'dash' } });
+  plot('hr-lv', [
+    { x, y: HR.P, mode: 'lines', name: 'Bitcoin price (USD, left axis, monthly mean)', line: { color: K.Orange, width: 1.4 }, hovertemplate: '%{x|%b %Y}: %{y:,.2f} USD<extra></extra>' },
+    { x, y: HR.H.map(v => v / 1e6), mode: 'lines', yaxis: 'y2', name: 'Hashrate (EH/s, right axis, monthly mean)', line: { color: K.MainBlue, width: 1.4 }, hovertemplate: '%{x|%b %Y}: %{y:.3g} EH/s<extra></extra>' }
+  ], layout({ shapes, margin: { l: 60, r: 60, t: 20, b: 30 },
+    annotations: [{ x: monthEnd(m), y: 0.02, yref: 'paper', text: ' end of the first window', showarrow: false, xanchor: 'left', font: { size: 11, color: K.Navy } }],
+    xaxis: AX('', { type: 'date' }), yaxis: AX('Price (USD)', { type: 'log', exponentformat: 'power' }),
+    yaxis2: AX('Hashrate (EH/s)', { type: 'log', overlaying: 'y', side: 'right', exponentformat: 'power', showgrid: false }) }));
+  const tr = HR.halvings.map(h => ({ x: HR.k, y: HR.H_ev[h], mode: 'lines', name: 'Hashrate, halving of ' + h.slice(0, 4), line: { color: HR_COL[h], width: 1.4 },
+    hovertemplate: h.slice(0, 4) + ', day %{x}: %{y:.1f}%<extra></extra>' }));
+  tr.push({ x: [HR.k[0], HR.k[HR.k.length - 1]], y: [-50, -50], mode: 'lines', name: 'Lemma 1, static benchmark: -50%', line: { color: K.Navy, width: 1.2, dash: 'dash' }, hoverinfo: 'skip' });
+  plot('hr-ev', tr, layout({ legend: Object.assign(layout().legend, { y: -0.3 }), margin: { l: 60, r: 12, t: 20, b: 40 }, shapes: [{ type: 'line', xref: 'x', yref: 'paper', x0: k, x1: k, y0: 0, y1: 1, line: { color: K.Navy, width: 1.4, dash: 'dot' } }, hline(0, K.Navy)],
+    xaxis: AX('Days from the halving', { range: [HR.k[0], HR.k[HR.k.length - 1]] }), yaxis: AX('Change from the week before (%)') }));
+  const A = hrLevels(HR.paper[0], m), B = hrLevels(nx, HR.oos[1]), i = HR.k.indexOf(k), R = HR.ref.levels;
+  const hs = HR.halvings.map(h => `${h.slice(0, 4)}: ${sgn(HR.H_ev[h][i], 1)}%`).join('; '), bs = HR.halvings.map(h => `${h.slice(0, 4)}: ${sgn(HR.B_ev[h][i], 1)}%`).join('; ');
+  out('hr-out', [T.hr(fm(HR.paper[0]), fm(m), A.n, nf(A.b, 2), nf(A.b0, 2), nf(A.r20, 2)),
+    T.hr2(fm(nx), fm(HR.oos[1]), B.n, nf(B.b, 2), nf(B.b0, 2), nf(B.r20, 2)),
+    T.hr3(nf(R.paper.eg_p, 2), nf(R.oos.eg_p, 2)),
+    T.hr4(k, hs, bs)]);
+}
+
 // ================================================================= wiring
 function init() {
   $('aa-chart').style.height = '470px'; $('pg-chart').style.height = '460px'; $('mv-chart').style.height = '420px';
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   const nM = D.mv.months.length;
   setMax('mv-t', nM - 1, nM - 1); on(['mv-t'], marketValue); P('mv-play', 'mv-t', range(0, nM - 1, 1), 110);
   on(['rv-w'], rollVol); P('rv-play', 'rv-w', range(30, 730, 20), 220);
@@ -446,8 +489,13 @@ function init() {
   on(['aa-k'], altAssets); P('aa-play', 'aa-k', range(0, 8, 1), 1100);
   setMax('lt-e', LT_M.length - 1, LT_M.indexOf(D.ltw_end.slice(0, 7))); on(['lt-e'], ltw); P('lt-play', 'lt-e', range(0, LT_M.length - 1, 1), 160);
   on(['az-w'], zscan); P('az-play', 'az-w', range(100, 800, 50), 500);
-  marketValue(); rollVol(); weekday(); rollingCorr(); crix(); peg(); svb(); tvl(); lp(); etfTrack(); etfTiming(); altAssets(); ltw(); zscan();
+  setMax('hr-e', HR_S.length - 1, HR_S.indexOf(HR.months.indexOf(HR.paper[1]))); setMax('hr-k', 90, 30); on(['hr-e', 'hr-k'], hashrate); P('hr-play', 'hr-k', range(0, 90, 1), 90);
+  const PFX = { 'market-value': 'mv', 'rolling-vol': 'rv', 'weekday': 'wd', 'rolling-corr': 'rc', 'crix': 'cx', 'peg': 'pg', 'svb': 'dp',
+    'tvl': 'tv', 'lp': 'lp', 'etf-tracking': 'et', 'etf-timing': 'tm', 'alt-assets': 'aa', 'ltw': 'lt', 'hashrate': 'hr', 'zscan': 'az' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  marketValue(); rollVol(); weekday(); rollingCorr(); crix(); peg(); svb(); tvl(); lp(); etfTrack(); etfTiming(); altAssets(); ltw(); hashrate(); zscan();
 }
-window.CH16 = { rollVolSeries, rollCorr, periodCorr, crixStats, lpPaths, altPCA, zScan, ols, jacobi };
+window.CH16 = { rollVolSeries, rollCorr, periodCorr, crixStats, lpPaths, altPCA, zScan, ols, jacobi, olsTrend, hrLevels };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

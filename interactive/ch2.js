@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH2_DATA;
-const { C, sum, rng, mean, sdev, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { C, sum, rng, mean, sdev, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH2_TEXT;
 
 // ---------------------------------------------------------------- colours (same as the slides)
@@ -117,22 +117,26 @@ function acfMarkets() {
   const k = +$('ac-k').value, A = D.acf;
   $('ac-k-v').textContent = k;
   const ks = [...D.order].sort((p, q) => A[p].rho[k - 1] - A[q].rho[k - 1]), y = ks.map((_, i) => i), tr = [];
+  // test bands centred at 0 use the SEs derived under H0; the bars are 95% CIs with the HAC SE of the estimator
+  const bands = ks.map((m, i) => ({ type: 'rect', layer: 'below', xref: 'x', yref: 'y', x0: -1.96 * A[m].se[k - 1], x1: 1.96 * A[m].se[k - 1],
+    y0: i - 0.32, y1: i + 0.32, fillcolor: BAND, opacity: 0.8, line: { width: 0 } }));
   for (const [gname, col] of Object.entries(GROUP_COL)) {
     const idx = ks.map((m, i) => [m, i]).filter(([m]) => D.groups[m] === gname);
     tr.push({ x: idx.map(([m]) => A[m].rho[k - 1]), y: idx.map(([, i]) => i), mode: 'markers', name: gname, marker: { color: col, size: 8 },
-      error_x: { type: 'data', array: idx.map(([m]) => 1.96 * A[m].se[k - 1]), color: col, thickness: 1.6, width: 3 },
-      customdata: idx.map(([m]) => [short(m), 1.96 * A[m].se[k - 1], 1.96 / Math.sqrt(A[m].T)]),
-      hovertemplate: '%{customdata[0]}<br>ρ̂ = %{x:.3f}<br>robust ±%{customdata[1]:.3f}<br>i.i.d. ±%{customdata[2]:.3f}<extra></extra>' });
+      error_x: { type: 'data', array: idx.map(([m]) => 1.96 * A[m].hac[k - 1]), color: col, thickness: 1.6, width: 3 },
+      customdata: idx.map(([m]) => [short(m), 1.96 * A[m].hac[k - 1], 1.96 * A[m].se[k - 1], 1.96 / Math.sqrt(A[m].T)]),
+      hovertemplate: '%{customdata[0]}<br>ρ̂ = %{x:.3f}<br>95% CI (HAC) ±%{customdata[1]:.3f}<br>robust test band at 0: ±%{customdata[2]:.3f}<br>i.i.d. test band at 0: ±%{customdata[3]:.3f}<extra></extra>' });
   }
   const ix = [], iy = [];
-  ks.forEach((m, i) => { const h = 1.96 / Math.sqrt(A[m].T); ix.push(A[m].rho[k - 1] - h, A[m].rho[k - 1] + h, null); iy.push(i + 0.3, i + 0.3, null); });
-  tr.push({ x: ix, y: iy, mode: 'lines', name: 'i.i.d. 95% interval ρ̂ ± 1.96/√T', line: { color: NAVY, width: 1.5 }, hoverinfo: 'skip' });
-  tr.push({ x: [null], y: [null], mode: 'lines', name: 'Robust 95% interval (bars)', line: { color: NAVY, width: 1.6 } });
-  plot('ac-chart', tr, layout({ title: ttl('Lag-' + k + ' autocorrelation of daily log returns (full samples)'), shapes: [vline(0, NAVY)],
+  ks.forEach((m, i) => { const h = 1.96 / Math.sqrt(A[m].T); ix.push(-h, h); iy.push(i, i); });
+  tr.push({ x: ix, y: iy, mode: 'markers', name: 'Test band at 0, i.i.d. ±1.96/√T', marker: { symbol: 'line-ns-open', size: 12, color: NAVY, line: { color: NAVY, width: 1.5 } }, hoverinfo: 'skip' });
+  tr.push({ x: [null], y: [null], mode: 'lines', name: 'Test band at 0, robust SE under H₀', line: { color: BAND, width: 10 } });
+  tr.push({ x: [null], y: [null], mode: 'lines', name: '95% CI, HAC SE (bars)', line: { color: NAVY, width: 1.6 } });
+  plot('ac-chart', tr, layout({ title: ttl('Lag-' + k + ' autocorrelation of daily log returns (full samples)'), shapes: [...bands, vline(0, NAVY)],
     xaxis: AX('Lag-' + k + ' autocorrelation ρ̂' + k, { zeroline: false }), yaxis: AX('', { tickvals: y, ticktext: ks.map(m => D.labels[m]), range: [-0.6, ks.length - 0.4] }),
     legend: { orientation: 'h', x: 0, y: -0.12, yanchor: 'top', font: { size: 11 } }, margin: { l: 150, r: 12, t: 30, b: 40 } }));
   const rej = ks.filter(m => Math.abs(A[m].rho[k - 1]) > 1.96 * A[m].se[k - 1]), rejI = ks.filter(m => Math.abs(A[m].rho[k - 1]) > 1.96 / Math.sqrt(A[m].T));
-  out('ac-out', [T.ac(k, rej.length, rej.map(short).join(', ') || '—', rejI.length), T.ac2(k, nf(A.sp500.rho[k - 1], 3), nf(A.sp500.se[k - 1], 3), nf(1 / Math.sqrt(A.sp500.T), 3))]);
+  out('ac-out', [T.ac(k, rej.length, rej.map(short).join(', ') || '—', rejI.length), T.ac2(k, nf(A.sp500.rho[k - 1], 3), nf(A.sp500.se[k - 1], 3), nf(1 / Math.sqrt(A.sp500.T), 3), nf(A.sp500.hac[k - 1], 3))]);
 }
 
 // ================================================================= variance-ratio profiles
@@ -252,10 +256,72 @@ function multipleTesting() {
   out('mt-out', [T.mt(k, pct(n196 / k, 1), n196, pct(n3 / k, 2), n3, nf(Math.max(...a), 2)), T.mt2(k, pct(1 - 0.95 ** k, 1))]);
 }
 
+// ================================================================= case study: weekly crypto momentum (Liu & Tsyvinski, 2021)
+const nwLag = T => Math.floor(4 * Math.pow(T / 100, 2 / 9));
+function olsHac(y, x, L) {           // OLS y = a + b x; Newey-West (Bartlett, no small-sample correction), as crypto_momentum_case.ols_hac
+  const T = y.length; L = L === undefined ? nwLag(T) : L;
+  let sx = 0, sxx = 0, sy = 0, sxy = 0;
+  for (let i = 0; i < T; i++) { sx += x[i]; sxx += x[i] * x[i]; sy += y[i]; sxy += x[i] * y[i]; }
+  const det = T * sxx - sx * sx, i00 = sxx / det, i01 = -sx / det, i11 = T / det;
+  const b = (T * sxy - sx * sy) / det, a = (sy - b * sx) / T, e = y.map((v, i) => v - a - b * x[i]);
+  const u0 = e, u1 = e.map((v, i) => v * x[i]);
+  let s00 = 0, s01 = 0, s11 = 0;
+  for (let i = 0; i < T; i++) { s00 += u0[i] * u0[i]; s01 += u0[i] * u1[i]; s11 += u1[i] * u1[i]; }
+  for (let l = 1; l <= L; l++) {
+    const w = 1 - l / (L + 1); let g00 = 0, g01 = 0, g10 = 0, g11 = 0;
+    for (let i = l; i < T; i++) { g00 += u0[i] * u0[i - l]; g01 += u0[i] * u1[i - l]; g10 += u1[i] * u0[i - l]; g11 += u1[i] * u1[i - l]; }
+    s00 += 2 * w * g00; s01 += w * (g01 + g10); s11 += 2 * w * g11;
+  }
+  const v11 = i01 * (i01 * s00 + i11 * s01) + i11 * (i01 * s01 + i11 * s11), ssr = sum(e.map(v => v * v));
+  return { b, se: Math.sqrt(v11), t: b / Math.sqrt(v11), tOls: b / Math.sqrt(ssr / (T - 2) * i11), T, L };
+}
+function cmSeries(k) {
+  const M = D.cmom, d = [], r = [];
+  M.dates.forEach((x, i) => { if (M[k][i] !== null) { d.push(x); r.push(M[k][i]); } });
+  return { d, r };
+}
+function cmPeriod(S, a, b) {         // weeks with a <= date <= b; regressions of R(t+h) on R(t) for h = 1..4
+  const idx = S.d.map((x, i) => i).filter(i => S.d[i] >= a && S.d[i] <= b), r = idx.map(i => S.r[i]);
+  const reg = [1, 2, 3, 4].map(h => olsHac(r.slice(h), r.slice(0, r.length - h)));
+  return { r, reg, sd: sdev(r), weeks: r.length };
+}
+function cmRolling(S, W) {
+  const x = S.r.slice(0, -1), y = S.r.slice(1), res = [];
+  for (let i = W; i <= x.length; i++) res.push(Object.assign(olsHac(y.slice(i - W, i), x.slice(i - W, i)), { date: S.d[i] }));
+  return res;
+}
+const cmCut = m => { const y = 2011 + Math.floor(m / 12), mo = m % 12, last = new Date(Date.UTC(y, mo + 1, 0)); return { s: last.toISOString().slice(0, 10), label: T.months[mo] + ' ' + y }; };
+function cryptoMomentum() {
+  const k = $('cm-asset').value, m = +$('cm-m').value, W = +$('cm-w').value, S = cmSeries(k), c = cmCut(m);
+  $('cm-m-v').textContent = c.label; $('cm-w-v').textContent = W;
+  const A = cmPeriod(S, S.d[0], c.s), F = cmPeriod(S, c.s + 'z', '9999'), H = [1, 2, 3, 4], name = k === 'btc' ? 'Bitcoin' : 'Ethereum';
+  const fy = d => d.slice(0, 4) === S.d[0].slice(0, 4) ? 'Jan ' + S.d[0].slice(0, 4) : d;
+  const mon = s => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+s.slice(5, 7) - 1] + ' ' + s.slice(0, 4);
+  const nxt = cmCut(m + 1).s.slice(0, 8) + '01', last = S.d[S.d.length - 1];
+  const tr = [
+    { x: H.map(h => h - 0.13), y: A.reg.map(f => f.b), error_y: { type: 'data', array: A.reg.map(f => 1.96 * f.se), color: MB, thickness: 1.2, width: 4 }, mode: 'markers', marker: { color: MB, size: 8 },
+      name: fy(S.d[0]) + ' – ' + mon(c.s), hovertemplate: 'h = %{customdata}: b = %{y:.3f}<extra></extra>', customdata: H },
+    { x: H.map(h => h + 0.13), y: F.reg.map(f => f.b), error_y: { type: 'data', array: F.reg.map(f => 1.96 * f.se), color: RED, thickness: 1.2, width: 4 }, mode: 'markers', marker: { color: RED, size: 8 },
+      name: mon(nxt) + ' – ' + mon(last), hovertemplate: 'h = %{customdata}: b = %{y:.3f}<extra></extra>', customdata: H }];
+  if (k === 'btc') tr.push({ x: H, y: D.cmom.paper.beta, mode: 'markers', marker: { color: AMBER, size: 9, symbol: 'diamond' }, name: 'Liu & Tsyvinski (working paper)', hovertemplate: 'paper, h = %{x}: b = %{y:.2f}<extra></extra>' });
+  plot('cm-b', tr, layout({ title: ttl(name + ', weekly: slope of R(t+h) on R(t), 95% NW intervals'), shapes: [hline(0, NAVY)],
+    xaxis: AX('Horizon h (weeks)', { tickvals: H, range: [0.5, 4.5] }), yaxis: AX('Slope b_h') }));
+  const Rl = cmRolling(S, W), dd = Rl.map(f => f.date);
+  plot('cm-roll', [
+    { x: dd, y: Rl.map(f => f.b + 1.96 * f.se), mode: 'lines', line: { width: 0 }, hoverinfo: 'skip', showlegend: false },
+    { x: dd, y: Rl.map(f => f.b - 1.96 * f.se), mode: 'lines', line: { width: 0 }, fill: 'tonexty', fillcolor: BAND, name: '95% NW band', hoverinfo: 'skip' },
+    { x: dd, y: Rl.map(f => f.b), mode: 'lines', line: { color: MB, width: 1.6 }, name: 'Rolling b_1 (' + W + ' weeks)', hovertemplate: '%{x}: b_1 = %{y:.3f}<extra></extra>' },
+    { x: [null], y: [null], mode: 'lines', line: { color: RED, dash: 'dash', width: 2 }, name: 'End of the first period' }
+  ], layout({ title: ttl(name + ': one-week slope b_1, rolling windows'), shapes: [hline(0, NAVY), vline(c.s, RED, 'dash')], xaxis: AX('', { type: 'date' }), yaxis: AX('Slope b_1') }));
+  const sig = Rl.filter(f => Math.abs(f.t) > 1.96).length;
+  out('cm-out', [T.cm(name, c.label, A.weeks, nf(A.reg[0].b, 3), nf(A.reg[0].t, 2), F.weeks, nf(F.reg[0].b, 3), nf(F.reg[0].t, 2)),
+    T.cmE(pct(A.reg[0].b * A.sd, 2), pct(F.reg[0].b * F.sd, 2), pct(A.sd, 1), pct(F.sd, 1)), T.cm2(W, pct(sig / Rl.length, 0), Rl.length)]);
+}
+
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   setH('rg-chart', 420); setH('cr-chart', 460); setH('ac-chart', 560); setH('vr-chart', 520);
   rgMake(); $('rg-t').max = D.game.n; $('rg-t').value = D.game.n; on(['rg-t', 'rg-show'], game); P('rg-play', 'rg-t', range(20, D.game.n, 40).concat([D.game.n]), 60);
   $('rg-new').addEventListener('click', () => { rgSeed++; rgMake(); $('rg-show').value = 'hidden'; game(); });
@@ -267,8 +333,14 @@ function init() {
   on(['ev-L', 'ev-a', 'ev-b'], eventStudy); P('ev-play', 'ev-b', range(0, 5, 1), 800);
   on(['mt-n', 'mt-p'], multipleTesting); P('mt-play', 'mt-n', range(20, 2000, 20), 60);
   $('mt-new').addEventListener('click', () => { mtSeed++; multipleTesting(); });
-  game(); rwReturns(); rwSquared(); acfMarkets(); vrProfile(); oosDp(); eventStudy(); multipleTesting();
+  const cmMin = () => { const mn = $('cm-asset').value === 'eth' ? 72 : 24; $('cm-m').min = mn; if (+$('cm-m').value < mn) $('cm-m').value = mn; };
+  $('cm-asset').addEventListener('input', cmMin); on(['cm-asset', 'cm-m', 'cm-w'], cryptoMomentum); P('cm-play', 'cm-m', range(24, 164, 2), 250);
+  const PFX = { 'random-walk-game': 'rg', 'rw-models': 'cr', 'garch-acf': 'cs', 'acf-markets': 'ac', 'vr-profile': 'vr',
+    'oos-dp': 'od', 'bank-tax': 'ev', 'multiple-testing': 'mt', 'crypto-momentum': 'cm' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  game(); rwReturns(); rwSquared(); acfMarkets(); vrProfile(); oosDp(); eventStudy(); multipleTesting(); cryptoMomentum();
 }
-window.CH2 = { garchPath, acf, kurt, eventFit, carStat, mtStats };
+window.CH2 = { garchPath, acf, kurt, eventFit, carStat, mtStats, olsHac, cmSeries, cmPeriod, cmRolling };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

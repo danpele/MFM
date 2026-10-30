@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch2_crypto_efficiency'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Crypto efficiency year by year: lag-1 autocorrelation with robust intervals and the variance-ratio statistic for Bitcoin (from 2011) and Ethereum (from 2016).'
+Description: 'Crypto efficiency year by year: lag-1 autocorrelation with HAC 95% intervals and the variance-ratio statistic for Bitcoin (from 2011) and Ethereum (from 2016).'
 
 Keywords: 'Bitcoin, Ethereum, cryptocurrency efficiency, autocorrelation, variance ratio, Urquhart'
 

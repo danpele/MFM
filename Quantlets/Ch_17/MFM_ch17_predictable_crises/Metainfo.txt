@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch17_predictable_crises'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Second case study of Chapter 17: Greenwood, Hanson, Shleifer and Sorensen (2022), Predictable Financial Crises, Journal of Finance 77(2), 863-921. On the Jorda-Schularick-Taylor Macrohistory Database (R6, 18 advanced economies, read online), forecasts made in 1950-2016: 3-year change of business and household credit to GDP, 3-year real stock and house price growth, the R-zone (credit growth in the top quintile and price growth in the top tercile of the panel, Eq. 2a-2c) and the probability that a financial crisis (JST chronology) begins within h = 1, ..., 4 years, with 95% year-block bootstrap intervals; the credit threshold is varied from the 50th to the 95th percentile.'
+
+Keywords: 'financial crises, credit boom, R-zone, Kindleberger-Minsky, early warning, house prices, stock prices, Macrohistory database, block bootstrap'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Jorda-Schularick-Taylor Macrohistory Database, release 6 (JSTdatasetR6.xlsx, macrohistory.net): tbus, thh, gdp, cpi, eq_capgain, hpnom, crisisJST'
+
+Output: 'ch17_ghss_rzone.pdf, case17_crises.json'

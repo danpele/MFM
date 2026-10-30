@@ -5,6 +5,7 @@ mfm_data.py -- Data loading for Chapter 11 (MFM): continuous-time models
   * log_returns(name)  -- log returns on each series' own calendar
   * load_vix()         -- the VIX index (CBOE), daily level
   * read_fred(series)  -- public FRED series (e.g. DTB3, the 3-month Treasury bill rate)
+  * load_spy_5m(), load_spy_5m_bars() -- SPY 5-minute log returns (and closes, volumes), regular session
 
 Conventions (as in Chapters 0-8):
   * equity indices: weekdays only; stale quotes (close equal to the previous day's and no intraday range,
@@ -143,3 +144,16 @@ def load_spy_5m(end=END):
     first = np.r_[True, day[1:] != day[:-1]]
     r[first] = lc[first] - lo[first]
     return pd.Series(r, index=d.index, name='spy_5m')
+
+
+def load_spy_5m_bars(end=END):
+    """The bars of load_spy_5m as a table: log return r (same definition), close and traded volume per 5-minute bar."""
+    r = load_spy_5m(end)
+    fname = 'intraday/SPY.US_5m.csv'
+    path = os.path.join(MARKET_DIR, fname)
+    src = path if os.path.exists(path) else REPO_RAW + fname
+    d = pd.read_csv(src, index_col='datetime_utc', parse_dates=True).sort_index()
+    d = d[~d.index.duplicated()]
+    d.index = d.index.tz_localize('UTC').tz_convert('America/New_York')
+    d = d.reindex(r.index)
+    return pd.DataFrame({'r': r.values, 'close': d['close'].values, 'volume': d['volume'].values}, index=r.index)

@@ -7,8 +7,9 @@ mfm_data.py -- Data loading for Chapter 19 (MFM): review and integrated case stu
   * MARKETS             -- S&P 500, BET, Bitcoin, EUR/RON, gold; ETFs and BVB stocks for portfolios
 
 Conventions (as in Chapters 0-8):
-  * stock indices: weekdays only; days whose close repeats the previous day
-    (holidays filled with the last price) are removed;
+  * stock indices: weekdays only; artificial non-trading-day fills (a repeated close on a row that shows no
+    trading: zero volume, no intraday range or a copy of the previous row) are removed, genuine zero returns are
+    kept (artificial_fill, the rule of Chapters 2, 5, 9, 16-18);
   * gold (XAU/USD): weekend quotes removed; annualised with the real frequency;
   * crypto: 7 days a week;
   * ETFs and stocks: adjusted price (dividends, splits); indices, FX, crypto: closing price;
@@ -83,6 +84,26 @@ def drop_duplicate_records(df):
     return df[~(df[cols] == df[cols].shift()).all(axis=1)]
 
 
+def artificial_fill(d):
+    """Rows that repeat the previous close and show no trading: an artificial non-trading-day fill
+    (the rule of Quantlets/Ch_02/mfm_data.artificial_fill).
+
+    A repeated close is a fill only if the row itself shows no trading: zero volume (for files that report
+    volume), no intraday range (open = high = low = close) or a copy of the previous row in every field. A
+    repeated close on a day with volume and an intraday range is a genuine unchanged close (a zero return)
+    and is kept. Files with closes only (the BET) give no such evidence, so every row is kept.
+    """
+    repeat = d['close'].diff() == 0
+    no_trade = pd.Series(False, index=d.index)
+    if 'volume' in d and (d['volume'] > 0).mean() > 0.5:
+        no_trade |= d['volume'].fillna(0) <= 0
+    if {'open', 'high', 'low'} <= set(d.columns):
+        no_trade |= (d['open'] == d['high']) & (d['high'] == d['low']) & (d['low'] == d['close'])
+        fields = [c for c in ['open', 'high', 'low', 'close', 'volume'] if c in d]
+        no_trade |= (d[fields] == d[fields].shift()).all(axis=1)
+    return repeat & no_trade
+
+
 def load_close(name, start=None, end=END):
     """Daily price, cleaned with the conventions of the chapter."""
     symbol, _, kind, start0 = MARKETS[name]
@@ -93,7 +114,7 @@ def load_close(name, start=None, end=END):
     if kind != 'crypto':
         df = df[df.index.dayofweek < 5]       # no weekend quotes
     if kind == 'index':
-        df = drop_duplicate_records(df)       # no duplicate records
+        df = df[~artificial_fill(df)]         # non-trading days filled with the previous price
     s = df['close']
     s = s[s > 0].dropna()
     return s.rename(name)
@@ -115,7 +136,7 @@ def asset_price(key, end=END):
     if key != 'BTC':
         df = df[df.index.dayofweek < 5]       # no weekend quotes
     if symbol.endswith('.INDX'):
-        df = drop_duplicate_records(df)       # no duplicate records
+        df = df[~artificial_fill(df)]         # non-trading days filled with the previous price
     s = df[col]
     s = s[s > 0].dropna()
     return s.rename(key)

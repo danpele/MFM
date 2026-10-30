@@ -6,8 +6,10 @@ mfm_data.py -- Incarcarea datelor pentru Capitolul 2 (MFM): eficienta pietei
   * MARKETS            -- piete dezvoltate, emergente/de frontiera, cripto si EUR/RON
 
 Conventii (ca in capitolele 0 si 1):
-  * indicii bursieri: doar zilele lucratoare; zilele cu inchidere identica cu ziua precedenta
-    (sarbatori completate cu ultimul pret) sunt eliminate;
+  * indicii bursieri: doar zilele lucratoare; o zi cu inchidere identica cu ziua precedenta este eliminata
+    doar daca nu arata tranzactionare (volum zero, open = high = low = close sau o copie a randului
+    precedent): o completare artificiala a unei zile nelucratoare; o inchidere neschimbata reala
+    (randament zero) este pastrata;
   * cripto: 7 zile din 7;
   * EUR/RON: cursul oficial de referinta BNR (seria EODHD are cotatii eronate).
 
@@ -86,12 +88,31 @@ def load_close(name, start=None, end=END):
     start = start or start0
     if symbol.startswith('REF:'):
         return read_reference_rate(symbol.split(':')[1], start=start, end=end).rename(name)
-    s = read_market(symbol)['close'].loc[start:end]
-    s = s[s > 0].dropna()
+    d = read_market(symbol).loc[start:end]
+    d = d[d['close'] > 0].dropna(subset=['close'])
     if group != 'Crypto':
-        s = s[s.index.dayofweek < 5]          # no weekend quotes
-        s = s[s.diff() != 0]                  # no holidays filled with the previous price
-    return s.rename(name)
+        d = d[d.index.dayofweek < 5]          # no weekend quotes
+        d = d[~artificial_fill(d)]            # non-trading days filled with the previous price
+    return d['close'].rename(name)
+
+
+def artificial_fill(d):
+    """Rows that repeat the previous close and show no trading: an artificial non-trading-day fill.
+
+    A repeated close is a fill only if the row itself shows no trading: zero volume (for files that report
+    volume), no intraday range (open = high = low = close) or a copy of the previous row in every field. A
+    repeated close on a day with volume and an intraday range is a genuine unchanged close (a zero return)
+    and is kept. Files with closes only (the BET) give no such evidence, so every row is kept.
+    """
+    repeat = d['close'].diff() == 0
+    no_trade = pd.Series(False, index=d.index)
+    if 'volume' in d and (d['volume'] > 0).mean() > 0.5:
+        no_trade |= d['volume'].fillna(0) <= 0
+    if {'open', 'high', 'low'} <= set(d.columns):
+        no_trade |= (d['open'] == d['high']) & (d['high'] == d['low']) & (d['low'] == d['close'])
+        fields = [c for c in ['open', 'high', 'low', 'close', 'volume'] if c in d]
+        no_trade |= (d[fields] == d[fields].shift()).all(axis=1)
+    return repeat & no_trade
 
 
 def complete_months(x):

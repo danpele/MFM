@@ -3,9 +3,9 @@ ai_discovery_case.py -- Capitolul 4, sectiunea "AI for Scientific Discovery": mi
 ================================================================================================
 Ipoteza: o regula de optimizare bate 1/N out of sample (diferenta de Sharpe > 0).
 Pasul 1 (replicare): diferenta MV-LO minus 1/N pe universul multi-activ si valoarea p bootstrap.
-Pasul 2 (inferenta pe familia de teste): cele 21 de teste ale capitolului (7 reguli x 3 universuri),
+Pasul 2 (inferenta pe familia de teste): cele 18 teste ale capitolului (6 reguli implementabile x 3 universuri; MV, lichidata, nu intra),
 corectii Holm (FWER) si Benjamini-Hochberg (FDR) pe valorile p HAC bilaterale (H0: Delta = 0) si
-unilaterale (H0: Delta <= 0, ipoteza de superioritate); puterea testului unilateral la 5% si la 5%/21.
+unilaterale (H0: Delta <= 0, ipoteza de superioritate); puterea testului unilateral la 5% si la 5%/m.
 Intrare: ch4_results.json (produs de generate_all_charts.py din data/market); iesire: ai_discovery_case.json.
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """
@@ -48,7 +48,7 @@ from scipy import stats   # noqa: E402
 with open(os.path.join(HERE, 'ch4_results.json')) as f:
     T_OOS = json.load(f)['oos']['Multi-asset']['T']            # luni OOS, universul multi-activ (mai 2012 - iulie 2026)
 se = mvlo['diff'] / stats.norm.ppf(1 - mvlo['p_hac'] / 2)
-# putere 80%, test unilateral la 5% (fara corectie) si la 5%/21 (Bonferroni, primul pas Holm)
+# putere 80%, test unilateral la 5% (fara corectie) si la 5%/m (Bonferroni, primul pas Holm)
 T80 = T_OOS * ((stats.norm.ppf(0.95) + stats.norm.ppf(0.80)) * se / mvlo['diff']) ** 2
 T80_fam = T_OOS * ((stats.norm.ppf(1 - 0.05 / m) + stats.norm.ppf(0.80)) * se / mvlo['diff']) ** 2
 out = {

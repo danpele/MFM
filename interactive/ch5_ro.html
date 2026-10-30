@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch5_data.js?v=20261029b"></script>
-<script src="ch5_text_ro.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch5.js?v=20261029b" defer></script>
+<script src="ch5_data.js?v=20261030a"></script>
+<script src="ch5_text_ro.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch5.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
-<p class="toc"><a href="#s-risk">Prognoza riscului de mîine</a> · <a href="#s-dyn">Dinamica dispersiei</a> · <a href="#s-est">Estimare și incertitudine</a> · <a href="#s-mkt">Prognoze și rezultate pe piețe</a> · <a href="#s-asym">Asimetrie și alegerea modelului</a> · <a href="#s-diag">Inovații și diagnostic</a> · <a href="#s-fc">Prognoza și evaluarea prognozelor</a> · <a href="#s-ext">Extensii și limite</a> · <a href="#s-qsd">Studiu de caz: volatilitate bazată pe un cvasi-scor</a></p>
+<p class="toc"><a href="#s-risk">Prognoza riscului de mîine</a> · <a href="#s-dyn">Dinamica dispersiei</a> · <a href="#s-est">Estimare și incertitudine</a> · <a href="#s-mkt">Prognoze și rezultate pe piețe</a> · <a href="#s-asym">Asimetrie și alegerea modelului</a> · <a href="#s-diag">Inovații și diagnostic</a> · <a href="#s-fc">Prognoza și evaluarea prognozelor</a> · <a href="#s-ext">Extensii și limite</a> · <a href="#s-qsd">Studii de caz: volatilitate bazată pe un cvasi-scor și ciclurile volatilității</a></p>
 <h2 class="sec" id="s-risk">Prognoza riscului de mîine</h2>
 <section class="blk" id="clustering">
   <h3>Volatility clustering pe orice piață</h3>
@@ -63,7 +63,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="si-a">Reacția la știri α: <b id="si-a-v"></b></label><input type="range" id="si-a" min="0" max="0.3" step="0.01" value="0.1"></div><div class="ctl"><label for="si-p">Persistența α + β (ω = 1 − α − β): <b id="si-p-v"></b></label><input type="range" id="si-p" min="0.5" max="0.995" step="0.005" value="0.98"></div><button class="btn play" id="si-play" type="button"></button></div><div class="charts "><div class="chart" id="si-chart"></div></div><ul class="out" id="si-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Inovațiile z sînt Normale. Au randamentele unui GARCH(1,1) cu α = 0,10 și β = 0,88 cozi groase?</div>
-  <details><summary>Răspuns</summary><p>Da. Excesul de kurtosis teoretic este 3,06, finit deoarece (α + β)² + 2α² = 0,98 < 1. Un amestec de distribuții Normale cu dispersii diferite are cozi groase. Pe o traiectorie de un milion de zile, excesul de kurtosis estimat este 2,47.</p></details>
+  <details><summary>Răspuns</summary><p>Da. Excesul de kurtosis teoretic este 3,06, finit deoarece (α + β)² + 2α² = 0,98 < 1. Un amestec de distribuții Normale cu dispersii diferite are cozi groase. Pe o traiectorie de un milion de zile, excesul de kurtosis estimat este 2,47; pe cele 2 000 de zile simulate în pagină, doar 0,40: kurtosis se estimează imprecis pe eșantioane scurte.</p></details>
 </section><h2 class="sec" id="s-est">Estimare și incertitudine</h2>
 <section class="blk" id="delta-method">
   <h3>Persistență aproape de 1: limitele metodei delta</h3>
@@ -72,8 +72,8 @@
       <figcaption>Slide-ul 23</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="dm-p">Persistența p = α + β: <b id="dm-p-v"></b></label><input type="range" id="dm-p" min="0.975" max="0.99995" step="1e-05" value="0.99471"></div><button class="btn play" id="dm-play" type="button"></button></div><div class="charts "><div class="chart" id="dm-h"></div><div class="chart" id="dm-v"></div></div><ul class="out" id="dm-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Timpul de înjumătățire estimat pentru S&amp;P 500 este 131 de zile, cu o eroare standard de 116 zile. Este 131 ± 1,96 × 116 un interval util?</div>
-  <details><summary>Răspuns</summary><p>Nu. Limita inferioară ar fi −96 de zile: h(p) este puternic convexă lîngă p = 1, iar tangenta metodei delta coboară sub zero. Transformînd intervalul pentru p, [0,9855; 1,0039], se obține h ∈ [48; ∞).</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Timpul de înjumătățire estimat pentru S&amp;P 500 este 132 de zile, cu o eroare standard de 118 zile. Este 132 ± 1,96 × 118 un interval util?</div>
+  <details><summary>Răspuns</summary><p>Nu. Limita inferioară ar fi −99 de zile: h(p) este puternic convexă lîngă p = 1, iar tangenta metodei delta coboară sub zero. Transformînd intervalul pentru p, [0,9856; 1,0039], se obține h ∈ [48; ∞).</p></details>
 </section><h2 class="sec" id="s-mkt">Prognoze și rezultate pe piețe</h2>
 <section class="blk" id="term-structure">
   <h3>Structura la termen a volatilității</h3>
@@ -83,7 +83,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ts-t">Ziua de la care se face prognoza (ultima zi a lunii): <b id="ts-t-v"></b></label><input type="range" id="ts-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="ts-play" type="button"></button></div><div class="charts "><div class="chart" id="ts-l"></div><div class="chart" id="ts-r"></div></div><ul class="out" id="ts-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe 18.09.2026, volatilitatea S&amp;P 500 prognozată pentru ziua următoare este 11,3% pe an. Cît prognozează GARCH(1,1)-t în medie pe următoarele 250 de zile?</div>
-  <details><summary>Răspuns</summary><p>20,1%. Prognoza crește spre nivelul de termen lung, 27,3%, pentru că nivelul curent este sub el. La aur nivelul curent este peste cel de termen lung, iar curba scade de la 23,9% la 22,4%. La Bitcoin α̂ + β̂ = 1, deci prognoza crește fără limită: 108,3% în medie pe 250 de zile.</p></details>
+  <details><summary>Răspuns</summary><p>20,1%. Prognoza crește spre nivelul de termen lung, 27,4%, pentru că nivelul curent este sub el. La aur nivelul curent este peste cel de termen lung, iar curba scade de la 24,0% la 22,5%. La Bitcoin α̂ + β̂ = 1, deci prognoza crește fără limită: 108,3% în medie pe 250 de zile.</p></details>
 </section>
 <section class="blk" id="persistence">
   <h3>Persistența: viteza de disipare a șocurilor</h3>
@@ -93,7 +93,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="pe-h">Orizontul h (zile): <b id="pe-h-v"></b></label><input type="range" id="pe-h" min="0" max="250" step="1" value="100"></div><button class="btn play" id="pe-play" type="button"></button></div><div class="charts "><div class="chart" id="pe-chart"></div></div><ul class="out" id="pe-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce parte dintr-un șoc de dispersie mai rămîne după 100 de zile la S&amp;P 500 și la BET-TR?</div>
-  <details><summary>Răspuns</summary><p>La S&amp;P 500 rămîn 59% (timpul de înjumătățire este 131 de zile), la BET-TR practic nimic (8 zile). La Bitcoin și EUR/RON α̂ + β̂ = 1, deci în model șocurile nu se disipă.</p></details>
+  <details><summary>Răspuns</summary><p>La S&amp;P 500 rămîn 59% (timpul de înjumătățire este 132 de zile), la BET-TR practic nimic (8 zile). La Bitcoin și EUR/RON α̂ + β̂ = 1, deci în model șocurile nu se disipă.</p></details>
 </section>
 <section class="blk" id="vix">
   <h3>S&amp;P 500: volatilitatea GARCH și VIX</h3>
@@ -113,17 +113,17 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ni-e">Șocul ε(t−1), în %: <b id="ni-e-v"></b></label><input type="range" id="ni-e" min="-6" max="6" step="0.1" value="-3"></div><div class="ctl"><label for="ni-s">Dispersia σ²(t−1), în %²: <b id="ni-s-v"></b></label><input type="range" id="ni-s" min="0.25" max="6" step="any" value="1.4714"></div><button class="btn play" id="ni-play" type="button"></button></div><div class="charts "><div class="chart" id="ni-chart"></div></div><ul class="out" id="ni-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce dispersie prognozează GJR-GARCH-t pentru ziua următoare după un șoc de −3% și după unul de +3%?</div>
-  <details><summary>Răspuns</summary><p>3,16 după −3% și 1,31 după +3%, cu σ²(t−1) fixată la dispersia de selecție 1,47: de 2,4 ori mai mult după știri proaste. EGARCH dă 2,76 și 1,22, iar GARCH(1,1) dă 2,40 pentru ambele șocuri.</p></details>
+  <details><summary>Răspuns</summary><p>3,16 după −3% și 1,31 după +3%, cu σ²(t−1) fixată la dispersia de selecție 1,47: de 2,4 ori mai mult după știri proaste. EGARCH dă 2,75 și 1,22, iar GARCH(1,1) dă 2,40 pentru ambele șocuri.</p></details>
 </section><h2 class="sec" id="s-diag">Inovații și diagnostic</h2>
 <section class="blk" id="innovations">
   <h3>S&amp;P 500: normalitatea inovațiilor</h3>
   <div class="pair">
     <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol5_modele_garch.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch5_innovations_ro.jpg" alt="Slide-ul 41: S&amp;P 500: normalitatea inovațiilor" loading="lazy"></a>
       <figcaption>Slide-ul 41</figcaption></figure>
-    <div class="live"><div class="ctls"><div class="ctl"><label for="in-nu">Gradele de libertate ν ale distribuției Student-t: <b id="in-nu-v"></b></label><input type="range" id="in-nu" min="3" max="30" step="0.01" value="6.26"></div><button class="btn play" id="in-play" type="button"></button></div><div class="charts "><div class="chart" id="in-d"></div><div class="chart" id="in-q"></div></div><ul class="out" id="in-out"></ul></div>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="in-nu">Gradele de libertate ν ale distribuției Student-t: <b id="in-nu-v"></b></label><input type="range" id="in-nu" min="3" max="30" step="any" value="6.2455"></div><button class="btn play" id="in-play" type="button"></button></div><div class="charts "><div class="chart" id="in-d"></div><div class="chart" id="in-q"></div></div><ul class="out" id="in-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cîte reziduuri standardizate ale GARCH(1,1) cu inovații Normale sînt sub −4? Cîte ar fi de așteptat sub distribuția Normală?</div>
-  <details><summary>Răspuns</summary><p>15, față de 0,21 așteptate sub distribuția Normală și 8,5 sub Student-t cu ν = 6,3. Excesul de kurtosis scade de la 10,7 (randamente) la 1,73 (reziduuri), dar normalitatea este respinsă clar: Jarque–Bera 1 153.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Sub distribuția Normală, 0,21 dintre reziduurile standardizate ar fi sub −4. Cîte reziduuri standardizate ale GARCH(1,1) cu inovații Normale sînt sub −4?</div>
+  <details><summary>Răspuns</summary><p>16, față de 0,21 așteptate sub distribuția Normală și 8,6 sub Student-t cu ν = 6,2. Excesul de kurtosis scade de la 10,7 (randamente) la 1,73 (reziduuri), dar normalitatea este respinsă clar: Jarque–Bera 1 156.</p></details>
 </section><h2 class="sec" id="s-fc">Prognoza și evaluarea prognozelor</h2>
 <section class="blk" id="oos">
   <h3>Schema out-of-sample și traiectoriile prognozelor, 2016–2026</h3>
@@ -133,7 +133,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="oo-l">Factorul de descreștere λ al EWMA: <b id="oo-l-v"></b></label><input type="range" id="oo-l" min="0.8" max="0.995" step="0.005" value="0.94"></div><div class="ctl"><label for="oo-per">Perioada</label><select id="oo-per"><option value="all" selected>2016–2026</option><option value="y2020">2020</option><option value="y2022">2022</option><option value="y2025">2025</option></select></div><button class="btn play" id="oo-play" type="button"></button></div><div class="charts "><div class="chart" id="oo-chart"></div></div><ul class="out" id="oo-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> EWMA cu λ = 0,94 nu are parametri estimați. Cît pierde față de GJR-GARCH-t pe 2016–2026, după QLIKE?</div>
-  <details><summary>Răspuns</summary><p>QLIKE mediu este 0,815 pentru EWMA și 0,732 pentru GJR-t, cel mai mic dintre cele șase prognoze; t DM al EWMA față de GARCH-t este 3,48. Alegerea lui λ nu închide diferența: cel mai mic QLIKE al EWMA, 0,813, se obține pentru λ = 0,93.</p></details>
+  <details><summary>Răspuns</summary><p>QLIKE mediu este 0,814 pentru EWMA și 0,731 pentru GJR-t, cel mai mic dintre cele șase prognoze; t DM al EWMA față de GARCH-t este 3,47. Alegerea lui λ nu închide diferența: cel mai mic QLIKE al EWMA, 0,812, se obține pentru λ = 0,93.</p></details>
 </section>
 <section class="blk" id="qlike">
   <h3>S&amp;P 500: evaluarea prognozelor față de GARCH(1,1)</h3>
@@ -143,7 +143,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ql-loss">Funcția de pierdere</label><select id="ql-loss"><option value="qlike" selected>QLIKE</option><option value="mse">MSE</option></select></div><div class="ctl"><label for="ql-y">Evaluarea începe în: <b id="ql-y-v"></b></label><input type="range" id="ql-y" min="2016" max="2025" step="1" value="2016"></div><button class="btn play" id="ql-play" type="button"></button></div><div class="charts "><div class="chart" id="ql-chart"></div></div><ul class="out" id="ql-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Este GJR-t semnificativ mai bun decît GARCH-t după QLIKE?</div>
-  <details><summary>Răspuns</summary><p>Nu. Diferența medie de QLIKE este −0,025, cu t DM = −1,22; pentru aceste perechi imbricate statistica se citește descriptiv. EWMA (t = 3,48) și Hist-20 (t = 4,10) sînt clar mai slabe. Cu MSE ordinea se schimbă: EGARCH-t are cea mai mică valoare, 21,30.</p></details>
+  <details><summary>Răspuns</summary><p>Nu. Diferența medie de QLIKE este −0,025, cu t DM = −1,22; pentru aceste perechi imbricate statistica se citește descriptiv. EWMA (t = 3,47) și Hist-20 (t = 4,10) sînt clar mai slabe. Cu MSE ordinea se schimbă: EGARCH-t are cea mai mică valoare, 21,30.</p></details>
 </section><h2 class="sec" id="s-ext">Extensii și limite</h2>
 <section class="blk" id="long-memory">
   <h3>Memoria lungă: forma ACF a lui |r|</h3>
@@ -153,8 +153,8 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="lm-r">Nivelul la lagul 1, ρ₁: <b id="lm-r-v"></b></label><input type="range" id="lm-r" min="0.1" max="0.5" step="0.001" value="0.289"></div><div class="ctl"><label for="lm-p">Rata de scădere p: <b id="lm-p-v"></b></label><input type="range" id="lm-p" min="0.95" max="0.9999" step="0.0001" value="0.9947"></div><button class="btn play" id="lm-play" type="button"></button></div><div class="charts "><div class="chart" id="lm-chart"></div></div><ul class="out" id="lm-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Poate o singură rată de scădere geometrică reproduce ACF a lui |r| pentru S&amp;P 500 de la lagul 1 la lagul 250?</div>
-  <details><summary>Răspuns</summary><p>Nu. Datele au 0,289 la lagul 1, 0,082 la lagul 100 și 0,009 la lagul 250; GARCH(1,1)-t simulat dă 0,416, 0,130 și 0,020, iar FIGARCH 0,397, 0,215 și 0,144. Cu nivelul datelor la lagul 1, cea mai bună rată geometrică este p = 0,9876, dar curba rămîne sub date la lagul 10 (0,258 față de 0,295) și peste ele la lagul 50 (0,157 față de 0,127).</p></details>
-</section><h2 class="sec" id="s-qsd">Studiu de caz: volatilitate bazată pe un cvasi-scor</h2>
+  <details><summary>Răspuns</summary><p>Nu. Datele au 0,289 la lagul 1, 0,083 la lagul 100 și 0,013 la lagul 250; GARCH(1,1)-t simulat dă 0,417, 0,131 și 0,020, iar FIGARCH 0,396, 0,214 și 0,144. Cu nivelul datelor la lagul 1, cea mai bună rată geometrică (cele mai mici pătrate pe 250 de laguri) este p = 0,9875: curba scade prea repede la început, rămînînd sub date la lagul 10 (0,258 față de 0,295), și prea încet apoi, peste date la lagul 50 (0,156 față de 0,132).</p></details>
+</section><h2 class="sec" id="s-qsd">Studii de caz: volatilitate bazată pe un cvasi-scor și ciclurile volatilității</h2>
 <section class="blk" id="qsd">
   <h3>QSD: replicare pe 11 acțiuni (cf. lucrarea, Fig. 2)</h3>
   <div class="pair">
@@ -165,7 +165,17 @@
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La cîte dintre cele 11 acțiuni este ξ̂ > ζ̂, adică atenuarea șocurilor mari este mai slabă decît cea impusă de Beta-t-GARCH?</div>
   <details><summary>Răspuns</summary><p>La 10 din 11; excepția este Cisco (ξ̂ = 0,193, ζ̂ = 0,195). Testul LR respinge ξ = ζ la 5% pentru 8 acțiuni și ζ = 0 (actualizarea GARCH-t) pentru 9.</p></details>
 </section>
-<p class="src foot">Randamente logaritmice zilnice în %, închideri pînă la 18 septembrie 2026: S&amp;P 500, BET, BET-TR, Bitcoin, aur (XAU/USD) și VIX, prețuri EODHD; EUR/RON: cursul de referință BNR. Studiul de caz: 11 acțiuni din S&amp;P 500, 1995–2019, prețuri EODHD.</p>
+<section class="blk" id="volatility-cycles">
+  <h3>S&amp;P 500: componenta lentă a volatilității și prognozele pe luni</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol5_modele_garch.pdf#page=60" target="_blank" rel="noopener"><img src="slides/ch5_mf2_garch_ro.jpg" alt="Slide-ul 59: S&amp;P 500: componenta lentă a volatilității și prognozele pe luni" loading="lazy"></a>
+      <figcaption>Slide-ul 59</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="mf-m">Fereastra m a componentei pe termen lung (zile): <b id="mf-m-v"></b></label><input type="range" id="mf-m" min="5" max="160" step="1" value="63"></div><div class="ctl"><label for="mf-per">Perioada evaluării</label><select id="mf-per"><option value="both" selected>2010–2019 și 2010–2026</option><option value="pre">2010–2019</option><option value="full">2010–2026</option></select></div><button class="btn play" id="mf-play" type="button"></button></div><div class="charts "><div class="chart" id="mf-vol"></div><div class="chart" id="mf-ql"></div></div><ul class="out" id="mf-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe 2010–2019, MF2-GARCH prognozează dispersia din luna 8 mai bine decît GJR-GARCH, după QLIKE. Rămîne așa dacă evaluarea ține pînă în 2026?</div>
+  <details><summary>Răspuns</summary><p>Nu. Pe 2010–2019, QLIKE relativ la prognoza istorică este 0,714 pentru MF2-GARCH și 0,806 pentru GJR-GARCH (t DM −2,66). Pe 2010–2026 ordinea se inversează: 0,911 față de 0,838 (t DM 0,99). Pe luna 1, cele două modele sînt practic egale pe 2010–2019 (0,578 și 0,576).</p></details>
+</section>
+<p class="src foot">Randamente logaritmice zilnice în %, închideri pînă la 18 septembrie 2026: S&amp;P 500, BET, BET-TR, Bitcoin, aur (XAU/USD) și VIX, prețuri EODHD; EUR/RON: cursul de referință BNR. Studiile de caz: 11 acțiuni din S&amp;P 500, 1995–2019, și S&amp;P 500, 1990–2026, prețuri EODHD.</p>
 </main>
 </body>
 </html>

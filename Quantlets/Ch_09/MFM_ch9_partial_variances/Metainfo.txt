@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch9_partial_variances'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Bollerslev, Medeiros, Patton and Quaedvlieg (2022, Journal of Econometrics): realised partial variances. Next-day out-of-sample forecasts of SPY intraday RV (2022-2026) and Bitcoin 24-hour RV (2025-2026) with RV-HAR, SV-HAR (semivariances, threshold zero), PV(2)-HAR with one threshold at the quantile q of the standardised 5-minute returns, and PV(3)-HAR with two thresholds chosen by 5-fold cross-validation; MSE and QLIKE relative to RV-HAR; Diebold-Mariano tests.'
+
+Keywords: 'realised partial variance, realised semivariance, HAR-RV, volatility forecasting, threshold, cross-validation, QLIKE, Diebold-Mariano'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Course data: SPY and Bitcoin 5-minute bars'
+
+Output: 'ch9_partial_q.pdf'

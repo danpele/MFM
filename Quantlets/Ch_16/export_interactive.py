@@ -13,6 +13,7 @@ import pandas as pd
 
 import generate_all_charts as g
 import ai_discovery_case as ai
+import case_pagnotta as cp
 from mfm_data import (ASSETS, CRIX_UNIVERSE, STABLE, END, price, log_returns, joint_prices, joint_returns,
                       periods_per_year, market_values, defi_tvl, read_market)
 
@@ -25,7 +26,7 @@ CHARTS = os.path.join(HERE, '..', '..', 'charts')
 
 def files_hash():
     fs = sorted(glob.glob(os.path.join(CHARTS, 'ch16_*'))) + [os.path.join(HERE, f) for f in
-         ('ch16_results.json', 'ch16_stylised_facts.csv', 'ch16_asset_features.csv', 'ai_discovery_case.json')]
+         ('ch16_results.json', 'ch16_stylised_facts.csv', 'ch16_asset_features.csv', 'ai_discovery_case.json', 'ch16_pagnotta.json')]
     return {f: hashlib.md5(open(f, 'rb').read()).hexdigest() for f in fs}
 
 
@@ -113,6 +114,8 @@ def main():
     eth = price('ETH', '2020-01-01')
     mm = pd.concat([tvl.resample('ME').last(), eth.resample('ME').last()], axis=1).dropna()
     mm.columns = ['TVL', 'ETH']
+    if (pd.Timestamp(END) + pd.Timedelta(days=1)).day != 1:     # complete months only, as in the slides
+        mm = mm.iloc[:-1]
     dl = np.log(mm).diff().dropna()
     reg = g.hac_ols(dl['TVL'], dl['ETH'], lags=3)
     close(reg.params['ETH'], res['defi']['beta'])
@@ -151,6 +154,19 @@ def main():
         d['ltw'][k] = dict(dates=[f'{t:%Y-%m-%d}' for t in x.index], r=r(x, 6), paper=list(g.LTW_T1[k]))
     d['ltw_ref'] = {k: {s: res['ltw'][k][s] for s in ('ins', 'oos')} for k in g.LTW_T1}
     d['ltw_end'] = g.LTW_END
+
+    # 15. Pagnotta (2022): monthly means of price, hashrate, USD block reward; hashrate around the four halvings
+    pres = json.load(open(os.path.join(HERE, 'ch16_pagnotta.json')))
+    dd = cp.daily()
+    lv, mlog = cp.levels(dd)
+    for w in ('paper', 'oos'):
+        close(lv[w]['b'], pres['levels'][w]['b'])
+    ev, paths = cp.event(dd)
+    mm = np.exp(mlog.loc[cp.PAPER[0]:])
+    d['hr'] = dict(months=[f'{t:%Y-%m}' for t in mm.index], P=sig(mm['P'], 7), H=sig(mm['H'], 7), B=sig(mm['B'], 7),
+                   paper=list(cp.PAPER), oos=list(cp.OOS), k=paths[cp.HALVINGS[0]]['k'].tolist(), halvings=cp.HALVINGS,
+                   H_ev={h: r(paths[h]['H'], 3) for h in cp.HALVINGS}, B_ev={h: r(paths[h]['B'], 3) for h in cp.HALVINGS},
+                   ref=dict(levels=pres['levels'], halvings=pres['halvings'], h_last=pres['h_last']))
 
     with open(OUT, 'w') as fh:
         fh.write('// Inputs of the Chapter 16 interactive page, exported by Quantlets/Ch_16/export_interactive.py.\n')

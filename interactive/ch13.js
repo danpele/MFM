@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH13_DATA;
-const { LANG, C, sum, solve, mean, sdev, median, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { LANG, C, sum, solve, mean, sdev, median, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH13_TEXT;
 
 // ---------------------------------------------------------------- colours (generate_all_charts.py)
@@ -165,14 +165,14 @@ function purgedScheme() {
       let v;
       if (i >= a && i <= b) v = 1;
       else if (i < a) v = t1[i] < a ? 0 : 2;                          // purge: label ends inside the test labels
-      else if (i <= b + e) v = 3;                                      // embargo after the test block
-      else v = i > Tk ? 0 : 2;                                         // purge after the test: label start before T_k
+      else if (i <= Tk) v = 2;                                         // purge after the test: label start up to T_k
+      else v = i <= Tk + e ? 3 : 0;                                    // embargo: the e observations after the last test label ends
       row.push(v); c[v]++;
     }
     z.push(row); stat.push(c); a = b + 1;
   }
   const cs = [[0, K.blue], [0.25, K.blue], [0.25, K.red], [0.5, K.red], [0.5, K.purple], [0.75, K.purple], [0.75, K.amber], [1, K.amber]];
-  const names = ['Train', 'Test', 'Purged (label overlaps test)', 'Embargo (after test)'];
+  const names = ['Train', 'Test', 'Purged (label overlaps test)', 'Embargo (after the last test label)'];
   plot('pc-chart', [
     { z: z.map(r => r.map(v => v + 0.5)), x: range(0, n - 1, 1), y: range(1, k, 1).map(f => 'Fold ' + f), type: 'heatmap', zmin: 0, zmax: 4, colorscale: cs, showscale: false, xgap: 1, ygap: 6,
       customdata: z.map(r => r.map(v => names[v])), hovertemplate: '%{y}, observation %{x}: %{customdata}<extra></extra>' },
@@ -253,6 +253,50 @@ function walkForward() {
   out('wf-out', [T.wf(nf(sS, 2), nf(sB, 2), pct(ex, 0), sw, bp)]);
 }
 
+// ================================================================= anomalies and the market (Dong, Li, Rapach & Zhou 2022)
+function ncdf(x) {                                                       // Abramowitz-Stegun 7.1.26
+  const t = 1 / (1 + 0.3275911 * Math.abs(x) / Math.SQRT2), e = Math.exp(-x * x / 2);
+  const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * e;
+  return x >= 0 ? 0.5 * (1 + y) : 0.5 * (1 - y);
+}
+function r2oos(y, f, hm) { let a = 0, b = 0; y.forEach((v, i) => { a += (v - f[i]) ** 2; b += (v - hm[i]) ** 2; }); return 100 * (1 - a / b); }
+function clarkWest(y, f, hm) {                                         // HAC (Newey-West, Bartlett), floor(4 (T/100)^(2/9)) lags
+  const d = y.map((v, i) => (v - hm[i]) ** 2 - ((v - f[i]) ** 2 - (hm[i] - f[i]) ** 2)), T = d.length, m = mean(d);
+  const L = Math.floor(4 * Math.pow(T / 100, 2 / 9)), e = d.map(v => v - m);
+  let om = e.reduce((a, v) => a + v * v, 0) / T;
+  for (let j = 1; j <= L; j++) { let g = 0; for (let t = j; t < T; t++) g += e[t] * e[t - j]; om += 2 * (1 - j / (L + 1)) * g / T; }
+  const t = m / Math.sqrt(om / T);
+  return { t, p: 1 - ncdf(t), L };
+}
+const AN_SET = { all: [0, 15], ff: [0, 7], dec: [7, 15] };
+function anomalies() {
+  const A = D.dlrz, ye = +$('an-y').value, set = AN_SET[$('an-s').value];
+  const n = A.dates.filter(d => d <= ye + '-12').length, sl = a => a.slice(0, n), x = sl(A.dates).map(d => d + '-15');
+  $('an-y-v').textContent = `${A.dates[0].slice(0, 4)}–${ye}`;
+  const y = sl(A.y), hm = sl(A.hm), cols = range(set[0], set[1] - 1, 1);
+  const comb = sl(A.uni).map(r => mean(cols.map(j => r[j]))), cen = sl(A.cenet);
+  const gain = f => { let s = 0; return y.map((v, i) => 1e4 * (s += (v - hm[i]) ** 2 - (v - f[i]) ** 2)); };
+  const per = `${A.dates[0].slice(0, 4)}-${A.dates[n - 1].slice(0, 4)}`, k = cols.length;
+  const rc = r2oos(y, comb, hm), re = r2oos(y, cen, hm), cw = clarkWest(y, comb, hm), cwe = clarkWest(y, cen, hm);
+  const lab = { all: 'mean of 15 univariate forecasts', ff: 'mean of the 7 factor forecasts', dec: 'mean of the 8 decile-spread forecasts' }[$('an-s').value];
+  const pe = A.dates.indexOf(A.paper_end);
+  plot('an-gain', [
+    { x, y: gain(comb), mode: 'lines', name: `Comb: ${lab} (R²OOS ${ef(rc, 2)}%, ${per})`, line: { color: K.blue, width: 1.4 }, hovertemplate: '%{x|%b %Y}: %{y:.1f}<extra></extra>' },
+    { x, y: gain(cen), mode: 'lines', name: `C-ENet: mean of the forecasts selected by elastic net (R²OOS ${ef(re, 2)}%, ${per})`, line: { color: K.red, width: 1.4 }, hovertemplate: '%{x|%b %Y}: %{y:.1f}<extra></extra>' }
+  ], layout({ title: ttl(`Anomaly returns forecasting the market excess return: out-of-sample ${per.replace('-', '–')}`), legend: legendBelow(-0.13),
+    shapes: [hline(0, K.navy)].concat(pe >= 0 && pe < n ? [vline(A.paper_end + '-31', K.navy, 'dash')] : []),
+    xaxis: AX('', { type: 'date' }), yaxis: AX('Cumulative gain in squared errors (%²)') }));
+  const ur = A.names.map((_, j) => r2oos(y, sl(A.uni).map(r => r[j]), hm));
+  plot('an-uni', [
+    { x: A.names, y: ur, type: 'bar', marker: { color: A.names.map((_, j) => (j >= set[0] && j < set[1] ? (ur[j] > 0 ? K.blue : K.red) : K.band)) }, showlegend: false, hovertemplate: '%{x}: %{y:.2f}%<extra></extra>' }
+  ], layout({ title: ttl(`Single-anomaly forecasts: R²OOS, ${per.replace('-', '–')}`), shapes: [hline(0, K.navy)],
+    xaxis: AX('', { tickangle: -45 }), yaxis: AX('R²OOS (%)') }));
+  const all = r2oos(y, sl(A.ols), hm), en = r2oos(y, sl(A.enet), hm), npos = cols.filter(j => ur[j] > 0).length;
+  const ns = sl(A.nsel), none = ns.filter(v => v === 0).length / n;
+  out('an-out', [T.an(per.replace('-', '–'), k, nf(rc, 2), nf(cw.p, 3), nf(re, 2), nf(cwe.p, 3), nf(en, 2), nf(all, 2)),
+                 T.an2(npos, k, pct(none, 0), nf(A.paper['C-ENet'], 2), nf(A.paper.Comb, 2))]);
+}
+
 // ================================================================= best of N zero-skill strategies
 function expectedMax() {
   const E = D.emax, k = +$('em-k').value, N = E.N[k], sd = Math.sqrt(252 / E.T), s = E.sims[k];
@@ -278,8 +322,9 @@ function expectedMax() {
 function isOos() {
   const G = D.grid, ys = $('io-y').value, q = +$('io-q').value / 100, S = G.splits[ys];
   $('io-q-v').textContent = Math.round(100 * q) + '%'; $('io-y-v').textContent = ys;
-  const ix = S.is.map((v, i) => i).filter(i => S.is[i] !== null && S.oos[i] !== null);
-  const a = ix.map(i => S.is[i]), b = ix.map(i => S.oos[i]), lab = ix.map(i => `MA ${G.fast[i]}/${G.slow[i]}, band ${G.band[i] * 100}%`);
+  // family fixed in sample: rules with a defined IS Sharpe; an undefined OOS Sharpe (always in cash) counts as 0
+  const ix = S.is.map((v, i) => i).filter(i => S.is[i] !== null);
+  const a = ix.map(i => S.is[i]), b = ix.map(i => (S.oos[i] === null ? 0 : S.oos[i])), lab = ix.map(i => `MA ${G.fast[i]}/${G.slow[i]}, band ${G.band[i] * 100}%`);
   const ord = a.map((_, j) => j).sort((i, j) => a[j] - a[i]), top = ord.slice(0, Math.floor(ix.length * q)), best = ord[0];
   const lo = Math.min(...a, ...b) - 0.1, hi = Math.max(...a, ...b) + 0.1, rho = spearman(a, b);
   const yEnd = G.end.slice(0, 4), isLab = `May 2015 – ${+ys - 1}`, oosLab = `${ys} – ${yEnd}`;
@@ -350,7 +395,7 @@ function cpz() {
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   on(['sn-p', 'sn-per'], signalNoise); P('sn-play', 'sn-p', range(0.25, 3, 0.25), 600);
   on(['la-pen', 'la-k'], lassoPath); P('la-play', 'la-k', range(0, 39, 1), 220);
   on(['ff-k', 'ff-lag'], ffd); P('ff-play', 'ff-k', range(0, 20, 1), 500);
@@ -362,9 +407,14 @@ function init() {
   on(['em-k'], expectedMax); P('em-play', 'em-k', range(0, D.emax.N.length - 1, 1), 700);
   on(['io-y', 'io-q'], isOos); P('io-play', 'io-y', range(2018, 2024, 1), 1000);
   on(['vx-l'], vixInference); P('vx-play', 'vx-l', range(0, D.vix.lags.length - 1, 1), 700);
+  on(['an-y', 'an-s'], anomalies); P('an-play', 'an-y', range(1990, +D.dlrz.dates[D.dlrz.dates.length - 1].slice(0, 4), 1), 500);
   on(['cp-y', 'cp-t'], cpz); P('cp-play', 'cp-y', range(1976, 1991, 1), 600);
-  signalNoise(); lassoPath(); ffd(); tripleBarrier(); purgedScheme(); leakage(); modelComparison(); walkForward(); expectedMax(); isOos(); vixInference(); cpz();
+  const PFX = { 'predictability': 'sn', 'lasso-path': 'la', 'ffd-adf': 'ff', 'triple-barrier': 'tb', 'purged-cv': 'pc', 'leakage': 'lk',
+    'model-comparison': 'mc', 'walk-forward': 'wf', 'anomalies': 'an', 'max-sharpe': 'em', 'is-oos': 'io', 'vix': 'vx', 'deep-sdf': 'cp' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  signalNoise(); lassoPath(); ffd(); tripleBarrier(); purgedScheme(); leakage(); modelComparison(); walkForward(); anomalies(); expectedMax(); isOos(); vixInference(); cpz();
 }
-window.CH13 = { lagCorr, auc, spearman, ffdWeights, ffdSeries, tangency, msr, nppf };
+window.CH13 = { r2oos, clarkWest, ncdf, lagCorr, auc, spearman, ffdWeights, ffdSeries, tangency, msr, nppf };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

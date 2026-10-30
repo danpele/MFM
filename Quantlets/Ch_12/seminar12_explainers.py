@@ -344,7 +344,7 @@ def fig_vrp(h=21, A=252):
     vol, r = sim_vol_path()
     n = len(r) - h
     rv = np.array([A / h * np.sum((100 * r[t + 1:t + 1 + h]) ** 2) for t in range(n)])
-    # implied variance: the expected variance plus a premium of 20 % of it
+    # implied variance: the current instantaneous variance (a proxy for the expected 21-day variance) plus 20 % of it
     iv2 = (100 * vol[:n]) ** 2 * 1.2
     t = np.arange(n) / A
     fig, ax = plt.subplots(figsize=HALF)

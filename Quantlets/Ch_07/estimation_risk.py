@@ -7,7 +7,7 @@ estimation_risk.py -- Inference for risk measures (Chapter 7, MFM)
   * estimation risk in the FHS VaR: residual bootstrap (Christoffersen & Goncalves, 2005);
   * symmetric absolute value CAViaR (Engle & Manganelli, 2004), fitted by the pinball loss;
   * the extremal index (intervals estimator, Ferro & Segers, 2003) and declustering.
-Convention: loss L = -r in %, VaR_alpha = q_{1-alpha}(L) = -q_alpha(r), ES_alpha = E[L | L >= VaR_alpha].
+Convention: loss L = -r in %, VaR_alpha = q_{1-alpha}(L) = -q_alpha(r), ES_alpha = (1/alpha) int_{1-alpha}^1 q_u(L) du (historical: fractional weight on the last loss).
 The numbers are written to ch7_inference.json; chart ch7_caviar.
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """
@@ -417,6 +417,9 @@ if __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == 'precision':
         INF = json.load(f)
     B6 = lecture_es_bootstrap()
     fig_precision(INF, B6)
+    INF['es_boot'] = B6                      # i.i.d. and block bootstrap intervals of the historical ES 2.5% (lecture)
+    with open(os.path.join(HERE, 'ch7_inference.json'), 'w') as f:
+        json.dump(jsonable(INF), f, indent=1)
 elif __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == 'extras':
     with open(os.path.join(HERE, 'ch7_inference.json')) as f:
         OUT = json.load(f)

@@ -10,7 +10,9 @@ import numpy as np
 
 import generate_all_charts as g
 from ct_models import (scaled_random_walk, bm_paths, gbm_simulate_returns, acf)
-from mfm_data import read_fred, load_spy_5m
+import pandas as pd
+
+from mfm_data import read_fred, load_spy_5m, load_spy_5m_bars
 
 g.save_fig = lambda name: None          # never rewrite slide charts
 
@@ -90,13 +92,45 @@ def models(res):
     me = res['merton']['sp500']
     S = {'GBM': g.simulate_stats('GBM', res['gbm']['sp500'], n, DT, 100, rng),
          'Merton': g.simulate_stats('Merton', me, n, DT, 100, rng),
-         'Heston': g.simulate_stats('Heston', hpp, n, DT, 100, rng, mu=res['gbm']['sp500']['mu'])}
+         'Heston': g.simulate_stats('Heston', hpp, n, DT, 100, rng, mu=res['gbm']['sp500']['mu'],
+                                    substeps=g.HESTON_SUBSTEPS)}
     out = {}
     for m, s in S.items():
         out[m] = dict(exkurt=r([x['exkurt'] for x in s], 4), hill=r([x['hill'] for x in s], 4),
                       skew=r([x['skew'] for x in s], 4), acf=[r(x['acf_abs'], 4) for x in s])
         med = float(np.median([x['exkurt'] for x in s]))
         assert abs(med - res['compare'][m]['exkurt']['med']) < 1e-9, (m, med)
+    return out
+
+
+def drift_bursts(res):
+    """Second case study (drift_burst_spy, the same seed): per drift bandwidth h = 5..60 minutes, the counts of days with
+    max |T| > c in the data and under the random-sign null, the null 95% quantile c95 and the event days above it
+    (return before and after the peak, in bp); the 5-minute returns and closes of the ten days with the largest |T|
+    at h = 15 minutes, for the T_t path computed in the browser."""
+    bars = load_spy_5m_bars()
+    out = {'hs': list(range(5, 61, 5)), 'by_h': {}}
+    for h in out['hs']:
+        db = g.drift_burst_spy(h=float(h), bars=bars)
+        if h == 15:
+            ref = res['drift_burst']
+            assert db['tests']['c95'] == ref['tests']['c95'] and abs(db['b'] - ref['b']) < 1e-12 and db['rev'] == ref['rev']
+            top = db['top']
+        ok = (db['M'] > db['q']['c95']) & ~np.isnan(db['Rp'])
+        k = np.arange(0, len(db['grid']), 2)                         # c = 2.00, 2.02, ..., 4.00
+        neg = int(np.sum(np.sign(db['Rm'][ok]) < 0))
+        out['by_h'][str(h)] = dict(
+            c95=db['q']['c95'], c99=db['q']['c99'], tests=db['tests'], n_events=db['n_events'], n_events_neg=db['n_events_neg'],
+            n_close=db['n_events_close'], jump_bound=round(db['jump_bound'], 4), grid=r(db['grid'][k], 2),
+            data=db['cnt_data'][k].astype(int).tolist(), null_mean=r(db['cnt_null_mean'][k], 3),
+            null_lo=r(db['cnt_null_lo'][k], 2), null_hi=r(db['cnt_null_hi'][k], 2),
+            rm=r(1e4 * db['Rm'][ok], 4), rp=r(1e4 * db['Rp'][ok], 4), neg_reg=neg)
+    days = pd.Index(bars.index.date)
+    sel = [t['day'] for t in top]
+    out['days'] = {d: dict(r=r(bars['r'].values[days == pd.Timestamp(d).date()], 8),
+                           close=r(bars['close'].values[days == pd.Timestamp(d).date()], 4)) for d in sel}
+    out['top'] = sel
+    out['ref'] = {k: res['drift_burst'][k] for k in ('b', 'b_t', 'rev', 'n_reg', 'gumbel', 'm_tests', 'n_days', 'B')}
     return out
 
 
@@ -138,6 +172,7 @@ def main():
     rough['nlls_m15'] = r(rv['nlls_m15'], 8)
     rough['x'] = r(x, 6)
     d['rough'] = rough
+    d['drift_burst'] = drift_bursts(res)
 
     with open(OUT, 'w') as f:
         f.write('// Inputs of the Chapter 11 interactive page, exported by Quantlets/Ch_11/export_interactive.py.\n')

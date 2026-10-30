@@ -2,7 +2,7 @@
 
 No model is trained or run here. The page uses the forecasts that run_forecasts.py saved (ch14_returns_*.csv,
 ch14_risk_*.csv, ch14_rv.csv) and the results files (ch14_results.json, ch14_inference.json, kmz_case.json,
-ai_discovery_case.json). Statistics that need a bootstrap (block-bootstrap intervals for R^2, the model confidence
+ai_discovery_case.json, m6_case.json with the forecasts in m6_case_probs.json). Statistics that need a bootstrap (block-bootstrap intervals for R^2, the model confidence
 set) are computed here with the chapter's own functions (mfm_tsfm.py) for a grid of evaluation windows, so the
 full-sample values are those of the slides. The PIT intervals of GARCH-t and FHS use inference_tests.garch_grid,
 the cheap GARCH refit of the chapter. No chart is drawn: the save functions are replaced by a no-op and the chart
@@ -182,6 +182,26 @@ def main():
     d['kmz'] = dict(c=kmz['c'], logz=[-3, -2, -1, 0, 1, 2, 3], curve=kmz['curve'], lin_sr=kmz['table']['lin3']['sr'],
                     n=kmz['n'], start=kmz['start'], end=kmz['end'], draws=kmz['draws'], table=kmz['table'])
     d['ai'] = ai
+    # second case study (m6_case.py): realised fractional quintiles and the saved forecasts of each period
+    m6 = json.load(open(os.path.join(HERE, 'm6_case.json')))
+    pr = json.load(open(os.path.join(HERE, 'm6_case_probs.json')))
+    per = pr['periods']
+    # compact: q in fifths (with 19 assets every q_k is a multiple of 0.2), probabilities in units of 1e-4
+    q5 = np.rint(5 * np.array([p_['q'] for p_ in per])).astype(int)
+    assert np.abs(q5 / 5 - np.array([p_['q'] for p_ in per])).max() < 1e-3
+    fi = {mdl: np.rint(10000 * np.array([p_['f'][mdl] for p_ in per])).astype(int) for mdl in ('HM', 'VOL', 'NN')}
+    q = q5 / 5
+    rU = ((np.cumsum(q, 2) - np.cumsum(np.full_like(q, 0.2), 2)) ** 2).mean(2).mean(1)
+    for mdl in ('HM', 'VOL', 'NN'):
+        f_ = fi[mdl] / 10000
+        rm = ((np.cumsum(q, 2) - np.cumsum(f_, 2)) ** 2).mean(2).mean(1)
+        for key, sel in (('m6', [p_['m6'] for p_ in per]), ('ext', [p_['ext'] for p_ in per])):
+            gain = 100 * (1 - rm[sel].mean() / rU[sel].mean())
+            assert abs(gain - m6[key][mdl]['gain']) < 0.02, (mdl, key, gain)
+    d['m6'] = dict(assets=pr['assets'], start=[p_['start'] for p_ in per], end=[p_['end'] for p_ in per],
+                   m6=[p_['m6'] for p_ in per], ext=[p_['ext'] for p_ in per], q5=q5.tolist(),
+                   f10k={mdl: fi[mdl].tolist() for mdl in ('HM', 'VOL', 'NN')},
+                   res={k: m6[k] for k in ('m6', 'ext')}, paper=m6['paper'], first=m6['m6_first'])
 
     after = hashes()
     assert before == after, 'chart or results files changed'

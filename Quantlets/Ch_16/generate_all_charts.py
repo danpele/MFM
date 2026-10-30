@@ -168,6 +168,16 @@ def fig_market_value():
 STYL = ['BTC', 'ETH', 'SOL', 'DOGE', 'SPX', 'GOLD']
 
 
+def hs_es(L, alpha):
+    """Historical ES (as in Quantlets/Ch_07/risk_measures.hs_es): the integral of the empirical quantile function of
+    the loss L over its top alpha, ES = (1/(n alpha)) [sum of the m = floor(n alpha) largest losses
+    + (n alpha - m) x the (m+1)-th largest loss]."""
+    L = np.sort(np.asarray(L, float))[::-1]
+    na = len(L) * alpha
+    m = int(np.floor(na + 1e-9))
+    return float((L[:m].sum() + (na - m) * (L[m] if m < len(L) else 0.0)) / na)
+
+
 def stylised_table(start='2018-01-01'):
     """Moments, tails, autocorrelations, maximum drawdowns and historical VaR 1% / ES 2.5%, each series on its own calendar."""
     rows = {}
@@ -176,16 +186,15 @@ def stylised_table(start='2018-01-01'):
         r = 100 * np.log(p).diff().dropna()
         ppy = periods_per_year(r)
         q = np.quantile(r, 0.01)
-        q25 = np.quantile(r, 0.025)
         mdd, mdd_date = max_drawdown(p)
         rows[k] = dict(N=len(r), start=str(r.index[0].date()), ppy=ppy, ann_mean=r.mean() * ppy,
                        ann_vol=r.std() * np.sqrt(ppy), skew=stats.skew(r), kurt=stats.kurtosis(r),
-                       acf1=r.autocorr(1), acf1_abs=r.abs().autocorr(1), var1=-q, es2_5=-r[r <= q25].mean(),
+                       acf1=r.autocorr(1), acf1_abs=r.abs().autocorr(1), var1=-q, es2_5=hs_es(-r.values, 0.025),
                        min=r.min(), min_date=str(r.idxmin().date()), mdd=mdd, mdd_date=str(mdd_date.date()),
                        hill_left=hill(-r.values), share5sd=100 * (np.abs(r - r.mean()) > 5 * r.std()).mean(),
                        # the same measures as simple losses, in % of the position: 1 - exp(r/100)
                        var1_simple=100 * (1 - np.exp(q / 100)),
-                       es2_5_simple=100 * (1 - np.exp(r[r <= q25] / 100)).mean(),
+                       es2_5_simple=hs_es(100 * (1 - np.exp(r.values / 100)), 0.025),
                        min_simple=100 * (np.exp(r.min() / 100) - 1))
     t = pd.DataFrame(rows).T
     t.to_csv(os.path.join(HERE, 'ch16_stylised_facts.csv'))
@@ -715,7 +724,9 @@ def fig_defi_tvl():
     ax.set_ylabel('Index (100 in Jan 2020, log scale)')
     legend_outside_bottom(ax, ncol=2, y=-0.14)
     save_fig('ch16_defi_tvl')
-    d = np.log(m).diff().dropna()
+    # complete months only: the month of END is dropped from the regression when END is not its last day
+    mc = m if (pd.Timestamp(END) + pd.Timedelta(days=1)).day == 1 else m.iloc[:-1]
+    d = np.log(mc).diff().dropna()
     reg = hac_ols(d['TVL'], d['ETH'], lags=3)
     # TVL by blockchain on the same date as the total series (END): the 10 largest of today's top 15
     ch = pd.Series({c: chain_tvl_at(c, END) for c in chain_tvl().head(15).index}).sort_values(ascending=False).head(10)

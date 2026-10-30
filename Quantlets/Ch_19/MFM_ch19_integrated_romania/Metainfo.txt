@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch19_integrated_romania'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Integrated case study for an investor who measures wealth in lei and holds 50% BET and 50% Euro Stoxx 50 (daily closes and the BNR EUR/RON reference rate, 2005-2026): Lo-MacKinlay variance ratios and the Chow-Denning test (Chapter 2), weekly factor exposures with Newey-West errors (Chapter 3), GARCH(1,1)-t volatility (Chapter 5), the rolling three-year minimum-variance currency hedge ratio (Chapter 6) and the weekly VaR 1% and ES 2.5% by historical simulation for no hedge, the rolling hedge and a full hedge (Chapter 7).'
+
+Keywords: 'EUR/RON, BNR reference rate, BET, Euro Stoxx 50, variance ratio, factor exposure, GARCH, currency hedging, minimum-variance hedge ratio, expected shortfall'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Daily market data (course data): BET, Euro Stoxx 50; EUR/RON reference rate (BNR, online)'
+
+Output: 'ch19_int_romania.pdf, ch19_int_romania.png, ch19_integrated.json'

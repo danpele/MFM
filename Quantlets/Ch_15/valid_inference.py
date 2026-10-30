@@ -9,7 +9,10 @@ ch15_memory_monthly.csv, ai_discovery_case.json); nu ruleaza din nou niciun mode
   * calibrarea probabilitatilor: ECE, Brier, log loss, scalarea temperaturii
   * panelul cu 16 actiuni: grupare pe doua dimensiuni, wild cluster bootstrap restrictionat (Cameron, Gelbach &
     Miller, 2008), corectia Holm pe cele 9 regresii si pe cele 3 strategii
-  * studiul de eveniment: diferenta pozitiv - negativ cu CI grupat pe zile; testul Boehmer, Musumeci & Poulsen (1991)
+  * studiul de eveniment: diferenta pozitiv - negativ cu ponderi egale pe evenimentele actiune-zi, CI Driscoll-Kraay
+    (HAC pe contributiile agregate pe fiecare zi a calendarului: ferestrele de randament ale zilelor apropiate se
+    suprapun); separat, contrastul mediilor zilnice pe zilele cu evenimente in ambele grupuri, cu t Newey-West;
+    testul Boehmer, Musumeci & Poulsen (1991)
   * curba specificatiilor (Simonsohn, Simmons & Nelson, 2020) pe grila de 36 de strategii, cu nul prin schimbarea
     semnului pe blocuri de 10 zile de tranzacționare consecutive (inclusiv zilele cu randament zero) (bootstrap salbatic dependent, Shao, 2010)
   * testul formal AUC inainte vs dupa publicare (DeLong et al., 1988) si diferenta minima detectabila
@@ -167,9 +170,10 @@ def ppi_sim(ns=(100, 200, 400, 800), R=2000, seed=15):
             r[k] = {'cover': float(np.mean(np.abs(v[:, 0] - theta) <= z * v[:, 1])), 'width': float(np.mean(2 * z * v[:, 1])),
                     'bias': float(v[:, 0].mean() - theta)}
         out['by_n'][str(n)] = r
-    # a concrete example with n = 200 (a random split of the headlines: n labelled, the rest unlabelled)
-    idx = np.random.default_rng(1).permutation(N)
-    L, U = idx[:200], idx[200:]
+    # a concrete example with n = 200, drawn as in the simulation: two independent samples with replacement from the
+    # N headlines (n labelled, N - n unlabelled)
+    rng1 = np.random.default_rng(1)
+    L, U = rng1.integers(0, N, 200), rng1.integers(0, N, N - 200)
     ex = {'classical': (y[L].mean(), y[L].std(ddof=1) / np.sqrt(200))}
     for c in F:
         rect = F[c][L] - y[L]
@@ -228,8 +232,10 @@ def calib_stats(P, y, bins=10):
     return {'ece': float(ece), 'brier': brier, 'logloss': ll, 'acc': float(hit.mean()), 'rel': rel}
 
 
-def temp_scale(P, T):
-    L = np.log(np.clip(P, 1e-12, 1)) / T
+def temp_scale(P, T, eps=1e-12):
+    """The saved probabilities are rounded to 6 decimals: zeros are replaced numerically by eps before the logs, so
+    the 'logits' rebuilt here are regularised, not the model's own."""
+    L = np.log(np.clip(P, eps, 1)) / T
     L -= L.max(1, keepdims=True)
     E = np.exp(L)
     return E / E.sum(1, keepdims=True)
@@ -248,8 +254,12 @@ def calibration(seed=15):
         P = P / P.sum(1, keepdims=True)
         nll = lambda T: -np.mean(np.log(np.clip(temp_scale(P[A], T)[np.arange(len(A)), y[A]], 1e-12, 1)))  # noqa: E731
         T = float(minimize_scalar(nll, bounds=(0.05, 50), method='bounded').x)
+        # sensitivity to the numerical floor that replaces the rounded zeros
+        nll6 = lambda T: -np.mean(np.log(np.clip(temp_scale(P[A], T, 1e-6)[np.arange(len(A)), y[A]], 1e-12, 1)))  # noqa: E731
+        T6 = float(minimize_scalar(nll6, bounds=(0.05, 50), method='bounded').x)
         out[name] = {'raw': calib_stats(P[B], y[B]), 'T': T, 'scaled': calib_stats(temp_scale(P[B], T), y[B]),
-                     'all': calib_stats(P, y)}
+                     'all': calib_stats(P, y), 'T_eps1e-6': T6, 'n_zero': int((P == 0).sum()),
+                     'n_texts_zero': int((P == 0).any(1).sum())}
     VI['calib'] = out
     return out
 
@@ -367,18 +377,50 @@ def panel_inference(P, strat=None):
 # =============================================================================
 # 5. EVENT STUDY: POSITIVE - NEGATIVE DIFFERENCE AND THE BMP TEST
 # =============================================================================
+def dk_ols(y, x, days, calendar, L=None):
+    """OLS y = a + b x with Driscoll-Kraay standard errors: the contributions x_i e_i summed by day over the full
+    trading calendar (days without events contribute 0), Newey-West (Bartlett) long-run variance with L lags."""
+    X = np.column_stack([np.ones(len(x)), x])
+    XtX = np.linalg.inv(X.T @ X)
+    b = XtX @ X.T @ y
+    e = y - X @ b
+    pos = pd.Index(calendar).get_indexer(pd.DatetimeIndex(days))
+    T = len(calendar)
+    S = np.zeros((T, 2))
+    np.add.at(S, pos, X * e[:, None])
+    L = int(np.floor(4 * (T / 100) ** (2 / 9))) if L is None else L
+    meat = S.T @ S
+    for l in range(1, L + 1):
+        G_l = S[l:].T @ S[:-l]
+        meat += (1 - l / (L + 1)) * (G_l + G_l.T)
+    n = len(y)
+    V = XtX @ meat @ XtX * (n - 1) / (n - 2)
+    return float(b[1]), float(np.sqrt(V[1, 1])), L
+
+
 def event_inference(P, rets, col='finbert'):
+    """Estimand of the regression: the difference between the mean window returns of the positive and the negative
+    events, each stock-day event weighted equally. The chart (generate_all_charts.eval_news) averages each group
+    within a day first and then across the days of that group: a different weighting and a different set of days.
+    The daily contrast below uses only the days with events in both groups."""
     neg, pos = g.event_groups(P[col])
     sub = P[neg | pos].copy()
     sub['pos'] = pos[neg | pos].astype(float)
     sub['post'] = sub[['r2', 'rp3', 'rp4', 'rp5']].sum(1, min_count=4)
     sub['pre'] = sub[['rm5', 'rm4', 'rm3', 'rm2', 'rm1']].sum(1, min_count=5)
+    dd = sub.index.get_level_values('day')
+    cal = rets.index[(rets.index >= dd.min()) & (rets.index <= dd.max())]
     out = {}
     for w in ('pre', 'r0', 'r1', 'post'):
         s = sub.dropna(subset=[w])
-        r = M.cluster_ols(s[w].values, s['pos'].values, s.index.get_level_values('day'))
-        out[w] = {'d': float(r['b']), 'lo': float(r['b'] - 1.96 * r['se_cl']), 'hi': float(r['b'] + 1.96 * r['se_cl']),
-                  't': float(r['t_cl'])}
+        b, se, L = dk_ols(s[w].values, s['pos'].values, s.index.get_level_values('day'), cal)
+        out[w] = {'d': b, 'lo': b - 1.96 * se, 'hi': b + 1.96 * se, 't': b / se, 'L': L}
+        # daily contrast on the common days: mean of the positive events minus mean of the negative events
+        m = s.groupby([s.index.get_level_values('day'), 'pos'])[w].mean().unstack().dropna()
+        dlt = (m[1.0] - m[0.0]).values
+        mu, t = M.nw_t(dlt, lags=L)
+        out[w + '_daily'] = {'d': float(mu), 'lo': float(mu - 1.96 * mu / t), 'hi': float(mu + 1.96 * mu / t),
+                             't': float(t), 'n_days': int(len(dlt))}
     # BMP: CAR standardised by the standard deviation of the excess return over the 250 days ending at -6
     ex = rets.drop(columns='SPY').sub(rets['SPY'], axis=0)
     sd = ex.rolling(250, min_periods=120).std().shift(6)
@@ -388,8 +430,16 @@ def event_inference(P, rets, col='finbert'):
     sub['scar'] = sub['post'] / (sub['sig'] * np.sqrt(4))
     for grp, sel in (('pos', sub['pos'] == 1), ('neg', sub['pos'] == 0)):
         v = sub.loc[sel, 'scar'].values
+        # the same mean SCAR with a Driscoll-Kraay standard error (events of the same day and overlapping windows)
+        e = v - v.mean()
+        posd = pd.Index(cal).get_indexer(pd.DatetimeIndex(sub.loc[sel].index.get_level_values('day')))
+        S = np.zeros(len(cal))
+        np.add.at(S, posd, e)
+        Lb = int(np.floor(4 * (len(cal) / 100) ** (2 / 9)))
+        lr = S @ S + sum(2 * (1 - l / (Lb + 1)) * (S[l:] @ S[:-l]) for l in range(1, Lb + 1))
+        se_dk = np.sqrt(lr) / len(v)
         out[f'bmp_{grp}'] = {'mean_scar': float(v.mean()), 'z': float(v.mean() * np.sqrt(len(v)) / v.std(ddof=1)),
-                             'n': int(len(v))}
+                             'z_dk': float(v.mean() / se_dk), 'n': int(len(v))}
     VI['event'] = out
     return out
 

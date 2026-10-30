@@ -38,6 +38,7 @@ RET = {'hist': 'Historical mean', 'ar1': 'AR(1)', 'lstm': 'LSTM', 'chronos2_poin
        'bolt_point': 'Chronos-Bolt', 'timesfm_point': 'TimesFM-2.5'}
 LV = np.array(M.C2_LEVELS)
 BLOCK, B = 20, 2000
+GW_LAGS = 6
 
 
 def nw_se(x):
@@ -219,6 +220,8 @@ def kupiec_power():
         return -2 * (ll0 - ll1) > crit
 
     def power(T, p):
+        # exact binomial probability of the Kupiec rule with the asymptotic chi2(1) critical value (nominal 5%);
+        # power(T, p0) is the exact size of that rule, not 5%
         return float(stats.binom.pmf(np.arange(T + 1), T, p)[rej(T)].sum())
     res = {'p1': 0.0167}
     for T in (220, 1000, 2693):
@@ -397,7 +400,7 @@ def aci(y, q, alpha, gamma=0.001, n_cal=250):
     Scores E_i = q_i - y_i on the last n_cal days; corrected quantile q_t - Qhat_t, where Qhat_t is the
     ceil((1 - alpha_t)(n_cal + 1))-th smallest score. Published boundary rule: if alpha_t <= 0 or that rank exceeds
     n_cal, Qhat_t = +inf (the interval is the whole real line: VaR = +inf, no breach possible); if alpha_t >= 1,
-    Qhat_t = -inf. Update alpha_{t+1} = alpha_t + gamma (alpha - err_t); gamma = 0: split conformal."""
+    Qhat_t = -inf. Update alpha_{t+1} = alpha_t + gamma (alpha - err_t); gamma = 0: rolling calibration at a fixed\n    level (the 250-score window moves every day), not standard split conformal."""
     T = len(y)
     E = q - y
     at = alpha
@@ -504,9 +507,19 @@ def gw():
         Z = np.column_stack([np.ones(len(dd) - 1), dd[:-1]]) * dd[1:, None]
         T = len(Z)
         zb = Z.mean(0)
-        Om = (Z - zb).T @ (Z - zb) / T
+        U = Z - zb
+        Om0 = U.T @ U / T
+        # the null shown on the slides is the unconditional restriction E[Z_t] = 0, which does not rule out
+        # autocorrelation in Z_t: long-run (HAC) covariance, Bartlett kernel, GW_LAGS lags
+        Om = Om0.copy()
+        for j in range(1, GW_LAGS + 1):
+            G = U[j:].T @ U[:-j] / T
+            Om += (1 - j / (GW_LAGS + 1)) * (G + G.T)
         st = float(T * zb @ np.linalg.solve(Om, zb))
-        res[m] = dict(gw=st, p=float(stats.chi2.sf(st, 2)))
+        # contemporaneous covariance: valid only under the stronger conditional null (Z_t a martingale difference)
+        st0 = float(T * zb @ np.linalg.solve(Om0, zb))
+        res[m] = dict(gw=st, p=float(stats.chi2.sf(st, 2)), lags=GW_LAGS,
+                      gw_mds=st0, p_mds=float(stats.chi2.sf(st0, 2)))
     OUT['gw'] = res
 
 

@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch7_tailshape'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Time-varying extreme tail shape (D’Innocenzo, Lucas, Schwaab and Zhang, 2024, Journal of Business & Economic Statistics, https://doi.org/10.1080/07350015.2023.2260439) on the daily S&P 500 losses of the course, 2000-2026: dynamic 90% quantile threshold estimated by the pinball loss, score-driven generalised Pareto distribution (GPD) tail shape and scale estimated by maximum likelihood, filtered Value-at-Risk (VaR) 1% and Expected Shortfall (ES) 2.5%; comparison by AIC with a static GPD and with a constant-shape model; the same estimation on 2000-2015 only.'
+
+Keywords: 'extreme value theory, generalised Pareto distribution, score-driven model, time-varying tail shape, value-at-risk, expected shortfall, S&P 500'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'Daily market data of the course: S&P 500 (GSPC.INDX), January 2000 - September 2026'
+
+Output: 'ch7_tailshape.pdf'

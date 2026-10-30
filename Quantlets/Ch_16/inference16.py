@@ -590,6 +590,318 @@ def dimson(etf='IBIT', coin='BTC'):
                 se_ols=float(m0.bse['now']), r2=float(m.rsquared))
 
 
+# =============================================================================
+# 9. ROBUSTNESS OF THE INFERENCE (dependence, regime-specific break CI, joint bootstrap, multiple testing)
+# =============================================================================
+def holm(p):
+    """Holm (1979) step-down adjusted p-values for a dict {name: p}."""
+    ks = sorted(p, key=p.get)
+    adj, run = {}, 0.0
+    for i, k in enumerate(ks):
+        run = max(run, min(1.0, (len(ks) - i) * p[k]))
+        adj[k] = run
+    return adj
+
+
+def _tar_design(d, p):
+    """Pairs on consecutive calendar days: y = d_t, x = d_(t-1), L = (Delta d_(t-1), ..., Delta d_(t-p))."""
+    s = d.copy()
+    full = pd.Series(s.values, index=s.index).asfreq('D')
+    y, x = full, full.shift(1)
+    L = pd.concat([full.diff().shift(j).rename(f'dd{j}') for j in range(1, p + 1)], axis=1) if p else None
+    D = pd.concat([y.rename('y'), x.rename('x')] + ([L] if p else []), axis=1).dropna()
+    return D['y'].values, D['x'].values, (D[[f'dd{j}' for j in range(1, p + 1)]].values if p else np.zeros((len(D), 0)))
+
+
+def _tar_stats(ys, xs, Ls, cuts, A, Lx_cum, LtY, Lx_tot):
+    """Heteroskedasticity-robust Wald statistics for phi_in = phi_out at every cut (sorted order; the common lag
+    coefficients are partialled out, Frisch-Waugh-Lovell); returns W, phi_in, phi_out."""
+    n = len(ys)
+    i = cuts - 1
+    S2 = np.cumsum(xs ** 2)
+    Sxy = np.cumsum(xs * ys)
+    a = Lx_cum[i]                       # L' x_in, one row per cut
+    b = Lx_tot[None, :] - a             # L' x_out
+    Aa, Ab = a @ A, b @ A
+    m11 = S2[i] - np.einsum('ij,ij->i', Aa, a)
+    m22 = (S2[-1] - S2[i]) - np.einsum('ij,ij->i', Ab, b)
+    m12 = -np.einsum('ij,ij->i', Aa, b)
+    r1 = Sxy[i] - Aa @ LtY
+    r2 = (Sxy[-1] - Sxy[i]) - Ab @ LtY
+    det = m11 * m22 - m12 ** 2
+    pin = (m22 * r1 - m12 * r2) / det
+    pout = (m11 * r2 - m12 * r1) / det
+    inner = (np.arange(n)[None, :] < cuts[:, None])
+    Xin = np.where(inner, xs[None, :], 0.0)
+    Xout = np.where(inner, 0.0, xs[None, :])
+    if Ls.shape[1]:
+        gam = (LtY[None, :] - a * pin[:, None] - b * pout[:, None]) @ A            # cuts x p
+        U = ys[None, :] - Xin * pin[:, None] - Xout * pout[:, None] - gam @ Ls.T
+        Xin_t = Xin - Aa @ Ls.T
+        Xout_t = Xout - Ab @ Ls.T
+    else:
+        U = ys[None, :] - Xin * pin[:, None] - Xout * pout[:, None]
+        Xin_t, Xout_t = Xin, Xout
+    U2 = U ** 2
+    s11, s22, s12 = (U2 * Xin_t ** 2).sum(1), (U2 * Xout_t ** 2).sum(1), (U2 * Xin_t * Xout_t).sum(1)
+    # V = M^-1 S M^-1 for the 2x2 block; variance of phi_in - phi_out
+    Mi = np.stack([np.stack([m22, -m12], -1), np.stack([-m12, m11], -1)], -2) / det[:, None, None]
+    Sm = np.stack([np.stack([s11, s12], -1), np.stack([s12, s22], -1)], -2)
+    V = Mi @ Sm @ Mi
+    c = np.array([1.0, -1.0])
+    var = np.einsum('i,nij,j->n', c, V, c)
+    return (pin - pout) ** 2 / var, pin, pout, U
+
+
+def tar_robust(d, p=None, pmax=14, trim=TRIM, B=999, block=None, seed=SEED):
+    """EQ-TAR with p lagged differences (common coefficients; if p is None, the smallest p in 0..pmax for which the
+    Ljung-Box test with 10 lags does not reject at 5% the absence of autocorrelation in the residuals),
+    threshold re-estimated by minimum SSR; sup-Wald (White) for phi_in = phi_out; p-value by the fixed-regressor
+    bootstrap with block multipliers (dependent wild bootstrap: eta constant on blocks of consecutive pairs,
+    length n^(1/3)), which keeps the serial dependence of the scores. Also: lag-1 autocorrelation of the score
+    x_t e_t and the Ljung-Box p-value (10 lags) of the residuals at the estimated threshold."""
+    from statsmodels.stats.diagnostic import acorr_ljungbox
+    if p is None:
+        for p in range(pmax + 1):
+            if tar_robust(d, p=p, trim=trim, B=0)['lb10_p'] >= 0.05:
+                break
+    y, x, L = _tar_design(d, p)
+    n = len(y)
+    order = np.argsort(np.abs(x), kind='stable')
+    xs, ys, Ls, as_ = x[order], y[order], L[order], np.abs(x)[order]
+    lo, hi = int(np.floor(trim * n)), int(np.ceil((1 - trim) * n))
+    cuts = np.array([i for i in range(lo, hi) if as_[i] < as_[i + 1]]) + 1
+    A = np.linalg.inv(Ls.T @ Ls) if p else np.zeros((0, 0))
+    Lx_cum = np.cumsum(Ls * xs[:, None], axis=0)
+    Lx_tot = Lx_cum[-1]
+    W, pin, pout, U = _tar_stats(ys, xs, Ls, cuts, A, Lx_cum, Ls.T @ ys, Lx_tot)
+    ssr = (U ** 2).sum(1)
+    j = int(np.argmin(ssr))
+    e_hat = np.empty(n)
+    e_hat[order] = U[j]
+    xin = np.abs(x) <= as_[cuts[j] - 1]
+    score = x * e_hat
+    lb = float(acorr_ljungbox(e_hat, lags=[10])['lb_pvalue'].iloc[0])
+    # restricted (linear) residuals, in time order, for the bootstrap
+    Z = np.column_stack([x, L])
+    e0 = y - Z @ np.linalg.lstsq(Z, y, rcond=None)[0]
+    ell = block or int(np.ceil(n ** (1 / 3)))
+    rng = np.random.default_rng(seed)
+    sup0 = float(W.max())
+    nb = int(np.ceil(n / ell))
+    bs = np.empty(B)
+    for bi in range(B):
+        eta = np.repeat(rng.standard_normal(nb), ell)[:n]
+        yb = (e0 * eta)[order]
+        bs[bi] = _tar_stats(yb, xs, Ls, cuts, A, Lx_cum, Ls.T @ yb, Lx_tot)[0].max()
+    return dict(n=n, lags=int(p), block=ell, c=float(as_[cuts[j] - 1]), phi_in=float(pin[j]), phi_out=float(pout[j]),
+                sup_w=sup0, p_block=float((1 + (bs >= sup0).sum()) / (B + 1)) if B else None, B=B,
+                score_ac1=float(pd.Series(score).autocorr(1)), lb10_p=lb, share_in=float(100 * xin.mean()))
+
+
+def peg_robust(start='2021-01-01', B=999):
+    """For USDT, USDC, DAI, full sample and without 9-16 March 2023: (i) AR(1) EQ-TAR with block multipliers;
+    (ii) EQ-TAR with BIC-selected lagged differences and block multipliers; lag-1 autocorrelation of the score of
+    the AR(1) EQ-TAR; Holm over the three coins for each sample and specification."""
+    out = {}
+    for k in STABLE:
+        d = 1e4 * (read_market(ASSETS[k][0]).loc[start:END, 'close'] - 1)
+        ex = d.drop(d.loc['2023-03-09':'2023-03-16'].index)
+        out[k] = {}
+        for lab, dd in (('full', d), ('ex', ex)):
+            out[k][lab] = dict(ar1=tar_robust(dd, p=0, B=B), aug=tar_robust(dd, B=B), iid=tar_fit(dd))
+            print('   tar', k, lab, out[k][lab]['ar1']['p_block'], out[k][lab]['aug']['p_block'], out[k][lab]['aug']['lags'])
+    out['holm'] = {}
+    for lab in ('full', 'ex'):
+        for spec in ('ar1', 'aug'):
+            out['holm'][f'{lab}_{spec}'] = holm({k: out[k][lab][spec]['p_block'] for k in STABLE})
+        out['holm'][f'{lab}_iid'] = holm({k: out[k][lab]['iid']['p_boot'] for k in STABLE})
+    return out
+
+
+def _argmax_quantiles(xi, phi, reps=20000, h=0.02, S=150.0, seed=SEED):
+    """2.5% and 97.5% quantiles of argmax_s Z(s), Z(s) = W1(-s) - |s|/2 (s <= 0), sqrt(phi) W2(s) - xi s/2 (s > 0)
+    (Bai, 1997, regimes with different moments); simulation on a grid of step h over [-S, S]."""
+    rng = np.random.default_rng(seed)
+    m = int(S / h)
+    s = np.arange(1, m + 1) * h
+    out = []
+    for _ in range(reps // 500):
+        W1 = np.cumsum(rng.standard_normal((500, m)) * np.sqrt(h), axis=1) - s / 2
+        W2 = np.sqrt(phi) * np.cumsum(rng.standard_normal((500, m)) * np.sqrt(h), axis=1) - xi * s / 2
+        z = np.concatenate([W1[:, ::-1], np.zeros((500, 1)), W2], axis=1)
+        grid = np.concatenate([-s[::-1], [0.0], s])
+        out.append(grid[np.argmax(z, axis=1)])
+    out = np.concatenate(out)
+    return float(np.percentile(out, 2.5)), float(np.percentile(out, 97.5))
+
+
+def bai_ci(y, X, index, tb, L):
+    """Bai (1997) 95% CI for the break date with regime-specific moments: Q_i = X_i'X_i / T_i and the long-run
+    variance Omega_i of x_t u_t (Bartlett, L lags) in each regime; lambda = (d'Q_1 d)^2 / (d'Omega_1 d),
+    xi = d'Q_2 d / d'Q_1 d, phi = d'Omega_2 d / d'Omega_1 d; CI = [tb - c_hi/lambda - 1, tb - c_lo/lambda + 1]."""
+    T = len(y)
+    Q, Om, bet, vu = [], [], [], []
+    for a, b in [(0, tb), (tb, T)]:
+        Xa, ya = X[a:b], y[a:b]
+        bb = np.linalg.lstsq(Xa, ya, rcond=None)[0]
+        u = ya - Xa @ bb
+        Q.append(Xa.T @ Xa / (b - a))
+        Om.append(hac_meat(Xa, u, L) / (b - a))
+        bet.append(bb)
+        vu.append(float(np.var(u, ddof=X.shape[1])))
+    dlt = bet[1] - bet[0]
+    q1, q2 = dlt @ Q[0] @ dlt, dlt @ Q[1] @ dlt
+    o1, o2 = dlt @ Om[0] @ dlt, dlt @ Om[1] @ dlt
+    lam = q1 ** 2 / o1
+    xi, phi = q2 / q1, o2 / o1
+    c_lo, c_hi = _argmax_quantiles(xi, phi)
+    k_lo = max(tb - int(np.ceil(c_hi / lam)) - 1, 0)
+    k_hi = min(tb - int(np.floor(c_lo / lam)) + 1, T - 1)
+    idx = pd.DatetimeIndex(index)
+    return dict(xi=float(xi), phi=float(phi), lam=float(lam), c_lo=c_lo, c_hi=c_hi, var_u=vu,
+                ci_lo=str(idx[k_lo].date()), ci_hi=str(idx[k_hi].date()), n_lo=tb - k_lo, n_hi=k_hi - tb)
+
+
+def break_robust(start='2016-01-01', B=2000, seed=SEED):
+    """BTC-SPX: Bai (1997) CI with regime-specific Q and long-run variances; test for a second break
+    (sup-Wald in each regime, Bai-Perron sequential statistic sup F(2|1) = max over the two regimes,
+    P(max <= x) = G(x)^2); block-bootstrap CI for the change in the correlation at the estimated date; sample sizes."""
+    r = 100 * joint_returns(['BTC', 'SPX'], start)
+    y = r['BTC'].values
+    X = np.column_stack([np.ones(len(r)), r['SPX'].values])
+    T = len(y)
+    sw = sup_wald(y, X, r.index)
+    tb = int(np.where(r.index == pd.Timestamp(sw['date']))[0][0])
+    seg = [(0, tb), (tb, T)]
+    out = bai_ci(y, X, r.index, tb, sw['lags'])
+    out.update(T=T, n_pre=tb, n_post=T - tb, date=sw['date'],
+               var_spx=[float(r['SPX'].values[a:b].var(ddof=1)) for a, b in seg], ci_sym=[sw['ci_lo'], sw['ci_hi']])
+    crit = sup_wald_crit(2)
+    sub = []
+    for a, b in seg:
+        s2 = sup_wald(y[a:b], X[a:b], r.index[a:b])
+        sub.append(dict(sup_w=s2['sup_w'], date=s2['date'], n=b - a))
+    stat = max(z['sup_w'] for z in sub)
+    G = (crit < stat).mean()
+    out['second'] = dict(seg=sub, stat=float(stat), p=float(1 - G ** 2), cv5=float(np.percentile(crit, 100 * 0.95 ** 0.5)))
+    # correlation before / after the estimated date: moving-block bootstrap within each regime
+    rng = np.random.default_rng(seed)
+    pre, post = r.values[:tb], r.values[tb:]
+    def cbb(z, bl=20):
+        n = len(z)
+        st = rng.integers(0, n - bl + 1, int(np.ceil(n / bl)))
+        return z[(st[:, None] + np.arange(bl)[None, :]).ravel()[:n]]
+    rp, rq = np.corrcoef(pre.T)[0, 1], np.corrcoef(post.T)[0, 1]
+    dd = [np.corrcoef(cbb(post).T)[0, 1] - np.corrcoef(cbb(pre).T)[0, 1] for _ in range(B)]
+    out['rho'] = dict(pre=float(rp), post=float(rq), diff=float(rq - rp), lo=float(np.percentile(dd, 2.5)),
+                      hi=float(np.percentile(dd, 97.5)))
+    return out
+
+
+def hill_joint(start='2018-01-01', B=1000, block=28, seed=SEED):
+    """Differences of the Hill indices (left tail) for BTC-SPX, BTC-GOLD, DOGE-SPX: moving-block bootstrap common to
+    both assets (blocks of 28 calendar days; each asset takes its own returns, on its own calendar, from the
+    same days), at k = 2.5%, 5% and 10% of the losses; 95% percentile CI and the bootstrap SE."""
+    rng = np.random.default_rng(seed)
+    R = {k: 100 * np.log(price(k, start)).diff().dropna() for k in ['BTC', 'DOGE', 'SPX', 'GOLD']}
+    days = pd.date_range(min(s.index[0] for s in R.values()), max(s.index[-1] for s in R.values()), freq='D')
+    n = len(days)
+    fr = {'k2.5': 0.025, 'k5': 0.05, 'k10': 0.10}
+    pairs = [('BTC', 'SPX'), ('BTC', 'GOLD'), ('DOGE', 'SPX')]
+    est = {(a, f): hill(-R[a].values, fr[f]) for a in R for f in fr}
+    draws = {(a, b, f): [] for a, b in pairs for f in fr}
+    for _ in range(B):
+        st = rng.integers(0, n - block + 1, int(np.ceil(n / block)))
+        sel = days[(st[:, None] + np.arange(block)[None, :]).ravel()[:n]]
+        hb = {}
+        for a in R:
+            x = -R[a].reindex(sel).dropna().values
+            for f in fr:
+                hb[(a, f)] = hill(x, fr[f])
+        for a, b in pairs:
+            for f in fr:
+                draws[(a, b, f)].append(hb[(a, f)] - hb[(b, f)])
+    out = {}
+    for a, b in pairs:
+        for f in fr:
+            dv = np.array(draws[(a, b, f)])
+            out[f'{a}_{b}_{f}'] = dict(diff=float(est[(a, f)] - est[(b, f)]), lo=float(np.percentile(dv, 2.5)),
+                                       hi=float(np.percentile(dv, 97.5)), se=float(dv.std()))
+    return out
+
+
+def ap_robust(start='2018-01-05', Bb=2000, block=4, L=None, seed=SEED):
+    """GRS and Fama-MacBeth with serial dependence: Ljung-Box (4 lags) of the time-series residuals; GRS p-value by
+    the wild bootstrap with block multipliers (constant on 4 consecutive weeks); Newey-West SE of the mean
+    cross-sectional slopes; moving-block bootstrap of weeks (blocks of 4) that re-estimates both stages."""
+    from statsmodels.stats.diagnostic import acorr_ljungbox
+    tot, _ = crix_index(None, 'cap')
+    p = pd.concat([price(c) for c in COINS] + [tot.rename('MKT')], axis=1).dropna()
+    w = p.resample('W-FRI').last().pct_change().dropna().loc[start:END]
+    rf = weekly_rf().reindex(w.index).ffill()
+    ex = w.sub(rf, axis=0).dropna()
+    R, f = ex[COINS].values, ex[['MKT']].values
+    T, N = R.shape
+    stat, Bc, E = grs_test(R, f)
+    lb = {c: float(acorr_ljungbox(E[:, i], lags=[4])['lb_pvalue'].iloc[0]) for i, c in enumerate(COINS)}
+    lbsq = {c: float(acorr_ljungbox(E[:, i] ** 2, lags=[4])['lb_pvalue'].iloc[0]) for i, c in enumerate(COINS)}
+    ac1 = {c: float(pd.Series(E[:, i]).autocorr(1)) for i, c in enumerate(COINS)}
+    rng = np.random.default_rng(seed)
+    X = np.column_stack([np.ones(T), f])
+    fit0 = X[:, 1:] @ Bc[1:]
+    nb = int(np.ceil(T / block))
+    bs = []
+    for _ in range(Bb):
+        eta = np.repeat(rng.choice([-1.0, 1.0], nb), block)[:T][:, None]
+        bs.append(grs_test(fit0 + E * eta, f)[0])
+    p_block = float((1 + (np.array(bs) >= stat).sum()) / (Bb + 1))
+
+    def fm(Rm, fm_):
+        Tm = len(Rm)
+        Xm = np.column_stack([np.ones(Tm), fm_])
+        beta = np.linalg.lstsq(Xm, Rm, rcond=None)[0][1]
+        Xc = np.column_stack([np.ones(N), beta])
+        return np.array([np.linalg.lstsq(Xc, Rm[t], rcond=None)[0] for t in range(Tm)])
+    G = fm(R, f)
+    gam = G.mean(0)
+    Lw = nw_lags(T) if L is None else L
+    se_nw = np.sqrt(np.diag(hac_meat(np.ones((T, 1)), G[:, 1] - gam[1], Lw)))[0] / T
+    se_nw0 = np.sqrt(np.diag(hac_meat(np.ones((T, 1)), G[:, 0] - gam[0], Lw)))[0] / T
+    lam_b = []
+    for _ in range(Bb):
+        st = rng.integers(0, T - block + 1, nb)
+        ix = (st[:, None] + np.arange(block)[None, :]).ravel()[:T]
+        lam_b.append(fm(R[ix], f[ix]).mean(0)[1])
+    lam_b = np.array(lam_b)
+    return dict(T=T, grs=float(stat), p_block=p_block, block=block, lb4=lb, lb4_sq=lbsq, ac1=ac1,
+                n_lb_rej=int(sum(v < 0.05 for v in lb.values())), n_lbsq_rej=int(sum(v < 0.05 for v in lbsq.values())),
+                g1=float(52 * 100 * gam[1]), se_nw1=float(52 * 100 * se_nw), se_nw0=float(52 * 100 * se_nw0), lags=Lw,
+                se_mbb1=float(52 * 100 * lam_b.std()), lo_mbb1=float(52 * 100 * np.percentile(lam_b, 2.5)),
+                hi_mbb1=float(52 * 100 * np.percentile(lam_b, 97.5)), ac1_g1=float(pd.Series(G[:, 1]).autocorr(1)))
+
+
+def robust():
+    res = {}
+    res['break'] = break_robust()
+    print('break done')
+    res['hill'] = hill_joint()
+    print('hill done')
+    res['ap'] = ap_robust()
+    print('ap done')
+    res['tar'] = peg_robust()
+    print('tar done')
+    with open(os.path.join(HERE, 'ch16_robust.json'), 'w') as fh:
+        json.dump(jsonable(res), fh, indent=1)
+    print(json.dumps(jsonable({k: v for k, v in res.items() if k != 'tar'}), indent=1))
+    return res
+
+
+if __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == '--robust':
+    robust()
+    sys.exit(0)
+
+
 if __name__ == '__main__':
     print('Chapter 16: inference')
     res = {}
@@ -609,6 +921,7 @@ if __name__ == '__main__':
     print('alt done')
     res['ap'] = asset_pricing()
     res['dimson'] = {'ibit': dimson('IBIT', 'BTC'), 'etha': dimson('ETHA', 'ETH')}
+    robust()                     # ch16_robust.json
     with open(os.path.join(HERE, 'ch16_inference.json'), 'w') as fh:
         json.dump(jsonable(res), fh, indent=1)
     print(json.dumps(jsonable({k: v for k, v in res.items() if k != 'crix_rule'}), indent=1))

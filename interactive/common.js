@@ -165,7 +165,7 @@ class Player {
     let i = cur >= 0 && cur < this.values.length - 1 ? cur + 1 : 0;
     this.timer = setInterval(() => {
       el.value = this.values[i]; el.dispatchEvent(new Event('input'));
-      if (++i >= this.values.length) this.stop();
+      if (++i >= this.values.length) { this.stop(); if (typeof this.onEnd === 'function') this.onEnd(); }
     }, this.ms);
     this.label();
   }
@@ -173,8 +173,122 @@ class Player {
 }
 const range = (a, b, st) => { const r = []; for (let x = a; st > 0 ? x <= b + 1e-9 : x >= b - 1e-9; x += st) r.push(+x.toFixed(6)); return r; };
 
+// ---------------------------------------------------------------- opt-in: predict, then check (per block) and exit ticket
+// Pages that do not call predict() or exitTicket() are unchanged.
+const UI = LANG === 'ro'
+  ? { pick: 'Ce credeți? Alegeți o variantă:', check: 'Verifică', right: 'Corect.', wrong: 'Nu: varianta corectă este marcată.', checkAll: 'Verifică răspunsurile',
+      score: (k, n) => `${k} din ${n} răspunsuri corecte.`, none: 'Fără răspuns.', ok: 'Corect', bad: 'Greșit', title: 'Verifică-te',
+      show: 'Arată slide-ul', hidden: 'Rezultatul apare după „Verifică”, după ▶ sau cînd modificați parametrii.' }
+  : { pick: 'What do you think? Pick an option:', check: 'Check', right: 'Correct.', wrong: 'No: the correct option is marked.', checkAll: 'Check answers',
+      score: (k, n) => `${k} of ${n} answers correct.`, none: 'No answer.', ok: 'Correct', bad: 'Wrong', title: 'Check Yourself',
+      show: 'Show slide', hidden: 'The result appears after “Check”, after ▶, or when you change the parameters.' };
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// Opt-in veil of a block: the slide image is blurred under a „Arată slide-ul” / "Show slide" button and, with { out: true },
+// the readout of the live figure is blurred too. Returns reveal(), which removes both. A trusted (user) input in the block's
+// controls reveals the readout only, since it then describes the reader's own choice.
+function veil(blk, opt) {
+  const fig = blk.querySelector('figure.slide'), outs = opt && opt.out ? [...blk.querySelectorAll('.out')] : [];
+  if (!fig && !outs.length) return () => {};
+  const a = fig && fig.querySelector('a'), b = document.createElement('button');
+  if (fig) {
+    fig.classList.add('veiled');
+    b.type = 'button'; b.className = 'btn play veil-btn'; b.textContent = UI.show;
+    fig.appendChild(b);
+    if (a) { a.setAttribute('tabindex', '-1'); a.setAttribute('aria-hidden', 'true'); }
+  }
+  const showOut = () => outs.forEach(o => { o.classList.remove('veiled-out'); o.removeAttribute('title'); });
+  outs.forEach(o => { o.classList.add('veiled-out'); o.title = UI.hidden; });
+  let on = true;
+  const reveal = () => {
+    showOut(); if (!on) return; on = false;
+    if (fig) { fig.classList.remove('veiled'); b.remove(); if (a) { a.removeAttribute('tabindex'); a.removeAttribute('aria-hidden'); } }
+  };
+  b.addEventListener('click', () => { reveal(); if (a) a.focus(); });
+  const ctls = blk.querySelector('.ctls');
+  if (ctls && outs.length) ['input', 'change'].forEach(ev => ctls.addEventListener(ev, e => { if (e.isTrusted) showOut(); }));
+  return reveal;
+}
+// Deterministic shuffle of the options, seeded by a string, so the correct option does not sit at a predictable position;
+// returns the options in display order and the display index of the key.
+function shuffleOpts(seed, opts, key) {
+  let h = 2166136261;
+  for (const ch of String(seed)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  const idx = opts.map((_, i) => i);
+  for (let i = idx.length - 1; i > 0; i--) { h = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0; const j = h % (i + 1); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+  return { opts: idx.map(i => opts[i]), key: idx.indexOf(key) };
+}
+// spec: { opts: [text, ...], key: index of the correct option, player: Player (optional),
+//         veil: true | { out: true } (optional: blur the slide, and the readout with out: true, until the reader presses
+//         „Arată slide-ul”, presses „Verifică” or runs ▶ to the end) }; options are shown in a fixed shuffled order
+function predict(blockId, spec) {
+  const blk = $(blockId), ask = blk && blk.querySelector('.ask'), det = blk && blk.querySelector('details');
+  if (!ask || !spec || !spec.opts) return null;
+  spec = Object.assign({}, spec, shuffleOpts('p:' + blockId, spec.opts, spec.key));
+  const reveal = spec.veil ? veil(blk, spec.veil) : () => {};
+  const nm = 'pred-' + blockId;
+  const fs = document.createElement('fieldset'); fs.className = 'pred';
+  fs.innerHTML = `<legend>${UI.pick}</legend>` + spec.opts.map((t, i) =>
+    `<label class="pick"><input type="radio" name="${nm}" value="${i}"><span>${esc(t)}</span></label>`).join('') +
+    `<div class="pred-act"><button class="btn" type="button">${UI.check}</button><span class="pred-res" role="status" aria-live="polite"></span></div>`;
+  ask.appendChild(fs);
+  const labels = [...fs.querySelectorAll('label.pick')], res = fs.querySelector('.pred-res');
+  const chosen = () => { const r = fs.querySelector('input:checked'); return r ? +r.value : null; };
+  const clear = () => { labels.forEach(l => l.classList.remove('ok', 'bad')); res.textContent = ''; res.className = 'pred-res'; };
+  const check = () => {
+    const c = chosen(); clear(); reveal();
+    if (c !== null) {
+      labels[spec.key].classList.add('ok');
+      if (c !== spec.key) labels[c].classList.add('bad');
+      res.textContent = c === spec.key ? UI.right : UI.wrong; res.classList.add(c === spec.key ? 'is-ok' : 'is-bad');
+    }
+    if (det) det.open = true;
+  };
+  fs.querySelector('button').addEventListener('click', check);
+  fs.addEventListener('change', clear);
+  if (spec.player) spec.player.onEnd = () => { reveal(); if (chosen() !== null) check(); };
+  return { check, chosen, reveal };
+}
+// spec: { title (optional), id (default 'check'), store (localStorage key, optional),
+//         qs: [{ q, key, opts: [{ t, why }, ...] }, ...] }; inserted before the page footnote (or at the end of <main>)
+function exitTicket(spec) {
+  const main = document.querySelector('main'); if (!main || !spec || !spec.qs) return null;
+  const id = spec.id || 'check', title = spec.title || UI.title;
+  spec = Object.assign({}, spec, { qs: spec.qs.map((q, k) => Object.assign({}, q, shuffleOpts(`t:${id}:${k}`, q.opts, q.key))) });
+  const sec = document.createElement('section'); sec.className = 'ticket'; sec.id = id;
+  sec.innerHTML = `<h2 class="sec">${esc(title)}</h2><ol class="tq">` + spec.qs.map((q, k) =>
+    `<li><fieldset><legend>${esc(q.q)}</legend>` + q.opts.map((o, i) =>
+      `<label class="pick"><input type="radio" name="${id}-q${k}" value="${i}"><span>${esc(o.t)}<span class="why" hidden></span></span></label>`).join('') +
+    `</fieldset></li>`).join('') + `</ol><div class="pred-act"><button class="btn play" type="button">${UI.checkAll}</button><span class="pred-res" role="status" aria-live="polite"></span></div>`;
+  const foot = main.querySelector('.src.foot');
+  foot ? main.insertBefore(sec, foot) : main.appendChild(sec);
+  const toc = main.querySelector('.toc');
+  if (toc && !toc.querySelector(`a[href="#${id}"]`)) toc.insertAdjacentHTML('beforeend', `${toc.children.length ? ' · ' : ''}<a href="#${id}">${esc(title)}</a>`);
+  const items = [...sec.querySelectorAll('ol.tq > li')], res = sec.querySelector('.pred-res');
+  const save = () => { if (!spec.store) return; try { localStorage.setItem(spec.store, JSON.stringify(items.map(li => { const r = li.querySelector('input:checked'); return r ? +r.value : null; }))); } catch (e) { /* storage unavailable */ } };
+  const clear = li => { li.querySelectorAll('label.pick').forEach(l => l.classList.remove('ok', 'bad', 'no', 'mine')); li.querySelectorAll('.why').forEach(w => { w.hidden = true; w.textContent = ''; }); };
+  const check = () => {
+    let n = 0;
+    items.forEach((li, k) => {
+      const q = spec.qs[k], r = li.querySelector('input:checked'), c = r ? +r.value : null;
+      clear(li);
+      li.querySelectorAll('label.pick').forEach((l, i) => {
+        l.classList.add(i === q.key ? 'ok' : i === c ? 'bad' : 'no'); if (i === c) l.classList.add('mine');
+        const w = l.querySelector('.why'); w.textContent = `${i === q.key ? UI.ok : UI.bad}. ${q.opts[i].why}`; w.hidden = false;
+      });
+      if (c === q.key) n++;
+    });
+    res.textContent = UI.score(n, items.length); res.className = 'pred-res';
+  };
+  sec.querySelector('button').addEventListener('click', check);
+  items.forEach(li => li.addEventListener('change', () => { clear(li); res.textContent = ''; save(); }));
+  if (spec.store) {
+    try { const v = JSON.parse(localStorage.getItem(spec.store) || 'null'); if (Array.isArray(v)) v.forEach((c, k) => { const r = c !== null && items[k] && items[k].querySelectorAll('input')[c]; if (r) r.checked = true; }); } catch (e) { /* storage unavailable */ }
+  }
+  if (location.hash === '#' + id) sec.scrollIntoView();
+  return { check };
+}
 
 window.MFMI = { LANG, C, dot, mv, quad, scale, sum, sub, solve, chol, eigSym, cov2corr, wEW, wTan, wGMV, projSimplex, trace, wLOmv, wGMVLO, wTanLO,
   ercStep, wERC, riskContrib, frontierUnc, leaves, hrpLevels, rng, sampleMoments, median, mean, sdev, sharpe, nf, pct, $, AX, layout, ttl, CFG, plot, out,
-  vline, hline, Player, range };
+  vline, hline, Player, range, predict, exitTicket };
 })();

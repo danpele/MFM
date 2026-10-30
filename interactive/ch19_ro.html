@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch19_data.js?v=20261029b"></script>
-<script src="ch19_text_ro.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch19.js?v=20261029b" defer></script>
+<script src="ch19_data.js?v=20261030a"></script>
+<script src="ch19_text_ro.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch19.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
-<p class="toc"><a href="#s-bet">Studiu de caz integrat: BET</a> · <a href="#s-nse">Studiu de caz: erorile nestandard</a></p>
+<p class="toc"><a href="#s-bet">Studiu de caz integrat: BET</a> · <a href="#s-int">Studii de caz integrate: portofoliu, Bitcoin, investitor român</a> · <a href="#s-nse">Studiu de caz: erorile nestandard</a></p>
 <h2 class="sec" id="s-bet">Studiu de caz integrat: BET</h2>
 <section class="blk" id="bet-facts">
   <h3>Pasul 1: faptele stilizate ale BET</h3>
@@ -43,7 +43,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="bf-y0">Primul an: <b id="bf-y0-v"></b></label><input type="range" id="bf-y0" min="2000" max="2025" step="1" value="2000"></div><div class="ctl"><label for="bf-y1">Ultimul an: <b id="bf-y1-v"></b></label><input type="range" id="bf-y1" min="2001" max="2026" step="1" value="2026"></div><div class="ctl"><label for="bf-k">Hill: k ca pondere din zilele cu pierdere: <b id="bf-k-v"></b></label><input type="range" id="bf-k" min="1" max="10" step="0.5" value="5"></div><button class="btn play" id="bf-play" type="button"></button></div><div class="charts "><div class="chart" id="bf-qq"></div><div class="chart" id="bf-acf"></div></div><ul class="out" id="bf-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Tail index-ul Hill al pierderilor BET este 2,39. Ce spune această valoare despre kurtosis-ul randamentelor?</div>
-  <details><summary>Răspuns</summary><p>Momentele de ordin cel puțin 2,39 sînt infinite, deci și kurtosis-ul populației. Întregul interval de încredere de 95% [2,12; 3,03] este sub 4, așa că excesul de kurtosis empiric (11,1) nu estimează nimic și se raportează tail index-ul. Pe tot eșantionul sînt 51 de zile dincolo de ±4 abateri standard, față de 0,42 așteptate sub distribuția Normală.</p></details>
+  <details><summary>Răspuns</summary><p>Sub o coadă de tip Pareto, momentele de ordin peste 2,39 sînt infinite. Întregul interval de încredere de 95% [2,12; 3,03] este sub 4: datele sînt compatibile cu un kurtosis infinit, fără să-l demonstreze, iar excesul de kurtosis empiric (11,1) nu estimează un parametru finit, deci se raportează tail index-ul. Pe tot eșantionul sînt 51 de zile dincolo de ±4 abateri standard, față de 0,42 așteptate sub distribuția Normală.</p></details>
 </section>
 <section class="blk" id="bet-garch">
   <h3>Pasul 2: volatilitatea GARCH(1,1)-t</h3>
@@ -84,18 +84,48 @@
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Un model VaR 1% are în realitate o rată a depășirilor de 2%. Cît de des îl respinge testul Kupiec de 5% după un an Basel (T = 250)?</div>
   <details><summary>Răspuns</summary><p>Doar în 24% din cazuri. Efectul minim detectabil cu o putere de 80% este 3,65% la T = 250, 2,05% la T = 1 000 și 1,45% la T = 5 432. O nerespingere cu putere mică înseamnă „nicio dovadă”, nu „nicio problemă”.</p></details>
+</section><h2 class="sec" id="s-int">Studii de caz integrate: portofoliu, Bitcoin, investitor român</h2>
+<section class="blk" id="int-portfolio">
+  <h3>Portofoliul multi-active: ponderi, VaR și contribuții la risc</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch19_int_portfolio_ro.jpg" alt="Slide-ul 47: Portofoliul multi-active: ponderi, VaR și contribuții la risc" loading="lazy"></a>
+      <figcaption>Slide-ul 47</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ip-m">Modelul VaR 1%</label><select id="ip-m"><option value="n" selected>DCC-Normal</option><option value="fhs">DCC-FHS</option><option value="hs">HS (500 de zile)</option></select></div><div class="ctl"><label for="ip-y0">Începutul evaluării: <b id="ip-y0-v"></b></label><input type="range" id="ip-y0" min="2012" max="2025" step="1" value="2012"></div><div class="ctl"><label for="ip-t">Pînă la: <b id="ip-t-v"></b></label><input type="range" id="ip-t" min="0" max="1000" step="1" value="1000"></div><button class="btn play" id="ip-play" type="button"></button></div><div class="charts "><div class="chart" id="ip-c1"></div><div class="chart" id="ip-c2"></div><div class="chart" id="ip-c3"></div></div><ul class="out" id="ip-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> De ce eșuează VaR-ul DCC-FHS, deși folosește aceeași covarianță condiționată ca DCC-Normal?</div>
+  <details><summary>Răspuns</summary><p>Istoria lui aplică ponderile de azi pe datele din care au fost estimate: în fereastra FHS, abaterea standard a randamentelor standardizate ale portofoliului este 0,91, în afara ei 0,95. Cuantila de 99% a pierderii standardizate iese prea mică: VaR-ul mediu este 0,55%, față de 0,58% pentru DCC-Normal, iar depășirile sînt 52, față de 35,8 așteptate (p Kupiec 0,011). DCC-Normal are 40 de depășiri și trece toate cele trei teste. Comparația este retrospectivă: modelul VaR este ales pe aceeași perioadă pe care este evaluat.</p></details>
+</section>
+<section class="blk" id="int-bitcoin">
+  <h3>Bitcoin: bule, VaR din volatilitatea realizată și lichiditate</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=52" target="_blank" rel="noopener"><img src="slides/ch19_int_bitcoin_ro.jpg" alt="Slide-ul 51: Bitcoin: bule, VaR din volatilitatea realizată și lichiditate" loading="lazy"></a>
+      <figcaption>Slide-ul 51</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ib-a">Nivelul VaR α: <b id="ib-a-v"></b></label><input type="range" id="ib-a" min="0.5" max="5" step="0.25" value="1"></div><div class="ctl"><label for="ib-w">Fereastra HS (zile): <b id="ib-w-v"></b></label><input type="range" id="ib-w" min="250" max="900" step="50" value="500"></div><button class="btn play" id="ib-play" type="button"></button></div><div class="charts "><div class="chart" id="ib-c1"></div><div class="chart" id="ib-c2"></div><div class="chart" id="ib-c3"></div></div><ul class="out" id="ib-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Evaluarea are 422 de zile. Cît de des ar respinge testul Kupiec de 5% un model VaR 1% care greșește cu o rată reală de 2%?</div>
+  <details><summary>Răspuns</summary><p>Doar cu probabilitatea 47%; efectul minim detectabil cu o putere de 80% este 2,70%. Ambele modele au 7 depășiri față de 4,2 așteptate (p = 0,214), deci diferența practică este capitalul: VaR mediu 5,29% pentru log-HAR, față de 6,24% pentru HS.</p></details>
+</section>
+<section class="blk" id="int-romania">
+  <h3>Investitorul român: eficiență, acoperire valutară și ES în lei</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch19_int_romania_ro.jpg" alt="Slide-ul 55: Investitorul român: eficiență, acoperire valutară și ES în lei" loading="lazy"></a>
+      <figcaption>Slide-ul 55</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="ir-w">Fereastra lui h* (săptămîni): <b id="ir-w-v"></b></label><input type="range" id="ir-w" min="52" max="260" step="4" value="156"></div><div class="ctl"><label for="ir-y0">Primul an al testelor VR: <b id="ir-y0-v"></b></label><input type="range" id="ir-y0" min="2005" max="2020" step="1" value="2005"></div><button class="btn play" id="ir-play" type="button"></button></div><div class="charts "><div class="chart" id="ir-c1"></div><div class="chart" id="ir-c2"></div><div class="chart" id="ir-c3"></div></div><ul class="out" id="ir-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Partea în euro pierde cînd Euro Stoxx 50 scade. De ce acoperirea integrală a riscului valutar nu reduce ES-ul portofoliului?</div>
+  <details><summary>Răspuns</summary><p>Leul se depreciază în săptămînile în care acțiunile scad (β = −0,52, t = −2,61), deci cursul compensează o parte din pierdere, iar volatilitatea EUR/RON este 4,6% pe an, față de 20,9% pentru Euro Stoxx 50. ES 2,5% săptămînal, aug. 2008 – sept. 2026: 9,60% fără acoperire, 9,67% cu acoperire integrală; retrospectiv, alegerea lui h a contat puțin pentru risc.</p></details>
 </section><h2 class="sec" id="s-nse">Studiu de caz: erorile nestandard</h2>
 <section class="blk" id="nse-multiverse">
   <h3>Mini-multivers pe datele cursului: 27 de specificații pe indice</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=57" target="_blank" rel="noopener"><img src="slides/ch19_nse_multiverse_ro.jpg" alt="Slide-ul 56: Mini-multivers pe datele cursului: 27 de specificații pe indice" loading="lazy"></a>
-      <figcaption>Slide-ul 56</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=69" target="_blank" rel="noopener"><img src="slides/ch19_nse_multiverse_ro.jpg" alt="Slide-ul 68: Mini-multivers pe datele cursului: 27 de specificații pe indice" loading="lazy"></a>
+      <figcaption>Slide-ul 68</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="nm-model">Modelul variației anuale</label><select id="nm-model"><option value="all" selected>toate trei</option><option value="Linear trend">Tendință liniară</option><option value="Log difference">Diferență logaritmică</option><option value="Relative difference">Diferență relativă</option></select></div><div class="ctl"><label for="nm-meas">Măsura ineficienței</label><select id="nm-meas"><option value="all" selected>toate trei</option><option value="|VR(5) - 1|">|VR(5) − 1|</option><option value="|VR(21) - 1|">|VR(21) − 1|</option><option value="AR(1) R$^2$">R² al AR(1)</option></select></div><div class="ctl"><label for="nm-ol">Valorile extreme</label><select id="nm-ol"><option value="all" selected>toate trei</option><option value="None">netratate</option><option value="Winsorised">winsorizate</option><option value="Trimmed">trunchiate</option></select></div><div class="ctl"><label for="nm-q">Percentila de winsorizare și trunchiere: <b id="nm-q-v"></b></label><input type="range" id="nm-q" min="1" max="10" step="0.5" value="2.5"></div><button class="btn play" id="nm-play" type="button"></button></div><div class="charts "><div class="chart" id="nm-chart"></div></div><ul class="out" id="nm-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care dintre cele trei decizii (valorile extreme, măsura, modelul) produce cea mai mare parte din dispersia celor 27 de estimări?</div>
-  <details><summary>Răspuns</summary><p>Modelul. Pentru cele nouă specificații cu tendință liniară, IQR-ul este 2,0 pp pentru Euro Stoxx 50 și 7,5 pp pentru BET, față de 22,9 pp și 84,4 pp pe toate cele 27. Cu diferențe relative, medianele urcă la +210,4% și +108,7% pe an.</p></details>
+  <details><summary>Răspuns</summary><p>Modelul. Pentru cele nouă specificații cu tendință liniară, IQR-ul este 2,6 pp pentru Euro Stoxx 50 și 6,7 pp pentru BET, față de 64,6 pp și 82,6 pp pe toate cele 27. Cu diferențe relative, medianele urcă la +98,7% și +80,3% pe an.</p></details>
 </section>
-<p class="src foot">Indicele BET: valori oficiale zilnice de închidere, 6 ian. 2000 – 18 sept. 2026, randamente logaritmice în %. Prognozele VaR la o zi: fereastră rolling de 1 000 de zile (500 pentru HS și modelul Normal), GARCH reestimat la fiecare 21 de zile, evaluare din 3 ian. 2005. Mini-multiversul: închideri zilnice Euro Stoxx 50 (EODHD) și BET, 2002–2018.</p>
+<p class="src foot">Indicele BET: valori oficiale zilnice de închidere, 6 ian. 2000 – 18 sept. 2026, randamente logaritmice în %. Prognozele VaR la o zi: fereastră rolling de 1 000 de zile (500 pentru HS și modelul Normal), GARCH reestimat la fiecare 21 de zile, evaluare din 3 ian. 2005. Mini-multiversul: închideri zilnice Euro Stoxx 50 (EODHD) și BET, 2002–2018. Studiile de caz integrate: opt ETF-uri multi-active (prețuri ajustate, 2007–2026), Bitcoin (închideri zilnice 2014–2026, bare de 5 minute 2024–2026), BET, Euro Stoxx 50 și cursul de referință EUR/RON al BNR (2005–2026).</p>
 </main>
 </body>
 </html>

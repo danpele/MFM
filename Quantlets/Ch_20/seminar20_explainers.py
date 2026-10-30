@@ -315,7 +315,12 @@ def fig_holm_bh(m=50, seed=6):
     ok = np.where(p <= bh)[0]
     n_bh = int(ok.max() + 1) if len(ok) else 0
     fig, ax = plt.subplots(figsize=(2.75, 1.95))
-    ax.plot(k, p, 'o', color=Navy, ms=2.6, label='sorted $p_{(k)}$')
+    # points coloured by the decision of each algorithm: Holm stops at the first rank that fails its threshold;
+    # BH finds the last rank that passes its threshold and rejects every rank up to it
+    both, bh_only, none = k <= n_holm, (k > n_holm) & (k <= n_bh), k > n_bh
+    ax.plot(k[both], p[both], 'o', color=IDAred, ms=2.8, label='rejected by Holm and BH')
+    ax.plot(k[bh_only], p[bh_only], 's', color=Forest, ms=2.8, label='rejected by BH only')
+    ax.plot(k[none], p[none], 'o', mfc='none', mec=Navy, mew=0.6, ms=2.6, label='not rejected')
     ax.plot(k, holm, color=IDAred, lw=1.1, ls='--', label='Holm')
     ax.plot(k, bh, color=Forest, lw=1.1, label='BH')
     ax.axhline(0.05, color=Amber, lw=0.9, ls='-.', label='0.05')
@@ -323,7 +328,7 @@ def fig_holm_bh(m=50, seed=6):
     ax.set_xlabel('Rank $k$')
     ax.set_ylabel('$p$-value (log)')
     ax.set_title(f'$m$ = {m}: raw {int((p <= 0.05).sum())}, Holm {n_holm}, BH {n_bh}', loc='left')
-    bottom_legend(fig, ax, ncol=4)
+    bottom_legend(fig, ax, ncol=2)
     save_fig(fig, 'ch20_sem_primer_holm_bh')
     return dict(raw=int((p <= 0.05).sum()), holm=n_holm, bh=n_bh, p5=p[:8].round(5).tolist())
 

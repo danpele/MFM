@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch10_data.js?v=20261029b"></script>
-<script src="ch10_text_en.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch10.js?v=20261029b" defer></script>
+<script src="ch10_data.js?v=20261030a"></script>
+<script src="ch10_text_en.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch10.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
-<p class="toc"><a href="#s-lob">The Limit Order Book</a> · <a href="#s-spr">The Bid-Ask Spread</a> · <a href="#s-ill">Illiquidity and Intraday Patterns</a> · <a href="#s-inf">Information and Prices</a> · <a href="#s-exe">Price Impact and Optimal Execution</a> · <a href="#s-hft">High-Frequency Trading and Market Stress</a> · <a href="#s-race">Case Study: Quantifying the HFT Arms Race</a> · <a href="#s-ai">Artificial Intelligence for Scientific Discovery</a></p>
+<p class="toc"><a href="#s-lob">The Limit Order Book</a> · <a href="#s-spr">The Bid-Ask Spread</a> · <a href="#s-ill">Illiquidity and Intraday Patterns</a> · <a href="#s-inf">Information and Prices</a> · <a href="#s-exe">Price Impact and Optimal Execution</a> · <a href="#s-hft">High-Frequency Trading and Market Stress</a> · <a href="#s-race">Case Studies: the HFT Arms Race and Intraday Momentum</a> · <a href="#s-ai">Artificial Intelligence for Scientific Discovery</a></p>
 <h2 class="sec" id="s-lob">The Limit Order Book</h2>
 <section class="blk" id="order-book">
   <h3>A Simulated Order Book</h3>
@@ -73,7 +73,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="sf-y">Period: <b id="sf-y-v"></b></label><input type="range" id="sf-y" min="0" max="7" step="1" value="0"></div><button class="btn play" id="sf-play" type="button"></button></div><div class="charts "><div class="chart" id="sf-chart"></div></div><ul class="out" id="sf-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> One tick is 0.21 bp of the SPY price. Which estimator comes closest to this value?</div>
-  <details><summary>Answer</summary><p>EDGE on 5-minute bars: 0.46 bp, with the 95% interval [0.42, 0.49]. On daily bars all estimates are two orders of magnitude above one tick (Roll 64.3, Corwin–Schultz 26.5, Abdi–Ranaldo 55.1 and EDGE 40.1 bp), because the daily range is dominated by volatility.</p></details>
+  <details><summary>Answer</summary><p>EDGE on 5-minute bars: 0.46 bp; the 95% interval for the mean of the estimator, from a 20-day block bootstrap, is [0.41, 0.51]. On daily bars all estimates are two orders of magnitude above one tick (Roll 64.3, Corwin–Schultz 26.5, Abdi–Ranaldo 55.1 and EDGE 40.1 bp), because the daily range is dominated by volatility.</p></details>
 </section>
 <section class="blk" id="spread-cross">
   <h3>Spread Estimates Across 25 Assets</h3>
@@ -93,7 +93,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="am-s">Window starts in: <b id="am-s-v"></b></label><input type="range" id="am-s" min="0" max="23" step="1" value="0"></div><button class="btn play" id="am-play" type="button"></button></div><div class="charts "><div class="chart" id="am-chart"></div></div><ul class="out" id="am-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> How many times larger is the Amihud ratio of Banca Transilvania, the most liquid BVB stock, than that of SPY?</div>
-  <details><summary>Answer</summary><p>About 15,500 times: 24.7 bp against 0.0016 bp per USD 1 million traded. Bitcoin has 0.0037 bp, close to SPY, and Transelectrica 1,024.0 bp. The Amihud ratio separates the three markets by orders of magnitude, which the spread estimators from daily bars do not.</p></details>
+  <details><summary>Answer</summary><p>About 17,600 times: 28.0 bp against 0.0016 bp per USD 1 million traded. Bitcoin has 0.0037 bp, close to SPY, and Transelectrica 1,024.0 bp. The Amihud ratio separates the three markets by orders of magnitude, which the spread estimators from daily bars do not.</p></details>
 </section>
 <section class="blk" id="amihud-time">
   <h3>Illiquidity over Time: Three Markets</h3>
@@ -154,7 +154,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> How far did SPY fall on 6 May 2010, at the low of the day and at the close?</div>
   <details><summary>Answer</summary><p>The low, USD 105.00, was 10.1% below the previous close (USD 116.82), but the close was only 3.3% lower. Volume was 3.0 times the median of the preceding days. Daily bars show the range, not the fall and the recovery within the day.</p></details>
-</section><h2 class="sec" id="s-race">Case Study: Quantifying the HFT Arms Race</h2>
+</section><h2 class="sec" id="s-race">Case Studies: the HFT Arms Race and Intraday Momentum</h2>
 <section class="blk" id="race-tax">
   <h3>Case Study: the Implied Daily Tax on SPY</h3>
   <div class="pair">
@@ -164,12 +164,22 @@
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> On how many days does the implied SPY tax exceed the authors' most pessimistic scenario, 0.74 bp?</div>
   <details><summary>Answer</summary><p>On 2 of the 1,244 days. The maximum, 1.04 bp, is on 7 April 2025, with a realised volatility of 106.7%. The median tax is 0.40 bp, close to the 0.419 bp measured in London, and on 30% of the days the tax exceeds 0.4213 bp.</p></details>
+</section>
+<section class="blk" id="intraday-momentum">
+  <h3>Case Study: SPY Intraday Momentum, 2020–2026</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=59" target="_blank" rel="noopener"><img src="slides/ch10_intraday_momentum_en.jpg" alt="Slide 58: Case Study: SPY Intraday Momentum, 2020–2026" loading="lazy"></a>
+      <figcaption>Slide 58</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="im-m">Length of the last interval (minutes): <b id="im-m-v"></b></label><input type="range" id="im-m" min="10" max="60" step="10" value="30"></div><button class="btn play" id="im-play" type="button"></button></div><div class="charts "><div class="chart" id="im-scat"></div><div class="chart" id="im-year"></div></div><ul class="out" id="im-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Does the last half hour of SPY continue the move of the rest of the day, as in the paper's futures?</div>
+  <details><summary>Answer</summary><p>We find no significant positive momentum. Over the 1,460 days of Oct 2020 – Sep 2026 the slope is 100β = −0.32 (t = −0.33), with the 95% interval [−2.22, 1.58]: the paper's slope, 4.18, lies outside it. The only period whose interval excludes 0 is 2020-21, with slope −4.81, of the opposite sign (p = 0.019; after the Holm correction for six subperiods, p = 0.11). For the last 10 minutes the slope is −1.48 (p = 0.043): a negative coefficient, not significant after the Holm correction for six intervals (p = 0.26).</p></details>
 </section><h2 class="sec" id="s-ai">Artificial Intelligence for Scientific Discovery</h2>
 <section class="blk" id="mini-case">
   <h3>Mini-Case: Cost or Volatility?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=59" target="_blank" rel="noopener"><img src="slides/ch10_sem_cross_en.jpg" alt="Slide 58: Mini-Case: Cost or Volatility?" loading="lazy"></a>
-      <figcaption>Slide 58</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=64" target="_blank" rel="noopener"><img src="slides/ch10_sem_cross_en.jpg" alt="Slide 63: Mini-Case: Cost or Volatility?" loading="lazy"></a>
+      <figcaption>Slide 63</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="mc-x">Assets included: <b id="mc-x-v"></b></label><input type="range" id="mc-x" min="0" max="3" step="1" value="0"></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts three"><div class="chart" id="mc-1"></div><div class="chart" id="mc-2"></div><div class="chart" id="mc-3"></div></div><ul class="out" id="mc-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Do the Corwin–Schultz ranks from daily bars follow the cost of trading or volatility?</div>

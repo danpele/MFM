@@ -856,10 +856,15 @@ def grs_sharpe(ex, mk):
 
 
 def fm_krs_table(ex, F, fac):
-    """Fama-MacBeth (FM, NW 6, Shanken) plus Kan-Robotti-Shanken errors, on the same assets."""
+    """Fama-MacBeth (FM, NW 6, Shanken) plus Kan-Robotti-Shanken errors, on the same assets.
+
+    se_krs: misspecification-robust, serially uncorrelated moments; se_krs_nw: the same with a
+    Newey-West (6 lags) S matrix, robust to misspecification and to serial dependence.
+    """
     d = fama_macbeth(ex, F, fac)
     k = two_pass_gmm(ex.values, F, fac)
     d['se_krs'] = k['se_krs']
+    d['se_krs_nw'] = two_pass_gmm(ex.values, F, fac, lags=6)['se_krs']
     d['se_correct'] = k['se_correct']
     return d
 

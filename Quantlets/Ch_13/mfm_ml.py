@@ -162,7 +162,9 @@ class PurgedKFold:
          in care se cunoaste eticheta (sfarsitul ferestrei etichetei).
     Purjare: se elimina din antrenare observatiile al caror interval [t0, t1]
              se suprapune cu intervalul setului de test.
-    Embargo: se elimina si o fractiune pct_embargo de observatii imediat dupa test.
+    Embargo: dupa sfirsitul informational al testului (max t1 din test) se elimina inca
+             e = int(n * pct_embargo) observatii (Lopez de Prado 2018, sectiunea 7.4.2);
+             pentru un pliu interior cu etichete de h observatii se pierd 2h + e observatii.
     """
 
     def __init__(self, n_splits=5, t1=None, pct_embargo=0.01):
@@ -183,8 +185,10 @@ class PurgedKFold:
             test_t0, test_t1 = t0[start], t1[test].max()
             # purjare: antrenare doar pe observatii care nu se suprapun cu testul
             before = idx[(t1 < test_t0)]
-            after_start = min(stop + 1 + embargo, len(X))
-            after = idx[after_start:][t0[after_start:] > test_t1]
+            # prima observatie care incepe dupa sfirsitul ultimei etichete din test, apoi embargoul
+            later = idx[(idx > stop) & (t0 > test_t1)]
+            after_start = min(later[0] + embargo, len(X)) if len(later) else len(X)
+            after = idx[after_start:]
             yield np.concatenate([before, after]), test
 
 
@@ -244,11 +248,14 @@ def probabilistic_sharpe_ratio(sr, sr_benchmark, T, skew=0.0, kurt=3.0):
 def expected_max_sharpe(n_trials, sr_std=1.0):
     """
     Teorema strategiei false (Bailey & Lopez de Prado, 2014):
-    E[max SR_n] ~ sqrt(V[SR]) * ((1-g) Phi^{-1}(1 - 1/N) + g Phi^{-1}(1 - 1/(N e)))
+    E[max SR_n] ~ sqrt(V[SR]) * ((1-g) Phi^{-1}(1 - 1/N) + g Phi^{-1}(1 - 1/(N e))), N >= 2.
+    Pentru N = 1 nu exista selectie: SR_0(1) = 0, deci DSR = PSR(0).
     """
     n = np.asarray(n_trials, dtype=float)
-    return sr_std * ((1 - EULER_GAMMA) * stats.norm.ppf(1 - 1 / n)
-                     + EULER_GAMMA * stats.norm.ppf(1 - 1 / (n * np.e)))
+    with np.errstate(divide='ignore', invalid='ignore'):
+        e = sr_std * ((1 - EULER_GAMMA) * stats.norm.ppf(1 - 1 / n)
+                      + EULER_GAMMA * stats.norm.ppf(1 - 1 / (n * np.e)))
+    return np.where(n <= 1, 0.0, e) if e.ndim else (0.0 if n <= 1 else float(e))
 
 
 def deflated_sharpe_ratio(sr, T, n_trials, sr_std, skew=0.0, kurt=3.0):
@@ -262,11 +269,18 @@ def deflated_sharpe_ratio(sr, T, n_trials, sr_std, skew=0.0, kurt=3.0):
 # =============================================================================
 FRENCH_URL = 'https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/'
 FF_FILES = {'ff3': 'F-F_Research_Data_Factors_CSV.zip',
-            'ff5': 'F-F_Research_Data_5_Factors_2x3_CSV.zip'}
+            'ff5': 'F-F_Research_Data_5_Factors_2x3_CSV.zip',
+            # al doilea studiu de caz (Dong, Li, Rapach & Zhou 2022): factori si sortari univariate (decile, VW)
+            'mom': 'F-F_Momentum_Factor_CSV.zip',
+            'strev': 'F-F_ST_Reversal_Factor_CSV.zip',
+            'ltrev': 'F-F_LT_Reversal_Factor_CSV.zip',
+            **{k: f'Portfolios_Formed_on_{k}_CSV.zip' for k in ('AC', 'NI', 'BETA', 'VAR', 'RESVAR',
+                                                                 'E-P', 'CF-P', 'D-P')}}
 
 
 def french_factors(name='ff5'):
-    """Factorii lunari FF3 / FF5 (in zecimal, index = sfarsitul lunii) din Kenneth French Data Library."""
+    """Factorii lunari FF3 / FF5 / Mom / reversal sau primul tabel (VW lunar) al unei sortari univariate
+    (in zecimal, index = sfarsitul lunii) din Kenneth French Data Library."""
     import io
     import zipfile
     import urllib.request

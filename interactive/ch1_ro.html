@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261029b">
+<link rel="stylesheet" href="interactive.css?v=20261030a">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch1_data.js?v=20261029b"></script>
-<script src="ch1_text_ro.js?v=20261029b"></script>
-<script src="common.js?v=20261029b"></script>
-<script src="ch1.js?v=20261029b" defer></script>
+<script src="ch1_data.js?v=20261030a"></script>
+<script src="ch1_text_ro.js?v=20261030a"></script>
+<script src="common.js?v=20261030a"></script>
+<script src="ch1.js?v=20261030a" defer></script>
 </head>
 <body>
 <header>
@@ -33,7 +33,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
-<p class="toc"><a href="#s-ret">Prețuri și randamente</a> · <a href="#s-tails">Distribuție și cozi</a> · <a href="#s-dep">Dependența și mecanismele ei</a> · <a href="#s-pers">Persistența și limitele inferenței</a> · <a href="#s-ohlc">Volatilitatea din deschidere, maxim, minim și închidere</a> · <a href="#s-risk">Randament ajustat la risc și drawdown</a> · <a href="#s-cs">Studiu de caz: volatilitatea depinde (în mare parte) de traiectorie</a></p>
+<p class="toc"><a href="#s-ret">Prețuri și randamente</a> · <a href="#s-tails">Distribuție și cozi</a> · <a href="#s-dep">Dependența și mecanismele ei</a> · <a href="#s-pers">Persistența și limitele inferenței</a> · <a href="#s-ohlc">Volatilitatea din deschidere, maxim, minim și închidere</a> · <a href="#s-risk">Randament ajustat la risc și drawdown</a> · <a href="#s-cs">Studii de caz: volatilitatea dependentă de traiectorie și randamentul de peste noapte</a></p>
 <h2 class="sec" id="s-ret">Prețuri și randamente</h2>
 <section class="blk" id="prices-returns">
   <h3>Cinci piețe: prețuri și randamente logaritmice zilnice</h3>
@@ -43,7 +43,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="pr-th">Pragul pentru |r<sub>t</sub>|: <b id="pr-th-v"></b></label><input type="range" id="pr-th" min="0.5" max="10" step="0.5" value="1"></div><button class="btn play" id="pr-play" type="button"></button></div><div class="charts "><div class="chart" id="pr-chart"></div></div><ul class="out" id="pr-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît de des variază cursul EUR/RON cu peste 1% într-o zi?</div>
-  <details><summary>Răspuns</summary><p>În 1,4% din zile, față de 25,5% din zile pentru S&amp;P 500 și 60,8% pentru Bitcoin. Cea mai slabă zi a Bitcoin, 12 martie 2020, are randamentul logaritmic −46,5%: prețul se înmulțește cu e<sup>−0,465</sup>, deci scade cu 37,2%.</p></details>
+  <details><summary>Răspuns</summary><p>În 1,4% din zile, față de 25,5% din zile pentru S&amp;P 500 și 60,8% pentru Bitcoin. Sub distribuția Normală cu volatilitatea zilnică a EUR/RON, 0,28%, o variație de peste 1% ar apărea doar în 0,03% din zile. Cea mai slabă zi a Bitcoin, 12 martie 2020, are randamentul logaritmic −46,5%: prețul se înmulțește cu e<sup>−0,465</sup>, deci scade cu 37,2%.</p></details>
 </section><h2 class="sec" id="s-tails">Distribuție și cozi</h2>
 <section class="blk" id="heavy-tails">
   <h3>Faptul 2, cozi groase: histograme și grafice cuantilă–cuantilă (QQ plot-uri)</h3>
@@ -63,7 +63,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="hl-f">Fracțiunea din coadă k/n (%): <b id="hl-f-v"></b></label><input type="range" id="hl-f" min="0.5" max="10" step="0.25" value="2.5"></div><button class="btn play" id="hl-play" type="button"></button></div><div class="charts "><div class="chart" id="hl-plot"></div><div class="chart" id="hl-ci"></div></div><ul class="out" id="hl-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Este finit momentul de ordinul patru al randamentelor?</div>
-  <details><summary>Răspuns</summary><p>Cel mai probabil nu. La k = 2,5% din n, α = 4 este în afara tuturor intervalelor de 95%, cu excepția celui pentru Bitcoin (α̂ = 4,22). Concluzia rămîne cu erorile standard bootstrap pe blocuri, de 1,1–1,6 ori mai mari decît cele i.i.d.</p></details>
+  <details><summary>Răspuns</summary><p>Estimările îl pun sub semnul întrebării. La k = 2,5% din n, α = 4 este în afara tuturor intervalelor de 95%, cu excepția celui pentru Bitcoin (α̂ = 4,22). Rezultatul rămîne cu erorile standard bootstrap pe blocuri, de 1,1–1,6 ori mai mari decît cele i.i.d. Concluzia este condiționată de aproximarea Pareto a cozii și de pragul folosit: mișcați k/n și urmăriți cum se schimbă α̂.</p></details>
 </section>
 <section class="blk" id="gain-loss">
   <h3>Faptul 3: asimetria cîștig/pierdere în date</h3>
@@ -83,7 +83,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ac-a">Piața</label><select id="ac-a"><option value="sp500" selected>S&amp;P 500</option><option value="bettr">BET-TR</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option><option value="gold">Aur</option></select></div><div class="ctl"><label for="ac-y">Eșantionul începe în: <b id="ac-y-v"></b></label><input type="range" id="ac-y" min="1990" max="2020" step="1" value="1990"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts three"><div class="chart" id="ac-r"></div><div class="chart" id="ac-b"></div><div class="chart" id="ac-s"></div></div><ul class="out" id="ac-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cîte dintre primele 100 de autocorelații ale randamentelor S&amp;P 500 ies din banda de 95%?</div>
-  <details><summary>Răspuns</summary><p>20 ies din banda i.i.d. și doar 7 din banda robustă; la 5%, circa 5 din 100 ies întîmplător. Autocorelațiile lui |r<sub>t</sub>| și r<sub>t</sub><sup>2</sup> sînt pozitive la toate cele 100 de laguri, deci randamentele sînt necorelate, dar nu independente.</p></details>
+  <details><summary>Răspuns</summary><p>20 ies din banda i.i.d. și doar 7 din banda robustă; la 5%, circa 5 din 100 ies întîmplător. Autocorelațiile lui |r<sub>t</sub>| și r<sub>t</sub><sup>2</sup> sînt pozitive la toate cele 100 de laguri: autocorelațiile randamentelor sînt mici, cu excepția lagului 1 (ρ̂₁ = −0,08), dar randamentele nu sînt independente.</p></details>
 </section>
 <section class="blk" id="rolling-vol">
   <h3>Faptul 5: intermitența în date</h3>
@@ -93,7 +93,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="rv-n">Fereastra (zile): <b id="rv-n-v"></b></label><input type="range" id="rv-n" min="10" max="250" step="1" value="63"></div><button class="btn play" id="rv-play" type="button"></button></div><div class="charts "><div class="chart" id="rv-chart"></div></div><ul class="out" id="rv-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce s-a întîmplat cu volatilitatea EUR/RON după iunie 2013?</div>
-  <details><summary>Răspuns</summary><p>A scăzut puternic, sub regimul de managed float al BNR. Media volatilității pe 63 de zile scade de la 5,8% înainte de iulie 2013 la 2,0% după; testul de ruptură în varianță datează schimbarea la 27 iunie 2013.</p></details>
+  <details><summary>Răspuns</summary><p>A scăzut puternic, sub regimul de managed float al BNR. În pagină, media volatilității pe ferestre de 63 de zile scade de la 5,8% înainte de iulie 2013 la 2,0% după. În curs, testul de ruptură în varianță datează schimbarea la 27 iunie 2013, iar volatilitatea anualizată a celor două subeșantioane este 6,6% înainte și 2,2% după.</p></details>
 </section>
 <section class="blk" id="aggregation">
   <h3>Faptul 4: gaussianitate prin agregare</h3>
@@ -113,7 +113,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="lv-a">Piața</label><select id="lv-a"><option value="sp500" selected>S&amp;P 500</option><option value="bettr">BET-TR</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option><option value="gold">Aur</option></select></div><div class="ctl"><label for="lv-k">Lagul k (zile): <b id="lv-k-v"></b></label><input type="range" id="lv-k" min="1" max="20" step="1" value="1"></div><button class="btn play" id="lv-play" type="button"></button></div><div class="charts "><div class="chart" id="lv-bar"></div><div class="chart" id="lv-bin"></div></div><ul class="out" id="lv-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Crește volatilitatea S&amp;P 500 mai mult după scăderi decît după creșteri?</div>
-  <details><summary>Răspuns</summary><p>Da. L(1) = −0,12, cu z = −4,6 calculat cu eroarea standard robustă, iar la k = 10 este încă −0,07. După cele mai slabe 5% dintre zile, |r<sub>t+1</sub>| are media 1,40%, după cele mai bune 5% doar 1,04%. Pe EUR/RON efectul este inversat: L(1) = +0,10 (z = 2,7).</p></details>
+  <details><summary>Răspuns</summary><p>Da. L(1) = −0,12, cu z = −5,4 calculat cu eroarea standard robustă, iar la k = 10 este încă −0,07. După cele mai slabe 5% dintre zile, |r<sub>t+1</sub>| are media 1,40%, după cele mai bune 5% doar 1,04%. Pe EUR/RON efectul este inversat: L(1) = +0,10 (z = 2,5).</p></details>
 </section>
 <section class="blk" id="volume">
   <h3>Faptul 10: volumul și volatilitatea evoluează împreună</h3>
@@ -133,7 +133,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="aa-a">Curbele de referință pentru</label><select id="aa-a"><option value="sp500" selected>S&amp;P 500</option><option value="bettr">BET-TR</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option><option value="gold">Aur</option></select></div><div class="ctl"><label for="aa-d">Parametrul de memorie d: <b id="aa-d-v"></b></label><input type="range" id="aa-d" min="0.01" max="0.49" step="0.01" value="0.3"></div><button class="btn play" id="aa-play" type="button"></button></div><div class="charts "><div class="chart" id="aa-chart"></div></div><ul class="out" id="aa-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Dovedește scăderea lentă a ACF lui |r<sub>t</sub>| existența memoriei lungi?</div>
-  <details><summary>Răspuns</summary><p>Nu. Pentru S&amp;P 500, ACF este 0,27 la lagul 1, 0,22 la lagul 20 și încă 0,09 la lagul 100, mult peste o scădere exponențială. Rupturile structurale ale nivelului volatilității produc însă același tipar; estimatorii semiparametrici dau d̂ între 0,35 și 0,50.</p></details>
+  <details><summary>Răspuns</summary><p>Nu. Pentru S&amp;P 500, ACF este 0,27 la lagul 1, 0,22 la lagul 20 și încă 0,09 la lagul 100, mult peste o scădere exponențială. Rupturile structurale ale nivelului volatilității produc însă același tipar. Pe cele cinci piețe, estimatorii semiparametrici dau d̂ între 0,35 și 0,50 (S&amp;P 500: 0,48 cu Whittle local, 0,50 cu log-periodograma).</p></details>
 </section>
 <section class="blk" id="taylor">
   <h3>Efectul Taylor</h3>
@@ -143,7 +143,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ty-a">Piața</label><select id="ty-a"><option value="sp500" selected>S&amp;P 500</option><option value="bettr">BET-TR</option><option value="btc">Bitcoin</option><option value="eurron">EUR/RON</option><option value="gold">Aur</option></select></div><div class="ctl"><label for="ty-k">Lagul k (zile): <b id="ty-k-v"></b></label><input type="range" id="ty-k" min="1" max="100" step="1" value="1"></div><button class="btn play" id="ty-play" type="button"></button></div><div class="charts "><div class="chart" id="ty-c"></div><div class="chart" id="ty-m"></div></div><ul class="out" id="ty-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru ce putere δ este maximă autocorelația lui |r<sub>t</sub>|<sup>δ</sup> pe S&amp;P 500?</div>
-  <details><summary>Răspuns</summary><p>Sub 2 la fiecare lag: δ = 1,75 la lagul 1, 1,5 la lagul 5 și 1,25 la lagul 20. Maximul se apropie de 1 cînd lagul crește, dar la lagul 1 este mai aproape de 2 decît de 1. Poziția maximului nu are eroare standard, deci comparația cu δ = 1 este descriptivă.</p></details>
+  <details><summary>Răspuns</summary><p>Sub 2 la lagurile din grafic: δ = 1,75 la lagul 1, 1,5 la lagul 5 și 1,25 la lagul 20; la lagul 2, maximul este chiar la δ = 2. La lagul 1 maximul este mai aproape de 2 decît de 1. Cînd lagul crește, maximul coboară spre 1 și, la majoritatea lagurilor de peste 30, sub 1 (0,5–0,75), unde curbele sînt aproape plate. Poziția maximului nu are eroare standard, deci comparația cu δ = 1 este descriptivă.</p></details>
 </section><h2 class="sec" id="s-ohlc">Volatilitatea din deschidere, maxim, minim și închidere</h2>
 <section class="blk" id="ohlc">
   <h3>Deschiderea, maximul, minimul și închiderea (OHLC) unei zile</h3>
@@ -173,7 +173,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="dd-t">Pînă în luna: <b id="dd-t-v"></b></label><input type="range" id="dd-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="dd-play" type="button"></button></div><div class="charts "><div class="chart" id="dd-chart"></div></div><ul class="out" id="dd-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce creștere este necesară pentru a recupera drawdown-ul S&amp;P 500 din 2007–2009?</div>
-  <details><summary>Răspuns</summary><p>+131%. Indicele a scăzut de la 1 565,15 (9 octombrie 2007) la 676,53 (9 martie 2009), adică cu 56,8%, iar după o scădere x revenirea la vîrf cere o creștere de 1/(1 − x) − 1.</p></details>
+  <details><summary>Răspuns</summary><p>+131%. Indicele a scăzut de la 1 565,15 (9 octombrie 2007) la 676,53 (9 martie 2009), adică cu 56,8%, iar după o scădere x revenirea la vîrf cere o creștere de 1/(1 − x) − 1. Drawdown-ul pe scară logaritmică, −ln(1 − 0,568) = 0,84, nu este creșterea necesară: e<sup>0,84</sup> − 1 = 131%.</p></details>
 </section>
 <section class="blk" id="risk-return">
   <h3>Risc și randament pe piețe</h3>
@@ -183,8 +183,8 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="rr-y">Început comun al eșantioanelor: <b id="rr-y-v"></b></label><input type="range" id="rr-y" min="1990" max="2022" step="1" value="1990"></div><button class="btn play" id="rr-play" type="button"></button></div><div class="charts "><div class="chart" id="rr-chart"></div></div><ul class="out" id="rr-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Arată graficul că BET-TR a fost cea mai bună investiție dintre cele cinci?</div>
-  <details><summary>Răspuns</summary><p>Nu. Perioadele diferă, iar cu r<sub>f</sub> = 0 raportul Sharpe al BET-TR (1,34, SE 0,29) este supraestimat: indicele include dividendele și este în lei, cu dobînzi mult peste cele în USD. Cu un început comun în 2015, raportul Sharpe este 1,38 pentru BET-TR, 1,05 pentru Bitcoin și 0,72 pentru S&amp;P 500, dar erorile standard sînt de circa 0,3, deci ordinea nu este sigură.</p></details>
-</section><h2 class="sec" id="s-cs">Studiu de caz: volatilitatea depinde (în mare parte) de traiectorie</h2>
+  <details><summary>Răspuns</summary><p>Nu. Perioadele diferă, iar cu r<sub>f</sub> = 0 raportul Sharpe al BET-TR (1,34, SE 0,29) este supraestimat: indicele include dividendele și este în lei, cu dobînzi mult peste cele în USD. Cu un început comun în 2015, raportul Sharpe este 1,38 pentru BET-TR, 1,05 pentru Bitcoin și 0,73 pentru S&amp;P 500, dar erorile standard sînt de circa 0,3, deci ordinea nu este sigură.</p></details>
+</section><h2 class="sec" id="s-cs">Studii de caz: volatilitatea dependentă de traiectorie și randamentul de peste noapte</h2>
 <section class="blk" id="path-vol">
   <h3>Studiu de caz (3/4): VIX observat și VIX estimat din randamentele S&P 500</h3>
   <div class="pair">
@@ -195,7 +195,17 @@
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît din VIX explică doar randamentele trecute ale S&amp;P 500?</div>
   <details><summary>Răspuns</summary><p>Pe datele cursului, R<sup>2</sup> = 0,947 la antrenare (2000–2018) și 0,863 la test (2019 – mai 2022), cu RMSE 0,020 și 0,034. Ultimele 5 zile concentrează 20% din ponderea nucleului volatilității, iar lagurile de peste 250 de zile încă 10%.</p></details>
 </section>
-<p class="src foot">Prețuri de închidere zilnice pînă la 18 septembrie 2026: S&amp;P 500, BET-TR, Bitcoin, aur spot și VIX din EODHD; EUR/RON: cursul de referință BNR. Randamente logaritmice, fiecare serie pe propriul calendar.</p>
+<section class="blk" id="overnight">
+  <h3>Randamentul pieței în jurul ceasului (2/4): SPY peste noapte și în timpul zilei</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol1_fapte_stilizate.pdf#page=65" target="_blank" rel="noopener"><img src="slides/ch1_cs_overnight_ro.jpg" alt="Slide-ul 64: Randamentul pieței în jurul ceasului (2/4): SPY peste noapte și în timpul zilei" loading="lazy"></a>
+      <figcaption>Slide-ul 64</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="on-y">Eșantionul începe în: <b id="on-y-v"></b></label><input type="range" id="on-y" min="1993" max="2020" step="1" value="1993"></div><button class="btn play" id="on-play" type="button"></button></div><div class="charts "><div class="chart" id="on-c"></div><div class="chart" id="on-b"></div></div><ul class="out" id="on-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cînd s-a cîștigat randamentul SPY în 1993–2026: peste noapte sau în timpul zilei?</div>
+  <details><summary>Răspuns</summary><p>Peste noapte. Media de peste noapte este 7,7% pe an (t = 4,6), cea din timpul zilei 0,8% pe an (t = 0,33), iar 91% din randamentul logaritmic cumulat al prețului s-a obținut peste noapte. Volatilitatea de peste noapte, 10,6%, este totuși mai mică decît cea din timpul zilei, 15,2%. Dividendele adaugă 1,8% pe an.</p></details>
+</section>
+<p class="src foot">Prețuri de închidere zilnice pînă la 18 septembrie 2026: S&amp;P 500, BET-TR, Bitcoin, aur spot și VIX din EODHD; EUR/RON: cursul de referință BNR. Studiul de caz 2: SPY (deschidere, închidere, închidere ajustată) și barele Bitcoin de 5 minute, din EODHD. Randamente logaritmice, fiecare serie pe propriul calendar.</p>
 </main>
 </body>
 </html>

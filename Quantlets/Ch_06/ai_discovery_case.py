@@ -33,7 +33,16 @@ rep = {'rho_pre': float(R.loc[:'2021-12-31'].corr().iloc[0, 1]),
 # monthly realised correlation (at least 15 days in the month)
 g = R.groupby(R.index.to_period('M'))
 rho_m = g.apply(lambda x: x['spy'].corr(x['tlt']) if len(x) >= 15 else np.nan).dropna()
-rho_m = rho_m.iloc[1:-1] if rho_m.index[-1] >= pd.Period('2026-09', 'M') else rho_m.iloc[1:]  # without incomplete months
+
+
+def covered(m, idx):
+    """Month m is complete when the data start on or before its first business day and end on or after its last."""
+    first = pd.offsets.BMonthBegin().rollforward(m.start_time)
+    last = pd.offsets.BMonthEnd().rollback(m.end_time.normalize())
+    return idx[0] <= first and idx[-1] >= last
+
+
+rho_m = rho_m[[covered(m, R.index) for m in rho_m.index]]   # without incomplete months (by calendar coverage)
 z_m = np.arctanh(rho_m)
 
 cpi = pd.read_csv('https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL', index_col=0, parse_dates=True).iloc[:, 0]

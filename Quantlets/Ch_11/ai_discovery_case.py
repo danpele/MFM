@@ -11,6 +11,8 @@ sunt salturi reale sau volatilitate stochastică deghizată?
   * Standardizare: EWMA (RiskMetrics), sigma^2_t = 0.94 sigma^2_{t-1} + 0.06 r^2_{t-1} (Capitolul 5),
     apoi scalare la abaterea standard a eșantionului; aceeași estimare Merton pe seria standardizată
   * Test: raportul de verosimilitate Merton vs distribuția Normală (GBM) pe ambele serii
+  * Același eșantion: EWMA pierde primele BURN zile (inițializarea), deci comparația se face și pe seria
+    nestandardizată fără aceste zile (raw_same); raw rămîne estimarea pe întreg eșantionul (cifra din curs)
 Iesire: ai_discovery_case.json
 Modelarea Pietelor Financiare - Daniel Traian PELE
 """
@@ -58,7 +60,9 @@ def main():
     z = (r / np.sqrt(s2))[BURN:]
     z = z * r[BURN:].std() / z.std()
     std = summary(z)
-    out = dict(raw=raw, ewma=std, start=str(log_returns('sp500').index[0].date()))
+    raw_same = summary(r[BURN:])
+    out = dict(raw=raw, raw_same=raw_same, ewma=std, start=str(log_returns('sp500').index[0].date()),
+               start_same=str(log_returns('sp500').index[BURN].date()))
     with open(os.path.join(HERE, 'ai_discovery_case.json'), 'w') as f:
         json.dump(out, f, indent=1)
     print(json.dumps(out, indent=1))

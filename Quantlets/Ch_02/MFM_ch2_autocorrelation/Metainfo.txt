@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch2_autocorrelation'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Lag-1 autocorrelation of daily log returns across 16 markets, with naive i.i.d. bands and heteroskedasticity-robust 95% intervals.'
+Description: 'Lag-1 autocorrelation of daily log returns across 16 markets, with 95% confidence intervals from the HAC (Newey-West) standard error of the estimator and test bands around zero (robust standard error under the null, and i.i.d.).'
 
 Keywords: 'autocorrelation, robust standard errors, heteroskedasticity, weak-form efficiency'
 

@@ -38,3 +38,33 @@ details p { margin: 0.35rem 0 0; }
   .charts:has(.chart + .chart), .charts.three, .charts.three:has(.chart + .chart) { grid-template-columns: 1fr; }
   .chart { height: 320px; }
 }
+/* opt-in: predict, then check (MFMI.predict) and exit ticket (MFMI.exitTicket) */
+.pred { border: 0; margin: 0.6rem 0 0; padding: 0; min-width: 0; }
+.pred legend, .ticket legend { font-weight: 600; color: var(--main-blue); padding: 0; margin-bottom: 0.3rem; }
+.pick { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.35rem 0.55rem; margin: 0.25rem 0; border: 1px solid var(--border); border-radius: 6px; background: var(--white); cursor: pointer; line-height: 1.4; }
+.pick input { margin: 0.2rem 0 0; flex: none; accent-color: var(--main-blue); width: 1rem; height: 1rem; }
+.pick span { min-width: 0; overflow-wrap: anywhere; }
+.pick:hover { border-color: var(--main-blue); }
+.pick:focus-within { outline: 2px solid var(--main-blue); outline-offset: 2px; }
+.pick.ok { border-color: #2E7D32; background: #EAF4EB; }
+.pick.bad { border-color: #CD0000; background: #FBECEC; }
+.pick.mine { border-width: 2px; }
+.pick .why { display: block; font-size: 0.88rem; margin-top: 0.2rem; }
+.pick.ok .why { color: #1E5E22; }
+.pick.bad .why, .pick.no .why { color: #8E1B1B; }
+.pred-act { display: flex; flex-wrap: wrap; gap: 0.4rem 0.8rem; align-items: center; margin-top: 0.45rem; }
+.pred-res { font-weight: 600; }
+.pred-res.is-ok { color: #2E7D32; }
+.pred-res.is-bad { color: #CD0000; }
+.btn:focus-visible { outline: 2px solid var(--main-blue); outline-offset: 2px; }
+.ticket { margin: 0 0 1.4rem; }
+.tq { margin: 0; padding: 0; list-style: none; counter-reset: tq; }
+.tq > li legend::before { counter-increment: tq; content: counter(tq) ". "; }
+.tq > li { margin: 0 0 1rem; max-width: 900px; }
+.tq fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+/* opt-in veil (MFMI.predict with veil): slide blurred under a button, readout blurred until reveal */
+.slide.veiled > a { display: block; overflow: hidden; border-radius: 4px; pointer-events: none; }
+.slide.veiled img { filter: blur(6px); }
+.veil-btn { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); z-index: 2; box-shadow: 0 2px 8px rgba(31, 42, 68, 0.35); }
+.out.veiled-out { filter: blur(5px); user-select: none; }
+@media (max-width: 1100px) { .slide.veiled { position: relative; top: auto; } }

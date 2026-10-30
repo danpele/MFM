@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch0_bond_beta'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Treasury bond-stock betas after Pflueger (2025, Journal of Financial Economics): 10-year nominal Treasury excess returns regressed on US equity excess returns over 5-year rolling windows of quarters (1962-2026), and daily betas of 10-year nominal and inflation-indexed (TIPS) bonds on SPY over 120-day windows (2018-2026). Bond returns from FRED constant-maturity yields with a duration of 10 years.'
+
+Keywords: 'bond-stock beta, stock-bond correlation, Treasury bonds, TIPS, inflation risk, stagflation, rolling regression'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Thursday, 29 October 2026'
+
+Datafile: 'FRED (DGS10, DFII10, DTB3), Kenneth French Data Library (Fama-French factors), daily market data from the MFM course repository (SPY)'
+
+Output: 'ch0_pflueger_betas.pdf, ch0_pflueger_results.json'

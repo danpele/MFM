@@ -1,6 +1,6 @@
 """Export the inputs of the Chapter 2 interactive page (MFM/interactive/ch2_data.js).
 
-Uses the chapter's own functions (generate_all_charts.py, eff_tests.py, predictability.py) and its results files,
+Uses the chapter's own functions (generate_all_charts.py, eff_tests.py, predictability.py, crypto_momentum_case.py) and its results files,
 so the page starts from the same numbers as the slides. The two illustrative random-walk figures use the
 innovations of latex/ch2_concept_charts.py (numpy seed 203, 900 days).
 """
@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 
 import generate_all_charts as g
-from eff_tests import variance_ratio
+from eff_tests import variance_ratio, acf_se
 from mfm_data import load_close, read_market
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -40,13 +40,12 @@ def game(seed=7):
 
 
 def acf_lags(x, kmax=10):
-    """Lag-k autocorrelation (pandas autocorr, as in efficiency_table) and its robust standard error."""
+    """Lag-k autocorrelation (pandas autocorr, as in efficiency_table) and two standard errors (eff_tests.acf_se):
+    se = SE under H0 (robust test band centred at 0), hac = HAC SE of the estimator (interval around rho_k)."""
     s = pd.Series(np.asarray(x, float))
-    e = s.values - s.values.mean()
-    den = (e ** 2).sum() ** 2
     rho = [float(s.autocorr(k)) for k in range(1, kmax + 1)]
-    se = [float(np.sqrt((e[k:] ** 2 * e[:-k] ** 2).sum() / den)) for k in range(1, kmax + 1)]
-    return rho, se
+    ses = [acf_se(s.values, k) for k in range(1, kmax + 1)]
+    return rho, [a for a, _ in ses], [b for _, b in ses]
 
 
 def main():
@@ -65,9 +64,10 @@ def main():
     d['acf'], d['vr'] = {}, {}
     for k in g.ORDER:
         x = g.rets[k]
-        rho, se = acf_lags(x.values)
+        rho, se, hac = acf_lags(x.values)
         assert abs(rho[0] - t.loc[k, 'rho1']) < 1e-5 and abs(se[0] - t.loc[k, 'rho1_se_rob']) < 1e-5
-        d['acf'][k] = dict(T=len(x), rho=r(rho), se=r(se), start=str(x.index[0].date()))
+        assert abs(hac[0] - t.loc[k, 'rho1_se_hac']) < 1e-5
+        d['acf'][k] = dict(T=len(x), rho=r(rho), se=r(se), hac=r(hac), start=str(x.index[0].date()))
         vp = g.vr_profile(x)
         d['vr'][k] = dict(VR=r(vp['VR'].values), band=r(vp['band'].values),
                           zstar=r([variance_ratio(x, q)[2] for q in (2, 5, 10, 20)], 4), CD_p=float(t.loc[k, 'CD_p']))
@@ -104,6 +104,21 @@ def main():
     assert abs(np.mean(np.abs(ts) > 1.96) - res['multiple_testing']['share_196']) < 1e-9
     assert abs(np.abs(ts).max() - res['multiple_testing']['max_abs_t']) < 1e-9
     d['mt'] = dict(r_bp=r(x, 2), t=r(ts, 4), res=res['multiple_testing'])
+
+    # case study (Liu & Tsyvinski, 2021): weekly Bitcoin and Ethereum returns of crypto_momentum_case.py
+    import crypto_momentum_case as cmc
+    wk = pd.read_csv(os.path.join(HERE, 'ch2_crypto_tsmom_weekly.csv'), index_col=0, parse_dates=True)
+    cres = json.load(open(os.path.join(HERE, 'ch2_crypto_tsmom.json')))
+    for k in ('btc', 'eth'):
+        for p, (a, b) in cmc.PERIODS.items():
+            if p in cres[k]:
+                chk = cmc.period_stats(wk[k].dropna(), a, b)['reg'][1]
+                assert abs(chk['b'] - cres[k][p]['reg']['1']['b']) < 1e-6 and abs(chk['t_hac'] - cres[k][p]['reg']['1']['t_hac']) < 1e-5
+    col = lambda k: [None if np.isnan(v) else round(float(v), 8) for v in wk[k].values]
+    d['cmom'] = dict(dates=[f'{x:%Y-%m-%d}' for x in wk.index], btc=col('btc'), eth=col('eth'), paper=cres['paper_numbers'],
+                     window=cres['roll_window'], res={k: {p: dict(b1=v['reg']['1']['b'], t1=v['reg']['1']['t_hac'], weeks=v['weeks'])
+                                                         for p, v in cres[k].items() if p != 'rolling'} for k in ('btc', 'eth')},
+                     rolling=cres['btc']['rolling'])
 
     with open(OUT, 'w') as f:
         f.write('// Inputs of the Chapter 2 interactive page, exported by Quantlets/Ch_02/export_interactive.py.\n')

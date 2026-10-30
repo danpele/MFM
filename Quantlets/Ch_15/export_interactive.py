@@ -1,7 +1,7 @@
 """Export the inputs of the Chapter 15 interactive page (MFM/interactive/ch15_data.js).
 
-Uses the functions and the saved outputs of generate_all_charts.py, mfm_text.py, valid_inference.py and
-ai_discovery_case.py, so the page starts from the same numbers as the slides. No language model is run: the scores
+Uses the functions and the saved outputs of generate_all_charts.py, mfm_text.py, valid_inference.py,
+ai_discovery_case.py and colour_words.py (ch15_colour_results.json), so the page starts from the same numbers as the slides. No language model is run: the scores
 of the dictionaries, FinBERT, the Qwen2.5 models, MiniLM and TF-IDF are the chapter's saved tables (ch15_*.csv),
 and the evaluation results come from ch15_results.json and ch15_inference.json. save_fig is replaced by a no-op,
 so no chart or results file of the chapter is rewritten. Market data: the local files in data/market (EODHD).
@@ -186,6 +186,18 @@ def main():
     # 9. Lopez-Lira and Tang (2026), Table 5, as drawn in the lecture
     d['llt'] = dict(models=list(g.LLT_TABLE5), hit_r=[v[0] for v in g.LLT_TABLE5.values()], hit_d=[v[1] for v in g.LLT_TABLE5.values()],
                     sr=[v[2] for v in g.LLT_TABLE5.values()], mu=[v[3] for v in g.LLT_TABLE5.values()])
+
+    # 9b. Garcia, Hu and Rohrer (2023) on the FNSPID headlines: the word lists and regressions of colour_words.py
+    # (ch15_colour_results.json), for every cut-off on D+ computed there
+    col = json.load(open(os.path.join(HERE, 'ch15_colour_results.json')))
+    specs = ('lm_all', 'lm_only', 'ml_only', 'overlap', 'joint', 'finbert', 'qwen')
+    d['colour'] = dict(cut=col['cut'], cuts=[int(c) for c in col['by_cut']], n_test=col['n_test'], n_train=col['n_train'],
+                       dplus=[[w, round(v, 1)] for w, v, _ in col['dplus50']],
+                       by_cut={c: dict({k: v[k] for k in ('n_ml_pos', 'n_ml_neg', 'n_ov_pos', 'n_ov_neg', 'n_ml_only_pos', 'n_ml_only_neg')},
+                                       r2={k: v['reg'][k]['r2'] for k in specs}, b={k: v['reg'][k]['b'] for k in specs},
+                                       se={k: v['reg'][k]['se'] for k in specs}, t={k: v['reg'][k]['t'] for k in specs},
+                                       boot=v['reg']['boot'])
+                               for c, v in col['by_cut'].items()})
 
     # 10. specification curve: the 36 strategies of the mini-case and the sign-flip test of valid_inference.py
     d['spec'] = {k: inf['spec'][k] for k in ('t', 'meta', 'n_pos_sig', 'median_t', 'p_count', 'p_median', 'n_neg_sig', 'B', 'block')}

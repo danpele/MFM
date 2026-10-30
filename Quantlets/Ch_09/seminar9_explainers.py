@@ -365,7 +365,7 @@ def fig_mz(seed=7, T=600):
     fig, ax = plt.subplots(figsize=(2.55, 1.65))
     ax.plot(F, V, 'o', color=MainBlue, ms=1.8, alpha=0.6, label='Days: $(F_t, V_t)$')
     xx = np.linspace(0, F.max(), 10)
-    ax.plot(xx, xx, color=Navy, lw=1.0, ls='--', label='$a = 0$, $b = 1$ (unbiased)')
+    ax.plot(xx, xx, color=Navy, lw=1.0, ls='--', label='$a = 0$, $b = 1$ (calibrated)')
     ax.plot(xx, a + b * xx, color=IDAred, lw=1.4, label=rf'OLS fit: $\hat a$ = {a:.2f}, $\hat b$ = {b:.2f}')
     ax.set_xlim(0, F.max())
     ax.set_ylim(0, np.quantile(V, 0.995))

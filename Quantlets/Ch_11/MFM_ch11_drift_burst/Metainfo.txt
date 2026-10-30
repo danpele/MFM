@@ -1,0 +1,15 @@
+Name of QuantLet: 'MFM_ch11_drift_burst'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Case study, Christensen, Oomen and Reno (2022): the drift burst t-statistic (left-sided exponential kernel, drift bandwidth 15 minutes, volatility bandwidth 75 minutes) on SPY 5-minute bars (09:30-16:00 New York time, full trading days, 2020-2026); daily maximum of |T| against a random-sign null that keeps the volatility path (200 replications); Gumbel critical values; reversal regression of the 15-minute return after the peak on the 15-minute return before it; volume relative to its time-of-day mean.'
+
+Keywords: 'drift burst, flash crash, kernel estimation, spot volatility, extreme value, sign-flip bootstrap, SPY'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: '5-minute SPY bars (data/market/intraday/SPY.US_5m.csv), 2020-2026'
+
+Output: 'ch11_case_drift_burst.pdf'

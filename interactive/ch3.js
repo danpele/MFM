@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH3_DATA;
-const { C, dot, mv, quad, solve, wTan, frontierUnc, rng, mean, sum, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { C, dot, mv, quad, solve, wTan, frontierUnc, rng, mean, sum, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, predict, exitTicket } = window.MFMI;
 const T = window.CH3_TEXT;
 // layout with the legend further down when the x axis has a title (no overlap with the axis title)
 const lay = extra => { const l = layout(extra); if (l.xaxis && l.xaxis.title && l.xaxis.title.text) l.legend = Object.assign({}, l.legend, { y: -0.3 }); return l; };
@@ -320,6 +320,56 @@ function factorEtfs() {
   out('fe-out', [T.fe(E.dates[k], E.dates[last], L.map(o => `${o.s} ${pct(o.g, 1)}`).join(', '))]);
 }
 
+// ================================================================= case study: factor momentum (Ehsani & Linnainmaa, 2022)
+// signal = compounded return over months t-L ... t-1; TSFM_t = mean_i sign(signal_i,t) r_i,t (sign 0 counts as negative)
+function tfStats(L, i0) {
+  const P = D.tf, N = P.names.length, n = P.dates.length, R = P.names.map(c => P.f[c]);
+  const start = Math.max(i0, L), idx = range(start, n - 1, 1);
+  const up = P.names.map(() => []), dn = P.names.map(() => []), ts = [], yv = [], dv = [], gv = [];
+  idx.forEach((t, k) => {
+    let s = 0;
+    for (let i = 0; i < N; i++) {
+      let w = 1;
+      for (let l = 1; l <= L; l++) w *= 1 + R[i][t - l] / 100;
+      const pos = w - 1 > 0, r = R[i][t];
+      (pos ? up : dn)[i].push(r); s += (pos ? 1 : -1) * r;
+      yv.push(r); dv.push(pos ? 1 : 0); gv.push(k);
+    }
+    ts.push(s / N);
+  });
+  // pooled difference, standard errors clustered by month
+  const n1 = sum(dv), n0 = dv.length - n1, m0 = sum(yv.filter((_, j) => !dv[j])) / n0, m1 = sum(yv.filter((_, j) => dv[j])) / n1;
+  const XtX = [[dv.length, n1], [n1, n1]], Xi = inv(XtX), Sg = [[0, 0], [0, 0]], sc = idx.map(() => [0, 0]);
+  yv.forEach((y, j) => { const e = y - (dv[j] ? m1 : m0); sc[gv[j]][0] += e; sc[gv[j]][1] += dv[j] * e; });
+  sc.forEach(v => { for (let a = 0; a < 2; a++) for (let b = 0; b < 2; b++) Sg[a][b] += v[a] * v[b]; });
+  const mm = (A, B) => A.map(r => B[0].map((_, j) => r.reduce((s, v, m) => s + v * B[m][j], 0))), V = mm(Xi, mm(Sg, Xi));
+  const mom = idx.map(t => P.f.MOM[t]), ff5 = idx.map(t => ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA'].map(c => P.f[c][t]));
+  const sd = a => { const m = mean(a); return Math.sqrt(sum(a.map(v => (v - m) * (v - m))) / (a.length - 1)); };
+  const sr = a => mean(a) / sd(a) * Math.sqrt(12);
+  return { idx, up: up.map(mean), dn: dn.map(mean), pdn: m0, pup: m1, diff: m1 - m0, tdiff: (m1 - m0) / Math.sqrt(V[1][1]),
+    nf: up.filter((u, i) => mean(u) > mean(dn[i])).length, ts, mom, tsT: olsNW(ts).t[0], tsM: mean(ts), sr: sr(ts), srm: sr(mom),
+    a0: olsNW(mom, ff5), a1: olsNW(mom, ff5.map((r, k) => [...r, ts[k]])) };
+}
+function factorMom() {
+  const P = D.tf, L = +$('tf-L').value, y0 = +$('tf-y').value;
+  $('tf-L-v').textContent = L; $('tf-y-v').textContent = y0;
+  const i0 = P.dates.indexOf(y0 + '-07'), S = tfStats(L, i0), dts = S.idx.map(t => P.dates[t]);
+  const names = [...P.names, 'Average factor'];
+  plot('tf-bar', [
+    { x: names, y: [...S.dn, S.pdn], type: 'bar', name: 'After a negative signal', marker: { color: K.red }, hovertemplate: '%{x}: %{y:.2f}% a month<extra></extra>' },
+    { x: names, y: [...S.up, S.pup], type: 'bar', name: 'After a positive signal', marker: { color: K.green }, hovertemplate: '%{x}: %{y:.2f}% a month<extra></extra>' }
+  ], lay({ barmode: 'group', bargap: 0.25, title: ttl(`Factor returns after a positive or negative prior ${L}-month return`), shapes: [hline(0, C.navy)],
+    xaxis: AX('', { tickangle: -30 }), yaxis: AX('Mean return, % a month') }));
+  const cum = a => { let w = 1; return a.map(v => (w *= 1 + v / 100)); };
+  plot('tf-cum', [
+    { x: dts, y: cum(S.ts), mode: 'lines', name: 'Factor momentum (TSFM)', line: { color: K.blue, width: 1.5 }, hovertemplate: 'TSFM %{x}: %{y:.2f}<extra></extra>' },
+    { x: dts, y: cum(S.mom), mode: 'lines', name: 'Stock momentum (MOM)', line: { color: K.orange, width: 1.5 }, hovertemplate: 'MOM %{x}: %{y:.2f}<extra></extra>' }
+  ], lay({ title: ttl(`Growth of 1, ${dts[0]} to ${dts[dts.length - 1]}`), xaxis: AX(''), yaxis: AX('Growth of 1 (log scale)', { type: 'log', tickvals: [0.5, 1, 2, 5, 10, 20, 50, 100], ticktext: ['0.5', '1', '2', '5', '10', '20', '50', '100'] }) }));
+  const p2 = v => nf(v, 2) + '%';
+  out('tf-out', [T.tf1(`${dts[0]} – ${dts[dts.length - 1]}, T = ${dts.length}`, L, dts.length, p2(S.pdn), p2(S.pup), nf(S.diff, 2), nf(S.tdiff, 2), S.nf),
+    T.tf2(p2(S.tsM), nf(S.tsT, 2), nf(S.sr, 2), nf(S.srm, 2), p2(S.a0.b[0]), nf(S.a0.t[0], 2), p2(S.a1.b[0]), nf(S.a1.t[0], 2))]);
+}
+
 // ================================================================= AI mini-case: momentum after publication
 function aiFit(y, ps0, pub) {
   const X = y.map((_, t) => [t >= ps0 && t < pub ? 1 : 0, t >= pub ? 1 : 0]), r = olsNW(y, X), V = r.V;
@@ -350,7 +400,7 @@ function ai() {
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   const nfr = D.fr.dates.length - 1;
   $('fr-t').max = nfr; $('fr-t').value = nfr; on(['fr-t'], frontier); P('fr-play', 'fr-t', range(60, nfr, 6), 220);
   on(['xk-b', 'xk-L'], xlk); $('xk-res').style.gridColumn = '1 / -1'; $('xk-res').style.height = '280px'; P('xk-play', 'xk-b', range(1, 24, 1), 700);
@@ -365,9 +415,14 @@ function init() {
   $('pc-play').addEventListener('click', () => { if ($('pc-w').value === 'all') { $('pc-w').value = '252'; } }, true);
   $('fe-t').max = D.etf.dates.length - 253; on(['fe-t'], factorEtfs); P('fe-play', 'fe-t', range(0, D.etf.dates.length - 253, 21), 120);
   const ia = D.ai.dates.indexOf('1993-04'); $('ai-p').min = D.ai.dates.indexOf('1975-01'); $('ai-p').max = D.ai.dates.indexOf('2015-01'); $('ai-p').value = ia;
+  on(['tf-L', 'tf-y'], factorMom); P('tf-play', 'tf-L', range(1, 36, 1), 600);
   on(['ai-p'], ai); P('ai-play', 'ai-p', range(D.ai.dates.indexOf('1975-01'), D.ai.dates.indexOf('2015-01'), 6), 250);
-  frontier(); xlk(); dimson(); rolling(); grid(); sml(); factorCum(); fm(); pca(); factorEtfs(); ai();
+  const PFX = { 'frontier': 'fr', 'xlk-beta': 'xk', 'dimson': 'dm', 'rolling-beta': 'rb', 'test-assets': 'pg', 'sml': 'sm', 'factor-returns': 'fc',
+    'fama-macbeth': 'fm', 'pca': 'pc', 'factor-etfs': 'fe', 'factor-momentum': 'tf', 'momentum-decay': 'ai' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  frontier(); xlk(); dimson(); rolling(); grid(); sml(); factorCum(); fm(); pca(); factorEtfs(); factorMom(); ai();
 }
-window.CH3 = { olsNW, fUpper, eigSymV, p25Stats, famaMacBeth, bootAlpha, rollBeta, aiFit };
+window.CH3 = { olsNW, fUpper, eigSymV, p25Stats, famaMacBeth, bootAlpha, rollBeta, aiFit, tfStats };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

@@ -843,9 +843,15 @@ def hedge_example():
 # Additional numbers for the interpretations
 # =============================================================================
 def first_persistent_positive(x, n=20):
-    """First day after which the estimate stays positive for n consecutive days."""
+    """The day that confirms the first run of n consecutive positive days (the last day of the run)."""
     run = (x > 0).astype(int).rolling(n).sum()
     return run[run == n].index[0]
+
+
+def first_persistent_positive_start(x, n=20):
+    """The first day of that run."""
+    end = first_persistent_positive(x, n)
+    return x.index[x.index.get_loc(end) - n + 1]
 
 
 def extra_numbers():
@@ -853,7 +859,9 @@ def extra_numbers():
     X = 100 * R
     s = slice('2021-06-01', '2023-06-30')
     NUM.update(sw_e94=str(first_persistent_positive(ewma_corr(X, 0.94).loc[s]).date()),
-               sw_r250=str(first_persistent_positive(rolling_corr(X, 250).loc[s]).date()))
+               sw_r250=str(first_persistent_positive(rolling_corr(X, 250).loc[s]).date()),
+               sw_e94_start=str(first_persistent_positive_start(ewma_corr(X, 0.94).loc[s]).date()),
+               sw_r250_start=str(first_persistent_positive_start(rolling_corr(X, 250).loc[s]).date()))
     P, V, Z, _ = garch_all(R)
     d = dcc_fit(Z)
     rc = pd.Series(d['R'][:, 0, 1], index=Z.index)

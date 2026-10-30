@@ -2,7 +2,7 @@
 (function () {
 'use strict';
 const D = window.CH18_DATA;
-const { mean, sdev, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range } = window.MFMI;
+const { mean, sdev, nf, pct, $, AX, layout, ttl, plot, out, vline, hline, Player, range, solve, predict, exitTicket } = window.MFMI;
 const T = window.CH18_TEXT;
 
 // ---------------------------------------------------------------- colours (generate_all_charts.py)
@@ -50,8 +50,8 @@ function bankIndices() {
     tr.push({ x, y, mode: 'lines', name: RLAB[rg] + ' (equal weights)', line: { color: RCOL[rg], width: 1.3 }, hovertemplate: rg + ' %{x}: %{y:.0f}<extra></extra>' });
   }
   const em = eventMarks(x[0], x[x.length - 1]);
-  plot('bi-chart', tr, LY({ title: ttl('Value of 100 invested on ' + dt[i0] + ' (daily rebalancing)'), shapes: [hline(100, K.navy), ...em.shapes], annotations: em.annotations,
-    xaxis: AX('', { type: 'date' }), yaxis: AX('Value of 100 invested') }));
+  plot('bi-chart', tr, LY({ title: ttl('Synthetic index of local-currency returns, ' + dt[i0] + ' = 100 (daily rebalancing)'), shapes: [hline(100, K.navy), ...em.shapes], annotations: em.annotations,
+    xaxis: AX('', { type: 'date' }), yaxis: AX('Index (start = 100)') }));
   out('bi-out', ['US', 'EU', 'RO'].map(rg => T.bi(T.reg[rg], nf(st[rg].last, 0), pct(-st[rg].dd, 0), st[rg].ddd, nf(st[rg].vol, 0))));
 }
 
@@ -279,10 +279,73 @@ function quantileCase() {
   out('qc-out', [T.qc(nf(+lo, 2), nf(vl, 2), nf(+hi, 2), nf(vh, 2), nf(vh - vl, 2), nf(vl - A.mean, 2), nf(vh - A.mean, 2))]);
 }
 
+// ================================================================= bank rate risk (second case study, case_rate_risk.py)
+const rrCache = {};
+function olsNW(rows, y, lags) {     // OLS with Newey-West (Bartlett) standard errors, as case_rate_risk.ols_nw
+  const n = y.length, k = rows[0].length, XtX = Array.from({ length: k }, () => new Array(k).fill(0)), Xty = new Array(k).fill(0);
+  for (let t = 0; t < n; t++) for (let a = 0; a < k; a++) { Xty[a] += rows[t][a] * y[t]; for (let c = 0; c < k; c++) XtX[a][c] += rows[t][a] * rows[t][c]; }
+  const inv = XtX.map((_, j) => solve(XtX, XtX.map((__, i) => (i === j ? 1 : 0))));   // columns of the inverse (symmetric)
+  const b = inv.map(r => r.reduce((s, v, i) => s + v * Xty[i], 0));
+  const g = rows.map((r, t) => { const u = y[t] - r.reduce((s, v, i) => s + v * b[i], 0); return r.map(v => v * u); });
+  const S = Array.from({ length: k }, () => new Array(k).fill(0));
+  for (let L = 0; L <= lags; L++) {
+    const w = L === 0 ? 1 : 1 - L / (lags + 1);
+    for (let t = L; t < n; t++) for (let a = 0; a < k; a++) for (let c = 0; c < k; c++) {
+      const v = g[t][a] * g[t - L][c]; S[a][c] += w * v; if (L > 0) S[c][a] += w * v;
+    }
+  }
+  const j = k - 1; let V = 0;
+  for (let a = 0; a < k; a++) for (let c = 0; c < k; c++) V += inv[j][a] * S[a][c] * inv[c][j];
+  return [100 * b[j], 100 * Math.sqrt(V)];
+}
+function rateRolling(w) {
+  if (rrCache[w]) return rrCache[w];
+  const R = D.rate, n = R.dates.length, f = a => a.map(v => v / 1e4);
+  const bank = f(R.bank), spx = f(R.spx), ief = f(R.ief), d10 = f(R.d10);
+  const o = { dates: [], b: [], se: [], bi: [] };
+  for (let t = w; t <= n; t++) {
+    const rowsB = [], rowsI = [], yb = [], yi = [];
+    for (let u = t - w; u < t; u++) { rowsB.push([1, spx[u], d10[u]]); rowsI.push([1, d10[u]]); yb.push(bank[u]); yi.push(ief[u]); }
+    const [b, se] = olsNW(rowsB, yb, R.lags), [bi] = olsNW(rowsI, yi, R.lags);
+    o.dates.push(R.dates[t - 1]); o.b.push(b); o.se.push(se); o.bi.push(bi);
+  }
+  return (rrCache[w] = o);
+}
+const lastUpTo = (o, d) => { let i = -1; o.dates.forEach((x, j) => { if (x <= d) i = j; }); return i; };
+function rateRisk() {
+  const R = D.rate, w = +$('rr-w').value, o = rateRolling(w);
+  $('rr-w-v').textContent = w;
+  // left: value of 100 on the base date, to the end of 2023
+  const i0 = R.dates.indexOf(R.base), i1 = lastUpTo({ dates: R.dates }, '2023-12-31'), x = R.dates.slice(i0, i1 + 1);
+  const cum = a => { let v = 100; return x.map((_, j) => (j === 0 ? 100 : (v *= 1 + a[i0 + j] / 1e6))); };
+  const svbLine = { type: 'line', xref: 'x', yref: 'paper', x0: R.svb, x1: R.svb, y0: 0, y1: 1, line: { color: K.navy, width: 1, dash: 'dot' } };
+  const svbLab = { x: R.svb, xref: 'x', yref: 'paper', y: 1, text: 'SVB', textangle: -90, showarrow: false, xanchor: 'right', yanchor: 'top', font: { size: 10, color: K.navy } };
+  plot('rr-mtm', [
+    { x: [R.base, R.mtm_end, R.mtm_end, R.base], y: [55, 55, 115, 115], fill: 'toself', mode: 'none', fillcolor: 'rgba(197,210,232,0.45)', name: 'Q1 2022 to Q1 2023', hoverinfo: 'skip' },
+    ...[['ief', K.amber, 'IEF: Treasuries 7-10y, total return'], ['tlt', K.purple, 'TLT: Treasuries 20y+, total return'], ['bank', K.blue, 'Six US banks, total return'], ['spx', K.green, 'S&P 500 price index']].map(([k, c, nm]) =>
+      ({ x, y: cum(R[k]), mode: 'lines', name: nm, line: { color: c, width: 1.4 }, hovertemplate: nm + ' %{x}: %{y:.1f}<extra></extra>' }))
+  ], LY({ title: ttl('Treasury ETFs and bank equity'), shapes: [hline(100, K.navy), svbLine], annotations: [svbLab],
+    xaxis: AX('', { type: 'date' }), yaxis: AX('Value of 100 on 31 Dec 2021', { range: [55, 115] }) }));
+  // right: rolling rate beta
+  const lo = o.b.map((v, i) => v - 1.96 * o.se[i]), hi = o.b.map((v, i) => v + 1.96 * o.se[i]);
+  plot('rr-beta', [
+    { x: o.dates, y: hi, mode: 'lines', line: { width: 0 }, showlegend: false, hoverinfo: 'skip' },
+    { x: o.dates, y: lo, mode: 'lines', line: { width: 0 }, fill: 'tonexty', fillcolor: K.band, name: 'Bank beta: 95% Newey-West interval', hoverinfo: 'skip' },
+    { x: o.dates, y: o.b, mode: 'lines', name: 'Bank beta, given the S&P 500', line: { color: K.blue, width: 1.4 }, hovertemplate: '%{x}: %{y:.2f}%<extra></extra>' },
+    { x: o.dates, y: o.bi, mode: 'lines', name: 'IEF beta', line: { color: K.amber, width: 1.2 }, hovertemplate: 'IEF %{x}: %{y:.2f}%<extra></extra>' },
+    { x: ['2022-03-16', '2022-03-16'], y: [Math.min(...lo, ...o.bi), Math.max(...hi)], mode: 'lines', name: 'First Fed hike', line: { color: K.red, width: 1.2, dash: 'dash' }, hoverinfo: 'skip' }
+  ], LY({ title: ttl(`Rolling ${w}-day rate beta, per +100 bp in the US 10Y yield`), shapes: [hline(0, K.navy), svbLine], annotations: [svbLab],
+    xaxis: AX('', { type: 'date' }), yaxis: AX('Return (%)') }));
+  const e = lastUpTo(o, '2021-12-31'), s = lastUpTo(o, R.svb), M = R.mtm, P = R.periods;
+  out('rr-out', [T.rr1(w, e >= 0 ? pp(o.b[e], 1) : '–', pp(o.b[s], 2), nf(lo[s], 2), nf(hi[s], 2)),
+    T.rr2(nf(-M.ief, 1), nf(-M.tlt, 1), nf(-M.bank, 1), nf(-M.spx, 1)),
+    T.rr3(pp(P['2012-2019'].b, 1), nf(P['2012-2019'].t, 1), pp(P.Tightening.b, 1), nf(P.Tightening.t, 1), nf(P.Tightening.b_ief, 1))]);
+}
+
 // ================================================================= wiring
 function init() {
   const on = (ids, f) => ids.forEach(id => $(id).addEventListener('input', f));
-  const P = (btn, id, vals, ms) => new Player(btn, $(id), vals, ms);
+  const players = {}, P = (btn, id, vals, ms) => (players[btn] = new Player(btn, $(id), vals, ms));
   on(['bi-s'], bankIndices); bankIndices(); P('bi-play', 'bi-s', range(0, +$('bi-s').max, 3), 160);
   on(['me-a'], mesBars); P('me-play', 'me-a', range(1, 20, 1), 450);
   on(['sr-k', 'sr-l'], srisk); P('sr-play', 'sr-k', range(3, 12, 0.5), 300);
@@ -295,10 +358,15 @@ function init() {
   $('sp-t').max = 9999; $('sp-t').value = 9999; on(['sp-w', 'sp-h', 'sp-t'], spillRolling); P('sp-play', 'sp-t', range(0, D.roll.dates_250.length - 1, 6), 60);
   $('fr-a').max = D.frm.dates.length - 1; $('fr-b').max = D.frm.dates.length - 1; $('fr-a').value = 0; $('fr-b').value = D.frm.dates.length - 1;
   on(['fr-a', 'fr-b'], frm); P('fr-play', 'fr-b', range(10, D.frm.dates.length - 1, 4), 80);
-  on(['ss-l'], stress); P('ss-play', 'ss-l', range(3, 20, 1), 450);
+  on(['ss-l'], stress); P('ss-play', 'ss-l', range(3, 18, 1), 450);   // the shortest episode (Brexit vote) has 18 days
   on(['qc-p'], quantileCase); P('qc-play', 'qc-p', PAIRS.map(Number), 1100);
-  mesBars(); srisk(); covarQR(); dcovar(); varDcovar(); exposure(); spillTable(); spillNetwork(); spillRolling(); frm(); stress(); quantileCase();
+  on(['rr-w'], rateRisk); P('rr-play', 'rr-w', range(63, 504, 21), 700);
+  const PFX = { 'bank-indices': 'bi', 'mes': 'me', 'srisk': 'sr', 'covar-qr': 'qr', 'dcovar': 'dc', 'var-dcovar': 'vd', 'exposure': 'ex',
+    'spill-table': 'st', 'spill-network': 'sn', 'spill-rolling': 'sp', 'frm': 'fr', 'stress': 'ss', 'quantile': 'qc', 'rate-risk': 'rr' };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  if (T.ticket && exitTicket) exitTicket(T.ticket);
+  mesBars(); srisk(); covarQR(); dcovar(); varDcovar(); exposure(); spillTable(); spillNetwork(); spillRolling(); frm(); stress(); quantileCase(); rateRisk();
 }
-window.CH18 = { spillStats, block, quantile, stressWindow, spearman, pearson, sriskRatio, breakEven, CV };
+window.CH18 = { rateRolling, olsNW, spillStats, block, quantile, stressWindow, spearman, pearson, sriskRatio, breakEven, CV };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
