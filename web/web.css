@@ -172,7 +172,7 @@ ul.bib a.doi { font-size: 0.88em; }
 .epi-p blockquote, .epi-p figcaption { grid-column: 2; }
 .imot { margin-bottom: 0.3rem; }
 .ochart { margin: 0.4rem 0 1.2rem; max-width: 52rem; }
-.ochart img { display: block; width: 100%; max-width: 540px; height: auto; margin: 0 auto; }
+.ochart img { display: block; width: auto; max-width: 100%; height: auto; margin: 0 auto; }
 .ochart figcaption { font-size: 0.88rem; line-height: 1.5; margin-top: 0.35rem; color: var(--dark-gray); }
 .ochart .ilive { font-weight: 600; text-decoration: none; margin-left: 0.2rem; }
 .ochart .ilive:hover { text-decoration: underline; }

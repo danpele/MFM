@@ -468,9 +468,10 @@
                 selfStudy: 'Self-study',
                 quantinar: 'Go deeper on Quantinar',
                 links: {
-                    slides: 'Lecture Slides', seminar: 'Seminar', lectureNb: 'Lecture Notebook',
-                    seminarNb: 'Seminar Notebook', quantlets: 'Quantlets', interactive: 'Interactive', web: 'Web Lecture', colab: 'Open in Colab'
+                    slides: 'Slides', seminar: 'Seminar', lectureNb: 'Lecture Notebook',
+                    seminarNb: 'Seminar Notebook', quantlets: 'Quantlets', interactive: 'Interactive', web: 'Web page', colab: 'Open in Colab'
                 },
+                linkRows: { course: 'Lecture', seminar: 'Seminar', code: 'Code' },
                 projectTitle: 'Team Project and the Use of AI',
                 aiTitle: 'Using AI in this course',
                 quizzes: 'Self-Assessment Quizzes',
@@ -539,9 +540,10 @@
                 selfStudy: 'Studiu individual',
                 quantinar: 'Aprofundare pe Quantinar',
                 links: {
-                    slides: 'Slide-uri curs', seminar: 'Seminar', lectureNb: 'Notebook curs',
-                    seminarNb: 'Notebook seminar', quantlets: 'Quantlets', interactive: 'Interactiv', web: 'Curs web', colab: 'Deschide în Colab'
+                    slides: 'Slide-uri', seminar: 'Seminar', lectureNb: 'Notebook curs',
+                    seminarNb: 'Notebook seminar', quantlets: 'Quantlets', interactive: 'Interactiv', web: 'Pagina web', colab: 'Deschide în Colab'
                 },
+                linkRows: { course: 'Curs', seminar: 'Seminar', code: 'Cod' },
                 projectTitle: 'Proiectul de echipă și utilizarea AI',
                 aiTitle: 'Utilizarea AI în acest curs',
                 quizzes: 'Quiz-uri de autoevaluare',

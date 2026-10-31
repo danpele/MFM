@@ -119,7 +119,17 @@
         if (!m) return links;
         const sfx = `ch${m[1]}${LANG === 'ro' ? '_ro' : ''}.html`;
         const i = links.indexOf(s), it = { type: 'interactive', href: `interactive/${sfx}` }, wb = { type: 'web', href: `web/${sfx}` };
-        return [...links.slice(0, i + 1), it, wb, ...links.slice(i + 1)];
+        return [...links.slice(0, i + 1), wb, it, ...links.slice(i + 1)];
+    }
+
+    // chapter buttons in three labelled rows: lecture (slides, web page, interactive), seminar, code
+    const LINK_ROWS = [['course', ['slides', 'web', 'interactive']], ['seminar', ['seminar']], ['code', ['lectureNb', 'seminarNb', 'quantlets']]];
+
+    function linkRows(links) {
+        return LINK_ROWS.map(([row, types]) => {
+            const ls = types.flatMap(t => links.filter(l => l.type === t));
+            return ls.length ? `<div class="link-row"><span class="link-row-h">${T.linkRows[row]}</span><div class="link-row-b">${ls.map(linkButton).join('')}</div></div>` : '';
+        }).join('');
     }
 
     function renderChapters() {
@@ -127,7 +137,7 @@
             const badge = (ch.available ? '' : `<span class="badge badge-soon">${T.comingSoon}</span>`) +
                 (ch.selfStudy ? `<span class="badge badge-self">${T.selfStudy}</span>` : '');
             const links = ch.available
-                ? withInteractive(ch.links[LANG]).map(linkButton).join('')
+                ? linkRows(withInteractive(ch.links[LANG]))
                 : PLACEHOLDER_LINKS.map(t => `<span class="btn disabled" aria-disabled="true">${T.links[t]}</span>`).join('');
             const qn = (ch.quantinar || []).length
                 ? `<div class="quantinar-box"><h4><img src="logos/qr_logo.png" alt="">${T.quantinar}</h4><ul>` +
