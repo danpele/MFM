@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch13_triple_barrier'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Triple-barrier labelling of the S&P 500: volatility-scaled profit-taking and stop-loss barriers plus a vertical (time) barrier; illustration on 2022 events and comparison of label shares with fixed-horizon labels.'
+Description: 'Triple-barrier labelling of the S&P 500: volatility-scaled profit-taking and stop-loss barriers plus a vertical (time) barrier; illustration on 2022 events and comparison of label shares with fixed-horizon labels.
+
+The path example uses a 15-trading-day time limit. A time-out receives the sign of its realised return, so it can still have label +1 or -1. The distribution comparison uses 10 trading days for both methods: the fixed-horizon bars count return signs, whereas the triple-barrier bars count which barrier is reached first (upper, lower or time limit), not the final sign label. The holding-time histogram covers the events that reach a horizontal barrier and measures elapsed calendar days.'
 
 Keywords: 'triple-barrier method, labelling, meta-labelling, EWMA volatility, S&P 500, financial machine learning'
 

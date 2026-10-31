@@ -194,7 +194,7 @@ function jumps() {
     lay['xaxis' + ax] = AX('', { type: 'date', anchor: 'y' + ax, domain: [0, 1] });
     lay['yaxis' + ax] = AX('% p.a.', { domain: i ? [0, 0.44] : [0.56, 1], anchor: 'x' + ax });
     const nj = idx.length, js = sum(R.Jt) / sum(v), mj = nj ? mean(idx.map(j => R.Jt[j] / v[j])) : 0;
-    res.push(T.jp(name, nj, fint(R.n), pct(nj / R.n, 1), nf(R.n * a, 1), pct(js, 1), nj ? pct(mj, 0) : '–'));
+    res.push(T.jp(name, nj, fint(R.n), pct(nj / R.n, 1), nf(R.n * a, 1), pct(js, 1), nj ? pct(mj, 0) : '–', bh));
   });
   plot('jp-chart', tr, lay);
   res.push(bh ? T.jp3(fmtA(a)) : T.jp2(fmtA(a), nf(nppf(1 - a), 2)));

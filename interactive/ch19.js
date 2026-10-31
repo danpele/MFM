@@ -465,7 +465,10 @@ function init() {
   on(['ir-w', 'ir-y0'], romaniaBlock); P('ir-play', 'ir-w', range(52, 260, 8), 500);
   const PFX = { 'bet-facts': 'bf', 'bet-garch': 'bg', 'bet-var': 'bv', 'breach-rates': 'br', 'kupiec-power': 'kp', 'nse-multiverse': 'nm',
     'int-portfolio': 'ip', 'int-bitcoin': 'ib', 'int-romania': 'ir' };
-  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  // blocks whose initial live chart shows the answer: the charts are veiled with the slide and the readout
+  const VEIL_CHART = new Set(['bet-var', 'breach-rates', 'nse-multiverse']);
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) =>
+    predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true, charts: VEIL_CHART.has(b) } }, sp)));
   if (T.ticket && exitTicket) exitTicket(T.ticket);
   facts(); garch(); varPath(); breachRates(); kupiecPowerBlock(); nseBlock(); portfolioBlock(); bitcoinBlock(); romaniaBlock();
 }

@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch19_data.js?v=20261030a"></script>
-<script src="ch19_text_ro.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch19.js?v=20261030a" defer></script>
+<script src="ch19_data.js?v=20261030b"></script>
+<script src="ch19_text_ro.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch19.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,28 +38,28 @@
 <section class="blk" id="bet-facts">
   <h3>Pasul 1: faptele stilizate ale BET</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=38" target="_blank" rel="noopener"><img src="slides/ch19_bet_facts_ro.jpg" alt="Slide-ul 37: Pasul 1: faptele stilizate ale BET" loading="lazy"></a>
-      <figcaption>Slide-ul 37</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=39" target="_blank" rel="noopener"><img src="slides/ch19_bet_facts_ro.jpg" alt="Slide-ul 38: Pasul 1: faptele stilizate ale BET" loading="lazy"></a>
+      <figcaption>Slide-ul 38</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="bf-y0">Primul an: <b id="bf-y0-v"></b></label><input type="range" id="bf-y0" min="2000" max="2025" step="1" value="2000"></div><div class="ctl"><label for="bf-y1">Ultimul an: <b id="bf-y1-v"></b></label><input type="range" id="bf-y1" min="2001" max="2026" step="1" value="2026"></div><div class="ctl"><label for="bf-k">Hill: k ca pondere din zilele cu pierdere: <b id="bf-k-v"></b></label><input type="range" id="bf-k" min="1" max="10" step="0.5" value="5"></div><button class="btn play" id="bf-play" type="button"></button></div><div class="charts "><div class="chart" id="bf-qq"></div><div class="chart" id="bf-acf"></div></div><ul class="out" id="bf-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Tail index-ul Hill al pierderilor BET este 2,39. Ce spune această valoare despre kurtosis-ul randamentelor?</div>
-  <details><summary>Răspuns</summary><p>Sub o coadă de tip Pareto, momentele de ordin peste 2,39 sînt infinite. Întregul interval de încredere de 95% [2,12; 3,03] este sub 4: datele sînt compatibile cu un kurtosis infinit, fără să-l demonstreze, iar excesul de kurtosis empiric (11,1) nu estimează un parametru finit, deci se raportează tail index-ul. Pe tot eșantionul sînt 51 de zile dincolo de ±4 abateri standard, față de 0,42 așteptate sub distribuția Normală.</p></details>
+  <details><summary>Răspuns</summary><p>Pentru o coadă de tip Pareto cu indicele adevărat α &lt; 4, momentul de ordin patru este infinit. Estimarea Hill 2,39 și intervalul de încredere de 95% [2,12; 3,03] susțin această interpretare, fără să o demonstreze. Dacă această ipoteză despre coadă este corectă, excesul empiric de kurtosis, 11,1, nu estimează un parametru finit; de aceea se raportează tail index-ul. Pragul 2 privește momentul de ordin doi; pentru momentul de ordin patru, pragul relevant este 4. Pe tot eșantionul sînt 51 de zile dincolo de ±4 abateri standard, față de 0,42 așteptate sub distribuția Normală.</p></details>
 </section>
 <section class="blk" id="bet-garch">
   <h3>Pasul 2: volatilitatea GARCH(1,1)-t</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=40" target="_blank" rel="noopener"><img src="slides/ch19_bet_garch_ro.jpg" alt="Slide-ul 39: Pasul 2: volatilitatea GARCH(1,1)-t" loading="lazy"></a>
-      <figcaption>Slide-ul 39</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch19_bet_garch_ro.jpg" alt="Slide-ul 40: Pasul 2: volatilitatea GARCH(1,1)-t" loading="lazy"></a>
+      <figcaption>Slide-ul 40</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="bg-a">α, ponderea șocului de ieri: <b id="bg-a-v"></b></label><input type="range" id="bg-a" min="0.02" max="0.4" step="0.001" value="0.192"></div><div class="ctl"><label for="bg-p">Persistența α + β: <b id="bg-p-v"></b></label><input type="range" id="bg-p" min="0.9" max="1.0" step="0.0001" value="0.9907"></div><button class="btn play" id="bg-play" type="button"></button></div><div class="charts "><div class="chart" id="bg-chart"></div></div><ul class="out" id="bg-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Persistența estimată este α + β = 0,9907. După cîte zile s-a stins jumătate dintr-un șoc de volatilitate?</div>
-  <details><summary>Răspuns</summary><p>După aproximativ 74 de zile de tranzacționare, din ln 0,5 / ln 0,9907. Persistența nu poate fi separată de 1: testul raportului de verosimilitate pentru p = 1 dă LR = 1,01, cu p-value 0,16, deci intervalul pentru timpul de înjumătățire începe la 27 de zile și nu are o limită superioară finită.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În GARCH(1,1), efectul unui șoc asupra prognozei varianței se transmite cu factorul α + β = 0,9907 pe zi. După aproximativ cîte zile se înjumătățește acest efect?</div>
+  <details><summary>Răspuns</summary><p>După aproximativ 74 de zile de tranzacționare: ln 0,5 / ln 0,9907. Folosirea doar a lui β = 0,799 ignoră propagarea prin șocurile viitoare; 1/(1 − p) nu este formula timpului de înjumătățire. Persistența nu poate fi separată de 1: testul raportului de verosimilitate pentru p = 1 dă LR = 1,01, cu p-value 0,16. Intervalul profil pentru p, [0,975; 1], se transformă într-un interval pentru timpul de înjumătățire cu limita inferioară de aproximativ 27 de zile și fără limită superioară finită.</p></details>
 </section>
 <section class="blk" id="bet-var">
   <h3>Pasul 3: pierderi și VaR 1%, 2020–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch19_bet_var_ro.jpg" alt="Slide-ul 40: Pasul 3: pierderi și VaR 1%, 2020–2026" loading="lazy"></a>
-      <figcaption>Slide-ul 40</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch19_bet_var_ro.jpg" alt="Slide-ul 41: Pasul 3: pierderi și VaR 1%, 2020–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 41</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="bv-m">Modelul comparat cu FHS</label><select id="bv-m"><option value="Normal" selected>Normal (500 de zile)</option><option value="HS">HS</option><option value="GARCH-t">GARCH-t</option></select></div><div class="ctl"><label for="bv-l">Nivelul VaR</label><select id="bv-l"><option value="1" selected>1%</option><option value="2.5">2,5%</option></select></div><div class="ctl"><label for="bv-y0">Începutul ferestrei: <b id="bv-y0-v"></b></label><input type="range" id="bv-y0" min="2005" max="2025" step="1" value="2020"></div><div class="ctl"><label for="bv-t">Pînă la: <b id="bv-t-v"></b></label><input type="range" id="bv-t" min="0" max="1000" step="1" value="1000"></div><button class="btn play" id="bv-play" type="button"></button></div><div class="charts "><div class="chart" id="bv-chart"></div></div><ul class="out" id="bv-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În cele 1 675 de zile din 2020–2026 erau de așteptat aproximativ 17 depășiri ale VaR 1%. Care dintre cele două modele se apropie de acest număr?</div>
@@ -68,38 +68,38 @@
 <section class="blk" id="breach-rates">
   <h3>Pasul 4: ratele depășirilor</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=43" target="_blank" rel="noopener"><img src="slides/ch19_breach_rates_ro.jpg" alt="Slide-ul 42: Pasul 4: ratele depășirilor" loading="lazy"></a>
-      <figcaption>Slide-ul 42</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch19_breach_rates_ro.jpg" alt="Slide-ul 43: Pasul 4: ratele depășirilor" loading="lazy"></a>
+      <figcaption>Slide-ul 43</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="br-l">Nivelul VaR</label><select id="br-l"><option value="1" selected>1%</option><option value="2.5">2,5%</option></select></div><div class="ctl"><label for="br-adj">Citirea celor patru teste Kupiec</label><select id="br-adj"><option value="none" selected>separat, fără corecție</option><option value="holm">Holm (FWER)</option><option value="bh">Benjamini–Hochberg (FDR 5%)</option></select></div><div class="ctl"><label for="br-y0">Primul an: <b id="br-y0-v"></b></label><input type="range" id="br-y0" min="2005" max="2026" step="1" value="2005"></div><div class="ctl"><label for="br-y1">Ultimul an: <b id="br-y1-v"></b></label><input type="range" id="br-y1" min="2005" max="2026" step="1" value="2026"></div><button class="btn play" id="br-play" type="button"></button></div><div class="charts "><div class="chart" id="br-chart"></div></div><ul class="out" id="br-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care dintre cele patru modele are o rată a depășirilor compatibilă cu 1% în cele 5 432 de zile de evaluare?</div>
-  <details><summary>Răspuns</summary><p>Doar FHS: 1,23%, în intervalul binomial de 95% [0,74%; 1,27%], iar testul Kupiec nu îl respinge (p = 0,095). HS are 1,45%, GARCH-t 1,47%, iar modelul Normal 2,25%, de peste două ori ținta.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> VaR 1%, 5 432 de zile de evaluare: citite separat, testele Kupiec la 5% resping HS, modelul Normal și GARCH-t. Se schimbă lista modelelor respinse dacă aplicăm corecția Holm (FWER 5%) celor patru teste?</div>
+  <details><summary>Răspuns</summary><p>Nu. P-value-urile Kupiec sînt sub 0,001 (Normal, 122 de depășiri), 0,001 (GARCH-t, 80), 0,002 (HS, 79) și 0,095 (FHS, 67). Holm le compară, în ordine, cu 0,05/4 = 0,0125, 0,05/3 ≈ 0,0167, 0,05/2 = 0,025 și 0,05: primele trei trec pragul, FHS nu. Corecția face testele mai stricte, deci nu poate adăuga respingeri. Rata FHS, 1,23%, este în banda binomială de 95% [0,74%; 1,27%]; nerespingerea nu demonstrează că rata adevărată este exact 1%. O rată peste 1% nu implică automat respingerea, iar apropierea numerică de 1% nu înlocuiește testul.</p></details>
 </section>
 <section class="blk" id="kupiec-power">
   <h3>Puterea de detecție a unui backtest: testul Kupiec</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch19_kupiec_power_ro.jpg" alt="Slide-ul 45: Puterea de detecție a unui backtest: testul Kupiec" loading="lazy"></a>
-      <figcaption>Slide-ul 45</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch19_kupiec_power_ro.jpg" alt="Slide-ul 46: Puterea de detecție a unui backtest: testul Kupiec" loading="lazy"></a>
+      <figcaption>Slide-ul 46</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="kp-T">Zile de evaluare T: <b id="kp-T-v"></b></label><input type="range" id="kp-T" min="50" max="6000" step="1" value="250"></div><div class="ctl"><label for="kp-pi">Rata reală a depășirilor: <b id="kp-pi-v"></b></label><input type="range" id="kp-pi" min="0.2" max="4.0" step="0.05" value="2.0"></div><div class="ctl"><label for="kp-a">Nivelul testului</label><select id="kp-a"><option value="0.01">1%</option><option value="0.05" selected>5%</option><option value="0.1">10%</option></select></div><button class="btn play" id="kp-play" type="button"></button></div><div class="charts "><div class="chart" id="kp-chart"></div></div><ul class="out" id="kp-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Un model VaR 1% are în realitate o rată a depășirilor de 2%. Cît de des îl respinge testul Kupiec de 5% după un an Basel (T = 250)?</div>
-  <details><summary>Răspuns</summary><p>Doar în 24% din cazuri. Efectul minim detectabil cu o putere de 80% este 3,65% la T = 250, 2,05% la T = 1 000 și 1,45% la T = 5 432. O nerespingere cu putere mică înseamnă „nicio dovadă”, nu „nicio problemă”.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Presupunem depășiri independente, cu probabilitatea reală 2% pe zi, pentru un model VaR 1%. Cum se schimbă probabilitatea ca testul Kupiec de 5% să respingă modelul cînd ▶ mărește T de la 250 la 5 432 de zile?</div>
+  <details><summary>Răspuns</summary><p>Crește de la 24% la aproape 100% (78% la T = 1 000). La T = 250 testul respinge la 0 depășiri sau la cel puțin 7. Nivelul de 5% este nominal și privește ipoteza nulă; nici 1 − 5% nu este puterea. Cu pragul asimptotic 3,84, probabilitatea efectivă de respingere la rata nulă de 1% este 9,5% la T = 250. Pe grila paginii, prima rată reală detectată cu o putere de cel puțin 80% este 3,65% la T = 250 (un exces de 2,65 puncte procentuale peste țintă), 2,05% la T = 1 000 și 1,45% la T = 5 432. O nerespingere cu putere mică înseamnă „nicio dovadă”, nu „nicio problemă”.</p></details>
 </section><h2 class="sec" id="s-int">Studii de caz integrate: portofoliu, Bitcoin, investitor român</h2>
 <section class="blk" id="int-portfolio">
   <h3>Portofoliul multi-active: ponderi, VaR și contribuții la risc</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch19_int_portfolio_ro.jpg" alt="Slide-ul 47: Portofoliul multi-active: ponderi, VaR și contribuții la risc" loading="lazy"></a>
-      <figcaption>Slide-ul 47</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch19_int_portfolio_ro.jpg" alt="Slide-ul 48: Portofoliul multi-active: ponderi, VaR și contribuții la risc" loading="lazy"></a>
+      <figcaption>Slide-ul 48</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ip-m">Modelul VaR 1%</label><select id="ip-m"><option value="n" selected>DCC-Normal</option><option value="fhs">DCC-FHS</option><option value="hs">HS (500 de zile)</option></select></div><div class="ctl"><label for="ip-y0">Începutul evaluării: <b id="ip-y0-v"></b></label><input type="range" id="ip-y0" min="2012" max="2025" step="1" value="2012"></div><div class="ctl"><label for="ip-t">Pînă la: <b id="ip-t-v"></b></label><input type="range" id="ip-t" min="0" max="1000" step="1" value="1000"></div><button class="btn play" id="ip-play" type="button"></button></div><div class="charts "><div class="chart" id="ip-c1"></div><div class="chart" id="ip-c2"></div><div class="chart" id="ip-c3"></div></div><ul class="out" id="ip-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> De ce eșuează VaR-ul DCC-FHS, deși folosește aceeași covarianță condiționată ca DCC-Normal?</div>
-  <details><summary>Răspuns</summary><p>Istoria lui aplică ponderile de azi pe datele din care au fost estimate: în fereastra FHS, abaterea standard a randamentelor standardizate ale portofoliului este 0,91, în afara ei 0,95. Cuantila de 99% a pierderii standardizate iese prea mică: VaR-ul mediu este 0,55%, față de 0,58% pentru DCC-Normal, iar depășirile sînt 52, față de 35,8 așteptate (p Kupiec 0,011). DCC-Normal are 40 de depășiri și trece toate cele trei teste. Comparația este retrospectivă: modelul VaR este ales pe aceeași perioadă pe care este evaluat.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce mecanism poate contribui la subestimarea riscului de către DCC-FHS, deși DCC-FHS și DCC-Normal folosesc aceeași covarianță condiționată?</div>
+  <details><summary>Răspuns</summary><p>Istoria FHS reutilizează datele pe care au fost optimizate ponderile GMV, ceea ce poate face riscul istoric prea mic: media abaterilor standard ale randamentelor standardizate ale portofoliului în ferestrele FHS este 0,91, iar abaterea standard a randamentelor standardizate out-of-sample este 0,95. FHS înmulțește cuantila empirică a pierderilor standardizate cu volatilitatea curentă: VaR-ul mediu este 0,55%, față de 0,58% pentru DCC-Normal. DCC-FHS are 52 de depășiri, față de 35,8 așteptate (p Kupiec 0,011); DCC-Normal are 40 de depășiri și trece toate cele trei teste. Rezultatele susțin diagnosticul, fără să izoleze contribuția fiecărui mecanism. Comparația este retrospectivă: modelul VaR este ales pe aceeași perioadă pe care este evaluat.</p></details>
 </section>
 <section class="blk" id="int-bitcoin">
   <h3>Bitcoin: bule, VaR din volatilitatea realizată și lichiditate</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=52" target="_blank" rel="noopener"><img src="slides/ch19_int_bitcoin_ro.jpg" alt="Slide-ul 51: Bitcoin: bule, VaR din volatilitatea realizată și lichiditate" loading="lazy"></a>
-      <figcaption>Slide-ul 51</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=53" target="_blank" rel="noopener"><img src="slides/ch19_int_bitcoin_ro.jpg" alt="Slide-ul 52: Bitcoin: bule, VaR din volatilitatea realizată și lichiditate" loading="lazy"></a>
+      <figcaption>Slide-ul 52</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ib-a">Nivelul VaR α: <b id="ib-a-v"></b></label><input type="range" id="ib-a" min="0.5" max="5" step="0.25" value="1"></div><div class="ctl"><label for="ib-w">Fereastra HS (zile): <b id="ib-w-v"></b></label><input type="range" id="ib-w" min="250" max="900" step="50" value="500"></div><button class="btn play" id="ib-play" type="button"></button></div><div class="charts "><div class="chart" id="ib-c1"></div><div class="chart" id="ib-c2"></div><div class="chart" id="ib-c3"></div></div><ul class="out" id="ib-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Evaluarea are 422 de zile. Cît de des ar respinge testul Kupiec de 5% un model VaR 1% care greșește cu o rată reală de 2%?</div>
@@ -108,22 +108,22 @@
 <section class="blk" id="int-romania">
   <h3>Investitorul român: eficiență, acoperire valutară și ES în lei</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch19_int_romania_ro.jpg" alt="Slide-ul 55: Investitorul român: eficiență, acoperire valutară și ES în lei" loading="lazy"></a>
-      <figcaption>Slide-ul 55</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=57" target="_blank" rel="noopener"><img src="slides/ch19_int_romania_ro.jpg" alt="Slide-ul 56: Investitorul român: eficiență, acoperire valutară și ES în lei" loading="lazy"></a>
+      <figcaption>Slide-ul 56</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ir-w">Fereastra lui h* (săptămîni): <b id="ir-w-v"></b></label><input type="range" id="ir-w" min="52" max="260" step="4" value="156"></div><div class="ctl"><label for="ir-y0">Primul an al testelor VR: <b id="ir-y0-v"></b></label><input type="range" id="ir-y0" min="2005" max="2020" step="1" value="2005"></div><button class="btn play" id="ir-play" type="button"></button></div><div class="charts "><div class="chart" id="ir-c1"></div><div class="chart" id="ir-c2"></div><div class="chart" id="ir-c3"></div></div><ul class="out" id="ir-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Partea în euro pierde cînd Euro Stoxx 50 scade. De ce acoperirea integrală a riscului valutar nu reduce ES-ul portofoliului?</div>
-  <details><summary>Răspuns</summary><p>Leul se depreciază în săptămînile în care acțiunile scad (β = −0,52, t = −2,61), deci cursul compensează o parte din pierdere, iar volatilitatea EUR/RON este 4,6% pe an, față de 20,9% pentru Euro Stoxx 50. ES 2,5% săptămînal, aug. 2008 – sept. 2026: 9,60% fără acoperire, 9,67% cu acoperire integrală; retrospectiv, alegerea lui h a contat puțin pentru risc.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În comparația retrospectivă pentru aug. 2008 – sept. 2026, ce mecanism poate explica faptul că acoperirea integrală a riscului valutar nu a redus ES-ul portofoliului?</div>
+  <details><summary>Răspuns</summary><p>Asocierea negativă dintre randamentul Euro Stoxx 50 și variația EUR/RON (β = −0,52, t = −2,61) a compensat parțial pierderile: cînd EUR/RON crește, leul se depreciază, iar valoarea în lei a investiției în euro crește, celelalte condiții fiind neschimbate. Asocierea nu este o regulă valabilă în fiecare săptămînă. Volatilitatea EUR/RON este 4,6% pe an, față de 20,9% pentru Euro Stoxx 50. ES 2,5% săptămînal, aug. 2008 – sept. 2026: 9,60% fără acoperire, 9,67% cu acoperire integrală; în aug. 2008 – dec. 2012 ordinea se inversează (15,23% și 15,12%). Comparația retrospectivă nu înlocuiește regula de decizie din curs, care alege acoperirea integrală (h = 1).</p></details>
 </section><h2 class="sec" id="s-nse">Studiu de caz: erorile nestandard</h2>
 <section class="blk" id="nse-multiverse">
   <h3>Mini-multivers pe datele cursului: 27 de specificații pe indice</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=69" target="_blank" rel="noopener"><img src="slides/ch19_nse_multiverse_ro.jpg" alt="Slide-ul 68: Mini-multivers pe datele cursului: 27 de specificații pe indice" loading="lazy"></a>
-      <figcaption>Slide-ul 68</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol19_recapitulare_proiecte.pdf#page=70" target="_blank" rel="noopener"><img src="slides/ch19_nse_multiverse_ro.jpg" alt="Slide-ul 69: Mini-multivers pe datele cursului: 27 de specificații pe indice" loading="lazy"></a>
+      <figcaption>Slide-ul 69</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="nm-model">Modelul variației anuale</label><select id="nm-model"><option value="all" selected>toate trei</option><option value="Linear trend">Tendință liniară</option><option value="Log difference">Diferență logaritmică</option><option value="Relative difference">Diferență relativă</option></select></div><div class="ctl"><label for="nm-meas">Măsura ineficienței</label><select id="nm-meas"><option value="all" selected>toate trei</option><option value="|VR(5) - 1|">|VR(5) − 1|</option><option value="|VR(21) - 1|">|VR(21) − 1|</option><option value="AR(1) R$^2$">R² al AR(1)</option></select></div><div class="ctl"><label for="nm-ol">Valorile extreme</label><select id="nm-ol"><option value="all" selected>toate trei</option><option value="None">netratate</option><option value="Winsorised">winsorizate</option><option value="Trimmed">trunchiate</option></select></div><div class="ctl"><label for="nm-q">Percentila de winsorizare și trunchiere: <b id="nm-q-v"></b></label><input type="range" id="nm-q" min="1" max="10" step="0.5" value="2.5"></div><button class="btn play" id="nm-play" type="button"></button></div><div class="charts "><div class="chart" id="nm-chart"></div></div><ul class="out" id="nm-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care dintre cele trei decizii (valorile extreme, măsura, modelul) produce cea mai mare parte din dispersia celor 27 de estimări?</div>
-  <details><summary>Răspuns</summary><p>Modelul. Pentru cele nouă specificații cu tendință liniară, IQR-ul este 2,6 pp pentru Euro Stoxx 50 și 6,7 pp pentru BET, față de 64,6 pp și 82,6 pp pe toate cele 27. Cu diferențe relative, medianele urcă la +98,7% și +80,3% pe an.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe toate cele 27 de specificații, IQR-ul estimărilor pentru Euro Stoxx 50 este 64,6 pp. ▶ restrînge grila, pe rînd, la un singur model al variației anuale. Cît devine IQR-ul celor nouă specificații cu tendință liniară?</div>
+  <details><summary>Răspuns</summary><p>Circa 2,6 pp (BET: 6,7 pp, față de 82,6 pp pe întreaga grilă). Cu diferențe relative, medianele sînt +98,7% și +80,3% pe an: modelul variației anuale separă cel mai mult distribuțiile estimărilor. Reperul de eșantionare, 1,35 × SE-ul median, este 41,3 pp pe întreaga grilă și 3,9 pp pentru cele nouă specificații cu tendință liniară. Comparația este descriptivă, nu o estimare a ponderii din dispersie datorate fiecărei alegeri.</p></details>
 </section>
 <p class="src foot">Indicele BET: valori oficiale zilnice de închidere, 6 ian. 2000 – 18 sept. 2026, randamente logaritmice în %. Prognozele VaR la o zi: fereastră rolling de 1 000 de zile (500 pentru HS și modelul Normal), GARCH reestimat la fiecare 21 de zile, evaluare din 3 ian. 2005. Mini-multiversul: închideri zilnice Euro Stoxx 50 (EODHD) și BET, 2002–2018. Studiile de caz integrate: opt ETF-uri multi-active (prețuri ajustate, 2007–2026), Bitcoin (închideri zilnice 2014–2026, bare de 5 minute 2024–2026), BET, Euro Stoxx 50 și cursul de referință EUR/RON al BNR (2005–2026).</p>
 </main>

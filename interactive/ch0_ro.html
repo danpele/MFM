@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch0_data.js?v=20261030a"></script>
-<script src="ch0_text_ro.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch0.js?v=20261030a" defer></script>
+<script src="ch0_data.js?v=20261030b"></script>
+<script src="ch0_text_ro.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch0.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,48 +38,48 @@
 <section class="blk" id="history">
   <h3>Cinci secole de burse, patru secole de crahuri</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=16" target="_blank" rel="noopener"><img src="slides/ch0_market_history_ro.jpg" alt="Slide-ul 15: Cinci secole de burse, patru secole de crahuri" loading="lazy"></a>
-      <figcaption>Slide-ul 15</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=17" target="_blank" rel="noopener"><img src="slides/ch0_market_history_ro.jpg" alt="Slide-ul 16: Cinci secole de burse, patru secole de crahuri" loading="lazy"></a>
+      <figcaption>Slide-ul 16</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="hi-y">Pînă în anul: <b id="hi-y-v"></b></label><input type="range" id="hi-y" min="1250" max="2026" step="1" value="1602"></div><button class="btn play" id="hi-play" type="button"></button></div><div class="charts "><div class="chart" id="hi-chart"></div></div><ul class="out" id="hi-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Acțiunile VOC se tranzacționează din 1602; graficul pornește în acel an, iar butonul ▶ continuă cronologia. Cît a trecut pînă la prima bulă marcată pe grafic?</div>
-  <details><summary>Răspuns</summary><p>35 de ani: tulip mania, în 1637. Bulele Mississippi și Mării Sudului au urmat abia în 1720, la 118 ani după VOC, iar Bursa de Valori București și-a început activitatea în 1882.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Anul selectat este 1602, cînd încep tranzacțiile cu acțiuni VOC. Ce episod apare primul după acest an pe axa „Bule, panici și crahuri”?</div>
+  <details><summary>Răspuns</summary><p>Tulip mania, în 1637, la 35 de ani după 1602. Bulele Mississippi și Mării Sudului apar în 1720, iar panica în 1792. Bursa de Valori București și-a început activitatea în 1882.</p></details>
 </section><h2 class="sec" id="s-land">Piețele între 2000 și 2026</h2>
 <section class="blk" id="risk-return">
   <h3>Randament și risc, 2015–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=36" target="_blank" rel="noopener"><img src="slides/ch0_risk_return_ro.jpg" alt="Slide-ul 35: Randament și risc, 2015–2026" loading="lazy"></a>
-      <figcaption>Slide-ul 35</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch0_risk_return_ro.jpg" alt="Slide-ul 36: Randament și risc, 2015–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 36</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="rr-y">Începutul ferestrei (2 ianuarie): <b id="rr-y-v"></b></label><input type="range" id="rr-y" min="2015" max="2024" step="1" value="2015"></div><div class="ctl"><label for="rr-a">Activul descris</label><select id="rr-a"><option value="S&P 500 TR (SPY)" selected>S&P 500 TR (SPY)</option><option value="Euro Stoxx 50 (USD)">Euro Stoxx 50 (USD)</option><option value="Nikkei 225 (USD)">Nikkei 225 (USD)</option><option value="Gold">Gold</option><option value="US Treasuries 20y+ (TLT)">US Treasuries 20y+ (TLT)</option><option value="Bitcoin">Bitcoin</option><option value="Ethereum">Ethereum</option><option value="EUR/USD">EUR/USD</option><option value="EUR/RON">EUR/RON</option></select></div><button class="btn play" id="rr-play" type="button"></button></div><div class="charts "><div class="chart" id="rr-chart"></div></div><ul class="out" id="rr-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În 2015–2026, S&P 500 cu dividende are un CAGR de 13,7%, iar aurul de 11,8%. Este diferența randamentelor medii semnificativă statistic?</div>
-  <details><summary>Răspuns</summary><p>Nu. Pe zilele comune, S&P 500 minus aur dă +1,9 pp pe an, cu SE 6,8 pp, deci t = 0,28. Chiar pentru un singur activ, eroarea standard a randamentului mediu anualizat, σ/√Y cu Y = 11,7 ani, este 5,1 pp la S&P 500 și 4,8 pp la aur. Datele zilnice nu micșorează această eroare standard: ea depinde de numărul de ani, nu de numărul de observații.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe zilele comune din 2015–2026, diferența mediilor randamentelor simple SPY − aur, anualizată, este 1,9 pp, cu SE 6,8 pp. Este semnificativă într-un test bilateral la 5%?</div>
+  <details><summary>Răspuns</summary><p>Calculăm t = 1,9/6,8 ≈ 0,28. Nu respingem egalitatea mediilor; nu demonstrăm că mediile sînt egale. Testul folosește randamente simple, nu diferența CAGR-urilor din grafic (13,7% și 11,8%). Pentru un singur activ, eroarea standard a randamentului mediu anualizat, σ/√Y cu Y = 11,7 ani, este 5,1 pp la S&P 500 și 4,8 pp la aur. În modelul cu randamente iid, la aceeași volatilitate anuală și același orizont, eșantionarea mai frecventă nu reduce SE a mediei anualizate.</p></details>
 </section>
 <section class="blk" id="drawdowns">
   <h3>Crize și drawdown-uri</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch0_sp500_drawdowns_ro.jpg" alt="Slide-ul 40: Crize și drawdown-uri" loading="lazy"></a>
-      <figcaption>Slide-ul 40</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch0_sp500_drawdowns_ro.jpg" alt="Slide-ul 41: Crize și drawdown-uri" loading="lazy"></a>
+      <figcaption>Slide-ul 41</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="dd-t">Sfîrșitul eșantionului: <b id="dd-t-v"></b></label><input type="range" id="dd-t" min="0" max="7000" step="1" value="7000"></div><button class="btn play" id="dd-play" type="button"></button></div><div class="charts "><div class="chart" id="dd-chart"></div></div><ul class="out" id="dd-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> S&P 500 a scăzut cu 57% de la maximul din 9 octombrie 2007 pînă pe 9 martie 2009. Cu cît trebuia să crească de la minim ca să revină la maxim?</div>
-  <details><summary>Răspuns</summary><p>Cu 131%: 1.565,15/676,53 = 2,31. După o scădere d, revenirea cere o creștere de d/(1 − d), nu de d. Revenirea a durat 5,5 ani de la maxim, pînă pe 28 martie 2013; o creștere de 57% de la minim era atinsă deja în septembrie 2009, la 1,9 ani după maxim.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> S&P 500 a coborît de la 1.565,15 (9 octombrie 2007) la 676,53 (9 martie 2009). Ce creștere procentuală de la minim era necesară pentru revenirea la maxim?</div>
+  <details><summary>Răspuns</summary><p>(1.565,15/676,53 − 1) × 100 = 131,3%. Scăderea de 56,8% folosește maximul ca bază; recuperarea folosește minimul. Valoarea finală reprezintă 231,3% din minim, deci creșterea este 131,3%. Revenirea a durat 5,5 ani de la maxim, pînă pe 28 martie 2013.</p></details>
 </section>
 <section class="blk" id="vix">
   <h3>Regimuri de volatilitate: VIX</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=43" target="_blank" rel="noopener"><img src="slides/ch0_vix_regimes_ro.jpg" alt="Slide-ul 42: Regimuri de volatilitate: VIX" loading="lazy"></a>
-      <figcaption>Slide-ul 42</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch0_vix_regimes_ro.jpg" alt="Slide-ul 43: Regimuri de volatilitate: VIX" loading="lazy"></a>
+      <figcaption>Slide-ul 43</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="vx-lo">Pragul inferior: <b id="vx-lo-v"></b></label><input type="range" id="vx-lo" min="10" max="40" step="1" value="20"></div><div class="ctl"><label for="vx-hi">Pragul superior: <b id="vx-hi-v"></b></label><input type="range" id="vx-hi" min="15" max="60" step="1" value="30"></div><button class="btn play" id="vx-play" type="button"></button></div><div class="charts "><div class="chart" id="vx-chart"></div></div><ul class="out" id="vx-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Media VIX din 2000 încoace este 19,8. De la ce prag inferior se află cel puțin jumătate dintre zile sub prag? Verificați mutînd pragul inferior.</div>
-  <details><summary>Răspuns</summary><p>De la 18: VIX este sub 18 în 51% dintre zile și sub 17 în 45%. Mediana, 17,8, este sub media de 19,8: vîrfurile de stres lungesc coada din dreapta și ridică media, dar nu mediana. VIX a fost sub 20 în 62% dintre zile și cel puțin 30 în 9%. Cele mai mari valori sînt 82,7 pe 16 martie 2020, 80,9 pe 20 noiembrie 2008 și 52,3 pe 8 aprilie 2025: perioadele calme sînt lungi, iar cele de stres scurte și intense.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care este cel mai mic prag întreg pentru care cel puțin 50% dintre valorile zilnice VIX din eșantion sînt strict sub prag? Verificați mutînd pragul inferior.</div>
+  <details><summary>Răspuns</summary><p>Sub 17 se află 45,4% dintre valori, iar sub 18 se află 51,4%. Prin urmare, pragul cerut este 18. Mediana este 17,75; rotunjirea ei în jos nu dă pragul cerut. Media, 19,79, este mai sensibilă la valorile extreme mari. VIX a fost sub 20 în 62% dintre zile și cel puțin 30 în 9%. Cele mai mari valori sînt 82,7 pe 16 martie 2020, 80,9 pe 20 noiembrie 2008 și 52,3 pe 8 aprilie 2025: perioadele calme sînt lungi, iar cele de stres scurte și intense.</p></details>
 </section>
 <section class="blk" id="correlations">
   <h3>Beneficiul diversificării variază în timp</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch0_rolling_correlations_ro.jpg" alt="Slide-ul 43: Beneficiul diversificării variază în timp" loading="lazy"></a>
-      <figcaption>Slide-ul 43</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch0_rolling_correlations_ro.jpg" alt="Slide-ul 44: Beneficiul diversificării variază în timp" loading="lazy"></a>
+      <figcaption>Slide-ul 44</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="co-w">Fereastra (zile de tranzacționare): <b id="co-w-v"></b></label><input type="range" id="co-w" min="63" max="756" step="21" value="252"></div><button class="btn play" id="co-play" type="button"></button></div><div class="charts "><div class="chart" id="co-chart"></div></div><ul class="out" id="co-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Media corelației rolling pe 252 de zile dintre S&P 500 și TLT a fost −0,43 în 2010–2020 și +0,08 în 2022–2026. Butonul ▶ lungește fereastra pînă la 756 de zile. Ce se întîmplă cu media din 2022–2026?</div>
@@ -88,38 +88,38 @@
 <section class="blk" id="bet">
   <h3>Indicele BET, 1997–2026: o recuperare îndelungată</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch0_bvb_history_ro.jpg" alt="Slide-ul 45: Indicele BET, 1997–2026: o recuperare îndelungată" loading="lazy"></a>
-      <figcaption>Slide-ul 45</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch0_bvb_history_ro.jpg" alt="Slide-ul 46: Indicele BET, 1997–2026: o recuperare îndelungată" loading="lazy"></a>
+      <figcaption>Slide-ul 46</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="bt-y">Data de început (1 ianuarie): <b id="bt-y-v"></b></label><input type="range" id="bt-y" min="1997" max="2025" step="1" value="1997"></div><button class="btn play" id="bt-play" type="button"></button></div><div class="charts "><div class="chart" id="bt-chart"></div></div><ul class="out" id="bt-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît a durat pînă cînd BET a revenit la maximul din 24 iulie 2007?</div>
-  <details><summary>Răspuns</summary><p>13,6 ani. Indicele a scăzut cu 82,5% în 1,6 ani, pînă pe 25 februarie 2009, și a revenit la nivelul maximului abia pe 16 martie 2021; S&P 500 și-a recuperat maximul din 2007 în 5,5 ani. Pe întreaga perioadă 1997–2026, BET a crescut de 32,8 ori, un CAGR de 12,8%.</p></details>
+  <details><summary>Răspuns</summary><p>De la maximul din 24 iulie 2007 pînă la recuperarea din 16 martie 2021 au trecut 13,6 ani. Indicele a scăzut cu 82,5% pînă la minimul din 25 februarie 2009; cei 12,1 ani măsoară intervalul de la acest minim la recuperare. Cei 5,5 ani se referă la recuperarea maximului S&P 500 din 2007. Pe întreaga perioadă 1997–2026, BET a crescut de 32,8 ori, un CAGR de 12,8%.</p></details>
 </section><h2 class="sec" id="s-dig">Active digitale și tokenizare</h2>
 <section class="blk" id="usdt">
   <h3>Stablecoin-urile și ancora lor</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch0_usdt_peg_ro.jpg" alt="Slide-ul 48: Stablecoin-urile și ancora lor" loading="lazy"></a>
-      <figcaption>Slide-ul 48</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=50" target="_blank" rel="noopener"><img src="slides/ch0_usdt_peg_ro.jpg" alt="Slide-ul 49: Stablecoin-urile și ancora lor" loading="lazy"></a>
+      <figcaption>Slide-ul 49</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="us-b">Banda în jurul ancorei: <b id="us-b-v"></b></label><input type="range" id="us-b" min="0.1" max="2" step="0.1" value="0.5"></div><div class="ctl"><label for="us-p">Perioada</label><select id="us-p"><option value="all" selected>2019–2026</option><option value="m20">martie 2020</option><option value="2019">2019</option><option value="2020">2020</option><option value="2021">2021</option><option value="2022">2022</option><option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option></select></div><button class="btn play" id="us-play" type="button"></button></div><div class="charts "><div class="chart" id="us-chart"></div></div><ul class="out" id="us-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În ce parte din zile a rămas USDT la cel mult 0,5% de 1 USD în 2019–2026?</div>
-  <details><summary>Răspuns</summary><p>În 93% dintre zile, iar la cel mult 1% în 98%. Ancora nu ține în fiecare zi, dar abaterile rămîn de ordinul procentelor, departe de variațiile Bitcoin. Abaterile extreme sînt din martie 2020: 1,054 USD pe 12 martie și 0,974 USD pe 18 martie.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În ce proporție dintre zilele observate din 2019–2026 cotația zilnică USDT din date se află la cel mult 0,5% de 1 USD?</div>
+  <details><summary>Răspuns</summary><p>Proporția este 93,0%. Valoarea de 98% corespunde benzii mai largi, de ±1%; circa 7% este proporția din afara benzii de ±0,5%. Calculul folosește cotațiile zilnice disponibile și nu descrie toate variațiile intraday. Abaterile extreme sînt din martie 2020: 1,054 USD pe 12 martie și 0,974 USD pe 18 martie.</p></details>
 </section><h2 class="sec" id="s-pas">Investițiile pasive și concentrarea pieței</h2>
 <section class="blk" id="concentration">
   <h3>Ponderare după capitalizare și ponderi egale: SPY și RSP</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=53" target="_blank" rel="noopener"><img src="slides/ch0_concentration_ro.jpg" alt="Slide-ul 52: Ponderare după capitalizare și ponderi egale: SPY și RSP" loading="lazy"></a>
-      <figcaption>Slide-ul 52</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=54" target="_blank" rel="noopener"><img src="slides/ch0_concentration_ro.jpg" alt="Slide-ul 53: Ponderare după capitalizare și ponderi egale: SPY și RSP" loading="lazy"></a>
+      <figcaption>Slide-ul 53</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cc-y">Anul de început: <b id="cc-y-v"></b></label><input type="range" id="cc-y" min="2003" max="2025" step="1" value="2003"></div><button class="btn play" id="cc-play" type="button"></button></div><div class="charts "><div class="chart" id="cc-g"></div><div class="chart" id="cc-r"></div></div><ul class="out" id="cc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Din aprilie 2003, SPY a crescut de 12,7 ori, iar RSP de 11,9 ori. Butonul ▶ mută anul de început pînă în 2025. Pentru ce ani de început termină SPY înaintea RSP?</div>
-  <details><summary>Răspuns</summary><p>Pentru toți anii de început din 2003–2025: raportul final SPY/RSP este între 1,07 (început în 2003 sau în 2025) și 1,40 (început în 2015). Raportul final se schimbă cu anul de început, pentru că fiecare fereastră pornește din alt punct al raportului. Concluzia depinde însă de data de sfîrșit: raportul, egal cu 1 în aprilie 2003, coborîse la 0,76 în aprilie 2015, iar avantajul SPY provine din creșterea de 31% a raportului din ianuarie 2023. Un randament realizat mai mare nu arată o primă așteptată.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Păstrăm sfîrșitul eșantionului și mutăm începutul din aprilie 2003 în ianuarie 2015. Ambele serii sînt rebazate la 1 la noul început. Aproximativ cît devine raportul final SPY/RSP?</div>
+  <details><summary>Răspuns</summary><p>Raportul final devine 1,396, aproximativ 1,40. Valoarea de 1,07 corespunde începutului din aprilie 2003; 1,31 corespunde începutului din ianuarie 2023. Rebazarea schimbă raportul final deoarece schimbă baza comparației. Concluzia depinde însă de data de sfîrșit: raportul, egal cu 1 în aprilie 2003, coborîse la 0,76 în aprilie 2015, iar avantajul SPY provine din creșterea de 31% a raportului din ianuarie 2023. Un randament realizat mai mare nu arată o primă așteptată.</p></details>
 </section><h2 class="sec" id="s-case">Studii de caz: competiția pe piața de acțiuni și riscul obligațiunilor de stat</h2>
 <section class="blk" id="elasticity">
   <h3>Studiu de caz: un scenariu ilustrativ, 30% trec la administrare pasivă</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=57" target="_blank" rel="noopener"><img src="slides/ch0_hhl_elasticity_ro.jpg" alt="Slide-ul 56: Studiu de caz: un scenariu ilustrativ, 30% trec la administrare pasivă" loading="lazy"></a>
-      <figcaption>Slide-ul 56</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch0_hhl_elasticity_ro.jpg" alt="Slide-ul 57: Studiu de caz: un scenariu ilustrativ, 30% trec la administrare pasivă" loading="lazy"></a>
+      <figcaption>Slide-ul 57</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="hh-chi">Răspunsul strategic χ: <b id="hh-chi-v"></b></label><input type="range" id="hh-chi" min="0" max="10" step="0.01" value="2.97"></div><div class="ctl"><label for="hh-p">Ponderea trecută la pasiv, 1 − α: <b id="hh-p-v"></b></label><input type="range" id="hh-p" min="0" max="100" step="1" value="30"></div><button class="btn play" id="hh-play" type="button"></button></div><div class="charts "><div class="chart" id="hh-chart"></div></div><ul class="out" id="hh-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> 30% dintre investitori trec la administrare pasivă (α = 0,7). Butonul ▶ crește răspunsul strategic χ pînă la 10. Cum se schimbă rata de transmitere 1/(1 + χα) cînd χ crește?</div>
@@ -128,22 +128,22 @@
 <section class="blk" id="bond-beta">
   <h3>Studiu de caz: beta obligațiunilor de stat față de acțiuni, 1967–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=63" target="_blank" rel="noopener"><img src="slides/ch0_pflueger_betas_ro.jpg" alt="Slide-ul 62: Studiu de caz: beta obligațiunilor de stat față de acțiuni, 1967–2026" loading="lazy"></a>
-      <figcaption>Slide-ul 62</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=64" target="_blank" rel="noopener"><img src="slides/ch0_pflueger_betas_ro.jpg" alt="Slide-ul 63: Studiu de caz: beta obligațiunilor de stat față de acțiuni, 1967–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 63</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="bb-q">Fereastra trimestrială (trimestre): <b id="bb-q-v"></b></label><input type="range" id="bb-q" min="8" max="40" step="1" value="20"></div><div class="ctl"><label for="bb-d">Fereastra zilnică (zile de tranzacționare): <b id="bb-d-v"></b></label><input type="range" id="bb-d" min="20" max="250" step="10" value="120"></div><button class="btn play" id="bb-play" type="button"></button></div><div class="charts "><div class="chart" id="bb-a"></div><div class="chart" id="bb-b"></div></div><ul class="out" id="bb-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Între 1979T4 și 2001T1, beta trimestrial al obligațiunii nominale la 10 ani față de acțiuni este 0,27. Cît este în 2001T2–2019T4 și ce înseamnă schimbarea de semn?</div>
-  <details><summary>Răspuns</summary><p>Este −0,34 (SE 0,06): după 2001, obligațiunea nominală cîștigă cînd acțiunile pierd, deci acoperă riscul unui portofoliu de acțiuni. În 2020T1–2026T2 beta nominal este 0,00 (SE 0,17), iar cel al TIPS 0,19 (SE 0,13). Pe randamentele zilnice din 2026 (pînă pe 18 septembrie), beta nominal, 0,22, trece peste cel TIPS, 0,17; pe fereastra de 120 de zile din grafic, valorile din 18 septembrie sînt 0,27 și 0,19.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În regresia trimestrială pe 2001T2–2019T4, beta obligațiunii nominale la 10 ani este −0,34. Dacă randamentul în exces al pieței de acțiuni este cu 1 pp mai mic, cu cît se modifică randamentul în exces ajustat al obligațiunii, potrivit regresiei?</div>
+  <details><summary>Răspuns</summary><p>Modificarea valorii ajustate este (−0,34) × (−1 pp) = +0,34 pp. Semnul negativ (SE 0,06) indică o asociere de sens opus în această subperioadă; nu garantează un cîștig în fiecare trimestru cu scăderi ale acțiunilor. Valoarea de 2,94 provine din inversarea nejustificată a coeficientului. În 1979T4–2001T1 beta este 0,27. În 2020T1–2026T2 beta nominal este 0,00 (SE 0,17), iar cel al TIPS 0,19 (SE 0,13). Pe randamentele zilnice din 2026 (pînă pe 18 septembrie), beta nominal, 0,22, trece peste cel TIPS, 0,17; pe fereastra de 120 de zile din grafic, valorile din 18 septembrie sînt 0,27 și 0,19.</p></details>
 </section><h2 class="sec" id="s-ai">AI pentru descoperire științifică</h2>
 <section class="blk" id="premium">
   <h3>Mini studiu de caz: estimație, interval și MDE</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=69" target="_blank" rel="noopener"><img src="slides/ch0_ai_spread_ro.jpg" alt="Slide-ul 68: Mini studiu de caz: estimație, interval și MDE" loading="lazy"></a>
-      <figcaption>Slide-ul 68</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol0_piete_financiare.pdf#page=70" target="_blank" rel="noopener"><img src="slides/ch0_ai_spread_ro.jpg" alt="Slide-ul 69: Mini studiu de caz: estimație, interval și MDE" loading="lazy"></a>
+      <figcaption>Slide-ul 69</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ai-y">Împărțirea eșantionului (1 ianuarie): <b id="ai-y-v"></b></label><input type="range" id="ai-y" min="2005" max="2024" step="1" value="2015"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-ci"></div><div class="chart" id="ai-cum"></div></div><ul class="out" id="ai-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe întregul eșantion, diferența medie SPY − RSP este +0,29% pe an, cu t = 0,27. Înseamnă asta că nu există o primă de concentrare?</div>
-  <details><summary>Răspuns</summary><p>Nu. Efectul minim detectabil este 3,1% pe an, deci o primă reală mai mică ar trece de cele mai multe ori nedetectată. P-value-ul bilateral, circa 0,79, nu este probabilitatea ca prima să existe sau să lipsească. Semnul se schimbă între jumătăți: −2,28% (t = −1,75) în 2003–2014 și +2,85% (t = 1,63) în 2015–2026.</p></details>
+  <details><summary>Răspuns</summary><p>Nu. Media estimată este +0,29% pe an, cu SE HAC de circa 1,10 pp și t = 0,27. Nu respingem media nulă la 5%. MDE de circa 3,1% pe an corespunde unei puteri de aproximativ 80%, în aproximația bazată pe distribuția Normală. Efectele mai mici au putere sub 80%, nu neapărat sub 50%. P-value-ul de circa 0,79 nu este probabilitatea ca prima să existe. Semnul se schimbă între jumătăți: −2,28% (t = −1,75) în 2003–2014 și +2,85% (t = 1,63) în 2015–2026.</p></details>
 </section>
 <p class="src foot">Prețuri zilnice EODHD pînă la 18 sep. 2026: indici, ETF-uri (prețuri ajustate), aur, Bitcoin, Ethereum, USDT; BET: valori oficiale de închidere. Cursurile USD/EUR și JPY/USD din FRED, cursul EUR/RON de referință al BNR. Studiile de caz: Haddad, Huebner și Loualiche (2025), ec. (5) și Tabelul 2; Pflueger (2025), Figura 1, cu randamentele FRED DGS10, DFII10 și DTB3, piața SUA din biblioteca Kenneth French și SPY.</p>
 </main>

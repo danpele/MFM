@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch11_data.js?v=20261030a"></script>
-<script src="ch11_text_en.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch11.js?v=20261030a" defer></script>
+<script src="ch11_data.js?v=20261030b"></script>
+<script src="ch11_text_en.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch11.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,38 +38,38 @@
 <section class="blk" id="donsker">
   <h3>From Random Walk to Brownian Motion: Donsker's Theorem</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=5" target="_blank" rel="noopener"><img src="slides/ch11_donsker_en.jpg" alt="Slide 4: From Random Walk to Brownian Motion: Donsker's Theorem" loading="lazy"></a>
-      <figcaption>Slide 4</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=6" target="_blank" rel="noopener"><img src="slides/ch11_donsker_en.jpg" alt="Slide 5: From Random Walk to Brownian Motion: Donsker's Theorem" loading="lazy"></a>
+      <figcaption>Slide 5</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="dk-a">Level a: <b id="dk-a-v"></b></label><input type="range" id="dk-a" min="0.25" max="2.5" step="0.05" value="1"></div><button class="btn play" id="dk-play" type="button"></button></div><div class="charts "><div class="chart" id="dk-paths"></div><div class="chart" id="dk-p"></div></div><ul class="out" id="dk-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Is the maximum of a path observed only at daily closes smaller or larger than the maximum of the continuous path?</div>
-  <details><summary>Answer</summary><p>Smaller, on average. A coarse grid misses the maximum reached between observations: P(max W_n > 1) is 0.220 with n = 5 and 0.316 with n = 2,000, against the Brownian limit 2(1 − Φ(1)) = 0.3173. Donsker’s theorem is a limit result: the gap closes slowly, at rate 1/√n.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For standard Brownian motion on [0, 1], raise the threshold from a = 1 to a = 2. What is the probability that the path maximum exceeds the new threshold?</div>
+  <details><summary>Answer</summary><p>About 0.0455. The reflection principle gives P(max W(t) > 2) = 2[1 − Φ(2)] ≈ 0.0455, against 0.3173 at a = 1. The value 0.0228 = 1 − Φ(2) concerns W(1) alone, not the maximum over the path. The value 0.1587 incorrectly halves the probability at threshold 1: the probability is not inversely proportional to the threshold. On the page, at a = 2, the random walk with n = 2,000 steps gives 0.042. The random-walk curves illustrate convergence to the Brownian benchmark; they do not sample the same Brownian path.</p></details>
 </section><h2 class="sec" id="s-qv">Quadratic Variation and Itô Calculus</h2>
 <section class="blk" id="quadratic-variation">
   <h3>Quadratic Variation: Simulation and Data</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=9" target="_blank" rel="noopener"><img src="slides/ch11_quadratic_variation_en.jpg" alt="Slide 8: Quadratic Variation: Simulation and Data" loading="lazy"></a>
-      <figcaption>Slide 8</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=10" target="_blank" rel="noopener"><img src="slides/ch11_quadratic_variation_en.jpg" alt="Slide 9: Quadratic Variation: Simulation and Data" loading="lazy"></a>
+      <figcaption>Slide 9</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="qv-p">Exponent p in Σ|ΔW|^p: <b id="qv-p-v"></b></label><input type="range" id="qv-p" min="0.5" max="3" step="0.1" value="2"></div><div class="ctl"><label for="qv-c">Highlighted period</label><select id="qv-c"><option value="none" selected>None</option><option value="2008">Sep 2008 – Mar 2009</option><option value="2020">Feb – Apr 2020</option></select></div><button class="btn play" id="qv-play" type="button"></button></div><div class="charts "><div class="chart" id="qv-grid"></div><div class="chart" id="qv-sp"></div></div><ul class="out" id="qv-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> What happens to Σ|ΔW|^p as the grid gets finer, for p below 2, equal to 2 and above 2?</div>
-  <details><summary>Answer</summary><p>The mean of the sum is n^(1−p/2)·E|Z|^p. For p < 2 the sum grows without bound (the total variation, p = 1, reaches 205 with 65,536 intervals), for p = 2 it tends to T = 1 (1.006 on the finest grid), and for p > 2 it tends to zero. Only the exponent 2 gives a non-degenerate limit, hence (dW)² = dt.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For standard Brownian motion on [0, 1], set p = 1.5. If the number of equal intervals increases fourfold, by what factor does the mean of Σ|ΔW|^1.5 change?</div>
+  <details><summary>Answer</summary><p>By √2 ≈ 1.41. The mean is n^(1 − p/2)·E|Z|^p, where Z has the standard Normal distribution; for p = 1.5, the factor is 4^0.25 = √2. A factor of 4 ignores the shrinking increments; 1/√2 reverses the direction of the change. This relation concerns the mean, not an exact equality for every path: on the path of the page, the sum goes from 9.75 with 16,384 intervals to 13.83 with 65,536 intervals (ratio 1.42). Only the exponent 2 gives a non-degenerate limit: Σ(ΔW)² tends to T = 1 (1.006 on the finest grid), hence (dW)² = dt.</p></details>
 </section><h2 class="sec" id="s-gbm">Geometric Brownian Motion</h2>
 <section class="blk" id="drift-precision">
   <h3>How Precisely Can We Estimate the Drift?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=20" target="_blank" rel="noopener"><img src="slides/ch11_drift_precision_en.jpg" alt="Slide 19: How Precisely Can We Estimate the Drift?" loading="lazy"></a>
-      <figcaption>Slide 19</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=21" target="_blank" rel="noopener"><img src="slides/ch11_drift_precision_en.jpg" alt="Slide 20: How Precisely Can We Estimate the Drift?" loading="lazy"></a>
+      <figcaption>Slide 20</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="dp-w">Rolling window (years): <b id="dp-w-v"></b></label><input type="range" id="dp-w" min="1" max="20" step="1" value="10"></div><button class="btn play" id="dp-play" type="button"></button></div><div class="charts "><div class="chart" id="dp-ci"></div><div class="chart" id="dp-roll"></div></div><ul class="out" id="dp-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> With 10 years of daily data, how precisely is the drift of the S&P 500 estimated?</div>
-  <details><summary>Answer</summary><p>The 95% interval has a half-width of about ±11 percentage points (1.96 standard errors; the standard error σ/√T is 5.7 points), however fine the grid: the 2,520 daily returns do not reduce it. On 10-year windows the log drift ranges from −6.0% (2009-03) to 15.8% (2000-09); with this precision the swings cannot be safely attributed to changes in the drift; a precision of ±1 point would need 1,243 years of data.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Compare two GBM models with constant parameters: the first has σ = 20% and 10 years of data; the second has σ = 40% and 40 years of data. How does the half-width of the 95% interval for the log drift change from the first to the second?</div>
+  <details><summary>Answer</summary><p>It stays the same. The half-width is 1.96σ/√T: approximately 12.4 percentage points in both cases. Doubling volatility exactly offsets the halving of 1/√T. ‘It halves’ ignores the volatility change; ‘it doubles’ ignores the observation span. For the S&P 500 (σ = 18%), 10 years of data give ±11.2 percentage points, however fine the grid: the 2,520 daily returns do not reduce this half-width. On 10-year windows the log drift ranges from −6.0% (2009-03) to 15.8% (2000-09); with this precision the swings cannot be safely attributed to changes in the drift.</p></details>
 </section>
 <section class="blk" id="gbm-vs-data">
   <h3>Does GBM Fit the S&P 500?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=22" target="_blank" rel="noopener"><img src="slides/ch11_gbm_vs_data_en.jpg" alt="Slide 21: Does GBM Fit the S&P 500?" loading="lazy"></a>
-      <figcaption>Slide 21</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch11_gbm_vs_data_en.jpg" alt="Slide 22: Does GBM Fit the S&P 500?" loading="lazy"></a>
+      <figcaption>Slide 22</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="gd-k">Threshold k (standard deviations): <b id="gd-k-v"></b></label><input type="range" id="gd-k" min="2" max="6" step="0.25" value="4"></div><div class="ctl"><label for="gd-s">Series for the ACF</label><select id="gd-s"><option value="abs" selected>|r|</option><option value="sq">r²</option><option value="raw">r</option></select></div><button class="btn play" id="gd-play" type="button"></button></div><div class="charts "><div class="chart" id="gd-qq"></div><div class="chart" id="gd-acf"></div></div><ul class="out" id="gd-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> How many days beyond ±4 standard deviations should appear in 9,245 days if returns had the Normal distribution?</div>
@@ -78,8 +78,8 @@
 <section class="blk" id="vasicek">
   <h3>Vasicek on the 3-Month Treasury Bill Rate</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=27" target="_blank" rel="noopener"><img src="slides/ch11_vasicek_en.jpg" alt="Slide 26: Vasicek on the 3-Month Treasury Bill Rate" loading="lazy"></a>
-      <figcaption>Slide 26</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch11_vasicek_en.jpg" alt="Slide 27: Vasicek on the 3-Month Treasury Bill Rate" loading="lazy"></a>
+      <figcaption>Slide 27</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="va-a">Sample start: <b id="va-a-v"></b></label><input type="range" id="va-a" min="1954" max="2021" step="1" value="1954"></div><div class="ctl"><label for="va-b">Sample end: <b id="va-b-v"></b></label><input type="range" id="va-b" min="1959" max="2026" step="1" value="2026"></div><button class="btn play" id="va-play" type="button"></button></div><div class="charts "><div class="chart" id="va-rate"></div><div class="chart" id="va-k"></div></div><ul class="out" id="va-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Does a positive κ̂ over 1954–2026 show that the short rate is mean-reverting?</div>
@@ -88,42 +88,42 @@
 <section class="blk" id="merton-density">
   <h3>Merton Fit to the Return Distribution</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch11_merton_density_en.jpg" alt="Slide 43: Merton Fit to the Return Distribution" loading="lazy"></a>
-      <figcaption>Slide 43</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch11_merton_density_en.jpg" alt="Slide 44: Merton Fit to the Return Distribution" loading="lazy"></a>
+      <figcaption>Slide 44</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="mj-l">Jump intensity λ: <b id="mj-l-v"></b></label><input type="range" id="mj-l" min="0" max="1.15" step="0.05" value="1"></div><button class="btn play" id="mj-play" type="button"></button></div><div class="charts "><div class="chart" id="mj-sp"></div><div class="chart" id="mj-btc"></div></div><ul class="out" id="mj-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> The Merton model fitted to the S&P 500 has about 102 jumps a year. Are these crashes?</div>
-  <details><summary>Answer</summary><p>No. The jumps are small (standard deviation 1.44%) and account for 71% of the variance; the model uses them to mimic changing volatility. The implied excess kurtosis is 3.7 against 10.9 in the data, and the most extreme days stay beyond both curves. The jumps still improve the fit: with λ = 0 the S&P 500 log-likelihood falls from 29,500 to 28,291.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> In the Merton model, λ = 102 jumps per year. With 252 trading days per year, what is the probability of at least one jump in a day?</div>
+  <details><summary>Answer</summary><p>About 33.3%. The daily jump count has a Poisson distribution with mean 102/252 = 0.405; the required probability is 1 − exp(−102/252) ≈ 33.3%. The value 40.5% confuses the expected jump count with the probability of at least one jump; 66.7% is the probability of no jump. A model jump is not automatically a crash: the estimated standard deviation of jump size is 1.44%. The jumps account for 71% of the variance and fit the shape of the marginal distribution; they do not reproduce volatility clustering. The implied excess kurtosis is 3.7 against 10.9 in the data. At λ = 0, preserving the fitted Merton model’s mean and variance, the S&P 500 log-likelihood is 28,291, against 29,500 at the MLE; for a separately refitted GBM, it is 28,300.</p></details>
 </section><h2 class="sec" id="s-cmp">Models against the Data</h2>
 <section class="blk" id="models-vs-data">
   <h3>Which Model Reproduces the S&P 500?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=53" target="_blank" rel="noopener"><img src="slides/ch11_models_vs_data_en.jpg" alt="Slide 52: Which Model Reproduces the S&P 500?" loading="lazy"></a>
-      <figcaption>Slide 52</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=54" target="_blank" rel="noopener"><img src="slides/ch11_models_vs_data_en.jpg" alt="Slide 53: Which Model Reproduces the S&P 500?" loading="lazy"></a>
+      <figcaption>Slide 53</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="mv-k">Simulations included: <b id="mv-k-v"></b></label><input type="range" id="mv-k" min="1" max="100" step="1" value="100"></div><div class="ctl"><label for="mv-m">Individual simulations</label><select id="mv-m"><option value="none" selected>Hidden</option><option value="GBM">GBM</option><option value="Merton">Merton</option><option value="Heston">Heston</option></select></div><button class="btn play" id="mv-play" type="button"></button></div><div class="charts three"><div class="chart" id="mv-acf"></div><div class="chart" id="mv-ku"></div><div class="chart" id="mv-hi"></div></div><ul class="out" id="mv-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Which of the three models reproduces the volatility clustering of the S&P 500?</div>
-  <details><summary>Answer</summary><p>Only Heston, with the VIX-based parameters: its simulated ACF of |r| follows the data, while GBM and Merton give autocorrelations around zero: Poisson jumps are independent over time, so Merton’s fat tails do not cluster. Merton matches the Hill statistic (2.70 against 2.56) and the skewness (−0.32 against −0.36). Heston, simulated with 390 steps per day, gives a skewness of −0.21. No model reaches the excess kurtosis of the data, 10.88.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Randomly permute the returns within each Heston simulation, keeping every value. What typically happens to the lag-1 ACF of |r|?</div>
+  <details><summary>Answer</summary><p>It moves close to zero. Permutation destroys the time ordering responsible for volatility clustering, so the ACF moves close to zero, with sampling fluctuations, as for GBM and Merton. The value 0.28 (the Heston median without permutation, against 0.27 in the data) incorrectly assumes that preserving the empirical distribution also preserves temporal dependence. The excess kurtosis of each simulation remains unchanged. Merton matches the Hill statistic (2.70 against 2.56) and the skewness (−0.32 against −0.36). With these parameters, none of the 100 simulations of the three models reaches the excess kurtosis of the data, 10.88.</p></details>
 </section><h2 class="sec" id="s-rough">Case Studies: Rough and Persistent Volatility, Drift Bursts</h2>
 <section class="blk" id="rough-volatility">
   <h3>Case Study: Replication on SPY, Δ = 1 Day</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=60" target="_blank" rel="noopener"><img src="slides/ch11_case_rough_spy_en.jpg" alt="Slide 59: Case Study: Replication on SPY, Δ = 1 Day" loading="lazy"></a>
-      <figcaption>Slide 59</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=61" target="_blank" rel="noopener"><img src="slides/ch11_case_rough_spy_en.jpg" alt="Slide 60: Case Study: Replication on SPY, Δ = 1 Day" loading="lazy"></a>
+      <figcaption>Slide 60</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ro-m">Lags for OLS, k = 1..m: <b id="ro-m-v"></b></label><input type="range" id="ro-m" min="2" max="30" step="1" value="6"></div><div class="ctl"><label for="ro-H">Lags for the ACF fit, h = 1..H: <b id="ro-H-v"></b></label><input type="range" id="ro-H" min="4" max="60" step="1" value="12"></div><button class="btn play" id="ro-play" type="button"></button></div><div class="charts "><div class="chart" id="ro-vg"></div><div class="chart" id="ro-acf"></div></div><ul class="out" id="ro-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Fitted on the first 12 lags, can a short-memory OU process reproduce the autocorrelation of SPY log-volatility at lag 100?</div>
-  <details><summary>Answer</summary><p>No. Fitted on the first 12 lags, OU has a half-life of 11 days; 100 days are about 9 half-lives, so the implied autocorrelation at lag 100 is 0.002, against 0.13 in the data. The Cauchy class gives β̂ = 0.26 and β̂* = 0.24, both below 1, consistent with long memory; the variogram gives α̂ = −0.32 (OLS) and −0.35 (NLLS), a path rougher than Brownian motion. With ▶, the fit on 60 lags gives a half-life of 36 days and an OU autocorrelation of 0.149 at lag 100, but the fitted curve gives 0.48 at lag 1 against 0.73 in the data: a single exponential cannot follow both the fast decay at the first lags and the slow tail.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Extend the fit of the plotted exponential curve from the first 12 lags to the first 60. What trade-off appears in its agreement with the empirical ACF?</div>
+  <details><summary>Answer</summary><p>The fit improves at lag 100 but worsens at lag 1. For the plotted curve, A·exp(−κh), the lag-100 value rises from about 0.0014 to 0.073, moving closer to the empirical value of 0.13; at lag 1 it falls from about 0.661 to 0.484, moving away from the empirical value of about 0.73. Fitting more lags does not guarantee improvement at every lag: a single exponential cannot follow both the fast decay at the first lags and the slow tail. The normalized OU benchmark, exp(−κh), is distinct: with the slope fitted over 12 lags (half-life 11 days) it gives 0.002 at lag 100, and with the slope fitted over 60 lags (36 days) it gives 0.149. The Cauchy class gives β̂ = 0.26 and β̂* = 0.24, both below 1, consistent with long memory; the variogram gives α̂ = −0.32 (OLS) and −0.35 (NLLS), a path rougher than Brownian motion.</p></details>
 </section>
 <section class="blk" id="drift-burst">
   <h3>Second Case Study (2/6): Drift Bursts in SPY, 5-Minute Bars</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=63" target="_blank" rel="noopener"><img src="slides/ch11_case_drift_burst_en.jpg" alt="Slide 62: Second Case Study (2/6): Drift Bursts in SPY, 5-Minute Bars" loading="lazy"></a>
-      <figcaption>Slide 62</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter11_continuous_time.pdf#page=64" target="_blank" rel="noopener"><img src="slides/ch11_case_drift_burst_en.jpg" alt="Slide 63: Second Case Study (2/6): Drift Bursts in SPY, 5-Minute Bars" loading="lazy"></a>
+      <figcaption>Slide 63</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="db-h">Drift bandwidth h (minutes): <b id="db-h-v"></b></label><input type="range" id="db-h" min="5" max="60" step="5" value="15"></div><div class="ctl"><label for="db-d">Day on the left</label><select id="db-d"><option value="2023-12-20" selected>2023-12-20</option><option value="2021-06-14">2021-06-14</option><option value="2024-04-04">2024-04-04</option><option value="2024-05-31">2024-05-31</option><option value="2025-05-21">2025-05-21</option><option value="2021-11-22">2021-11-22</option><option value="2024-09-30">2024-09-30</option><option value="2025-10-15">2025-10-15</option><option value="2025-10-14">2025-10-14</option><option value="2023-06-12">2023-06-12</option></select></div><button class="btn play" id="db-play" type="button"></button></div><div class="charts three"><div class="chart" id="db-day"></div><div class="chart" id="db-cnt"></div><div class="chart" id="db-rev"></div></div><ul class="out" id="db-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Of the 109 days with max |T_t| > 2.91, how many are drift bursts?</div>
-  <details><summary>Answer</summary><p>The procedure does not answer this. Under the random-sign null, which keeps the absolute returns but removes the drift, jump asymmetry and leverage, 73.84 such days are expected on average (at most 100 in 200 replications). The excess of 35.16 days is descriptive and does not estimate the number of true drift bursts; nor is 5% the share of false alarms among the flagged days: it is the probability that a day without drift exceeds the threshold. The reversal, present on 65% of the 80 days with a full window after the peak, is descriptive too: the peak is chosen in hindsight, and under the null with the same selection the share is 56.5% on average; the slope is only 0.03, and on E-mini S&P 500 trades the paper finds −0.26.</p></details>
+  <details><summary>Answer</summary><p>This procedure does not identify the number of true drift bursts. The 109 days are candidates; 109 − 73.84 = 35.16 is a descriptive excess over the random-sign null, which keeps the absolute returns but removes the drift, jump asymmetry and leverage. The threshold is calibrated for approximately 5% daily-maximum exceedances under this null, not for 5% false alarms among selected days or for every process without drift bursts. None of the 200 replications reaches 109 days (the maximum is 100); the Monte Carlo p-value is about 0.005. This result does not identify the mechanism producing the excess. The reversal, present on 65% of the 80 days with a full window after the peak, is descriptive too: the peak is chosen in hindsight, and under the null with the same selection the share is 56.5% on average; the slope is only 0.03, and on E-mini S&P 500 trades the paper finds −0.26.</p></details>
 </section>
 <p class="src foot">Daily log returns up to 18 September 2026: S&amp;P 500 (from 1990) and Bitcoin (from 2014), EODHD prices. 3-month US Treasury bill rate: FRED, series DTB3, 1954–2026. Case studies: SPY 5-minute bars, EODHD, October 2020 – September 2026. The simulations (random walk, Brownian motion, GBM, Merton, Heston) use the same seeds as the charts of the lecture.</p>
 </main>

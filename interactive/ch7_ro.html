@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch7_data.js?v=20261030a"></script>
-<script src="ch7_text_ro.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch7.js?v=20261030a" defer></script>
+<script src="ch7_data.js?v=20261030b"></script>
+<script src="ch7_text_ro.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch7.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,58 +38,58 @@
 <section class="blk" id="loss-distribution">
   <h3>VaR și ES pentru S&P 500</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=9" target="_blank" rel="noopener"><img src="slides/ch7_loss_distribution_ro.jpg" alt="Slide-ul 8: VaR și ES pentru S&P 500" loading="lazy"></a>
-      <figcaption>Slide-ul 8</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=10" target="_blank" rel="noopener"><img src="slides/ch7_loss_distribution_ro.jpg" alt="Slide-ul 9: VaR și ES pentru S&P 500" loading="lazy"></a>
+      <figcaption>Slide-ul 9</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ld-a">Nivelul α: <b id="ld-a-v"></b></label><input type="range" id="ld-a" min="0" max="10" step="1" value="6"></div><button class="btn play" id="ld-play" type="button"></button></div><div class="charts "><div class="chart" id="ld-dist"></div><div class="chart" id="ld-tail"></div></div><ul class="out" id="ld-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> VaR 1% istoric al S&P 500 este 3,45%. Cît este ES 1%, pierderea medie în cel mai rău 1% dintre zile?</div>
-  <details><summary>Răspuns</summary><p>5,03%. Pragul VaR a fost depășit în 68 din 6 717 zile (1,01%), iar ES 1% este media celor mai mari nα = 67,17 pierderi, ultima cu ponderea 0,17. Distribuția Normală cu aceeași medie și abatere standard dă VaR 1% de 2,80% și ES 1% de 3,21%: cozile ei sînt prea subțiri.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Mărim cu 1 pp fiecare dintre cele mai mari zece pierderi ale S&P 500, celelalte observații rămînînd neschimbate. Ce se întîmplă cu VaR 1% și ES 1% istorice?</div>
+  <details><summary>Răspuns</summary><p>VaR rămîne 3,45%, iar ES crește de la 5,03% la circa 5,18%. Cele zece pierderi modificate sînt deasupra observațiilor care determină cuantila, deci VaR nu se schimbă. ES 1% este media celor mai mari nα = 67,17 pierderi (ultima cu ponderea 0,17); toate cele zece intră cu ponderea 1, deci ES crește cu 10/67,17 ≈ 0,15 pp. VaR localizează pragul; ES ține cont și de severitatea pierderilor de dincolo de el. Distribuția Normală cu aceeași medie și abatere standard dă VaR 1% de 2,80% și ES 1% de 3,21%.</p></details>
 </section><h2 class="sec" id="s-coh">Măsuri de risc coerente</h2>
 <section class="blk" id="subadditivity">
   <h3>Subaditivitatea: încălcată de VaR, respectată de ES</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=17" target="_blank" rel="noopener"><img src="slides/ch7_subadditivity_ro.jpg" alt="Slide-ul 16: Subaditivitatea: încălcată de VaR, respectată de ES" loading="lazy"></a>
-      <figcaption>Slide-ul 16</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=18" target="_blank" rel="noopener"><img src="slides/ch7_subadditivity_ro.jpg" alt="Slide-ul 17: Subaditivitatea: încălcată de VaR, respectată de ES" loading="lazy"></a>
+      <figcaption>Slide-ul 17</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="sa-p">Probabilitatea de default a fiecărei obligațiuni: <b id="sa-p-v"></b></label><input type="range" id="sa-p" min="0.1" max="2" step="0.1" value="0.9"></div><button class="btn play" id="sa-play" type="button"></button></div><div class="charts "><div class="chart" id="sa-chart"></div></div><ul class="out" id="sa-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Fiecare obligațiune are VaR 1% egal cu 0. De ce portofoliul format din cele două are VaR 1% egal cu 100?</div>
-  <details><summary>Răspuns</summary><p>Probabilitatea de default a fiecărei obligațiuni, 0,9%, este sub nivelul de 1%, deci VaR individual este 0. Probabilitatea ca cel puțin una să intre în default este 1,79%, peste 1%, deci VaR-ul portofoliului este 100 > 0 + 0. ES este subaditiv: 100,8 pentru portofoliu, față de 90 + 90 = 180. VaR încalcă subaditivitatea doar cînd probabilitatea de default este între circa 0,5% și 1%.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Păstrăm cele două obligațiuni independente, cu pierderea 100 la fiecare default. Dacă probabilitatea de default a fiecăreia crește de la 0,9% la 1,1%, cît devine VaR 1% al portofoliului?</div>
+  <details><summary>Răspuns</summary><p>100. Probabilitatea ca cel puțin una să intre în default devine 2,19%, peste 1%, dar probabilitatea a două defaulturi este doar 0,012%, sub 1%; VaR 1% al portofoliului rămîne 100. Fiecare VaR individual devine 100, deci suma lor este 200 ≥ 100 și subaditivitatea este respectată: 200 este suma VaR-urilor individuale, nu VaR-ul portofoliului, iar 0 era VaR-ul individual la 0,9%. La 0,9% (slide-ul), probabilitatea cel puțin unui default este 1,79%, iar VaR-ul portofoliului, 100, depășește suma 0 + 0. În acest exemplu, VaR încalcă subaditivitatea doar cînd probabilitatea de default este între circa 0,5% și 1%. ES este subaditiv: la 0,9%, 100,8 pentru portofoliu, față de 90 + 90 = 180.</p></details>
 </section><h2 class="sec" id="s-est">Metode de estimare</h2>
 <section class="blk" id="var-levels">
   <h3>Cinci metode la diferite niveluri de risc</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch7_var_levels_ro.jpg" alt="Slide-ul 22: Cinci metode la diferite niveluri de risc" loading="lazy"></a>
-      <figcaption>Slide-ul 22</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch7_var_levels_ro.jpg" alt="Slide-ul 23: Cinci metode la diferite niveluri de risc" loading="lazy"></a>
+      <figcaption>Slide-ul 23</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="vl-a">Nivelul α (cursorul): <b id="vl-a-v"></b></label><input type="range" id="vl-a" min="0" max="54" step="1" value="54"></div><button class="btn play" id="vl-play" type="button"></button></div><div class="charts "><div class="chart" id="vl-var"></div><div class="chart" id="vl-es"></div></div><ul class="out" id="vl-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La ce nivel α diferă cel mai mult cele cinci metode?</div>
-  <details><summary>Răspuns</summary><p>În extremitatea cozii. La α = 0,1%, VaR este 7,22% istoric, 7,04% cu EVT, 8,58% cu Student-t și 15,06% cu Cornish–Fisher, iar distribuția Normală dă doar 3,72%. La α = 5%, toate cele cinci valori sînt între 1,67% și 1,97%.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Unde este mai mare diferența dintre cel mai mare și cel mai mic VaR estimat de cele cinci metode: la α = 5% sau la α = 0,1%?</div>
+  <details><summary>Răspuns</summary><p>La α = 0,1%: diferența este 11,34 pp (Cornish–Fisher 15,06% minus distribuția Normală 3,72%), față de 0,30 pp la α = 5%, unde toate cele cinci valori sînt între 1,67% și 1,97%. La α = 0,1%, VaR este 7,22% istoric, 7,04% cu EVT și 8,58% cu Student-t. Acolo unde datele sînt puține, ipotezele despre coadă decid estimarea: aceeași țintă statistică nu obligă modele diferite să dea valori apropiate.</p></details>
 </section><h2 class="sec" id="s-prec">Precizia estimărilor VaR și ES</h2>
 <section class="blk" id="precision">
   <h3>Precizia pentru S&P 500</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=27" target="_blank" rel="noopener"><img src="slides/ch7_precision_ro.jpg" alt="Slide-ul 26: Precizia pentru S&P 500" loading="lazy"></a>
-      <figcaption>Slide-ul 26</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch7_precision_ro.jpg" alt="Slide-ul 27: Precizia pentru S&P 500" loading="lazy"></a>
+      <figcaption>Slide-ul 27</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="pr-n">Ultimele n zile (rîndurile 2 și 4): <b id="pr-n-v"></b></label><input type="range" id="pr-n" min="0" max="7" step="1" value="1"></div><button class="btn play" id="pr-play" type="button"></button></div><div class="charts "><div class="chart" id="pr-chart"></div></div><ul class="out" id="pr-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe cîte pierderi se sprijină ES 2,5% estimat pe ultimele 500 de zile și cît de lat este intervalul lui de 95%?</div>
-  <details><summary>Răspuns</summary><p>Pe nα = 12,5 pierderi: cele mai mari 12 cu ponderea 1 și a 13-a cu ponderea 0,5. Intervalul HAC are lățimea de 2,55 pp, iar cel bootstrap pe blocuri 2,42 pp. Pe selecția 2000–2026, volatility clustering lărgește intervalul ES de la 0,60 pp (i.i.d.) la 1,00 pp (HAC), iar bootstrap-ul de la 0,62 pp la 1,17 pp.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În ES 2,5% istoric calculat pe ultimele 500 de zile, ce observații intră în media cozii?</div>
+  <details><summary>Răspuns</summary><p>Masa cozii este 500 × 0,025 = 12,5 observații: adunăm cele mai mari 12 pierderi și 0,5 din a 13-a, apoi împărțim la 12,5. Cu 13 ponderi egale, nivelul efectiv al cozii devine 13/500 = 2,6%. Intervalul HAC de 95% al acestui ES are lățimea de 2,55 pp, iar cel bootstrap pe blocuri 2,42 pp. Pe selecția 2000–2026, volatility clustering lărgește intervalul ES de la 0,60 pp (i.i.d.) la 1,00 pp (HAC), iar bootstrap-ul de la 0,62 pp la 1,17 pp.</p></details>
 </section><h2 class="sec" id="s-cond">VaR și ES condiționate</h2>
 <section class="blk" id="hs-fhs">
   <h3>Simularea istorică și simularea istorică filtrată: S&P 500</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch7_hs_fhs_sp500_ro.jpg" alt="Slide-ul 31: Simularea istorică și simularea istorică filtrată: S&P 500" loading="lazy"></a>
-      <figcaption>Slide-ul 31</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch7_hs_fhs_sp500_ro.jpg" alt="Slide-ul 32: Simularea istorică și simularea istorică filtrată: S&P 500" loading="lazy"></a>
+      <figcaption>Slide-ul 32</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="hf-a">Nivelul VaR</label><select id="hf-a"><option value="0.05">5%</option><option value="0.025">2,5%</option><option value="0.01" selected>1%</option><option value="0.005">0,5%</option><option value="0.0025">0,25%</option><option value="0.001">0,1%</option></select></div><div class="ctl"><label for="hf-w">Fereastra simulării istorice (zile)</label><select id="hf-w"><option value="250">250</option><option value="500" selected>500</option><option value="1000">1000</option></select></div><div class="ctl"><label for="hf-t">Pînă la data: <b id="hf-t-v"></b></label><input type="range" id="hf-t" min="0" max="5209" step="1" value="5209"></div><button class="btn play" id="hf-play" type="button"></button></div><div class="charts "><div class="chart" id="hf-chart"></div></div><ul class="out" id="hf-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În 2006–2026, care metodă se apropie mai mult de ținta de 1% a depășirilor VaR 1%?</div>
-  <details><summary>Răspuns</summary><p>FHS, cu 1,54% (80 din 5 210 zile), față de 1,67% pentru simularea istorică pe 500 de zile și 2,34% pentru GARCH cu șocuri Normale. Depășirile simulării istorice apar în grupuri, în 2008 și 2020, pentru că fereastra reacționează cu luni de întîrziere.</p></details>
+  <details><summary>Răspuns</summary><p>FHS este cea mai apropiată de ținta de 1%: 80 din 5 210 zile, adică 1,54%, față de 1,67% pentru simularea istorică pe 500 de zile și 2,34% pentru GARCH cu șocuri Normale. Fereastra istorică se actualizează zilnic, dar dă ponderi egale observațiilor din regimuri de volatilitate diferite și se poate adapta lent; depășirile ei apar în grupuri, în 2008 și 2020. Apropierea frecvenței de 1% nu verifică singură independența depășirilor.</p></details>
 </section>
 <section class="blk" id="caviar">
   <h3>CAViaR față de simularea istorică filtrată out-of-sample</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch7_caviar_ro.jpg" alt="Slide-ul 34: CAViaR față de simularea istorică filtrată out-of-sample" loading="lazy"></a>
-      <figcaption>Slide-ul 34</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=36" target="_blank" rel="noopener"><img src="slides/ch7_caviar_ro.jpg" alt="Slide-ul 35: CAViaR față de simularea istorică filtrată out-of-sample" loading="lazy"></a>
+      <figcaption>Slide-ul 35</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cv-b1">Persistența β₁: <b id="cv-b1-v"></b></label><input type="range" id="cv-b1" min="0.7" max="0.98" step="0.001" value="0.897"></div><div class="ctl"><label for="cv-b2">Reacția β₂ la |r| de ieri: <b id="cv-b2-v"></b></label><input type="range" id="cv-b2" min="0.05" max="0.6" step="0.001" value="0.246"></div><button class="btn play" id="cv-play" type="button"></button></div><div class="charts "><div class="chart" id="cv-chart"></div></div><ul class="out" id="cv-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> După un șoc, în cîte zile se înjumătățește efectul lui asupra VaR CAViaR estimat?</div>
@@ -98,78 +98,78 @@
 <section class="blk" id="gev">
   <h3>Maximele lunare ale pierderilor S&P 500</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch7_gev_ro.jpg" alt="Slide-ul 36: Maximele lunare ale pierderilor S&P 500" loading="lazy"></a>
-      <figcaption>Slide-ul 36</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=38" target="_blank" rel="noopener"><img src="slides/ch7_gev_ro.jpg" alt="Slide-ul 37: Maximele lunare ale pierderilor S&P 500" loading="lazy"></a>
+      <figcaption>Slide-ul 37</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="gv-b">Blocul</label><select id="gv-b"><option value="week">săptămînă</option><option value="month" selected>lună calendaristică (slide-ul)</option><option value="quarter">trimestru</option><option value="half">semestru</option><option value="year">an</option></select></div><div class="ctl"><label for="gv-y">Perioada de revenire (ani): <b id="gv-y-v"></b></label><input type="range" id="gv-y" min="2" max="50" step="1" value="10"></div><button class="btn play" id="gv-play" type="button"></button></div><div class="charts "><div class="chart" id="gv-chart"></div></div><ul class="out" id="gv-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît de mare este pierderea zilnică pe care S&P 500 o depășește, în medie, o dată la zece ani?</div>
-  <details><summary>Răspuns</summary><p>8,09%, nivelul de revenire la 10 ani (120 de luni) al distribuției GEV estimate pe maximele lunare, cu ξ = 0,22. Patru dintre cele 321 de maxime lunare îl depășesc, iar cel mai mare maxim lunar observat este 12,77%.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce probabilitate atribuie GEV estimată pe maximele lunare evenimentului ca maximul unei luni să depășească nivelul de revenire la zece ani?</div>
+  <details><summary>Răspuns</summary><p>1/120 ≈ 0,83%. Blocurile sînt luni, deci zece ani înseamnă 120 de blocuri; nivelul de revenire 8,09% (ξ = 0,22) satisface P(maximul lunar > 8,09%) = 1/120 în modelul estimat. 1/10 confundă anii cu blocurile; 1/2 520 tratează zilele (252 pe an) drept blocuri. Nivelul nu înseamnă că depășirile apar periodic, iar o lună cu depășire poate avea mai multe zile peste prag. Patru dintre cele 321 de maxime lunare îl depășesc; cel mai mare maxim lunar observat este 12,77%.</p></details>
 </section>
 <section class="blk" id="mean-excess">
   <h3>Graficul excesului mediu: S&P 500</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=43" target="_blank" rel="noopener"><img src="slides/ch7_mean_excess_ro.jpg" alt="Slide-ul 42: Graficul excesului mediu: S&P 500" loading="lazy"></a>
-      <figcaption>Slide-ul 42</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch7_mean_excess_ro.jpg" alt="Slide-ul 43: Graficul excesului mediu: S&P 500" loading="lazy"></a>
+      <figcaption>Slide-ul 43</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="me-k">Pragul: cele mai mari pierderi: <b id="me-k-v"></b></label><input type="range" id="me-k" min="0" max="10" step="1" value="4"></div><button class="btn play" id="me-play" type="button"></button></div><div class="charts "><div class="chart" id="me-chart"></div></div><ul class="out" id="me-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> De ce crește excesul mediu odată cu pragul?</div>
-  <details><summary>Răspuns</summary><p>Pentru că coada este grea: pentru o GPD cu ξ > 0, e(u) este liniară, cu panta ξ/(1 − ξ) = 0,23. La pragul u₀ = 1,85% (cele mai mari 5% dintre pierderi, 336 de depășiri), excesul mediu empiric este 1,09%, iar GPD dă 1,11%. Pentru o coadă exponențială, graficul ar fi orizontal.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce concluzie susține o porțiune aproximativ liniară și crescătoare a graficului excesului mediu?</div>
+  <details><summary>Răspuns</summary><p>Este compatibilă cu o coadă GPD cu 0 < ξ < 1: atunci excesul mediu este finit și liniar în prag, cu panta ξ/(1 − ξ) > 0; la ξ ≥ 1, excesul mediu teoretic este infinit. Estimarea curentă dă ξ = 0,19 și panta 0,23. La pragul u₀ = 1,85% (cele mai mari 5% dintre pierderi, 336 de depășiri), excesul mediu empiric este 1,09%, iar GPD dă 1,11%. Graficul susține această aproximație, dar nu o dovedește; alegerea pragului cere și verificarea stabilității parametrilor. Pentru o coadă exponențială, graficul ar fi orizontal.</p></details>
 </section>
 <section class="blk" id="gpd-tail">
   <h3>Cozi GPD: S&P 500 și Bitcoin</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch7_gpd_tail_ro.jpg" alt="Slide-ul 43: Cozi GPD: S&P 500 și Bitcoin" loading="lazy"></a>
-      <figcaption>Slide-ul 43</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch7_gpd_tail_ro.jpg" alt="Slide-ul 44: Cozi GPD: S&P 500 și Bitcoin" loading="lazy"></a>
+      <figcaption>Slide-ul 44</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="gt-k">Pragul: cele mai mari pierderi: <b id="gt-k-v"></b></label><input type="range" id="gt-k" min="0" max="10" step="1" value="4"></div><button class="btn play" id="gt-play" type="button"></button></div><div class="charts "><div class="chart" id="gt-sp500"></div><div class="chart" id="gt-btc"></div></div><ul class="out" id="gt-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care serie are coada mai grea, S&P 500 sau Bitcoin?</div>
-  <details><summary>Răspuns</summary><p>Estimările formei sînt apropiate: ξ = 0,19 (SE 0,065) pentru S&P 500 și ξ = 0,16 (SE 0,078) pentru Bitcoin, deci diferența nu este semnificativă. Bitcoin are însă o scală mult mai mare: VaR 1% din GPD este 10,23%, față de 3,54% pentru S&P 500.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> VaR 1% din GPD este 10,23% pentru Bitcoin și 3,54% pentru S&P 500. Este suficient pentru a afirma că Bitcoin are parametrul de formă ξ mai mare?</div>
+  <details><summary>Răspuns</summary><p>Nu: VaR depinde de prag, de scală și de formă. Estimările formei sînt ξ = 0,16 (SE 0,078) pentru Bitcoin și ξ = 0,19 (SE 0,065) pentru S&P 500; diferența mare de VaR vine din scala mult mai mare a Bitcoin. Erorile standard individuale presupun depășiri independente, iar pagina nu calculează un test al diferenței dintre cele două ξ; nici estimările apropiate nu demonstrează forme egale. O concluzie inferențială cere incertitudinea diferenței, ținînd cont de dependența datelor.</p></details>
 </section>
 <section class="blk" id="cond-evt">
   <h3>EVT condiționată pentru S&P 500</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch7_cond_evt_ro.jpg" alt="Slide-ul 46: EVT condiționată pentru S&P 500" loading="lazy"></a>
-      <figcaption>Slide-ul 46</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch7_cond_evt_ro.jpg" alt="Slide-ul 47: EVT condiționată pentru S&P 500" loading="lazy"></a>
+      <figcaption>Slide-ul 47</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ce-a">Nivelul VaR α: <b id="ce-a-v"></b></label><input type="range" id="ce-a" min="0" max="5" step="1" value="2"></div><button class="btn play" id="ce-play" type="button"></button></div><div class="charts "><div class="chart" id="ce-chart"></div></div><ul class="out" id="ce-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> GARCH cu șocuri Normale urmărește corect creșterile și scăderile riscului. De ce are totuși prea multe depășiri?</div>
-  <details><summary>Răspuns</summary><p>Pentru că șocurile standardizate au cozi mai grele decît distribuția Normală. În 2018–2026 (2 190 de zile), VaR 1% GARCH-Normal este depășit în 2,42% din zile, EVT condiționată în 1,23%, iar simularea istorică pe 500 de zile în 1,60%. EVT condiționată păstrează dinamica GARCH și corectează nivelul printr-o coadă GPD a reziduurilor.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Păstrăm aceleași prognoze GARCH ale mediei și volatilității. Ce schimbă EVT condiționată față de GARCH cu șocuri Normale?</div>
+  <details><summary>Răspuns</summary><p>Modelul cozii pierderilor standardizate. EVT condiționată păstrează filtrul GARCH și nivelul α, dar înlocuiește coada Normală a șocurilor standardizate cu o aproximație GPD. În 2018–2026 (2 190 de zile, 21,9 depășiri așteptate), frecvența depășirilor VaR 1% scade de la 2,42% (53 de zile) cu GARCH-Normal la 1,23% (27) cu EVT condiționată; simularea istorică pe 500 de zile are 1,60% (35). Comparația singură nu arată că întreaga specificație este corectă.</p></details>
 </section><h2 class="sec" id="s-hor">Orizontul: regula rădăcinii pătrate</h2>
 <section class="blk" id="horizon">
   <h3>Regula rădăcinii pătrate în date</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch7_horizon_ro.jpg" alt="Slide-ul 50: Regula rădăcinii pătrate în date" loading="lazy"></a>
-      <figcaption>Slide-ul 50</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=52" target="_blank" rel="noopener"><img src="slides/ch7_horizon_ro.jpg" alt="Slide-ul 51: Regula rădăcinii pătrate în date" loading="lazy"></a>
+      <figcaption>Slide-ul 51</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="hz-h">Orizontul h (zile): <b id="hz-h-v"></b></label><input type="range" id="hz-h" min="1" max="20" step="1" value="10"></div><button class="btn play" id="hz-play" type="button"></button></div><div class="charts "><div class="chart" id="hz-ratio"></div><div class="chart" id="hz-mc"></div></div><ul class="out" id="hz-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La h = 10 zile, este regula √h prea mică sau prea mare?</div>
-  <details><summary>Răspuns</summary><p>Depinde de serie. Raportul dintre VaR 1% empiric pe 10 zile și √10 × VaR pe o zi este 1,22 pentru BET (autocorelația de ordinul 1: 0,109) și 1,05 pentru EUR/RON, deci regula subestimează riscul. Pentru S&P 500 (0,95), aur (0,92) și Bitcoin (0,89) regula este conservatoare. Pentru S&P 500, Monte Carlo filtrat dă 6,29%, față de 6,22% pentru √10 × VaR filtrat pe o zi.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru BET, raportul dintre VaR 1% empiric pe 10 zile și √10 × VaR pe o zi este 1,22. Dacă randamentele nu ar avea autocorelație, ar deveni regula √h obligatoriu exactă pentru VaR?</div>
+  <details><summary>Răspuns</summary><p>Nu. Fără autocorelație și cu varianța constantă, varianța pe h zile este h ori cea zilnică, dar cuantila sumei depinde și de forma distribuției ei, care se schimbă cu h (cozi groase, volatility clustering). Regula este exactă, de exemplu, pentru pierderi i.i.d. cu distribuția Normală și media zero. În date, raportul la h = 10 este 1,22 pentru BET (autocorelația de ordinul 1: 0,109) și 1,05 pentru EUR/RON, deci regula subestimează riscul; pentru S&P 500 (0,95), aur (0,92) și Bitcoin (0,89) regula este conservatoare. Pentru S&P 500, Monte Carlo filtrat dă 6,29%, față de 6,22% pentru √10 × VaR filtrat pe o zi.</p></details>
 </section><h2 class="sec" id="s-port">VaR de portofoliu și contribuțiile la risc</h2>
 <section class="blk" id="components">
   <h3>Contribuțiile activelor la risc</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=54" target="_blank" rel="noopener"><img src="slides/ch7_components_ro.jpg" alt="Slide-ul 53: Contribuțiile activelor la risc" loading="lazy"></a>
-      <figcaption>Slide-ul 53</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch7_components_ro.jpg" alt="Slide-ul 54: Contribuțiile activelor la risc" loading="lazy"></a>
+      <figcaption>Slide-ul 54</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="pc-w">Ponderea Bitcoin (restul în proporția 40:30:20): <b id="pc-w-v"></b></label><input type="range" id="pc-w" min="0" max="30" step="1" value="10"></div><button class="btn play" id="pc-play" type="button"></button></div><div class="charts "><div class="chart" id="pc-chart"></div></div><ul class="out" id="pc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Bitcoin are 10% din capital. Ce parte din riscul portofoliului îi revine?</div>
-  <details><summary>Răspuns</summary><p>37,8% din VaR 1% (Normal, Euler) și 36,6% din ES 2,5% (istoric). TLT, cu 30% din capital, aduce doar 6,6% din ES. Diversificarea reduce VaR 1% de la 3,11% (suma VaR-urilor individuale) la 1,77%.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> ▶ crește ponderea Bitcoin în capital de la 10% la 30%, restul rămînînd în proporția 40:30:20. Ce se întîmplă cu partea Bitcoin din ES 2,5% istoric?</div>
+  <details><summary>Răspuns</summary><p>Crește de la 36,6% la 87,0%: ponderea în capital se triplează, partea din ES crește de 2,4 ori. Contribuția Euler la ES este ponderea înmulțită cu pierderea medie a Bitcoin în zilele din coada portofoliului, iar aceste zile se schimbă odată cu ponderea; partea din risc nu este ponderea în capital și nu crește proporțional cu ea. La ponderea din slide, 10%, Bitcoin aduce 37,8% din VaR 1% (Normal, Euler) și 36,6% din ES 2,5% (istoric); TLT, cu 30% din capital, aduce doar 6,6% din ES. Diversificarea reduce VaR 1% de la 3,11% (suma VaR-urilor individuale) la 1,77%.</p></details>
 </section><h2 class="sec" id="s-reg">Lichiditate și reglementare</h2>
 <section class="blk" id="basel">
   <h3>VaR 1% față de ES 2,5% pe cinci active</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch7_basel_ro.jpg" alt="Slide-ul 57: VaR 1% față de ES 2,5% pe cinci active" loading="lazy"></a>
-      <figcaption>Slide-ul 57</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=59" target="_blank" rel="noopener"><img src="slides/ch7_basel_ro.jpg" alt="Slide-ul 58: VaR 1% față de ES 2,5% pe cinci active" loading="lazy"></a>
+      <figcaption>Slide-ul 58</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="bs-a">Nivelul ES (VaR rămîne la 1%): <b id="bs-a-v"></b></label><input type="range" id="bs-a" min="1" max="5" step="0.25" value="2.5"></div><button class="btn play" id="bs-play" type="button"></button></div><div class="charts "><div class="chart" id="bs-chart"></div></div><ul class="out" id="bs-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Sub distribuția Normală, ES 2,5% este aproape egal cu VaR 1%. Cît este raportul ES 2,5% / VaR 1% în date?</div>
-  <details><summary>Răspuns</summary><p>Între 1,03 (Bitcoin) și 1,11 (BET): 1,09 pentru S&P 500, 1,10 pentru EUR/RON și 1,06 pentru aur. Sub distribuția Normală, raportul este 2,338/2,326 ≈ 1,005. Trecerea de la VaR 1% la ES 2,5% crește deci măsura pe o zi cu 3–11%.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> ▶ crește nivelul ES de la 2,5% pînă la 5%, cu VaR fixat la 1%. Ce se întîmplă cu rapoartele ES / VaR 1% ale celor cinci active?</div>
+  <details><summary>Răspuns</summary><p>Scad sub 1: la ES 5%, rapoartele sînt între 0,81 (Bitcoin) și 0,86 (S&P 500), iar sub distribuția Normală cu media zero 0,887. ES ≥ VaR doar la același nivel α; ES 5% face media pe cel mai rău 5% dintre zile, o coadă mai puțin extremă decît cea a VaR 1%. La nivelul Basel, ES 2,5%, rapoartele sînt între 1,03 (Bitcoin) și 1,11 (BET): 1,09 pentru S&P 500, 1,10 pentru EUR/RON și 1,06 pentru aur. Reperul Normal cu media zero este φ(z₀,₉₇₅)/(0,025 × z₀,₉₉) = 2,338/2,326 ≈ 1,005; cu o medie nenulă, aceasta intră atît în ES, cît și în VaR, iar raportul se schimbă.</p></details>
 </section><h2 class="sec" id="s-case">Studii de caz: rețele neuronale și forma dinamică a cozii</h2>
 <section class="blk" id="deep-quantile">
   <h3>Studiu de caz: erorile relative, α = 1%</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch7_crk_table6_ro.jpg" alt="Slide-ul 61: Studiu de caz: erorile relative, α = 1%" loading="lazy"></a>
-      <figcaption>Slide-ul 61</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=63" target="_blank" rel="noopener"><img src="slides/ch7_crk_table6_ro.jpg" alt="Slide-ul 62: Studiu de caz: erorile relative, α = 1%" loading="lazy"></a>
+      <figcaption>Slide-ul 62</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ck-s">Setul de predictori: <b id="ck-s-v"></b></label><input type="range" id="ck-s" min="0" max="4" step="1" value="0"></div><button class="btn play" id="ck-play" type="button"></button></div><div class="charts "><div class="chart" id="ck-chart"></div></div><ul class="out" id="ck-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Arată un RMSFE relativ sub 1 că rețelele adînci estimează mai bine cuantila condiționată?</div>
@@ -178,22 +178,22 @@
 <section class="blk" id="tail-shape">
   <h3>Al doilea studiu de caz (2/4): forma și scala cozii S&P 500, 2000–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=65" target="_blank" rel="noopener"><img src="slides/ch7_tailshape_ro.jpg" alt="Slide-ul 64: Al doilea studiu de caz (2/4): forma și scala cozii S&P 500, 2000–2026" loading="lazy"></a>
-      <figcaption>Slide-ul 64</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=66" target="_blank" rel="noopener"><img src="slides/ch7_tailshape_ro.jpg" alt="Slide-ul 65: Al doilea studiu de caz (2/4): forma și scala cozii S&P 500, 2000–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 65</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ts-m">Multiplicatorul pasului a<sub>ξ</sub> al formei (1 = estimarea): <b id="ts-m-v"></b></label><input type="range" id="ts-m" min="0" max="2" step="0.05" value="1"></div><button class="btn play" id="ts-play" type="button"></button></div><div class="charts "><div class="chart" id="ts-risk"></div><div class="chart" id="ts-xi"></div></div><ul class="out" id="ts-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît cîștigă log-verosimilitatea exceselor cînd forma cozii ξ<sub>t</sub> devine dinamică?</div>
-  <details><summary>Răspuns</summary><p>Doar 1,04: −380,85 cu ξ<sub>t</sub> și δ<sub>t</sub> dinamice, față de −381,89 cu ξ constant (0,056) și δ<sub>t</sub> dinamic, pentru doi parametri în plus. AIC este 774 față de 772, deci modelul cu ξ constant este preferat; GPD statică are AIC 853, deci cîștigul vine din scala δ<sub>t</sub>. Cu a<sub>ξ</sub> = 0, ξ<sub>t</sub> rămîne fix la 0,083. VaR 1% filtrat este depășit în 61 din 6 717 zile (0,91%).</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Forma dinamică ξ<sub>t</sub> adaugă 1,04 la log-verosimilitatea exceselor și doi parametri, față de modelul cu ξ constant și scala δ<sub>t</sub> dinamică. Cu cît se schimbă AIC?</div>
+  <details><summary>Răspuns</summary><p>Crește cu circa 1,92: ΔAIC = 2 × 2 − 2 × 1,04 = 1,92, deci AIC dezavantajează modelul cu ξ<sub>t</sub> dinamic (774 față de 772). −2,08 ignoră penalizarea parametrilor; 2,96 omite factorul 2 din termenul log-verosimilității. Log-verosimilitatea este −380,85 cu ξ<sub>t</sub> și δ<sub>t</sub> dinamice, față de −381,89 cu ξ constant (0,056) și δ<sub>t</sub> dinamic. GPD statică are AIC 853, deci scăderea 853 → 774 vine din dinamica scalei δ<sub>t</sub>. Cu a<sub>ξ</sub> = 0, ξ<sub>t</sub> rămîne fix la 0,083. VaR 1% filtrat este depășit în 61 din 6 717 zile (0,91%).</p></details>
 </section><h2 class="sec" id="s-ai">AI pentru descoperire științifică</h2>
 <section class="blk" id="fz0-ranking">
   <h3>Mini-studiu de caz: ordonarea modelelor ES</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=70" target="_blank" rel="noopener"><img src="slides/ch7_ai_fz0_ro.jpg" alt="Slide-ul 69: Mini-studiu de caz: ordonarea modelelor ES" loading="lazy"></a>
-      <figcaption>Slide-ul 69</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol7_var_expected_shortfall.pdf#page=71" target="_blank" rel="noopener"><img src="slides/ch7_ai_fz0_ro.jpg" alt="Slide-ul 70: Mini-studiu de caz: ordonarea modelelor ES" loading="lazy"></a>
+      <figcaption>Slide-ul 70</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ai-y">Ultimul an al primei subperioade: <b id="ai-y-v"></b></label><input type="range" id="ai-y" min="2008" max="2024" step="1" value="2015"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-ci"></div><div class="chart" id="ai-cum"></div></div><ul class="out" id="ai-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Este cîștigul EVT condiționate față de FHS demonstrat după regula pre-înregistrată?</div>
-  <details><summary>Răspuns</summary><p>Nu. Diferența medie a scorurilor FZ0 este semnificativ negativă pe 2006–2026 (t = −2,59) și în 2006–2015 (t = −2,32), dar nu și în 2016–2026 (t = −1,18; intervalul [−0,017; 0,004]). Regula cere semnificație la 5% în ambele jumătăți. FHS față de GARCH–Normal o îndeplinește: t = −3,23 și t = −3,38.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În 2016–2026, intervalul HAC de 95% pentru diferența medie a scorurilor FZ0, EVT condiționată minus FHS, este [−0,017; 0,004]. Ce concluzie permite?</div>
+  <details><summary>Răspuns</summary><p>Nu stabilește nici avantajul EVT, nici echivalența. Intervalul conține zero și diferențe de ambele semne (t = −1,18), deci avantajul EVT condiționate nu este semnificativ în 2016–2026. Regula pre-înregistrată cere t < −1,96 (test bilateral la 5%) în ambele subperioade; în 2006–2015, t = −2,32, iar pe 2006–2026, t = −2,59. Echivalența ar cere o marjă stabilită dinainte și o analiză dedicată. FHS față de GARCH–Normal îndeplinește regula: t = −3,23 și t = −3,38.</p></details>
 </section>
 <p class="src foot">Pierderi zilnice L = −r, în %, pînă la 18 septembrie 2026. S&P 500, BET, Bitcoin, aur (XAU/USD) și ETF-urile SPY, TLT, GLD: prețuri zilnice EODHD; EUR/RON: cursul de referință BNR. Studiile de caz: Tabelul 6 din Chronopoulos, Raftapostolos și Kapetanios (2024), Journal of Financial Econometrics; modelul GPD score-driven din D’Innocenzo, Lucas, Schwaab și Zhang (2024), Journal of Business & Economic Statistics, estimat pe datele cursului.</p>
 </main>

@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch13_feature_importance'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Feature importance for S&P 500 direction models: in-sample MDI of a random forest, out-of-sample MDA (permutation, change in AUC) and mean absolute SHAP values of a gradient boosting model.'
+Description: 'Feature importance for S&P 500 direction models: in-sample MDI of a random forest, out-of-sample MDA (permutation, decrease in AUC) and mean absolute SHAP values of a gradient boosting model.
+
+MDI and MDA describe the same random forest; SHAP describes a separately fitted gradient boosting model. Their scales differ: impurity importance, decrease in ROC AUC (baseline minus permuted), and mean absolute contribution to the predicted probability. Bar lengths across panels are not interchangeable. The plotted MDA values are averages over permutations, without confidence intervals; the sign or size of a mean alone does not establish statistical significance.'
 
 Keywords: 'feature importance, MDI, MDA, permutation importance, SHAP, explainable AI, random forest'
 

@@ -402,7 +402,10 @@ function init() {
   $('ai-b').max = bmax; $('ai-b').value = b0; on(['ai-b', 'ai-m'], aiBlock); P('ai-play', 'ai-b', range(120, bmax, 21), 300);
   const PFX = { 'signal': 'ac', 'patching': 'pa', 'return-r2': 'r2', 'rv-forecasts': 'rv', 'qlike': 'ql', 'breach-rates': 'br', 'covid-var': 'vp',
     'pit': 'pi', 'mcs': 'mc', 'conformal': 'cf', 'complexity': 'kz', 'm6': 'm6', 'pre-post': 'ai' };
-  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  // blocks whose initial live chart shows the answer: the charts are veiled with the slide and the readout
+  const VEIL_CHART = new Set(['signal', 'return-r2', 'rv-forecasts', 'qlike', 'breach-rates', 'pit', 'mcs', 'conformal', 'complexity', 'm6', 'pre-post']);
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) =>
+    predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true, charts: VEIL_CHART.has(b) } }, sp)));
   if (T.ticket && exitTicket) exitTicket(T.ticket);
   acfBlock(); patchBlock(); r2Block(); rvBlock(); qlBlock(); brBlock(); vpBlock(); pitBlock(); mcsBlock(); cfBlock(); kzBlock(); m6Block(); aiBlock();
 }

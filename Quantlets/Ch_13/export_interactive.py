@@ -142,7 +142,7 @@ def main(keys=None):
     if want('lasso'):
         d['lasso'] = dict(features=feat, lam=r(1 / Cs, 6), coef=paths, cv_auc=cvauc)
 
-    # four models, purged 5-fold CV: out-of-fold probabilities
+    # four models, purged 5-fold CV: out-of-fold probabilities (stored ×1e6: at 1e-4 a few values just above 0.5 round to 0.5)
     probs = {}
     for name, model in g.get_models().items() if want('models') else ():
         p = np.full(len(y), np.nan)
@@ -154,7 +154,7 @@ def main(keys=None):
               'fold auc', np.mean([roc_auc_score(y[te], p[te]) for _, te in folds]))
     if want('models'):
       d['models'] = dict(names=list(probs), y=''.join(map(str, y)), fold=''.join(map(str, fold_id)),
-                       p={k: [int(round(v * 1e4)) for v in p] for k, p in probs.items()}, n=len(y), start=f'{df.index[0]:%Y-%m-%d}', end=f'{df.index[-1]:%Y-%m-%d}')
+                       p={k: [int(round(v * 1e6)) for v in p] for k, p in probs.items()}, n=len(y), start=f'{df.index[0]:%Y-%m-%d}', end=f'{df.index[-1]:%Y-%m-%d}')
 
     # walk-forward 2010-2026: yearly refit, purged training window; d of the FFD feature frozen on data up to 2009;
     # decision at the close of t, trade at the close of t+1 (ret = log return from the close of t+1 to that of t+2)

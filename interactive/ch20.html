@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch20_data.js?v=20261030a"></script>
-<script src="ch20_text_en.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch20.js?v=20261030a" defer></script>
+<script src="ch20_data.js?v=20261030b"></script>
+<script src="ch20_text_en.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch20.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,82 +38,82 @@
 <section class="blk" id="volare">
   <h3>Realised Volatility Across Asset Classes</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch20_volare_rv_en.jpg" alt="Slide 12: Realised Volatility Across Asset Classes" loading="lazy"></a>
-      <figcaption>Slide 12</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=14" target="_blank" rel="noopener"><img src="slides/ch20_volare_rv_en.jpg" alt="Slide 13: Realised Volatility Across Asset Classes" loading="lazy"></a>
+      <figcaption>Slide 13</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="vr-k">Moving average: <b id="vr-k-v"></b></label><input type="range" id="vr-k" min="1" max="13" step="1" value="1"></div><div class="ctl"><label for="vr-s">Scale</label><select id="vr-s"><option value="log" selected>log</option><option value="lin">linear</option></select></div><button class="btn play" id="vr-play" type="button"></button></div><div class="charts three"><div class="chart" id="vr-stocks"></div><div class="chart" id="vr-futures"></div><div class="chart" id="vr-forex"></div></div><ul class="out" id="vr-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> In which asset class is the volatility spike of 2020 largest?</div>
-  <details><summary>Answer</summary><p>In futures. The five-day mean of the annualised volatility of crude oil (CL) reaches 458% in the five days ending 22 April 2020, and that of ES 115% in March. Among stocks, JPM reaches 111% and NVDA 118%, while EURUSD and USDJPY stay near 20%. The median volatility per class is 17.1% for stocks, 19.7% for futures and 7.3% for FX.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> We keep the same scale. When ▶ widens the moving-average window of the annualised volatility from 5 to 65 days, what happens to the crude-oil (CL) maximum in the first half of 2020?</div>
+  <details><summary>Answer</summary><p>It falls, from 458% (five days ending 22 April 2020) to 152% (65 days ending 3 June 2020). A longer averaging window mixes the extreme values with quieter days. The option “unchanged” confuses the smoothed series with the original observations; “rises” confuses a mean with a sum. With the five-day mean, ES reaches 115% in March, JPM 111% and NVDA 118%, while EURUSD and USDJPY stay near 20%. The median volatility per class is 17.1% for stocks, 19.7% for futures and 7.3% for FX.</p></details>
 </section><h2 class="sec" id="s-res">Results</h2>
 <section class="blk" id="qlike">
   <h3>QLIKE Relative to HAR, Asset by Asset</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch20_qlike_ratio_en.jpg" alt="Slide 40: QLIKE Relative to HAR, Asset by Asset" loading="lazy"></a>
-      <figcaption>Slide 40</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch20_qlike_ratio_en.jpg" alt="Slide 41: QLIKE Relative to HAR, Asset by Asset" loading="lazy"></a>
+      <figcaption>Slide 41</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="qr-b">Benchmark</label><select id="qr-b"><option value="HAR" selected>HAR</option><option value="logHAR">log-HAR</option></select></div><div class="ctl"><label for="qr-g">Assets</label><select id="qr-g"><option value="all" selected>All 50 assets</option><option value="stocks">US stocks (40)</option><option value="futures">Futures (5)</option><option value="forex">FX (5)</option></select></div><div class="ctl"><label for="qr-k">Assets left out, those with the highest ratios: <b id="qr-k-v"></b></label><input type="range" id="qr-k" min="0" max="10" step="1" value="0"></div><button class="btn play" id="qr-play" type="button"></button></div><div class="charts three"><div class="chart" id="qr-1"></div><div class="chart" id="qr-5"></div><div class="chart" id="qr-22"></div></div><ul class="out" id="qr-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> At h = 1, do the 36 signature features improve on log-HAR?</div>
-  <details><summary>Answer</summary><p>No. The mean ratio to HAR is 0.883 for log-HAR, 0.885 for log-HAR-K and 0.886 for Sig-L. Relative to log-HAR, Sig-L loses 0.4% and Sig-LK 4.5%. At h = 5 and 22 the Sig-LK medians (0.997 and 0.968) are far below the means, so a few assets pull the mean up.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> At h = 1, across all 50 assets, the mean QLIKE ratio of Sig-L to HAR is 0.886. We switch the benchmark from HAR to log-HAR. Where will the mean of the Sig-L ratios lie?</div>
+  <details><summary>Answer</summary><p>Above 1: the mean Sig-L/log-HAR ratio is 1.004, so Sig-L has a slightly higher relative loss in this sample; for Sig-LK, 1.045. When the benchmark changes, the page recomputes the ratio of each asset and then averages; it does not divide the two means. A value of 1 is guaranteed only for the benchmark compared with itself. Relative to HAR, the means are 0.883 for log-HAR, 0.885 for log-HAR-K and 0.886 for Sig-L. These means are not a significance test.</p></details>
 </section>
 <section class="blk" id="mcs">
   <h3>Model Confidence Sets</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch20_mcs_en.jpg" alt="Slide 44: Model Confidence Sets" loading="lazy"></a>
-      <figcaption>Slide 44</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch20_mcs_en.jpg" alt="Slide 45: Model Confidence Sets" loading="lazy"></a>
+      <figcaption>Slide 45</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="mc-l">Loss</label><select id="mc-l"><option value="ql" selected>QLIKE</option><option value="se">MSE</option></select></div><div class="ctl"><label for="mc-g">Assets</label><select id="mc-g"><option value="all" selected>All 50 assets</option><option value="stocks">US stocks (40)</option><option value="futures">Futures (5)</option><option value="forex">FX (5)</option></select></div><div class="ctl"><label for="mc-a">MCS level: <b id="mc-a-v"></b></label><input type="range" id="mc-a" min="75" max="99" step="1" value="90"></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts "><div class="chart" id="mc-chart"></div></div><ul class="out" id="mc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> For what share of the assets do log-HAR and Sig-LK stay in the 90% MCS under QLIKE?</div>
-  <details><summary>Answer</summary><p>log-HAR: 100%, 98% and 98% at h = 1, 5 and 22; Sig-LK: 100%, 94% and 88%. The four log models are rarely separated, while HAR, HARQ and SHAR are excluded for a fifth to a third of the assets. Under MSE almost every model stays in the set.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> We keep QLIKE and all 50 assets. When ▶ raises the MCS confidence level from 90% to 99%, what happens to the share of assets for which Sig-LK stays in the set?</div>
+  <details><summary>Answer</summary><p>It rises or stays the same. The elimination threshold α falls from 0.10 to 0.01, and the page keeps the models with an MCS p-value above the threshold, so it eliminates fewer. For Sig-LK, the shares go from 100%, 94% and 88% to 100%, 100% and 100% at h = 1, 5 and 22; for log-HAR, from 100%, 98% and 98% to 100%. A higher confidence level does not mean a more restrictive selection. Membership of the MCS does not establish equal accuracy: at 90%, the four log models are rarely separated, while HAR, HARQ and SHAR are excluded for a fifth to a third of the assets.</p></details>
 </section>
 <section class="blk" id="covid">
   <h3>Inside the COVID-19 Crash: JPM, Next Day</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch20_covid_forecasts_en.jpg" alt="Slide 48: Inside the COVID-19 Crash: JPM, Next Day" loading="lazy"></a>
-      <figcaption>Slide 48</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=50" target="_blank" rel="noopener"><img src="slides/ch20_covid_forecasts_en.jpg" alt="Slide 49: Inside the COVID-19 Crash: JPM, Next Day" loading="lazy"></a>
+      <figcaption>Slide 49</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cv-h">Horizon</label><select id="cv-h"><option value="1" selected>h = 1</option><option value="5">h = 5</option><option value="22">h = 22</option></select></div><div class="ctl"><label for="cv-t">Up to: <b id="cv-t-v"></b></label><input type="range" id="cv-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="cv-play" type="button"></button></div><div class="charts "><div class="chart" id="cv-chart"></div></div><ul class="out" id="cv-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Which model reacts first to the jump in JPM volatility in March 2020?</div>
-  <details><summary>Answer</summary><p>None anticipates the first jump: at the origin of 11 March the target is 139%, and the forecasts are 59% (HAR), 49% (log-HAR) and 60% (Sig-LK). Sig-LK reacts slightly faster than log-HAR in mid-March, once the path has already turned. HAR in levels overshoots the target, then the raw HAR forecast turns negative in late March; the chart shows the value after the positivity rule (the mean target of the training window), and the 7 replaced origins are marked with ×.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> At h = 1, which of the three displayed forecasts captures the size of the target jump for the 11 March 2020 origin of JPM volatility?</div>
+  <details><summary>Answer</summary><p>None. At this origin, the next-day target is about 139%, while the forecasts are 59% (HAR), 49% (log-HAR) and 60% (Sig-LK): all strongly underestimate the jump. The somewhat faster later reaction of Sig-LK in mid-March and the later overshooting of the target by HAR do not show that either anticipated this jump. The raw HAR forecast turns negative in late March; the chart shows the value after the positivity rule (the mean target of the training window), and the 7 replaced origins are marked with ×.</p></details>
 </section>
 <section class="blk" id="subperiods">
   <h3>Stress Periods vs Normal Times (H4)</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch20_subperiod_en.jpg" alt="Slide 50: Stress Periods vs Normal Times (H4)" loading="lazy"></a>
-      <figcaption>Slide 50</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=52" target="_blank" rel="noopener"><img src="slides/ch20_subperiod_en.jpg" alt="Slide 51: Stress Periods vs Normal Times (H4)" loading="lazy"></a>
+      <figcaption>Slide 51</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="sp-g">Assets: <b id="sp-g-v"></b></label><input type="range" id="sp-g" min="0" max="3" step="1" value="0"></div><div class="ctl"><label for="sp-st">Aggregation over assets</label><select id="sp-st"><option value="mean" selected>mean</option><option value="median">median</option></select></div><button class="btn play" id="sp-play" type="button"></button></div><div class="charts "><div class="chart" id="sp-chart"></div></div><ul class="out" id="sp-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Do the signature models gain more in stress periods, as H4 predicts?</div>
-  <details><summary>Answer</summary><p>No. At h = 1, in the COVID-19 crash, log-HAR has 0.70 and Sig-LK 0.73 of the HAR loss, and on the other days 0.94 and 0.97. At h = 22, in the same crash, Sig-LK has 6.35 times and Sig-L 8.30 times the HAR loss.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> At h = 1, in the COVID-19 crash, the mean QLIKE ratio Sig-LK/HAR is 0.73. Is this sufficient to credit the signature procedure with a gain over log-HAR?</div>
+  <details><summary>Answer</summary><p>No. The value 0.73 shows an advantage over HAR; with the same benchmark, however, log-HAR has 0.70, so the results show no additional advantage of Sig-LK. On the other days, the ratios are 0.94 (log-HAR) and 0.97 (Sig-LK). At h = 22, in the same crash, Sig-LK has 6.35 times and Sig-L 8.30 times the HAR loss. The results give no descriptive support to H4; they are not a formal test of the difference between periods.</p></details>
 </section>
 <section class="blk" id="weights">
   <h3>Kernel Weights at the Origin 16 March 2020</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=53" target="_blank" rel="noopener"><img src="slides/ch20_weights_2020_en.jpg" alt="Slide 52: Kernel Weights at the Origin 16 March 2020" loading="lazy"></a>
-      <figcaption>Slide 52</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=54" target="_blank" rel="noopener"><img src="slides/ch20_weights_2020_en.jpg" alt="Slide 53: Kernel Weights at the Origin 16 March 2020" loading="lazy"></a>
+      <figcaption>Slide 53</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="kw-N">Truncation depth N: <b id="kw-N-v"></b></label><input type="range" id="kw-N" min="1" max="3" step="1" value="3"></div><div class="ctl"><label for="kw-c">Temperature c, γ = c / median distance: <b id="kw-c-v"></b></label><input type="range" id="kw-c" min="0" max="10" step="1" value="2"></div><button class="btn play" id="kw-play" type="button"></button><div style="flex-basis:100%;height:0"></div><div class="ctl"><label for="kw-k">Points of the origin window drawn: <b id="kw-k-v"></b></label><input type="range" id="kw-k" min="2" max="22" step="1" value="22"></div><button class="btn play" id="kw-play2" type="button"></button></div><div class="charts "><div class="chart" id="kw-chart"></div></div><div class="charts "><div class="chart" id="kw-path"></div></div><ul class="out" id="kw-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> How much extra weight do windows similar to that of 16 March 2020 receive?</div>
-  <details><summary>Answer</summary><p>Very little: with c = 0.5 the average weight over the 40 stocks stays between 0.61 and 1.43 times 1/n, and the effective sample size is 975 of 1000. The highest weights go to the last days before the origin, whose 22-point windows overlap the current window. The correlation of the weights with log volatility is +0.04.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> At the 16 March 2020 origin, with N = 3, ▶ raises c from 0.5 to 8. What happens to the mean effective sample size over the 40 stocks?</div>
+  <details><summary>Answer</summary><p>It falls, from about 975 to 36 of 1,000. The weights are proportional to exp(−c δ / median of δ), where δ is the distance between windows: a larger c concentrates them on the small distances. The number of observations stays 1,000; the effective size falls. With c = 0.5, the average weight stays between 0.61 and 1.43 times 1/n; with c = 8, between 0.10 and 157 times 1/n. The highest weights go to the last days before the origin, whose 22-point windows overlap the current window. Translation invariance does not mean equal distances between windows.</p></details>
 </section><h2 class="sec" id="s-abl">Ablations and Robustness</h2>
 <section class="blk" id="ablation">
   <h3>The 2 × 2 Ablation</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch20_ablation_en.jpg" alt="Slide 54: The 2 × 2 Ablation" loading="lazy"></a>
-      <figcaption>Slide 54</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch20_ablation_en.jpg" alt="Slide 55: The 2 × 2 Ablation" loading="lazy"></a>
+      <figcaption>Slide 55</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ab-g">Assets</label><select id="ab-g"><option value="all" selected>All 50 assets</option><option value="stocks">US stocks (40)</option><option value="futures">Futures (5)</option><option value="forex">FX (5)</option></select></div><div class="ctl"><label for="ab-x">Asset left out: <b id="ab-x-v"></b></label><input type="range" id="ab-x" min="0" max="50" step="1" value="0"></div><button class="btn play" id="ab-play" type="button"></button><div class="ctl"><label for="ab-h">Horizon</label><select id="ab-h"><option value="1" selected>h = 1</option><option value="5">h = 5</option><option value="22">h = 22</option></select></div></div><div class="charts "><div class="chart" id="ab-chart"></div><div class="chart" id="ab-assets"></div></div><ul class="out" id="ab-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Which ingredient drives the result, the signature features or the kernel weights?</div>
-  <details><summary>Answer</summary><p>The weights alone (log-HAR-K) have no detectable effect on the mean loss: 1.002, 1.002 and 1.004 relative to log-HAR. The features alone (Sig-L) worsen the long horizons: 1.004, 1.285 and 2.238. Both (Sig-LK): 1.045, 1.280 and 1.929. At h = 1 the loss comes mainly from crude oil (CL, ratio 2.71): without CL, Sig-LK has 1.011.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> At h = 1, the mean QLIKE ratio Sig-LK/log-HAR over the 50 assets is 1.045, and the largest ratio is that of crude oil (CL). If we leave CL out, does the mean fall below 1?</div>
+  <details><summary>Answer</summary><p>No: the mean falls from 1.045 to 1.011, so leaving CL out does not reverse the descriptive ranking. CL has a ratio of 2.71, but the effect of leaving it out also depends on the other 49 ratios. The weights alone (log-HAR-K) give 1.002, 1.002 and 1.004 relative to log-HAR at h = 1, 5 and 22; Sig-L gives 1.004, 1.285 and 2.238; Sig-LK, 1.045, 1.280 and 1.929. Sig-L evaluates the procedure with signatures and LASSO selection, so its difference from log-HAR cannot be attributed to the features alone.</p></details>
 </section><h2 class="sec" id="s-case">Case Study: The Signature as a Lead-Lag Metric</h2>
 <section class="blk" id="leadlag">
   <h3>SPY and Bitcoin at Five Minutes: Who Moves First?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch20_leadlag_en.jpg" alt="Slide 61: SPY and Bitcoin at Five Minutes: Who Moves First?" loading="lazy"></a>
-      <figcaption>Slide 61</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter20_signatures_realized_volatility.pdf#page=63" target="_blank" rel="noopener"><img src="slides/ch20_leadlag_en.jpg" alt="Slide 62: SPY and Bitcoin at Five Minutes: Who Moves First?" loading="lazy"></a>
+      <figcaption>Slide 62</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ll-p">Period</label><select id="ll-p"><option value="all" selected>all days</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option></select></div><div class="ctl"><label for="ll-m">Window of the Lévy area: <b id="ll-m-v"></b></label><input type="range" id="ll-m" min="0" max="7" step="1" value="0"></div><button class="btn play" id="ll-play" type="button"></button></div><div class="charts "><div class="chart" id="ll-ccf"></div><div class="chart" id="ll-t"></div></div><ul class="out" id="ll-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> In which windows does the Lévy area show that SPY moves before Bitcoin?</div>
-  <details><summary>Answer</summary><p>Only in short windows. The correlation between SPY at t − 1 and BTC at t is 0.088 (NW t = 9.8), and in the reverse direction −0.005; their difference is 0.093 (NW t = 9.5). In a 10-minute window the Lévy area has t = 9.6 and is positive on 70% of the days; over the whole session t = 1.51 and 51% of the days: the long window adds lags without effect. The 20 tests (12 lags and 8 windows) are exploratory: after Holm, the 2-hour window has adjusted p 0.032 and the 195-minute window 0.157. The effect weakens in 2026: the lag +1 correlation falls to 0.04.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Across all 489 days, what is the longest tested window for which the mean Lévy area between SPY and Bitcoin is positive and significant at 5% after the Holm correction for the 20 tests?</div>
+  <details><summary>Answer</summary><p>120 minutes: NW t ≈ 3.05 and Holm-adjusted p ≈ 0.032. At 195 minutes, NW t ≈ 2.45 passes the pointwise 1.96 threshold, but the adjusted p is 0.157. The 10-minute option confuses the window with the strongest signal (t = 9.6, the area positive on 70% of the days) with the longest significant window; 195 minutes uses the pointwise threshold instead of the correction. Over the whole session, t = 1.51. The correlation between SPY at t − 1 and BTC at t is 0.088 (NW t = 9.8), and in the reverse direction −0.005. The 20 tests (12 lags and 8 windows) are exploratory, and the result indicates a lead-lag association, not causality. The effect weakens in 2026: the lag +1 correlation falls to 0.04.</p></details>
 </section>
 <p class="src foot">Realised variance from the VOLARE database (Cipollini et al., 2026): 40 US stocks (2015–2026), 5 futures and 5 currency pairs (2009–2026), five-minute returns. VOLARE data are licensed for research use and are not redistributed; only summaries appear here: per-asset mean losses and MCS p-values, kernel weights and distances, five-day means of the volatility of the six assets on the slide (one value per week), and the JPM forecasts of February–May 2020. The lead-lag case study uses the five-minute bars of SPY and Bitcoin (EODHD, data/market/intraday): the cross-correlations and mean Lévy areas of each day.</p>
 </main>

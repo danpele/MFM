@@ -205,7 +205,7 @@ function leakage() {
 let MC = null;
 function mcPre() {
   const M = D.models, y = [...M.y].map(Number), f = [...M.fold].map(Number), P = {};
-  M.names.forEach(nm => (P[nm] = M.p[nm].map(v => v / 1e4)));
+  M.names.forEach(nm => (P[nm] = M.p[nm].map(v => v / 1e6)));
   const folds = range(0, 4, 1).map(k => f.map((v, i) => (v === k ? i : -1)).filter(i => i >= 0));
   const aucs = {}; M.names.forEach(nm => (aucs[nm] = folds.map(ix => auc(ix.map(i => y[i]), ix.map(i => P[nm][i])))));
   const base = mean(folds.map(ix => { const m = mean(ix.map(i => y[i])); return Math.max(m, 1 - m); }));
@@ -411,7 +411,11 @@ function init() {
   on(['cp-y', 'cp-t'], cpz); P('cp-play', 'cp-y', range(1976, 1991, 1), 600);
   const PFX = { 'predictability': 'sn', 'lasso-path': 'la', 'ffd-adf': 'ff', 'triple-barrier': 'tb', 'purged-cv': 'pc', 'leakage': 'lk',
     'model-comparison': 'mc', 'walk-forward': 'wf', 'anomalies': 'an', 'max-sharpe': 'em', 'is-oos': 'io', 'vix': 'vx', 'deep-sdf': 'cp' };
-  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  // blocks whose live chart shows the answer: the charts stay blurred with the readout (common veil; reveal on „Verifică”, on the
+  // slide button, at the end of ▶ or on the reader's own change of a parameter)
+  const VEIL_CHART = new Set(['predictability', 'lasso-path', 'model-comparison', 'max-sharpe', 'is-oos', 'deep-sdf']);
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) =>
+    predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true, charts: VEIL_CHART.has(b) } }, sp)));
   if (T.ticket && exitTicket) exitTicket(T.ticket);
   signalNoise(); lassoPath(); ffd(); tripleBarrier(); purgedScheme(); leakage(); modelComparison(); walkForward(); anomalies(); expectedMax(); isOos(); vixInference(); cpz();
 }

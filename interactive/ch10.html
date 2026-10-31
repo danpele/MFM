@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch10_data.js?v=20261030a"></script>
-<script src="ch10_text_en.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch10.js?v=20261030a" defer></script>
+<script src="ch10_data.js?v=20261030b"></script>
+<script src="ch10_text_en.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch10.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,58 +38,58 @@
 <section class="blk" id="order-book">
   <h3>A Simulated Order Book</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=5" target="_blank" rel="noopener"><img src="slides/ch10_lob_snapshot_en.jpg" alt="Slide 4: A Simulated Order Book" loading="lazy"></a>
-      <figcaption>Slide 4</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=6" target="_blank" rel="noopener"><img src="slides/ch10_lob_snapshot_en.jpg" alt="Slide 5: A Simulated Order Book" loading="lazy"></a>
+      <figcaption>Slide 5</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="lob-k">Snapshot: <b id="lob-k-v"></b></label><input type="range" id="lob-k" min="0" max="198" step="1" value="99"></div><button class="btn play" id="lob-play" type="button"></button></div><div class="charts three"><div class="chart" id="lob-book"></div><div class="chart" id="lob-depth"></div><div class="chart" id="lob-path"></div></div><ul class="out" id="lob-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> How far from the mid-price do most limit orders sit in the simulated book?</div>
-  <details><summary>Answer</summary><p>Away from the mid. The average depth is 0.8 orders at 1 tick from the mid, 4.8 at 10 ticks and 5.0 at 25 ticks. Near the mid, market orders consume liquidity faster than limit orders replenish it; the spread averages 3.23 ticks.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Why does the arrival rate of limit orders alone not determine the average depth at a price level?</div>
+  <details><summary>Answer</summary><p>Depth is a stock of resting orders; arrivals are a flow. Executions and cancellations determine how long orders remain in the book, and market orders consume the best quotes first. In the simulation, the average depth is 0.8 orders at 1 tick from the mid, 4.8 at 10 ticks and 5.0 at 25 ticks; the spread averages 3.23 ticks.</p></details>
 </section>
 <section class="blk" id="walk-book">
   <h3>The Price Impact of a Market Order</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=7" target="_blank" rel="noopener"><img src="slides/ch10_walk_book_en.jpg" alt="Slide 6: The Price Impact of a Market Order" loading="lazy"></a>
-      <figcaption>Slide 6</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=8" target="_blank" rel="noopener"><img src="slides/ch10_walk_book_en.jpg" alt="Slide 7: The Price Impact of a Market Order" loading="lazy"></a>
+      <figcaption>Slide 7</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="wb-q">Size of the buy order (units): <b id="wb-q-v"></b></label><input type="range" id="wb-q" min="1" max="80" step="1" value="80"></div><button class="btn play" id="wb-play" type="button"></button></div><div class="charts "><div class="chart" id="wb-chart"></div><div class="chart" id="wb-book"></div></div><ul class="out" id="wb-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> A market buy order of 80 units is 80 times larger than one of a single unit. How many times further from the mid does it reach?</div>
-  <details><summary>Answer</summary><p>About 12 times: from 1.7 to 20.1 ticks. On log axes the slope is 0.53, close to 1/2, so the impact is concave. The average execution price rises with slope 0.44: the 80 units pay 11.9 ticks per unit on average.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Approximate the average cost per unit relative to the mid-price by Q<sup>0.44</sup>. By what factor does the total cost relative to the mid rise when the order size doubles?</div>
+  <details><summary>Answer</summary><p>About 2.71. Total cost is quantity times average cost per unit: 2<sup>1+0.44</sup> ≈ 2.71. The factor 1.36 = 2<sup>0.44</sup> applies only to the cost per unit; the factor 2 assumes that it stays constant. The slope 0.44 is fitted over the 10 sizes (the 80-unit order pays 11.9 ticks per unit on average), so the relation is an approximation, not an identity for every pair of orders. The deepest level reached has slope 0.53, close to 1/2: the impact is concave.</p></details>
 </section><h2 class="sec" id="s-spr">The Bid-Ask Spread</h2>
 <section class="blk" id="roll">
   <h3>The Bid-Ask Bounce (Simulated)</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch10_roll_bounce_en.jpg" alt="Slide 11: The Bid-Ask Bounce (Simulated)" loading="lazy"></a>
-      <figcaption>Slide 11</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch10_roll_bounce_en.jpg" alt="Slide 12: The Bid-Ask Bounce (Simulated)" loading="lazy"></a>
+      <figcaption>Slide 12</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ro-c">Half-spread c: <b id="ro-c-v"></b></label><input type="range" id="ro-c" min="0" max="0.15" step="0.005" value="0.05"></div><div class="ctl"><label for="ro-s">Volatility of the efficient price σ: <b id="ro-s-v"></b></label><input type="range" id="ro-s" min="0.005" max="0.05" step="0.005" value="0.02"></div><div class="ctl"><label for="ro-n">Number of trades n</label><select id="ro-n"><option value="78">78</option><option value="250">250</option><option value="1000">1,000</option><option value="5000" selected>5,000</option></select></div><button class="btn play" id="ro-play" type="button"></button></div><div class="charts "><div class="chart" id="ro-path"></div><div class="chart" id="ro-acf"></div></div><ul class="out" id="ro-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> The efficient price is a random walk. Are the changes of the trade price uncorrelated?</div>
-  <details><summary>Answer</summary><p>No. Their first-order autocorrelation is −0.458, close to the theoretical value −c²/(σ² + 2c²) = −0.463. The Roll estimator gives ŝ = 0.0998, against the true spread 2c = 0.10. Beyond lag 1 the autocorrelations stay inside the 95% band.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Keep σ = 0.02 and double the half-spread c from 0.05 to 0.10. What is the theoretical first-order autocorrelation of trade-price changes?</div>
+  <details><summary>Answer</summary><p>About −0.490: ρ<sub>1</sub> = −c²/(σ² + 2c²) = −0.01/0.0204. The autocorrelation does not double, because c also enters the denominator. At c = 0.05 the estimate is −0.458, against −0.463 theoretically, and the Roll estimator gives ŝ = 0.0998, against the true spread 2c = 0.10. Beyond lag 1 the autocorrelations are small, but the one at lag 3 (0.0278) lies very slightly outside the 95% band (0.0277): the band is pointwise and does not cover all lags simultaneously.</p></details>
 </section>
 <section class="blk" id="spread-frequency">
   <h3>Spread Estimators at Two Frequencies: SPY</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=17" target="_blank" rel="noopener"><img src="slides/ch10_spread_frequency_en.jpg" alt="Slide 16: Spread Estimators at Two Frequencies: SPY" loading="lazy"></a>
-      <figcaption>Slide 16</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=18" target="_blank" rel="noopener"><img src="slides/ch10_spread_frequency_en.jpg" alt="Slide 17: Spread Estimators at Two Frequencies: SPY" loading="lazy"></a>
+      <figcaption>Slide 17</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="sf-y">Period: <b id="sf-y-v"></b></label><input type="range" id="sf-y" min="0" max="7" step="1" value="0"></div><button class="btn play" id="sf-play" type="button"></button></div><div class="charts "><div class="chart" id="sf-chart"></div></div><ul class="out" id="sf-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> One tick is 0.21 bp of the SPY price. Which estimator comes closest to this value?</div>
-  <details><summary>Answer</summary><p>EDGE on 5-minute bars: 0.46 bp; the 95% interval for the mean of the estimator, from a 20-day block bootstrap, is [0.41, 0.51]. On daily bars all estimates are two orders of magnitude above one tick (Roll 64.3, Corwin–Schultz 26.5, Abdi–Ranaldo 55.1 and EDGE 40.1 bp), because the daily range is dominated by volatility.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> EDGE on 5-minute bars has a mean of 0.46 bp and a 95% bootstrap interval of [0.41, 0.51] bp. One tick is 0.21 bp. Does this establish that the true effective spread exceeds 0.21 bp?</div>
+  <details><summary>Answer</summary><p>No. The interval, from a 20-day block bootstrap, concerns the mean of the EDGE estimates after negative estimates are replaced by zero; it does not automatically cover the true effective spread. One tick is a lower bound for the quoted spread, not for the effective spread; proximity to one tick is only a plausibility check. On daily bars all estimates are two orders of magnitude above one tick (Roll 64.3, Corwin–Schultz 26.5, Abdi–Ranaldo 55.1 and EDGE 40.1 bp), because the daily range is dominated by volatility.</p></details>
 </section>
 <section class="blk" id="spread-cross">
   <h3>Spread Estimates Across 25 Assets</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=19" target="_blank" rel="noopener"><img src="slides/ch10_spread_estimators_en.jpg" alt="Slide 18: Spread Estimates Across 25 Assets" loading="lazy"></a>
-      <figcaption>Slide 18</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=20" target="_blank" rel="noopener"><img src="slides/ch10_spread_estimators_en.jpg" alt="Slide 19: Spread Estimates Across 25 Assets" loading="lazy"></a>
+      <figcaption>Slide 19</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="sc-e">Estimator: <b id="sc-e-v"></b></label><input type="range" id="sc-e" min="0" max="3" step="1" value="0"></div><div class="ctl"><label for="sc-s">Order of the assets</label><select id="sc-s"><option value="group" selected>By market, as on the slide</option><option value="vol">By volatility</option></select></div><button class="btn play" id="sc-play" type="button"></button></div><div class="charts "><div class="chart" id="sc-bars"></div><div class="chart" id="sc-scat"></div></div><ul class="out" id="sc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> The median Corwin–Schultz estimate is 53 bp in the US and 54 bp on the BVB. Are BVB stocks as liquid as large US companies?</div>
-  <details><summary>Answer</summary><p>No. The median daily traded value is USD 10,505 million in the US and USD 0.34 million on the BVB, a ratio of about 31,000. Estimates from daily bars rank the assets by volatility (the Spearman correlation with annualised volatility is 0.94), and Abdi–Ranaldo is 0 for 8 of the 25 assets.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The median Corwin–Schultz estimates are 53 bp in the US and 54 bp on the BVB. What can we infer about the effective spreads of the two groups?</div>
+  <details><summary>Answer</summary><p>Similar proxy values do not establish similar effective spreads. Estimates from daily bars rank the assets by volatility (the Spearman correlation with annualised volatility is 0.94), which describes the ranking without validating the level of trading costs; that requires an independent benchmark from trades and quotes. The median daily traded value, USD 10,505 million in the US and USD 0.34 million on the BVB (a ratio of about 31,000), warrants caution.</p></details>
 </section><h2 class="sec" id="s-ill">Illiquidity and Intraday Patterns</h2>
 <section class="blk" id="amihud">
   <h3>Amihud Illiquidity Across 25 Assets</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch10_amihud_en.jpg" alt="Slide 22: Amihud Illiquidity Across 25 Assets" loading="lazy"></a>
-      <figcaption>Slide 22</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch10_amihud_en.jpg" alt="Slide 23: Amihud Illiquidity Across 25 Assets" loading="lazy"></a>
+      <figcaption>Slide 23</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="am-s">Window starts in: <b id="am-s-v"></b></label><input type="range" id="am-s" min="0" max="23" step="1" value="0"></div><button class="btn play" id="am-play" type="button"></button></div><div class="charts "><div class="chart" id="am-chart"></div></div><ul class="out" id="am-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> How many times larger is the Amihud ratio of Banca Transilvania, the most liquid BVB stock, than that of SPY?</div>
@@ -98,18 +98,18 @@
 <section class="blk" id="amihud-time">
   <h3>Illiquidity over Time: Three Markets</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=25" target="_blank" rel="noopener"><img src="slides/ch10_amihud_time_en.jpg" alt="Slide 24: Illiquidity over Time: Three Markets" loading="lazy"></a>
-      <figcaption>Slide 24</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=26" target="_blank" rel="noopener"><img src="slides/ch10_amihud_time_en.jpg" alt="Slide 25: Illiquidity over Time: Three Markets" loading="lazy"></a>
+      <figcaption>Slide 25</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="at-t">Up to month: <b id="at-t-v"></b></label><input type="range" id="at-t" min="0" max="115" step="1" value="115"></div><button class="btn play" id="at-play" type="button"></button></div><div class="charts "><div class="chart" id="at-chart"></div></div><ul class="out" id="at-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Did BVB illiquidity fall after Romania became an emerging market in September 2020?</div>
-  <details><summary>Answer</summary><p>There is no visible break in September 2020. The BVB median declines gradually, from 435 bp per USD 1 million in 2017 to 169 bp in 2026, and remains about 7,000 times the US median (0.023 bp in 2026). The largest decline is in crypto: from 7.6 bp to 0.089 bp.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Does the decline of the BVB Amihud ratio identify the effect of the move to FTSE Russell emerging-market status in September 2020?</div>
+  <details><summary>Answer</summary><p>No: the observed path alone provides no counterfactual, and the absence of a visible break does not establish a zero effect either. The mean of the monthly BVB medians falls from 435 bp per USD 1 million in 2017 to 169 bp in January–August 2026; in August 2026 the monthly median is 153 bp, about 7,000 times the US median. The largest decline is in crypto: the annual mean falls from 7.6 bp to 0.089 bp.</p></details>
 </section>
 <section class="blk" id="intraday">
   <h3>SPY Within the Trading Day</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=27" target="_blank" rel="noopener"><img src="slides/ch10_spy_intraday_en.jpg" alt="Slide 26: SPY Within the Trading Day" loading="lazy"></a>
-      <figcaption>Slide 26</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch10_spy_intraday_en.jpg" alt="Slide 27: SPY Within the Trading Day" loading="lazy"></a>
+      <figcaption>Slide 27</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="id-p">Period: <b id="id-p-v"></b></label><input type="range" id="id-p" min="0" max="7" step="1" value="0"></div><div class="ctl"><label for="id-t">5-minute bar: <b id="id-t-v"></b></label><input type="range" id="id-t" min="0" max="77" step="1" value="0"></div><button class="btn play" id="id-play" type="button"></button></div><div class="charts "><div class="chart" id="id-vol"></div><div class="chart" id="id-abs"></div></div><ul class="out" id="id-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> What share of the daily SPY volume trades in the last 30 minutes of the session?</div>
@@ -118,72 +118,72 @@
 <section class="blk" id="illiq-vix">
   <h3>Liquidity and Volatility: SPY and the VIX</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=29" target="_blank" rel="noopener"><img src="slides/ch10_spy_illiq_vix_en.jpg" alt="Slide 28: Liquidity and Volatility: SPY and the VIX" loading="lazy"></a>
-      <figcaption>Slide 28</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=30" target="_blank" rel="noopener"><img src="slides/ch10_spy_illiq_vix_en.jpg" alt="Slide 29: Liquidity and Volatility: SPY and the VIX" loading="lazy"></a>
+      <figcaption>Slide 29</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="iv-f">Means by: <b id="iv-f-v"></b></label><input type="range" id="iv-f" min="0" max="3" step="1" value="2"></div><button class="btn play" id="iv-play" type="button"></button></div><div class="charts "><div class="chart" id="iv-chart"></div><div class="chart" id="iv-scat"></div></div><ul class="out" id="iv-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Does SPY illiquidity rise when the VIX rises?</div>
-  <details><summary>Answer</summary><p>Yes. The correlation is 0.58 on daily data and 0.69 on monthly means, and the elasticity of log illiquidity with respect to the log VIX is 0.95 (HAC standard error 0.12). In April 2025 illiquidity was 3.04 bp per USD 100 million, against a mean of 1.83.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On daily data, the regression of log SPY illiquidity on the log VIX has slope 0.95. Approximately what percentage change in illiquidity is associated with a 10% rise in the VIX?</div>
+  <details><summary>Answer</summary><p>A rise of about 9.5%: the elasticity of illiquidity with respect to the VIX is 0.95, and 0.95 × 10% = 9.5%. This is an association, not an identified causal effect. The daily slope has HAC standard error 0.12; on monthly means the slope is 1.03. The correlation is 0.58 on daily data and 0.69 on monthly means. In April 2025 illiquidity was 3.04 bp per USD 100 million, against a mean of 1.83.</p></details>
 </section><h2 class="sec" id="s-inf">Information and Prices</h2>
 <section class="blk" id="kyle">
   <h3>Kyle's Lambda and the Insider's Profit</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch10_kyle_en.jpg" alt="Slide 34: Kyle's Lambda and the Insider's Profit" loading="lazy"></a>
-      <figcaption>Slide 34</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=36" target="_blank" rel="noopener"><img src="slides/ch10_kyle_en.jpg" alt="Slide 35: Kyle's Lambda and the Insider's Profit" loading="lazy"></a>
+      <figcaption>Slide 35</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ky-v">σ<sub>v</sub>, standard deviation of the value: <b id="ky-v-v"></b></label><input type="range" id="ky-v" min="0.5" max="5" step="0.5" value="2"></div><div class="ctl"><label for="ky-u">σ<sub>u</sub>, noise-trader orders: <b id="ky-u-v"></b></label><input type="range" id="ky-u" min="2" max="40" step="1" value="10"></div><button class="btn play" id="ky-play" type="button"></button></div><div class="charts three"><div class="chart" id="ky-lam"></div><div class="chart" id="ky-prof"></div><div class="chart" id="ky-imp"></div></div><ul class="out" id="ky-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> What happens to Kyle's lambda and to the insider's profit if the standard deviation of noise-trader orders doubles?</div>
-  <details><summary>Answer</summary><p>λ = σ<sub>v</sub>/(2σ<sub>u</sub>) halves, so market depth 1/λ doubles; the expected profit σ<sub>v</sub>σ<sub>u</sub>/2 doubles as well. The insider trades more aggressively (β = σ<sub>u</sub>/σ<sub>v</sub>), and the price still reveals half of the private information.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> In the Kyle model, σ<sub>v</sub> halves and σ<sub>u</sub> doubles. What happens to the expected profit of the insider?</div>
+  <details><summary>Answer</summary><p>It stays the same. Expected profit is σ<sub>v</sub>σ<sub>u</sub>/2, so the two changes offset each other: from σ<sub>v</sub> = USD 2 and σ<sub>u</sub> = 10 thousand shares to USD 1 and 20 thousand shares, the profit stays at USD 10 thousand. λ = σ<sub>v</sub>/(2σ<sub>u</sub>), by contrast, falls fourfold, from 0.10 to 0.025 USD per thousand shares. The price still reveals half of the private information.</p></details>
 </section><h2 class="sec" id="s-exe">Price Impact and Optimal Execution</h2>
 <section class="blk" id="almgren-chriss">
   <h3>Optimal Trajectories and the Efficient Frontier</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=43" target="_blank" rel="noopener"><img src="slides/ch10_almgren_chriss_en.jpg" alt="Slide 42: Optimal Trajectories and the Efficient Frontier" loading="lazy"></a>
-      <figcaption>Slide 42</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch10_almgren_chriss_en.jpg" alt="Slide 43: Optimal Trajectories and the Efficient Frontier" loading="lazy"></a>
+      <figcaption>Slide 43</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ac-l">Risk aversion λ: <b id="ac-l-v"></b></label><input type="range" id="ac-l" min="0" max="15" step="1" value="8"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-traj"></div><div class="chart" id="ac-front"></div></div><ul class="out" id="ac-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> What does it cost to reduce the risk of selling 1 million shares over 5 days?</div>
-  <details><summary>Answer</summary><p>With λ = 2·10⁻⁶, the standard deviation of the cost falls from USD 1.04 million (selling evenly) to USD 0.45 million, and the expected cost rises by USD 0.48 million, from 0.60 to 1.08 million. 57% of the position is sold on the first day. The frontier is convex: the first reductions of risk are cheap, the last ones expensive.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> If σ doubles, how must λ change to keep the same optimal Almgren–Chriss trajectory, holding the other parameters fixed?</div>
+  <details><summary>Answer</summary><p>Divide λ by 4. The trajectory depends on the product λσ², and doubling σ multiplies σ² by 4; this also holds for the discrete formula, in five daily steps, used by the page. Selling 1 million shares over 5 days with λ = 2·10⁻⁶, the standard deviation of the cost falls from USD 1.04 million (selling evenly) to USD 0.45 million, and the expected cost rises from 0.60 to 1.08 million USD; 57% of the position is sold on the first day.</p></details>
 </section><h2 class="sec" id="s-hft">High-Frequency Trading and Market Stress</h2>
 <section class="blk" id="flash-crash">
   <h3>The Flash Crash of 6 May 2010</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch10_flash_crash_en.jpg" alt="Slide 47: The Flash Crash of 6 May 2010" loading="lazy"></a>
-      <figcaption>Slide 47</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch10_flash_crash_en.jpg" alt="Slide 48: The Flash Crash of 6 May 2010" loading="lazy"></a>
+      <figcaption>Slide 48</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="fc-t">Up to the day: <b id="fc-t-v"></b></label><input type="range" id="fc-t" min="0" max="40" step="1" value="40"></div><button class="btn play" id="fc-play" type="button"></button></div><div class="charts "><div class="chart" id="fc-chart"></div></div><ul class="out" id="fc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> How far did SPY fall on 6 May 2010, at the low of the day and at the close?</div>
-  <details><summary>Answer</summary><p>The low, USD 105.00, was 10.1% below the previous close (USD 116.82), but the close was only 3.3% lower. Volume was 3.0 times the median of the preceding days. Daily bars show the range, not the fall and the recovery within the day.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On 6 May 2010, the SPY low is USD 105.00 and the close USD 112.942. How far is the close above the low, as a percentage of the low?</div>
+  <details><summary>Answer</summary><p>About 7.56%: 112.942/105 − 1. The low was 10.1% below the previous close (USD 116.82), and the close 3.3% below it. Volume was 3.0 times the median of the preceding days. Daily bars support these comparisons without describing the fall and the recovery within the day.</p></details>
 </section><h2 class="sec" id="s-race">Case Studies: the HFT Arms Race and Intraday Momentum</h2>
 <section class="blk" id="race-tax">
   <h3>Case Study: the Implied Daily Tax on SPY</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch10_race_tax_en.jpg" alt="Slide 54: Case Study: the Implied Daily Tax on SPY" loading="lazy"></a>
-      <figcaption>Slide 54</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch10_race_tax_en.jpg" alt="Slide 55: Case Study: the Implied Daily Tax on SPY" loading="lazy"></a>
+      <figcaption>Slide 55</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="rt-h">Tax threshold: <b id="rt-h-v"></b></label><input type="range" id="rt-h" min="0.2" max="1.1" step="0.0001" value="0.4213"></div><div class="ctl"><label for="rt-b">Volatility coefficient: <b id="rt-b-v"></b></label><input type="range" id="rt-b" min="0" max="0.02" step="0.0001" value="0.0066"></div><button class="btn play" id="rt-play" type="button"></button></div><div class="charts "><div class="chart" id="rt-chart"></div><div class="chart" id="rt-hist"></div></div><ul class="out" id="rt-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> On how many days does the implied SPY tax exceed the authors' most pessimistic scenario, 0.74 bp?</div>
-  <details><summary>Answer</summary><p>On 2 of the 1,244 days. The maximum, 1.04 bp, is on 7 April 2025, with a realised volatility of 106.7%. The median tax is 0.40 bp, close to the 0.419 bp measured in London, and on 30% of the days the tax exceeds 0.4213 bp.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Keep the volatility coefficient at 0.0066 and raise the threshold from 0.4213 to 0.74 bp. What happens to the implied-tax series?</div>
+  <details><summary>Answer</summary><p>It stays the same. The implied tax is 0.3354 + 0.0066 × realised volatility, in percent; the threshold changes only the classification of exceedances: from 30% of the days above 0.4213 bp to 2 of the 1,244 days above 0.74 bp. The maximum, 1.04 bp, is on 7 April 2025, with a realised volatility of 106.7%; the median is 0.40 bp. The values transfer to SPY the coefficients estimated in London, where the measured tax is 0.419 bp.</p></details>
 </section>
 <section class="blk" id="intraday-momentum">
   <h3>Case Study: SPY Intraday Momentum, 2020–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=59" target="_blank" rel="noopener"><img src="slides/ch10_intraday_momentum_en.jpg" alt="Slide 58: Case Study: SPY Intraday Momentum, 2020–2026" loading="lazy"></a>
-      <figcaption>Slide 58</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=60" target="_blank" rel="noopener"><img src="slides/ch10_intraday_momentum_en.jpg" alt="Slide 59: Case Study: SPY Intraday Momentum, 2020–2026" loading="lazy"></a>
+      <figcaption>Slide 59</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="im-m">Length of the last interval (minutes): <b id="im-m-v"></b></label><input type="range" id="im-m" min="10" max="60" step="10" value="30"></div><button class="btn play" id="im-play" type="button"></button></div><div class="charts "><div class="chart" id="im-scat"></div><div class="chart" id="im-year"></div></div><ul class="out" id="im-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Does the last half hour of SPY continue the move of the rest of the day, as in the paper's futures?</div>
-  <details><summary>Answer</summary><p>We find no significant positive momentum. Over the 1,460 days of Oct 2020 – Sep 2026 the slope is 100β = −0.32 (t = −0.33), with the 95% interval [−2.22, 1.58]: the paper's slope, 4.18, lies outside it. The only period whose interval excludes 0 is 2020-21, with slope −4.81, of the opposite sign (p = 0.019; after the Holm correction for six subperiods, p = 0.11). For the last 10 minutes the slope is −1.48 (p = 0.043): a negative coefficient, not significant after the Holm correction for six intervals (p = 0.26).</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> We explore six lengths of the last interval. The smallest two-sided p-value is 0.043, for the last 10 minutes. What does the Holm procedure decide at the 5% level?</div>
+  <details><summary>Answer</summary><p>It rejects none of the null hypotheses in this family: the first comparison is 0.043 against 0.05/6 ≈ 0.0083, and the smallest adjusted p-value is about 0.26. Non-rejection does not establish zero slopes. For the last 30 minutes, over the 1,460 days of Oct 2020 – Sep 2026, the slope is 100β = −0.32 (t = −0.33), with the 95% interval [−2.22, 1.58]: the paper's slope, 4.18, lies outside it. The only subperiod whose interval excludes 0 is 2020-21, with slope −4.81, of the opposite sign (p = 0.019; after the Holm correction for six subperiods, p = 0.11).</p></details>
 </section><h2 class="sec" id="s-ai">Artificial Intelligence for Scientific Discovery</h2>
 <section class="blk" id="mini-case">
   <h3>Mini-Case: Cost or Volatility?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=64" target="_blank" rel="noopener"><img src="slides/ch10_sem_cross_en.jpg" alt="Slide 63: Mini-Case: Cost or Volatility?" loading="lazy"></a>
-      <figcaption>Slide 63</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter10_market_microstructure.pdf#page=65" target="_blank" rel="noopener"><img src="slides/ch10_sem_cross_en.jpg" alt="Slide 64: Mini-Case: Cost or Volatility?" loading="lazy"></a>
+      <figcaption>Slide 64</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="mc-x">Assets included: <b id="mc-x-v"></b></label><input type="range" id="mc-x" min="0" max="3" step="1" value="0"></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts three"><div class="chart" id="mc-1"></div><div class="chart" id="mc-2"></div><div class="chart" id="mc-3"></div></div><ul class="out" id="mc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Do the Corwin–Schultz ranks from daily bars follow the cost of trading or volatility?</div>
-  <details><summary>Answer</summary><p>Volatility. The Spearman correlation with annualised volatility is 0.94, and with the Amihud ratio −0.12 (p = 0.58). The difference between the two correlations is 1.06, with the 95% interval [0.58, 1.44] over assets. The Amihud ratio and traded value have a correlation of −0.99.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Across the 25 assets, the Spearman correlation between Corwin–Schultz and Amihud is −0.12, with p = 0.58. Which conclusion is justified?</div>
+  <details><summary>Answer</summary><p>The test does not identify a nonzero monotonic association; it establishes neither independence nor causality. The Amihud ratio is an illiquidity proxy, not the observed effective trading cost. In the same sample, the correlation of Corwin–Schultz with annualised volatility is 0.94; the difference between the two correlations is 1.06, with the 95% interval [0.58, 1.44] over assets. The Amihud ratio and traded value have a correlation of −0.99.</p></details>
 </section>
 <p class="src foot">SPY: 5-minute bars of the regular session, October 2020 – September 2026, and daily bars. The 25 US, BVB and crypto assets: daily bars, September 2024 – September 2026; BVB traded values are converted to USD. EODHD prices; VIX. The order book and the Roll model are simulated.</p>
 </main>

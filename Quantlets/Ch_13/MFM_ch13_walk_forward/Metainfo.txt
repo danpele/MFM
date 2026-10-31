@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch13_walk_forward'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Walk-forward backtest 2010-2026 of a gradient boosting long/cash signal on the S&P 500 with yearly refits, purged training windows and 5 bp transaction costs, compared with buy-and-hold.'
+Description: 'Walk-forward backtest 2010-2026 of a gradient boosting long/cash signal on the S&P 500 with yearly refits, purged training windows and 5 bp transaction costs, compared with buy-and-hold. The order d of the FFD price feature is chosen on data up to 2009 only; the decision is taken at the close of day t and the trade executes at the close of day t+1.'
 
 Keywords: 'walk-forward, backtest, gradient boosting, transaction costs, Sharpe ratio, S&P 500'
 

@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch16_data.js?v=20261030a"></script>
-<script src="ch16_text_en.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch16.js?v=20261030a" defer></script>
+<script src="ch16_data.js?v=20261030b"></script>
+<script src="ch16_text_en.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch16.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,98 +38,98 @@
 <section class="blk" id="market-value">
   <h3>Five Coins, One Dominant Asset</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=5" target="_blank" rel="noopener"><img src="slides/ch16_market_value_en.jpg" alt="Slide 4: Five Coins, One Dominant Asset" loading="lazy"></a>
-      <figcaption>Slide 4</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=6" target="_blank" rel="noopener"><img src="slides/ch16_market_value_en.jpg" alt="Slide 5: Five Coins, One Dominant Asset" loading="lazy"></a>
+      <figcaption>Slide 5</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="mv-t">Month: <b id="mv-t-v"></b></label><input type="range" id="mv-t" min="0" max="104" step="1" value="104"></div><button class="btn play" id="mv-play" type="button"></button></div><div class="charts "><div class="chart" id="mv-chart"></div></div><ul class="out" id="mv-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> What share of the value of the five coins does Bitcoin hold, and how stable has this share been since 2018?</div>
-  <details><summary>Answer</summary><p>82.5% on 18 September 2026. The share ranged between 55.8% (1 Feb 2018) and 88.5% (5 Sep 2019). Ethereum holds 16.2%, and Dogecoin, Cardano and Litecoin together less than 1.5%. The total value, 1,970 billion USD, follows prices, because supply changes slowly.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Bitcoin accounts for 82.5% of the five coins' market value. If only Bitcoin's price doubles and quantities remain unchanged, what is its new share?</div>
+  <details><summary>Answer</summary><p>About 90.4%: 2 × 0.825 / (2 × 0.825 + 0.175) = 0.904. Constant quantities do not imply constant value weights. The 91.25% option adds half of the other coins' share instead of recalculating total market value. In the data, the Bitcoin share ranged between 55.8% (1 Feb 2018) and 88.5% (5 Sep 2019); on 18 September 2026 Ethereum holds 16.2%, and the five coins are worth 1,970 billion USD.</p></details>
 </section><h2 class="sec" id="s-sty">Stylised Facts of Crypto Returns</h2>
 <section class="blk" id="rolling-vol">
   <h3>Volatility Over Time</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch16_rolling_vol_en.jpg" alt="Slide 11: Volatility Over Time" loading="lazy"></a>
-      <figcaption>Slide 11</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch16_rolling_vol_en.jpg" alt="Slide 12: Volatility Over Time" loading="lazy"></a>
+      <figcaption>Slide 12</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="rv-w">Window (calendar days): <b id="rv-w-v"></b></label><input type="range" id="rv-w" min="30" max="730" step="5" value="365"></div><button class="btn play" id="rv-play" type="button"></button></div><div class="charts "><div class="chart" id="rv-chart"></div></div><ul class="out" id="rv-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> How volatile is Bitcoin today compared with the S&P 500?</div>
-  <details><summary>Answer</summary><p>On the one-year window, the annualised volatility is 45% for Bitcoin and 13% for the S&P 500, so Bitcoin is 3.5 times as volatile. Bitcoin volatility fell from 88% to 45%, and Ethereum volatility from 109% to 64%. The decline is consistent with a maturing market, but the chart does not identify a cause.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On 18 September 2026, using the 365-day window, the ratio of annualised Bitcoin to S&P 500 volatility is about 3.5. What is the ratio of their annualised variances?</div>
+  <details><summary>Answer</summary><p>About 12.2. Variance is squared volatility: (45.1% / 12.9%)² ≈ 3.5² ≈ 12.2. The 3.5 option confuses variance with standard deviation; 1.9 takes another square root. Annualised Bitcoin volatility fell from its post-2019 maximum of 88% to 45%, and Ethereum volatility from 109% to 64%. The decline is consistent with a maturing market, but the chart does not identify a cause.</p></details>
 </section>
 <section class="blk" id="weekday">
   <h3>A 7-Day Market with a Weekend Lull</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch16_weekday_en.jpg" alt="Slide 12: A 7-Day Market with a Weekend Lull" loading="lazy"></a>
-      <figcaption>Slide 12</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=14" target="_blank" rel="noopener"><img src="slides/ch16_weekday_en.jpg" alt="Slide 13: A 7-Day Market with a Weekend Lull" loading="lazy"></a>
+      <figcaption>Slide 13</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="wd-s">Split date: <b id="wd-s-v"></b></label><input type="range" id="wd-s" min="0" max="86" step="1" value="60"></div><button class="btn play" id="wd-play" type="button"></button></div><div class="charts "><div class="chart" id="wd-chart"></div></div><ul class="out" id="wd-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Is Bitcoin as volatile at weekends as on weekdays?</div>
-  <details><summary>Answer</summary><p>No. The ratio of the weekend variance to the weekday variance is 0.45 before 11 January 2024 and 0.39 after. At weekends there is no macroeconomic news, no US stock market and no ETF flows. All days are calmer after the ETF launch: on weekdays, the root mean squared return falls from 4.01% to 2.73%.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> After 11 January 2024, the ratio of Bitcoin's weekend return variance to its weekday return variance is 0.39. What is the ratio of standard deviations?</div>
+  <details><summary>Answer</summary><p>About 0.62: √0.39 ≈ 0.62. The 0.39 option retains the variance ratio; 1.60 reverses the comparison. Before 11 January 2024, the variance ratio is 0.45. The chart displays the root mean squared return by weekday, a distinct measure: on weekdays it falls from 4.01% to 2.73%. At weekends the US stock market is closed and there are no ETF flows; the before/after difference does not establish a causal ETF effect.</p></details>
 </section>
 <section class="blk" id="rolling-corr">
   <h3>Is Bitcoin Moving with Shares?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=14" target="_blank" rel="noopener"><img src="slides/ch16_rolling_corr_en.jpg" alt="Slide 13: Is Bitcoin Moving with Shares?" loading="lazy"></a>
-      <figcaption>Slide 13</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch16_rolling_corr_en.jpg" alt="Slide 14: Is Bitcoin Moving with Shares?" loading="lazy"></a>
+      <figcaption>Slide 14</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="rc-w">Window (common days): <b id="rc-w-v"></b></label><input type="range" id="rc-w" min="20" max="500" step="10" value="250"></div><button class="btn play" id="rc-play" type="button"></button></div><div class="charts "><div class="chart" id="rc-chart"></div></div><ul class="out" id="rc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Did the correlation between Bitcoin and the S&P 500 change at the spot ETF launch or earlier?</div>
-  <details><summary>Answer</summary><p>Earlier. The correlation is 0.02 in 2017–2019, 0.39 in 2020–2023 and 0.38 after the ETF launch. The break appears in early 2020; the sup-Wald test of the lecture dates it to 9 March 2020. With gold, the correlation rises from −0.02 to 0.12 and then to 0.22.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Bitcoin–S&P 500 correlation is 0.02 in 2017–2019, 0.39 in 2020–2023 and 0.38 after the spot ETF launch. What does this comparison support?</div>
+  <details><summary>Answer</summary><p>The increase predates the launch, and the comparison establishes timing, not a mechanism. In the separate regression of Bitcoin on S&P 500 returns, the sup-Wald test rejects no break in the coefficients (sup W = 20.12), and the date that minimises SSR is 9 March 2020. With gold, the correlation rises from −0.02 to 0.12 and then to 0.22.</p></details>
 </section><h2 class="sec" id="s-crix">Crypto Indices: CRIX</h2>
 <section class="blk" id="crix">
   <h3>Crypto Indices Since 2018</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch16_crix_index_en.jpg" alt="Slide 22: Crypto Indices Since 2018" loading="lazy"></a>
-      <figcaption>Slide 22</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch16_crix_index_en.jpg" alt="Slide 23: Crypto Indices Since 2018" loading="lazy"></a>
+      <figcaption>Slide 23</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cx-s">Start of the period: <b id="cx-s-v"></b></label><input type="range" id="cx-s" min="0" max="92" step="1" value="0"></div><button class="btn play" id="cx-play" type="button"></button></div><div class="charts "><div class="chart" id="cx-chart"></div></div><ul class="out" id="cx-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> The equally weighted index had a compound annual return of 30.0%, above the 21.4% of the cap-weighted index. Is this a stable premium?</div>
-  <details><summary>Answer</summary><p>No. The difference comes from 2021, when the equally weighted index rose by 998% and the cap-weighted index by 113%. Its volatility is also higher: 82.5% against 65.7%. The five coins are chosen ex post among today's survivors, so both returns are biased upwards (survivorship bias).</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The equally weighted index has a CAGR of 30.0%, versus 21.4% for market-cap weighting. Is this sufficient to recommend equal weights for a new period?</div>
+  <details><summary>Answer</summary><p>No. The difference is concentrated in 2021, when the equally weighted index rose by 998% and the cap-weighted index by 113%. Volatilities are 82.5% and 65.7%; CAGR is not a risk-adjusted measure. The five coins are chosen ex post among today's survivors: a shared universe does not remove the selection problem (survivorship bias).</p></details>
 </section><h2 class="sec" id="s-stab">Stablecoins</h2>
 <section class="blk" id="peg">
   <h3>Deviations from 1 USD</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=27" target="_blank" rel="noopener"><img src="slides/ch16_peg_deviation_en.jpg" alt="Slide 26: Deviations from 1 USD" loading="lazy"></a>
-      <figcaption>Slide 26</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch16_peg_deviation_en.jpg" alt="Slide 27: Deviations from 1 USD" loading="lazy"></a>
+      <figcaption>Slide 27</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="pg-c">Threshold for |deviation|: <b id="pg-c-v"></b></label><input type="range" id="pg-c" min="10" max="200" step="5" value="50"></div><button class="btn play" id="pg-play" type="button"></button></div><div class="charts "><div class="chart" id="pg-chart"></div></div><ul class="out" id="pg-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> How often does the closing price of a stablecoin deviate from 1 USD by more than 50 bp?</div>
-  <details><summary>Answer</summary><p>On less than 1% of the days in 2021–2026: 0.14% for Tether and USD Coin, 0.57% for Dai. The standard deviation of the close is 7.3 bp, 7.5 bp and 10.8 bp respectively. Stress episodes are rare but severe: the daily low of USD Coin was −1,226 bp, on 11 March 2023.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> If we raise the threshold for the absolute closing-price deviation from 50 to 100 bp, what happens to the number of exceedance days?</div>
+  <details><summary>Answer</summary><p>Days exceeding 100 bp are a subset of those exceeding 50 bp. Their counts fall from 3 to 1 for Tether, from 3 to 2 for USD Coin and from 12 to 3 for Dai, in 2021–2026. The standard deviation of the close is 7.3 bp, 7.5 bp and 10.8 bp respectively, but the tails are heavy: stress episodes are rare, not impossible. The counts use closing prices; the daily low of USD Coin was −1,226 bp, on 11 March 2023.</p></details>
 </section>
 <section class="blk" id="svb">
   <h3>March 2023: a Bank Failure Hits USD Coin</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch16_depeg_2023_en.jpg" alt="Slide 32: March 2023: a Bank Failure Hits USD Coin" loading="lazy"></a>
-      <figcaption>Slide 32</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=34" target="_blank" rel="noopener"><img src="slides/ch16_depeg_2023_en.jpg" alt="Slide 33: March 2023: a Bank Failure Hits USD Coin" loading="lazy"></a>
+      <figcaption>Slide 33</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="dp-t">Day: <b id="dp-t-v"></b></label><input type="range" id="dp-t" min="0" max="15" step="1" value="6"></div><button class="btn play" id="dp-play" type="button"></button></div><div class="charts "><div class="chart" id="dp-chart"></div></div><ul class="out" id="dp-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Silicon Valley Bank was closed on Friday, 10 March 2023. Why did USD Coin reach its low on Saturday?</div>
-  <details><summary>Answer</summary><p>At the weekend redemptions could not be settled, so the arbitrage that keeps the price within the band disappeared. The daily low of USD Coin was 0.8774 USD on Saturday, 11 March, with a close of 0.9715 USD. Dai, backed by crypto-assets, fell to 0.8970 USD, while Tether stayed above the peg.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On Saturday, 11 March 2023, USD Coin closes at USD 0.9715 while USD redemption settlement is unavailable. Is buying USD Coin for later redemption automatically a risk-free arbitrage?</div>
+  <details><summary>Answer</summary><p>No. A price below USD 1 does not guarantee receipt of one dollar. Uncertainty about the reserves held at Silicon Valley Bank, closed on Friday, 10 March, and unavailable weekend settlement constrained the redemption mechanism that keeps the price within the band. The daily low, USD 0.8774, differs from the USD 0.9715 close. Dai, backed by crypto-assets, fell to USD 0.8970, while Tether stayed above the peg.</p></details>
 </section><h2 class="sec" id="s-defi">DeFi and Automated Market Makers</h2>
 <section class="blk" id="tvl">
   <h3>Total Value Locked in DeFi</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch16_defi_tvl_en.jpg" alt="Slide 34: Total Value Locked in DeFi" loading="lazy"></a>
-      <figcaption>Slide 34</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=36" target="_blank" rel="noopener"><img src="slides/ch16_defi_tvl_en.jpg" alt="Slide 35: Total Value Locked in DeFi" loading="lazy"></a>
+      <figcaption>Slide 35</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="tv-s">First month of the regression: <b id="tv-s-v"></b></label><input type="range" id="tv-s" min="0" max="56" step="1" value="0"></div><button class="btn play" id="tv-play" type="button"></button></div><div class="charts "><div class="chart" id="tv-chart"></div><div class="chart" id="tv-sc"></div></div><ul class="out" id="tv-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> How much of the monthly variation of TVL does the Ether price explain?</div>
-  <details><summary>Answer</summary><p>In the regression of monthly log changes, β = 0.79 (Newey–West SE 0.07) and R² = 0.62, over 79 complete months. TVL is the value of the deposited tokens, so it moves mechanically with their prices. TVL rose from 0.6 billion USD in January 2020 to 177 billion on 9 Nov 2021 and is 88 billion today.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The regression of monthly TVL log changes on Ether price log changes has β = 0.79 and R² = 0.62. For two months whose Ether log changes differ by 0.10, how much do the fitted TVL log changes differ?</div>
+  <details><summary>Answer</summary><p>0.079 = 0.79 × 0.10. R² measures the fraction of sample variation explained, not the slope; the 0.062 option confuses the two. The 0.10 option assumes a one-for-one relationship. The estimate uses 79 complete months, with a Newey–West SE of 0.066. TVL is the value of the deposited tokens, so it moves mechanically with their prices; the regression does not identify a causal effect. TVL rose from 0.6 billion USD in January 2020 to 177 billion on 9 Nov 2021 and is 88 billion today.</p></details>
 </section>
 <section class="blk" id="lp">
   <h3>A Liquidity Provider in an Ether Pool</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch16_lp_vs_hodl_en.jpg" alt="Slide 40: A Liquidity Provider in an Ether Pool" loading="lazy"></a>
-      <figcaption>Slide 40</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch16_lp_vs_hodl_en.jpg" alt="Slide 41: A Liquidity Provider in an Ether Pool" loading="lazy"></a>
+      <figcaption>Slide 41</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="lp-t">Date: <b id="lp-t-v"></b></label><input type="range" id="lp-t" min="0" max="992" step="1" value="992"></div><div class="ctl"><label for="lp-f">Fee income of the pool (% a year): <b id="lp-f-v"></b></label><input type="range" id="lp-f" min="0" max="12" step="0.5" value="0"></div><button class="btn play" id="lp-play" type="button"></button></div><div class="charts "><div class="chart" id="lp-chart"></div><div class="chart" id="lp-il"></div></div><ul class="out" id="lp-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Ether ended the period close to its initial price (r = 1.11). Did the liquidity provider lose against simply holding?</div>
-  <details><summary>Answer</summary><p>Very little: 105.4 against 105.5, an impermanent loss of −0.14%. Against the rebalancing benchmark (122.4), however, the gap is 17.0 points. The realised LVR is 5.83% a year, close to σ²/8 = 5.79% (σ = 68.1%), so fees must bring about 5.8% a year to match the benchmark.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> In the no-fee model, Ether returns exactly to its initial price after several price changes. What happens to the impermanent loss (IL) and to the accumulated LVR?</div>
+  <details><summary>Answer</summary><p>IL depends only on the ratio r of the final to the initial price and is zero at r = 1. LVR accumulates along the path, with every price change. In the sample, Ether ends at r = 1.11: the pool is worth 105.4, holding 105.5 (IL −0.14%) and the rebalancing benchmark 122.4. The realised LVR rate is 5.83% a year and the approximation σ²/8 is 5.79% (σ = 68.1%). The compounded fee rate that brings the pool to the benchmark's terminal value in the simulator is about 5.5% a year; these are different quantities.</p></details>
 </section><h2 class="sec" id="s-etf">Spot ETFs and Crypto Equities</h2>
 <section class="blk" id="etf-tracking">
   <h3>IBIT Follows Bitcoin</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch16_etf_tracking_en.jpg" alt="Slide 44: IBIT Follows Bitcoin" loading="lazy"></a>
-      <figcaption>Slide 44</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch16_etf_tracking_en.jpg" alt="Slide 45: IBIT Follows Bitcoin" loading="lazy"></a>
+      <figcaption>Slide 45</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="et-p">ETF</label><select id="et-p"><option value="IBIT" selected>IBIT / Bitcoin</option><option value="ETHA">ETHA / Ether</option></select></div><div class="ctl"><label for="et-t">Up to: <b id="et-t-v"></b></label><input type="range" id="et-t" min="0" max="672" step="1" value="672"></div><button class="btn play" id="et-play" type="button"></button></div><div class="charts "><div class="chart" id="et-chart"></div></div><ul class="out" id="et-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> How much does IBIT lose per year against Bitcoin?</div>
@@ -138,52 +138,52 @@
 <section class="blk" id="etf-timing">
   <h3>Daily vs Weekly Returns and the Dimson Beta</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch16_etf_timing_en.jpg" alt="Slide 47: Daily vs Weekly Returns and the Dimson Beta" loading="lazy"></a>
-      <figcaption>Slide 47</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch16_etf_timing_en.jpg" alt="Slide 48: Daily vs Weekly Returns and the Dimson Beta" loading="lazy"></a>
+      <figcaption>Slide 48</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="tm-p">ETF</label><select id="tm-p"><option value="IBIT" selected>IBIT / Bitcoin</option><option value="ETHA">ETHA / Ether</option></select></div><div class="ctl"><label for="tm-h">Return horizon, left panel: <b id="tm-h-v"></b></label><input type="range" id="tm-h" min="1" max="10" step="1" value="1"></div><button class="btn play" id="tm-play" type="button"></button></div><div class="charts "><div class="chart" id="tm-d"></div><div class="chart" id="tm-w"></div></div><ul class="out" id="tm-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Why is the R² between IBIT and Bitcoin 0.82 on daily returns but 0.98 on weekly returns?</div>
-  <details><summary>Answer</summary><p>The daily close of the coin and the New York close are several hours apart, so part of the move of day t reaches the ETF on day t ± 1. On weekly returns the offset matters little: beta goes from 0.93 to 1.01. Newey–West standard errors do not correct the bias of beta.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For IBIT, what happens to the left-panel R² when ▶ increases the return horizon from one to 10 trading days?</div>
+  <details><summary>Answer</summary><p>It rises from 0.82 to 0.99, and beta from 0.93 to 0.99, using 67 non-overlapping observations. The weekly panel uses Friday-to-Friday returns and gives R² = 0.98 and beta = 1.01. The daily close of the coin and the New York close are several hours apart, so part of the move of day t reaches the ETF on day t ± 1; the offset matters relatively less over longer horizons. R² does not rise at every step.</p></details>
 </section><h2 class="sec" id="s-alt">Are Cryptos Becoming Alternative Assets?</h2>
 <section class="blk" id="alt-assets">
   <h3>Cryptos Among Other Asset Classes</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch16_alt_assets_en.jpg" alt="Slide 55: Cryptos Among Other Asset Classes" loading="lazy"></a>
-      <figcaption>Slide 55</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=57" target="_blank" rel="noopener"><img src="slides/ch16_alt_assets_en.jpg" alt="Slide 56: Cryptos Among Other Asset Classes" loading="lazy"></a>
+      <figcaption>Slide 56</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="aa-k">Feature left out of the PCA: <b id="aa-k-v"></b></label><input type="range" id="aa-k" min="0" max="8" step="1" value="0"></div><button class="btn play" id="aa-play" type="button"></button></div><div class="charts "><div class="chart" id="aa-chart"></div></div><ul class="out" id="aa-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Did crypto-assets move closer to the other asset classes between W1 (2019 – June 2021) and W2 (January 2024 – September 2026)?</div>
-  <details><summary>Answer</summary><p>The point estimates suggest so: the distance to equities falls from 3.03 to 2.63, and to commodities from 2.26 to 1.86. Crypto-assets have also become more alike: their spread around their centre falls from 2.13 to 1.43. Bitcoin volatility falls from 77% to 47%. All 95% bootstrap intervals of these shifts contain 0 (equities: Δ = −0.39, CI [−1.04, 0.59]), so the move is not separated from noise.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Using all eight features, the change in the crypto–equity distance between W1 (2019 – June 2021) and W2 (January 2024 – September 2026) is −0.39, with a 95% bootstrap CI of [−1.04, 0.59]. What does this interval support?</div>
+  <details><summary>Answer</summary><p>The estimate suggests convergence, but the interval does not exclude no change. The sign of the estimate does not establish significance, and including zero does not establish equality. The distance is measured in the space of the eight standardised features, not just in the PC1–PC2 projection: to equities it falls from 3.03 to 2.63, to commodities from 2.26 to 1.86, and the spread of crypto-assets around their centre from 2.13 to 1.43. The interval is indicative, because some features require finite moments that are questionable here, and it does not carry over to the variants with a feature left out, for which the bootstrap is not recomputed.</p></details>
 </section><h2 class="sec" id="s-case">Case Study: Common Risk Factors in Cryptocurrency</h2>
 <section class="blk" id="ltw">
   <h3>Case Study: Table 1 Rebuilt on the Course Data</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=61" target="_blank" rel="noopener"><img src="slides/ch16_ltw_table1_en.jpg" alt="Slide 60: Case Study: Table 1 Rebuilt on the Course Data" loading="lazy"></a>
-      <figcaption>Slide 60</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch16_ltw_table1_en.jpg" alt="Slide 61: Case Study: Table 1 Rebuilt on the Course Data" loading="lazy"></a>
+      <figcaption>Slide 61</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="lt-e">End of the in-sample period: <b id="lt-e-v"></b></label><input type="range" id="lt-e" min="0" max="95" step="1" value="30"></div><button class="btn play" id="lt-play" type="button"></button></div><div class="charts "><div class="chart" id="lt-chart"></div></div><ul class="out" id="lt-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Do the weekly mean and volatility reported by Liu, Tsyvinski and Wu (2022) hold on the new data?</div>
-  <details><summary>Answer</summary><p>On the same weeks, our sample reproduces Table 1: the largest difference, for the Ether mean, is 0.26 standard errors. Out of sample (319 weeks), the means are lower (Bitcoin 0.9%, XRP 1.6%, Ether 1.2%), and the standard deviation of Ether roughly halves, from 20.7% to 11.1%.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> If the in-sample endpoint moves from July 2020 to December 2025, do the orange bars still reproduce Table 1 of Liu, Tsyvinski and Wu (2022) on the same weeks?</div>
+  <details><summary>Answer</summary><p>No. A same-week replication requires the paper's calendar, ending in July 2020; extending the sample changes the observations and may change the estimated moments. At the July 2020 split, the largest difference from Table 1, for the Ether mean, is 0.26 i.i.d. standard errors; this does not establish equality of the parameters. Out of sample (319 weeks), the weekly means are lower (Bitcoin 0.9%, XRP 1.6%, Ether 1.2%), and the standard deviation of Ether falls from 20.7% to 11.1%.</p></details>
 </section>
 <section class="blk" id="hashrate">
   <h3>Case Study: Bitcoin Price and Hashrate, 2010–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=64" target="_blank" rel="noopener"><img src="slides/ch16_pagnotta_hashrate_en.jpg" alt="Slide 63: Case Study: Bitcoin Price and Hashrate, 2010–2026" loading="lazy"></a>
-      <figcaption>Slide 63</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=65" target="_blank" rel="noopener"><img src="slides/ch16_pagnotta_hashrate_en.jpg" alt="Slide 64: Case Study: Bitcoin Price and Hashrate, 2010–2026" loading="lazy"></a>
+      <figcaption>Slide 64</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="hr-e">End of the first window: <b id="hr-e-v"></b></label><input type="range" id="hr-e" min="0" max="132" step="1" value="73"></div><div class="ctl"><label for="hr-k">Day after the halving: <b id="hr-k-v"></b></label><input type="range" id="hr-k" min="0" max="90" step="1" value="30"></div><button class="btn play" id="hr-play" type="button"></button></div><div class="charts "><div class="chart" id="hr-lv"></div><div class="chart" id="hr-ev"></div></div><ul class="out" id="hr-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Lemma 1 of Pagnotta (2022) predicts that a halving halves the hashrate with the expected price, the cost and the number of miners unchanged. What do the four halvings show?</div>
-  <details><summary>Answer</summary><p>After 30 days, the USD reward per block had fallen by 45% (2012), 56% (2016), 48% (2020) and 52% (2024), but the hashrate changed by −10%, +4%, −5% and −8%. The largest fall in the first 90 days was −25% (2020, day 14). Hardware already bought is a sunk cost: miners stay active while the reward covers the cost of energy. In levels, the elasticity to the USD reward per block, with a trend, is 1.19 in the paper's window and 0.03 after January 2020, a descriptive association; the Engle–Granger test does not reject no cointegration in either.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On day 30 after the four halvings, hashrate changes range from about −10% to +4%, far less than the static −50% benchmark of Lemma 1 in Pagnotta (2022). Does this comparison refute Lemma 1?</div>
+  <details><summary>Answer</summary><p>Not by itself. The −50% benchmark assumes linear costs, a halving of the reward, and unchanged expected price, unit cost and number of miners; the data include dynamic adjustment, fees and price changes. After 30 days, the USD reward per block had fallen by 45% (2012), 56% (2016), 48% (2020) and 52% (2024), while the hashrate changed by −10%, +4%, −5% and −8%. Day 30 does not describe the whole interval: on day 90 the hashrate is 25% (2012) and 20% (2016) above its pre-halving level. In levels, the elasticity to the USD reward per block, with a trend, is 1.19 in the paper's window and 0.03 after January 2020, a descriptive association; the Engle–Granger test does not reject no cointegration in either.</p></details>
 </section><h2 class="sec" id="s-ai">AI for Scientific Discovery</h2>
 <section class="blk" id="zscan">
   <h3>Mini-Case: Did the ETFs Break the Correlation?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=70" target="_blank" rel="noopener"><img src="slides/ch16_ai_zscan_en.jpg" alt="Slide 69: Mini-Case: Did the ETFs Break the Correlation?" loading="lazy"></a>
-      <figcaption>Slide 69</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter16_digital_assets_defi.pdf#page=71" target="_blank" rel="noopener"><img src="slides/ch16_ai_zscan_en.jpg" alt="Slide 70: Mini-Case: Did the ETFs Break the Correlation?" loading="lazy"></a>
+      <figcaption>Slide 70</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="az-w">Window h on each side: <b id="az-w-v"></b></label><input type="range" id="az-w" min="100" max="800" step="50" value="500"></div><button class="btn play" id="az-play" type="button"></button></div><div class="charts "><div class="chart" id="az-chart"></div></div><ul class="out" id="az-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> If we let the data choose the break date, is it 11 January 2024?</div>
-  <details><summary>Answer</summary><p>No. The largest z is on 5 February 2020 (z = 7.26). At the ETF date z = −1.48, and 82% of the candidate dates give a larger |z|. The ±1.96 band is pointwise: the maximum over more than a thousand overlapping dates needs its own critical value, which is why inference uses the sup-Wald test.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> With windows of 500 common days, the largest |z| of the change in the Bitcoin–S&P 500 correlation is 7.26. Is exceeding 1.96 sufficient to declare a break at a global 5% level?</div>
+  <details><summary>Answer</summary><p>No. The scan considers 1,694 candidate dates with overlapping windows, and the maximum over these dates needs its own critical value. The ±1.96 band is pointwise and indicative under heavy tails and dependence. The maximum is on 5 February 2020; at the ETF date z = −1.48, and 82% of the candidate dates give a |z| at least as large. The scan is descriptive; the lecture's sup-Wald test concerns breaks in the regression coefficients and does not supply the critical value for this scan's maximum.</p></details>
 </section>
 <p class="src foot">Daily EODHD prices (crypto-assets, stablecoins, ETFs, S&P 500, gold) up to 18 September 2026. Circulating supply of the coins: Coin Metrics Community Data. Total value locked (TVL): DefiLlama. Table 1: Liu, Tsyvinski and Wu (2022), Journal of Finance. Hashrate and coins issued per day: Coin Metrics Community Data; Lemma 1: Pagnotta (2022), Review of Financial Studies.</p>
 </main>

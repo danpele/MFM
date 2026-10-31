@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch3_data.js?v=20261030a"></script>
-<script src="ch3_text_ro.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch3.js?v=20261030a" defer></script>
+<script src="ch3_data.js?v=20261030b"></script>
+<script src="ch3_text_ro.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch3.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,108 +38,108 @@
 <section class="blk" id="frontier">
   <h3>Frontiera eficientă a sectoarelor din SUA</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=11" target="_blank" rel="noopener"><img src="slides/ch3_frontier_ro.jpg" alt="Slide-ul 10: Frontiera eficientă a sectoarelor din SUA" loading="lazy"></a>
-      <figcaption>Slide-ul 10</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch3_frontier_ro.jpg" alt="Slide-ul 11: Frontiera eficientă a sectoarelor din SUA" loading="lazy"></a>
+      <figcaption>Slide-ul 11</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="fr-t">Eșantionul se termină în: <b id="fr-t-v"></b></label><input type="range" id="fr-t" min="60" max="330" step="1" value="330"></div><button class="btn play" id="fr-play" type="button"></button></div><div class="charts "><div class="chart" id="fr-chart"></div><div class="chart" id="fr-w"></div></div><ul class="out" id="fr-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> SPY are raportul Sharpe 0,49, iar portofoliul tangent al sectoarelor 0,66. Respinge această distanță CAPM?</div>
-  <details><summary>Răspuns</summary><p>Nu. Cu Mkt-RF ca piață, testul GRS pe cele 9 sectoare dă 0,53, cu p = 0,85. Portofoliul tangent este estimat in-sample și are poziții short mari: −0,37 în XLF și −0,21 în XLB.</p></details>
+  <details><summary>Răspuns</summary><p>Nu. Portofoliul tangent este optimizat in-sample, deci diferența trebuie evaluată statistic. Cu SPY ca reper, testul GRS pe cele nouă sectoare dă aproximativ 0,72, cu p = 0,69. Slide-urile raportează separat GRS = 0,53, cu p = 0,85, folosind Mkt-RF. Niciunul dintre aceste teste nu respinge la 5%; aceasta nu dovedește că modelul este corect. Portofoliul tangent are poziții short mari: −0,37 în XLF și −0,21 în XLB.</p></details>
 </section><h2 class="sec" id="s-beta">Estimarea lui beta</h2>
 <section class="blk" id="xlk-beta">
   <h3>Beta ETF-ului de tehnologie (XLK) în date</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=17" target="_blank" rel="noopener"><img src="slides/ch3_sem_b1_xlk_ro.jpg" alt="Slide-ul 16: Beta ETF-ului de tehnologie (XLK) în date" loading="lazy"></a>
-      <figcaption>Slide-ul 16</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=18" target="_blank" rel="noopener"><img src="slides/ch3_sem_b1_xlk_ro.jpg" alt="Slide-ul 17: Beta ETF-ului de tehnologie (XLK) în date" loading="lazy"></a>
+      <figcaption>Slide-ul 17</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="xk-b">Lungimea blocului bootstrap (luni): <b id="xk-b-v"></b></label><input type="range" id="xk-b" min="1" max="36" step="1" value="12"></div><div class="ctl"><label for="xk-L">Laguri Newey–West, L: <b id="xk-L-v"></b></label><input type="range" id="xk-L" min="0" max="12" step="1" value="5"></div><button class="btn play" id="xk-play" type="button"></button></div><div class="charts "><div class="chart" id="xk-sc"></div><div class="chart" id="xk-boot"></div><div class="chart" id="xk-res"></div></div><ul class="out" id="xk-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Eroarea standard a lui beta XLK este 0,041 cu formula clasică și 0,082 cu Newey–West. Se schimbă și estimația beta = 1,277?</div>
-  <details><summary>Răspuns</summary><p>Nu. Erorile HAC schimbă doar erorile standard; estimațiile punctuale rămîn cele OLS. Alfa anual este 0,33%, cu t = 0,13, iar intervalul bootstrap de 95% este [−5,5%; 4,9%], deci alfa nu diferă de zero.</p></details>
+  <details><summary>Răspuns</summary><p>Nu. Calculul Newey–West păstrează coeficienții OLS și schimbă matricea estimată de covarianță a acestora; nu reponderează observațiile și nu aplică shrinkage. Beta rămîne 1,277. Alfa anual estimat este 0,33%, cu t = 0,13. Intervalul bootstrap de 95%, [−5,5%; 4,9%], include zero: nu respingem alfa zero la 5%.</p></details>
 </section>
 <section class="blk" id="dimson">
   <h3>De ce depinde un beta estimat</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=20" target="_blank" rel="noopener"><img src="slides/ch3_sem_primer_dimson_ro.jpg" alt="Slide-ul 19: De ce depinde un beta estimat" loading="lazy"></a>
-      <figcaption>Slide-ul 19</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=21" target="_blank" rel="noopener"><img src="slides/ch3_sem_primer_dimson_ro.jpg" alt="Slide-ul 20: De ce depinde un beta estimat" loading="lazy"></a>
+      <figcaption>Slide-ul 20</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="dm-p">Probabilitatea de tranzacționare într-o zi: <b id="dm-p-v"></b></label><input type="range" id="dm-p" min="0.3" max="1" step="0.05" value="0.75"></div><div class="ctl"><label for="dm-b">Beta adevărat: <b id="dm-b-v"></b></label><input type="range" id="dm-b" min="0" max="2" step="0.1" value="1"></div><button class="btn play" id="dm-play" type="button"></button></div><div class="charts "><div class="chart" id="dm-chart"></div></div><ul class="out" id="dm-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> O acțiune cu beta 1 se tranzacționează doar în 75% din zile. Ce pantă dă regresia pe randamentul pieței din aceeași zi?</div>
-  <details><summary>Răspuns</summary><p>0,77, deci beta este subestimat. Panta pe randamentul pieței din ziua anterioară este 0,16, iar beta Dimson, suma celor trei pante, este 0,93. Butonul ▶ crește probabilitatea de tranzacționare de la 30% la 100%: panta din aceeași zi urcă de la 0,33 la 1,00.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În această simulare, beta adevărat este 1, iar acțiunea se tranzacționează în 75% din zile; panta contemporană din regresia Dimson este 0,77. Cînd probabilitatea de tranzacționare ajunge de la 75% la 100%, cum se schimbă această pantă?</div>
+  <details><summary>Răspuns</summary><p>Panta contemporană crește de la 0,77 la aproximativ 1,00. Cu tranzacționare zilnică, reacția nu mai este amînată de zile fără tranzacții. Suma Dimson este aproximativ 0,98; într-un eșantion finit nu trebuie să fie exact 1. La 75%, panta pe randamentul pieței din ziua anterioară este 0,16, iar suma Dimson 0,93.</p></details>
 </section>
 <section class="blk" id="rolling-beta">
   <h3>Beta nu este constant</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=21" target="_blank" rel="noopener"><img src="slides/ch3_rolling_beta_ro.jpg" alt="Slide-ul 20: Beta nu este constant" loading="lazy"></a>
-      <figcaption>Slide-ul 20</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=22" target="_blank" rel="noopener"><img src="slides/ch3_rolling_beta_ro.jpg" alt="Slide-ul 21: Beta nu este constant" loading="lazy"></a>
+      <figcaption>Slide-ul 21</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="rb-w">Fereastra: <b id="rb-w-v"></b></label><input type="range" id="rb-w" min="0" max="4" step="1" value="2"></div><button class="btn play" id="rb-play" type="button"></button></div><div class="charts "><div class="chart" id="rb-chart"></div></div><ul class="out" id="rb-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Între ce valori a variat beta XLE pe ferestre de 252 de zile?</div>
-  <details><summary>Răspuns</summary><p>Între −0,31 și 1,49; la sfîrșitul eșantionului este −0,29, pentru că petrolul a evoluat în sens opus pieței. Beta XLF a variat între 0,60 și 2,17, cu maximul imediat după criza bancară din 2008–2009. Cu ferestre de 504 și 756 de zile, beta XLE rămîne pozitiv (minimele 0,20 și 0,29): fereastra lungă netezește variația.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În aceste date, cum se schimbă amplitudinea estimărilor rolling pentru beta XLE cînd fereastra crește de la 252 la 504 zile?</div>
+  <details><summary>Răspuns</summary><p>Intervalul estimărilor trece de la [−0,31; 1,49] la [0,20; 1,38]. Fereastra mai lungă netezește variația observată. Aceasta nu dovedește că beta adevărat este constant. Beta XLF variază între 0,60 și 2,17 la 252 de zile, cu maximul imediat după criza bancară din 2008–2009.</p></details>
 </section><h2 class="sec" id="s-test">Testarea CAPM</h2>
 <section class="blk" id="test-assets">
   <h3>Activele de test: 25 de portofolii mărime × B/M</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=27" target="_blank" rel="noopener"><img src="slides/ch3_p25_grid_ro.jpg" alt="Slide-ul 26: Activele de test: 25 de portofolii mărime × B/M" loading="lazy"></a>
-      <figcaption>Slide-ul 26</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch3_p25_grid_ro.jpg" alt="Slide-ul 27: Activele de test: 25 de portofolii mărime × B/M" loading="lazy"></a>
+      <figcaption>Slide-ul 27</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="pg-s">Statistica</label><select id="pg-s"><option value="0" selected>Randamentul mediu anual în exces</option><option value="1">Alfa CAPM anual</option><option value="2">Statistica t a lui alfa (Newey–West)</option></select></div><div class="ctl"><label for="pg-y">Eșantionul începe în: <b id="pg-y-v"></b></label><input type="range" id="pg-y" min="1963" max="2006" step="1" value="1963"></div><button class="btn play" id="pg-play" type="button"></button></div><div class="charts "><div class="chart" id="pg-heat"></div><div class="chart" id="pg-bar"></div></div><ul class="out" id="pg-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe fiecare rînd de mărime, care coloană B/M are randamentul mediu cel mai mare?</div>
-  <details><summary>Răspuns</summary><p>Coloana value (BM5). Colțurile extreme sînt small-growth, cu 3,9% pe an, și small-value, cu 13,3% pe an. Alfa CAPM păstrează aceeași ordine: −6,3% pe an pentru small-growth și +5,7% pentru small-value.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe eșantionul iulie 1963–iulie 2026, ce se întîmplă cu diferența small-value minus small-growth cînd trecem de la randamentele medii în exces la alfa CAPM?</div>
+  <details><summary>Răspuns</summary><p>Diferența crește de la aproximativ 9,46 la 12,00 puncte procentuale pe an: randamentele medii sînt 3,9% pentru small-growth și 13,3% pentru small-value, iar alfa CAPM −6,3% și +5,7%. Beta small-growth este aproximativ 1,42, iar beta small-value 1,06; CAPM scade o componentă de piață mai mare din randamentul small-growth. Ajustarea nu scade aceeași sumă din ambele randamente.</p></details>
 </section>
 <section class="blk" id="sml">
   <h3>Dreapta pieței titlurilor (SML) în date</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch3_sml_ro.jpg" alt="Slide-ul 27: Dreapta pieței titlurilor (SML) în date" loading="lazy"></a>
-      <figcaption>Slide-ul 27</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=29" target="_blank" rel="noopener"><img src="slides/ch3_sml_ro.jpg" alt="Slide-ul 28: Dreapta pieței titlurilor (SML) în date" loading="lazy"></a>
+      <figcaption>Slide-ul 28</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="sm-y">Eșantionul începe în: <b id="sm-y-v"></b></label><input type="range" id="sm-y" min="1963" max="2006" step="1" value="1963"></div><button class="btn play" id="sm-play" type="button"></button></div><div class="charts "><div class="chart" id="sm-sml"></div><div class="chart" id="sm-alpha"></div></div><ul class="out" id="sm-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Panta dreptei CAPM este prima pieței, 7,2% pe an. Ce pantă are dreapta estimată pe cele 25 de portofolii?</div>
-  <details><summary>Răspuns</summary><p>−4,4% pe an: portofoliile cu beta mai mare au randamente medii mai mici. Valorile beta acoperă doar intervalul 0,86–1,42, 10 din 25 de valori alfa au |t| > 1,96, iar GRS = 4,20, cu p = 7,5 × 10<sup>−11</sup> (rotunjit pe slide: 8 × 10<sup>−11</sup>). Panta rămîne negativă cînd eșantionul începe mai tîrziu: −1,0% pe an din 2006.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Din 1963, dreapta estimată pe cele 25 de portofolii are panta −4,4% pe an. Cînd începutul eșantionului ajunge la ianuarie 2003, ce se întîmplă cu această pantă?</div>
+  <details><summary>Răspuns</summary><p>Pentru ianuarie 2003–iulie 2026, panta estimată este aproximativ +2,0% pe an, iar prima pieței este 10,7%. Semnul pantei depinde de eșantion: este −4,4% cu începutul în 1963 și −1,0% cu începutul în 2006. Din 1963, valorile beta acoperă doar intervalul 0,86–1,42, iar GRS = 4,20, cu p = 7,5 × 10<sup>−11</sup> (rotunjit pe slide: 8 × 10<sup>−11</sup>).</p></details>
 </section><h2 class="sec" id="s-multi">Modele multifactoriale</h2>
 <section class="blk" id="factor-returns">
   <h3>Randamentele cumulate ale celor șase factori, 1963–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=40" target="_blank" rel="noopener"><img src="slides/ch3_factor_cum_ro.jpg" alt="Slide-ul 39: Randamentele cumulate ale celor șase factori, 1963–2026" loading="lazy"></a>
-      <figcaption>Slide-ul 39</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch3_factor_cum_ro.jpg" alt="Slide-ul 40: Randamentele cumulate ale celor șase factori, 1963–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 40</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="fc-y">Investiția începe în: <b id="fc-y-v"></b></label><input type="range" id="fc-y" min="1963" max="2016" step="1" value="1963"></div><button class="btn play" id="fc-play" type="button"></button></div><div class="charts "><div class="chart" id="fc-chart"></div></div><ul class="out" id="fc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care factor are cea mai mare valoare finală a unei unități investite în iulie 1963?</div>
-  <details><summary>Răspuns</summary><p>MOM, cu 48,0, urmat de Mkt-RF, cu 43,2. HML ajunge la 6,9, iar SMB la 2,9. Momentum a pierdut mult la revenirea pieței din 2009, iar factorul valoare a stagnat aproximativ din 2007 pînă în 2020. Clasamentul depinde de început: din 2016, Mkt-RF ajunge la 3,4, iar MOM la 1,0.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Din iulie 1963, MOM ajunge la 48,0, iar Mkt-RF la 43,2. Dacă mutăm începutul la ianuarie 2016 și păstrăm sfîrșitul în iulie 2026, care indice compus va avea valoarea finală mai mare?</div>
+  <details><summary>Răspuns</summary><p>Mkt-RF ajunge la aproximativ 3,4, iar MOM la 1,0. Din iulie 1963, ordinea era inversă: MOM 48,0 și Mkt-RF 43,2. Indicii sînt calculați ca produsul termenilor (1 + randamentul lunar al factorului), pornind de la 1; nu reprezintă automat strategii investibile cu aceeași finanțare. Momentum a pierdut mult la revenirea pieței din 2009.</p></details>
 </section><h2 class="sec" id="s-fm">Regresii Fama–MacBeth</h2>
 <section class="blk" id="fama-macbeth">
   <h3>Primele de risc estimate</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch3_fama_macbeth_ro.jpg" alt="Slide-ul 44: Primele de risc estimate" loading="lazy"></a>
-      <figcaption>Slide-ul 44</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch3_fama_macbeth_ro.jpg" alt="Slide-ul 45: Primele de risc estimate" loading="lazy"></a>
+      <figcaption>Slide-ul 45</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="fm-se">Erori standard</label><select id="fm-se"><option value="sh" selected>Shanken</option><option value="fm">Fama–MacBeth</option><option value="nw">Newey–West, 6 laguri</option></select></div><div class="ctl"><label for="fm-y">Eșantionul începe în: <b id="fm-y-v"></b></label><input type="range" id="fm-y" min="1963" max="2000" step="1" value="1963"></div><button class="btn play" id="fm-play" type="button"></button></div><div class="charts "><div class="chart" id="fm-chart"></div></div><ul class="out" id="fm-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În FF3, prima de piață estimată prin Fama–MacBeth este −6,5% pe an, iar media factorului este 7,2%. De ce diferă atît de mult?</div>
-  <details><summary>Răspuns</summary><p>Valorile beta de piață diferă puțin între cele 25 de portofolii (0,89–1,14 în FF3), deci prima pieței este slab identificată, iar termenul liber preia nivelul mediu al randamentelor. Pentru HML, prima estimată (4,0%) este apropiată de media factorului (3,6%).</p></details>
+  <details><summary>Răspuns</summary><p>Beta de piață diferă puțin între portofolii: 0,89–1,14 în FF3. Această dispersie redusă face dificilă separarea primei de piață de termenul liber. Estimația negativă nu stabilește preferințele investitorilor pentru risc. Corecția Shanken schimbă erorile standard, nu estimația primei. Pentru HML, prima estimată (4,0%) este apropiată de media factorului (3,6%).</p></details>
 </section><h2 class="sec" id="s-pca">Factori latenți: PCA și IPCA</h2>
 <section class="blk" id="pca">
   <h3>PCA pe ETF-urile sectoriale din SUA</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=54" target="_blank" rel="noopener"><img src="slides/ch3_pca_ro.jpg" alt="Slide-ul 53: PCA pe ETF-urile sectoriale din SUA" loading="lazy"></a>
-      <figcaption>Slide-ul 53</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch3_pca_ro.jpg" alt="Slide-ul 54: PCA pe ETF-urile sectoriale din SUA" loading="lazy"></a>
+      <figcaption>Slide-ul 54</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="pc-w">Fereastra</label><select id="pc-w"><option value="all" selected>Tot eșantionul</option><option value="504">504 zile</option><option value="252">252 de zile</option><option value="126">126 de zile</option></select></div><div class="ctl"><label for="pc-t">Fereastra se termină în: <b id="pc-t-v"></b></label><input type="range" id="pc-t" min="0" max="2072" step="1" value="2072"></div><button class="btn play" id="pc-play" type="button"></button></div><div class="charts "><div class="chart" id="pc-scree"></div><div class="chart" id="pc-load"></div></div><ul class="out" id="pc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce parte din varianța celor 11 sectoare explică prima componentă principală?</div>
-  <details><summary>Răspuns</summary><p>66,0%. Loadings sînt toate pozitive (0,24–0,34), iar corelația PC1 cu SPY este 0,954. PC2 (9,7%) opune sectoarele defensive, de exemplu utilitățile (+0,55), sectoarelor de creștere, de exemplu tehnologia (−0,40). Ponderea PC1 se schimbă în timp: pe fereastra de 252 de zile încheiată la 2026-09-18 este 36,6%.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe întregul eșantion, PC1 explică 66,0% din varianța randamentelor standardizate ale celor 11 sectoare. Dacă alegem fereastra de 252 de zile încheiată la 18 septembrie 2026, ce pondere explică PC1?</div>
+  <details><summary>Răspuns</summary><p>PC1 explică 36,6%, față de 66,0% pe întregul eșantion. Standardizarea egalizează varianțele celor 11 serii de intrare, nu varianțele componentelor principale. Ponderea PC1 se recalculează din corelațiile ferestrei selectate. Pe întregul eșantion, loadings PC1 sînt toate pozitive (0,24–0,34), iar corelația PC1 cu SPY este 0,954; pe fereastra de 252 de zile este 0,723.</p></details>
 </section><h2 class="sec" id="s-inv">Investiții factoriale</h2>
 <section class="blk" id="factor-etfs">
   <h3>ETF-urile factoriale față de piață</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch3_factor_etfs_ro.jpg" alt="Slide-ul 57: ETF-urile factoriale față de piață" loading="lazy"></a>
-      <figcaption>Slide-ul 57</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=59" target="_blank" rel="noopener"><img src="slides/ch3_factor_etfs_ro.jpg" alt="Slide-ul 58: ETF-urile factoriale față de piață" loading="lazy"></a>
+      <figcaption>Slide-ul 58</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="fe-t">Investiția începe în: <b id="fe-t-v"></b></label><input type="range" id="fe-t" min="0" max="2993" step="1" value="0"></div><button class="btn play" id="fe-play" type="button"></button></div><div class="charts "><div class="chart" id="fe-chart"></div></div><ul class="out" id="fe-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care ETF-uri factoriale au, din iulie 2013, o rată anuală compusă de creștere (CAGR) mai mare decît SPY?</div>
-  <details><summary>Răspuns</summary><p>Doar IWF (16,3%) și MTUM (15,5%), față de 14,0% pentru SPY. QUAL are 13,5%, VLUE 13,1%, IWD 10,7%, USMV 10,5% și IWM 9,3%. Treisprezece ani reprezintă o singură traiectorie istorică, prea scurtă pentru a respinge primele factorilor.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> IWF are CAGR 16,3%, iar SPY 14,0% pe aceeași perioadă. Este diferența de 2,3 puncte procentuale o estimație a alfa CAPM pentru IWF?</div>
+  <details><summary>Răspuns</summary><p>Nu. Diferența dintre CAGR-uri descrie performanța compusă realizată. Alfa CAPM este termenul liber al regresiei randamentelor în exces pe randamentul în exces al pieței. Diversificarea nu impune beta egal cu 1. Pentru o concluzie despre alfa sînt necesare estimarea și incertitudinea ei. Din iulie 2013, doar IWF și MTUM (15,5%) au CAGR peste SPY; QUAL are 13,5%, VLUE 13,1%, IWD 10,7%, USMV 10,5% și IWM 9,3%.</p></details>
 </section><h2 class="sec" id="s-case">Studii de caz: criza replicării și factor momentum</h2>
 <section class="blk" id="factor-momentum">
   <h3>Factor momentum în factorii French, 1964–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=65" target="_blank" rel="noopener"><img src="slides/ch3_factor_momentum_ro.jpg" alt="Slide-ul 64: Factor momentum în factorii French, 1964–2026" loading="lazy"></a>
-      <figcaption>Slide-ul 64</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=66" target="_blank" rel="noopener"><img src="slides/ch3_factor_momentum_ro.jpg" alt="Slide-ul 65: Factor momentum în factorii French, 1964–2026" loading="lazy"></a>
+      <figcaption>Slide-ul 65</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="tf-L">Fereastra semnalului (luni): <b id="tf-L-v"></b></label><input type="range" id="tf-L" min="1" max="36" step="1" value="12"></div><div class="ctl"><label for="tf-y">Eșantionul începe în: <b id="tf-y-v"></b></label><input type="range" id="tf-y" min="1964" max="2006" step="1" value="1964"></div><button class="btn play" id="tf-play" type="button"></button></div><div class="charts "><div class="chart" id="tf-bar"></div><div class="chart" id="tf-cum"></div></div><ul class="out" id="tf-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Factorul mediu cîștigă 0,47% pe lună după un an anterior pozitiv și 0,05% după unul negativ. Explică acest factor momentum tot alfa lui MOM?</div>
@@ -148,12 +148,12 @@
 <section class="blk" id="momentum-decay">
   <h3>Ministudiu de caz: arbitrajul și declinul momentum-ului</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=70" target="_blank" rel="noopener"><img src="slides/ch3_ai_momentum_ro.jpg" alt="Slide-ul 69: Ministudiu de caz: arbitrajul și declinul momentum-ului" loading="lazy"></a>
-      <figcaption>Slide-ul 69</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol3_modele_factoriale.pdf#page=71" target="_blank" rel="noopener"><img src="slides/ch3_ai_momentum_ro.jpg" alt="Slide-ul 70: Ministudiu de caz: arbitrajul și declinul momentum-ului" loading="lazy"></a>
+      <figcaption>Slide-ul 70</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ai-p">Data publicării presupusă: <b id="ai-p-v"></b></label><input type="range" id="ai-p" min="120" max="600" step="1" value="339"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-per"></div><div class="chart" id="ai-dec"></div></div><ul class="out" id="ai-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> După publicarea din 1993, media momentum scade cu 0,45 puncte procentuale pe lună. Este scăderea semnificativă la 5%?</div>
-  <details><summary>Răspuns</summary><p>Nu: t = −1,45, iar intervalul de 95% este [−1,05%; 0,16%]. Scăderea reprezintă 54% din media in-sample de 0,82% pe lună, apropiată de 58% în McLean și Pontiff (2016). Pentru Mkt-RF (placebo), b₂ = +0,40%, cu t = 1,12.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> După publicarea din 1993, media momentum scade cu 0,45 puncte procentuale pe lună, cu t = −1,45. Dacă estimația rămîne aceeași, dar eroarea standard se înjumătățește, respingem H₀: b₂ = 0 într-un test bilateral la 5%, folosind pragul asimptotic 1,96?</div>
+  <details><summary>Răspuns</summary><p>Da. Statistica t este estimația împărțită la eroarea standard. Înjumătățirea erorii standard dublează valoarea absolută a lui t: 2,90 &gt; 1,96. În calculul actual, t = −1,45, intervalul de 95% este [−1,05%; 0,16%] și nu respingem. Nici semnificația statistică nu ar demonstra singură că publicarea a cauzat scăderea. Scăderea reprezintă 54% din media in-sample de 0,82% pe lună, apropiată de 58% în McLean și Pontiff (2016).</p></details>
 </section>
 <p class="src foot">ETF-uri din SUA: prețuri EODHD ajustate pentru dividende; randamentele în exces folosesc rata fără risc din Kenneth French Data Library. Factorii Fama–French, momentum, reversal și cele 25 de portofolii mărime × B/M: Kenneth French Data Library. Beta Dimson: date simulate.</p>
 </main>

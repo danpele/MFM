@@ -629,3 +629,7 @@ ch11_sem_a39_jumps.png
 /Quantlets/Ch_07/ch7_inference_private.py
 /Quantlets/Ch_07/ch7_inference_private.json
 /Quantlets/Ch_07/ch7_plot_private.py
+
+# notebook builder data (holds instructor solutions) and web build logs stay local
+notebooks/*.json
+web/*_log.txt

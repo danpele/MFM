@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch5_data.js?v=20261030a"></script>
-<script src="ch5_text_en.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch5.js?v=20261030a" defer></script>
+<script src="ch5_data.js?v=20261030b"></script>
+<script src="ch5_text_en.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch5.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,8 +38,8 @@
 <section class="blk" id="clustering">
   <h3>Volatility Clusters in Every Market</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=4" target="_blank" rel="noopener"><img src="slides/ch5_clustering_en.jpg" alt="Slide 3: Volatility Clusters in Every Market" loading="lazy"></a>
-      <figcaption>Slide 3</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=5" target="_blank" rel="noopener"><img src="slides/ch5_clustering_en.jpg" alt="Slide 4: Volatility Clusters in Every Market" loading="lazy"></a>
+      <figcaption>Slide 4</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cl-k">Threshold for |r| (s: standard deviation of the series): <b id="cl-k-v"></b></label><input type="range" id="cl-k" min="1" max="6" step="0.5" value="3"></div><button class="btn play" id="cl-play" type="button"></button></div><div class="charts "><div class="chart" id="cl-chart"></div></div><ul class="out" id="cl-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> On the S&amp;P 500, how often is a day with |r| above 3 standard deviations followed by another such day within the next 5 days?</div>
@@ -48,58 +48,58 @@
 <section class="blk" id="acf">
   <h3>The Sign Is Nearly Unpredictable, the Size Is Not</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=6" target="_blank" rel="noopener"><img src="slides/ch5_acf_r_r2_en.jpg" alt="Slide 5: The Sign Is Nearly Unpredictable, the Size Is Not" loading="lazy"></a>
-      <figcaption>Slide 5</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=7" target="_blank" rel="noopener"><img src="slides/ch5_acf_r_r2_en.jpg" alt="Slide 6: The Sign Is Nearly Unpredictable, the Size Is Not" loading="lazy"></a>
+      <figcaption>Slide 6</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ac-m">Series</label><select id="ac-m"><option value="sp500" selected>S&amp;P 500</option><option value="bet">BET</option><option value="bettr">BET-TR</option><option value="btc">Bitcoin</option><option value="gold">Gold (XAU/USD)</option></select></div><div class="ctl"><label for="ac-d">Power δ in |r|^δ: <b id="ac-d-v"></b></label><input type="range" id="ac-d" min="0.25" max="4" step="0.25" value="2"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-chart"></div></div><ul class="out" id="ac-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> At lag 1, the autocorrelation of S&amp;P 500 returns is −0.099. What is the autocorrelation of their squares?</div>
-  <details><summary>Answer</summary><p>0.313. All 50 autocorrelations of r² lie outside the ±0.024 band; for r, 15 of 50 do, but all are small. The sign of tomorrow's return is nearly unpredictable, its size is not.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> At lag 1, the autocorrelation of S&amp;P 500 returns is −0.099 and that of their squares 0.313; squared-return autocorrelations stay positive and persistent. What follows for modelling?</div>
+  <details><summary>Answer</summary><p>Dependence in return magnitudes can exist without strong linear dependence in returns. All 50 autocorrelations of r² lie outside the ±0.024 band; for r, 15 of 50 do, but all are small. Small autocorrelations do not imply independence, and squared-return autocorrelations do not measure sign-forecast accuracy. The ±0.024 band is a pointwise asymptotic reference under the i.i.d. assumption.</p></details>
 </section><h2 class="sec" id="s-dyn">Variance Dynamics</h2>
 <section class="blk" id="simulation">
   <h3>Simulation: GARCH Produces Clustering</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch5_simulation_en.jpg" alt="Slide 14: Simulation: GARCH Produces Clustering" loading="lazy"></a>
-      <figcaption>Slide 14</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=16" target="_blank" rel="noopener"><img src="slides/ch5_simulation_en.jpg" alt="Slide 15: Simulation: GARCH Produces Clustering" loading="lazy"></a>
+      <figcaption>Slide 15</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="si-a">News reaction α: <b id="si-a-v"></b></label><input type="range" id="si-a" min="0" max="0.3" step="0.01" value="0.1"></div><div class="ctl"><label for="si-p">Persistence α + β (ω = 1 − α − β): <b id="si-p-v"></b></label><input type="range" id="si-p" min="0.5" max="0.995" step="0.005" value="0.98"></div><button class="btn play" id="si-play" type="button"></button></div><div class="charts "><div class="chart" id="si-chart"></div></div><ul class="out" id="si-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> The innovations z are Normal. Do the returns of a GARCH(1,1) with α = 0.10 and β = 0.88 have fat tails?</div>
-  <details><summary>Answer</summary><p>Yes. The theoretical excess kurtosis is 3.06, finite because (α + β)² + 2α² = 0.98 < 1. A mixture of Normal distributions with different variances has fat tails. On a path of one million days, the estimated excess kurtosis is 2.47; on the 2,000 days simulated on the page, only 0.40: kurtosis is estimated imprecisely on short samples.</p></details>
+  <details><summary>Answer</summary><p>Yes, the unconditional return distribution has theoretical excess kurtosis of approximately 3.06. The fourth moment is finite because 0.98² + 2 × 0.10² = 0.9804 &lt; 1. The conditional distribution is Normal; the unconditional distribution mixes different variances. Estimated excess kurtosis is 0.40 on the page's 2,000-day path and 2.47 on the lecture's million-day path: kurtosis is estimated imprecisely on short samples.</p></details>
 </section><h2 class="sec" id="s-est">Estimation and Uncertainty</h2>
 <section class="blk" id="delta-method">
   <h3>Near-Unit Persistence: What the Delta Method Can and Cannot Do</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch5_sem_a2_halflife_en.jpg" alt="Slide 23: Near-Unit Persistence: What the Delta Method Can and Cannot Do" loading="lazy"></a>
-      <figcaption>Slide 23</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=25" target="_blank" rel="noopener"><img src="slides/ch5_sem_a2_halflife_en.jpg" alt="Slide 24: Near-Unit Persistence: What the Delta Method Can and Cannot Do" loading="lazy"></a>
+      <figcaption>Slide 24</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="dm-p">Persistence p = α + β: <b id="dm-p-v"></b></label><input type="range" id="dm-p" min="0.975" max="0.99995" step="1e-05" value="0.99471"></div><button class="btn play" id="dm-play" type="button"></button></div><div class="charts "><div class="chart" id="dm-h"></div><div class="chart" id="dm-v"></div></div><ul class="out" id="dm-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> The estimated half-life for the S&amp;P 500 is 132 days, with a standard error of 118 days. Is 132 ± 1.96 × 118 a useful interval?</div>
-  <details><summary>Answer</summary><p>No. Its lower end would be −99 days: h(p) is strongly convex near p = 1, and the delta-method tangent falls below zero. Transforming the interval for p, [0.9856, 1.0039], gives h ∈ [48, ∞).</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The estimated half-life for the S&amp;P 500 is 132 days, with a standard error of 118 days, and 132 ± 1.96 × 118 has a lower endpoint of −99 days. We replace this negative endpoint with zero. Does this justify approximately 95% coverage?</div>
+  <details><summary>Answer</summary><p>No. Removing negative values does not justify coverage. The problem is the curvature of h(p) near 1: the delta-method tangent falls below zero. Transforming the p &lt; 1 portion of the persistence interval, [0.9856, 1.0039], gives a lower endpoint of about 48 days and no finite upper endpoint; values p ≥ 1 do not describe a shock that halves.</p></details>
 </section><h2 class="sec" id="s-mkt">Forecasts and Results by Market</h2>
 <section class="blk" id="term-structure">
   <h3>Volatility Term Structure</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=30" target="_blank" rel="noopener"><img src="slides/ch5_term_structure_en.jpg" alt="Slide 29: Volatility Term Structure" loading="lazy"></a>
-      <figcaption>Slide 29</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=31" target="_blank" rel="noopener"><img src="slides/ch5_term_structure_en.jpg" alt="Slide 30: Volatility Term Structure" loading="lazy"></a>
+      <figcaption>Slide 30</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ts-t">Forecast origin (last day of the month): <b id="ts-t-v"></b></label><input type="range" id="ts-t" min="0" max="999" step="1" value="999"></div><button class="btn play" id="ts-play" type="button"></button></div><div class="charts "><div class="chart" id="ts-l"></div><div class="chart" id="ts-r"></div></div><ul class="out" id="ts-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> On 18.09.2026, the forecast S&amp;P 500 volatility for the next day is 11.3% a year. What does GARCH(1,1)-t forecast on average over the next 250 days?</div>
-  <details><summary>Answer</summary><p>20.1%. The forecast rises towards the long-run level of 27.4%, because the current level is below it. For gold the current level is above the long-run one, and the curve falls from 24.0% to 22.5%. For Bitcoin α̂ + β̂ = 1, so the forecast grows without bound: 108.3% on average over 250 days.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On 18.09.2026, the GARCH(1,1)-t forecast of S&amp;P 500 volatility for the next day is 11.3% a year, and at the 250-day horizon the curve shows 20.1%. What does the 20.1% value represent?</div>
+  <details><summary>Answer</summary><p>The page computes √(A · H<sup>−1</sup> Σ<sub>j=1</sub><sup>H</sup> E<sub>t</sub>[σ<sup>2</sup><sub>t+j</sub>]), where A is the number of returns per year. Averaging precedes taking the square root. At H = 250 the result is 20.1%; it is neither average volatility nor the final day's volatility. The forecast rises towards the long-run level of 27.4%, because the current level is below it. For gold the curve falls from 24.0% to 22.5%; for Bitcoin α̂ + β̂ = 1 and the 250-day value is 108.3%.</p></details>
 </section>
 <section class="blk" id="persistence">
   <h3>Persistence: How Fast Do Shocks Fade?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch5_persistence_en.jpg" alt="Slide 32: Persistence: How Fast Do Shocks Fade?" loading="lazy"></a>
-      <figcaption>Slide 32</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=34" target="_blank" rel="noopener"><img src="slides/ch5_persistence_en.jpg" alt="Slide 33: Persistence: How Fast Do Shocks Fade?" loading="lazy"></a>
+      <figcaption>Slide 33</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="pe-h">Horizon h (days): <b id="pe-h-v"></b></label><input type="range" id="pe-h" min="0" max="250" step="1" value="100"></div><button class="btn play" id="pe-play" type="button"></button></div><div class="charts "><div class="chart" id="pe-chart"></div></div><ul class="out" id="pe-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> What share of a variance shock is left after 100 days for the S&amp;P 500 and for BET-TR?</div>
-  <details><summary>Answer</summary><p>For the S&amp;P 500, 59% is left (the half-life is 132 days); for BET-TR practically nothing (8 days). For Bitcoin and EUR/RON α̂ + β̂ = 1, so in the model the shocks never fade.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> We double the initial variance shock while keeping the GARCH parameters fixed. What happens to its half-life?</div>
+  <details><summary>Answer</summary><p>It stays unchanged. The remaining effect is proportional to the initial shock, but the remaining fraction is p<sup>h</sup>. Half-life depends on p, not amplitude: about 132 days for the S&amp;P 500 and 8.18 days for BET-TR. After 100 days, 59% of the shock is left for the S&amp;P 500 and practically nothing for BET-TR. For Bitcoin and EUR/RON α̂ + β̂ = 1, so in the model the shocks never fade.</p></details>
 </section>
 <section class="blk" id="vix">
   <h3>S&amp;P 500: GARCH Volatility and the VIX</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=34" target="_blank" rel="noopener"><img src="slides/ch5_sp500_vol_en.jpg" alt="Slide 33: S&amp;P 500: GARCH Volatility and the VIX" loading="lazy"></a>
-      <figcaption>Slide 33</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch5_sp500_vol_en.jpg" alt="Slide 34: S&amp;P 500: GARCH Volatility and the VIX" loading="lazy"></a>
+      <figcaption>Slide 34</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="vx-a">α, with β fixed at 0.872: <b id="vx-a-v"></b></label><input type="range" id="vx-a" min="0.02" max="0.127" step="0.0001" value="0.1226"></div><div class="ctl"><label for="vx-per">Period</label><select id="vx-per"><option value="all" selected>Whole period, 2000–2026</option><option value="gfc">2008–2009</option><option value="covid">2020</option><option value="tariffs">2025</option></select></div><button class="btn play" id="vx-play" type="button"></button></div><div class="charts "><div class="chart" id="vx-chart"></div></div><ul class="out" id="vx-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> The correlation between the GARCH(1,1)-t volatility and the VIX is 0.89, and the VIX is higher on average: 19.8% against 17.0%. Does this gap measure the variance risk premium?</div>
@@ -108,72 +108,72 @@
 <section class="blk" id="news-impact">
   <h3>The News Impact Curve for the S&amp;P 500</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=38" target="_blank" rel="noopener"><img src="slides/ch5_nic_en.jpg" alt="Slide 37: The News Impact Curve for the S&amp;P 500" loading="lazy"></a>
-      <figcaption>Slide 37</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=39" target="_blank" rel="noopener"><img src="slides/ch5_nic_en.jpg" alt="Slide 38: The News Impact Curve for the S&amp;P 500" loading="lazy"></a>
+      <figcaption>Slide 38</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ni-e">Shock ε(t−1), in %: <b id="ni-e-v"></b></label><input type="range" id="ni-e" min="-6" max="6" step="0.1" value="-3"></div><div class="ctl"><label for="ni-s">Variance σ²(t−1), in %²: <b id="ni-s-v"></b></label><input type="range" id="ni-s" min="0.25" max="6" step="any" value="1.4714"></div><button class="btn play" id="ni-play" type="button"></button></div><div class="charts "><div class="chart" id="ni-chart"></div></div><ul class="out" id="ni-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> What next-day variance does GJR-GARCH-t forecast after a shock of −3% and after one of +3%?</div>
-  <details><summary>Answer</summary><p>3.16 after −3% and 1.31 after +3%, with σ²(t−1) fixed at the sample variance 1.47: 2.4 times as much after bad news. EGARCH gives 2.75 and 1.22, and GARCH(1,1) gives 2.40 for both shocks.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> With σ²(t−1) = 1.47 %², GJR-GARCH-t forecasts 3.16 %² after a −3% shock and 1.31 %² after a +3% shock. Keep the shocks and double the previous variance without re-estimating. How does the difference between the two variance forecasts change?</div>
+  <details><summary>Answer</summary><p>It remains approximately 1.85 %². The difference is γ × 3² ≈ 1.846 %². The previous-variance term increases equally for both signs and cancels from the difference. Doubling previous variance does not double the asymmetry; the percentage shocks remain fixed. At σ²(t−1) = 1.47, EGARCH gives 2.75 and 1.22, and GARCH(1,1) gives 2.40 for both shocks.</p></details>
 </section><h2 class="sec" id="s-diag">Innovations and Diagnostics</h2>
 <section class="blk" id="innovations">
   <h3>S&amp;P 500: Are the Innovations Normal?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch5_innovations_en.jpg" alt="Slide 41: S&amp;P 500: Are the Innovations Normal?" loading="lazy"></a>
-      <figcaption>Slide 41</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=43" target="_blank" rel="noopener"><img src="slides/ch5_innovations_en.jpg" alt="Slide 42: S&amp;P 500: Are the Innovations Normal?" loading="lazy"></a>
+      <figcaption>Slide 42</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="in-nu">Degrees of freedom ν of the Student-t: <b id="in-nu-v"></b></label><input type="range" id="in-nu" min="3" max="30" step="any" value="6.2455"></div><button class="btn play" id="in-play" type="button"></button></div><div class="charts "><div class="chart" id="in-d"></div><div class="chart" id="in-q"></div></div><ul class="out" id="in-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Under the Normal distribution, 0.21 of the standardised residuals would lie below −4. How many standardised residuals of GARCH(1,1) with Normal innovations lie below −4?</div>
-  <details><summary>Answer</summary><p>16, against 0.21 expected under the Normal distribution and 8.6 under a Student-t with ν = 6.2. The excess kurtosis falls from 10.7 (returns) to 1.73 (residuals), but normality is clearly rejected: Jarque–Bera 1,156.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> 16 standardised residuals of GARCH(1,1) with Normal innovations lie below −4, against 8.6 expected under a Student-t with ν ≈ 6.25. Increase ν to 30 while keeping the residuals fixed and the Student-t variance equal to 1. What changes below −4?</div>
+  <details><summary>Answer</summary><p>The slider changes the reference distribution, not the estimated residuals. The 16 observations remain unchanged. The expected count under the Student-t falls from about 8.6 to about 0.9 at ν = 30; 0.21 are expected under the Normal distribution. The excess kurtosis falls from 10.7 (returns) to 1.73 (residuals), but normality is clearly rejected: Jarque–Bera 1,156.</p></details>
 </section><h2 class="sec" id="s-fc">Forecasting and Forecast Evaluation</h2>
 <section class="blk" id="oos">
   <h3>Out-of-Sample Design and Forecast Paths, 2016–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch5_forecast_oos_en.jpg" alt="Slide 46: Out-of-Sample Design and Forecast Paths, 2016–2026" loading="lazy"></a>
-      <figcaption>Slide 46</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch5_forecast_oos_en.jpg" alt="Slide 47: Out-of-Sample Design and Forecast Paths, 2016–2026" loading="lazy"></a>
+      <figcaption>Slide 47</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="oo-l">EWMA decay factor λ: <b id="oo-l-v"></b></label><input type="range" id="oo-l" min="0.8" max="0.995" step="0.005" value="0.94"></div><div class="ctl"><label for="oo-per">Period</label><select id="oo-per"><option value="all" selected>2016–2026</option><option value="y2020">2020</option><option value="y2022">2022</option><option value="y2025">2025</option></select></div><button class="btn play" id="oo-play" type="button"></button></div><div class="charts "><div class="chart" id="oo-chart"></div></div><ul class="out" id="oo-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> EWMA with λ = 0.94 has no estimated parameters. How much does it lose against GJR-GARCH-t over 2016–2026, by QLIKE?</div>
-  <details><summary>Answer</summary><p>The mean QLIKE is 0.814 for EWMA and 0.731 for GJR-t, the lowest of the six forecasts; the DM t of EWMA against GARCH-t is 3.47. The choice of λ does not close the gap: the lowest EWMA QLIKE, 0.812, is reached at λ = 0.93.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> We choose λ = 0.93 because it minimises EWMA QLIKE on the grid evaluated over 2016–2026. Is QLIKE on that same period an out-of-sample evaluation of the choice of λ?</div>
+  <details><summary>Answer</summary><p>No. Forecasts for a fixed λ use past data, but retrospective selection of λ uses outcomes from the entire period. The grid minimum is about 0.812, versus 0.814 at λ = 0.94 and 0.731 for GJR-t. Evaluating the selection procedure requires a separate period or rolling selection. Against GARCH-t, the DM t of EWMA with λ = 0.94 is 3.47.</p></details>
 </section>
 <section class="blk" id="qlike">
   <h3>S&amp;P 500: Does Anything Beat GARCH(1,1)?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch5_qlike_en.jpg" alt="Slide 47: S&amp;P 500: Does Anything Beat GARCH(1,1)?" loading="lazy"></a>
-      <figcaption>Slide 47</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch5_qlike_en.jpg" alt="Slide 48: S&amp;P 500: Does Anything Beat GARCH(1,1)?" loading="lazy"></a>
+      <figcaption>Slide 48</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ql-loss">Loss function</label><select id="ql-loss"><option value="qlike" selected>QLIKE</option><option value="mse">MSE</option></select></div><div class="ctl"><label for="ql-y">Evaluation starts in: <b id="ql-y-v"></b></label><input type="range" id="ql-y" min="2016" max="2025" step="1" value="2016"></div><button class="btn play" id="ql-play" type="button"></button></div><div class="charts "><div class="chart" id="ql-chart"></div></div><ul class="out" id="ql-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Is GJR-t significantly better than GARCH-t by QLIKE?</div>
-  <details><summary>Answer</summary><p>No. The mean QLIKE difference is −0.025, with DM t = −1.22; for these nested pairs the statistic is read descriptively. EWMA (t = 3.47) and Hist-20 (t = 4.10) are clearly worse. With MSE the ranking changes: EGARCH-t has the lowest value, 21.30.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For GJR-t relative to GARCH-t, mean QLIKE differs by −0.025 and the DM statistic is −1.22. What conclusion do these results support?</div>
+  <details><summary>Answer</summary><p>GARCH-t is nested in GJR-t, and the estimated-model forecasting scheme does not automatically justify a standard Normal reference for DM. The negative difference describes the observed average advantage. It establishes neither statistical superiority nor equal accuracy. EWMA (t = 3.47) and Hist-20 (t = 4.10) have larger losses; with MSE the ranking changes: EGARCH-t has the lowest value, 21.30.</p></details>
 </section><h2 class="sec" id="s-ext">Extensions and Limits</h2>
 <section class="blk" id="long-memory">
   <h3>Long Memory: the Shape of the ACF of |r|</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch5_long_memory_en.jpg" alt="Slide 50: Long Memory: the Shape of the ACF of |r|" loading="lazy"></a>
-      <figcaption>Slide 50</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=52" target="_blank" rel="noopener"><img src="slides/ch5_long_memory_en.jpg" alt="Slide 51: Long Memory: the Shape of the ACF of |r|" loading="lazy"></a>
+      <figcaption>Slide 51</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="lm-r">Level at lag 1, ρ₁: <b id="lm-r-v"></b></label><input type="range" id="lm-r" min="0.1" max="0.5" step="0.001" value="0.289"></div><div class="ctl"><label for="lm-p">Decay rate p: <b id="lm-p-v"></b></label><input type="range" id="lm-p" min="0.95" max="0.9999" step="0.0001" value="0.9947"></div><button class="btn play" id="lm-play" type="button"></button></div><div class="charts "><div class="chart" id="lm-chart"></div></div><ul class="out" id="lm-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Can a single geometric decay rate reproduce the ACF of |r| for the S&amp;P 500 from lag 1 to lag 250?</div>
-  <details><summary>Answer</summary><p>No. The data have 0.289 at lag 1, 0.083 at lag 100 and 0.013 at lag 250; the simulated GARCH(1,1)-t gives 0.417, 0.131 and 0.020, and FIGARCH 0.396, 0.214 and 0.144. With the data level at lag 1, the best geometric rate (least squares over 250 lags) is p = 0.9875: the curve falls too fast at first, staying below the data at lag 10 (0.258 against 0.295), and too slowly afterwards, above the data at lag 50 (0.156 against 0.132).</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For the geometric curve ρ<sub>k</sub> = ρ₁p<sup>k−1</sup>, does p = 0.9948 establish long memory?</div>
+  <details><summary>Answer</summary><p>No. High persistence is not the same as long memory. For this curve, the autocorrelations sum to ρ₁/(1 − p), which is finite. Separately, the empirical fit is imperfect: with ρ₁ = 0.289, least squares over 250 lags gives p ≈ 0.9875, rather than the initial value of 0.9948; the curve falls too fast at first (0.258 against 0.295 at lag 10) and too slowly afterwards (0.156 against 0.132 at lag 50). The data have 0.289 at lag 1, 0.083 at lag 100 and 0.013 at lag 250.</p></details>
 </section><h2 class="sec" id="s-qsd">Case Studies: Quasi Score-Driven Volatility and Volatility Cycles</h2>
 <section class="blk" id="qsd">
   <h3>Case Study: Replication on 11 Stocks (cf. Paper, Fig. 2)</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch5_qsd_gap_en.jpg" alt="Slide 57: Case Study: Replication on 11 Stocks (cf. Paper, Fig. 2)" loading="lazy"></a>
-      <figcaption>Slide 57</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=59" target="_blank" rel="noopener"><img src="slides/ch5_qsd_gap_en.jpg" alt="Slide 58: Case Study: Replication on 11 Stocks (cf. Paper, Fig. 2)" loading="lazy"></a>
+      <figcaption>Slide 58</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="qs-s">Stock</label><select id="qs-s"><option value="AAPL" selected>Apple (AAPL)</option><option value="AMZN">Amazon (AMZN)</option><option value="BAC">Bank of America (BAC)</option><option value="C">Citigroup (C)</option><option value="CSCO">Cisco (CSCO)</option><option value="GS">Goldman Sachs (GS)</option><option value="JPM">JPMorgan (JPM)</option><option value="MS">Morgan Stanley (MS)</option><option value="MSFT">Microsoft (MSFT)</option><option value="NVDA">Nvidia (NVDA)</option><option value="WFC">Wells Fargo (WFC)</option></select></div><div class="ctl"><label for="qs-z">Downweighting ζ: <b id="qs-z-v"></b></label><input type="range" id="qs-z" min="0" max="0.3" step="0.001" value="0.15"></div><button class="btn play" id="qs-play" type="button"></button></div><div class="charts "><div class="chart" id="qs-gap"></div><div class="chart" id="qs-nic"></div></div><ul class="out" id="qs-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> For how many of the 11 stocks is ξ̂ > ζ̂, i.e. large shocks are downweighted less than Beta-t-GARCH imposes?</div>
-  <details><summary>Answer</summary><p>For 10 of 11; the exception is Cisco (ξ̂ = 0.193, ζ̂ = 0.195). The LR test rejects ξ = ζ at 5% for 8 stocks and ζ = 0 (the GARCH-t update) for 9.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For Apple, increase ζ from 0.15 to 0.30 without re-estimating. How does the contribution of a standardised shock ε = 5 to the QSD update change?</div>
+  <details><summary>Answer</summary><p>It decreases. The contribution, in units of αf<sub>t</sub>, decreases from approximately 6.46 to 4.11. For this large shock, increasing ζ strengthens downweighting. The density parameter ξ remains separate from ζ in QSD. Across the 11 stocks, ξ̂ &gt; ζ̂ for 10 (the exception is Cisco); the LR test rejects ξ = ζ at 5% for 8 stocks and ζ = 0 (the GARCH-t update) for 9.</p></details>
 </section>
 <section class="blk" id="volatility-cycles">
   <h3>S&amp;P 500: The Slow Volatility Component and Forecasts Months Ahead</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=60" target="_blank" rel="noopener"><img src="slides/ch5_mf2_garch_en.jpg" alt="Slide 59: S&amp;P 500: The Slow Volatility Component and Forecasts Months Ahead" loading="lazy"></a>
-      <figcaption>Slide 59</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=61" target="_blank" rel="noopener"><img src="slides/ch5_mf2_garch_en.jpg" alt="Slide 60: S&amp;P 500: The Slow Volatility Component and Forecasts Months Ahead" loading="lazy"></a>
+      <figcaption>Slide 60</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="mf-m">Window m of the long-term component (days): <b id="mf-m-v"></b></label><input type="range" id="mf-m" min="5" max="160" step="1" value="63"></div><div class="ctl"><label for="mf-per">Evaluation period</label><select id="mf-per"><option value="both" selected>2010–2019 and 2010–2026</option><option value="pre">2010–2019</option><option value="full">2010–2026</option></select></div><button class="btn play" id="mf-play" type="button"></button></div><div class="charts "><div class="chart" id="mf-vol"></div><div class="chart" id="mf-ql"></div></div><ul class="out" id="mf-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Over 2010–2019, MF2-GARCH forecasts the variance of month 8 better than GJR-GARCH, by QLIKE. Does this still hold if the evaluation runs to 2026?</div>
-  <details><summary>Answer</summary><p>No. Over 2010–2019, the QLIKE relative to the historical forecast is 0.714 for MF2-GARCH and 0.806 for GJR-GARCH (DM t −2.66). Over 2010–2026 the ranking reverses: 0.911 against 0.838 (DM t 0.99). For month 1, the two models are practically equal over 2010–2019 (0.578 and 0.576).</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Over 2010–2026, month-8 relative QLIKE is 0.911 for MF2-GARCH and 0.838 for GJR-GARCH; the DM t-statistic for MF2−GJR is 0.99. Does a one-sided test support GJR superiority at 5%?</div>
+  <details><summary>Answer</summary><p>No. Under the lecture's asymptotic approximation, the one-sided threshold is 1.645. The statistic of 0.99 does not exceed it. GJR has lower average loss in this sample, without evidence of superiority at 5%; this does not establish equality. Over 2010–2019 the ranking was reversed: 0.714 for MF2-GARCH and 0.806 for GJR-GARCH (DM t −2.66).</p></details>
 </section>
 <p class="src foot">Daily log returns in %, closes up to 18 September 2026: S&amp;P 500, BET, BET-TR, Bitcoin, gold (XAU/USD) and the VIX, EODHD prices; EUR/RON: the BNR reference rate. Case studies: 11 S&amp;P 500 stocks, 1995–2019, and the S&amp;P 500, 1990–2026, EODHD prices.</p>
 </main>

@@ -125,30 +125,6 @@ function mismatchBlock() {
 }
 
 // ================================================================= three sources of a smile
-// complex numbers as [re, im]
-const cx = { add: (a, b) => [a[0] + b[0], a[1] + b[1]], sub: (a, b) => [a[0] - b[0], a[1] - b[1]], mul: (a, b) => [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]],
-  div: (a, b) => { const d = b[0] * b[0] + b[1] * b[1]; return [(a[0] * b[0] + a[1] * b[1]) / d, (a[1] * b[0] - a[0] * b[1]) / d]; },
-  exp: a => { const e = Math.exp(a[0]); return [e * Math.cos(a[1]), e * Math.sin(a[1])]; },
-  log: a => [Math.log(Math.hypot(a[0], a[1])), Math.atan2(a[1], a[0])],
-  sqrt: a => { const r = Math.hypot(a[0], a[1]), re = Math.sqrt((r + a[0]) / 2), im = Math.sqrt(Math.max((r - a[0]) / 2, 0)); return [re, a[1] < 0 ? -im : im]; },
-  sc: (a, k) => [a[0] * k, a[1] * k] };
-function hestonCalls(S, Ks, t, v0, kappa, theta, xi, rho) {   // Lewis (2001), as option_tools.heston_price with r = 0
-  const n = 4000, U = 200, h = U / n, phis = [];
-  for (let j = 0; j <= n; j++) {
-    const uu = [j * h, -0.5], iu = [-uu[1], uu[0]];             // u - i/2 and i u
-    const a = cx.sub(cx.sc(iu, rho * xi), [kappa, 0]);
-    const d = cx.sqrt(cx.add(cx.mul(a, a), cx.sc(cx.add(iu, cx.mul(uu, uu)), xi * xi)));
-    const km = cx.sub([kappa, 0], cx.sc(iu, rho * xi)), g = cx.div(cx.sub(km, d), cx.add(km, d)), e = cx.exp(cx.sc(d, -t));
-    const one = [1, 0], Cc = cx.sc(cx.sub(cx.sc(cx.sub(km, d), t), cx.sc(cx.log(cx.div(cx.sub(one, cx.mul(g, e)), cx.sub(one, g))), 2)), kappa * theta / (xi * xi));
-    const Dd = cx.mul(cx.sc(cx.sub(km, d), 1 / (xi * xi)), cx.div(cx.sub(one, e), cx.sub(one, cx.mul(g, e))));
-    phis.push({ u: j * h, p: cx.exp(cx.add(Cc, cx.sc(Dd, v0))) });
-  }
-  return Ks.map(Kk => {
-    const x = Math.log(S / Kk); let s = 0;
-    phis.forEach(({ u, p }, j) => { const w = j === 0 || j === n ? 1 : j % 2 ? 4 : 2, ex = [Math.cos(u * x), Math.sin(u * x)]; s += w * cx.mul(ex, p)[0] / (u * u + 0.25); });
-    return S - Math.sqrt(S * Kk) / Math.PI * s * h / 3;
-  });
-}
 function mertonPrice(S, Kk, t, s, lam, muj, sj, put) {        // Poisson series, r = 0 (option_tools.merton_price)
   const kap = Math.exp(muj + 0.5 * sj * sj) - 1, l2 = lam * (1 + kap) * t; let tot = 0, lf = 0;
   for (let k = 0; k < 60; k++) {
@@ -158,15 +134,11 @@ function mertonPrice(S, Kk, t, s, lam, muj, sj, put) {        // Poisson series,
   }
   return tot;
 }
-const hesCache = {};
 function smileBlock() {
   const M = D.smile, rho = +$('sm-rho').value, mj = +$('sm-j').value / 100, t = M.T, S = 100, Ks = M.K.map(k => 100 * k);
   $('sm-rho-v').textContent = nf(rho, 1); $('sm-j-v').textContent = pct(mj, 0);
-  if (!hesCache[rho]) {
-    const c = hestonCalls(S, Ks, t, 0.03, 3.0, 0.04, 0.8, rho);
-    hesCache[rho] = Ks.map((Kk, i) => (Kk < S ? impliedVol(c[i] - S + Kk, S, Kk, t, true) : impliedVol(c[i], S, Kk, t, false)) * 100);
-  }
-  const hes = hesCache[rho], mer = Ks.map(Kk => impliedVol(mertonPrice(S, Kk, t, 0.14, 1.0, mj, 0.08, Kk < S), S, Kk, t, Kk < S) * 100), emp = M.emp;
+  // Heston smiles precomputed in Python (export_interactive.heston_smiles): deep OTM puts at ρ near +0.9 cost ~1e-13
+  const hes = M.hes[(Math.round(rho * 10) / 10 + 0).toFixed(1)], mer = Ks.map(Kk => impliedVol(mertonPrice(S, Kk, t, 0.14, 1.0, mj, 0.08, Kk < S), S, Kk, t, Kk < S) * 100), emp = M.emp;
   plot('sm-chart', [
     { x: M.K, y: emp, mode: 'lines', name: 'Historical S&P 500 returns (1990-2026)', line: { color: K.blue, width: 2.5 }, hovertemplate: 'K/S %{x:.2f}: %{y:.1f}%<extra></extra>' },
     { x: M.K, y: mer, mode: 'lines', name: `Merton: one ${(mj * 100).toFixed(0)}% mean jump per year`, line: { color: K.red, width: 2, dash: 'dash' }, hovertemplate: 'K/S %{x:.2f}: %{y:.1f}%<extra></extra>' },
@@ -469,12 +441,16 @@ function init() {
   on(['lm-y'], lmBlock); P('lm-play', 'lm-y', range(2005, 2026, 1), 700);
   const PFX = { 'greeks': 'gk', 'hedge-error': 'he', 'vol-mismatch': 'vm', 'smile-models': 'sm', 'btc-smile': 'bs', 'btc-rnd': 'rn',
     'vix-history': 'vh', 'vrp': 'vr', 'mincer-zarnowitz': 'mz', 'odte': 'od', 'bounds': 'bk', 'vol-expectations': 'lm' };
-  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  // charts that show the answer of the question are blurred too (common veil), until „Verifică”, „Arată slide-ul”, the end of ▶
+  // or a change of the parameters
+  const HIDE = { 'hedge-error': ['he-hist', 'he-sd'], 'vol-mismatch': ['vm-chart'], 'odte': ['od-g'] };
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) =>
+    predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: HIDE[b] ? { out: true, charts: HIDE[b] } : { out: true } }, sp)));
   if (T.ticket && exitTicket) exitTicket(T.ticket);
   greeksBlock(); hedgeBlock(); mismatchBlock(); smileBlock(); btcSmile(); rndBlock(); vixBlock(); vrpBlock(); mzBlock(); odteBlock(); bckBlock(); lmBlock();
   const o = $('bk-out'), st = bckStatic(), redraw = () => { if (!o.querySelector('.bk3')) o.insertAdjacentHTML('beforeend', `<li class="bk3">${st}</li>`); };
   redraw(); $('bk-h').addEventListener('input', redraw);
 }
-window.CH12 = { lmCompute, bs, greeks, impliedVol, hestonCalls, mertonPrice, svi, sviG, olsHAC, nwMean, rnPrep, rnBelow, get RN() { return RN; } };
+window.CH12 = { lmCompute, bs, greeks, impliedVol, mertonPrice, svi, sviG, olsHAC, nwMean, rnPrep, rnBelow, get RN() { return RN; } };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

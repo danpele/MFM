@@ -108,7 +108,11 @@ def heston_price(S, K, T, r, v0, kappa, theta, xi, rho, kind='call'):
         return np.exp(C + D * v0)
     x = np.log(S / K) + r * T
     f = lambda u: (np.exp(1j * u * x) * phi(u - 0.5j)).real / (u ** 2 + 0.25)
-    call = S - np.sqrt(S * K) * np.exp(-r * T / 2) / np.pi * integrate.quad(f, 0, 200, limit=500, epsabs=1e-12)[0]
+    # integral over [0, 2^14] in dyadic pieces: a cut at u = 200 leaves an error of about 1e-5 in the price, which
+    # visibly moves deep out-of-the-money implied volatilities
+    edges = np.r_[0.0, 2.0 ** np.arange(15)]
+    integral = sum(integrate.quad(f, a, b, limit=200, epsabs=1e-14, epsrel=1e-12)[0] for a, b in zip(edges[:-1], edges[1:]))
+    call = S - np.sqrt(S * K) * np.exp(-r * T / 2) / np.pi * integral
     return call if kind == 'call' else call - S + K * np.exp(-r * T)
 
 

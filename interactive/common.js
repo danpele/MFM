@@ -184,11 +184,15 @@ const UI = LANG === 'ro'
       show: 'Show slide', hidden: 'The result appears after “Check”, after ▶, or when you change the parameters.' };
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 // Opt-in veil of a block: the slide image is blurred under a „Arată slide-ul” / "Show slide" button and, with { out: true },
-// the readout of the live figure is blurred too. Returns reveal(), which removes both. A trusted (user) input in the block's
-// controls reveals the readout only, since it then describes the reader's own choice.
+// the readout of the live figure is blurred too; with { charts: true } (all .chart divs of the block) or { charts: [ids] } the
+// live charts are blurred and made inert (no hover), for questions whose answer the initial chart shows. Returns reveal(),
+// which removes all of it. A trusted (user) input in the block's controls reveals the readout and the charts only, since they
+// then describe the reader's own choice.
 function veil(blk, opt) {
   const fig = blk.querySelector('figure.slide'), outs = opt && opt.out ? [...blk.querySelectorAll('.out')] : [];
-  if (!fig && !outs.length) return () => {};
+  const cs = !opt || !opt.charts ? [] : Array.isArray(opt.charts) ? opt.charts.map(id => $(id)).filter(e => e && blk.contains(e))
+    : [...blk.querySelectorAll('.chart')];
+  if (!fig && !outs.length && !cs.length) return () => {};
   const a = fig && fig.querySelector('a'), b = document.createElement('button');
   if (fig) {
     fig.classList.add('veiled');
@@ -196,8 +200,12 @@ function veil(blk, opt) {
     fig.appendChild(b);
     if (a) { a.setAttribute('tabindex', '-1'); a.setAttribute('aria-hidden', 'true'); }
   }
-  const showOut = () => outs.forEach(o => { o.classList.remove('veiled-out'); o.removeAttribute('title'); });
+  const showOut = () => {
+    outs.forEach(o => { o.classList.remove('veiled-out'); o.removeAttribute('title'); });
+    cs.forEach(c => { c.classList.remove('veiled-chart'); c.removeAttribute('aria-hidden'); c.removeAttribute('title'); });
+  };
   outs.forEach(o => { o.classList.add('veiled-out'); o.title = UI.hidden; });
+  cs.forEach(c => { c.classList.add('veiled-chart'); c.setAttribute('aria-hidden', 'true'); c.title = UI.hidden; });
   let on = true;
   const reveal = () => {
     showOut(); if (!on) return; on = false;
@@ -205,7 +213,7 @@ function veil(blk, opt) {
   };
   b.addEventListener('click', () => { reveal(); if (a) a.focus(); });
   const ctls = blk.querySelector('.ctls');
-  if (ctls && outs.length) ['input', 'change'].forEach(ev => ctls.addEventListener(ev, e => { if (e.isTrusted) showOut(); }));
+  if (ctls && (outs.length || cs.length)) ['input', 'change'].forEach(ev => ctls.addEventListener(ev, e => { if (e.isTrusted) showOut(); }));
   return reveal;
 }
 // Deterministic shuffle of the options, seeded by a string, so the correct option does not sit at a predictable position;
@@ -218,8 +226,9 @@ function shuffleOpts(seed, opts, key) {
   return { opts: idx.map(i => opts[i]), key: idx.indexOf(key) };
 }
 // spec: { opts: [text, ...], key: index of the correct option, player: Player (optional),
-//         veil: true | { out: true } (optional: blur the slide, and the readout with out: true, until the reader presses
-//         „Arată slide-ul”, presses „Verifică” or runs ▶ to the end) }; options are shown in a fixed shuffled order
+//         veil: true | { out: true, charts: true | [chart ids] } (optional: blur the slide, the readout with out: true and the
+//         live charts with charts, until the reader presses „Arată slide-ul”, presses „Verifică” or runs ▶ to the end) };
+//         options are shown in a fixed shuffled order
 function predict(blockId, spec) {
   const blk = $(blockId), ask = blk && blk.querySelector('.ask'), det = blk && blk.querySelector('details');
   if (!ask || !spec || !spec.opts) return null;

@@ -16,7 +16,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import generate_all_charts as g
-from option_tools import svi_fit, delta_hedge
+from option_tools import svi_fit, delta_hedge, heston_price
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', '..', 'interactive', 'ch12_data.js')
@@ -52,6 +52,18 @@ def hist_density(e, bins):
     return r(h, 4)
 
 
+def heston_smiles(S, Ks, T):
+    """Heston smiles for the page's rho slider (-0.9 to 0.9, step 0.1), with the parameters of fig_smile_models.
+
+    Computed here, not in the browser: at rho near +0.9 the deep out-of-the-money puts cost about 1e-13, below what a
+    fixed-step integral in double precision resolves."""
+    out = {}
+    for rho in np.arange(-9, 10) / 10:
+        price = lambda K, kind: heston_price(S, K, T, 0.0, 0.03, 3.0, 0.04, 0.8, rho, kind)
+        out[f'{rho:.1f}'] = r(100 * g.smile_from_prices(S, Ks, T, price), 4)
+    return out
+
+
 def main():
     res = json.load(open(os.path.join(HERE, 'ch12_results.json')))
     d = {}
@@ -74,7 +86,7 @@ def main():
         mm[str(sr)] = dict(dens=hist_density(e, bins), mean=float(e.mean()), sd=float(e.std()), win=float((e > 0).mean()))
     d['mismatch'] = dict(bins=[-6, 6, 120], vega=res['mismatch']['vega'], premium=res['mismatch']['premium'], runs=mm)
 
-    # smiles: the historical S&P 500 smile (the Merton and Heston smiles are recomputed in the browser)
+    # smiles: the historical S&P 500 smile and the Heston smiles (the Merton smile is recomputed in the browser)
     S, T = 100.0, 21 / 252
     Ks = np.linspace(80, 120, 41)
     lr = np.log(g.load_close('sp500'))
@@ -83,6 +95,7 @@ def main():
     emp = lambda K, kind: np.mean(np.maximum(ST - K, 0)) if kind == 'call' else np.mean(np.maximum(K - ST, 0))
     d['smile'] = dict(K=r(Ks / S, 4), emp=r(100 * g.smile_from_prices(S, Ks, T, emp), 4), T=T, nR=int(len(R)),
                       skew=res['smile']['skew_R'], kurt=res['smile']['kurt_R'])
+    d['smile']['hes'] = heston_smiles(S, Ks, T)
 
     # Bitcoin surface: quotes and SVI fits of every expiry
     orig_csv = pd.DataFrame.to_csv
@@ -168,5 +181,17 @@ def main():
     print('wrote', OUT, os.path.getsize(OUT) // 1024, 'KB')
 
 
+def only_heston():
+    """Refresh only d['smile']['hes'] in the existing ch12_data.js (the full export reruns every bootstrap)."""
+    txt = open(OUT).read()
+    head, js = txt.split('window.CH12_DATA = ', 1)
+    d = json.loads(js.rstrip().rstrip(';'))
+    d['smile']['hes'] = heston_smiles(100.0, np.linspace(80, 120, 41), 21 / 252)
+    with open(OUT, 'w') as fh:
+        fh.write(head + 'window.CH12_DATA = ' + json.dumps(d, separators=(',', ':')) + ';\n')
+    print('wrote', OUT, os.path.getsize(OUT) // 1024, 'KB')
+
+
 if __name__ == '__main__':
-    main()
+    import sys
+    only_heston() if '--only' in sys.argv and 'heston' in sys.argv else main()

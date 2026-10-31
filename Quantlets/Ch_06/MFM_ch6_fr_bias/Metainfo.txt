@@ -2,7 +2,7 @@ Name of QuantLet: 'MFM_ch6_fr_bias'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'How much volatility alone raises a measured correlation: rho_c = rho sqrt((1+delta)/(1+delta rho^2)) for three true correlations, with the 2008 S&P 500 variance ratio marked.'
+Description: 'How much volatility alone raises a measured correlation: rho_c = rho sqrt((1+delta)/(1+delta rho^2)) for three calm-period correlations (constant beta), with the 2008 S&P 500 variance ratio marked.'
 
 Keywords: 'Forbes-Rigobon, heteroskedasticity bias, conditional correlation, contagion'
 

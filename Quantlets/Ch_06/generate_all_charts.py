@@ -343,7 +343,7 @@ def fig_fr_bias():
     delta = np.linspace(0, 10, 201)
     fig, ax = plt.subplots(figsize=SIDE)
     for rho, c in ((0.2, Forest), (0.4, MainBlue), (0.6, IDAred)):
-        ax.plot(delta, fr_inflation(rho, delta), color=c, lw=1.5, label=f'true correlation {rho}')
+        ax.plot(delta, fr_inflation(rho, delta), color=c, lw=1.5, label=f'calm-period correlation {rho}')
         ax.axhline(rho, color=c, lw=0.6, ls=':')
     ax.axvline(NUM['fr_delta'], color=Gray, ls='--', lw=0.9, label=f'S&P 500 in 2008: delta = {NUM["fr_delta"]:.1f}')
     ax.set_xlabel('delta = Var(crisis) / Var(calm) - 1 for the source market')

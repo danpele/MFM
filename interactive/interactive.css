@@ -62,9 +62,11 @@ details p { margin: 0.35rem 0 0; }
 .tq > li legend::before { counter-increment: tq; content: counter(tq) ". "; }
 .tq > li { margin: 0 0 1rem; max-width: 900px; }
 .tq fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
-/* opt-in veil (MFMI.predict with veil): slide blurred under a button, readout blurred until reveal */
+/* opt-in veil (MFMI.predict with veil): slide blurred under a button, readout and (with charts) live charts blurred until reveal */
 .slide.veiled > a { display: block; overflow: hidden; border-radius: 4px; pointer-events: none; }
-.slide.veiled img { filter: blur(6px); }
+.slide.veiled img { filter: blur(20px); opacity: 0.45; }
+.chart.veiled-chart { filter: blur(28px); opacity: 0.3; user-select: none; }
+.chart.veiled-chart, .chart.veiled-chart * { pointer-events: none !important; }
 .veil-btn { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); z-index: 2; box-shadow: 0 2px 8px rgba(31, 42, 68, 0.35); }
 .out.veiled-out { filter: blur(5px); user-select: none; }
 @media (max-width: 1100px) { .slide.veiled { position: relative; top: auto; } }

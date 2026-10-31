@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch0_data.js?v=20261030a"></script>
-<script src="ch0_text_en.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch0.js?v=20261030a" defer></script>
+<script src="ch0_data.js?v=20261030b"></script>
+<script src="ch0_text_en.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch0.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,48 +38,48 @@
 <section class="blk" id="history">
   <h3>Five Centuries of Exchanges, Four Centuries of Crashes</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=16" target="_blank" rel="noopener"><img src="slides/ch0_market_history_en.jpg" alt="Slide 15: Five Centuries of Exchanges, Four Centuries of Crashes" loading="lazy"></a>
-      <figcaption>Slide 15</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=17" target="_blank" rel="noopener"><img src="slides/ch0_market_history_en.jpg" alt="Slide 16: Five Centuries of Exchanges, Four Centuries of Crashes" loading="lazy"></a>
+      <figcaption>Slide 16</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="hi-y">Up to the year: <b id="hi-y-v"></b></label><input type="range" id="hi-y" min="1250" max="2026" step="1" value="1602"></div><button class="btn play" id="hi-play" type="button"></button></div><div class="charts "><div class="chart" id="hi-chart"></div></div><ul class="out" id="hi-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> VOC shares have traded since 1602; the chart starts in that year, and the ▶ button continues the timeline. How long did it take until the first bubble marked on the chart?</div>
-  <details><summary>Answer</summary><p>35 years: the tulip mania, in 1637. The Mississippi and South Sea bubbles only followed in 1720, 118 years after the VOC, and the Bucharest Stock Exchange opened in 1882.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The selected year is 1602, when trading in VOC shares begins. Which episode appears first after this year on the ‘Bubbles, panics and crashes’ lane?</div>
+  <details><summary>Answer</summary><p>Tulip mania, in 1637, 35 years after 1602. The Mississippi and South Sea bubbles occur in 1720, and the panic in 1792. The Bucharest Stock Exchange opened in 1882.</p></details>
 </section><h2 class="sec" id="s-land">The 2000–2026 Landscape</h2>
 <section class="blk" id="risk-return">
   <h3>Risk and Return, 2015–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch0_risk_return_en.jpg" alt="Slide 34: Risk and Return, 2015–2026" loading="lazy"></a>
-      <figcaption>Slide 34</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=36" target="_blank" rel="noopener"><img src="slides/ch0_risk_return_en.jpg" alt="Slide 35: Risk and Return, 2015–2026" loading="lazy"></a>
+      <figcaption>Slide 35</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="rr-y">Start of the window (2 January): <b id="rr-y-v"></b></label><input type="range" id="rr-y" min="2015" max="2024" step="1" value="2015"></div><div class="ctl"><label for="rr-a">Asset described</label><select id="rr-a"><option value="S&P 500 TR (SPY)" selected>S&P 500 TR (SPY)</option><option value="Euro Stoxx 50 (USD)">Euro Stoxx 50 (USD)</option><option value="Nikkei 225 (USD)">Nikkei 225 (USD)</option><option value="Gold">Gold</option><option value="US Treasuries 20y+ (TLT)">US Treasuries 20y+ (TLT)</option><option value="Bitcoin">Bitcoin</option><option value="Ethereum">Ethereum</option><option value="EUR/USD">EUR/USD</option><option value="EUR/RON">EUR/RON</option></select></div><button class="btn play" id="rr-play" type="button"></button></div><div class="charts "><div class="chart" id="rr-chart"></div></div><ul class="out" id="rr-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Over 2015–2026 the S&P 500 with dividends has a CAGR of 13.7% and gold one of 11.8%. Is the difference in mean returns statistically significant?</div>
-  <details><summary>Answer</summary><p>No. On common days, the S&P 500 minus gold gives +1.9 pp a year with an SE of 6.8 pp, so t = 0.28. Even for a single asset the standard error of the annualised mean return, σ/√Y with Y = 11.7 years, is 5.1 pp for the S&P 500 and 4.8 pp for gold. Daily data do not shrink this standard error: it depends on the number of years, not on the number of observations.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On common dates in 2015–2026, the annualised difference in mean simple returns, SPY minus gold, is 1.9 pp, with an SE of 6.8 pp. Is it significant in a two-sided test at 5%?</div>
+  <details><summary>Answer</summary><p>We calculate t = 1.9/6.8 ≈ 0.28. We do not reject equal means; we do not establish that the means are equal. The test uses simple returns, not the difference between the plotted CAGRs (13.7% and 11.8%). For a single asset the standard error of the annualised mean return, σ/√Y with Y = 11.7 years, is 5.1 pp for the S&P 500 and 4.8 pp for gold. Under iid returns, with the same annual volatility and time span, more frequent sampling does not reduce the SE of the annualised mean.</p></details>
 </section>
 <section class="blk" id="drawdowns">
   <h3>Crises and Drawdowns</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=39" target="_blank" rel="noopener"><img src="slides/ch0_sp500_drawdowns_en.jpg" alt="Slide 38: Crises and Drawdowns" loading="lazy"></a>
-      <figcaption>Slide 38</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=40" target="_blank" rel="noopener"><img src="slides/ch0_sp500_drawdowns_en.jpg" alt="Slide 39: Crises and Drawdowns" loading="lazy"></a>
+      <figcaption>Slide 39</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="dd-t">End of the sample: <b id="dd-t-v"></b></label><input type="range" id="dd-t" min="0" max="7000" step="1" value="7000"></div><button class="btn play" id="dd-play" type="button"></button></div><div class="charts "><div class="chart" id="dd-chart"></div></div><ul class="out" id="dd-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> The S&P 500 fell by 57% from its peak of 9 October 2007 to 9 March 2009. By how much did it have to rise from the trough to regain the peak?</div>
-  <details><summary>Answer</summary><p>By 131%: 1,565.15/676.53 = 2.31. After a fall d, recovery needs a rise of d/(1 − d), not d. The recovery took 5.5 years from the peak, until 28 March 2013; a 57% rise from the trough was already reached in September 2009, 1.9 years after the peak.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The S&P 500 fell from 1,565.15 (9 October 2007) to 676.53 (9 March 2009). What percentage gain from the trough was needed to regain the peak?</div>
+  <details><summary>Answer</summary><p>(1,565.15/676.53 − 1) × 100 = 131.3%. The 56.8% decline uses the peak as its base; recovery uses the trough. The final level is 231.3% of the trough, so the gain is 131.3%. The recovery took 5.5 years from the peak, until 28 March 2013.</p></details>
 </section>
 <section class="blk" id="vix">
   <h3>Volatility Regimes: the VIX</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch0_vix_regimes_en.jpg" alt="Slide 40: Volatility Regimes: the VIX" loading="lazy"></a>
-      <figcaption>Slide 40</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch0_vix_regimes_en.jpg" alt="Slide 41: Volatility Regimes: the VIX" loading="lazy"></a>
+      <figcaption>Slide 41</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="vx-lo">Lower threshold: <b id="vx-lo-v"></b></label><input type="range" id="vx-lo" min="10" max="40" step="1" value="20"></div><div class="ctl"><label for="vx-hi">Upper threshold: <b id="vx-hi-v"></b></label><input type="range" id="vx-hi" min="15" max="60" step="1" value="30"></div><button class="btn play" id="vx-play" type="button"></button></div><div class="charts "><div class="chart" id="vx-chart"></div></div><ul class="out" id="vx-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> The mean VIX since 2000 is 19.8. From which lower threshold are at least half of the days below it? Check by moving the lower threshold.</div>
-  <details><summary>Answer</summary><p>From 18: the VIX is below 18 on 51% of the days and below 17 on 45%. The median, 17.8, is below the mean of 19.8: stress spikes stretch the right tail and lift the mean, but not the median. The VIX was below 20 on 62% of the days and at least 30 on 9%. The highest values are 82.7 on 16 March 2020, 80.9 on 20 November 2008 and 52.3 on 8 April 2025: calm periods are long, stress periods short and intense.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> What is the smallest integer threshold with at least 50% of the sample’s daily VIX values strictly below it? Check by moving the lower threshold.</div>
+  <details><summary>Answer</summary><p>45.4% of observations are below 17, and 51.4% are below 18. The required threshold is therefore 18. The median is 17.75; rounding it down does not give the required threshold. The mean, 19.79, is more sensitive to large extreme values. The VIX was below 20 on 62% of the days and at least 30 on 9%. The highest values are 82.7 on 16 March 2020, 80.9 on 20 November 2008 and 52.3 on 8 April 2025: calm periods are long, stress periods short and intense.</p></details>
 </section>
 <section class="blk" id="correlations">
   <h3>Diversification Benefits Change over Time</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch0_rolling_correlations_en.jpg" alt="Slide 41: Diversification Benefits Change over Time" loading="lazy"></a>
-      <figcaption>Slide 41</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=43" target="_blank" rel="noopener"><img src="slides/ch0_rolling_correlations_en.jpg" alt="Slide 42: Diversification Benefits Change over Time" loading="lazy"></a>
+      <figcaption>Slide 42</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="co-w">Window (trading days): <b id="co-w-v"></b></label><input type="range" id="co-w" min="63" max="756" step="21" value="252"></div><button class="btn play" id="co-play" type="button"></button></div><div class="charts "><div class="chart" id="co-chart"></div></div><ul class="out" id="co-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> The mean 252-day rolling correlation between the S&P 500 and TLT was −0.43 in 2010–2020 and +0.08 in 2022–2026. The ▶ button lengthens the window up to 756 days. What happens to the 2022–2026 mean?</div>
@@ -88,38 +88,38 @@
 <section class="blk" id="bet">
   <h3>The BET Index, 1997–2026: a Long Recovery</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch0_bvb_history_en.jpg" alt="Slide 43: The BET Index, 1997–2026: a Long Recovery" loading="lazy"></a>
-      <figcaption>Slide 43</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch0_bvb_history_en.jpg" alt="Slide 44: The BET Index, 1997–2026: a Long Recovery" loading="lazy"></a>
+      <figcaption>Slide 44</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="bt-y">Start date (1 January): <b id="bt-y-v"></b></label><input type="range" id="bt-y" min="1997" max="2025" step="1" value="1997"></div><button class="btn play" id="bt-play" type="button"></button></div><div class="charts "><div class="chart" id="bt-chart"></div></div><ul class="out" id="bt-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> How long did the BET take to regain its peak of 24 July 2007?</div>
-  <details><summary>Answer</summary><p>13.6 years. The index fell by 82.5% in 1.6 years, until 25 February 2009, and only returned to the peak level on 16 March 2021; the S&P 500 regained its 2007 peak in 5.5 years. Over the whole of 1997–2026 the BET grew 32.8 times, a CAGR of 12.8%.</p></details>
+  <details><summary>Answer</summary><p>13.6 years elapsed between the peak on 24 July 2007 and recovery on 16 March 2021. The index fell by 82.5% to the trough on 25 February 2009; the 12.1-year interval runs from this trough to the recovery. The 5.5-year interval refers to recovery of the S&P 500’s 2007 peak. Over the whole of 1997–2026 the BET grew 32.8 times, a CAGR of 12.8%.</p></details>
 </section><h2 class="sec" id="s-dig">Digital Assets and Tokenisation</h2>
 <section class="blk" id="usdt">
   <h3>Stablecoins and the Peg</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch0_usdt_peg_en.jpg" alt="Slide 46: Stablecoins and the Peg" loading="lazy"></a>
-      <figcaption>Slide 46</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch0_usdt_peg_en.jpg" alt="Slide 47: Stablecoins and the Peg" loading="lazy"></a>
+      <figcaption>Slide 47</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="us-b">Band around the peg: <b id="us-b-v"></b></label><input type="range" id="us-b" min="0.1" max="2" step="0.1" value="0.5"></div><div class="ctl"><label for="us-p">Period</label><select id="us-p"><option value="all" selected>2019–2026</option><option value="m20">March 2020</option><option value="2019">2019</option><option value="2020">2020</option><option value="2021">2021</option><option value="2022">2022</option><option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option></select></div><button class="btn play" id="us-play" type="button"></button></div><div class="charts "><div class="chart" id="us-chart"></div></div><ul class="out" id="us-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> On what share of days did USDT stay within 0.5% of 1 USD in 2019–2026?</div>
-  <details><summary>Answer</summary><p>On 93% of the days, and within 1% on 98%. The peg does not hold every day, but the deviations stay of the order of a percent, far from the moves of Bitcoin. The extreme deviations are from March 2020: 1.054 USD on 12 March and 0.974 USD on 18 March.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> On what proportion of observed days in 2019–2026 is the daily USDT quote in the data within 0.5% of USD 1?</div>
+  <details><summary>Answer</summary><p>The proportion is 93.0%. The 98% figure corresponds to the wider ±1% band; about 7% is the proportion outside the ±0.5% band. The calculation uses the available daily quotes and does not describe all intraday movements. The extreme deviations are from March 2020: 1.054 USD on 12 March and 0.974 USD on 18 March.</p></details>
 </section><h2 class="sec" id="s-pas">Passive Investing and Concentration</h2>
 <section class="blk" id="concentration">
   <h3>Cap-Weighted versus Equal-Weighted Performance: SPY and RSP</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch0_concentration_en.jpg" alt="Slide 50: Cap-Weighted versus Equal-Weighted Performance: SPY and RSP" loading="lazy"></a>
-      <figcaption>Slide 50</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=52" target="_blank" rel="noopener"><img src="slides/ch0_concentration_en.jpg" alt="Slide 51: Cap-Weighted versus Equal-Weighted Performance: SPY and RSP" loading="lazy"></a>
+      <figcaption>Slide 51</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cc-y">Start year: <b id="cc-y-v"></b></label><input type="range" id="cc-y" min="2003" max="2025" step="1" value="2003"></div><button class="btn play" id="cc-play" type="button"></button></div><div class="charts "><div class="chart" id="cc-g"></div><div class="chart" id="cc-r"></div></div><ul class="out" id="cc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Since April 2003 SPY has grown 12.7 times and RSP 11.9 times. The ▶ button moves the start year up to 2025. For which start years does SPY end ahead of RSP?</div>
-  <details><summary>Answer</summary><p>For every start year in 2003–2025: the final SPY/RSP ratio lies between 1.07 (start in 2003 or 2025) and 1.40 (start in 2015). The final ratio changes with the start year because each window starts from a different point of the ratio. The conclusion depends on the end date, though: the ratio, equal to 1 in April 2003, had fallen to 0.76 in April 2015, and the SPY advantage comes from the 31% rise of the ratio since January 2023. A higher realised return does not show an expected premium.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Keep the sample end fixed and move the start from April 2003 to January 2015. Both series are rebased to 1 at the new start. Approximately what does the final SPY/RSP ratio become?</div>
+  <details><summary>Answer</summary><p>The final ratio becomes 1.396, approximately 1.40. The value 1.07 corresponds to an April 2003 start; 1.31 corresponds to a January 2023 start. Rebasing changes the final ratio because it changes the comparison base. The conclusion depends on the end date, though: the ratio, equal to 1 in April 2003, had fallen to 0.76 in April 2015, and the SPY advantage comes from the 31% rise of the ratio since January 2023. A higher realised return does not show an expected premium.</p></details>
 </section><h2 class="sec" id="s-case">Case Studies: Stock Market Competition and Treasury Bond Risk</h2>
 <section class="blk" id="elasticity">
   <h3>Case Study: an Illustrative Scenario, 30% Turn Passive</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch0_hhl_elasticity_en.jpg" alt="Slide 55: Case Study: an Illustrative Scenario, 30% Turn Passive" loading="lazy"></a>
-      <figcaption>Slide 55</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=57" target="_blank" rel="noopener"><img src="slides/ch0_hhl_elasticity_en.jpg" alt="Slide 56: Case Study: an Illustrative Scenario, 30% Turn Passive" loading="lazy"></a>
+      <figcaption>Slide 56</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="hh-chi">Strategic response χ: <b id="hh-chi-v"></b></label><input type="range" id="hh-chi" min="0" max="10" step="0.01" value="2.97"></div><div class="ctl"><label for="hh-p">Share turned passive, 1 − α: <b id="hh-p-v"></b></label><input type="range" id="hh-p" min="0" max="100" step="1" value="30"></div><button class="btn play" id="hh-play" type="button"></button></div><div class="charts "><div class="chart" id="hh-chart"></div></div><ul class="out" id="hh-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> 30% of investors turn passive (α = 0.7). The ▶ button raises the strategic response χ up to 10. How does the pass-through rate 1/(1 + χα) change as χ rises?</div>
@@ -128,22 +128,22 @@
 <section class="blk" id="bond-beta">
   <h3>Case Study: Treasury Bond–Stock Betas, 1967–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch0_pflueger_betas_en.jpg" alt="Slide 61: Case Study: Treasury Bond–Stock Betas, 1967–2026" loading="lazy"></a>
-      <figcaption>Slide 61</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=63" target="_blank" rel="noopener"><img src="slides/ch0_pflueger_betas_en.jpg" alt="Slide 62: Case Study: Treasury Bond–Stock Betas, 1967–2026" loading="lazy"></a>
+      <figcaption>Slide 62</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="bb-q">Quarterly window (quarters): <b id="bb-q-v"></b></label><input type="range" id="bb-q" min="8" max="40" step="1" value="20"></div><div class="ctl"><label for="bb-d">Daily window (trading days): <b id="bb-d-v"></b></label><input type="range" id="bb-d" min="20" max="250" step="10" value="120"></div><button class="btn play" id="bb-play" type="button"></button></div><div class="charts "><div class="chart" id="bb-a"></div><div class="chart" id="bb-b"></div></div><ul class="out" id="bb-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Between 1979Q4 and 2001Q1 the quarterly beta of the 10-year nominal bond on stocks is 0.27. What is it in 2001Q2–2019Q4, and what does the sign change mean?</div>
-  <details><summary>Answer</summary><p>It is −0.34 (SE 0.06): after 2001 the nominal bond gains when stocks lose, so it hedges an equity portfolio. In 2020Q1–2026Q2 the nominal beta is 0.00 (SE 0.17) and the TIPS beta 0.19 (SE 0.13). On the daily returns of 2026 (up to 18 September) the nominal beta, 0.22, rises above the TIPS beta, 0.17; on the 120-day window of the chart the values on 18 September are 0.27 and 0.19.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> In the quarterly regression for 2001Q2–2019Q4, the beta of the 10-year nominal bond is −0.34. If the equity market’s excess return is 1 pp lower, how does the bond’s fitted excess return change?</div>
+  <details><summary>Answer</summary><p>The fitted change is (−0.34) × (−1 pp) = +0.34 pp. The negative sign (SE 0.06) indicates an opposite association during this subperiod; it does not guarantee a gain in every quarter with falling equities. The value 2.94 comes from incorrectly inverting the coefficient. In 1979Q4–2001Q1 the beta is 0.27. In 2020Q1–2026Q2 the nominal beta is 0.00 (SE 0.17) and the TIPS beta 0.19 (SE 0.13). On the daily returns of 2026 (up to 18 September) the nominal beta, 0.22, rises above the TIPS beta, 0.17; on the 120-day window of the chart the values on 18 September are 0.27 and 0.19.</p></details>
 </section><h2 class="sec" id="s-ai">AI for Scientific Discovery</h2>
 <section class="blk" id="premium">
   <h3>Mini-Case: Estimate, Interval and MDE</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=68" target="_blank" rel="noopener"><img src="slides/ch0_ai_spread_en.jpg" alt="Slide 67: Mini-Case: Estimate, Interval and MDE" loading="lazy"></a>
-      <figcaption>Slide 67</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter0_financial_markets.pdf#page=69" target="_blank" rel="noopener"><img src="slides/ch0_ai_spread_en.jpg" alt="Slide 68: Mini-Case: Estimate, Interval and MDE" loading="lazy"></a>
+      <figcaption>Slide 68</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ai-y">Sample split (1 January): <b id="ai-y-v"></b></label><input type="range" id="ai-y" min="2005" max="2024" step="1" value="2015"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-ci"></div><div class="chart" id="ai-cum"></div></div><ul class="out" id="ai-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Over the full sample the mean SPY − RSP difference is +0.29% a year, with t = 0.27. Does this mean that there is no concentration premium?</div>
-  <details><summary>Answer</summary><p>No. The minimum detectable effect is 3.1% a year, so a smaller true premium would usually go undetected. The two-sided p-value, about 0.79, is not the probability that the premium exists or is absent. The sign changes between the halves: −2.28% (t = −1.75) in 2003–2014 and +2.85% (t = 1.63) in 2015–2026.</p></details>
+  <details><summary>Answer</summary><p>No. The estimated mean is +0.29% a year, with an HAC SE of about 1.10 pp and t = 0.27. We do not reject a zero mean at 5%. The MDE of about 3.1% a year corresponds to approximately 80% power under the Normal approximation. Smaller effects have power below 80%, not necessarily below 50%. The p-value of about 0.79 is not the probability that the premium exists. The sign changes between the halves: −2.28% (t = −1.75) in 2003–2014 and +2.85% (t = 1.63) in 2015–2026.</p></details>
 </section>
 <p class="src foot">EODHD daily prices up to 18 Sep 2026: indices, ETFs (adjusted prices), gold, Bitcoin, Ethereum, USDT; BET: official closing values. USD/EUR and JPY/USD rates from FRED, the BNR EUR/RON reference rate. Case studies: Haddad, Huebner and Loualiche (2025), eq. (5) and Table 2; Pflueger (2025), Figure 1, with the FRED yields DGS10, DFII10 and DTB3, the US market from the Kenneth French library and SPY.</p>
 </main>

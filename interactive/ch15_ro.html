@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch15_data.js?v=20261030a"></script>
-<script src="ch15_text_ro.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch15.js?v=20261030a" defer></script>
+<script src="ch15_data.js?v=20261030b"></script>
+<script src="ch15_text_ro.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch15.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,132 +38,132 @@
 <section class="blk" id="dict-words">
   <h3>Cuvinte negative în psihologie, neutre în contabilitate</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=9" target="_blank" rel="noopener"><img src="slides/ch15_dict_words_ro.jpg" alt="Slide-ul 8: Cuvinte negative în psihologie, neutre în contabilitate" loading="lazy"></a>
-      <figcaption>Slide-ul 8</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=10" target="_blank" rel="noopener"><img src="slides/ch15_dict_words_ro.jpg" alt="Slide-ul 9: Cuvinte negative în psihologie, neutre în contabilitate" loading="lazy"></a>
+      <figcaption>Slide-ul 9</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="dw-l">Lista de cuvinte</label><select id="dw-l"><option value="gi" selected>Negative în GI, nu și în LM</option><option value="lm">Negative în LM, nu și în GI</option></select></div><div class="ctl"><label for="dw-k">Cuvinte afișate: <b id="dw-k-v"></b></label><input type="range" id="dw-k" min="5" max="30" step="1" value="14"></div><button class="btn play" id="dw-play" type="button"></button></div><div class="charts "><div class="chart" id="dw-chart"></div></div><ul class="out" id="dw-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> „Service”, „capital” și „board” sînt cuvinte negative în dicționarul Harvard IV-4. Cît de des apar în propoziții pe care adnotatorii le-au etichetat negativ?</div>
-  <details><summary>Răspuns</summary><p>Rar. „Service” apare în 106 propoziții din Financial PhraseBank, „capital” în 104 și „board” în 79; 98%, 93% și 96% dintre ele nu sînt etichetate negativ. Excepția este „lower”: doar 26% dintre propozițiile sale nu sînt negative, deși „costuri mai mici” este o veste bună.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> „Service”, „capital” și „board” sînt cuvinte negative în dicționarul Harvard IV-4. În Financial PhraseBank, ce proporție dintre propozițiile care conțin fiecare dintre aceste cuvinte este etichetată negativ?</div>
+  <details><summary>Răspuns</summary><p>Sub 10% pentru fiecare cuvînt: 2 din 106 propoziții cu „service” (1,9%), 7 din 104 cu „capital” (6,7%) și 3 din 79 cu „board” (3,8%). Semnul unui cuvînt în dicționar nu stabilește eticheta propoziției. Iar un cuvînt fără legătură cu tonul nu ar da 50%: el ar apărea în propoziții negative cu frecvența clasei negative din corpus, 12,5%.</p></details>
 </section><h2 class="sec" id="s-eval">Date etichetate și evaluare</h2>
 <section class="blk" id="accuracy">
   <h3>Unsprezece clasificatori, două seturi de date: niciun cîștigător unic</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=14" target="_blank" rel="noopener"><img src="slides/ch15_accuracy_ro.jpg" alt="Slide-ul 13: Unsprezece clasificatori, două seturi de date: niciun cîștigător unic" loading="lazy"></a>
-      <figcaption>Slide-ul 13</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch15_accuracy_ro.jpg" alt="Slide-ul 14: Unsprezece clasificatori, două seturi de date: niciun cîștigător unic" loading="lazy"></a>
+      <figcaption>Slide-ul 14</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ac-m">Metrica</label><select id="ac-m"><option value="acc" selected>Acuratețe</option><option value="f1">F1 macro</option></select></div><div class="ctl"><label for="ac-a">PhraseBank: acordul adnotatorilor: <b id="ac-a-v"></b></label><input type="range" id="ac-a" min="0" max="3" step="1" value="0"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-pb"></div><div class="chart" id="ac-tw"></div></div><ul class="out" id="ac-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe titlurile Twitter, care dintre cele 11 metode are cea mai mare acuratețe?</div>
-  <details><summary>Răspuns</summary><p>TF-IDF + regresie logistică, cu 83,2%. Este, împreună cu MiniLM + LR, una dintre cele două metode antrenate pe etichete Twitter. FinBERT are 72,5%, Qwen2.5-7B zero-shot 74,2%, iar toate cele trei dicționare rămîn sub reperul „mereu neutru” (66%).</p></details>
+  <details><summary>Răspuns</summary><p>TF-IDF + regresie logistică, cu 83,2%. FinBERT are 72,5%, Qwen2.5-7B zero-shot 74,2%, iar Qwen2.5-14B 72,4%: nici adaptarea la domeniu, nici numărul de parametri nu garantează primul loc. Toate cele trei dicționare rămîn sub reperul „mereu neutru” (65,6%). TF-IDF + LR este antrenat pe etichete Twitter, deci comparația nu izolează efectul arhitecturii.</p></details>
 </section><h2 class="sec" id="s-llm">Modele de limbaj: FinBERT și LLM-uri</h2>
 <section class="blk" id="llm-size">
   <h3>Mai mare nu înseamnă întotdeauna mai bun</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=22" target="_blank" rel="noopener"><img src="slides/ch15_llm_size_ro.jpg" alt="Slide-ul 21: Mai mare nu înseamnă întotdeauna mai bun" loading="lazy"></a>
-      <figcaption>Slide-ul 21</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch15_llm_size_ro.jpg" alt="Slide-ul 22: Mai mare nu înseamnă întotdeauna mai bun" loading="lazy"></a>
+      <figcaption>Slide-ul 22</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ls-m">Metrica</label><select id="ls-m"><option value="f1" selected>F1 macro</option><option value="acc">Acuratețe</option></select></div><div class="ctl"><label for="ls-p">Prompt-ul pe Twitter: <b id="ls-p-v"></b></label><input type="range" id="ls-p" min="1" max="3" step="1" value="1"></div><button class="btn play" id="ls-play" type="button"></button></div><div class="charts "><div class="chart" id="ls-chart"></div></div><ul class="out" id="ls-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Crește F1 macro pe Twitter odată cu numărul de parametri ai modelului Qwen2.5?</div>
-  <details><summary>Răspuns</summary><p>Nu monoton. Modelul 1.5B este cel mai slab (55,3%), iar 7B cel mai bun (72,6%), peste FinBERT (66,8%). Acuratețea 7B depășește acuratețea 1.5B cu 21,5 puncte procentuale (testul McNemar: p < 0,001). Cu prompt-ul P1, modelul 1.5B răspunde „neutral” doar pentru 23% dintre titluri.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pornim de la prompt-ul P1 și rulăm ▶ pînă la P3. Dintre modelele Qwen2.5 1.5B, 7B și 14B, care va avea cel mai mare F1 macro pe Twitter la P3?</div>
+  <details><summary>Răspuns</summary><p>14B. La P3, F1 macro este 57,8% pentru 1.5B, 71,8% pentru 7B și 73,3% pentru 14B. La P1 conducea 7B: 72,6%, față de 71,3% pentru 14B și 55,3% pentru 1.5B. Clasamentul depinde și de prompt: avantajul observat la P1 nu se transferă automat la P3.</p></details>
 </section><h2 class="sec" id="s-emb">Embeddings ca variabile</h2>
 <section class="blk" id="embeddings">
   <h3>Pot vectorii generici ai textelor măsura sentimentul?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch15_embeddings_ro.jpg" alt="Slide-ul 22: Pot vectorii generici ai textelor măsura sentimentul?" loading="lazy"></a>
-      <figcaption>Slide-ul 22</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch15_embeddings_ro.jpg" alt="Slide-ul 23: Pot vectorii generici ai textelor măsura sentimentul?" loading="lazy"></a>
+      <figcaption>Slide-ul 23</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="em-t">Direcția proiecției în planul PC1–PC2: <b id="em-t-v"></b></label><input type="range" id="em-t" min="0" max="180" step="5" value="0"></div><button class="btn play" id="em-play" type="button"></button></div><div class="charts "><div class="chart" id="em-sc"></div><div class="chart" id="em-h"></div></div><ul class="out" id="em-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Separă primele două componente principale ale vectorilor MiniLM titlurile pozitive de cele negative?</div>
-  <details><summary>Răspuns</summary><p>Nu. PCA păstrează direcțiile de varianță maximă, nu pe cele legate de etichetă: în planul primelor două componente, cea mai bună direcție dă un AUC de doar 0,636 între titlurile pozitive și cele negative (0,630 pe prima componentă). O regresie logistică pe toate cele 384 de dimensiuni ajunge la 78,6% acuratețe pe Twitter.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cea mai bună direcție din planul primelor două componente principale ale vectorilor MiniLM separă titlurile pozitive de cele negative cu AUC ≈ 0,636. Ce putem deduce despre informația de sentiment din embeddings?</div>
+  <details><summary>Răspuns</summary><p>Separarea liniară în acest plan este modestă, dar rezultatul nu exclude informație utilă în celelalte dimensiuni. PCA maximizează varianța explicată, fără să folosească etichetele. AUC privește aici numai ordonarea titlurilor pozitive față de cele negative; nu este acuratețea în trei clase. O regresie logistică pe toate cele 384 de dimensiuni ajunge la 78,6% acuratețe pe Twitter.</p></details>
 </section>
 <section class="blk" id="learning-curve">
   <h3>Numărul necesar de etichete</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch15_learning_curve_ro.jpg" alt="Slide-ul 23: Numărul necesar de etichete" loading="lazy"></a>
-      <figcaption>Slide-ul 23</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=25" target="_blank" rel="noopener"><img src="slides/ch15_learning_curve_ro.jpg" alt="Slide-ul 24: Numărul necesar de etichete" loading="lazy"></a>
+      <figcaption>Slide-ul 24</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="lc-k">Etichete de antrenare: <b id="lc-k-v"></b></label><input type="range" id="lc-k" min="0" max="7" step="1" value="0"></div><button class="btn play" id="lc-play" type="button"></button></div><div class="charts "><div class="chart" id="lc-chart"></div></div><ul class="out" id="lc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cîte etichete Twitter îi trebuie regresiei logistice pe embeddings pentru a depăși FinBERT?</div>
-  <details><summary>Răspuns</summary><p>Aproximativ 400. Cu 100 de etichete acuratețea este 69,0%, sub FinBERT (72,5%). TF-IDF pornește mai jos (66,9%), dar ajunge la circa 83% cu toate cele 9 543 de etichete, față de 78,6% pentru embeddings.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care este primul număr testat de etichete Twitter la care acuratețea medie a MiniLM + LR, calculată între reeșantionările de antrenare, depășește FinBERT?</div>
+  <details><summary>Răspuns</summary><p>400. Media este 71,9% la 200 de etichete și 73,3% la 400; FinBERT are 72,5%. Unele antrenări depășesc reperul deja la 200, iar la 800 îl depășesc toate cele zece. Pragul de 400 privește media, nu fiecare eșantion. TF-IDF pornește mai jos (66,9% la 100 de etichete), dar ajunge la circa 83% cu toate cele 9 543 de etichete, față de 78,6% pentru embeddings.</p></details>
 </section><h2 class="sec" id="s-look">Look-ahead bias și memorarea</h2>
 <section class="blk" id="memory">
   <h3>Memoria măsurată: lunile da, zilele nu</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch15_memory_auc_ro.jpg" alt="Slide-ul 27: Memoria măsurată: lunile da, zilele nu" loading="lazy"></a>
-      <figcaption>Slide-ul 27</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=29" target="_blank" rel="noopener"><img src="slides/ch15_memory_auc_ro.jpg" alt="Slide-ul 28: Memoria măsurată: lunile da, zilele nu" loading="lazy"></a>
+      <figcaption>Slide-ul 28</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ma-s">Seria</label><select id="ma-s"><option value="monthly" selected>S&P 500, luni</option><option value="daily">Apple, zile</option></select></div><div class="ctl"><label for="ma-m">Modelul</label><select id="ma-m"><option value="1.5B">Qwen2.5-1.5B</option><option value="7B">Qwen2.5-7B</option><option value="14B" selected>Qwen2.5-14B</option></select></div><div class="ctl"><label for="ma-c">Pragul: „creștere” dacă P(creștere) >: <b id="ma-c-v"></b></label><input type="range" id="ma-c" min="0" max="1" step="0.02" value="0.5"></div><button class="btn play" id="ma-play" type="button"></button></div><div class="charts "><div class="chart" id="ma-auc"></div><div class="chart" id="ma-roc"></div></div><ul class="out" id="ma-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Își amintește Qwen2.5-14B dacă S&P 500 a crescut sau a scăzut într-o lună dinainte de publicarea ponderilor?</div>
-  <details><summary>Răspuns</summary><p>În parte. Pe cele 296 de luni dinainte de publicare, AUC este 0,69 (CI [0,62; 0,75]) pentru 14B și 0,67 pentru 7B. Pentru zilele individuale ale Apple, AUC rămîne între 0,48 și 0,52. Cele 23 de luni de după publicare dau intervale prea largi: ar fi nevoie de circa 101 luni.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru Qwen2.5-14B, AUC pe lunile S&P 500 dinainte de publicarea ponderilor este 0,69, cu CI 95% [0,62; 0,75]. Ce concluzie susține acest rezultat?</div>
+  <details><summary>Răspuns</summary><p>Discriminare peste 0,5, compatibilă cu memorarea, fără să identifice singură mecanismul. Rezultatul măsoară discriminarea unor luni trecute: nu separă memorarea de regularitățile calendaristice sau de regim și nu stabilește performanța viitoare. Pentru zilele individuale ale Apple, AUC rămîne între 0,48 și 0,52. Pe cele 23 de luni de după publicare, AUC este 0,59, cu un interval larg, aproximativ [0,35; 0,84]: ar fi nevoie de circa 101 luni.</p></details>
 </section><h2 class="sec" id="s-sig">De la sentiment la un semnal de tranzacționare</h2>
 <section class="blk" id="news-hours">
   <h3>Problema marcajului de timp: date, nu ore</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch15_news_hours_ro.jpg" alt="Slide-ul 31: Problema marcajului de timp: date, nu ore" loading="lazy"></a>
-      <figcaption>Slide-ul 31</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch15_news_hours_ro.jpg" alt="Slide-ul 32: Problema marcajului de timp: date, nu ore" loading="lazy"></a>
+      <figcaption>Slide-ul 32</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="nh-o">Ceasul: decalajul față de UTC (ore): <b id="nh-o-v"></b></label><input type="range" id="nh-o" min="-12" max="12" step="1" value="0"></div><button class="btn play" id="nh-play" type="button"></button></div><div class="charts "><div class="chart" id="nh-chart"></div></div><ul class="out" id="nh-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Putem afla din FNSPID dacă un titlu a apărut înainte sau după închiderea bursei?</div>
-  <details><summary>Răspuns</summary><p>Nu. 99,8% dintre titluri au marcajul exact 00:00 UTC, deci sursa dă doar data. De aceea randamentele din zilele d și d+1 pot conține încă reacția, iar prima prognoză sigură este randamentul din d+2.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Dacă mutăm ceasul din UTC în UTC−5, aflăm dacă titlurile din FNSPID au apărut înainte sau după închiderea bursei?</div>
+  <details><summary>Răspuns</summary><p>Nu. 99,8% dintre titluri au marcajul exact 00:00 UTC, deci sursa dă doar data. La UTC−5, 00:00 UTC devine 19:00 în ziua anterioară, dar conversia schimbă doar afișarea marcajului, fără să adauge ora publicării. De aceea randamentele din zilele d și d+1 pot conține încă reacția, iar primul randament folosit ca prognoză tranzacționabilă este cel din d+2.</p></details>
 </section>
 <section class="blk" id="reaction">
   <h3>Reacție față de predicție: titlurile descriu prețurile</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=36" target="_blank" rel="noopener"><img src="slides/ch15_contemp_next_ro.jpg" alt="Slide-ul 35: Reacție față de predicție: titlurile descriu prețurile" loading="lazy"></a>
-      <figcaption>Slide-ul 35</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch15_contemp_next_ro.jpg" alt="Slide-ul 36: Reacție față de predicție: titlurile descriu prețurile" loading="lazy"></a>
+      <figcaption>Slide-ul 36</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cn-n">Numărul minim de titluri pe zi-acțiune: <b id="cn-n-v"></b></label><input type="range" id="cn-n" min="1" max="20" step="1" value="1"></div><div class="ctl"><label for="cn-h">Orizonturile</label><select id="cn-h"><option value="3" selected>d, d+1, d+2</option><option value="6">d … d+5</option></select></div><button class="btn play" id="cn-play" type="button"></button></div><div class="charts "><div class="chart" id="cn-chart"></div></div><ul class="out" id="cn-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Prognozează scorurile titlurilor randamentul în exces din ziua d+2?</div>
-  <details><summary>Răspuns</summary><p>Nu. În ziua d pantele sînt mari: FinBERT +39,2 bp (t = 17,27) și Qwen +41,4 bp (t = 19,07). În d+2 ele sînt −0,5 bp pentru FinBERT, +2,3 bp pentru Qwen și −0,0 bp pentru LM, toate cu |t| < 2. Multe titluri relatează chiar mișcarea prețului.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La filtrul inițial de cel puțin un titlu pe zi-acțiune, ce concluzie susțin estimările pantelor pentru randamentul în exces din ziua d+2?</div>
+  <details><summary>Răspuns</summary><p>Nu detectăm pante diferite de zero la pragul bilateral de 5%, cu erori standard grupate pe zi. Statisticile t sînt −0,25 pentru FinBERT, +1,19 pentru Qwen și −0,01 pentru LM; niciuna nu depășește în modul reperul asimptotic 1,96. Este lipsă de dovezi în această specificație, nu dovada unor efecte exact nule. În ziua d pantele sînt mari: FinBERT +39,2 bp (t = 17,27) și Qwen +41,4 bp (t = 19,07); multe titluri relatează chiar mișcarea prețului.</p></details>
 </section>
 <section class="blk" id="strategy">
   <h3>Randamentele cumulate ale strategiei: niciun profit net</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch15_strategy_ro.jpg" alt="Slide-ul 43: Randamentele cumulate ale strategiei: niciun profit net" loading="lazy"></a>
-      <figcaption>Slide-ul 43</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch15_strategy_ro.jpg" alt="Slide-ul 44: Randamentele cumulate ale strategiei: niciun profit net" loading="lazy"></a>
+      <figcaption>Slide-ul 44</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="sg-l">Ziua randamentului: <b id="sg-l-v"></b></label><input type="range" id="sg-l" min="1" max="5" step="1" value="2"></div><div class="ctl"><label for="sg-c">Cost pe tranzacție, într-un sens: <b id="sg-c-v"></b></label><input type="range" id="sg-c" min="0" max="10" step="0.5" value="5"></div><div class="ctl"><label for="sg-t">Pînă la: <b id="sg-t-v"></b></label><input type="range" id="sg-t" min="0" max="3567" step="1" value="3567"></div><button class="btn play" id="sg-play" type="button"></button></div><div class="charts "><div class="chart" id="sg-chart"></div></div><ul class="out" id="sg-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Strategia Qwen2.5-7B cîștigă 5,64 bp pe zi înainte de costuri. Rămîne profitabilă la 5 bp pe tranzacție?</div>
-  <details><summary>Răspuns</summary><p>Nu. Costul de echilibru este 1,5 bp pe tranzacție. Cu poziții în 95% dintre zile și 20 bp pe zi activă, media netă este −13,36 bp pe zi, iar raportul Sharpe scade de la +0,63 la −1,48.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru strategia Qwen2.5-7B pe d+2, media brută este 5,64 bp pe zi, iar proporția zilelor active este aproximativ 95%. La un cost c = 5 bp pe tranzacție, într-un sens, ce medie netă rezultă?</div>
+  <details><summary>Răspuns</summary><p>Aproximativ −13,36 bp pe zi. O zi activă plătește 4c: intrare și ieșire pentru poziția în acțiuni și pentru acoperirea cu SPY. Media netă este 5,64 − 0,95 × 4 × 5 ≈ −13,36 bp. +0,89 bp numără un singur sens; −3,86 bp numără un singur dus-întors. Raportul Sharpe scade de la +0,63 la −1,48, iar costul de echilibru este 1,5 bp pe tranzacție.</p></details>
 </section><h2 class="sec" id="s-est">Scorurile de sentiment sînt estimări</h2>
 <section class="blk" id="ppi">
   <h3>PPI pe titlurile Twitter: corecția distorsiunii este cîștigul principal</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=50" target="_blank" rel="noopener"><img src="slides/ch15_ppi_ro.jpg" alt="Slide-ul 49: PPI pe titlurile Twitter: corecția distorsiunii este cîștigul principal" loading="lazy"></a>
-      <figcaption>Slide-ul 49</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch15_ppi_ro.jpg" alt="Slide-ul 50: PPI pe titlurile Twitter: corecția distorsiunii este cîștigul principal" loading="lazy"></a>
+      <figcaption>Slide-ul 50</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="pp-n">Titluri etichetate de oameni, n: <b id="pp-n-v"></b></label><input type="range" id="pp-n" min="0" max="6" step="1" value="1"></div><button class="btn play" id="pp-play" type="button"></button></div><div class="charts "><div class="chart" id="pp-w"></div><div class="chart" id="pp-c"></div></div><div class="charts "><div class="chart" id="pp-h"></div></div><ul class="out" id="pp-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Media scorurilor FinBERT pe titlurile Twitter este −0,014, iar tonul mediu uman este 0,054. Elimină un eșantion mai mare această diferență?</div>
-  <details><summary>Răspuns</summary><p>Nu: este o distorsiune, nu zgomot. PPI scade distorsiunea medie estimată pe textele etichetate și păstrează acoperirea nominală (94,3% la n = 100). Intervalul se îngustează doar puțin: în curs, la n = 100, lățimea medie este 0,204 cu PPI și FinBERT față de 0,229 doar cu etichete umane (0,203 și 0,229 în simularea din browser).</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Păstrăm FinBERT fix și adăugăm titluri neetichetate din aceeași populație. Dispare astfel diferența dintre media scorurilor FinBERT (−0,014) și tonul mediu uman (0,054)?</div>
+  <details><summary>Răspuns</summary><p>Nu: scade incertitudinea mediei scorurilor, dar distorsiunea rămîne. Mai multe scoruri reduc eroarea de eșantionare, nu corectează distorsiunea modelului. PPI estimează media diferenței f − Y pe un eșantion etichetat și o scade din media scorurilor. La n = 100, intervalele cu nivel nominal 95% au acoperire empirică 94,3% în curs și 94,4% în browser; lățimea medie este 0,204 în curs și 0,203 în browser, față de 0,229 doar cu etichete umane.</p></details>
 </section><h2 class="sec" id="s-case">Studii de caz: ChatGPT și culoarea cuvintelor financiare</h2>
 <section class="blk" id="llt-models">
   <h3>Modelele: reacția inițială și randamentul ulterior</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch15_llt_models_ro.jpg" alt="Slide-ul 54: Modelele: reacția inițială și randamentul ulterior" loading="lazy"></a>
-      <figcaption>Slide-ul 54</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch15_llt_models_ro.jpg" alt="Slide-ul 55: Modelele: reacția inițială și randamentul ulterior" loading="lazy"></a>
+      <figcaption>Slide-ul 55</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="lt-h">Pragul ratei de succes pentru reacția inițială: <b id="lt-h-v"></b></label><input type="range" id="lt-h" min="50" max="95" step="1" value="50"></div><button class="btn play" id="lt-play" type="button"></button></div><div class="charts "><div class="chart" id="lt-hit"></div><div class="chart" id="lt-sr"></div></div><ul class="out" id="lt-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Este suficient ca un model să ghicească reacția inițială a pieței pentru a cîștiga din drift?</div>
-  <details><summary>Răspuns</summary><p>Nu. FinBERT ghicește reacția în 90% din zile, dar raportul Sharpe al drift-ului său este −0,33. Dintre cele șapte modele cu rate de succes de 86–93%, doar GPT-4 (2,97) și GPT-3.5 (1,66) au și un raport Sharpe mare. Modelele cu rate de 53–66% au rapoarte Sharpe negative.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> FinBERT are o rată de succes de 90% pentru reacția inițială și un raport Sharpe al drift-ului de −0,33. Ce distincție explică aceste rezultate?</div>
+  <details><summary>Răspuns</summary><p>Identificarea reacției inițiale nu garantează randamente ulterioare profitabile. Reacția inițială și drift-ul privesc ferestre diferite: informația reflectată deja în preț poate identifica reacția fără să ofere un cîștig ulterior. GPT-4 și GPT-3.5 au cele mai mari rapoarte Sharpe ale drift-ului, 2,97 și 1,66, dar nu sînt singurele pozitive: DistilBart are 1,26, BART-Large 1,05. Modelele cu rate de succes de 53–66% au rapoarte Sharpe negative.</p></details>
 </section>
 <section class="blk" id="colour-words">
   <h3>Listele învățate din randamente, pe titlurile FNSPID</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=59" target="_blank" rel="noopener"><img src="slides/ch15_colour_words_ro.jpg" alt="Slide-ul 58: Listele învățate din randamente, pe titlurile FNSPID" loading="lazy"></a>
-      <figcaption>Slide-ul 58</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=60" target="_blank" rel="noopener"><img src="slides/ch15_colour_words_ro.jpg" alt="Slide-ul 59: Listele învățate din randamente, pe titlurile FNSPID" loading="lazy"></a>
+      <figcaption>Slide-ul 59</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cw-c">Pragul pentru |D+| (procentul net al subeșantioanelor): <b id="cw-c-v"></b></label><input type="range" id="cw-c" min="50" max="95" step="5" value="80"></div><button class="btn play" id="cw-play" type="button"></button></div><div class="charts "><div class="chart" id="cw-r2"></div><div class="chart" id="cw-b"></div></div><ul class="out" id="cw-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cuvintele LM au fost alese de cercetători, pe rapoarte 10-K. Explică o listă aleasă de randamentele din 2009–2019 mai mult din randamentele de 4 zile din 2020–2023?</div>
-  <details><summary>Răspuns</summary><p>Da, dar puțin în termeni absoluți. Pe textele de test, cele 94 de cuvinte ML care nu sînt în LM dau un R² de 0,77%, față de 0,20% pentru toate cuvintele LM: diferența este +0,58 puncte procentuale, CI 95% [0,14; 1,02] (bootstrap pe blocuri de 10 zile). FinBERT (1,49%) și Qwen2.5-7B (1,73%) explică mai mult decît orice listă. Multe cuvinte ML („jumped”, „slumped”, „gainers”) descriu chiar mișcarea prețului, deci este o asociere în aceeași fereastră, nu o prognoză.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La |D+| ≥ 80%, cuvintele ML care nu sînt în LM dau R² = 0,77% pe textele din 2020–2023, față de 0,20% pentru toate cuvintele LM. Ce susține această comparație?</div>
+  <details><summary>Răspuns</summary><p>O asociere mai puternică pe textele din 2020–2023, fără să demonstreze o prognoză tranzacționabilă. Listele sînt învățate pe 2009–2019, dar pantele și R² sînt estimate pe 2020–2023, iar fereastra de randament de 4 zile poate include mișcarea relatată de titlu: multe cuvinte ML („jumped”, „slumped”, „gainers”) descriu chiar mișcarea prețului. Diferența de R² este 0,58 puncte procentuale, CI 95% [0,14; 1,02] (bootstrap pe blocuri de 10 zile); nu este un randament al strategiei. FinBERT (1,49%) și Qwen2.5-7B (1,73%) explică mai mult decît orice listă.</p></details>
 </section><h2 class="sec" id="s-ai">AI pentru descoperire științifică</h2>
 <section class="blk" id="spec-curve">
   <h3>Curba specificațiilor față de zgomot</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=66" target="_blank" rel="noopener"><img src="slides/ch15_spec_curve_ro.jpg" alt="Slide-ul 65: Curba specificațiilor față de zgomot" loading="lazy"></a>
-      <figcaption>Slide-ul 65</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=67" target="_blank" rel="noopener"><img src="slides/ch15_spec_curve_ro.jpg" alt="Slide-ul 66: Curba specificațiilor față de zgomot" loading="lazy"></a>
+      <figcaption>Slide-ul 66</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="sc-c">Valoarea critică a lui t: <b id="sc-c-v"></b></label><input type="range" id="sc-c" min="1" max="3.5" step="0.01" value="1.96"></div><div class="ctl"><label for="sc-b">Extrageri sub ipoteza nulă: <b id="sc-b-v"></b></label><input type="range" id="sc-b" min="100" max="2000" step="100" value="2000"></div><button class="btn play" id="sc-play" type="button"></button></div><div class="charts "><div class="chart" id="sc-curve"></div><div class="chart" id="sc-null"></div></div><ul class="out" id="sc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Trei dintre cele 36 de specificații au t > 1,96. Este mai mult decît ar produce zgomotul?</div>
-  <details><summary>Răspuns</summary><p>Nu. Sub ipoteza nulă comună, cu semnul pozițiilor schimbat aleator în blocuri de 10 zile, probabilitatea a cel puțin 3 specificații cu t > 1,96 este 0,113, iar a unei mediane a lui t cel puțin egale cu 0,50 este 0,207 (în curs, 2 000 de extrageri); extragerile din browser dau 0,103 și 0,217. Nicio specificație nu trece de pragul Bonferroni, |t| > 3,20.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Trei dintre cele 36 de specificații au t > 1,96. Cu 2 000 de extrageri, permite acest număr respingerea ipotezei nule comune la nivelul de 5%?</div>
+  <details><summary>Răspuns</summary><p>Nu. Comparația relevantă folosește distribuția comună a numărului de depășiri, care păstrează dependența dintre specificații: semnul pozițiilor este schimbat aleator în blocuri de 10 zile. Probabilitatea a cel puțin 3 specificații cu t > 1,96 este 0,113 în curs și 0,103 în browser, ambele peste 0,05. Nu respingem ipoteza nulă, ceea ce nu demonstrează că toate efectele sînt nule. Nicio specificație nu trece de pragul Bonferroni, |t| > 3,20.</p></details>
 </section>
 <p class="src foot">Texte etichetate: Financial PhraseBank (Malo et al., 2014) și Twitter Financial News (2022). Titluri datate: FNSPID (Dong, Fan și Peng, 2024), 16 acțiuni americane, 2009–2023; prețuri zilnice EODHD. Scorurile dicționarelor, ale FinBERT, ale modelelor Qwen2.5, MiniLM și TF-IDF sînt cele calculate în capitol. Studiile de caz: Lopez-Lira și Tang (2026), Tabelul 5; Garcia, Hu și Rohrer (2023), replicat pe titlurile FNSPID.</p>
 </main>

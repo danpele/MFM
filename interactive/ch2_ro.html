@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch2_data.js?v=20261030a"></script>
-<script src="ch2_text_ro.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch2.js?v=20261030a" defer></script>
+<script src="ch2_data.js?v=20261030b"></script>
+<script src="ch2_text_ro.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch2.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,18 +38,18 @@
 <section class="blk" id="random-walk-game">
   <h3>Un joc: identificarea seriei de piață reale</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=4" target="_blank" rel="noopener"><img src="slides/ch2_random_walk_game_ro.jpg" alt="Slide-ul 3: Un joc: identificarea seriei de piață reale" loading="lazy"></a>
-      <figcaption>Slide-ul 3</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=5" target="_blank" rel="noopener"><img src="slides/ch2_random_walk_game_ro.jpg" alt="Slide-ul 4: Un joc: identificarea seriei de piață reale" loading="lazy"></a>
+      <figcaption>Slide-ul 4</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="rg-t">Ziua de tranzacționare: <b id="rg-t-v"></b></label><input type="range" id="rg-t" min="20" max="4200" step="1" value="4200"></div><div class="ctl"><label for="rg-show">Seria reală</label><select id="rg-show"><option value="hidden" selected>ascunsă</option><option value="reveal">arătată</option></select></div><button class="btn play" id="rg-play" type="button"></button><button class="btn" id="rg-new" type="button">Alte random walks</button></div><div class="charts "><div class="chart" id="rg-chart"></div></div><ul class="out" id="rg-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Una dintre cele patru serii este S&P 500 între 2010 și 2026, celelalte trei sînt random walks cu același drift și aceeași volatilitate. Care este seria reală?</div>
-  <details><summary>Răspuns</summary><p>Seria D. Pe ochi nu se poate spune: random walk-urile simulate au și ele trenduri, cicluri și prăbușiri aparente. De aceea testăm eficiența cu statistici, nu prin inspecție vizuală.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Una dintre cele patru serii este S&P 500 între 2010 și 2026, celelalte trei sînt random walks cu același drift și aceeași volatilitate. În toate patru apar trenduri și scăderi puternice. Ce putem deduce doar din prezența acestor tipare?</div>
+  <details><summary>Răspuns</summary><p>Un random walk cu drift poate produce trenduri, iar inovațiile din distribuția Normală pot produce și variații mari. Aceste trăsături vizuale nu constituie singure o respingere statistică. Seria reală este D; recunoașterea ei nu dovedește predictibilitatea randamentelor. De aceea testăm eficiența cu statistici, nu prin inspecție vizuală.</p></details>
 </section>
 <section class="blk" id="rw-models">
   <h3>Trei modele pentru randamente și volatilitate</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch2_concept_rw_returns_ro.jpg" alt="Slide-ul 11: Trei modele pentru randamente și volatilitate" loading="lazy"></a>
-      <figcaption>Slide-ul 11</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch2_concept_rw_returns_ro.jpg" alt="Slide-ul 12: Trei modele pentru randamente și volatilitate" loading="lazy"></a>
+      <figcaption>Slide-ul 12</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cr-a">GARCH α (reacția la șocul de ieri): <b id="cr-a-v"></b></label><input type="range" id="cr-a" min="0" max="0.2" step="0.005" value="0.08"></div><div class="ctl"><label for="cr-b">GARCH β (persistența dispersiei): <b id="cr-b-v"></b></label><input type="range" id="cr-b" min="0" max="0.97" step="0.01" value="0.9"></div><div class="ctl"><label for="cr-s">Volatilitatea RW2 după ziua 450: <b id="cr-s-v"></b></label><input type="range" id="cr-s" min="1" max="5" step="0.5" value="3"></div><button class="btn play" id="cr-play" type="button"></button></div><div class="charts "><div class="chart" id="cr-chart"></div></div><ul class="out" id="cr-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> RW2 are randamente independente, cu abaterea standard 1% pînă la ziua 450 și 3% după; GARCH are perioade agitate după șocurile mari. Ce kurtosis are RW2 în această simulare?</div>
@@ -58,38 +58,38 @@
 <section class="blk" id="garch-acf">
   <h3>GARCH: randamente versus randamente la pătrat</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch2_concept_rw_squared_ro.jpg" alt="Slide-ul 12: GARCH: randamente versus randamente la pătrat" loading="lazy"></a>
-      <figcaption>Slide-ul 12</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=14" target="_blank" rel="noopener"><img src="slides/ch2_concept_rw_squared_ro.jpg" alt="Slide-ul 13: GARCH: randamente versus randamente la pătrat" loading="lazy"></a>
+      <figcaption>Slide-ul 13</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cs-a">GARCH α (reacția la șocul de ieri): <b id="cs-a-v"></b></label><input type="range" id="cs-a" min="0" max="0.2" step="0.005" value="0.08"></div><div class="ctl"><label for="cs-b">GARCH β (persistența dispersiei): <b id="cs-b-v"></b></label><input type="range" id="cs-b" min="0" max="0.97" step="0.01" value="0.9"></div><div class="ctl"><label for="cs-T">Lungimea seriei T (zile)</label><select id="cs-T"><option value="900" selected>900</option><option value="2000">2000</option><option value="5000">5000</option><option value="10000">10000</option></select></div><button class="btn play" id="cs-play" type="button"></button></div><div class="charts "><div class="chart" id="cs-r"></div><div class="chart" id="cs-s"></div></div><ul class="out" id="cs-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Randamentele GARCH au autocorelații aproape zero. Butonul ▶ crește α, reacția la șocul de ieri, pînă la 0,095, cu β = 0,90. Cum se schimbă autocorelația pătratelor la lagul 1?</div>
-  <details><summary>Răspuns</summary><p>Crește: în seria de 900 de zile este 0,05 la α = 0, 0,22 la α = 0,08 și 0,27 la α = 0,095. Cea mai mare autocorelație a randamentelor, în valoare absolută, rămîne între 0,064 și 0,074, iar cele ale pătratelor rămîn pozitive pînă la lagul 20. Randamentele nu sînt independente: seria respectă RW3, dar încalcă RW2, pentru că mărimea variației de azi depinde de șocurile trecute.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Păstrăm β = 0,90 și seria de 900 de zile. Cînd α crește de la 0,08 la 0,095, cum se schimbă autocorelația empirică de lag 1 a pătratelor randamentelor?</div>
+  <details><summary>Răspuns</summary><p>Crește: în această simulare, autocorelația empirică trece de la 0,216 la 0,272. Dispersia pe termen lung egală cu 1 nu fixează dependența pătratelor. La α = 0,095, expresia 3α² + 2αβ + β² este 1,0081: momentul de ordin patru al modelului staționar nu există, deci ACF teoretică a pătratelor nu este definită. ACF empirică a seriei finite poate fi calculată în continuare. La α = 0, randamentele sînt independente: autocorelația empirică a pătratelor este 0,049 la lagul 1, iar între lagurile 1–20 coboară pînă la −0,050. Pentru α &gt; 0, seria respectă RW3, dar încalcă RW2: mărimea variației de azi depinde de șocurile trecute.</p></details>
 </section><h2 class="sec" id="s-vr">Autocorelație și variance ratio</h2>
 <section class="blk" id="acf-markets">
   <h3>Autocorelația de ordinul 1 pe piețe</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=17" target="_blank" rel="noopener"><img src="slides/ch2_acf_markets_ro.jpg" alt="Slide-ul 16: Autocorelația de ordinul 1 pe piețe" loading="lazy"></a>
-      <figcaption>Slide-ul 16</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=18" target="_blank" rel="noopener"><img src="slides/ch2_acf_markets_ro.jpg" alt="Slide-ul 17: Autocorelația de ordinul 1 pe piețe" loading="lazy"></a>
+      <figcaption>Slide-ul 17</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ac-k">Lagul k: <b id="ac-k-v"></b></label><input type="range" id="ac-k" min="1" max="10" step="1" value="1"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-chart"></div></div><ul class="out" id="ac-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru S&P 500, ρ̂₁ = −0,099. Ar respinge testul ρ₁ = 0 cu eroarea standard i.i.d., dar nu cu cea robustă?</div>
-  <details><summary>Răspuns</summary><p>Nu, respinge cu amîndouă. Eroarea robustă sub H₀ (0,027) este de peste două ori mai mare decît cea i.i.d. (0,012), dar −0,099 rămîne în afara ambelor benzi de test din jurul lui zero. Diferența contează la piețe ca Euro Stoxx 50 sau Nikkei 225, unde ρ̂₁ iese din banda i.i.d., dar rămîne în cea robustă. Barele din jurul estimațiilor sînt intervale de încredere cu eroarea HAC a estimatorului (S&P 500: 0,030); ele servesc la comparații, nu la testul ρ₁ = 0.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Într-un exemplu ipotetic, autocorelația estimată este −0,040, eroarea standard i.i.d. este 0,012, iar cea robustă sub H₀ este 0,027. Cu pragul bilateral asimptotic 1,96, ce test respinge H₀: ρ₁ = 0?</div>
+  <details><summary>Răspuns</summary><p>Doar testul cu eroarea i.i.d. Cu eroarea i.i.d., |z| = 0,040/0,012 = 3,33; cu cea robustă, |z| = 0,040/0,027 = 1,48. Decizia depinde de raportul dintre estimație și eroarea standard, nu doar de mărimea autocorelației. Pentru S&P 500, ρ̂₁ = −0,099 rămîne în afara ambelor benzi de test, cu aceleași erori standard (0,027 robustă, 0,012 i.i.d.); la Euro Stoxx 50 sau Nikkei 225, ρ̂₁ iese din banda i.i.d., dar rămîne în cea robustă. Barele din jurul estimațiilor sînt intervale de încredere cu eroarea HAC a estimatorului (S&P 500: 0,030); ele servesc la comparații, nu la testul ρ₁ = 0.</p></details>
 </section>
 <section class="blk" id="vr-profile">
   <h3>Profilul variance ratio-ului</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch2_vr_profile_ro.jpg" alt="Slide-ul 22: Profilul variance ratio-ului" loading="lazy"></a>
-      <figcaption>Slide-ul 22</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch2_vr_profile_ro.jpg" alt="Slide-ul 23: Profilul variance ratio-ului" loading="lazy"></a>
+      <figcaption>Slide-ul 23</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="vr-set">Piețele</label><select id="vr-set"><option value="slide" selected>S&P 500, BET, Bitcoin, EUR/RON (slide-ul)</option><option value="cee">BET, WIG20, BUX, PX</option><option value="dev">S&P 500, Euro Stoxx 50, Nikkei 225, Hang Seng</option><option value="em">BIST 100, Bovespa, IPC, Ethereum</option></select></div><div class="ctl"><label for="vr-q">Orizontul q (zile): <b id="vr-q-v"></b></label><input type="range" id="vr-q" min="2" max="60" step="1" value="5"></div><button class="btn play" id="vr-play" type="button"></button></div><div class="charts "><div class="chart" id="vr-chart"></div></div><ul class="out" id="vr-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La S&P 500, variance ratio-ul la 20 de zile este 0,754. De ce nu respingem ipoteza nulă, deși la 10 zile (0,767) o respingem?</div>
-  <details><summary>Răspuns</summary><p>Null band-ul se lărgește cu q: marginea de jos este 0,817 la 10 zile și 0,740 la 20 de zile. La 20 de zile valoarea 0,754 rămîne în interior. Cu mai puține perioade independente de 20 de zile, aceeași abatere de la 1 este măsurată mai puțin precis.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La S&P 500, variance ratio-ul la 20 de zile este 0,754. Pentru această valoare, care este limita erorii standard sub care |(VR − 1)/SE| depășește 1,96?</div>
+  <details><summary>Răspuns</summary><p>Limita este |0,754 − 1|/1,96 = 0,1255. Valoarea 0,2460 este abaterea față de ipoteza nulă, înainte de împărțirea la prag. Valoarea 0,1328 este eroarea standard robustă efectivă la 20 de zile; fiind mai mare decît limita, nu permite respingerea. Null band-ul se lărgește cu q: marginea de jos este 0,817 la 10 zile, unde VR = 0,767 este respins, și 0,740 la 20 de zile. Calculul folosește randamente agregate suprapuse și eroarea standard robustă Lo–MacKinlay.</p></details>
 </section><h2 class="sec" id="s-oos">Predictibilitate out-of-sample</h2>
 <section class="blk" id="oos-dp">
   <h3>Raportul dividend–preț: prognoze out-of-sample</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=31" target="_blank" rel="noopener"><img src="slides/ch2_oos_dp_ro.jpg" alt="Slide-ul 30: Raportul dividend–preț: prognoze out-of-sample" loading="lazy"></a>
-      <figcaption>Slide-ul 30</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch2_oos_dp_ro.jpg" alt="Slide-ul 31: Raportul dividend–preț: prognoze out-of-sample" loading="lazy"></a>
+      <figcaption>Slide-ul 31</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="od-y">Evaluarea începe în: <b id="od-y-v"></b></label><input type="range" id="od-y" min="1970" max="2015" step="1" value="1970"></div><div class="ctl"><label for="od-f">Prognoza cu dp</label><select id="od-f"><option value="pred" selected>fără restricții</option><option value="ct">cu restricțiile Campbell–Thompson</option></select></div><button class="btn play" id="od-play" type="button"></button></div><div class="charts "><div class="chart" id="od-chart"></div></div><ul class="out" id="od-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe 680 de prognoze lunare din 1970, R²<sub>OS</sub> este −0,51%. Devine pozitiv dacă evaluarea începe mai tîrziu?</div>
@@ -98,32 +98,32 @@
 <section class="blk" id="bank-tax">
   <h3>Exemplu rezolvat: taxa bancară din decembrie 2018</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=40" target="_blank" rel="noopener"><img src="slides/ch2_sem_b9_ro.jpg" alt="Slide-ul 39: Exemplu rezolvat: taxa bancară din decembrie 2018" loading="lazy"></a>
-      <figcaption>Slide-ul 39</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch2_sem_b9_ro.jpg" alt="Slide-ul 40: Exemplu rezolvat: taxa bancară din decembrie 2018" loading="lazy"></a>
+      <figcaption>Slide-ul 40</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ev-L">Fereastra de estimare (zile): <b id="ev-L-v"></b></label><input type="range" id="ev-L" min="60" max="240" step="10" value="240"></div><div class="ctl"><label for="ev-a">CAR din ziua τ₁: <b id="ev-a-v"></b></label><input type="range" id="ev-a" min="-10" max="5" step="1" value="0"></div><div class="ctl"><label for="ev-b">CAR pînă în ziua τ₂: <b id="ev-b-v"></b></label><input type="range" id="ev-b" min="0" max="5" step="1" value="5"></div><button class="btn play" id="ev-play" type="button"></button></div><div class="charts "><div class="chart" id="ev-ar"></div><div class="chart" id="ev-car"></div></div><ul class="out" id="ev-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În ziua anunțului, randamentul anormal al TLV a fost −8,3%. Ce indică un CAR de doar −1,1% pe zilele 0 pînă la +5?</div>
-  <details><summary>Răspuns</summary><p>Că componenta anormală a scăderii TLV, măsurată față de BET, este aproape compensată în următoarele cinci ședințe: CAR pe zilele +1 pînă la +5 este +7,2% (t = 3,82). Asta nu arată că prețul acțiunii și-a recuperat pierderea: pe zilele 0 pînă la +5, randamentul logaritmic este −15,6% la TLV și −12,7% la benchmark-ul BET. Poate fi o reacție excesivă, efectul unor știri ulterioare sau un efect al benchmark-ului: BET, dominat de bănci, a scăzut odată cu TLV (−11,9% în ziua 0) și nu a revenit (−0,8% pe zilele +1 pînă la +5). Un singur eveniment nu separă cele trei explicații.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> CAR[0,5] al TLV este −1,1%, iar beta estimat este 1,18. Păstrăm randamentele TLV, alpha și beta neschimbate, dar mărim suma randamentelor logaritmice BET din fereastră cu 1 punct procentual. Cît devine CAR al TLV?</div>
+  <details><summary>Răspuns</summary><p>CAR scade cu 1,18 × 1 punct procentual, deoarece randamentul benchmark-ului se scade după înmulțirea cu beta: −1,1% − 1,18% = −2,28%. Varianta +0,08% inversează semnul ajustării. Varianta −1,1% ignoră benchmark-ul. CAR se poate schimba fără să se schimbe prețurile TLV. În date, AR₀ = −8,3%, iar CAR pe zilele +1 pînă la +5 este +7,2% (t = 3,82), deși pe zilele 0 pînă la +5 randamentul logaritmic este −15,6% la TLV și −12,7% la BET. Testul pentru CAR[0,5] dă t = −0,48 cu eroarea de predicție și t = −0,54 cu σ̂√L. Un singur eveniment nu separă reacția excesivă, știrile ulterioare și efectul benchmark-ului.</p></details>
 </section><h2 class="sec" id="s-mt">Testare multiplă și anomalii</h2>
 <section class="blk" id="multiple-testing">
   <h3>„Anomalii” produse de hazard</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch2_multiple_testing_ro.jpg" alt="Slide-ul 47: „Anomalii” produse de hazard" loading="lazy"></a>
-      <figcaption>Slide-ul 47</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch2_multiple_testing_ro.jpg" alt="Slide-ul 48: „Anomalii” produse de hazard" loading="lazy"></a>
+      <figcaption>Slide-ul 48</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="mt-n">Reguli încercate: <b id="mt-n-v"></b></label><input type="range" id="mt-n" min="20" max="2000" step="20" value="2000"></div><div class="ctl"><label for="mt-p">Ponderea „zilelor bune”</label><select id="mt-p"><option value="0.05">5%</option><option value="0.1">10%</option><option value="0.2" selected>20%</option><option value="0.5">50%</option></select></div><button class="btn play" id="mt-play" type="button"></button><button class="btn" id="mt-new" type="button">Alte reguli</button></div><div class="charts "><div class="chart" id="mt-chart"></div></div><ul class="out" id="mt-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Încercăm 2 000 de reguli de tranzacționare fără conținut economic. Cîte dintre ele vor fi „semnificative” la 5%?</div>
-  <details><summary>Răspuns</summary><p>Aproximativ 5%: în simulare 5,2%, adică 104 reguli. Șase reguli au |t| > 3,0; cea mai bună are |t| = 3,30 și ar trece pragul 3,0 dacă ar fi raportată singură. Cu cît sînt încercate mai multe reguli, cu atît crește cel mai mare |t| obținut din întîmplare.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru 2 000 de teste cu p-value-uri valide, ce prag individual Bonferroni garantează că probabilitatea cel puțin unei respingeri false este cel mult 5%, indiferent de dependența dintre teste?</div>
+  <details><summary>Răspuns</summary><p>Pragul este 0,05/2 000 = 0,000025. Valoarea 0,025 împarte nivelul la doi, nu la numărul testelor; p-value-ul bilateral include deja ambele cozi. Valoarea 0,05 păstrează nivelul individual, fără controlul familiei. Garanția Bonferroni nu cere independența testelor. În simulare, din 2 000 de reguli fără conținut economic, 104 (5,2%) au |t| &gt; 1,96, șase au |t| &gt; 3,0, iar cea mai bună are |t| = 3,30. Adăugarea unor reguli la aceeași familie nu poate micșora cel mai mare |t|.</p></details>
 </section><h2 class="sec" id="s-case">Studiu de caz: time-series momentum în Bitcoin</h2>
 <section class="blk" id="crypto-momentum">
   <h3>Bitcoin: panta momentum-ului în eșantionul lucrării și după</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=67" target="_blank" rel="noopener"><img src="slides/ch2_case_crypto_tsmom_ro.jpg" alt="Slide-ul 66: Bitcoin: panta momentum-ului în eșantionul lucrării și după" loading="lazy"></a>
-      <figcaption>Slide-ul 66</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol2_eficienta_pietei.pdf#page=68" target="_blank" rel="noopener"><img src="slides/ch2_case_crypto_tsmom_ro.jpg" alt="Slide-ul 67: Bitcoin: panta momentum-ului în eșantionul lucrării și după" loading="lazy"></a>
+      <figcaption>Slide-ul 67</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cm-asset">Criptomoneda</label><select id="cm-asset"><option value="btc" selected>Bitcoin</option><option value="eth">Ethereum</option></select></div><div class="ctl"><label for="cm-m">Sfîrșitul primei perioade: <b id="cm-m-v"></b></label><input type="range" id="cm-m" min="24" max="164" step="1" value="88"></div><div class="ctl"><label for="cm-w">Fereastra rolling (săptămîni): <b id="cm-w-v"></b></label><input type="range" id="cm-w" min="52" max="208" step="4" value="104"></div><button class="btn play" id="cm-play" type="button"></button></div><div class="charts "><div class="chart" id="cm-b"></div><div class="chart" id="cm-roll"></div></div><ul class="out" id="cm-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> După mai 2018, panta b₁ a lui Bitcoin este 0,115, cu t NW = 2,61. Înseamnă că o strategie care cumpără Bitcoin după o săptămînă bună este profitabilă?</div>
-  <details><summary>Răspuns</summary><p>Nu rezultă de aici. O abatere standard în plus azi adaugă doar 0,96% randamentului săptămînii următoare, față de 2,98% pe perioada eșantionului lucrării (pînă în mai 2018, cu datele cursului). Calculul nu are costuri de tranzacționare, ajustare la risc sau prognoze out-of-sample, iar pe ferestrele rolling de doi ani b₁ este semnificativ în doar 13% din ferestre.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> După mai 2018, panta Bitcoin este b₁ = 0,115, cu t NW = 2,61. Ce concluzie susține această regresie?</div>
+  <details><summary>Răspuns</summary><p>Regresia susține o asociere predictivă la o săptămînă. O abatere standard în plus a randamentului curent corespunde unei creșteri estimate de 0,96 puncte procentuale a randamentului săptămînii următoare, față de 2,98 puncte procentuale în perioada anterioară. Nu sînt evaluate o regulă de tranzacționare după costuri sau erori de prognoză out-of-sample. Folosirea unui eșantion ulterior lucrării nu înlocuiește această evaluare. Pe ferestrele rolling de doi ani, b₁ este semnificativ în 13% din ferestre.</p></details>
 </section>
 <p class="src foot">Indici bursieri, Bitcoin, Ethereum, TLV, BRD și BET: prețuri zilnice EODHD, pînă la 18 septembrie 2026. EUR/RON: cursul de referință BNR. S&P 500 lunar cu dividende: datele publice ale lui Robert J. Shiller, prelungite cu prețurile zilnice ale S&P 500; dobînda la titlurile de stat pe 3 luni din FRED (TB3MS).</p>
 </main>

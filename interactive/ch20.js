@@ -268,7 +268,10 @@ function init() {
   $('ab-x').max = D.assets.length; on(['ab-g', 'ab-x', 'ab-h'], ablation); P('ab-play', 'ab-x', range(0, D.assets.length, 1), 400);
   $('ll-m').max = D.leadlag.windows.length - 1; on(['ll-p', 'll-m'], leadlag); P('ll-play', 'll-m', range(0, D.leadlag.windows.length - 1, 1), 900);
   const PFX = { volare: 'vr', qlike: 'qr', mcs: 'mc', covid: 'cv', subperiods: 'sp', weights: 'kw', ablation: 'ab', leadlag: 'll' };
-  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  // blocks whose initial live chart shows the answer: the charts are veiled with the slide and the readout
+  const VEIL_CHART = new Set(['covid', 'subperiods', 'leadlag']);
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) =>
+    predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true, charts: VEIL_CHART.has(b) } }, sp)));
   if (T.ticket && exitTicket) exitTicket(T.ticket);
   volare(); qlikeRatio(); mcs(); covid(); subperiod(); weights(); ablation(); leadlag();
 }

@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch2_data.js?v=20261030a"></script>
-<script src="ch2_text_en.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch2.js?v=20261030a" defer></script>
+<script src="ch2_data.js?v=20261030b"></script>
+<script src="ch2_text_en.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch2.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,18 +38,18 @@
 <section class="blk" id="random-walk-game">
   <h3>A Game: Which Series Is the Real Market?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=4" target="_blank" rel="noopener"><img src="slides/ch2_random_walk_game_en.jpg" alt="Slide 3: A Game: Which Series Is the Real Market?" loading="lazy"></a>
-      <figcaption>Slide 3</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=5" target="_blank" rel="noopener"><img src="slides/ch2_random_walk_game_en.jpg" alt="Slide 4: A Game: Which Series Is the Real Market?" loading="lazy"></a>
+      <figcaption>Slide 4</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="rg-t">Trading day: <b id="rg-t-v"></b></label><input type="range" id="rg-t" min="20" max="4200" step="1" value="4200"></div><div class="ctl"><label for="rg-show">Real series</label><select id="rg-show"><option value="hidden" selected>hidden</option><option value="reveal">revealed</option></select></div><button class="btn play" id="rg-play" type="button"></button><button class="btn" id="rg-new" type="button">New random walks</button></div><div class="charts "><div class="chart" id="rg-chart"></div></div><ul class="out" id="rg-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> One of the four series is the S&P 500 from 2010 to 2026; the other three are random walks with the same drift and volatility. Which one is real?</div>
-  <details><summary>Answer</summary><p>Series D. The eye cannot tell: simulated random walks also show trends, cycles and apparent crashes. This is why efficiency is tested with statistics rather than by inspection.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> One of the four series is the S&P 500 from 2010 to 2026; the other three are random walks with the same drift and volatility. All four paths show trends and sharp falls. What can we infer from these features alone?</div>
+  <details><summary>Answer</summary><p>A random walk with drift can produce trends, and Normal innovations can produce large moves. These visual features alone do not constitute a statistical rejection. The real series is D; recognising it does not establish return predictability. This is why efficiency is tested with statistics rather than by inspection.</p></details>
 </section>
 <section class="blk" id="rw-models">
   <h3>Three models for returns and volatility</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch2_concept_rw_returns_en.jpg" alt="Slide 11: Three models for returns and volatility" loading="lazy"></a>
-      <figcaption>Slide 11</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch2_concept_rw_returns_en.jpg" alt="Slide 12: Three models for returns and volatility" loading="lazy"></a>
+      <figcaption>Slide 12</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cr-a">GARCH α (reaction to yesterday's shock): <b id="cr-a-v"></b></label><input type="range" id="cr-a" min="0" max="0.2" step="0.005" value="0.08"></div><div class="ctl"><label for="cr-b">GARCH β (persistence of the variance): <b id="cr-b-v"></b></label><input type="range" id="cr-b" min="0" max="0.97" step="0.01" value="0.9"></div><div class="ctl"><label for="cr-s">RW2 volatility after day 450: <b id="cr-s-v"></b></label><input type="range" id="cr-s" min="1" max="5" step="0.5" value="3"></div><button class="btn play" id="cr-play" type="button"></button></div><div class="charts "><div class="chart" id="cr-chart"></div></div><ul class="out" id="cr-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> RW2 has independent returns, with standard deviation 1% up to day 450 and 3% after; GARCH has turbulent periods after large shocks. What is the kurtosis of RW2 in this simulation?</div>
@@ -58,38 +58,38 @@
 <section class="blk" id="garch-acf">
   <h3>GARCH: returns versus squared returns</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch2_concept_rw_squared_en.jpg" alt="Slide 12: GARCH: returns versus squared returns" loading="lazy"></a>
-      <figcaption>Slide 12</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=14" target="_blank" rel="noopener"><img src="slides/ch2_concept_rw_squared_en.jpg" alt="Slide 13: GARCH: returns versus squared returns" loading="lazy"></a>
+      <figcaption>Slide 13</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cs-a">GARCH α (reaction to yesterday's shock): <b id="cs-a-v"></b></label><input type="range" id="cs-a" min="0" max="0.2" step="0.005" value="0.08"></div><div class="ctl"><label for="cs-b">GARCH β (persistence of the variance): <b id="cs-b-v"></b></label><input type="range" id="cs-b" min="0" max="0.97" step="0.01" value="0.9"></div><div class="ctl"><label for="cs-T">Series length T (days)</label><select id="cs-T"><option value="900" selected>900</option><option value="2000">2000</option><option value="5000">5000</option><option value="10000">10000</option></select></div><button class="btn play" id="cs-play" type="button"></button></div><div class="charts "><div class="chart" id="cs-r"></div><div class="chart" id="cs-s"></div></div><ul class="out" id="cs-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> GARCH returns have near-zero autocorrelations. The ▶ button raises α, the reaction to yesterday's shock, up to 0.095, with β = 0.90. How does the lag-1 autocorrelation of the squares change?</div>
-  <details><summary>Answer</summary><p>It rises: in the 900-day series it is 0.05 at α = 0, 0.22 at α = 0.08 and 0.27 at α = 0.095. The largest absolute autocorrelation of the returns stays between 0.064 and 0.074, and those of the squares stay positive up to lag 20. The returns are not independent: the series satisfies RW3 but violates RW2, because the size of today's move depends on past shocks.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Keep β = 0.90 and the 900-day series. As α rises from 0.08 to 0.095, how does the sample lag-1 autocorrelation of squared returns change?</div>
+  <details><summary>Answer</summary><p>It rises: in this simulation, the sample autocorrelation rises from 0.216 to 0.272. A long-run variance of 1 does not fix the dependence of squared returns. At α = 0.095, 3α² + 2αβ + β² equals 1.0081: the stationary model has no finite fourth moment, so the theoretical ACF of squared returns is undefined. The sample ACF of the finite series can still be calculated. At α = 0 the returns are independent: the sample autocorrelation of the squares is 0.049 at lag 1 and goes down to −0.050 over lags 1–20. For α &gt; 0 the series satisfies RW3 but violates RW2: the size of today's move depends on past shocks.</p></details>
 </section><h2 class="sec" id="s-vr">Autocorrelation and Variance Ratios</h2>
 <section class="blk" id="acf-markets">
   <h3>Lag-1 Autocorrelation Across Markets</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=17" target="_blank" rel="noopener"><img src="slides/ch2_acf_markets_en.jpg" alt="Slide 16: Lag-1 Autocorrelation Across Markets" loading="lazy"></a>
-      <figcaption>Slide 16</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=18" target="_blank" rel="noopener"><img src="slides/ch2_acf_markets_en.jpg" alt="Slide 17: Lag-1 Autocorrelation Across Markets" loading="lazy"></a>
+      <figcaption>Slide 17</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ac-k">Lag k: <b id="ac-k-v"></b></label><input type="range" id="ac-k" min="1" max="10" step="1" value="1"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-chart"></div></div><ul class="out" id="ac-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> For the S&P 500, ρ̂₁ = −0.099. Would the test reject ρ₁ = 0 with the i.i.d. standard error but not with the robust one?</div>
-  <details><summary>Answer</summary><p>No, it rejects with both. The robust standard error under H₀ (0.027) is more than twice the i.i.d. one (0.012), but −0.099 lies outside both test bands around zero. The difference matters for markets such as the Euro Stoxx 50 or the Nikkei 225, where ρ̂₁ falls outside the i.i.d. band but inside the robust one. The bars around the estimates are confidence intervals with the HAC standard error of the estimator (S&P 500: 0.030); they serve for comparisons, not for the test of ρ₁ = 0.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> In a hypothetical example, the estimated autocorrelation is −0.040, the i.i.d. standard error is 0.012, and the robust standard error under H₀ is 0.027. Using the asymptotic two-sided cutoff of 1.96, which test rejects H₀: ρ₁ = 0?</div>
+  <details><summary>Answer</summary><p>Only the test using the i.i.d. standard error. With the i.i.d. standard error, |z| = 0.040/0.012 = 3.33; with the robust error, |z| = 0.040/0.027 = 1.48. The decision depends on the estimate relative to its standard error, not on the autocorrelation's magnitude alone. For the S&P 500, ρ̂₁ = −0.099 lies outside both test bands, with the same standard errors (0.027 robust, 0.012 i.i.d.); for the Euro Stoxx 50 or the Nikkei 225, ρ̂₁ falls outside the i.i.d. band but inside the robust one. The bars around the estimates are confidence intervals with the HAC standard error of the estimator (S&P 500: 0.030); they serve for comparisons, not for the test of ρ₁ = 0.</p></details>
 </section>
 <section class="blk" id="vr-profile">
   <h3>Variance-Ratio Profiles</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch2_vr_profile_en.jpg" alt="Slide 22: Variance-Ratio Profiles" loading="lazy"></a>
-      <figcaption>Slide 22</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch2_vr_profile_en.jpg" alt="Slide 23: Variance-Ratio Profiles" loading="lazy"></a>
+      <figcaption>Slide 23</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="vr-set">Markets</label><select id="vr-set"><option value="slide" selected>S&P 500, BET, Bitcoin, EUR/RON (slide)</option><option value="cee">BET, WIG20, BUX, PX</option><option value="dev">S&P 500, Euro Stoxx 50, Nikkei 225, Hang Seng</option><option value="em">BIST 100, Bovespa, IPC, Ethereum</option></select></div><div class="ctl"><label for="vr-q">Horizon q (days): <b id="vr-q-v"></b></label><input type="range" id="vr-q" min="2" max="60" step="1" value="5"></div><button class="btn play" id="vr-play" type="button"></button></div><div class="charts "><div class="chart" id="vr-chart"></div></div><ul class="out" id="vr-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> For the S&P 500, the 20-day variance ratio is 0.754. Why is the null not rejected, although it is rejected at 10 days (0.767)?</div>
-  <details><summary>Answer</summary><p>The null band widens with q: its lower edge is 0.817 at 10 days and 0.740 at 20 days. At 20 days the value 0.754 stays inside. With fewer independent 20-day periods, the same deviation from 1 is measured less precisely.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For the S&P 500, the 20-day variance ratio is 0.754. For this value, what is the standard-error boundary below which |(VR − 1)/SE| exceeds 1.96?</div>
+  <details><summary>Answer</summary><p>The boundary is |0.754 − 1|/1.96 = 0.1255. The value 0.2460 is the deviation from the null before division by the cutoff. The value 0.1328 is the actual robust standard error at 20 days; it exceeds the boundary, so the test does not reject. The null band widens with q: its lower edge is 0.817 at 10 days, where VR = 0.767 is rejected, and 0.740 at 20 days. The calculation uses overlapping aggregated returns and the robust Lo–MacKinlay standard error.</p></details>
 </section><h2 class="sec" id="s-oos">Out-of-Sample Predictability</h2>
 <section class="blk" id="oos-dp">
   <h3>The Dividend–Price Ratio: Out-of-Sample Forecasts</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=31" target="_blank" rel="noopener"><img src="slides/ch2_oos_dp_en.jpg" alt="Slide 30: The Dividend–Price Ratio: Out-of-Sample Forecasts" loading="lazy"></a>
-      <figcaption>Slide 30</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch2_oos_dp_en.jpg" alt="Slide 31: The Dividend–Price Ratio: Out-of-Sample Forecasts" loading="lazy"></a>
+      <figcaption>Slide 31</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="od-y">Evaluation starts in: <b id="od-y-v"></b></label><input type="range" id="od-y" min="1970" max="2015" step="1" value="1970"></div><div class="ctl"><label for="od-f">Forecast with dp</label><select id="od-f"><option value="pred" selected>unrestricted</option><option value="ct">with Campbell–Thompson restrictions</option></select></div><button class="btn play" id="od-play" type="button"></button></div><div class="charts "><div class="chart" id="od-chart"></div></div><ul class="out" id="od-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Over 680 monthly forecasts from 1970, R²<sub>OS</sub> is −0.51%. Does it turn positive if the evaluation starts later?</div>
@@ -98,32 +98,32 @@
 <section class="blk" id="bank-tax">
   <h3>Worked Example: the Romanian Bank Tax of December 2018</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=40" target="_blank" rel="noopener"><img src="slides/ch2_sem_b9_en.jpg" alt="Slide 39: Worked Example: the Romanian Bank Tax of December 2018" loading="lazy"></a>
-      <figcaption>Slide 39</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch2_sem_b9_en.jpg" alt="Slide 40: Worked Example: the Romanian Bank Tax of December 2018" loading="lazy"></a>
+      <figcaption>Slide 40</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ev-L">Estimation window (days): <b id="ev-L-v"></b></label><input type="range" id="ev-L" min="60" max="240" step="10" value="240"></div><div class="ctl"><label for="ev-a">CAR from day τ₁: <b id="ev-a-v"></b></label><input type="range" id="ev-a" min="-10" max="5" step="1" value="0"></div><div class="ctl"><label for="ev-b">CAR up to day τ₂: <b id="ev-b-v"></b></label><input type="range" id="ev-b" min="0" max="5" step="1" value="5"></div><button class="btn play" id="ev-play" type="button"></button></div><div class="charts "><div class="chart" id="ev-ar"></div><div class="chart" id="ev-car"></div></div><ul class="out" id="ev-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> On the announcement day, the abnormal return of TLV was −8.3%. What does a CAR of only −1.1% over days 0 to +5 indicate?</div>
-  <details><summary>Answer</summary><p>That the abnormal component of TLV's fall, measured against the BET, is almost offset over the next five sessions: the CAR over days +1 to +5 is +7.2% (t = 3.82). This does not show that the share price recovered its loss: over days 0 to +5 the log return is −15.6% for TLV and −12.7% for the BET benchmark. It may be an overreaction, the effect of later news, or a benchmark effect: the bank-dominated BET fell with TLV (−11.9% on day 0) and did not rebound (−0.8% over days +1 to +5). A single event cannot separate the three explanations.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> TLV's CAR[0,5] is −1.1%, and its estimated beta is 1.18. Keep TLV returns, alpha and beta unchanged, but increase the sum of BET log returns over the window by 1 percentage point. What is TLV's new CAR?</div>
+  <details><summary>Answer</summary><p>CAR falls by 1.18 × 1 percentage point because the benchmark return is subtracted after multiplication by beta: −1.1% − 1.18% = −2.28%. The +0.08% option reverses the adjustment's sign. The −1.1% option ignores the benchmark. CAR can change without any change in TLV prices. In the data, AR₀ = −8.3% and the CAR over days +1 to +5 is +7.2% (t = 3.82), although over days 0 to +5 the log return is −15.6% for TLV and −12.7% for the BET. The test for CAR[0,5] gives t = −0.48 with the prediction error and t = −0.54 with σ̂√L. A single event cannot separate overreaction, later news and a benchmark effect.</p></details>
 </section><h2 class="sec" id="s-mt">Multiple Testing and Anomalies</h2>
 <section class="blk" id="multiple-testing">
   <h3>How Many “Anomalies” Does Pure Chance Produce?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch2_multiple_testing_en.jpg" alt="Slide 47: How Many “Anomalies” Does Pure Chance Produce?" loading="lazy"></a>
-      <figcaption>Slide 47</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=49" target="_blank" rel="noopener"><img src="slides/ch2_multiple_testing_en.jpg" alt="Slide 48: How Many “Anomalies” Does Pure Chance Produce?" loading="lazy"></a>
+      <figcaption>Slide 48</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="mt-n">Rules tried: <b id="mt-n-v"></b></label><input type="range" id="mt-n" min="20" max="2000" step="20" value="2000"></div><div class="ctl"><label for="mt-p">Share of "good days"</label><select id="mt-p"><option value="0.05">5%</option><option value="0.1">10%</option><option value="0.2" selected>20%</option><option value="0.5">50%</option></select></div><button class="btn play" id="mt-play" type="button"></button><button class="btn" id="mt-new" type="button">New rules</button></div><div class="charts "><div class="chart" id="mt-chart"></div></div><ul class="out" id="mt-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> We try 2,000 trading rules with no economic content. How many of them will be "significant" at 5%?</div>
-  <details><summary>Answer</summary><p>About 5%: 5.2% in the simulation, i.e. 104 rules. Six rules have |t| > 3.0; the best one has |t| = 3.30 and would pass the 3.0 threshold if reported alone. The more rules are tried, the larger the largest |t| obtained by chance.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For 2,000 tests with valid p-values, which individual Bonferroni cutoff guarantees at most a 5% probability of any false rejection, regardless of dependence between tests?</div>
+  <details><summary>Answer</summary><p>The cutoff is 0.05/2,000 = 0.000025. The value 0.025 divides the level by two rather than by the number of tests; a two-sided p-value already includes both tails. The value 0.05 retains the individual level without controlling the family. Bonferroni's guarantee does not require independent tests. In the simulation, of 2,000 rules with no economic content, 104 (5.2%) have |t| &gt; 1.96, six have |t| &gt; 3.0, and the best has |t| = 3.30. Adding rules to the same family cannot lower the largest |t|.</p></details>
 </section><h2 class="sec" id="s-case">Case Study: Time-Series Momentum in Bitcoin</h2>
 <section class="blk" id="crypto-momentum">
   <h3>Bitcoin: The Momentum Slope in the Paper's Sample and After</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=67" target="_blank" rel="noopener"><img src="slides/ch2_case_crypto_tsmom_en.jpg" alt="Slide 66: Bitcoin: The Momentum Slope in the Paper's Sample and After" loading="lazy"></a>
-      <figcaption>Slide 66</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter2_market_efficiency.pdf#page=68" target="_blank" rel="noopener"><img src="slides/ch2_case_crypto_tsmom_en.jpg" alt="Slide 67: Bitcoin: The Momentum Slope in the Paper's Sample and After" loading="lazy"></a>
+      <figcaption>Slide 67</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cm-asset">Cryptocurrency</label><select id="cm-asset"><option value="btc" selected>Bitcoin</option><option value="eth">Ethereum</option></select></div><div class="ctl"><label for="cm-m">End of the first period: <b id="cm-m-v"></b></label><input type="range" id="cm-m" min="24" max="164" step="1" value="88"></div><div class="ctl"><label for="cm-w">Rolling window (weeks): <b id="cm-w-v"></b></label><input type="range" id="cm-w" min="52" max="208" step="4" value="104"></div><button class="btn play" id="cm-play" type="button"></button></div><div class="charts "><div class="chart" id="cm-b"></div><div class="chart" id="cm-roll"></div></div><ul class="out" id="cm-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> After May 2018, the Bitcoin slope b₁ is 0.115, with NW t = 2.61. Does this mean that a strategy that buys Bitcoin after a good week is profitable?</div>
-  <details><summary>Answer</summary><p>It does not follow. One more standard deviation today adds only 0.96% to next week's return, against 2.98% over the paper's sample period (up to May 2018, with the course data). The calculation has no trading costs, no risk adjustment and no out-of-sample forecasts, and over rolling two-year windows b₁ is significant in only 13% of the windows.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> After May 2018, Bitcoin's slope is b₁ = 0.115, with NW t = 2.61. Which conclusion does this regression support?</div>
+  <details><summary>Answer</summary><p>The regression supports a one-week predictive association. A one-standard-deviation increase in the current return corresponds to an estimated 0.96-percentage-point increase in next week's return, compared with 2.98 percentage points in the earlier period. Neither a trading rule after costs nor out-of-sample forecast errors are evaluated. Using a sample after the paper's sample period does not replace that evaluation. Over rolling two-year windows, b₁ is significant in 13% of the windows.</p></details>
 </section>
 <p class="src foot">Stock indices, Bitcoin, Ethereum, TLV, BRD and BET: EODHD daily prices up to 18 September 2026. EUR/RON: the NBR reference rate. Monthly S&P 500 with dividends: Robert J. Shiller's public data, extended with daily S&P 500 prices; 3-month Treasury bill rate from FRED (TB3MS).</p>
 </main>

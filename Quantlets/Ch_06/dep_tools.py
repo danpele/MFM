@@ -178,7 +178,7 @@ def fr_adjust(rho_c, delta):
 
 
 def fr_inflation(rho, delta):
-    """Correlation measured in the crisis when the true correlation does not change: rho sqrt((1+delta)/(1+delta rho^2))."""
+    """Crisis correlation from a calm-period correlation rho when only the source-market variance rises (constant beta): rho sqrt((1+delta)/(1+delta rho^2))."""
     return rho * np.sqrt((1 + delta) / (1 + delta * rho ** 2))
 
 

@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'en';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch17_data.js?v=20261030a"></script>
-<script src="ch17_text_en.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch17.js?v=20261030a" defer></script>
+<script src="ch17_data.js?v=20261030b"></script>
+<script src="ch17_text_en.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch17.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,38 +38,38 @@
 <section class="blk" id="rational-bubble">
   <h3>A Simulated Rational Bubble</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=9" target="_blank" rel="noopener"><img src="slides/ch17_rational_bubble_en.jpg" alt="Slide 8: A Simulated Rational Bubble" loading="lazy"></a>
-      <figcaption>Slide 8</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=10" target="_blank" rel="noopener"><img src="slides/ch17_rational_bubble_en.jpg" alt="Slide 9: A Simulated Rational Bubble" loading="lazy"></a>
+      <figcaption>Slide 9</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="rb-pi">Survival probability π: <b id="rb-pi-v"></b></label><input type="range" id="rb-pi" min="0.9" max="0.995" step="0.005" value="0.97"></div><div class="ctl"><label for="rb-b">Restart value δ: <b id="rb-b-v"></b></label><input type="range" id="rb-b" min="1" max="20" step="1" value="5"></div><button class="btn play" id="rb-play" type="button"></button></div><div class="charts "><div class="chart" id="rb-chart"></div></div><ul class="out" id="rb-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> The bubble survives each period with probability π = 0.97 and the required return is r = 1%. ▶ raises π to 0.995. What happens to the growth rate of the bubble while it survives?</div>
-  <details><summary>Answer</summary><p>It falls from 4.1% to 1.5% per period. The rate is (1 + r)/π − 1: a bubble with a lower risk of collapse requires less compensation, and its expected growth stays at r = 1%. Its expected life, 1/(1 − π), rises from 33 to 200 periods. With π = 0.97, the simulated bubble collapsed visibly 4 times, and at its peak the price was 1.46 times the fundamental value.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For an Evans bubble much larger than its restart value δ, with r = 1%, how does the mean growth rate conditional on survival change when ▶ raises π from 0.97 to 0.995?</div>
+  <details><summary>Answer</summary><p>It falls from about 4.1% to 1.5% per period. For Bₜ &gt; δ, the mean growth rate conditional on survival is (1 + r)/π − 1 − (δ/Bₜ)(1 − π)/π; when Bₜ is much larger than δ, the last term is small. The unconditional mean growth stays at r = 1%; it is not the growth rate conditional on survival. The values 33.3 and 200 periods, 1/(1 − π), are geometric waiting times under a constant collapse risk, not the exact duration of Evans episodes. With π = 0.97, the simulated bubble collapsed visibly 4 times, and at its peak the price was 1.46 times the fundamental value.</p></details>
 </section><h2 class="sec" id="s-data">Run-Ups and Crashes in the Data</h2>
 <section class="blk" id="episodes">
   <h3>Run-Ups and Crashes Aligned at the Peak</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch17_episodes_en.jpg" alt="Slide 12: Run-Ups and Crashes Aligned at the Peak" loading="lazy"></a>
-      <figcaption>Slide 12</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=14" target="_blank" rel="noopener"><img src="slides/ch17_episodes_en.jpg" alt="Slide 13: Run-Ups and Crashes Aligned at the Peak" loading="lazy"></a>
+      <figcaption>Slide 13</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ep-sel">Highlighted episode</label><select id="ep-sel"><option value="all" selected>All</option><option value="0">Nasdaq 100, 2000</option><option value="1">Cisco, 2000</option><option value="2">BET, 2007</option><option value="3">Bitcoin, 2017</option><option value="4">Ethereum, 2018</option><option value="5">Bitcoin, 2021</option><option value="6">Dogecoin, 2021</option><option value="7">GameStop, 2021</option><option value="8">Tesla, 2021</option></select></div><div class="ctl"><label for="ep-h">Horizon after the peak (years): <b id="ep-h-v"></b></label><input type="range" id="ep-h" min="0.25" max="2" step="0.25" value="2"></div><button class="btn play" id="ep-play" type="button"></button></div><div class="charts "><div class="chart" id="ep-chart"></div></div><ul class="out" id="ep-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> The run-ups over the two years before the peak differ by orders of magnitude. Do the falls after the peak differ as much?</div>
-  <details><summary>Answer</summary><p>No. The run-ups range from +97% (BET, 2007) to +124,004% (Ethereum, 2018), while the maximum drawdowns over the four years after the peak lie between −74% (Tesla) and −94% (Ethereum). The episodes were chosen because they ended in a crash, so they do not show how often a run-up is followed by one.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> All nine selected episodes were followed by crashes. Can we use the proportion 9/9 to estimate the probability of a crash after a rapid run-up?</div>
+  <details><summary>Answer</summary><p>No. Selecting on the outcome excludes run-ups that did not end in a crash, and removing an extreme episode does not repair this selection. The run-ups over the two years before the peak range from +97% (BET, 2007) to +124,004% (Ethereum, 2018). The chart shows the maximum fall in the first two years after the peak, between −74% (Tesla) and −94% (Ethereum); the lecture table uses four years. For the Nasdaq 100, these are −76% and −83% respectively.</p></details>
 </section>
 <section class="blk" id="bubbles-for-fama">
   <h3>What Do Sharp Run-Ups Predict?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=16" target="_blank" rel="noopener"><img src="slides/ch17_gsy_en.jpg" alt="Slide 15: What Do Sharp Run-Ups Predict?" loading="lazy"></a>
-      <figcaption>Slide 15</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=17" target="_blank" rel="noopener"><img src="slides/ch17_gsy_en.jpg" alt="Slide 16: What Do Sharp Run-Ups Predict?" loading="lazy"></a>
+      <figcaption>Slide 16</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="gs-c">Crash: fall from a previous peak: <b id="gs-c-v"></b></label><input type="range" id="gs-c" min="0" max="8" step="1" value="4"></div><button class="btn play" id="gs-play" type="button"></button></div><div class="charts "><div class="chart" id="gs-chart"></div></div><ul class="out" id="gs-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> After an industry's two-year return exceeds 100%, how often does a 40% crash follow?</div>
-  <details><summary>Answer</summary><p>In 45% of the cases (53 episodes in 27 industries, 95% CI [27%, 62%]), against 11% for an arbitrary industry-month. The mean return over the next two years is only 2%, with CI [−13%, 20%]: a sharp run-up raises the risk of a crash, but does not make an average loss predictable.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Among the 53 episodes selected by the Greenwood, Shleifer and You rule, a crash of at least 40% follows in 45% of the cases. The mean return over the next two years is +2%, with a 95% CI of [−13%, 20%]. Which conclusion about the mean return do the data support?</div>
+  <details><summary>Answer</summary><p>There is no clear evidence that it is negative. The frequency of a crash and the return at the end of the two years measure different things. The interval contains negative and positive values; it does not establish that the mean is zero. A crash follows in 45% of the cases (53 episodes in 27 industries, 95% CI [27%, 62%]), against 11% for an arbitrary industry-month. Selection requires the two-year return to exceed the threshold both raw and in excess of the market, a raw five-year return of at least 50%, and at least two years between episodes of the same industry.</p></details>
 </section><h2 class="sec" id="s-tests">Testing for Explosive Behaviour</h2>
 <section class="blk" id="windows">
   <h3>Three Ways to Choose Windows</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=20" target="_blank" rel="noopener"><img src="slides/ch17_windows_en.jpg" alt="Slide 19: Three Ways to Choose Windows" loading="lazy"></a>
-      <figcaption>Slide 19</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=21" target="_blank" rel="noopener"><img src="slides/ch17_windows_en.jpg" alt="Slide 20: Three Ways to Choose Windows" loading="lazy"></a>
+      <figcaption>Slide 20</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="wi-r">Minimum window r₀ (fraction of the sample): <b id="wi-r-v"></b></label><input type="range" id="wi-r" min="0.05" max="0.5" step="0.05" value="0.25"></div><div class="ctl"><label for="wi-T">Sample length T</label><select id="wi-T"><option value="440" selected>440 (Nasdaq 100, monthly)</option><option value="626">626 (Bitcoin, weekly)</option><option value="1865">1,865 (P/D ratio, monthly)</option></select></div><button class="btn play" id="wi-play" type="button"></button></div><div class="charts three"><div class="chart" id="wi-a"></div><div class="chart" id="wi-s"></div><div class="chart" id="wi-g"></div></div><ul class="out" id="wi-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> With T = 440 months, how many ADF regressions does GSADF run with the minimum window of the PSY rule?</div>
@@ -78,8 +78,8 @@
 <section class="blk" id="null">
   <h3>Null Distributions and Critical Values</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=24" target="_blank" rel="noopener"><img src="slides/ch17_null_en.jpg" alt="Slide 23: Null Distributions and Critical Values" loading="lazy"></a>
-      <figcaption>Slide 23</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=25" target="_blank" rel="noopener"><img src="slides/ch17_null_en.jpg" alt="Slide 24: Null Distributions and Critical Values" loading="lazy"></a>
+      <figcaption>Slide 24</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="nu-k">Minimum window w₀ (months): <b id="nu-k-v"></b></label><input type="range" id="nu-k" min="0" max="6" step="1" value="2"></div><button class="btn play" id="nu-play" type="button"></button></div><div class="charts "><div class="chart" id="nu-chart"></div></div><ul class="out" id="nu-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> With a minimum window w₀ = 42 months, the 95% critical value of GSADF is 2.19, against −0.06 for a single ADF. ▶ raises w₀ to 132 months. What happens to the GSADF critical value?</div>
@@ -88,58 +88,58 @@
 <section class="blk" id="sp-pd">
   <h3>S&P Composite (Shiller) Price-Dividend Ratio, 1871–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch17_sp_pd_en.jpg" alt="Slide 27: S&P Composite (Shiller) Price-Dividend Ratio, 1871–2026" loading="lazy"></a>
-      <figcaption>Slide 27</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=29" target="_blank" rel="noopener"><img src="slides/ch17_sp_pd_en.jpg" alt="Slide 28: S&P Composite (Shiller) Price-Dividend Ratio, 1871–2026" loading="lazy"></a>
+      <figcaption>Slide 28</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="pd-t">Date: <b id="pd-t-v"></b></label><input type="range" id="pd-t" min="0" max="1864" step="1" value="1864"></div><div class="ctl"><label for="pd-L">Minimum duration L (months): <b id="pd-L-v"></b></label><input type="range" id="pd-L" min="1" max="24" step="1" value="8"></div><button class="btn play" id="pd-play" type="button"></button></div><div class="charts "><div class="chart" id="pd-chart"></div></div><ul class="out" id="pd-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> The price-dividend ratio reached its sample maximum, 91.2, in May 2026. Why is it not date-stamped as an explosive episode?</div>
-  <details><summary>Answer</summary><p>The test looks for acceleration, not for a high level. BSADF exceeds its critical value only in Aug 1917–Jun 1918 (an accelerating fall of the ratio), Nov 1928–Sep 1929 and May 1997–Aug 2001. GSADF = 3.41 against a 95% critical value of 2.39, and the full-sample ADF (−1.11) detects nothing.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> In May 2026, the S&amp;P Composite price-dividend ratio is at its sample maximum, 91.2, but BSADF does not exceed its critical value. What does this comparison establish?</div>
+  <details><summary>Answer</summary><p>There is no explosiveness signal at this date under the chosen specification: the test looks for acceleration, not for a high level. In May 2026, BSADF is about 0.00, below the critical value 0.60. With the minimum duration L = 8, three episodes are retained: Aug 1917–Jun 1918 (an accelerating fall of the ratio), Nov 1928–Sep 1929 and May 1997–Aug 2001; another 46 exceedances form shorter runs. Local non-rejection does not establish the absence of a bubble. On the full sample, GSADF = 3.41 exceeds the 95% critical value, 2.39, while the full-sample ADF (−1.11) detects nothing.</p></details>
 </section>
 <section class="blk" id="bitcoin">
   <h3>Bitcoin: Explosive Episodes</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=30" target="_blank" rel="noopener"><img src="slides/ch17_btc_en.jpg" alt="Slide 29: Bitcoin: Explosive Episodes" loading="lazy"></a>
-      <figcaption>Slide 29</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=31" target="_blank" rel="noopener"><img src="slides/ch17_btc_en.jpg" alt="Slide 30: Bitcoin: Explosive Episodes" loading="lazy"></a>
+      <figcaption>Slide 30</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="bt-cv">95% critical value</label><select id="bt-cv"><option value="mc" selected>Monte Carlo</option><option value="wild">Wild bootstrap</option></select></div><div class="ctl"><label for="bt-t">Date: <b id="bt-t-v"></b></label><input type="range" id="bt-t" min="0" max="625" step="1" value="625"></div><div class="ctl"><label for="bt-L">Minimum duration L (weeks): <b id="bt-L-v"></b></label><input type="range" id="bt-L" min="1" max="20" step="1" value="7"></div><button class="btn play" id="bt-play" type="button"></button></div><div class="charts "><div class="chart" id="bt-chart"></div></div><ul class="out" id="bt-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Bitcoin rose to new highs in 2024–2025. Is this rise an explosive episode as well?</div>
-  <details><summary>Answer</summary><p>No. With the Monte Carlo critical values the episodes are Apr 2017–Jun 2018 and Dec 2020–May 2021; with the wild bootstrap, May 2017–Jan 2018 and Dec 2020–Feb 2021. A steady rise is not an explosive acceleration. GSADF = 3.85 rejects the null with both critical values (2.27 and 2.82).</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Bitcoin: we keep the Monte Carlo critical values and reduce only the minimum duration from L = 7 to L = 3 weeks. Which March–April 2024 episode is retained?</div>
+  <details><summary>Answer</summary><p>1–15 March 2024. With the Monte Carlo critical values, BSADF exceeds the threshold on 1–15 March (three consecutive weeks) and on 29 March–5 April (two). Reducing L changes the duration filter, not the statistics or the thresholds: the three-exceedance run becomes an episode, the two-exceedance run stays excluded, and the gap between them prevents their merger. With L = 7, the episodes are Apr 2017–Jun 2018 and Dec 2020–May 2021; with the wild bootstrap, May 2017–Jan 2018 and Dec 2020–Feb 2021. GSADF = 3.85 rejects the null with both critical values (2.27 and 2.82).</p></details>
 </section>
 <section class="blk" id="family-wise">
   <h3>Date-Stamping Is a Multiple Test: Bitcoin</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch17_fwer_btc_en.jpg" alt="Slide 32: Date-Stamping Is a Multiple Test: Bitcoin" loading="lazy"></a>
-      <figcaption>Slide 32</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=34" target="_blank" rel="noopener"><img src="slides/ch17_fwer_btc_en.jpg" alt="Slide 33: Date-Stamping Is a Multiple Test: Bitcoin" loading="lazy"></a>
+      <figcaption>Slide 33</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="fw-k">Monitoring window τ<sub>b</sub> (weeks): <b id="fw-k-v"></b></label><input type="range" id="fw-k" min="0" max="5" step="1" value="3"></div><div class="ctl"><label for="fw-l">Family-wise level</label><select id="fw-l"><option value="q90">90%</option><option value="q95" selected>95%</option><option value="q99">99%</option></select></div><button class="btn play" id="fw-play" type="button"></button></div><div class="charts "><div class="chart" id="fw-chart"></div></div><ul class="out" id="fw-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Date-stamping compares BSADF with its pointwise 95% critical value in each of the 626 weeks. Under the null (random walk), how likely is at least one false alarm?</div>
-  <details><summary>Answer</summary><p>On 2,000 random-walk paths, an exceedance occurs in 95% of them and an "episode" in 59%. The Phillips–Shi threshold, calibrated on 104 weeks, is 1.75, against pointwise Monte Carlo values of at most 0.71; with it a single episode remains, Oct 2017–Jan 2018. Applied to all 626 weeks, the threshold is crossed under the null in 19% of paths: a sensitivity analysis, not family-wise error control.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Over a history of 626 weekly changes, we compare the 576 defined BSADF values with their pointwise 95% critical values. Under the null (random walk), in what proportion of paths does at least one exceedance occur?</div>
+  <details><summary>Answer</summary><p>About 95%: on 2,000 random-walk paths, an exceedance occurs in 95% of them, and an "episode" of at least seven consecutive exceedances in 59%. The 5% option is the nominal level of a single comparison. The 19% option comes from applying the Phillips–Shi threshold, calibrated on 104 weeks, to the whole history: a sensitivity analysis, not family-wise error control. The threshold is 1.75, against pointwise Monte Carlo values of at most 0.71; with it a single episode remains, Oct 2017–Jan 2018.</p></details>
 </section><h2 class="sec" id="s-lppls">The Log-Periodic Power Law (LPPLS)</h2>
 <section class="blk" id="lppls-bitcoin">
   <h3>LPPLS on Bitcoin, 2017</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=39" target="_blank" rel="noopener"><img src="slides/ch17_lppls_btc2017_en.jpg" alt="Slide 38: LPPLS on Bitcoin, 2017" loading="lazy"></a>
-      <figcaption>Slide 38</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=40" target="_blank" rel="noopener"><img src="slides/ch17_lppls_btc2017_en.jpg" alt="Slide 39: LPPLS on Bitcoin, 2017" loading="lazy"></a>
+      <figcaption>Slide 39</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="lp-k">End of the estimation window t₂: <b id="lp-k-v"></b></label><input type="range" id="lp-k" min="0" max="24" step="1" value="15"></div><button class="btn play" id="lp-play" type="button"></button></div><div class="charts "><div class="chart" id="lp-chart"></div></div><ul class="out" id="lp-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> The LPPLS fit up to 15 November 2017 puts t<sub>c</sub> on 21 Dec 2017, 5 days after the peak. Is it a qualified fit?</div>
-  <details><summary>Answer</summary><p>No. m = 0.95, ω = 10.54 and B = −2.62 lie in the required ranges, but the maximum relative error of the fitted price is 0.42, above the 0.15 limit. No fit on this grid is qualified, and the estimated t<sub>c</sub> moves by weeks as t₂ advances.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The LPPLS fit on Bitcoin up to 15 November 2017 has a maximum relative error of 0.42, and the qualification limit is 0.15. By at least what percentage must the error fall to pass this filter?</div>
+  <details><summary>Answer</summary><p>64.3% = (0.42 − 0.15)/0.42. The difference of 0.27 is 27 percentage points, not a relative reduction of 27%. The value 35.7% = 0.15/0.42 is the part of the initial error that may remain. The fit puts t<sub>c</sub> on 21 Dec 2017, 5 days after the peak, and m = 0.95, ω = 10.54 and B = −2.62 lie in the required ranges; passing the error filter does not guarantee passing the other conditions. No fit on this grid is qualified.</p></details>
 </section>
 <section class="blk" id="critical-time">
   <h3>How Stable Is the Critical Time?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch17_tc_instability_en.jpg" alt="Slide 40: How Stable Is the Critical Time?" loading="lazy"></a>
-      <figcaption>Slide 40</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch17_tc_instability_en.jpg" alt="Slide 41: How Stable Is the Critical Time?" loading="lazy"></a>
+      <figcaption>Slide 41</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="tc-s">Start of the window t₁</label><select id="tc-s"><option value="0">6 months earlier (1 Jul 2016; 8 Apr 1998)</option><option value="1" selected>As on the slide (1 Jan 2017; 8 Oct 1998)</option><option value="2">3 months later (1 Apr 2017; 8 Jan 1999)</option></select></div><div class="ctl"><label for="tc-k">Fits shown (every 7 days): <b id="tc-k-v"></b></label><input type="range" id="tc-k" min="1" max="44" step="1" value="44"></div><button class="btn play" id="tc-play" type="button"></button></div><div class="charts "><div class="chart" id="tc-chart"></div></div><ul class="out" id="tc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> If LPPLS anticipated the crash, the estimated t<sub>c</sub> should stay close to the peak as t₂ advances. Does it?</div>
-  <details><summary>Answer</summary><p>No. For Bitcoin, the 20 fits before the peak put t<sub>c</sub> between Oct 2017 and Feb 2018, with a mean absolute error of 48 days; only 20% are within 30 days of the peak. For the Nasdaq 100 the mean error is 71 days, and t<sub>c</sub> often follows the date of the estimate. None of these fits is qualified.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Four of the 20 LPPLS fits on Bitcoin before the peak put t<sub>c</sub> within 30 days of the peak. What does the 20% proportion represent?</div>
+  <details><summary>Answer</summary><p>The share of the fits on this grid that meet the retrospective criterion. The denominator is 20 fits, not 20 independent crashes; the proportion is neither a calibrated crash probability nor the confidence level of an interval. The 20 fits put t<sub>c</sub> between Oct 2017 and Feb 2018, with a mean absolute error of 48 days; for the Nasdaq 100 the mean error is 71 days. None of these fits is qualified.</p></details>
 </section>
 <section class="blk" id="confidence">
   <h3>Bitcoin: LPPLS Confidence Indicator</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch17_lppls_ci_price_en.jpg" alt="Slide 43: Bitcoin: LPPLS Confidence Indicator" loading="lazy"></a>
-      <figcaption>Slide 43</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch17_lppls_ci_price_en.jpg" alt="Slide 44: Bitcoin: LPPLS Confidence Indicator" loading="lazy"></a>
+      <figcaption>Slide 44</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ci-f">Fall that defines a crash (%): <b id="ci-f-v"></b></label><input type="range" id="ci-f" min="10" max="50" step="5" value="20"></div><div class="ctl"><label for="ci-h">Horizon (days)</label><select id="ci-h"><option value="30">30</option><option value="60">60</option><option value="90" selected>90</option><option value="180">180</option></select></div><button class="btn play" id="ci-play" type="button"></button></div><div class="charts "><div class="chart" id="ci-chart"></div></div><ul class="out" id="ci-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> After an LPPLS signal (positive indicator), is a 20% fall within 90 days more frequent than without one?</div>
@@ -148,62 +148,62 @@
 <section class="blk" id="filters">
   <h3>LPPLS: Qualification Filters</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch17_lppls_ci_filters_en.jpg" alt="Slide 44: LPPLS: Qualification Filters" loading="lazy"></a>
-      <figcaption>Slide 44</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=46" target="_blank" rel="noopener"><img src="slides/ch17_lppls_ci_filters_en.jpg" alt="Slide 45: LPPLS: Qualification Filters" loading="lazy"></a>
+      <figcaption>Slide 45</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="fl-y">Year of the date t₂: <b id="fl-y-v"></b></label><input type="range" id="fl-y" min="0" max="30" step="1" value="0"></div><button class="btn play" id="fl-play" type="button"></button></div><div class="charts "><div class="chart" id="fl-chart"></div></div><ul class="out" id="fl-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Which condition removes the most LPPLS fits on Bitcoin?</div>
-  <details><summary>Answer</summary><p>Taken separately, the maximum relative error of at most 0.15: only 10% of the windows pass it, against about a third for the conditions on m, ω, t<sub>c</sub> and the number of oscillations. After the Lomb test, 0.4% of the Bitcoin windows and 3.6% of the Nasdaq 100 windows remain; after all conditions, including the residual test, 0.3% and 3.5% remain qualified, hence the small values of the indicator (at most 0.18).</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For Bitcoin, 10.2% of the windows pass the relative-error filter on its own, while 0.4% pass all the conditions up to and including the Lomb test. What percentage of all windows does the Lomb test reject on its own?</div>
+  <details><summary>Answer</summary><p>It cannot be determined from these two shares. 0.4% is the intersection of all the preceding conditions with the Lomb test; its complement, 99.6%, is not the rejection rate of the Lomb test alone. Computing 1 − 0.4/10.2 = 96.1% wrongly attributes to the Lomb test every elimination between the error filter and the cumulative result. Taken separately, a relative error of at most 0.15 is passed by 10% of the windows, against about a third for the conditions on m, ω, t<sub>c</sub> and the number of oscillations. After all conditions, 0.3% of the Bitcoin windows and 3.5% of the Nasdaq 100 windows remain qualified, hence the small values of the indicator (at most 0.18).</p></details>
 </section><h2 class="sec" id="s-ms">Regime-Switching Models</h2>
 <section class="blk" id="ms-nasdaq">
   <h3>Nasdaq 100: Two Regimes</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=50" target="_blank" rel="noopener"><img src="slides/ch17_ms_ndx_en.jpg" alt="Slide 49: Nasdaq 100: Two Regimes" loading="lazy"></a>
-      <figcaption>Slide 49</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch17_ms_ndx_en.jpg" alt="Slide 50: Nasdaq 100: Two Regimes" loading="lazy"></a>
+      <figcaption>Slide 50</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ms-p">p₂₂: persistence of the turbulent regime: <b id="ms-p-v"></b></label><input type="range" id="ms-p" min="0.8" max="0.995" step="any" value="0.957"></div><div class="ctl"><label for="ms-s">σ₂: volatility of the turbulent regime (%): <b id="ms-s-v"></b></label><input type="range" id="ms-s" min="3" max="9" step="any" value="5.4"></div><button class="btn play" id="ms-play" type="button"></button></div><div class="charts "><div class="chart" id="ms-chart"></div></div><ul class="out" id="ms-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> The turbulent regime of the Nasdaq 100 has a probability of staying in the regime p₂₂ = 0.957. ▶ raises p₂₂ to 0.995. What happens to its expected duration?</div>
-  <details><summary>Answer</summary><p>It rises from 23.5 to 200 weeks: the duration is 1/(1 − p₂₂), so it grows ever faster as p₂₂ approaches 1 (calm regime: 75.4 weeks). The filtered probability is 0.99 at the end of March 2000, while prices were still rising: the model signals high volatility, not direction. By the smoothed probability, the turbulent episode around the peak starts in Jun 1998.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> The estimated probability of staying in the turbulent regime of the Nasdaq 100 is p₂₂ ≈ 0.957. ▶ raises it to 0.995. What happens to the expected duration of the regime?</div>
+  <details><summary>Answer</summary><p>It rises from about 23.5 to 200 weeks: the duration is 1/(1 − p₂₂), so it grows ever faster as p₂₂ approaches 1 (calm regime: 75.4 weeks). The first value uses the estimated parameter before rounding. The duration is not proportional to p₂₂ and does not depend on the volatility of the regime. The filtered probability of 0.99 on 31 March 2000 indicates the turbulent regime, not the direction of prices: that week the index fell from 4,692 to 4,398. The filter parameters are estimated on the whole sample. By the smoothed probability, the turbulent episode around the peak starts in Jun 1998.</p></details>
 </section>
 <section class="blk" id="ms-lr">
   <h3>How Many Regimes? A Bootstrap LR Test</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=53" target="_blank" rel="noopener"><img src="slides/ch17_ms_lr_en.jpg" alt="Slide 52: How Many Regimes? A Bootstrap LR Test" loading="lazy"></a>
-      <figcaption>Slide 52</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=54" target="_blank" rel="noopener"><img src="slides/ch17_ms_lr_en.jpg" alt="Slide 53: How Many Regimes? A Bootstrap LR Test" loading="lazy"></a>
+      <figcaption>Slide 53</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="lr-s">Left panel</label><select id="lr-s"><option value="btc_1v2" selected>Bitcoin: one vs two regimes</option><option value="ndx_1v2">Nasdaq 100: one vs two regimes</option></select></div><div class="ctl"><label for="lr-B">Bootstrap replications B: <b id="lr-B-v"></b></label><input type="range" id="lr-B" min="19" max="199" step="10" value="199"></div><button class="btn play" id="lr-play" type="button"></button></div><div class="charts "><div class="chart" id="lr-chart"></div></div><ul class="out" id="lr-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Bitcoin, one against two regimes: where does the 95% bootstrap critical value of the LR statistic lie relative to the value 9.5 from the χ²₄ distribution?</div>
-  <details><summary>Answer</summary><p>Above it: the 95% bootstrap critical value is 11.8, against 9.5 from χ²₄. Under H₀ the transition probabilities p₁₁ and p₂₂ are not identified, so LR does not follow a χ² distribution. The observed LR, 123.2, exceeds all 199 replications, so p = 1/(B + 1) = 0.005, the smallest p-value possible with B = 199.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Bitcoin, one against two regimes: none of the first 99 bootstrap replications reaches the observed LR, 123.2. What p-value does the rule p = (1 + number of exceedances)/(B + 1) report?</div>
+  <details><summary>Answer</summary><p>p = (1 + 0)/(99 + 1) = 0.010. The option 0 ignores the correction; 0.005 is the smallest possible value with 199 replications. Observing no exceedances does not establish that the tail probability is zero. Under H₀ the transition probabilities p₁₁ and p₂₂ are not identified, so LR does not follow a χ² distribution: with 199 replications, the 95% bootstrap critical value is 11.8, against 9.5 from χ²₄.</p></details>
 </section><h2 class="sec" id="s-ai">Crypto and AI Bubbles</h2>
 <section class="blk" id="dotcom-ai">
   <h3>Dot-Com vs AI</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch17_ai_dotcom_en.jpg" alt="Slide 55: Dot-Com vs AI" loading="lazy"></a>
-      <figcaption>Slide 55</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=57" target="_blank" rel="noopener"><img src="slides/ch17_ai_dotcom_en.jpg" alt="Slide 56: Dot-Com vs AI" loading="lazy"></a>
+      <figcaption>Slide 56</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ai-m">Months since the first signal: <b id="ai-m-v"></b></label><input type="range" id="ai-m" min="0" max="96" step="1" value="96"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-chart"></div></div><ul class="out" id="ai-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Forty months after the first explosive signal, which Nasdaq 100 episode stands higher relative to the level at the signal: the 1990s or the AI era?</div>
-  <details><summary>Answer</summary><p>The 1990s. In the AI episode (first signal in May 2023) the level is 2.1 times that at the signal after 40 months; in the 1990s (first signal in Jun 1995) it was 2.6 times, and the peak came after 57 months, at 8.2 times. NVIDIA stands at 9.6 times after 43 months; Cisco peaked after 16 months, at 4.1 times.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Forty months after the first explosive signal, the Nasdaq 100 levels relative to the level at the signal are, rounded, 2.6 in the 1990s episode and 2.1 in the AI episode. By what percentage is the first level higher?</div>
+  <details><summary>Answer</summary><p>23.8% = 2.6/2.1 − 1. The difference of 50 percentage points compares the cumulative returns, 160% and 110%; 45.5% = 160/110 − 1 relates the returns to each other, not the levels. The first signal is in Jun 1995 and May 2023 respectively. In the 1990s the peak came after 57 months, at 8.2 times the level at the signal. NVIDIA stands at 9.6 times after 43 months; Cisco peaked after 16 months, at 4.1 times.</p></details>
 </section><h2 class="sec" id="s-case">Case Studies: Housing Speculators and Predictable Crises</h2>
 <section class="blk" id="housing">
   <h3>Case Study (3/5): Prices and Volume, 2000–2011</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=61" target="_blank" rel="noopener"><img src="slides/ch17_dnz_cycle_en.jpg" alt="Slide 60: Case Study (3/5): Prices and Volume, 2000–2011" loading="lazy"></a>
-      <figcaption>Slide 60</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch17_dnz_cycle_en.jpg" alt="Slide 61: Case Study (3/5): Prices and Volume, 2000–2011" loading="lazy"></a>
+      <figcaption>Slide 61</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="dz-v">Volume</label><select id="dz-v"><option value="adj" selected>Calendar-month adjusted</option><option value="raw">Not adjusted</option></select></div><div class="ctl"><label for="dz-t">Up to month: <b id="dz-t-v"></b></label><input type="range" id="dz-t" min="0" max="143" step="1" value="143"></div><button class="btn play" id="dz-play" type="button"></button></div><div class="charts "><div class="chart" id="dz-chart"></div></div><ul class="out" id="dz-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Which peaks first in the US housing boom: volume or prices?</div>
-  <details><summary>Answer</summary><p>Volume. New-home sales, adjusted for the calendar month, peak at 157 in Jul 2005, while prices rise to 176 in Jul 2006: a 12-month quiet phase, with sales already down to 110 at the price peak. With unadjusted sales the quiet phase lasts 16 months. In 2011 the averages are 35 for sales and 133 for prices.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> In the US housing boom, the peak of adjusted volume precedes the price peak by 12 months in retrospect. Is this result sufficient to validate a real-time warning rule?</div>
+  <details><summary>Answer</summary><p>No. The date of the maximum over the whole interval is identified in retrospect; an alarm must be computable at the decision date and then evaluated out of sample. Seasonal adjustment does not solve this problem. New-home sales, adjusted for the calendar month, peak at 157 in Jul 2005, while prices rise to 176 in Jul 2006, with sales already down to 110. With unadjusted sales the lead is 16 months.</p></details>
 </section>
 <section class="blk" id="crises">
   <h3>Second Case Study (2/4): Crisis Probability After the R-Zone</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=65" target="_blank" rel="noopener"><img src="slides/ch17_ghss_rzone_en.jpg" alt="Slide 64: Second Case Study (2/4): Crisis Probability After the R-Zone" loading="lazy"></a>
-      <figcaption>Slide 64</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter17_bubbles_crashes.pdf#page=66" target="_blank" rel="noopener"><img src="slides/ch17_ghss_rzone_en.jpg" alt="Slide 65: Second Case Study (2/4): Crisis Probability After the R-Zone" loading="lazy"></a>
+      <figcaption>Slide 65</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="gh-q">Credit threshold of the R-zone (panel percentile): <b id="gh-q-v"></b></label><input type="range" id="gh-q" min="50" max="95" step="5" value="80"></div><button class="btn play" id="gh-play" type="button"></button></div><div class="charts "><div class="chart" id="gh-chart"></div></div><ul class="out" id="gh-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> What happens if we raise the credit threshold of the R-zone from the 50th to the 95th percentile?</div>
-  <details><summary>Answer</summary><p>The probability of a crisis within 3 years after an R-zone rises, but the R-zone announces fewer and fewer crises. For households: 21% after 206 R-zone country-years, which precede 17 of the 25 crises, at the 50th percentile; 34% (94 country-years, 15 crises) at the 80th; 50% (30 country-years, 8 crises) at the 95th. For firms: 17%, 27% and 37%, with 16, 11 and 3 of the 24 crises. A higher threshold means fewer false alarms and more missed crises.</p></details>
+  <div class="ask"><span class="ask-tag">Question for the room</span> For households, we compare the 50th and 95th percentiles of credit growth, with the house-price threshold held fixed. What trade-off appears in this sample for crises within the next three years?</div>
+  <details><summary>Answer</summary><p>The crisis frequency after an R-zone rises from 21% (206 country-years) to 50% (30 country-years), while the number of crises preceded by an R-zone falls from 17 to 8 of the 25. The two measures have different denominators. For firms: 17% and 37%, with 16 and 3 of the 24 crises. The comparison describes the two thresholds in this sample; the conditional frequency does not rise at every step of the grid (for firms, from the 50th to the 55th percentile it falls slightly, from 16.9% to 16.6%). A higher threshold means fewer false alarms and more missed crises.</p></details>
 </section>
 <p class="src foot">EODHD prices (Nasdaq 100, BET, Cisco, NVIDIA, Tesla, GameStop, Bitcoin, Ethereum, Dogecoin), up to 18 Sep 2026. S&P Composite price-dividend ratio: public data of Robert J. Shiller, Jan 1871–Jun 2026. 48 US industries: Kenneth French Data Library, Jul 1926–Sep 2026. Housing: FRED (CSUSHPINSA, HSN1FNSA). Credit, prices and crises: Jordà–Schularick–Taylor Macrohistory Database (R6), 18 advanced economies, 1950–2020. Critical values, LPPLS fits and Markov-switching models are computed with the chapter's code; the browser only recombines them.</p>
 </main>

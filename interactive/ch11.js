@@ -304,12 +304,13 @@ function rough() {
   plot('ro-acf', [
     { x: lags, y: RHO, mode: 'lines', name: 'Empirical ACF of log σ̂', line: { color: K.blue, width: 2 }, hovertemplate: 'lag %{x}: %{y:.3f}<extra></extra>' },
     { x: lags, y: lags.map(h => Math.exp(cStar) * cauchy(h, R.alpha_nlls, bStar)), mode: 'lines', name: `Cauchy class, noise-robust: β̂* = ${bStar.toFixed(2)}`, line: { color: K.purple, width: 1.8 }, hoverinfo: 'skip' },
-    { x: lags, y: lags.map(h => Math.exp(ic - lamOU * h)), mode: 'lines', name: `Exponential decay (OU): half-life ${hl.toFixed(0)} days`, line: { color: K.amber, width: 1.8, dash: 'dash' }, hoverinfo: 'skip' }
+    { x: lags, y: lags.map(h => Math.exp(ic - lamOU * h)), mode: 'lines', name: `Fitted exponential curve A·exp(−κh): half-life ${hl.toFixed(0)} days`, line: { color: K.amber, width: 1.8, dash: 'dash' }, hoverinfo: 'skip' }
   ], layout({ title: ttl('Persistence: ACF of log-volatility'), xaxis: AX('Lag h (trading days)'), yaxis: AX('', { range: [-0.1, 1.0], zeroline: true, zerolinecolor: K.navy }),
     shapes: [{ type: 'line', xref: 'x', yref: 'paper', x0: H, x1: H, y0: 0, y1: 1, line: { color: K.navy, width: 1, dash: 'dot' } }],
     annotations: [{ x: H, y: 0.95, xref: 'x', yref: 'y', text: `fit on lags 1..${H}`, showarrow: false, xanchor: 'left', xshift: 4, font: { size: 11, color: K.navy } }],
     legend: { orientation: 'h', x: 0, y: -0.22, yanchor: 'top', font: { size: 11 } } }));
-  out('ro-out', [T.ro(m, nf(aOls, 3), nf(R.alpha_nlls, 2)), T.ro2(H, nf(bPlain, 2), nf(bStar, 2), nf(hl, 1), nf(RHO[99], 2), nf(Math.exp(-lamOU * 100), 3))]);
+  out('ro-out', [T.ro(m, nf(aOls, 3), nf(R.alpha_nlls, 2)), T.ro2(H, nf(bPlain, 2), nf(bStar, 2), nf(hl, 1), nf(RHO[99], 2), nf(Math.exp(-lamOU * 100), 3),
+    nf(Math.exp(ic - lamOU), 3), nf(Math.exp(ic - lamOU * 100), Math.exp(ic - lamOU * 100) < 0.01 ? 4 : 3), nf(RHO[0], 2))]);
 }
 
 // ================================================================= drift bursts, SPY (second case study)

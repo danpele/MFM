@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch13_data.js?v=20261030a"></script>
-<script src="ch13_text_ro.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch13.js?v=20261030a" defer></script>
+<script src="ch13_data.js?v=20261030b"></script>
+<script src="ch13_text_ro.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch13.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,132 +38,132 @@
 <section class="blk" id="predictability">
   <h3>Predictibilitatea direcției și a riscului</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=8" target="_blank" rel="noopener"><img src="slides/ch13_signal_to_noise_ro.jpg" alt="Slide-ul 7: Predictibilitatea direcției și a riscului" loading="lazy"></a>
-      <figcaption>Slide-ul 7</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=9" target="_blank" rel="noopener"><img src="slides/ch13_signal_to_noise_ro.jpg" alt="Slide-ul 8: Predictibilitatea direcției și a riscului" loading="lazy"></a>
+      <figcaption>Slide-ul 8</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="sn-p">Puterea p în |r|^p: <b id="sn-p-v"></b></label><input type="range" id="sn-p" min="0.25" max="3" step="0.25" value="1"></div><div class="ctl"><label for="sn-per">Perioada</label><select id="sn-per"><option value="all" selected>2000–2026</option><option value="a">2000–2012</option><option value="b">2013–2026</option></select></div><button class="btn play" id="sn-play" type="button"></button></div><div class="charts "><div class="chart" id="sn-chart"></div></div><ul class="out" id="sn-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Autocorelația de ordinul 1 a randamentelor zilnice S&P 500 este −0,10, iar celelalte 39 sînt sub 0,07 în valoare absolută. Cum arată autocorelațiile lui |r_t|?</div>
-  <details><summary>Răspuns</summary><p>Sînt mari și persistente: 0,29 la lagul 1 și 0,16 la lagul 40, toate 40 deasupra benzii de ±0,024. La randamente, 13 din 40 ies din banda i.i.d., care nu este simultană și nici robustă la heteroscedasticitate; riscul este mult mai predictibil decît direcția, de aceea ML este cel mai util pentru volatilitate, risc și lichiditate.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru S&P 500, în 2000–2026, autocorelațiile randamentelor zilnice sînt mici la majoritatea lagurilor. Cum arată autocorelațiile randamentelor absolute |r_t|?</div>
+  <details><summary>Răspuns</summary><p>Pentru |r_t|, autocorelația este 0,29 la lagul 1 și 0,16 la lagul 40; toate cele 40 ies din banda ±0,024. La randamente, autocorelația de ordinul 1 este −0,10, iar 13 din 40 ies din bandă. Autocorelația liniară redusă nu implică independență, iar aplicarea modulului nu transformă ACF prin simpla ridicare la pătrat. Rezultatul indică persistența amplitudinii randamentelor. Banda ±0,024 este un reper punctual i.i.d., nu o bandă simultană robustă la heteroscedasticitate.</p></details>
 </section><h2 class="sec" id="s-tool">Trusa minimă de machine learning</h2>
 <section class="blk" id="lasso-path">
   <h3>Traiectoria de regularizare LASSO</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch13_lasso_path_ro.jpg" alt="Slide-ul 14: Traiectoria de regularizare LASSO" loading="lazy"></a>
-      <figcaption>Slide-ul 14</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=16" target="_blank" rel="noopener"><img src="slides/ch13_lasso_path_ro.jpg" alt="Slide-ul 15: Traiectoria de regularizare LASSO" loading="lazy"></a>
+      <figcaption>Slide-ul 15</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="la-pen">Penalizarea</label><select id="la-pen"><option value="l1" selected>LASSO (L1)</option><option value="l2">Ridge (L2)</option></select></div><div class="ctl"><label for="la-k">Penalizarea, de la puternică la slabă: <b id="la-k-v"></b></label><input type="range" id="la-k" min="0" max="39" step="1" value="39"></div><button class="btn play" id="la-play" type="button"></button></div><div class="charts "><div class="chart" id="la-path"></div><div class="chart" id="la-bar"></div></div><ul class="out" id="la-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Care caracteristică intră prima în modelul LASSO cînd penalizarea scade?</div>
-  <details><summary>Răspuns</summary><p>Log-prețul FFD (ffd_price), adică un nivel de preț scalat. La penalizare slabă cele mai mari coeficiente le au caracteristicile de volatilitate, dar toți coeficienții rămîn sub 0,16 în valoare absolută. În CV cu purjare, cu scalarea estimată în fiecare pliu, orice λ la care intră cel puțin o caracteristică dă un AUC între 0,476 și 0,486, sub 0,5.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe traiectoria LASSO estimată pe întregul eșantion, ce caracteristică devine prima nenulă cînd penalizarea scade?</div>
+  <details><summary>Răspuns</summary><p>Prima caracteristică este ffd_price. vol_20 are cel mai mare coeficient în valoare absolută la penalizare slabă, ceea ce nu stabilește ordinea intrării. Nici autocorelația de ordinul 1 a randamentelor nu stabilește această ordine. Filtrul FFD trunchiat păstrează o componentă proporțională cu nivelul log-prețului. Intrarea timpurie nu dovedește abilitate predictivă: AUC mediu în CV cu purjare, cu scalarea estimată în fiecare pliu, este între 0,476 și 0,486 pentru penalizările cu cel puțin un coeficient nenul.</p></details>
 </section><h2 class="sec" id="s-feat">Caracteristici: diferențierea fracționară și capcana ei</h2>
 <section class="blk" id="ffd-adf">
   <h3>Statistica ADF în funcție de d: S&P 500</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=21" target="_blank" rel="noopener"><img src="slides/ch13_ffd_adf_ro.jpg" alt="Slide-ul 20: Statistica ADF în funcție de d: S&P 500" loading="lazy"></a>
-      <figcaption>Slide-ul 20</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=22" target="_blank" rel="noopener"><img src="slides/ch13_ffd_adf_ro.jpg" alt="Slide-ul 21: Statistica ADF în funcție de d: S&P 500" loading="lazy"></a>
+      <figcaption>Slide-ul 21</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ff-k">Ordinul de diferențiere d: <b id="ff-k-v"></b></label><input type="range" id="ff-k" min="0" max="20" step="1" value="5"></div><div class="ctl"><label for="ff-lag">Lagurile testului ADF</label><select id="ff-lag"><option value="1" selected>1 lag</option><option value="aic">alese prin AIC</option></select></div><button class="btn play" id="ff-play" type="button"></button></div><div class="charts "><div class="chart" id="ff-adf"></div><div class="chart" id="ff-series"></div></div><ul class="out" id="ff-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La d = 0,25 statistica ADF cu 1 lag este −2,96, sub valoarea critică −2,86. Este seria FFD staționară?</div>
-  <details><summary>Răspuns</summary><p>Testul nu o arată. Cu 34 de laguri, alese prin AIC, ADF este −0,72 și nu respinge. Corelația cu log-prețul este 0,98, iar suma ponderilor trunchiate este 0,178: seria conține un random walk scalat.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La d = 0,25, ADF cu un lag respinge rădăcina unitate. Este această respingere suficientă pentru a considera seria FFD staționară?</div>
+  <details><summary>Răspuns</summary><p>ADF cu un lag respinge: −2,96 < −2,86. Cu 34 de laguri alese prin AIC, statistica este −0,72 și nu respinge. Niciun verdict nu este o demonstrație. Argumentul structural este că, pentru un log-preț I(1), filtrul finit cu suma ponderilor 0,178 păstrează componenta I(1). Corelația 0,98 cu log-prețul este un semnal de alarmă, nu un test de staționaritate.</p></details>
 </section><h2 class="sec" id="s-lab">Etichete: ce învață, de fapt, modelul</h2>
 <section class="blk" id="triple-barrier">
   <h3>Trei bariere: S&P 500 în 2022</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=26" target="_blank" rel="noopener"><img src="slides/ch13_triple_barrier_ro.jpg" alt="Slide-ul 25: Trei bariere: S&P 500 în 2022" loading="lazy"></a>
-      <figcaption>Slide-ul 25</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=27" target="_blank" rel="noopener"><img src="slides/ch13_triple_barrier_ro.jpg" alt="Slide-ul 26: Trei bariere: S&P 500 în 2022" loading="lazy"></a>
+      <figcaption>Slide-ul 26</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="tb-w">Lățimea barierelor π (în σ√h): <b id="tb-w-v"></b></label><input type="range" id="tb-w" min="0.25" max="3" step="0.25" value="1"></div><div class="ctl"><label for="tb-h">Orizontul h (zile de tranzacționare): <b id="tb-h-v"></b></label><input type="range" id="tb-h" min="5" max="40" step="1" value="15"></div><button class="btn play" id="tb-play" type="button"></button></div><div class="charts "><div class="chart" id="tb-chart"></div></div><ul class="out" id="tb-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Evenimentele din mai, august și noiembrie primesc eticheta +1. Au atins bariera de profit?</div>
-  <details><summary>Răspuns</summary><p>Nu. Se termină la bariera verticală, după 15 zile, peste nivelul de intrare, iar regula semnului le dă +1. Doar evenimentul din martie atinge bariera de profit; cel din ianuarie atinge stop-loss-ul (−1).</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Un eveniment atinge mai întîi bariera de profit, în ziua 5. În ziua 15, prețul este sub nivelul de intrare. Ce etichetă primește în implementarea paginii?</div>
+  <details><summary>Răspuns</summary><p>Evenimentul se încheie în ziua 5 și primește +1. Mișcarea ulterioară nu schimbă eticheta. Semnul randamentului la orizont se folosește numai dacă nu a fost atinsă anterior nicio barieră orizontală; nu există o regulă de anulare a semnelor. Pe grafic, doar evenimentul din martie atinge bariera de profit; cele din mai, august și noiembrie primesc +1 prin semnul randamentului la bariera verticală, iar cel din ianuarie atinge stop-loss-ul (−1).</p></details>
 </section><h2 class="sec" id="s-val">Validare onestă</h2>
 <section class="blk" id="purged-cv">
   <h3>K-fold cu purjare și embargo</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch13_purged_cv_scheme_ro.jpg" alt="Slide-ul 31: K-fold cu purjare și embargo" loading="lazy"></a>
-      <figcaption>Slide-ul 31</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch13_purged_cv_scheme_ro.jpg" alt="Slide-ul 32: K-fold cu purjare și embargo" loading="lazy"></a>
+      <figcaption>Slide-ul 32</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="pc-k">Numărul de pliuri K: <b id="pc-k-v"></b></label><input type="range" id="pc-k" min="3" max="10" step="1" value="5"></div><div class="ctl"><label for="pc-h">Lungimea etichetei h (observații): <b id="pc-h-v"></b></label><input type="range" id="pc-h" min="0" max="15" step="1" value="4"></div><div class="ctl"><label for="pc-e">Embargoul e (observații): <b id="pc-e-v"></b></label><input type="range" id="pc-e" min="0" max="10" step="1" value="3"></div><button class="btn play" id="pc-play" type="button"></button></div><div class="charts "><div class="chart" id="pc-chart"></div></div><ul class="out" id="pc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cu etichete de h = 4 observații și un embargo de e = 3, cîte observații se pierd la fiecare frontieră a pliului de test?</div>
-  <details><summary>Răspuns</summary><p>h = 4 înainte de bloc, ale căror etichete se termină în test, și h + e = 7 după el: 4 purjate, care încep pînă la sfîrșitul ultimei etichete de test, apoi 3 sub embargo. Un pliu interior pierde 2h + e = 11 observații.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În schema cu 100 de observații și 5 pliuri, păstrăm embargoul e = 3. Dacă lungimea etichetei crește de la h = 4 la h = 6, cîte observații de antrenare sînt eliminate în jurul pliului central?</div>
+  <details><summary>Răspuns</summary><p>Se elimină 2h + e = 15 observații: h = 6 înainte de bloc, ale căror etichete se termină în test, și h + e = 9 după el, adică 6 purjate și 3 sub embargo. Valoarea 13 actualizează numai frontiera din stînga; valoarea 12 omite embargoul. Cele 20 de observații de test nu intră în acest total.</p></details>
 </section>
 <section class="blk" id="leakage">
   <h3>Experiment de leakage: o țintă fără predictibilitate</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch13_leakage_experiment_ro.jpg" alt="Slide-ul 32: Experiment de leakage: o țintă fără predictibilitate" loading="lazy"></a>
-      <figcaption>Slide-ul 32</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=34" target="_blank" rel="noopener"><img src="slides/ch13_leakage_experiment_ro.jpg" alt="Slide-ul 33: Experiment de leakage: o țintă fără predictibilitate" loading="lazy"></a>
+      <figcaption>Slide-ul 33</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="lk-h">Lungimea h a etichetelor și a mediilor rolling (zile): <b id="lk-h-v"></b></label><input type="range" id="lk-h" min="0" max="6" step="1" value="4"></div><button class="btn play" id="lk-play" type="button"></button></div><div class="charts "><div class="chart" id="lk-bar"></div><div class="chart" id="lk-line"></div></div><ul class="out" id="lk-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Prețul este un random walk, deci acuratețea reală este 50%. De ce K-fold amestecat raportează 69,4%?</div>
-  <details><summary>Răspuns</summary><p>Etichetele pe 20 de zile se suprapun, iar caracteristicile sînt persistente, deci amestecarea pune zile aproape identice în antrenare și în test. Pliurile contigue dau 50,0%, iar purjarea și embargoul 49,6%. Cu h = 2, K-fold amestecat dă 49,9%; cu h = 60 ajunge la 84,5%.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În simularea cu incrementări independente și simetrice și caracteristici de zgomot, K-fold amestecat dă 69,4%, față de 49,6% cu purjare și embargo. Ce explică diferența?</div>
+  <details><summary>Răspuns</summary><p>La h = 20, zilele vecine au etichete suprapuse și caracteristici similare. Amestecarea le distribuie între antrenare și test. Dezechilibrul claselor nu explică diferența dintre evaluări pe aceleași observații, iar repetarea împărțirii nu înlătură acest mecanism. Pliurile contigue dau 50,0%, iar purjarea și embargoul 49,6%; aceste valori sînt rezultate ale simulării, nu garanții exacte. Cu h = 2, K-fold amestecat dă 49,9%; cu h = 60 ajunge la 84,5%.</p></details>
 </section><h2 class="sec" id="s-case">Studiu de caz: predicția S&P 500</h2>
 <section class="blk" id="model-comparison">
   <h3>Compararea modelelor: mediile pe pliuri</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=40" target="_blank" rel="noopener"><img src="slides/ch13_model_comparison_ro.jpg" alt="Slide-ul 39: Compararea modelelor: mediile pe pliuri" loading="lazy"></a>
-      <figcaption>Slide-ul 39</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=41" target="_blank" rel="noopener"><img src="slides/ch13_model_comparison_ro.jpg" alt="Slide-ul 40: Compararea modelelor: mediile pe pliuri" loading="lazy"></a>
+      <figcaption>Slide-ul 40</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="mc-c">Pragul probabilității pentru „sus”: <b id="mc-c-v"></b></label><input type="range" id="mc-c" min="0.4" max="0.65" step="0.005" value="0.5"></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts "><div class="chart" id="mc-acc"></div><div class="chart" id="mc-auc"></div></div><div class="charts "><div class="chart" id="mc-thr"></div></div><ul class="out" id="mc-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Logit-ul penalizat L2 are acuratețea 57,7%. Este un model bun?</div>
-  <details><summary>Răspuns</summary><p>Nu. Reperul „mereu în sus” are 58,1%. Logit-ul prezice „sus” în 98,3% din zile (TP = 3 575, FP = 2 589), deci a învățat regula majoritară. AUC-urile medii pe pliuri sînt între 0,477 și 0,508, aproape de 0,5.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La pragul 0,5, logit-ul are acuratețea 57,7%. Demonstrează acest rezultat un avantaj de acuratețe față de regula „mereu în sus”?</div>
+  <details><summary>Răspuns</summary><p>Nu. Regula „mereu în sus” are 58,1%, deci logit-ul are cu aproximativ 0,4 puncte procentuale mai puțin decît reperul. Depășirea nivelului de 50% sau clasarea înaintea celorlalte trei modele nu demonstrează depășirea acestui reper. Predicția „sus” în 98,3% din zile (TP = 3 575, FP = 2 589) arată apropierea de regula majoritară; nu dovedește că modelul reproduce exact această regulă. AUC-urile medii pe pliuri sînt între 0,477 și 0,508.</p></details>
 </section>
 <section class="blk" id="walk-forward">
   <h3>Backtest walk-forward: rezultate</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=44" target="_blank" rel="noopener"><img src="slides/ch13_walk_forward_backtest_ro.jpg" alt="Slide-ul 43: Backtest walk-forward: rezultate" loading="lazy"></a>
-      <figcaption>Slide-ul 43</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch13_walk_forward_backtest_ro.jpg" alt="Slide-ul 44: Backtest walk-forward: rezultate" loading="lazy"></a>
+      <figcaption>Slide-ul 44</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="wf-c">Pragul probabilității prezise pentru poziția long: <b id="wf-c-v"></b></label><input type="range" id="wf-c" min="0.45" max="0.6" step="0.005" value="0.5"></div><div class="ctl"><label for="wf-b">Costul pe schimbare de poziție: <b id="wf-b-v"></b></label><input type="range" id="wf-b" min="0" max="20" step="1" value="5"></div><button class="btn play" id="wf-play" type="button"></button></div><div class="charts "><div class="chart" id="wf-chart"></div></div><ul class="out" id="wf-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Strategia GBM long/cash, cu tranzacția la închiderea următoare și costuri de 5 bp, are raportul Sharpe 0,33. Ce raport Sharpe are buy-and-hold în aceeași perioadă?</div>
-  <details><summary>Răspuns</summary><p>0,66. Expunerea medie a strategiei este 76%. Diferența, −0,33, are p = 0,001 (test HAC Ledoit–Wolf): strategia este semnificativ mai slabă. Log-prețul FFD folosește d = 0,15, ales doar pe datele pînă în 2009.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Expunerea medie a strategiei GBM long/cash este 76%. Putem trata strategia ca pe buy-and-hold cu expunere constantă de 76% atunci cînd comparăm rapoartele Sharpe?</div>
+  <details><summary>Răspuns</summary><p>Nu. Invarianța raportului Sharpe la scalare se referă la înmulțirea tuturor randamentelor cu aceeași constantă pozitivă. O poziție care alternează între 0 și 1 nu este o astfel de scalare. În exemplu, cu tranzacția la închiderea următoare, la pragul 0,5 și costul de 5 bp, strategia are SR 0,33, iar buy-and-hold 0,66. Diferența, −0,33, are p = 0,001 (test HAC Ledoit–Wolf). Log-prețul FFD folosește d = 0,15, ales doar pe datele pînă în 2009.</p></details>
 </section>
 <section class="blk" id="anomalies">
   <h3>Anomaliile și piața: cîștigul out-of-sample față de media istorică</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch13_dlrz_oos_ro.jpg" alt="Slide-ul 46: Anomaliile și piața: cîștigul out-of-sample față de media istorică" loading="lazy"></a>
-      <figcaption>Slide-ul 46</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=48" target="_blank" rel="noopener"><img src="slides/ch13_dlrz_oos_ro.jpg" alt="Slide-ul 47: Anomaliile și piața: cîștigul out-of-sample față de media istorică" loading="lazy"></a>
+      <figcaption>Slide-ul 47</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="an-y">Sfîrșitul perioadei de evaluare (decembrie): <b id="an-y-v"></b></label><input type="range" id="an-y" min="1990" max="2026" step="1" value="2026"></div><div class="ctl"><label for="an-s">Anomaliile din combinație</label><select id="an-s"><option value="all" selected>toate cele 15</option><option value="ff">7 factori</option><option value="dec">8 diferențe de decile</option></select></div><button class="btn play" id="an-play" type="button"></button></div><div class="charts "><div class="chart" id="an-gain"></div></div><div class="charts "><div class="chart" id="an-uni"></div></div><ul class="out" id="an-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> OLS cu toate cele 15 anomalii are R²OOS −7,41% în 1985–2026. De ce media celor 15 prognoze univariate face mai bine, cu 0,41%?</div>
-  <details><summary>Răspuns</summary><p>Regresia cu 16 coeficienți, estimată pe 180–680 de luni, învață zgomotul: varianța estimării depășește semnalul. Media prognozelor univariate împarte fiecare pantă la 15 și diversifică erorile de estimare. Cîștigul rămîne mic (p unilateral Clark–West cu erori HAC, 5 laguri: 0,045; 0,063 cu 3 laguri); în lucrare, cu 100 de anomalii, OLS ajunge la −2 513,86%, iar combinația simplă la 0,89%.</p></details>
+  <details><summary>Răspuns</summary><p>Comb este media prognozelor univariate: contribuția fiecărei pante univariate este ponderată cu 1/15. Nu este OLS multivariat împărțit la 15. Combinarea poate reduce varianța erorilor, fără a garanta un cîștig. Multicoliniaritatea nu produce singură bias OLS. În acest eșantion, Comb are R²OOS 0,41%, față de −7,41% pentru OLS; semnificația cîștigului Comb este sensibilă la lagurile HAC (p unilateral Clark–West 0,045 cu 5 laguri, 0,063 cu 3 laguri). În lucrare, cu 100 de anomalii, OLS ajunge la −2 513,86%, iar combinația simplă la 0,89%.</p></details>
 </section><h2 class="sec" id="s-sel">Selecție și overfitting-ul backtest-ului</h2>
 <section class="blk" id="max-sharpe">
   <h3>Cea mai bună dintre N strategii fără abilitate</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=52" target="_blank" rel="noopener"><img src="slides/ch13_expected_max_sharpe_ro.jpg" alt="Slide-ul 51: Cea mai bună dintre N strategii fără abilitate" loading="lazy"></a>
-      <figcaption>Slide-ul 51</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=53" target="_blank" rel="noopener"><img src="slides/ch13_expected_max_sharpe_ro.jpg" alt="Slide-ul 52: Cea mai bună dintre N strategii fără abilitate" loading="lazy"></a>
+      <figcaption>Slide-ul 52</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="em-k">Numărul de strategii N: <b id="em-k-v"></b></label><input type="range" id="em-k" min="0" max="9" step="1" value="9"></div><button class="btn play" id="em-play" type="button"></button></div><div class="charts "><div class="chart" id="em-curve"></div><div class="chart" id="em-hist"></div></div><ul class="out" id="em-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Un cercetător încearcă 1 000 de strategii fără abilitate pe 5 ani de date zilnice. Ce raport Sharpe anualizat are cea mai bună?</div>
-  <details><summary>Răspuns</summary><p>Aproximativ 1,45: teorema strategiei false dă 1,46, iar media celor 200 de simulări este 1,43. Valoarea crește cu N și scade cu lungimea eșantionului, deoarece abaterea standard a SR anualizat este √(1/5) ≈ 0,45.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru 1 000 de strategii independente fără abilitate, fiecare evaluată pe 5 ani de randamente zilnice i.i.d., care este aproximativ media maximului raporturilor Sharpe anualizate?</div>
+  <details><summary>Răspuns</summary><p>Aproximativ 1,45: aproximarea teoretică dă 1,46, iar media celor 200 de simulări este 1,43. Zero este media unei strategii individuale; 0,45 = √(1/5) este abaterea sa standard aproximativă. Maximul unei realizări variază de la un eșantion la altul. Valoarea crește cu N și scade cu lungimea eșantionului.</p></details>
 </section>
 <section class="blk" id="is-oos">
   <h3>In-sample (IS) și out-of-sample (OOS): căutare pe grilă pe Bitcoin</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=54" target="_blank" rel="noopener"><img src="slides/ch13_is_vs_oos_ro.jpg" alt="Slide-ul 53: In-sample (IS) și out-of-sample (OOS): căutare pe grilă pe Bitcoin" loading="lazy"></a>
-      <figcaption>Slide-ul 53</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=55" target="_blank" rel="noopener"><img src="slides/ch13_is_vs_oos_ro.jpg" alt="Slide-ul 54: In-sample (IS) și out-of-sample (OOS): căutare pe grilă pe Bitcoin" loading="lazy"></a>
+      <figcaption>Slide-ul 54</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="io-y">Începutul perioadei out-of-sample (1 ianuarie): <b id="io-y-v"></b></label><input type="range" id="io-y" min="2018" max="2024" step="1" value="2021"></div><div class="ctl"><label for="io-q">Cele mai bune q% in-sample: <b id="io-q-v"></b></label><input type="range" id="io-q" min="1" max="50" step="1" value="10"></div><button class="btn play" id="io-play" type="button"></button></div><div class="charts "><div class="chart" id="io-chart"></div></div><ul class="out" id="io-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Regula cu cel mai mare SR in-sample, 2,02, este selectată. Ce SR are out-of-sample?</div>
-  <details><summary>Răspuns</summary><p>0,03. Corelația de rang Spearman dintre SR in-sample și out-of-sample este 0,13. Mediana out-of-sample a celor mai bune 10% reguli este 0,50, față de 0,41 pentru toate regulile. Rezultatul este compatibil cu supraoptimizarea; un SR pozitiv al familiei nu arată abilitate față de buy-and-hold, care cere un test separat.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Selectăm exclusiv pe perioada mai 2015–decembrie 2020 regula cu SR in-sample maxim, 2,02. Ce SR are această regulă în 2021–2026?</div>
+  <details><summary>Răspuns</summary><p>Regula MA 11/20, cu bandă 0%, are SR out-of-sample 0,03. Valorile 0,50 și 0,41 descriu mediane ale unor grupuri (cele mai bune 10% reguli in-sample, respectiv toate regulile), nu performanța acestei reguli. Corelația de rang Spearman dintre SR in-sample și out-of-sample este 0,13. Scăderea este compatibilă cu overfitting; comparația cu buy-and-hold cere o evaluare separată.</p></details>
 </section><h2 class="sec" id="s-inf">Machine learning pentru inferență</h2>
 <section class="blk" id="vix">
   <h3>Exemplu rezolvat: puterea predictivă a VIX pentru randamentele S&P 500</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch13_vix_inference_ro.jpg" alt="Slide-ul 61: Exemplu rezolvat: puterea predictivă a VIX pentru randamentele S&P 500" loading="lazy"></a>
-      <figcaption>Slide-ul 61</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=63" target="_blank" rel="noopener"><img src="slides/ch13_vix_inference_ro.jpg" alt="Slide-ul 62: Exemplu rezolvat: puterea predictivă a VIX pentru randamentele S&P 500" loading="lazy"></a>
+      <figcaption>Slide-ul 62</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="vx-l">Laguri Newey–West (HAC): <b id="vx-l-v"></b></label><input type="range" id="vx-l" min="0" max="9" step="1" value="4"></div><button class="btn play" id="vx-play" type="button"></button></div><div class="charts "><div class="chart" id="vx-chart"></div></div><ul class="out" id="vx-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> OLS doar cu VIX dă 7,5 bp, cu intervalul [−10,3; 25,2]. De ce intervalul selecției duble este de aproape două ori mai larg?</div>
-  <details><summary>Răspuns</summary><p>Cele 15 controale care prezic log VIX absorb o parte din variația lui, iar lui d_t îi rămîne mai puțină variație proprie. Selecția dublă dă 9,4 [−22,1; 40,8]. Toate intervalele conțin zero: datele nu permit o concluzie.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> OLS doar cu log VIX dă 7,5 bp, cu intervalul [−10,3; 25,2]. De ce intervalul selecției duble este de aproape două ori mai larg?</div>
+  <details><summary>Răspuns</summary><p>La 4 laguri HAC, intervalul selecției duble, [−22,1; 40,8] bp, este de aproximativ 1,8 ori mai larg. Cele 15 controale selectate pentru log VIX reduc variația acestuia rămasă după control, ceea ce poate mări eroarea standard. Metodele folosesc același eșantion, iar ambele intervale au corecție HAC. Mărimea coeficientului nu determină proporțional lățimea intervalului. Intervalul [−22,1; 40,8] bp nu separă coeficientul predictiv de zero la nivelul de 5%.</p></details>
 </section><h2 class="sec" id="s-front">Frontiera cercetării: structura înaintea flexibilității</h2>
 <section class="blk" id="deep-sdf">
   <h3>Deep learning în evaluarea activelor: rapoarte Sharpe out-of-sample</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=66" target="_blank" rel="noopener"><img src="slides/ch13_cpz_sharpe_ro.jpg" alt="Slide-ul 65: Deep learning în evaluarea activelor: rapoarte Sharpe out-of-sample" loading="lazy"></a>
-      <figcaption>Slide-ul 65</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol13_machine_learning.pdf#page=67" target="_blank" rel="noopener"><img src="slides/ch13_cpz_sharpe_ro.jpg" alt="Slide-ul 66: Deep learning în evaluarea activelor: rapoarte Sharpe out-of-sample" loading="lazy"></a>
+      <figcaption>Slide-ul 66</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cp-y">Perioada de estimare a ponderilor: <b id="cp-y-v"></b></label><input type="range" id="cp-y" min="1976" max="1991" step="1" value="1986"></div><div class="ctl"><label for="cp-t">Perioada de test</label><select id="cp-t"><option value="paper" selected>1992–2016</option><option value="after">2017–2026</option><option value="all">1992–2026</option></select></div><button class="btn play" id="cp-play" type="button"></button></div><div class="charts "><div class="chart" id="cp-sr"></div><div class="chart" id="cp-w"></div></div><ul class="out" id="cp-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Ce raport Sharpe lunar out-of-sample are portofoliul tangent FF5, cu ponderi fixate pe 1967–1986?</div>
-  <details><summary>Răspuns</summary><p>0,22 în 1992–2016, cu intervalul de 95% [0,11; 0,34]; lucrarea raportează tot 0,22. GAN are 0,75, iar SDF-ul liniar regularizat (EN) 0,50, peste rețeaua de prognoză FFN (0,44): structura fără arbitraj contează mai mult decît flexibilitatea.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cu ponderi FF5 estimate pe 1967–1986 și apoi fixate, care este raportul Sharpe lunar în perioada de test 1992–2016?</div>
+  <details><summary>Răspuns</summary><p>FF5 are SR lunar 0,22, cu interval aproximativ de 95% [0,11; 0,34]. Pagina folosește eroarea standard √((1 + SR²/2)/T), sub aproximarea i.i.d. Normală. Valorile 0,75 și 0,15 aparțin GAN din lucrare, respectiv pieței din replicare. În lucrare, EN are 0,50 și FFN 0,44: modelul liniar regularizat depășește această rețea de prognoză în comparația raportată, fără a demonstra o regulă universală despre structură și flexibilitate.</p></details>
 </section>
 <p class="src foot">S&P 500 și VIX: închideri zilnice, ianuarie 2000 – septembrie 2026; Bitcoin: închideri zilnice din septembrie 2014; prețuri EODHD. Factorii Fama–French: Kenneth French Data Library. Rapoartele Sharpe ale modelelor SDF: Chen, Pelger și Zhu (2024), Tabelul I și Tabelul A.VI. Anomaliile long-short (factori și diferențe de decile): Kenneth French Data Library; R²OOS din lucrare: Dong, Li, Rapach și Zhou (2022), Tabelul 2.</p>
 </main>

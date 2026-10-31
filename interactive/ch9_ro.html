@@ -9,13 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030a">
+<link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'ro';</script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch9_data.js?v=20261030a"></script>
-<script src="ch9_text_ro.js?v=20261030a"></script>
-<script src="common.js?v=20261030a"></script>
-<script src="ch9.js?v=20261030a" defer></script>
+<script src="ch9_data.js?v=20261030b"></script>
+<script src="ch9_text_ro.js?v=20261030b"></script>
+<script src="common.js?v=20261030b"></script>
+<script src="ch9.js?v=20261030b" defer></script>
 </head>
 <body>
 <header>
@@ -38,18 +38,18 @@
 <section class="blk" id="one-day">
   <h3>O zi, 78 de randamente: 7 aprilie 2025</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=10" target="_blank" rel="noopener"><img src="slides/ch9_intraday_day_ro.jpg" alt="Slide-ul 9: O zi, 78 de randamente: 7 aprilie 2025" loading="lazy"></a>
-      <figcaption>Slide-ul 9</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=11" target="_blank" rel="noopener"><img src="slides/ch9_intraday_day_ro.jpg" alt="Slide-ul 10: O zi, 78 de randamente: 7 aprilie 2025" loading="lazy"></a>
+      <figcaption>Slide-ul 10</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="id-d">Ziua</label><select id="id-d"><option value="2020-11-20">2020-11-20 (volatilitate 10%)</option><option value="2021-06-25">2021-06-25 (volatilitate 3%)</option><option value="2021-08-27">2021-08-27 (volatilitate 6%)</option><option value="2022-01-24">2022-01-24 (volatilitate 40%)</option><option value="2022-06-15">2022-06-15 (volatilitate 37%)</option><option value="2022-09-21">2022-09-21 (volatilitate 41%)</option><option value="2024-08-05">2024-08-05 (volatilitate 31%)</option><option value="2025-04-04">2025-04-04 (volatilitate 46%)</option><option value="2025-04-07" selected>2025-04-07 (volatilitate 107%)</option><option value="2025-04-08">2025-04-08 (volatilitate 46%)</option><option value="2025-04-09">2025-04-09 (volatilitate 72%)</option><option value="2025-04-10">2025-04-10 (volatilitate 54%)</option></select></div><div class="ctl"><label for="id-k">Ora (sfîrșitul intervalului de 5 minute): <b id="id-k-v"></b></label><input type="range" id="id-k" min="0" max="78" step="1" value="78"></div><button class="btn play" id="id-play" type="button"></button></div><div class="charts "><div class="chart" id="id-p"></div><div class="chart" id="id-c"></div></div><ul class="out" id="id-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe 7 aprilie 2025, ce parte din varianța realizată a zilei provine dintr-un singur randament de 5 minute?</div>
-  <details><summary>Răspuns</summary><p>41%. Randamentul de +4,28% din intervalul care se încheie la 10:15 aduce 18,3 %² din RV = 45,1 %². Pînă la 11:00, adică în prima oră și jumătate, se acumulează 76% din RV a zilei.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe 7 aprilie 2025, RV este 45,1 %², iar cel mai mare randament de 5 minute în valoare absolută aduce 18,3 %². Dacă numai acest randament și-ar dubla valoarea, cît ar deveni RV?</div>
+  <details><summary>Răspuns</summary><p>Circa 100,0 %². Contribuția acelui interval se înmulțește cu patru: 45,1 − 18,3 + 4 × 18,3 = 100,0 %². Valoarea 63,4 %² dublează contribuția la varianță în locul randamentului; 180,4 %² presupune dublarea tuturor randamentelor. În date, randamentul de +4,28% din intervalul care se încheie la 10:15 aduce 41% din RV a zilei.</p></details>
 </section>
 <section class="blk" id="rv-series">
   <h3>Volatilitatea realizată zilnică: SPY și Bitcoin</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch9_rv_series_ro.jpg" alt="Slide-ul 11: Volatilitatea realizată zilnică: SPY și Bitcoin" loading="lazy"></a>
-      <figcaption>Slide-ul 11</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=13" target="_blank" rel="noopener"><img src="slides/ch9_rv_series_ro.jpg" alt="Slide-ul 12: Volatilitatea realizată zilnică: SPY și Bitcoin" loading="lazy"></a>
+      <figcaption>Slide-ul 12</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="rs-k">Cele mai volatile zile excluse din medie: <b id="rs-k-v"></b></label><input type="range" id="rs-k" min="0" max="100" step="1" value="0"></div><button class="btn play" id="rs-play" type="button"></button></div><div class="charts "><div class="chart" id="rs-chart"></div></div><ul class="out" id="rs-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Volatilitatea SPY calculată din RV medie este 12,9% pe an, iar mediana zilnică 9,7%. Cît scade prima valoare dacă excludem cele mai volatile 20 de zile?</div>
@@ -58,102 +58,102 @@
 <section class="blk" id="overnight">
   <h3>Riscul intraday și riscul peste noapte</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=14" target="_blank" rel="noopener"><img src="slides/ch9_overnight_ro.jpg" alt="Slide-ul 13: Riscul intraday și riscul peste noapte" loading="lazy"></a>
-      <figcaption>Slide-ul 13</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch9_overnight_ro.jpg" alt="Slide-ul 14: Riscul intraday și riscul peste noapte" loading="lazy"></a>
+      <figcaption>Slide-ul 14</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="on-g">Agregarea</label><select id="on-g"><option value="year" selected>Pe ani</option><option value="quarter">Pe trimestre</option><option value="month">Pe luni</option></select></div><div class="ctl"><label for="on-c">Factorul de scalare c al RV intraday: <b id="on-c-v"></b></label><input type="range" id="on-c" min="1" max="2" step="0.01" value="1"></div><button class="btn play" id="on-play" type="button"></button></div><div class="charts "><div class="chart" id="on-chart"></div></div><ul class="out" id="on-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Piața este închisă 17,5 ore pe zi. Ce parte din varianța zilnică SPY vine din randamentul peste noapte?</div>
-  <details><summary>Răspuns</summary><p>38% pe tot eșantionul, între 33% (2023) și 51% (2020, an incomplet). Ca RV intraday să aibă aceeași medie ca varianța totală, ar trebui înmulțită cu c = 1,62; volatilitatea anualizată crește atunci de la 12,9% la 16,4%.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Volatilitatea calculată din RV intraday medie este 12,9% pe an. Dacă înmulțim fiecare RV intraday cu c = 1,62, aproximativ cît devine această volatilitate?</div>
+  <details><summary>Răspuns</summary><p>Circa 16,4%: volatilitatea se înmulțește cu √1,62, deci 12,9% × √1,62 ≈ 16,4% (readout-ul arată 16,5%, fiindcă pornește de la 12,93% nerotunjit). Valoarea 20,9% aplică factorul varianței direct volatilității; 10,1% este volatilitatea componentei overnight. Randamentele peste noapte aduc 38% din varianța zilnică SPY; scalarea egalează mediile varianțelor, nu reconstruiește componenta overnight a fiecărei zile.</p></details>
 </section><h2 class="sec" id="s-noise">Zgomotul de microstructură</h2>
 <section class="blk" id="signature">
   <h3>Signature plot-ul pe date reale</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=20" target="_blank" rel="noopener"><img src="slides/ch9_signature_ro.jpg" alt="Slide-ul 19: Signature plot-ul pe date reale" loading="lazy"></a>
-      <figcaption>Slide-ul 19</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=21" target="_blank" rel="noopener"><img src="slides/ch9_signature_ro.jpg" alt="Slide-ul 20: Signature plot-ul pe date reale" loading="lazy"></a>
+      <figcaption>Slide-ul 20</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="sg-y">Perioada</label><select id="sg-y"><option value="all" selected>Tot eșantionul</option><option value="2020">2020</option><option value="2021">2021</option><option value="2022">2022</option><option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option></select></div><div class="ctl"><label for="sg-w">Zgomot i.i.d. adăugat, abaterea standard ω: <b id="sg-w-v"></b></label><input type="range" id="sg-w" min="0" max="0.05" step="0.001" value="0"></div><button class="btn play" id="sg-play" type="button"></button></div><div class="charts "><div class="chart" id="sg-s"></div><div class="chart" id="sg-b"></div></div><ul class="out" id="sg-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cît zgomot i.i.d. ar trebui adăugat prețurilor SPY ca volatilitatea la 5 minute să crească de la 12,9% la peste 14%?</div>
-  <details><summary>Răspuns</summary><p>Aproximativ ω = 0,027%: deplasarea 2nω² = 2 × 78 × 0,027² = 0,11 %² pe zi ridică volatilitatea la 5 minute la 14,0%, iar la 130 de minute, cu n = 3 randamente pe zi, aproape nu schimbă nimic. Signature plot-ul real rămîne aproximativ plat, între 12,6% și 13,1%: compatibil cu o deplasare din zgomot la 5 minute mult mai mică, fără să excludă zgomotul.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În aproximația cu 78 de intervale pe zi, ce abatere standard ω a zgomotului independent adăugat log-prețurilor ridică volatilitatea SPY la 5 minute de la 12,9% la aproximativ 14,0% pe an?</div>
+  <details><summary>Răspuns</summary><p>Circa ω = 0,027%. Rezolvăm 252 × (RV medie + 2 × 78 × ω²) = 14² și obținem ω ≈ 0,02708%; pe slider, 0,027% dă 13,99%, iar 0,028% dă 14,07%. Valoarea 0,019% rezultă din folosirea greșită a lui 4nω²; 0,038%, din folosirea lui nω². Signature plot-ul real rămîne aproximativ plat, între 12,6% și 13,1%: compatibil cu o deplasare din zgomot la 5 minute mult mai mică, fără să excludă zgomotul.</p></details>
 </section><h2 class="sec" id="s-jump">Salturi</h2>
 <section class="blk" id="jumps">
   <h3>Zile cu salt: SPY și Bitcoin</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=25" target="_blank" rel="noopener"><img src="slides/ch9_jumps_ro.jpg" alt="Slide-ul 24: Zile cu salt: SPY și Bitcoin" loading="lazy"></a>
-      <figcaption>Slide-ul 24</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=26" target="_blank" rel="noopener"><img src="slides/ch9_jumps_ro.jpg" alt="Slide-ul 25: Zile cu salt: SPY și Bitcoin" loading="lazy"></a>
+      <figcaption>Slide-ul 25</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="jp-a">Nivelul testului α: <b id="jp-a-v"></b></label><input type="range" id="jp-a" min="0" max="6" step="1" value="4"></div><div class="ctl"><label for="jp-m">Testarea multiplă</label><select id="jp-m"><option value="none" selected>Fără corecție</option><option value="bh">Benjamini–Hochberg, FDR = α</option></select></div><button class="btn play" id="jp-play" type="button"></button></div><div class="charts "><div class="chart" id="jp-chart"></div></div><ul class="out" id="jp-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cîte zile cu salt ar da testul la nivelul de 5% pentru SPY, dacă nu ar exista salturi?</div>
-  <details><summary>Răspuns</summary><p>Circa 74 din 1 489; testul dă 236. La 0,1% rămîn 36 de zile, față de 1,5 așteptate fără salturi, iar cu FDR la 5% (Benjamini–Hochberg) rămîn 43.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Dacă niciuna dintre cele 1 489 de zile SPY nu conține salturi și fiecare test respinge eronat cu probabilitatea de 5%, cîte respingeri false avem în medie, înaintea corecției pentru testarea multiplă?</div>
+  <details><summary>Răspuns</summary><p>Circa 74: media este 1 489 × 0,05 = 74,45, nu un număr garantat într-un eșantion; independența dintre zile nu este necesară pentru acest calcul al mediei. În date, testul fără corecția de periodicitate dă 236 de respingeri la 5%, iar Benjamini–Hochberg (FDR la 5%) păstrează 43. După corecția de periodicitate, Benjamini–Hochberg păstrează 17.</p></details>
 </section><h2 class="sec" id="s-facts">Fapte stilizate ale volatilității realizate</h2>
 <section class="blk" id="distributions">
   <h3>Distribuții: log RV și randamente standardizate</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch9_distributions_ro.jpg" alt="Slide-ul 31: Distribuții: log RV și randamente standardizate" loading="lazy"></a>
-      <figcaption>Slide-ul 31</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch9_distributions_ro.jpg" alt="Slide-ul 32: Distribuții: log RV și randamente standardizate" loading="lazy"></a>
+      <figcaption>Slide-ul 32</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ds-m">Activul</label><select id="ds-m"><option value="spy" selected>SPY</option><option value="btc">Bitcoin</option></select></div><div class="ctl"><label for="ds-lam">Parametrul Box–Cox λ (0: logaritm, 1: nivel): <b id="ds-lam-v"></b></label><input type="range" id="ds-lam" min="0" max="1" step="0.05" value="0"></div><button class="btn play" id="ds-play" type="button"></button></div><div class="charts "><div class="chart" id="ds-l"></div><div class="chart" id="ds-r"></div></div><ul class="out" id="ds-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> De ce modelăm log RV și nu RV?</div>
-  <details><summary>Răspuns</summary><p>RV pentru SPY are asimetria 20,0 și kurtosis-ul 550, iar log RV are 0,29 și 3,21, aproape de valorile distribuției Normale (0 și 3). La λ = 0,5 (rădăcina pătrată) asimetria este încă 3,9.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru SPY, asimetria log RV este 0,29 la λ = 0. Aproximativ cît devine dacă mutăm parametrul Box–Cox la λ = 1?</div>
+  <details><summary>Răspuns</summary><p>Circa 20,0. La λ = 1, transformarea este RV − 1, care păstrează asimetria RV (kurtosis-ul 550). Valoarea 3,9 corespunde lui λ = 0,5 (rădăcina pătrată); 0,29 corespunde logaritmului. Apropierea momentelor log RV de cele ale distribuției Normale (0 și 3) nu demonstrează normalitatea condiționată.</p></details>
 </section>
 <section class="blk" id="persistence">
   <h3>Persistența volatilității realizate</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=34" target="_blank" rel="noopener"><img src="slides/ch9_acf_ro.jpg" alt="Slide-ul 33: Persistența volatilității realizate" loading="lazy"></a>
-      <figcaption>Slide-ul 33</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=35" target="_blank" rel="noopener"><img src="slides/ch9_acf_ro.jpg" alt="Slide-ul 34: Persistența volatilității realizate" loading="lazy"></a>
+      <figcaption>Slide-ul 34</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ac-c">Comparația</label><select id="ac-c"><option value="none" selected>Fără</option><option value="ar1">AR(1) cu ρ</option><option value="har">log-HAR estimat (SPY)</option></select></div><div class="ctl"><label for="ac-r">ρ al AR(1): <b id="ac-r-v"></b></label><input type="range" id="ac-r" min="0.3" max="0.99" step="0.01" value="0.64"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-chart"></div></div><ul class="out" id="ac-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Autocorelația log RV pentru SPY este 0,64 la lagul 1. Cît ar fi la lagul 22 pentru un AR(1) cu aceeași autocorelație la lagul 1?</div>
-  <details><summary>Răspuns</summary><p>0,64²² ≈ 0,00005, față de 0,24 în date. Modelul log-HAR estimat, privit ca AR(22), dă 0,63 la lagul 1 și 0,24 la lagul 22, ca datele, dar doar 0,02 la lagul 100, față de 0,10: cele trei componente reproduc scăderea lentă pe o lună, nu și dincolo de ea.</p></details>
+  <details><summary>Răspuns</summary><p>Pentru AR(1), autocorelația la lagul k este ρᵏ: 0,64²² ≈ 0,000054. Valoarea 0,24 este autocorelația empirică la lagul 22, nu implicația AR(1); împărțirea la 22 folosește o regulă greșită. Modelul log-HAR estimat, privit ca AR(22), dă 0,63 la lagul 1 și 0,24 la lagul 22, ca datele, dar subestimează autocorelația la lagul 100: circa 0,02 față de 0,10.</p></details>
 </section>
 <section class="blk" id="vix">
   <h3>Volatilitatea implicită față de cea realizată</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=36" target="_blank" rel="noopener"><img src="slides/ch9_vix_ro.jpg" alt="Slide-ul 35: Volatilitatea implicită față de cea realizată" loading="lazy"></a>
-      <figcaption>Slide-ul 35</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch9_vix_ro.jpg" alt="Slide-ul 36: Volatilitatea implicită față de cea realizată" loading="lazy"></a>
+      <figcaption>Slide-ul 36</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="vx-h">Orizontul volatilității realizate (zile de tranzacționare): <b id="vx-h-v"></b></label><input type="range" id="vx-h" min="5" max="63" step="1" value="21"></div><div class="ctl"><label for="vx-t">Data: <b id="vx-t-v"></b></label><input type="range" id="vx-t" min="0" max="1468" step="1" value="1467"></div><button class="btn play" id="vx-play" type="button"></button></div><div class="charts "><div class="chart" id="vx-l"></div><div class="chart" id="vx-r"></div></div><ul class="out" id="vx-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În ce proporție din zile a fost VIX peste volatilitatea realizată în următoarele 21 de zile de tranzacționare?</div>
-  <details><summary>Răspuns</summary><p>În 88% din cele 1 468 de zile, în medie cu 4,36 puncte procentuale (19,52% față de 15,15%). Diferența rămîne pozitivă în medie și pentru alte orizonturi: 4,84 puncte procentuale la 5 zile, 4,06 la 63 de zile.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> VIX depășește volatilitatea realizată în următoarele 21 de zile de tranzacționare în 88% din zile. Este suficient acest procent, singur, pentru a stabili că diferența medie este pozitivă?</div>
+  <details><summary>Răspuns</summary><p>Nu. Un număr mic de diferențe negative mari poate domina multe diferențe pozitive mici. În acest eșantion de 1 468 de zile, diferența medie este într-adevăr pozitivă, 4,36 puncte procentuale (19,52% față de 15,15%), dar aceasta rezultă din mărimea diferențelor, nu doar din frecvența semnelor. Este un decalaj ex post de volatilitate.</p></details>
 </section><h2 class="sec" id="s-fc">Prognoze: HAR față de GARCH</h2>
 <section class="blk" id="forecasts">
   <h3>Prognozele în timp</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=51" target="_blank" rel="noopener"><img src="slides/ch9_oos_ro.jpg" alt="Slide-ul 50: Prognozele în timp" loading="lazy"></a>
-      <figcaption>Slide-ul 50</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=52" target="_blank" rel="noopener"><img src="slides/ch9_oos_ro.jpg" alt="Slide-ul 51: Prognozele în timp" loading="lazy"></a>
+      <figcaption>Slide-ul 51</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="oo-l">Funcția de pierdere</label><select id="oo-l"><option value="qlike" selected>QLIKE</option><option value="mse">MSE</option></select></div><div class="ctl"><label for="oo-t">Evaluarea începe în: <b id="oo-t-v"></b></label><input type="range" id="oo-t" min="0" max="48" step="1" value="0"></div><button class="btn play" id="oo-play" type="button"></button></div><div class="charts "><div class="chart" id="oo-f"></div><div class="chart" id="oo-c"></div></div><ul class="out" id="oo-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Rămîne log-HAR mai bun decît GARCH(1,1)-t dacă evaluarea începe în ianuarie 2024?</div>
-  <details><summary>Răspuns</summary><p>Da. Din 2024, QLIKE mediu este 0,362 pentru log-HAR și 0,409 pentru GARCH(1,1)-t, cu t DM = −2,26. Pe tot eșantionul, din 2022, valorile sînt 0,310 și 0,343, cu t = −2,30.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Dacă evaluarea SPY începe în ianuarie 2024, cu aproximativ cît este QLIKE mediu al log-HAR mai mic decît al GARCH(1,1)-t, raportat la GARCH?</div>
+  <details><summary>Răspuns</summary><p>Cu circa 11,4%: 1 − 0,362/0,409 ≈ 0,114. Valoarea 12,9% folosește log-HAR la numitor; 9,6% este reducerea pe tot eșantionul, din 2022 (0,310 față de 0,343). Pentru evaluarea din 2024, t DM = −2,26, cu diferența definită ca pierderea log-HAR minus pierderea GARCH; concluzia privește SPY, această perioadă și pierderea QLIKE.</p></details>
 </section><h2 class="sec" id="s-rough">Rough volatility</h2>
 <section class="blk" id="rough">
   <h3>Scalarea incrementelor log-volatilității</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch9_rough_ro.jpg" alt="Slide-ul 55: Scalarea incrementelor log-volatilității" loading="lazy"></a>
-      <figcaption>Slide-ul 55</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=57" target="_blank" rel="noopener"><img src="slides/ch9_rough_ro.jpg" alt="Slide-ul 56: Scalarea incrementelor log-volatilității" loading="lazy"></a>
+      <figcaption>Slide-ul 56</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ro-a">Lagurile Δ folosite în regresie: <b id="ro-a-v"></b></label><input type="range" id="ro-a" min="1" max="20" step="1" value="1"></div><button class="btn play" id="ro-play" type="button"></button></div><div class="charts "><div class="chart" id="ro-m"></div><div class="chart" id="ro-z"></div></div><ul class="out" id="ro-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cum se schimbă Ĥ pentru SPY dacă regresia folosește doar lagurile de la 5 la 30 de zile?</div>
-  <details><summary>Răspuns</summary><p>Scade, de la 0,106 (lagurile 1–30) la 0,089. Sub o eroare de măsurare i.i.d., Ĥ ar trebui să crească cînd renunțăm la lagurile mici, deci acest rezultat nu susține explicația prin eroare i.i.d. Pentru Bitcoin, Ĥ trece de la 0,071 la 0,068.</p></details>
+  <details><summary>Răspuns</summary><p>Scade, de la 0,106 (lagurile 1–30) la 0,089. Direcția este opusă celei sugerate de modelul simplificat m(2, Δ) = cΔ^(2H) + k, cu eroare i.i.d. independentă de log-volatilitatea latentă. Rezultatul nu susține acest mecanism simplu ca explicație suficientă; nu exclude orice eroare de măsurare și nu este, singur, un test formal. Pentru Bitcoin, Ĥ trece de la 0,071 la 0,068.</p></details>
 </section><h2 class="sec" id="s-case">Studii de caz: învățare automată și varianțe parțiale</h2>
 <section class="blk" id="ml-vs-har">
   <h3>Studiu de caz: cîștigurile pe orizonturi</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=61" target="_blank" rel="noopener"><img src="slides/ch9_csv_horizons_ro.jpg" alt="Slide-ul 60: Studiu de caz: cîștigurile pe orizonturi" loading="lazy"></a>
-      <figcaption>Slide-ul 60</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=62" target="_blank" rel="noopener"><img src="slides/ch9_csv_horizons_ro.jpg" alt="Slide-ul 61: Studiu de caz: cîștigurile pe orizonturi" loading="lazy"></a>
+      <figcaption>Slide-ul 61</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="cs-m">Modelul evidențiat</label><select id="cs-m"><option value="HAR-X">HAR-X (OLS, all predictors)</option><option value="LogHAR">log-HAR</option><option value="LevHAR">HAR with leverage</option><option value="SHAR">SHAR</option><option value="HARQ">HARQ</option><option value="RR">Ridge</option><option value="LA">Lasso</option><option value="EN">Elastic net</option><option value="A-LA">Adaptive lasso</option><option value="P-LA">Post-lasso</option><option value="BG">Bagging</option><option value="RF">Random forest</option><option value="GB">Gradient boosting</option><option value="NN1_1">NN 1 layer, 1 fit</option><option value="NN10_1">NN 1 layer, 10 fits</option><option value="NN1_2">NN 2 layers, 1 fit</option><option value="NN10_2" selected>NN 2 layers, 10 fits</option><option value="NN1_3">NN 3 layers, 1 fit</option><option value="NN10_3">NN 3 layers, 10 fits</option><option value="NN1_4">NN 4 layers, 1 fit</option><option value="NN10_4">NN 4 layers, 10 fits</option></select></div><button class="btn play" id="cs-play" type="button"></button></div><div class="charts "><div class="chart" id="cs-chart"></div></div><ul class="out" id="cs-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cu toți cei 12 predictori, care model are cea mai mică eroare la o lună și cu cît bate HAR?</div>
-  <details><summary>Răspuns</summary><p>Random forest, cu 0,604 din MSE a HAR, urmat de bagging (0,621). HAR-X, adică OLS cu aceiași predictori, are 1,290, iar HARQ 1,569: liniaritatea și supraajustarea strică prognozele pe termen lung.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La orizontul de o lună, cu toți cei 12 predictori, random forest are MSE egal cu 0,604 din MSE al HAR. Cu cît este mai mic MSE-ul său, raportat la HAR?</div>
+  <details><summary>Răspuns</summary><p>Cu 39,6%: 100 × (1 − 0,604). Valoarea 60,4% este pierderea rămasă, nu reducerea; 65,6% exprimă cu cît MSE al HAR este mai mare, raportat la random forest. Urmează bagging (0,621); HAR-X, adică OLS cu aceiași predictori, are 1,290, iar HARQ 1,569. Clasamentul descrie aceste proceduri pe acest set de test; singur, nu identifică motivul diferențelor.</p></details>
 </section>
 <section class="blk" id="partial">
   <h3>Studiu de caz: pierderea în funcție de prag, SPY și Bitcoin</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=64" target="_blank" rel="noopener"><img src="slides/ch9_partial_q_ro.jpg" alt="Slide-ul 63: Studiu de caz: pierderea în funcție de prag, SPY și Bitcoin" loading="lazy"></a>
-      <figcaption>Slide-ul 63</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol9_volatilitate_realizata.pdf#page=65" target="_blank" rel="noopener"><img src="slides/ch9_partial_q_ro.jpg" alt="Slide-ul 64: Studiu de caz: pierderea în funcție de prag, SPY și Bitcoin" loading="lazy"></a>
+      <figcaption>Slide-ul 64</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="pv-k">Cele mai volatile zile excluse din evaluare: <b id="pv-k-v"></b></label><input type="range" id="pv-k" min="0" max="30" step="1" value="0"></div><button class="btn play" id="pv-play" type="button"></button></div><div class="charts "><div class="chart" id="pv-m"></div><div class="chart" id="pv-q"></div></div><ul class="out" id="pv-out"></ul></div>
   </div>
-  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe SPY, SV-HAR are MSE 0,908 din cel al RV-HAR. Ce credeți: ce rămîne din acest cîștig dacă scoatem din evaluare cele 10 zile cu cea mai mare RV?</div>
-  <details><summary>Răspuns</summary><p>Dispare: fără ele, SV-HAR are MSE 1,240 din cel al RV-HAR, pentru că cele 10 zile aduc 89% din eroarea pătratică a RV-HAR. Cîștigul la QLIKE rămîne: 0,937, față de 0,954 pe tot eșantionul. QLIKE cîntărește erorile relativ la nivelul volatilității, deci nu este dominată de cîteva zile extreme.</p></details>
+  <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru SPY, SV-HAR are MSE egal cu 0,908 din MSE al RV-HAR. Ce se întîmplă cu acest raport dacă excludem din evaluare cele 10 zile cu cea mai mare RV, păstrînd prognozele deja calculate?</div>
+  <details><summary>Răspuns</summary><p>Urcă la 1,240: pe zilele rămase, SV-HAR are MSE cu circa 24% mai mare. Cele 10 zile excluse aduc 89% din eroarea pătratică totală a RV-HAR. Raportul QLIKE rămîne sub 1, la 0,937 (față de 0,954 pe tot eșantionul), dar aceasta este o constatare pentru acest eșantion, nu o garanție că QLIKE este imună la observații extreme.</p></details>
 </section>
 <p class="src foot">SPY: bare de 5 minute din sesiunea regulată din SUA (09:30–16:00, ora New York), octombrie 2020 – septembrie 2026, și randamente zilnice ajustate; Bitcoin: bare de 5 minute pe zile UTC complete, septembrie 2024 – septembrie 2026; indicele VIX. Prețuri EODHD. Primul studiu de caz: tabelele 2–7 din Christensen, Siggaard și Veliyev (2023); al doilea studiu de caz: barele de 5 minute SPY și Bitcoin ale cursului.</p>
 </main>

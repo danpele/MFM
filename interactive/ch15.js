@@ -455,7 +455,10 @@ function init() {
   on(['sc-c', 'sc-b'], specCurve); P('sc-play', 'sc-b', range(100, 2000, 100), 500);
   const PFX = { 'dict-words': 'dw', 'accuracy': 'ac', 'llm-size': 'ls', 'embeddings': 'em', 'learning-curve': 'lc', 'memory': 'ma',
     'news-hours': 'nh', 'reaction': 'cn', 'strategy': 'sg', 'ppi': 'pp', 'llt-models': 'lt', 'colour-words': 'cw', 'spec-curve': 'sc' };
-  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true } }, sp)));
+  // blocks whose initial live chart shows the answer: the charts are veiled with the slide and the readout
+  const VEIL_CHART = new Set(['dict-words', 'accuracy', 'learning-curve', 'reaction', 'strategy', 'spec-curve']);
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) =>
+    predict(b, Object.assign({ player: players[PFX[b] + '-play'], veil: { out: true, charts: VEIL_CHART.has(b) } }, sp)));
   if (T.ticket && exitTicket) exitTicket(T.ticket);
   dictWords(); accuracy(); llmSize(); embeddings(); learningCurve(); memory(); newsHours(); contempNext(); strategy(); ppi(); lltModels(); colourWords(); specCurve();
 }

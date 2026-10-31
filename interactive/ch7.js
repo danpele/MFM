@@ -441,7 +441,11 @@ function init() {
   on(['ts-m'], tailShape); PL('ts-play', 'ts-m', range(0, 2, 0.1), 700);
   on(['ai-y'], aiCase); PL('ai-play', 'ai-y', range(2008, 2024, 1), 600);
   const PFX = { 'loss-distribution': 'ld', 'subadditivity': 'sa', 'var-levels': 'vl', 'precision': 'pr', 'hs-fhs': 'hf', 'caviar': 'cv', 'gev': 'gv', 'mean-excess': 'me', 'gpd-tail': 'gt', 'cond-evt': 'ce', 'horizon': 'hz', 'components': 'pc', 'basel': 'bs', 'deep-quantile': 'ck', 'tail-shape': 'ts', 'fz0-ranking': 'ai' };
-  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) => predict(b, Object.assign({ player: players[PFX[b] + '-play'] }, sp)));
+  // var-levels: both live charts show the VaR/ES curves of the five methods at every α, i.e. the answer; they are veiled until
+  // „Verifică”, „Arată slide-ul”, the end of ▶ or a change of α
+  const VEIL_CHART = new Set(['var-levels']);
+  if (T.predict && predict) Object.entries(T.predict).forEach(([b, sp]) =>
+    predict(b, Object.assign({ player: players[PFX[b] + '-play'] }, sp, VEIL_CHART.has(b) ? { veil: Object.assign({ out: true }, sp.veil, { charts: true }) } : {})));
   if (T.ticket && exitTicket) exitTicket(T.ticket);
   lossDist(); subadd(); varLevels(); precision(); hsFhs(); caviar(); gev(); meanExcess(); gpdTail(); condEvt(); horizon(); components(); basel(); crk(); tailShape(); aiCase();
 }

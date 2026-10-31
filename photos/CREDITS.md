@@ -190,3 +190,23 @@
 | ch0_amsterdam_beurs_1612.jpg | https://commons.wikimedia.org/wiki/File:Bird%27s-eye_view_of_the_Beurs_van_Hendrick_de_Keyser_by_Claes_Jansz._Visscher_(II)_1612_Stadsarchief_Amsterdam_010001000620.jpg | Claes Jansz. Visscher (Stadsarchief Amsterdam) | Public domain | 1612 |
 | ch0_tulip_satire_1640.jpg | https://commons.wikimedia.org/wiki/File:Jan_Brueghel_the_Younger,_Satire_on_Tulip_Mania,_c._1640.jpg | Jan Brueghel the Younger | Public domain | c. 1640 |
 | ch0_ibm_q_system.jpg | https://commons.wikimedia.org/wiki/File:IBM_Q_system_(Fraunhofer_2).jpg | IBM Research | CC BY 2.0 | 2021 |
+
+## Chapter openers: portrait of the quoted author (licences checked on the Commons file pages; 300 × 400 px crops, resized)
+
+| File | Source (Wikimedia Commons) | Author | Licence | Date |
+|---|---|---|---|---|
+| ch0_lo.jpg (crop of andrew_lo_2012.jpg) | https://commons.wikimedia.org/wiki/File:Andrew_Lo_2012_Shankbone_2.JPG | David Shankbone | CC BY 3.0 | 2012-04-24 |
+| ch1_mandelbrot.jpg (crop of mandelbrot_2007.jpg) | https://commons.wikimedia.org/wiki/File:Benoit_Mandelbrot_mg_1804-d.jpg | Rama | CC BY-SA 2.0 FR | 2007-03-14 |
+| ch2_fama.jpg (crop of fama_2013.jpg) | https://commons.wikimedia.org/wiki/File:Eugene_Fama_at_Nobel_Prize,_2013.jpg | Bengt Nyman | CC BY 2.0 | 2013-12-07 |
+| ch3_fama.jpg | https://commons.wikimedia.org/wiki/File:Eugene_Fama_close-up_(cropped).jpg | Bengt Nyman | CC BY 2.0 | 2013-12-07 |
+| ch5_engle.jpg (crop of ch5_engle_2022.jpg) | https://commons.wikimedia.org/wiki/File:0603-Kraneshares_KRBN-RobertEngle-JonDemske-16_(cropped).jpg | Jon Demske | CC BY-SA 4.0 | 2022-06-03 |
+| ch7_delbaen.jpg | https://commons.wikimedia.org/wiki/File:ETH-BIB-Delbaen,_Freddy_(1946-)-Portr_16468.tif | Unknown photographer (ETH-Bibliothek Zürich, Portr_16468) | CC BY-SA 4.0 | 1997 |
+| ch9_andersen.jpg (crop of ch9_andersen_2012.jpg) | https://commons.wikimedia.org/wiki/File:Torben_Gustav_Andersen.jpg | Soralum | CC BY-SA 4.0 | 2012-11-17 |
+| ch12_black.jpg (crop of ch3_fischer_black.jpg) | https://commons.wikimedia.org/wiki/File:Fischer_Black.JPG | Dalmatine at English Wikipedia | Public domain | 22 January 2009 (original upload date) |
+| ch13_harvey.jpg | https://commons.wikimedia.org/wiki/File:ASSA_2026_-_Campbell_Harvey_01_(cropped).jpg | Xuthoria | CC BY-SA 4.0 | 2026-01-03 |
+| ch14_lecun.jpg | https://commons.wikimedia.org/wiki/File:Yann_LeCun_-_2025_(cropped).jpg | École polytechnique (photo Jérémy Barande) | CC BY-SA 2.0 | 2025-02-11 |
+| ch18_adrian.jpg | https://commons.wikimedia.org/wiki/File:TobiasAdrian.jpg | Chianoo Adrian (VRTS permission 2021072210012251) | CC BY-SA 3.0 | 2021-07-21 |
+| ch19_menkveld.jpg | https://commons.wikimedia.org/wiki/File:Albert_Menkveld_-_2015.jpg | Me Judice (still from a YouTube video published under CC BY) | CC BY 3.0 | 2015-02-02 |
+| ch20_lyons.jpg (crop of ch20_terry_lyons_2024.jpg, Terry Lyons on the left) | https://commons.wikimedia.org/wiki/File:Terence_J._Lyons,_Xue-Mei_Li_Oberwolfach_2024.jpg | Katrin Schmid | CC BY-SA 2.0 DE | 2024 |
+
+No verifiable free portrait: Harry Markowitz (ch. 4), Kristin Forbes / Roberto Rigobon (ch. 6), Tobias Fissler / Johanna Ziegel (ch. 8), Richard Roll (ch. 10), M. F. M. Osborne (ch. 11), Paul Tetlock (ch. 15), Satoshi Nakamoto (ch. 16), Hyman Minsky (ch. 17: the only Commons file, HymanMinsky-1.jpg, is an uploader "own work" dated 2016 of a man who died in 1996, so its licence cannot be verified).
