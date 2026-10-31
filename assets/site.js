@@ -101,7 +101,7 @@
     // ------------------------------------------------------------
     // CHAPTER CARDS
     // ------------------------------------------------------------
-    const LINK_CLASS = { slides: 'btn-primary', seminar: 'btn-secondary', lectureNb: 'btn-outline', seminarNb: 'btn-outline', quantlets: 'btn-outline', interactive: 'btn-outline' };
+    const LINK_CLASS = { slides: 'btn-primary', seminar: 'btn-secondary', lectureNb: 'btn-outline', seminarNb: 'btn-outline', quantlets: 'btn-outline', interactive: 'btn-outline', web: 'btn-outline' };
     const PLACEHOLDER_LINKS = ['slides', 'seminar', 'lectureNb', 'seminarNb'];
 
     function linkButton(l) {
@@ -113,12 +113,13 @@
         return `<span class="link-group">${main}<a href="${l.colab}" class="btn btn-colab" target="_blank" rel="noopener" title="${T.links.colab}">Colab</a></span>`;
     }
 
-    // interactive companion page of a chapter (interactive/chN.html), placed after the slides
+    // interactive companion page (interactive/chN.html) and web lecture (web/chN.html), placed after the slides
     function withInteractive(links) {
         const s = links.find(l => l.type === 'slides'), m = s && /(?:chapter|capitol)(\d+)_/.exec(s.href);
         if (!m) return links;
-        const i = links.indexOf(s), it = { type: 'interactive', href: `interactive/ch${m[1]}${LANG === 'ro' ? '_ro' : ''}.html` };
-        return [...links.slice(0, i + 1), it, ...links.slice(i + 1)];
+        const sfx = `ch${m[1]}${LANG === 'ro' ? '_ro' : ''}.html`;
+        const i = links.indexOf(s), it = { type: 'interactive', href: `interactive/${sfx}` }, wb = { type: 'web', href: `web/${sfx}` };
+        return [...links.slice(0, i + 1), it, wb, ...links.slice(i + 1)];
     }
 
     function renderChapters() {
