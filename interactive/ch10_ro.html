@@ -11,11 +11,31 @@
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
 <link rel="stylesheet" href="interactive.css?v=20261030b">
 <script>window.MFM_LANG = 'ro';</script>
-<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
-<script src="ch10_data.js?v=20261030b"></script>
-<script src="ch10_text_ro.js?v=20261030b"></script>
-<script src="common.js?v=20261030b"></script>
-<script src="ch10.js?v=20261030b" defer></script>
+<link rel="preload" as="script" href="ch10.js?v=20261030b">
+<script>
+(function (early, page, rest) {
+  'use strict';
+  let left = early.length, ok = true, parsed = document.readyState !== 'loading', started = false;
+  function add(src, k, done, ordered) {
+    const s = document.createElement('script');
+    s.src = k ? src + (src.indexOf('?') < 0 ? '?' : '&') + 'retry=' + k : src;
+    s.async = !ordered;
+    s.onload = () => done(true);
+    s.onerror = () => { s.remove(); if (k < 3) setTimeout(() => add(src, k + 1, done, ordered), 300 * (k + 1)); else done(false); };
+    document.head.appendChild(s);
+  }
+  function chain(list) { if (list.length) add(list[0], 0, () => chain(list.slice(1)), true); }
+  function go() {
+    if (started || left || !parsed) return;
+    started = true;
+    if (!ok || !window.MFMI) console.error('MFM: a script of the interactive charts did not load; the live charts are off.');
+    chain((ok && window.MFMI ? [page] : []).concat(rest));
+  }
+  early.forEach(src => add(src, 0, r => { ok = ok && r; left--; go(); }, false));
+  if (!parsed) document.addEventListener('DOMContentLoaded', () => { parsed = true; go(); });
+  go();
+})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "ch10_data.js?v=20261030b", "ch10_text_ro.js?v=20261030b", "common.js?v=20261030b"], "ch10.js?v=20261030b", []);
+</script>
 </head>
 <body>
 <header>

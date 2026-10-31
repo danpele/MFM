@@ -22,7 +22,7 @@ window.CH6_TEXT = {
  fb1: (d, v, r, c, x) => `δ = ${d}: the variance of the source market is ${v} times its calm level. With a constant β, a calm-period correlation of ${r} is measured as ${c}, i.e. ${x} higher.`,
  fb2: (a, b, c) => `At the same δ, calm-period correlations of 0.4 and 0.2 are measured as ${a} and ${b}. The Forbes–Rigobon adjustment of the measured value gives back ${c}.`,
  fr1: (a, b, c, e, d) => `Calm year: ${a} – ${b}; crisis: ${c} – ${e}. The variance of 2-day S&P 500 returns rises by δ = ${d}.`,
- fr2: (m, a, b, c, p, q) => `${m}: correlation ${a} in the calm year, ${b} in the crisis, ${c} after the adjustment. p-value of the rise: ${p} raw, ${q} adjusted.`,
+ fr2: (m, a, b, c, p, q) => `${m}: correlation ${a} in the calm year, ${b} in the crisis, ${c} after the adjustment. p-value of the rise (Fisher z test): ${p} raw, ${q} adjusted.`,
  ex1: (q, a, na, b, nb) => `At q = ${q}: the correlation of joint losses is ${a} (${na} weeks) and that of joint gains ${b} (${nb} weeks).`,
  ex2: (n, r, t) => `The bivariate Normal distribution with correlation ${r} gives ${n} at the same threshold. Sample: ${window.CH6_TEXT.k(t)} weeks.`,
  cz1: (t, r, c, g, f) => `τ = ${t}: ρ = ${r} for the Gaussian and t copulas, θ = ${c} for Clayton, ${g} for Gumbel and ${f} for Frank.`,

@@ -1,4 +1,5 @@
 // Web version of a lecture (web/chN.html): table of contents state, wide inline formulas, veil of the course text on prediction frames.
+// Runs after the document is parsed: deferred on pages without live charts, after interactive/chN.js on the others (script_loader).
 (function () {
 'use strict';
 const toc = document.getElementById('wtoc');
@@ -12,6 +13,7 @@ function fitMath() {
   });
 }
 window.addEventListener('mfm-mathjax', fitMath);
+if (document.body.getAttribute('data-mj') === 'done') fitMath();   // on pages with live charts web.js runs after chN.js, maybe after MathJax
 let rt = null;
 window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(fitMath, 200); });
 // highlight the current section in the table of contents

@@ -23,7 +23,7 @@ window.CH6_TEXT = {
  fb1: (d, v, r, c, x) => `δ = ${d}: varianța pieței-sursă este de ${v} ori cea din perioada calmă. Cu β constant, o corelație de ${r} în perioada calmă se măsoară ca ${c}, adică cu ${x} mai mult.`,
  fb2: (a, b, c) => `La același δ, corelațiile de 0,4 și 0,2 din perioada calmă se măsoară ca ${a} și ${b}. Corecția Forbes–Rigobon aplicată valorii măsurate dă înapoi ${c}.`,
  fr1: (a, b, c, e, d) => `Anul calm: ${a} – ${b}; criza: ${c} – ${e}. Varianța randamentelor S&P 500 pe 2 zile crește cu δ = ${d}.`,
- fr2: (m, a, b, c, p, q) => `${m}: corelația ${a} în anul calm, ${b} în criză, ${c} după corecție. p-value-ul creșterii: ${p} brut, ${q} după corecție.`,
+ fr2: (m, a, b, c, p, q) => `${m}: corelația ${a} în anul calm, ${b} în criză, ${c} după corecție. p-value-ul creșterii (test Fisher z): ${p} brut, ${q} după corecție.`,
  ex1: (q, a, na, b, nb) => `La q = ${q}: corelația pe pierderile comune este ${a} (${window.CH6_TEXT.de(na)} săptămîni), iar pe cîștigurile comune ${b} (${window.CH6_TEXT.de(nb)} săptămîni).`,
  ex2: (n, r, t) => `Distribuția Normală bivariată cu corelația ${r} dă la același prag ${n}. Eșantionul: ${window.CH6_TEXT.de(t)} săptămîni.`,
  cz1: (t, r, c, g, f) => `τ = ${t}: ρ = ${r} pentru copulele Gaussiană și t, θ = ${c} pentru Clayton, ${g} pentru Gumbel și ${f} pentru Frank.`,

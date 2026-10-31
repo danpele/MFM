@@ -254,7 +254,7 @@ function newsImpact() {
   const MODS = [['GARCH', K.blue, 'GARCH(1,1)-t'], ['GJR', K.red, 'GJR-GARCH(1,1)-t'], ['EGARCH', K.green, 'EGARCH(1,1)-t']];
   const tr = MODS.map(([m, c, l]) => ({ x: E, y: E.map(e => nicValue(N.models[m], m, e, s2)), mode: 'lines', name: l, line: { color: c, width: 2 }, hovertemplate: l + ': shock %{x:.1f}%, variance %{y:.2f}<extra></extra>' }));
   MODS.forEach(([m, c]) => tr.push({ x: [e0], y: [nicValue(N.models[m], m, e0, s2)], mode: 'markers', showlegend: false, marker: { color: c, size: 9, line: { color: '#fff', width: 1.5 } }, hoverinfo: 'skip' }));
-  plot('ni-chart', tr, layout({ title: ttl('S&P 500, σ²(t−1) = ' + s2.toFixed(2) + ' (%²)'), shapes: [vline(0, K.navy), vline(e0, K.navy, 'dot')], xaxis: AX('Shock ε(t−1) (%)'), yaxis: AX('Next-day variance σ²(t) (%²)', { rangemode: 'tozero' }), legend: legendBelow(-0.2) }));
+  plot('ni-chart', tr, layout({ title: ttl('S&P 500, σ²(t−1) = ' + s2.toFixed(2) + ' (%²)'), shapes: [vline(0, K.navy), vline(e0, K.navy, 'dot')], xaxis: AX('Shock ε(t−1) (%)'), yaxis: AX('Next-day variance σ²(t) (%²)', { rangemode: 'tozero' }), legend: legendBelow(-0.3) }));
   const a = Math.abs(e0), v = (m, e) => nicValue(N.models[m], m, e, s2);
   out('ni-out', [T.ni(nf(-a, 1), nf(v('GJR', -a), 2), nf(v('EGARCH', -a), 2), nf(v('GARCH', -a), 2)),
     T.ni('+' + nf(a, 1), nf(v('GJR', a), 2), nf(v('EGARCH', a), 2), nf(v('GARCH', a), 2)),
