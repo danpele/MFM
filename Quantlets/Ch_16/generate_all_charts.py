@@ -64,7 +64,8 @@ Gray, LightGray = Navy, BandBlue   # legacy names kept for importing scripts
 COL = {'BTC': Orange, 'ETH': Purple, 'XRP': MainBlue, 'ADA': Forest, 'DOGE': Amber, 'LTC': Teal, 'LINK': IDAred,
        'SOL': Magenta, 'BNB': Brown, 'SPX': MainBlue, 'GOLD': Amber, 'QQQ': Teal, 'USDT': Forest, 'USDC': MainBlue,
        'DAI': Orange, 'IBIT': MainBlue, 'ETHA': Purple, 'COIN': MainBlue, 'MSTR': IDAred, 'TLT': Forest}
-CLASS_COL = {'Crypto': Orange, 'Equity': MainBlue, 'FX': Forest, 'Commodity': Amber, 'Bond': Purple}
+CLASS_COL = {'Crypto': Orange, 'Equity': MainBlue, 'FX': Forest, 'Commodity': Teal, 'Bond': Purple}
+CLASS_MK = {'Crypto': 'o', 'Equity': 's', 'FX': '^', 'Commodity': 'D', 'Bond': 'v'}
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CHART_DIR = os.path.join(HERE, '..', '..', 'charts')
@@ -783,7 +784,8 @@ def fig_alt_assets():
     ev = S ** 2 / (S ** 2).sum()
     fig, ax = plt.subplots(figsize=(7.2, 4.0))
     for cls, c in CLASS_COL.items():
-        for w, mk, fc in [('W1', 'o', 'none'), ('W2', 'o', c)]:
+        mk = CLASS_MK[cls]
+        for w, fc in [('W1', 'none'), ('W2', c)]:
             x = f[(f.cls == cls) & (f.window == w)]
             ax.scatter(x['pc1'], x['pc2'], s=26, marker=mk, facecolors=fc, edgecolors=c, lw=1.0,
                        label=f'{cls}, ' + ('2019 - Jun 2021' if w == 'W1' else 'Jan 2024 - Sep 2026'))

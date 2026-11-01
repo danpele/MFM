@@ -10,7 +10,8 @@ const K = { MainBlue: '#1A3A6E', IDAred: '#CD0000', Forest: '#2E7D32', Amber: '#
   Teal: '#17A2B8', Magenta: '#D63384', Navy: '#1F2A44', Band: '#C5D2E8' };
 const COL = { BTC: K.Orange, ETH: K.Purple, XRP: K.MainBlue, ADA: K.Forest, DOGE: K.Amber, LTC: K.Teal, SPX: K.MainBlue, QQQ: K.IDAred,
   GOLD: K.Forest, USDT: K.Forest, USDC: K.MainBlue, DAI: K.Orange, IBIT: K.MainBlue, ETHA: K.Purple };
-const CLASS_COL = { Crypto: K.Orange, Equity: K.MainBlue, FX: K.Forest, Commodity: K.Amber, Bond: K.Purple };
+const CLASS_COL = { Crypto: K.Orange, Equity: K.MainBlue, FX: K.Forest, Commodity: K.Teal, Bond: K.Purple };
+const CLASS_MK = { Crypto: 'circle', Equity: 'square', FX: 'triangle-up', Commodity: 'diamond', Bond: 'triangle-down' };
 const NAME = { BTC: 'Bitcoin', ETH: 'Ethereum', DOGE: 'Dogecoin', ADA: 'Cardano', LTC: 'Litecoin', XRP: 'XRP', SPX: 'S&P 500',
   QQQ: 'Nasdaq 100 (QQQ)', GOLD: 'Gold (XAU/USD)', USDT: 'Tether', USDC: 'USD Coin', DAI: 'Dai', IBIT: 'IBIT', ETHA: 'ETHA' };
 const rgba = (h, a) => `rgba(${parseInt(h.slice(1, 3), 16)},${parseInt(h.slice(3, 5), 16)},${parseInt(h.slice(5, 7), 16)},${a})`;
@@ -358,7 +359,7 @@ function altAssets() {
   for (const [cls, c] of Object.entries(CLASS_COL)) for (const w of ['W1', 'W2']) {
     const ii = A.cls.map((_, i) => i).filter(i => A.cls[i] === cls && A.window[i] === w);
     tr.push({ x: ii.map(i => P.pc[i][0]), y: ii.map(i => P.pc[i][1]), text: ii.map(i => A.label[i]), mode: 'markers', name: `${cls}, ` + (w === 'W1' ? '2019 - Jun 2021' : 'Jan 2024 - Sep 2026'),
-      marker: { size: 9, color: w === 'W1' ? 'rgba(0,0,0,0)' : c, line: { color: c, width: 1.6 } }, hovertemplate: '%{text}<br>PC1 %{x:.2f}, PC2 %{y:.2f}<extra>' + w + '</extra>' });
+      marker: { size: 9, symbol: CLASS_MK[cls], color: w === 'W1' ? 'rgba(0,0,0,0)' : c, line: { color: c, width: 1.6 } }, hovertemplate: '%{text}<br>PC1 %{x:.2f}, PC2 %{y:.2f}<extra>' + w + '</extra>' });
   }
   const at = (s, w) => A.symbol.findIndex((x, i) => x === s && A.window[i] === w), ann = [];
   for (const s of [...new Set(A.symbol.filter((_, i) => A.cls[i] === 'Crypto'))]) {
