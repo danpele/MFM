@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch14_fan_chart'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Zero-shot 22-day forecast of SPY realised volatility with Chronos-2 on log realised variance (512-day context): median and 5%-95% and 25%-75% bands.'
+Description: 'Zero-shot 22-day forecast of SPY realised volatility with Chronos-2 on log realised variance (512-day context): median and 5%-95% and 25%-75% bands.
+
+The forecast origin is the last date in the input series (`last`), not the date on which the notebook is opened. Volatility is expressed in annualised percent. The quantile bands are pointwise forecast intervals at each horizon, not a simultaneous band for the whole future path.'
 
 Keywords: 'Chronos-2, zero-shot forecasting, quantile forecast, fan chart, realised volatility'
 

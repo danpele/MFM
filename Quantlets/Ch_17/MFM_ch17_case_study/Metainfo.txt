@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch17_case_study'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Case study of DeFusco, Nathanson and Zwick (2022), Journal of Financial Economics 146(1), 205-229, at the national level: the U.S. housing cycle 2000-2011 (Figure 1, Panel A: prices and calendar-month adjusted volume, 2000 = 100, with the quiet from the peak of volume to the peak of prices) and the lead-lag relation of Eq. (1) (Figure 2: implied correlation of the demeaned log price with volume lagged k = -12, ..., 48 months, 2000-2011 with a 95% circular block bootstrap interval, and 1990-2011).'
+Description: 'Case study of DeFusco, Nathanson and Zwick (2022), Journal of Financial Economics 146(1), 205-229, at the national level: the U.S. housing cycle 2000-2011 (Figure 1, Panel A: prices and calendar-month adjusted volume, 2000 = 100, with the quiet from the peak of volume to the peak of prices) and the lead-lag relation of Eq. (1) (Figure 2: implied correlation of the demeaned log price with volume lagged k = -12, ..., 48 months, 2000-2011 with a 95% circular block bootstrap interval, and 1990-2011).
+
+The implied correlation is derived from the stated no-intercept regression and scaling, not a newly centred Pearson correlation at each lag; its pointwise bootstrap band can cross one. The long-lag estimates contain only about four to five 24-month blocks and should be treated cautiously. The 1990–2011 maximum occurs at the lag-grid boundary, 48 months; a larger lag was not searched. Calendar-month adjustment moves the volume peak from March to July 2005 and changes the quiet interval from 16 to 12 months.'
 
 Keywords: 'housing bubble, speculation, trading volume, lead-lag, Case-Shiller, new home sales, FRED, block bootstrap'
 

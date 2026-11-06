@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch14_tail_risk'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'VaR 1% and ES 2.5% forecasts of HS, GARCH-t, FHS, raw Chronos-2 quantiles and FHS with Chronos-2 or TimesFM volatility for the S&P 500, Bitcoin and BET: breach rates, Kupiec and Christoffersen tests, FZ0 losses and model confidence sets; VaR 10% of all three foundation models.'
+Description: 'VaR 1% and ES 2.5% forecasts of HS, GARCH-t, FHS, raw Chronos-2 quantiles and FHS with Chronos-2 or TimesFM volatility for the S&P 500, Bitcoin and BET: breach rates, Kupiec and Christoffersen tests, FZ0 losses and model confidence sets; VaR 10% of all three foundation models.
+
+The raw Chronos-Bolt 1% request is clamped to its lowest available quantile, 10%. The bar labelled '10% endpoint' intentionally shows why this value cannot be interpreted as a valid 1% tail forecast. The separate VaR10% comparison uses an available quantile level.'
 
 Keywords: 'value at risk, expected shortfall, foundation model, backtesting, FZ0, model confidence set'
 

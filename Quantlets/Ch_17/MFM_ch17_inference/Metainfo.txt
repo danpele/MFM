@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch17_inference'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Inference for the real-time bubble claims of Chapter 17: Monte Carlo size of GSADF under volatility shifts and GARCH (Monte Carlo vs wild bootstrap critical values, false date-stamped episodes); family-wise error of BSADF date-stamping and the Phillips-Shi (2020) bootstrap critical value for Bitcoin; a circular block bootstrap and Newey-West test of the LPPLS confidence indicator; parametric-bootstrap likelihood-ratio tests of the number of Markov regimes; the effective sample size of Bubbles for Fama.'
+Description: 'Bootstrap FWER critical value for Bitcoin, circular-block and HAC inference for LPPLS crash association, and effective sample size of Bubbles for Fama events.
+
+The bootstrap critical value is calibrated for 104 monitored weekly dates. Applying that same threshold over the full historical sample is an exploratory comparison, not a claim of 5% family-wise error control over all dates or all overlapping two-year windows. For Bitcoin in the inference notebook, the signal is associated with a lower subsequent crash frequency. The circular-block confidence interval for the difference includes zero, while the HAC test is borderline. This does not establish that the indicator anticipates crashes. The 90-day forward windows overlap; signal dates are not independent prediction trials. The run below evaluates FWER thresholds, LPPLS association and the effective sample size for Bubbles for Fama. The iid and upward-volatility-shift size illustration is executed in [Seminar 17 B8](https://github.com/danpele/MFM/blob/main/notebooks/EN/chapter17_seminar_notebook.ipynb). The downward-shift and GARCH extensions are proposed tasks in B9, not executed results here. The parametric-bootstrap Markov LR experiment is executed in [Lecture 17 section 10b](https://github.com/danpele/MFM/blob/main/notebooks/EN/chapter17_lecture_notebook.ipynb). Those experiments are separate analyses, not results produced by this Run cell.'
 
 Keywords: 'size distortion, wild bootstrap, family-wise error rate, date-stamping, LPPLS evaluation, block bootstrap, Markov switching, likelihood ratio, parametric bootstrap, Bitcoin, Nasdaq 100'
 
@@ -12,4 +14,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily market data (data/market): Nasdaq 100, S&P 500, BET, BET-FI, Bitcoin, Ethereum, Dogecoin, NVIDIA, Cisco, Tesla, GameStop, Strategy; S&P Composite monthly since 1871 (Robert J. Shiller); 49 US industry portfolios (Kenneth French Data Library)'
 
-Output: 'ch17_fwer_btc.pdf, ch17_ms_lr.pdf, inference17.json'
+Output: 'inference17.json'

@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch17_bitcoin'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Bitcoin, weekly 2014-2026: GSADF test and BSADF date-stamping with Monte Carlo and wild bootstrap critical values; real-time signal dates, peaks and drawdowns.'
+Description: 'Bitcoin, weekly 2014-2026: GSADF test and BSADF date-stamping with Monte Carlo and wild bootstrap critical values; retrospective first-exceedance dates, peaks and drawdowns.
+
+The start date is the first exceedance, identified retrospectively; a real-time alarm requires the stated minimum run length. lead_days and gain_to_peak use that retrospective start. The peak search extends six months beyond the episode, so a peak can occur after the signal ends. Drawdowns use the available part of the following two years; ongoing episodes and incomplete follow-up are right-censored. The plot and shading use Monte Carlo thresholds; the printed wild-bootstrap results are the separate heteroskedasticity-robust comparison.'
 
 Keywords: 'Bitcoin, cryptocurrency bubble, GSADF, BSADF, wild bootstrap, heteroskedasticity, date-stamping'
 

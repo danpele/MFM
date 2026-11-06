@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch15_news_data'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'FNSPID headlines about 16 large US stocks: number per year and hour of the timestamp (UTC), the basis for aligning news with trading days.'
+Description: 'FNSPID headlines about 16 US stocks in the analysed sample: number per year and hour of the timestamp (UTC), the basis for aligning news with trading days.
+
+The analysed news sample contains 16 stocks with observations (106,820 headlines). The candidate symbol mapping also contains COIN, which has no column in this sample. UTC is the timestamp timezone, not the exchange trading timezone.'
 
 Keywords: 'financial news, FNSPID, timestamps, market hours, data alignment'
 

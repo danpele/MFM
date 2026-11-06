@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch18_covar_dynamic'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Time-varying Delta-CoVaR at 1% with lagged state variables (log VIX, regional index and system returns) for six US and European banks, 2010-2026.'
+Description: 'Time-varying Delta-CoVaR at 1% with lagged state variables (log VIX, regional index and system returns) for six US and European banks, 2010-2026.
+
+Returns are measured between consecutive dates common to all banks and indices, after aligning prices. A gap can therefore span more than one trading day. Constituent returns are in local currencies without FX conversion; the European basket mixes currencies. The graph shows a 21-observation moving average; the table describes the unsmoothed observations, including their maximum. The loading b is constant: time variation comes from the conditional quantile spread of the individual bank, multiplied by b, rather than a changing transmission coefficient. VIX is a common state variable for US and European banks. The time average of dynamic ΔCoVaR need not equal the static estimate.'
 
 Keywords: 'time-varying CoVaR, state variables, quantile regression, VIX, systemic risk'
 

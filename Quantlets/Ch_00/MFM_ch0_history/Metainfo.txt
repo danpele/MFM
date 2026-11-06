@@ -12,4 +12,4 @@ Submitted: 'Monday, 21 September 2026'
 
 Datafile: 'None (dates from the literature cited in the lecture)'
 
-Output: 'ch0_market_history.pdf, ch0_model_history.pdf'
+Output: 'ch0_market_history.pdf, ch0_model_history.pdf, ch0_model_history_recent.pdf'

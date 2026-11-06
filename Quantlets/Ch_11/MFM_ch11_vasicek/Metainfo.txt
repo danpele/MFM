@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch11_vasicek'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Vasicek model on the 3-month US Treasury bill rate (FRED DTB3), 1954-2026: exact AR(1) maximum likelihood, long-run mean and speed of mean reversion by subperiod with 95% CIs.'
+Description: 'Vasicek model on the 3-month US Treasury bill rate (FRED DTB3), 1954-2026: exact AR(1) maximum likelihood, long-run mean and speed of mean reversion by subperiod, with 95% Wald intervals for the speed.
+
+The whiskers are asymptotic Wald intervals: estimate plus or minus 1.96 standard errors. Near a unit root, finite-sample bias and non-Normal sampling distributions can make these intervals unreliable; a bootstrap test of no mean reversion need not give the same conclusion. A nonpositive estimated mean-reversion speed does not define a stationary long-run distribution or a positive mean-reversion half-life.'
 
 Keywords: 'Vasicek, short rate, Ornstein-Uhlenbeck, mean reversion, maximum likelihood, interest rates'
 

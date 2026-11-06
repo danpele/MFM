@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch17_crypto_ai'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Explosive episodes date-stamped by BSADF in weekly data 2014-2026 for Bitcoin, Ethereum, Dogecoin, Strategy, NVIDIA, Tesla, GameStop, Nasdaq 100 and S&P 500; dot-com (Cisco, Nasdaq 100 in the 1990s) versus AI (NVIDIA, Nasdaq 100 since 2023) aligned at the first explosive signal.'
+Description: 'Explosive episodes date-stamped by BSADF in weekly data 2014-2026 for Bitcoin, Ethereum, Dogecoin, Strategy, NVIDIA, Tesla, GameStop, Nasdaq 100 and S&P 500; dot-com (Cisco, Nasdaq 100 in the 1990s) versus AI (NVIDIA, Nasdaq 100 since 2023) aligned at the first explosive signal.
+
+Dates and gains use the first retrospective exceedance, not the later confirmed alarm. For ongoing episodes, the observed maximum is only the maximum so far; a peak at the final observation and all subsequent drawdown comparisons are right-censored.'
 
 Keywords: 'crypto bubbles, AI bubble, NVIDIA, Cisco, dot-com, GSADF, BSADF, date-stamping'
 

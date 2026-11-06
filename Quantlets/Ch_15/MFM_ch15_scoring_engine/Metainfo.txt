@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch15_scoring_engine'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'How every sentiment score of Chapter 15 is produced: dictionary tone, VADER, FinBERT, zero-shot Qwen2.5-Instruct models (0.5B-14B) through next-token probabilities, MiniLM embeddings and TF-IDF with logistic regression, the look-ahead test on past market moves, and the scoring of FNSPID headlines.'
+Description: 'How every sentiment score of Chapter 15 is produced: dictionary tone, VADER, FinBERT, zero-shot Qwen2.5-Instruct models (0.5B-14B) through next-token probabilities, MiniLM embeddings and TF-IDF with logistic regression, the look-ahead test on past market moves, and the scoring of FNSPID headlines.
+
+By default RECOMPUTE is False: this notebook defines the scoring functions without running the large models. Set the switch to True to generate fresh score tables; downstream examples can instead use the saved public tables. Successful execution with the default switch does not validate a new model-scoring run.'
 
 Keywords: 'FinBERT, large language model, zero-shot classification, sentence embeddings, FNSPID, look-ahead bias'
 

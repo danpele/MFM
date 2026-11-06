@@ -9,9 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030b">
+<link rel="stylesheet" href="interactive.css?v=20261101a">
 <script>window.MFM_LANG = 'en';</script>
-<link rel="preload" as="script" href="ch3.js?v=20261030b">
+<link rel="preload" as="script" href="ch3.js?v=20261101a">
 <script>
 (function (early, page, rest) {
   'use strict';
@@ -34,7 +34,7 @@
   early.forEach(src => add(src, 0, r => { ok = ok && r; left--; go(); }, false));
   if (!parsed) document.addEventListener('DOMContentLoaded', () => { parsed = true; go(); });
   go();
-})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "ch3_data.js?v=20261030b", "ch3_text_en.js?v=20261030b", "common.js?v=20261030b"], "ch3.js?v=20261030b", []);
+})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "ch3_data.js?v=20261101a", "ch3_text_en.js?v=20261101a", "common.js?v=20261101a"], "ch3.js?v=20261101a", []);
 </script>
 </head>
 <body>
@@ -53,13 +53,13 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
-<p class="toc"><a href="#s-capm">From Markowitz to the CAPM</a> · <a href="#s-beta">Estimating Beta</a> · <a href="#s-test">Testing the CAPM</a> · <a href="#s-multi">Multifactor Models</a> · <a href="#s-fm">Fama–MacBeth Regressions</a> · <a href="#s-pca">Latent Factors: PCA and IPCA</a> · <a href="#s-inv">Factor Investing</a> · <a href="#s-case">Case Studies: the Replication Crisis and Factor Momentum</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
+<p class="toc"><a href="#s-capm">From Markowitz to the CAPM</a> · <a href="#s-beta">Estimating Beta</a> · <a href="#s-test">Testing the CAPM</a> · <a href="#s-multi">Multifactor Models</a> · <a href="#s-fm">Fama–MacBeth Regressions</a> · <a href="#s-inv">Factor Investing</a> · <a href="#s-pca">Further Topics: Latent Factors, PCA</a> · <a href="#s-case">Further Topics: Factor Momentum</a> · <a href="#s-ai">Further Topics: Arbitrage and the Decay of Momentum</a></p>
 <h2 class="sec" id="s-capm">From Markowitz to the CAPM</h2>
 <section class="blk" id="frontier">
   <h3>The Efficient Frontier of US Sectors</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=12" target="_blank" rel="noopener"><img src="slides/ch3_frontier_en.jpg" alt="Slide 11: The Efficient Frontier of US Sectors" loading="lazy"></a>
-      <figcaption>Slide 11</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=9" target="_blank" rel="noopener"><img src="slides/ch3_frontier_en.jpg" alt="Slide 8: The Efficient Frontier of US Sectors" loading="lazy"></a>
+      <figcaption>Slide 8</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="fr-t">Sample ends in: <b id="fr-t-v"></b></label><input type="range" id="fr-t" min="60" max="330" step="1" value="330"></div><button class="btn play" id="fr-play" type="button"></button></div><div class="charts "><div class="chart" id="fr-chart"></div><div class="chart" id="fr-w"></div></div><ul class="out" id="fr-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> SPY has a Sharpe ratio of 0.49 and the tangency portfolio of the sectors 0.66. Does this distance reject the CAPM?</div>
@@ -68,8 +68,8 @@
 <section class="blk" id="xlk-beta">
   <h3>The Beta of the Technology ETF (XLK) in the Data</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=18" target="_blank" rel="noopener"><img src="slides/ch3_sem_b1_xlk_en.jpg" alt="Slide 17: The Beta of the Technology ETF (XLK) in the Data" loading="lazy"></a>
-      <figcaption>Slide 17</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch3_sem_b1_xlk_en.jpg" alt="Slide 14: The Beta of the Technology ETF (XLK) in the Data" loading="lazy"></a>
+      <figcaption>Slide 14</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="xk-b">Bootstrap block length (months): <b id="xk-b-v"></b></label><input type="range" id="xk-b" min="1" max="36" step="1" value="12"></div><div class="ctl"><label for="xk-L">Newey–West lags, L: <b id="xk-L-v"></b></label><input type="range" id="xk-L" min="0" max="12" step="1" value="5"></div><button class="btn play" id="xk-play" type="button"></button></div><div class="charts "><div class="chart" id="xk-sc"></div><div class="chart" id="xk-boot"></div><div class="chart" id="xk-res"></div></div><ul class="out" id="xk-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> The standard error of the XLK beta is 0.041 with the classical formula and 0.082 with Newey–West. Does the estimate beta = 1.277 change as well?</div>
@@ -78,8 +78,8 @@
 <section class="blk" id="dimson">
   <h3>Choices That Change an Estimated Beta</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=21" target="_blank" rel="noopener"><img src="slides/ch3_sem_primer_dimson_en.jpg" alt="Slide 20: Choices That Change an Estimated Beta" loading="lazy"></a>
-      <figcaption>Slide 20</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=18" target="_blank" rel="noopener"><img src="slides/ch3_sem_primer_dimson_en.jpg" alt="Slide 17: Choices That Change an Estimated Beta" loading="lazy"></a>
+      <figcaption>Slide 17</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="dm-p">Probability of trading on a day: <b id="dm-p-v"></b></label><input type="range" id="dm-p" min="0.3" max="1" step="0.05" value="0.75"></div><div class="ctl"><label for="dm-b">True beta: <b id="dm-b-v"></b></label><input type="range" id="dm-b" min="0" max="2" step="0.1" value="1"></div><button class="btn play" id="dm-play" type="button"></button></div><div class="charts "><div class="chart" id="dm-chart"></div></div><ul class="out" id="dm-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> In this simulation, true beta is 1 and the stock trades on 75% of the days; the contemporaneous slope in the Dimson regression is 0.77. As the trading probability rises from 75% to 100%, how does this slope change?</div>
@@ -88,8 +88,8 @@
 <section class="blk" id="rolling-beta">
   <h3>Betas Are Not Constant</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=22" target="_blank" rel="noopener"><img src="slides/ch3_rolling_beta_en.jpg" alt="Slide 21: Betas Are Not Constant" loading="lazy"></a>
-      <figcaption>Slide 21</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=19" target="_blank" rel="noopener"><img src="slides/ch3_rolling_beta_en.jpg" alt="Slide 18: Betas Are Not Constant" loading="lazy"></a>
+      <figcaption>Slide 18</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="rb-w">Window: <b id="rb-w-v"></b></label><input type="range" id="rb-w" min="0" max="4" step="1" value="2"></div><button class="btn play" id="rb-play" type="button"></button></div><div class="charts "><div class="chart" id="rb-chart"></div></div><ul class="out" id="rb-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> In these data, how does the range of rolling XLE beta estimates change when the window increases from 252 to 504 days?</div>
@@ -98,8 +98,8 @@
 <section class="blk" id="test-assets">
   <h3>The Test Assets: 25 Size × B/M Portfolios</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=28" target="_blank" rel="noopener"><img src="slides/ch3_p25_grid_en.jpg" alt="Slide 27: The Test Assets: 25 Size × B/M Portfolios" loading="lazy"></a>
-      <figcaption>Slide 27</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=25" target="_blank" rel="noopener"><img src="slides/ch3_p25_grid_en.jpg" alt="Slide 24: The Test Assets: 25 Size × B/M Portfolios" loading="lazy"></a>
+      <figcaption>Slide 24</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="pg-s">Statistic</label><select id="pg-s"><option value="0" selected>Mean annual excess return</option><option value="1">Annual CAPM alpha</option><option value="2">t-statistic of alpha (Newey–West)</option></select></div><div class="ctl"><label for="pg-y">Sample starts in: <b id="pg-y-v"></b></label><input type="range" id="pg-y" min="1963" max="2006" step="1" value="1963"></div><button class="btn play" id="pg-play" type="button"></button></div><div class="charts "><div class="chart" id="pg-heat"></div><div class="chart" id="pg-bar"></div></div><ul class="out" id="pg-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> Over July 1963–July 2026, what happens to the small-value minus small-growth difference when we switch from mean excess returns to CAPM alphas?</div>
@@ -108,8 +108,8 @@
 <section class="blk" id="sml">
   <h3>The Security Market Line in the Data</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=29" target="_blank" rel="noopener"><img src="slides/ch3_sml_en.jpg" alt="Slide 28: The Security Market Line in the Data" loading="lazy"></a>
-      <figcaption>Slide 28</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=26" target="_blank" rel="noopener"><img src="slides/ch3_sml_en.jpg" alt="Slide 25: The Security Market Line in the Data" loading="lazy"></a>
+      <figcaption>Slide 25</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="sm-y">Sample starts in: <b id="sm-y-v"></b></label><input type="range" id="sm-y" min="1963" max="2006" step="1" value="1963"></div><button class="btn play" id="sm-play" type="button"></button></div><div class="charts "><div class="chart" id="sm-sml"></div><div class="chart" id="sm-alpha"></div></div><ul class="out" id="sm-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> From 1963, the line fitted on the 25 portfolios has a slope of −4.4% a year. When the sample start reaches January 2003, what happens to this slope?</div>
@@ -118,8 +118,8 @@
 <section class="blk" id="factor-returns">
   <h3>Cumulative Returns of the Six Factors, 1963–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=42" target="_blank" rel="noopener"><img src="slides/ch3_factor_cum_en.jpg" alt="Slide 41: Cumulative Returns of the Six Factors, 1963–2026" loading="lazy"></a>
-      <figcaption>Slide 41</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=40" target="_blank" rel="noopener"><img src="slides/ch3_factor_cum_en.jpg" alt="Slide 39: Cumulative Returns of the Six Factors, 1963–2026" loading="lazy"></a>
+      <figcaption>Slide 39</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="fc-y">Investment starts in: <b id="fc-y-v"></b></label><input type="range" id="fc-y" min="1963" max="2016" step="1" value="1963"></div><button class="btn play" id="fc-play" type="button"></button></div><div class="charts "><div class="chart" id="fc-chart"></div></div><ul class="out" id="fc-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> From July 1963, MOM ends at 48.0 and Mkt-RF at 43.2. If we move the start to January 2016 and retain July 2026 as the endpoint, which compounded index will have the higher final value?</div>
@@ -128,48 +128,48 @@
 <section class="blk" id="fama-macbeth">
   <h3>Estimated Risk Premia</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=47" target="_blank" rel="noopener"><img src="slides/ch3_fama_macbeth_en.jpg" alt="Slide 46: Estimated Risk Premia" loading="lazy"></a>
-      <figcaption>Slide 46</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=45" target="_blank" rel="noopener"><img src="slides/ch3_fama_macbeth_en.jpg" alt="Slide 44: Estimated Risk Premia" loading="lazy"></a>
+      <figcaption>Slide 44</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="fm-se">Standard errors</label><select id="fm-se"><option value="sh" selected>Shanken</option><option value="fm">Fama–MacBeth</option><option value="nw">Newey–West, 6 lags</option></select></div><div class="ctl"><label for="fm-y">Sample starts in: <b id="fm-y-v"></b></label><input type="range" id="fm-y" min="1963" max="2000" step="1" value="1963"></div><button class="btn play" id="fm-play" type="button"></button></div><div class="charts "><div class="chart" id="fm-chart"></div></div><ul class="out" id="fm-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> In FF3, the Fama–MacBeth market premium is −6.5% a year, while the mean of the factor is 7.2%. Why are they so far apart?</div>
   <details><summary>Answer</summary><p>Market betas vary little across portfolios: 0.89–1.14 in FF3. This limited dispersion makes it difficult to separate the market premium from the intercept. The negative estimate does not establish investors' preferences for risk. The Shanken correction changes standard errors, not the premium estimate. For HML, the estimated premium (4.0%) is close to the factor mean (3.6%).</p></details>
-</section><h2 class="sec" id="s-pca">Latent Factors: PCA and IPCA</h2>
-<section class="blk" id="pca">
-  <h3>PCA of the US Sector ETFs</h3>
-  <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=56" target="_blank" rel="noopener"><img src="slides/ch3_pca_en.jpg" alt="Slide 55: PCA of the US Sector ETFs" loading="lazy"></a>
-      <figcaption>Slide 55</figcaption></figure>
-    <div class="live"><div class="ctls"><div class="ctl"><label for="pc-w">Window</label><select id="pc-w"><option value="all" selected>Full sample</option><option value="504">504 days</option><option value="252">252 days</option><option value="126">126 days</option></select></div><div class="ctl"><label for="pc-t">Window ends on: <b id="pc-t-v"></b></label><input type="range" id="pc-t" min="0" max="2072" step="1" value="2072"></div><button class="btn play" id="pc-play" type="button"></button></div><div class="charts "><div class="chart" id="pc-scree"></div><div class="chart" id="pc-load"></div></div><ul class="out" id="pc-out"></ul></div>
-  </div>
-  <div class="ask"><span class="ask-tag">Question for the room</span> Over the full sample, PC1 explains 66.0% of the total variance of the standardised returns of the 11 sectors. If we select the 252-day window ending on 18 September 2026, what share does PC1 explain?</div>
-  <details><summary>Answer</summary><p>PC1 explains 36.6%, versus 66.0% in the full sample. Standardisation equalises the variances of the 11 input series, not those of the principal components. PC1's share is recomputed from the selected window's correlations. Over the full sample, the PC1 loadings are all positive (0.24–0.34) and the correlation of PC1 with SPY is 0.954; over the 252-day window it is 0.723.</p></details>
 </section><h2 class="sec" id="s-inv">Factor Investing</h2>
 <section class="blk" id="factor-etfs">
   <h3>Factor ETFs versus the Market</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=60" target="_blank" rel="noopener"><img src="slides/ch3_factor_etfs_en.jpg" alt="Slide 59: Factor ETFs versus the Market" loading="lazy"></a>
-      <figcaption>Slide 59</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=58" target="_blank" rel="noopener"><img src="slides/ch3_factor_etfs_en.jpg" alt="Slide 57: Factor ETFs versus the Market" loading="lazy"></a>
+      <figcaption>Slide 57</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="fe-t">Investment starts on: <b id="fe-t-v"></b></label><input type="range" id="fe-t" min="0" max="2993" step="1" value="0"></div><button class="btn play" id="fe-play" type="button"></button></div><div class="charts "><div class="chart" id="fe-chart"></div></div><ul class="out" id="fe-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> IWF has a CAGR of 16.3%, versus 14.0% for SPY over the same period. Is the 2.3-percentage-point difference an estimate of IWF's CAPM alpha?</div>
   <details><summary>Answer</summary><p>No. The CAGR difference describes realised compounded performance. CAPM alpha is the intercept in a regression of excess asset returns on excess market returns. Diversification does not impose a beta of 1. A conclusion about alpha requires its estimate and uncertainty. Since July 2013, only IWF and MTUM (15.5%) have a CAGR above SPY; QUAL has 13.5%, VLUE 13.1%, IWD 10.7%, USMV 10.5% and IWM 9.3%.</p></details>
-</section><h2 class="sec" id="s-case">Case Studies: the Replication Crisis and Factor Momentum</h2>
+</section><h2 class="sec" id="s-pca">Further Topics: Latent Factors, PCA</h2>
+<section class="blk" id="pca">
+  <h3>PCA of the US Sector ETFs</h3>
+  <div class="pair">
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=68" target="_blank" rel="noopener"><img src="slides/ch3_pca_en.jpg" alt="Slide 67: PCA of the US Sector ETFs" loading="lazy"></a>
+      <figcaption>Slide 67</figcaption></figure>
+    <div class="live"><div class="ctls"><div class="ctl"><label for="pc-w">Window</label><select id="pc-w"><option value="all" selected>Full sample</option><option value="504">504 days</option><option value="252">252 days</option><option value="126">126 days</option></select></div><div class="ctl"><label for="pc-t">Window ends on: <b id="pc-t-v"></b></label><input type="range" id="pc-t" min="0" max="2072" step="1" value="2072"></div><button class="btn play" id="pc-play" type="button"></button></div><div class="charts "><div class="chart" id="pc-scree"></div><div class="chart" id="pc-load"></div></div><ul class="out" id="pc-out"></ul></div>
+  </div>
+  <div class="ask"><span class="ask-tag">Question for the room</span> Over the full sample, PC1 explains 66.0% of the total variance of the standardised returns of the 11 sectors. If we select the 252-day window ending on 18 September 2026, what share does PC1 explain?</div>
+  <details><summary>Answer</summary><p>PC1 explains 36.6%, versus 66.0% in the full sample. Standardisation equalises the variances of the 11 input series, not those of the principal components. PC1's share is recomputed from the selected window's correlations. Over the full sample, the PC1 loadings are all positive (0.24–0.34) and the correlation of PC1 with SPY is 0.954; over the 252-day window it is 0.723.</p></details>
+</section><h2 class="sec" id="s-case">Further Topics: Factor Momentum</h2>
 <section class="blk" id="factor-momentum">
   <h3>Factor Momentum in the French Factors, 1964–2026</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=68" target="_blank" rel="noopener"><img src="slides/ch3_factor_momentum_en.jpg" alt="Slide 67: Factor Momentum in the French Factors, 1964–2026" loading="lazy"></a>
-      <figcaption>Slide 67</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=73" target="_blank" rel="noopener"><img src="slides/ch3_factor_momentum_en.jpg" alt="Slide 72: Factor Momentum in the French Factors, 1964–2026" loading="lazy"></a>
+      <figcaption>Slide 72</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="tf-L">Signal lookback (months): <b id="tf-L-v"></b></label><input type="range" id="tf-L" min="1" max="36" step="1" value="12"></div><div class="ctl"><label for="tf-y">Sample starts in: <b id="tf-y-v"></b></label><input type="range" id="tf-y" min="1964" max="2006" step="1" value="1964"></div><button class="btn play" id="tf-play" type="button"></button></div><div class="charts "><div class="chart" id="tf-bar"></div><div class="chart" id="tf-cum"></div></div><ul class="out" id="tf-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> The average factor earns 0.47% a month after a positive prior year and 0.05% after a negative one. Does this factor momentum explain all of the MOM alpha?</div>
   <details><summary>Answer</summary><p>No. The FF5 alpha of MOM falls from 0.74% a month (t = 4.18) to 0.32% (t = 2.27) when TSFM is added, i.e. by 57%. With seven factors, factor momentum explains just over half of the MOM alpha, and the rest remains significant at 5%; the paper, with many more factors, explains most forms of momentum.</p></details>
-</section><h2 class="sec" id="s-ai">AI for Scientific Discovery</h2>
+</section><h2 class="sec" id="s-ai">Further Topics: Arbitrage and the Decay of Momentum</h2>
 <section class="blk" id="momentum-decay">
   <h3>Mini-Case: Was Momentum Arbitraged Away?</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=73" target="_blank" rel="noopener"><img src="slides/ch3_ai_momentum_en.jpg" alt="Slide 72: Mini-Case: Was Momentum Arbitraged Away?" loading="lazy"></a>
-      <figcaption>Slide 72</figcaption></figure>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter3_factor_models.pdf#page=78" target="_blank" rel="noopener"><img src="slides/ch3_ai_momentum_en.jpg" alt="Slide 77: Mini-Case: Was Momentum Arbitraged Away?" loading="lazy"></a>
+      <figcaption>Slide 77</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ai-p">Assumed publication date: <b id="ai-p-v"></b></label><input type="range" id="ai-p" min="120" max="600" step="1" value="339"></div><button class="btn play" id="ai-play" type="button"></button></div><div class="charts "><div class="chart" id="ai-per"></div><div class="chart" id="ai-dec"></div></div><ul class="out" id="ai-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> After the 1993 publication, the momentum mean falls by 0.45 percentage points a month, with t = −1.45. If the estimate stays unchanged but its standard error is halved, do we reject H₀: b₂ = 0 in a two-sided 5% test using the asymptotic critical value 1.96?</div>

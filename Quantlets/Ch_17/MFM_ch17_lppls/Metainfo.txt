@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch17_lppls'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'LPPLS model calibrated with the Filimonov-Sornette method: fit to the 2017 Bitcoin bubble and the instability of the estimated critical time as the estimation window moves (Bitcoin 2017, Nasdaq 100 2000).'
+Description: 'LPPLS model calibrated with the Filimonov-Sornette method: fit to the 2017 Bitcoin bubble and the instability of the estimated critical time as the estimation window moves (Bitcoin 2017, Nasdaq 100 2000).
+
+The displayed LPPLS showcase fails the qualification filters. A critical time near the observed peak is not evidence of predictive accuracy when the fit is unqualified. Across estimation windows, boundary solutions and zero qualified fits make the critical-time error summaries descriptive, not a validated forecasting score.'
 
 Keywords: 'LPPLS, log-periodic power law, Johansen-Ledoit-Sornette, critical time, Filimonov-Sornette, Bitcoin, Nasdaq'
 

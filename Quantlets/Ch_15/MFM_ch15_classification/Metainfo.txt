@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch15_classification'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Accuracy with bootstrap intervals, macro-F1, confusion matrices and McNemar tests of eleven sentiment classifiers on Financial PhraseBank and Twitter Financial News; accuracy by annotator agreement.'
+Description: 'Accuracy with bootstrap intervals, macro-F1, confusion matrices and McNemar tests of eleven sentiment classifiers on Financial PhraseBank and Twitter Financial News; accuracy by annotator agreement.
+
+The scalar table reports accuracy, its bootstrap interval and macro-F1. The separate paired table gives McNemar p-values and accuracy differences (second classifier minus first), with 95% paired-bootstrap intervals; n01 counts first wrong/second right and n10 the reverse; it uses the same observations for each pair. Confusion-matrix rows are true labels and columns are predictions.'
 
 Keywords: 'sentiment classification, accuracy, macro-F1, confusion matrix, McNemar test, FinBERT, LLM'
 

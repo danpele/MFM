@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch14_acf_signal'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Autocorrelation of daily S&P 500 returns and absolute returns since 2000, lags 1-50, with the 95% band under independence: little signal in the mean, persistent signal in the size of moves.'
+Description: 'Autocorrelation of daily S&P 500 returns and absolute returns since 2000, lags 1-50, with the 95% band under independence: little signal in the mean, persistent signal in the size of moves.
+
+The shaded band is an i.i.d. reference, not a heteroskedasticity-robust or simultaneous confidence band. Counts of correlations outside it are descriptive; they do not by themselves establish exploitable return predictability.'
 
 Keywords: 'autocorrelation, volatility clustering, signal-to-noise, S&P 500, forecastability'
 

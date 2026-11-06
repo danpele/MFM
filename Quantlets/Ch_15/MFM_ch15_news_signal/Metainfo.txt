@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch15_news_signal'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'From headline sentiment to a trading signal: same-day versus next-day regressions with standard errors clustered by day, an event study around news days, and a daily long-short strategy with and without transaction costs, for Loughran-McDonald, FinBERT and Qwen2.5-7B scores.'
+Description: 'From headline sentiment to a trading signal: same-day versus next-day regressions with standard errors clustered by day, an event study around news days, and a daily long-short strategy with and without transaction costs, for Loughran-McDonald, FinBERT and Qwen2.5-7B scores.
+
+The regression table expresses slopes in percentage points per one standard deviation of sentiment; the plot converts them to basis points (100 bp = 1 percentage point). The strategy table reports daily means and intervals in bp, annualised Sharpe ratios before and after costs, and the break-even cost in bp per traded leg. The mean-return intervals are 95% moving-block bootstrap intervals (10-day blocks). A negative break-even value means the gross strategy already loses money at zero cost; it is not a feasible positive cost allowance. Regression r0/r1/r2 refer to the headline day, the next trading day and the following trading day. The event-study confidence bands are pointwise plus/minus 1.96 standard errors. The event-study shading marks trading days +2 to +5; cumulative returns are additive sums, not compounded wealth.'
 
 Keywords: 'news sentiment, event study, clustered standard errors, trading strategy, transaction costs'
 

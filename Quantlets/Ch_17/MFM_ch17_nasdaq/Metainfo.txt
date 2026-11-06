@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch17_nasdaq'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Nasdaq 100, monthly 1990-2026: GSADF date-stamping vs the recursive ADF of Phillips, Wu and Yu (2011), with real-time signal dates, peaks and subsequent drawdowns.'
+Description: 'Nasdaq 100, monthly 1990-2026: GSADF date-stamping vs the recursive ADF of Phillips, Wu and Yu (2011), with retrospective first-exceedance dates, peaks and subsequent drawdowns.
+
+The start date is the first exceedance, identified retrospectively; a real-time alarm requires the stated minimum run length. lead_days and gain_to_peak use that retrospective start. The peak search extends six months beyond the episode, so a peak can occur after the signal ends. Drawdowns use the available part of the following two years; ongoing episodes and incomplete follow-up are right-censored.'
 
 Keywords: 'Nasdaq 100, dot-com bubble, GSADF, SADF, date-stamping, real-time monitoring, AI'
 

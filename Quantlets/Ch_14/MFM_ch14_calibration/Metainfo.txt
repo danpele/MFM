@@ -2,7 +2,13 @@ Name of QuantLet: 'MFM_ch14_calibration'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Inference for forecast comparisons and calibration of predictive distributions, from the saved Chapter 14 forecasts: Clark-West tests for nested models, Holm, Romano-Wolf and SPA for the 18 return tests, the non-synchronous-trading check with the BET ETF, exact power of the Kupiec test, PIT histograms, censored Berkowitz tests and equally weighted quantile scores, the DQ test, adaptive conformal recalibration of Chronos-2 quantiles, conditional Giacomini-White tests and the ACF of absolute returns against geometric decay.'
+Description: 'Inference for forecast comparisons and calibration of predictive distributions, from the saved Chapter 14 forecasts: Clark-West tests for nested models, Holm, Romano-Wolf and SPA for the 18 return tests, the non-synchronous-trading check with the BET ETF, exact power of the Kupiec test, PIT histograms, censored Berkowitz tests and equally weighted quantile scores, the DQ test, adaptive conformal recalibration of Chronos-2 quantiles, conditional Giacomini-White tests and the ACF of absolute returns against geometric decay.
+
+Reading the output:
+- `r2_bet`, `r2_etf` and `r2_etf_next` are out-of-sample R-squared in percent, relative to the zero-return forecast. `zero_etf` is the percentage of ETF days with a zero return.
+- The Giacomini-White (GW) test compares each model's QLIKE loss with log-HAR. It tests conditional equal predictive accuracy; its non-directional chi-squared p-value does not by itself identify the better model.
+- `pow_T` is the rejection probability when the breach probability is 0.0167; `size_T` is the rejection probability under the null 0.01. Both use the nominal 5% Kupiec rejection rule. Report the actual size alongside power, especially in short samples.
+- `T80` is the first sample size reaching 80% power. `T80_stable` is the smallest sample size from which power stays at or above 80% for every larger size in the scanned range of 200 to 6,000 observations; discreteness can make power non-monotone. `T80_p2` is the first crossing when the breach probability is 0.02 instead of 0.0167.'
 
 Keywords: 'Clark-West, Romano-Wolf, SPA, PIT, Berkowitz, quantile score, dynamic quantile test, conformal prediction'
 

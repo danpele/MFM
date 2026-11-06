@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch18_spillover_rolling'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Rolling Diebold-Yilmaz total connectedness of 13 banks (250-day windows, every 5 days) and net spillovers by region, 2011-2026.'
+Description: 'Rolling Diebold-Yilmaz total connectedness of 13 banks (250-day windows, every 5 days) and net spillovers by region, 2011-2026.
+
+Each point is dated at the end of a backward-looking window of 250 observations on the common trading calendar; estimates are updated every five observations, with a fixed second-order vector autoregression, VAR(2), and ten-step forecast horizon. Consecutive windows overlap heavily. An extreme episode entering or leaving the window can change the estimates; a sharp fall need not mark a new economic regime. Event lines are date references, not causal estimates. Regional lines sum the member banks' NET values in percentage points. Within-region bilateral contributions cancel, and the three regional net sums add to zero before rounding. These are sums, not shares of a regional variance, so magnitudes can exceed 100. Links remain predictive variance attributions; market closing times and the chosen window can influence them.'
 
 Keywords: 'rolling connectedness, spillover index, Diebold-Yilmaz, crisis, COVID-19, net transmitter'
 

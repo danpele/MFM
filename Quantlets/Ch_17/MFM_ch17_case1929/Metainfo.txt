@@ -1,0 +1,17 @@
+Name of QuantLet: 'MFM_ch17_case1929'
+
+Published in: 'Modelling Financial Markets (MFM)'
+
+Description: 'Black Thursday, 24 October 1929: daily closes of the Dow Jones Industrial Average, 1921-1955 (MeasuringWorth), the crash in context and the weekly BSADF date-stamping on the log Dow, 1921-1932, with Monte Carlo and wild bootstrap critical values.
+
+The start of an episode is the first exceedance, identified retrospectively; the real-time alarm requires the stated minimum run length. The wild-bootstrap threshold is the heteroskedasticity-robust comparison.'
+
+Keywords: '1929 crash, Black Thursday, Dow Jones, GSADF, BSADF, wild bootstrap, date-stamping, MeasuringWorth'
+
+Author: 'Daniel Traian Pele'
+
+Submitted: 'Tuesday, 22 September 2026'
+
+Datafile: 'S. H. Williamson, Daily Closing Value of the Dow Jones Average, 1885 to Present, MeasuringWorth (data/market/DJIA_MeasuringWorth_daily.csv)'
+
+Output: 'ch17_1929.pdf, ch17_1929_bsadf.pdf, case1929.json'

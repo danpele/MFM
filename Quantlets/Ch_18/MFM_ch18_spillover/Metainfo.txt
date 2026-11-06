@@ -2,7 +2,13 @@ Name of QuantLet: 'MFM_ch18_spillover'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Diebold-Yilmaz connectedness of 13 banks: VAR on log Parkinson volatility, generalized forecast error variance decomposition at 10 days, connectedness table and the network of net pairwise spillovers.'
+Description: 'Diebold-Yilmaz connectedness of 13 banks: vector autoregression (VAR) on log Parkinson volatility, generalized forecast error variance decomposition at 10 days, connectedness table and the network of net pairwise spillovers.
+
+Each row attributes one bank's forecast-error variance to shocks associated with the column banks; the unrounded row sums to 100%. FROM is the off-diagonal row sum; TO is the off-diagonal column sum; NET = TO − FROM. TO sums contributions to other banks and need not be below 100. For JPM, the displayed TO 86.2 minus FROM 76.4 gives NET 9.8 percentage points. Total connectedness is the average FROM across the 13 banks.
+
+Generalized forecast error variance decomposition describes predictive variance attribution, not structural causation; different market closing times may affect the estimated links.
+
+Larger network nodes indicate larger TO; thicker arrows indicate larger positive pairwise net spillovers. Only the strongest quarter of positive pairwise links is shown. A bank can be an aggregate net receiver and a net transmitter to a particular other bank. Heatmap cells are rounded, and the heatmap’s colours saturate above 40%; read the printed cell values for larger shares. The return-based and log-volatility-based totals concern different forecast targets and are not interchangeable. Static lag order is chosen by the Bayesian information criterion (BIC).'
 
 Keywords: 'Diebold-Yilmaz, connectedness, spillover index, generalized variance decomposition, VAR, network'
 

@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch17_episodes'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Nine run-ups and crashes aligned at the peak (Nasdaq 100 and Cisco 2000, BET 2007, Bitcoin 2017 and 2021, Ethereum 2018, Dogecoin, GameStop and Tesla 2021): two-year run-up, maximum drawdown, recovery.'
+Description: 'Nine run-ups and crashes aligned at the peak (Nasdaq 100 and Cisco 2000, BET 2007, Bitcoin 2017 and 2021, Ethereum 2018, Dogecoin, GameStop and Tesla 2021): two-year run-up, maximum drawdown, recovery.
+
+A missing recovery date means the price has not recovered by the data cutoff, not that recovery is impossible.'
 
 Keywords: 'bubbles, crashes, drawdown, dot-com, cryptocurrency, GameStop, BET, Bucharest Stock Exchange'
 

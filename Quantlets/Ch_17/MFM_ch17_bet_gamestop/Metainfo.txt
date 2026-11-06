@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch17_bet_gamestop'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'GSADF test and BSADF date-stamping for the BET index (monthly 1997-2026) and GameStop (daily 2020-2021).'
+Description: 'GSADF test and BSADF date-stamping for the BET index (monthly 1997-2026) and GameStop (daily 2020-2021).
+
+The start date is the first exceedance, identified retrospectively; a real-time alarm requires the stated minimum run length. lead_days and gain_to_peak use that retrospective start. The peak search extends six months beyond the episode, so a peak can occur after the signal ends. Drawdowns use the available part of the following two years; ongoing episodes and incomplete follow-up are right-censored.'
 
 Keywords: 'BET, Bucharest Stock Exchange, GameStop, meme stocks, GSADF, BSADF, date-stamping'
 

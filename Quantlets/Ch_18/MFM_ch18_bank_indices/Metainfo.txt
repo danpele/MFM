@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch18_bank_indices'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Equal-weighted, daily rebalanced portfolios of US, European and Romanian banks, 2010-2026, with the largest peak-to-trough falls and annualised volatilities.'
+Description: 'Equal-weighted, daily rebalanced portfolios of US, European and Romanian banks, 2010-2026, with the largest peak-to-trough falls and annualised volatilities.
+
+Returns are measured between consecutive dates common to all banks and indices, after aligning prices. A gap can therefore span more than one trading day. Constituent returns are in local currencies without FX conversion; the European basket mixes currencies. The value 100 is invested before the first displayed return; the first point already includes that return. peak_date is the all-time index maximum, not the peak preceding the largest drawdown. vol is the standard deviation of the equal-weighted mean log return, scaled by √252, a 252-observation convention on this common calendar. The wealth curve instead compounds the equal-weighted simple return. The Romanian basket contains TLV and BRD.'
 
 Keywords: 'banking system, bank stocks, drawdown, volatility, systemic risk, Bucharest Stock Exchange'
 

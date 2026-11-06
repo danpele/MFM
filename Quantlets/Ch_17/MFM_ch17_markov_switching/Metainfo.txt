@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch17_markov_switching'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Two-regime Markov-switching models (Hamilton 1989) for weekly log returns of the Nasdaq 100 (1990-2026) and Bitcoin (2014-2026): regime means, volatilities, expected durations, filtered and smoothed probabilities.'
+Description: 'Two-regime Markov-switching models (Hamilton 1989) for weekly log returns of the Nasdaq 100 (1990-2026) and Bitcoin (2014-2026): regime means, volatilities, expected durations, filtered and smoothed probabilities.
+
+Calm and turbulent denote lower and higher conditional variance, not positive and negative returns or normal and crash states. The high-variance Bitcoin state can have a positive mean and occupy most of the sample. Filtered probabilities still use full-sample parameter estimates; the dated crossings are retrospective, not a real-time trading record.'
 
 Keywords: 'Markov switching, regime switching, Hamilton filter, filtered probability, smoothed probability, Nasdaq, Bitcoin'
 

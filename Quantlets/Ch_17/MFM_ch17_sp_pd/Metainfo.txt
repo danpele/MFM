@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch17_sp_pd'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'GSADF test and BSADF date-stamping on the S&P Composite real price-dividend ratio, monthly from January 1871 to the latest month available (Robert J. Shiller data), with Monte Carlo critical values.'
+Description: 'GSADF test and BSADF date-stamping on the S&P Composite real price-dividend ratio, monthly from January 1871 to the latest month available (Robert J. Shiller data), with Monte Carlo critical values.
+
+Read the global SADF/GSADF rejection before interpreting the dated intervals. Where that global test does not reject, the listed intervals are pointwise threshold exceedances, not globally confirmed explosive episodes.'
 
 Keywords: 'GSADF, BSADF, price-dividend ratio, S&P 500, Shiller, rational bubbles, dot-com bubble'
 

@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch15_llm_zero_shot'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Zero-shot sentiment classification with Qwen2.5-Instruct models from 0.5 to 14 billion parameters: macro-F1 against model size (FinBERT as reference) and sensitivity to the wording of the prompt.'
+Description: 'Zero-shot sentiment classification with Qwen2.5-Instruct models from 0.5 to 14 billion parameters: macro-F1 against model size (FinBERT as reference) and sensitivity to the wording of the prompt.
+
+The size plot compares macro-F1; the prompt plot compares accuracy. With a majority neutral class, those metrics can rank prompts differently. The prompt results include F1 as well, so a higher accuracy alone need not mean better performance across all three labels.'
 
 Keywords: 'large language model, zero-shot, prompt sensitivity, model size, Qwen2.5, FinBERT'
 

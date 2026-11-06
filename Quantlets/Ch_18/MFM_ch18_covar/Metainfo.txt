@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch18_covar'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'CoVaR and Delta-CoVaR at 1% for eleven US and European banks by quantile regression (system: the other banks of the region), moving-block bootstrap intervals, VaR versus Delta-CoVaR and exposure CoVaR.'
+Description: 'CoVaR and Delta-CoVaR at 1% for eleven US and European banks by quantile regression (system: the other banks of the region), moving-block bootstrap intervals, VaR versus Delta-CoVaR and exposure CoVaR.
+
+Returns are measured between consecutive dates common to all banks and indices, after aligning prices. A gap can therefore span more than one trading day. Constituent returns are in local currencies without FX conversion; the European basket mixes currencies. ΔCoVaR is the additional conditional loss relative to the median state, not the total conditional loss CoVaR. System and exposure bars have different outcomes: the other-bank portfolio versus the individual bank. Their levels are not directly comparable measures of strength. The pooled Spearman correlation is descriptive and combines regional systems. Marginal bootstrap intervals do not supply pairwise or simultaneous tests of the ranking; overlapping intervals alone do not prove equal effects.'
 
 Keywords: 'CoVaR, Delta-CoVaR, quantile regression, exposure CoVaR, systemic risk contribution, bootstrap'
 

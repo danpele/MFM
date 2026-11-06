@@ -2,7 +2,9 @@ Name of QuantLet: 'MFM_ch15_lookahead'
 
 Published in: 'Modelling Financial Markets (MFM)'
 
-Description: 'Does a language model already know what markets did? Qwen2.5 models are asked, without any context, whether the S&P 500 rose or fell in each month since 2000 and whether Apple rose or fell on single days; AUC before and after the release of the weights.'
+Description: 'Does a language model already know what markets did? Qwen2.5 models are asked, without any context, whether the S&P 500 rose or fell in each month since 2000 and whether Apple rose or fell on single days; AUC before and after the release of the weights.
+
+The post-release monthly sample contains only 23 observations, and all its reported AUC intervals include 0.5. In the daily task, some models choose almost the same class every time; an AUC can still rank small differences in their probabilities while balanced accuracy stays near 0.5. These diagnostics alone do not establish useful trading predictability or identify a cause of pre/post differences.'
 
 Keywords: 'look-ahead bias, memorisation, large language model, knowledge cutoff, AUC, backtesting'
 
