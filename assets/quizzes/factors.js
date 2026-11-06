@@ -43,10 +43,10 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Because 25 portfolios are too many test assets for a two-pass regression with three factors",
                     "Because a credible cross-sectional R² must exceed 95%",
                     "Because the OLS R² is always about 80% on these portfolios, whatever the factors",
-                    "Because any factors correlated with SMB and HML fit these portfolios"
+                    "Because many models that capture size and value comovement fit these portfolios"
                 ],
-                "correctExplanation": "In the lecture FF3 has an OLS R² of 0.66 on the 25 portfolios but 0.21 once 30 industries are added, and its GLS R² is at most 0.20.",
-                "incorrectExplanation": "A high OLS R² on the 25 size × B/M portfolios is a low hurdle: the assets are spanned by three factors, and many unrelated factor sets fit them."
+                "correctExplanation": "On portfolios sorted on the same characteristics, many models that capture the common size and value variation reach a high cross-sectional R². In the lecture FF3 goes from 0.66 to 0.22 (OLS) and from 0.21 to 0.08 (GLS) when 30 industries are added to the 25 portfolios.",
+                "incorrectExplanation": "A high OLS R² on the 25 size × B/M portfolios is a low hurdle: three factors explain most of their variation, so many factor sets fit their means."
             },
             "ro": {
                 "title": "O evaluare sceptică a lui R²",
@@ -55,10 +55,10 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Pentru că 25 de portofolii sînt prea multe active de test pentru o regresie în două etape",
                     "Pentru că un R² transversal credibil trebuie să depășească 95%",
                     "Pentru că R² OLS este mereu de circa 80% pe aceste portofolii, oricare ar fi factorii",
-                    "Pentru că orice factori corelați cu SMB și HML explică aceste portofolii"
+                    "Pentru că multe modele care surprind variația comună de mărime și valoare le explică"
                 ],
-                "correctExplanation": "În curs, FF3 are R² OLS 0,66 pe cele 25 de portofolii, dar 0,21 după adăugarea a 30 de industrii, iar R² GLS este cel mult 0,20.",
-                "incorrectExplanation": "Un R² OLS mare pe cele 25 de portofolii mărime × B/M este un criteriu puțin exigent: activele sînt explicate de trei factori, iar multe seturi de factori fără legătură le pot explica mediile."
+                "correctExplanation": "Pe portofolii sortate după aceleași caracteristici, multe modele care surprind variația comună de mărime și valoare obțin un R² transversal ridicat. În curs, FF3 scade de la 0,66 la 0,22 (OLS) și de la 0,21 la 0,08 (GLS) cînd se adaugă 30 de portofolii pe industrii celor 25.",
+                "incorrectExplanation": "Un R² OLS mare pe cele 25 de portofolii mărime × B/M este un criteriu puțin exigent: trei factori explică cea mai mare parte a variației lor, deci multe seturi de factori le reproduc mediile."
             }
         },
         {
@@ -89,30 +89,30 @@ window.MFM_DATA.quizzes['factors'] = {
             }
         },
         {
-            "correct": 3,
+            "correct": 1,
             "en": {
                 "title": "Newey–West errors",
-                "text": "In the monthly regression of XLK on the market (1999–2026), the Newey–West standard error of beta is about twice the classical one. Why?",
+                "text": "In the monthly regression of XLK on the market (1999–2026), what changes when the classical standard errors are replaced by Newey–West errors?",
                 "options": [
-                    "Because OLS gives a biased beta when returns are fat-tailed",
-                    "Because the sample is too short for OLS standard errors",
-                    "Because Newey–West changes the estimate of beta itself",
-                    "Because residual variance moves with market volatility"
+                    "The OLS estimate of beta, which becomes robust to fat tails",
+                    "The estimated covariance matrix of the coefficients, not the OLS beta",
+                    "Both beta and its standard error, by the same proportion",
+                    "The sample, because the first lags are dropped"
                 ],
-                "correctExplanation": "Newey–West keeps the OLS estimate and corrects its variance for heteroskedasticity and autocorrelation; volatility clustering makes classical errors too small.",
-                "incorrectExplanation": "The point estimate is the same; only the standard error changes, because residuals are heteroskedastic."
+                "correctExplanation": "Beta stays at 1.277; the standard error goes from 0.041 (classical) to 0.054 (White) and 0.082 (Newey–West, 5 lags). HAC errors allow for heteroskedasticity and autocorrelation; they need not be larger in every sample.",
+                "incorrectExplanation": "Newey–West changes only the estimated variance of the coefficients; the OLS point estimate and the sample are the same."
             },
             "ro": {
                 "title": "Erori Newey–West",
-                "text": "În regresia lunară a XLK pe piață (1999–2026), eroarea standard Newey–West a lui beta este aproximativ dublă față de cea clasică. De ce?",
+                "text": "În regresia lunară a XLK pe piață (1999–2026), ce se schimbă cînd erorile standard clasice sînt înlocuite cu erori Newey–West?",
                 "options": [
-                    "Pentru că OLS dă un beta deplasat cînd randamentele au cozi groase",
-                    "Pentru că eșantionul este prea scurt pentru erorile OLS",
-                    "Pentru că Newey–West schimbă chiar estimația lui beta",
-                    "Pentru că varianța reziduurilor urmează volatilitatea pieței"
+                    "Estimația OLS a lui beta, care devine robustă la cozi groase",
+                    "Matricea de covarianță estimată a coeficienților, nu beta OLS",
+                    "Atît beta, cît și eroarea lui standard, în aceeași proporție",
+                    "Eșantionul, pentru că primele laguri sînt eliminate"
                 ],
-                "correctExplanation": "Newey–West păstrează estimația OLS și îi corectează varianța pentru heteroscedasticitate și autocorelație; volatility clustering face erorile clasice prea mici.",
-                "incorrectExplanation": "Estimația punctuală este aceeași; se schimbă doar eroarea standard, pentru că reziduurile sînt heteroscedastice."
+                "correctExplanation": "Beta rămîne 1,277; eroarea standard trece de la 0,041 (clasică) la 0,054 (White) și 0,082 (Newey–West, 5 laguri). Erorile HAC țin cont de heteroscedasticitate și de autocorelație; ele nu sînt obligatoriu mai mari în orice eșantion.",
+                "incorrectExplanation": "Newey–West schimbă doar varianța estimată a coeficienților; estimația punctuală OLS și eșantionul rămîn aceleași."
             }
         },
         {
@@ -149,24 +149,24 @@ window.MFM_DATA.quizzes['factors'] = {
                 "text": "Daily OLS betas of thinly traded Bucharest Stock Exchange stocks on the BET index are…",
                 "options": [
                     "Biased upwards, because illiquid stocks react with a lag",
-                    "Biased towards zero; a Dimson beta with lagged BET returns corrects most of it",
+                    "Biased towards zero; the Dimson sum b₋₁ + b₀ + b₊₁ recovers part of the lag",
                     "Unbiased, because OLS is unbiased whatever the trading frequency",
                     "Undefined on the days when a stock does not trade at all"
                 ],
                 "correctExplanation": "Stale prices spread the reaction to market news over several days. In the seminar the Dimson beta of Nuclearelectrica rises from 0.80 to 0.94 and that of Digi from 0.67 to 0.75.",
-                "incorrectExplanation": "A stock that trades late reacts to today's market move tomorrow, so the contemporaneous covariance understates its beta; sum the lead and lag slopes."
+                "incorrectExplanation": "A stock that trades late reacts to today's market move tomorrow, so the contemporaneous covariance understates its beta; the Dimson beta adds the lagged, contemporaneous and leading slopes, b₋₁ + b₀ + b₊₁."
             },
             "ro": {
                 "title": "Tranzacționare asincronă",
                 "text": "Valorile beta OLS zilnice ale acțiunilor puțin lichide de la Bursa de Valori București față de indicele BET sînt…",
                 "options": [
                     "Deplasate în sus, pentru că acțiunile puțin lichide reacționează cu întîrziere",
-                    "Deplasate spre zero; beta Dimson, cu randamente BET întîrziate, corectează mare parte",
+                    "Deplasate spre zero; suma Dimson b₋₁ + b₀ + b₊₁ recuperează o parte a întîrzierii",
                     "Nedeplasate, pentru că OLS este nedeplasat la orice frecvență de tranzacționare",
                     "Nedefinite în zilele în care acțiunea nu se tranzacționează deloc"
                 ],
                 "correctExplanation": "Prețurile stale (neactualizate) distribuie reacția la știrile pieței pe mai multe zile. În seminar, beta Dimson al Nuclearelectrica crește de la 0,80 la 0,94, iar al Digi de la 0,67 la 0,75.",
-                "incorrectExplanation": "O acțiune care se tranzacționează cu întîrziere reacționează mîine la mișcarea de azi a pieței, deci covarianța contemporană subestimează beta; adunați pantele anticipate și întîrziate."
+                "incorrectExplanation": "O acțiune care se tranzacționează cu întîrziere reacționează mîine la mișcarea de azi a pieței, deci covarianța contemporană subestimează beta; beta Dimson adună panta întîrziată, cea contemporană și cea anticipată, b₋₁ + b₀ + b₊₁."
             }
         },
         {
@@ -180,7 +180,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "That the Shanken standard errors are too small",
                     "A wrong model, or betas too close together to identify λ"
                 ],
-                "correctExplanation": "A traded factor prices itself, so λ should equal E[f]. Market betas span only 0.86–1.42 on the 25 portfolios, so the intercept absorbs the level and λ_m is weakly identified.",
+                "correctExplanation": "A traded factor prices itself, so in a correct model λ equals E[f]. In FF3 the market betas span only 0.89–1.14 on the 25 portfolios, so the slope on them is imprecise and the intercept absorbs the level of returns: λ_m is weakly identified.",
                 "incorrectExplanation": "The gap is a diagnostic about the model and the test assets, not about the factor mean or the standard errors."
             },
             "ro": {
@@ -192,7 +192,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Că erorile standard Shanken sînt prea mici pentru acest eșantion",
                     "Un model greșit sau valori beta prea apropiate pentru a identifica λ"
                 ],
-                "correctExplanation": "Un factor tranzacționat se evaluează pe sine, deci λ ar trebui să fie egal cu E[f]. Valorile beta de piață acoperă doar 0,86–1,42 pe cele 25 de portofolii, deci termenul liber absoarbe nivelul, iar λ_m este slab identificat.",
+                "correctExplanation": "Un factor tranzacționat se evaluează pe sine, deci, într-un model corect, λ este egal cu E[f]. În FF3, valorile beta de piață acoperă doar 0,89–1,14 pe cele 25 de portofolii, deci panta pe ele este imprecisă, iar termenul liber preia nivelul randamentelor: λ_m este slab identificat.",
                 "incorrectExplanation": "Diferența este un diagnostic despre model și activele de test, nu despre media factorului sau erorile standard."
             }
         },
@@ -227,27 +227,27 @@ window.MFM_DATA.quizzes['factors'] = {
             "correct": 2,
             "en": {
                 "title": "Low power",
-                "text": "The GRS test does not reject the CAPM on 9 US sector ETFs (p = 0.85) but rejects it strongly on the 25 size × B/M portfolios. Why?",
+                "text": "Over the same 331 months, the GRS test does not reject the CAPM on 9 US sector ETFs (p = 0.85) but rejects it on the 25 size × B/M portfolios (GRS = 2.91). What is the most plausible explanation of the contrast?",
                 "options": [
                     "Sector ETFs are priced more efficiently than size and value portfolios",
                     "The CAPM holds for sectors but not for small value stocks",
                     "Sectors barely spread size and value, so the test has little power",
-                    "The sector sample is longer, so its test is more reliable"
+                    "The sector test uses a longer sample, so its result is more reliable"
                 ],
                 "correctExplanation": "Test assets must spread the characteristics that carry premia; sectors mix small and big, value and growth stocks. Not rejecting is weak evidence.",
-                "incorrectExplanation": "Failing to reject is not evidence that the CAPM holds; the sector test simply lacks power."
+                "incorrectExplanation": "Both tests use the same months. Not rejecting does not confirm the CAPM; the sectors are not built to contrast the characteristics that the CAPM fails to price."
             },
             "ro": {
                 "title": "Putere redusă",
-                "text": "Testul GRS nu respinge CAPM pe 9 ETF-uri sectoriale din SUA (p = 0,85), dar îl respinge categoric pe cele 25 de portofolii mărime × B/M. De ce?",
+                "text": "Pe aceleași 331 de luni, testul GRS nu respinge CAPM pe 9 ETF-uri sectoriale din SUA (p = 0,85), dar îl respinge pe cele 25 de portofolii mărime × B/M (GRS = 2,91). Care este explicația cea mai plauzibilă a contrastului?",
                 "options": [
                     "ETF-urile sectoriale sînt evaluate mai eficient decît portofoliile pe mărime și valoare",
                     "CAPM este valabil pentru sectoare, dar nu și pentru firmele mici de valoare",
                     "Sectoarele aproape nu diferă după mărime și valoare, deci testul are putere mică",
-                    "Eșantionul sectorial este mai lung, deci testul lui este mai sigur"
+                    "Testul pe sectoare folosește un eșantion mai lung, deci rezultatul lui este mai sigur"
                 ],
                 "correctExplanation": "Activele de test trebuie să aibă dispersie mare în caracteristicile care aduc o primă; sectoarele combină firme mici și mari, de valoare și de creștere. Nerespingerea este o dovadă slabă.",
-                "incorrectExplanation": "Nerespingerea nu este o dovadă că CAPM este adevărat; testul pe sectoare are putere mică."
+                "incorrectExplanation": "Ambele teste folosesc aceleași luni. Nerespingerea nu confirmă CAPM; sectoarele nu sînt construite pentru a contrasta caracteristicile pe care CAPM nu le evaluează."
             }
         },
         {
@@ -288,8 +288,8 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Long the market portfolio and short the risk-free asset",
                     "Long small stocks and short big stocks, with equal weights"
                 ],
-                "correctExplanation": "r_BAB = (R_L − R_f)/β_L − (R_H − R_f)/β_H: each leg is scaled to beta one, so the difference is market-neutral.",
-                "incorrectExplanation": "BAB buys low beta and sells high beta, scaled to a zero beta; it is not a size or market portfolio."
+                "correctExplanation": "r_BAB = (R_L − R_f)/β_L − (R_H − R_f)/β_H: each of the two portfolios is rescaled to beta one, so the long-minus-short difference has an estimated beta of zero.",
+                "incorrectExplanation": "r_BAB = (R_L − R_f)/β_L − (R_H − R_f)/β_H: each of the two portfolios is rescaled to beta one, so the long-minus-short difference has an estimated beta of zero."
             },
             "ro": {
                 "title": "Betting against beta",
@@ -300,8 +300,8 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Long portofoliul pieței și short activul fără risc",
                     "Long firme mici și short firme mari, cu ponderi egale"
                 ],
-                "correctExplanation": "r_BAB = (R_L − R_f)/β_L − (R_H − R_f)/β_H: fiecare parte este scalată la beta unu, deci diferența este neutră față de piață.",
-                "incorrectExplanation": "BAB cumpără beta mic și vinde beta mare, scalate la beta zero; nu este un portofoliu de mărime sau de piață."
+                "correctExplanation": "r_BAB = (R_L − R_f)/β_L − (R_H − R_f)/β_H: fiecare dintre cele două portofolii este redimensionat la beta unu, deci diferența long minus short are beta estimat zero.",
+                "incorrectExplanation": "r_BAB = (R_L − R_f)/β_L − (R_H − R_f)/β_H: fiecare dintre cele două portofolii este redimensionat la beta unu, deci diferența long minus short are beta estimat zero."
             }
         },
         {
@@ -332,7 +332,7 @@ window.MFM_DATA.quizzes['factors'] = {
             }
         },
         {
-            "correct": 2,
+            "correct": 1,
             "en": {
                 "title": "Fama–MacBeth",
                 "text": "In the second pass of a Fama–MacBeth regression, what is estimated?",
@@ -559,7 +559,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Negative loadings on the factor in the ETF's name"
                 ],
                 "correctExplanation": "MTUM had alpha −0.2% (t = −0.11) and a MOM loading of 0.36; VLUE loads 0.34 on HML. No evidence of skill beyond factor exposure.",
-                "incorrectExplanation": "The alphas were not statistically distinguishable from zero, and the market betas ranged from 0.74 to 1.04."
+                "incorrectExplanation": "For these two funds the alphas are not distinguishable from zero; their market betas are 1.034 (MTUM) and 0.983 (VLUE)."
             },
             "ro": {
                 "title": "ETF-uri factoriale",
@@ -567,11 +567,11 @@ window.MFM_DATA.quizzes['factors'] = {
                 "options": [
                     "Valori alfa mari și pozitive, de circa 5% pe an",
                     "Beta de piață aproape de zero pentru toate ETF-urile",
-                    "Alfa aproape de zero; loadings corespund denumirilor",
-                    "Loadings negative pe factorul din numele ETF-ului"
+                    "Alfa aproape de zero; expunerile corespund denumirilor",
+                    "Expuneri negative pe factorul din numele ETF-ului"
                 ],
                 "correctExplanation": "MTUM a avut alfa −0,2% (t = −0,11) și loading pe MOM 0,36; VLUE are loading 0,34 pe HML. Nicio dovadă de abilitate dincolo de expunerea factorială.",
-                "incorrectExplanation": "Valorile alfa nu s-au distins statistic de zero, iar beta de piață a variat între 0,74 și 1,04."
+                "incorrectExplanation": "Pentru aceste două fonduri, valorile alfa nu se disting de zero; beta lor de piață este 1,034 (MTUM) și 0,983 (VLUE)."
             }
         },
         {
@@ -664,7 +664,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "They are all zero: beta explains the whole average excess return",
                     "They are all positive, equal to the market risk premium",
                     "They are equal to the risk-free rate",
-                    "They are proportional to beta"
+                    "For an asset with beta one, alpha must be positive"
                 ],
                 "correctExplanation": "The CAPM, E[R_i] − R_f = β_i (E[R_m] − R_f), has no intercept; testing the CAPM is testing α_i = 0 for every asset, jointly with the GRS test.",
                 "incorrectExplanation": "The CAPM equation has no intercept, so every asset lies on the SML and every alpha is zero."
@@ -676,7 +676,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Sînt toate zero: beta explică tot randamentul mediu în exces",
                     "Sînt toate pozitive, egale cu prima de risc a pieței",
                     "Sînt egale cu rata fără risc",
-                    "Sînt proporționale cu beta"
+                    "Pentru un activ cu beta unu, alfa este obligatoriu pozitiv"
                 ],
                 "correctExplanation": "Ecuația CAPM, E[R_i] − R_f = β_i (E[R_m] − R_f), nu are termen liber; a testa CAPM înseamnă a testa α_i = 0 pentru toate activele, simultan, cu testul GRS.",
                 "incorrectExplanation": "Ecuația CAPM nu are termen liber, deci orice activ se află pe SML și orice alfa este zero."
@@ -686,27 +686,27 @@ window.MFM_DATA.quizzes['factors'] = {
             "correct": 1,
             "en": {
                 "title": "Why everyone wants alpha",
-                "text": "A fund earned 12% a year with beta 1.3, while the market earned 10% and the risk-free rate was 2%. What is its alpha, and is it worth a high fee?",
+                "text": "Over the same period, a fund earned on average 12% a year with beta 1.3, the market 10% and the risk-free rate 2% (arithmetic means). By how many percentage points did the fund beat its beta-adjusted benchmark?",
                 "options": [
-                    "+2%: the fund beat the market, so the fee is justified",
-                    "−0.4%: its beta alone would have paid 12.4%",
-                    "+10%: it earned 10 points above the risk-free rate",
-                    "0%: alpha is always zero for a diversified fund"
+                    "+2 points: the fund beat the market",
+                    "−0.4 points: its beta alone would have earned 12.4%",
+                    "+10 points: it earned 10 points above the risk-free rate",
+                    "0 points: alpha is always zero for a diversified fund"
                 ],
-                "correctExplanation": "α = 12 − 2 − 1.3 × (10 − 2) = −0.4%. Beta can be bought cheaply with an index ETF (with leverage for β > 1); only alpha deserves an active fee.",
+                "correctExplanation": "α = 12 − 2 − 1.3 × (10 − 2) = −0.4 points. Market exposure can be obtained at low cost through an index fund (with leverage for β > 1), so an active fee has to be justified by alpha, not by beating the market.",
                 "incorrectExplanation": "Beating the market is not alpha: subtract the return the fund's beta would have earned, 2 + 1.3 × 8 = 12.4%."
             },
             "ro": {
                 "title": "De ce vrea toată lumea alfa",
-                "text": "Un fond a cîștigat 12% pe an, cu beta 1,3, în timp ce piața a cîștigat 10%, iar rata fără risc a fost 2%. Cît este alfa fondului și merită el un comision mare?",
+                "text": "Pe aceeași perioadă, un fond a obținut în medie 12% pe an, cu beta 1,3, piața 10%, iar rata fără risc 2% (medii aritmetice). Cu cîte puncte procentuale a depășit fondul reperul ajustat la beta?",
                 "options": [
-                    "+2%: fondul a bătut piața, deci comisionul este justificat",
-                    "−0,4%: doar beta lui ar fi adus 12,4%",
-                    "+10%: a cîștigat cu 10 puncte peste rata fără risc",
-                    "0%: alfa este mereu zero pentru un fond diversificat"
+                    "+2 puncte: fondul a depășit piața",
+                    "−0,4 puncte: doar beta lui ar fi adus 12,4%",
+                    "+10 puncte: a cîștigat 10 puncte peste rata fără risc",
+                    "0 puncte: alfa este mereu zero pentru un fond diversificat"
                 ],
-                "correctExplanation": "α = 12 − 2 − 1,3 × (10 − 2) = −0,4%. Beta se poate cumpăra ieftin, printr-un ETF pe indice (cu levier pentru β > 1); doar alfa justifică un comision de administrare activă.",
-                "incorrectExplanation": "A bate piața nu înseamnă alfa: scădeți randamentul pe care l-ar fi adus beta fondului, 2 + 1,3 × 8 = 12,4%."
+                "correctExplanation": "α = 12 − 2 − 1,3 × (10 − 2) = −0,4 puncte. Expunerea la piață se poate obține cu costuri reduse printr-un fond indexat (cu levier pentru β > 1), deci un comision de administrare activă trebuie justificat prin alfa, nu prin depășirea pieței.",
+                "incorrectExplanation": "Depășirea pieței nu înseamnă alfa: scădeți randamentul pe care l-ar fi adus beta fondului, 2 + 1,3 × 8 = 12,4%."
             }
         }
     ]
