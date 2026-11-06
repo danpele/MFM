@@ -308,11 +308,12 @@ function sharpeTest() {
     }
   }
   const d = stDraws.slice(0, M), q = [...d].sort((x, y) => x - y), lo = q[Math.floor(0.025 * (M - 1))], hi = q[Math.ceil(0.975 * (M - 1))];
-  plot('st-chart', [{ x: d, type: 'histogram', xbins: { start: -1.5, end: 1.5, size: 0.04 }, name: 'Bootstrap draws', marker: { color: SCOL[s], line: { color: '#fff', width: 1 } }, hovertemplate: '%{x}: %{y}<extra></extra>' }],
+  plot('st-chart', [{ x: d, type: 'histogram', xbins: { start: -1.5, end: 1.5, size: 0.04 }, name: 'Bootstrap draws', marker: { color: SCOL[s], line: { color: '#fff', width: 1 } },
+    hovertemplate: `%{x}: %{y}<br>p HAC ${nf(R.p_hac, 2)}, Holm ${nf(R.p_holm, 2)}<br>p bootstrap ${nf(R.p_boot, 2)}, Holm ${nf(R.p_holm_boot, 2)}<extra></extra>` }],
     layout({ bargap: 0, showlegend: false, title: ttl(`${u}: ${s} minus 1/N, circular blocks of ${b} months, ${M} draws`), shapes: [vline(obs, C.red), vline(lo, C.navy, 'dash'), vline(hi, C.navy, 'dash')],
       annotations: [{ x: obs, y: 1, yref: 'paper', text: 'observed ' + nf(obs, 2), showarrow: false, xanchor: 'left', font: { color: C.red } }],
       xaxis: AX('Δ* − Δ (difference of annualised Sharpe ratios)', { range: [-1.2, 1.2] }), yaxis: AX('Draws') }));
-  out('st-out', [T.st(nf(obs, 2), nf(lo, 2), nf(hi, 2), nf(R.p_hac, 2), nf(R.p_boot, 2))]);
+  out('st-out', [T.st(nf(obs, 2), nf(lo, 2), nf(hi, 2), nf(R.p_hac, 2), nf(R.p_boot, 2), nf(R.p_holm, 2), nf(R.p_holm_boot, 2))]);
 }
 
 // ================================================================= BVB

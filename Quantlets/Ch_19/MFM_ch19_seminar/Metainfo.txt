@@ -12,4 +12,4 @@ Submitted: 'Tuesday, 22 September 2026'
 
 Datafile: 'Daily market data (course data): BET index (official closing values), Bitcoin, SPY'
 
-Output: 'ch19_sem_a11_kurtosis.pdf, ch19_sem_a1_power.pdf, ch19_sem_a2_pvalues.pdf, ch19_sem_a5_forecast.pdf, ch19_sem_b1_hill.pdf, ch19_sem_b2_profile.pdf, ch19_sem_b3_breaches.pdf, ch19_sem_b4_lookahead.pdf'
+Output: 'ch19_sem_a11_kurtosis.pdf, ch19_sem_a1_power.pdf, ch19_sem_a2_pvalues.pdf, ch19_sem_a5_forecast.pdf, ch19_sem_b1_hill.pdf, ch19_sem_b2_profile.pdf, ch19_sem_b3_breaches.pdf, ch19_sem_b4_lookahead.pdf, ch19_results.json, ch19_forecasts_bet.csv'

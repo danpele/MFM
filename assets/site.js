@@ -503,6 +503,30 @@
     // ------------------------------------------------------------
     // INIT
     // ------------------------------------------------------------
+    // left sidebar with the page sections (wide screens): built from the visible <section id> headings, current one highlighted
+    function renderSideToc() {
+        const main = document.querySelector('main');
+        if (!main || main.querySelector('.side-toc')) return;
+        const secs = [...main.querySelectorAll(':scope > section[id]')].filter(s => !s.hidden && s.querySelector('h2'));
+        if (secs.length < 3) return;
+        const txt = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        const aside = document.createElement('aside');
+        aside.className = 'side-toc';
+        aside.setAttribute('aria-label', LANG === 'ro' ? 'Secțiunile paginii' : 'Page sections');
+        aside.innerHTML = `<p class="side-toc-h">${LANG === 'ro' ? 'Pe această pagină' : 'On this page'}</p><ol>` +
+            secs.map(s => `<li><a href="#${s.id}">${txt(s.querySelector('h2').textContent.trim())}</a></li>`).join('') + '</ol>';
+        main.prepend(aside);
+        main.classList.add('with-side-toc');
+        const links = [...aside.querySelectorAll('a')];
+        const mark = () => {
+            let cur = secs[0];
+            for (const s of secs) if (!s.hidden && s.getBoundingClientRect().top < 200) cur = s;
+            links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + cur.id));
+        };
+        window.addEventListener('scroll', mark, { passive: true });
+        mark();
+    }
+
     function init() {
         renderStatic();
         renderOverview();
@@ -521,6 +545,7 @@
         renderQuizTabs();
         const first = D.chapters.find(c => D.quizzes[c.id]) || D.chapters[0];
         showQuiz(first.id);
+        renderSideToc();
         typeset();
     }
 

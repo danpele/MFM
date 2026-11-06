@@ -16,7 +16,7 @@ window.CH4_TEXT = {
  ow: (d, c, s, v, e) => `Up to ${d}, with ${c} bp: the highest Sharpe ratio is ${s} (${v}); 1/N has ${e}.`,
  os: (y, e, s, v) => `Sectors, evaluation from ${y}: the highest Sharpe ratio is ${s} (${v}); 1/N has ${e}.`,
  co: (c, s, v, e) => `At ${c} bp: the highest net Sharpe ratio is ${s} (${v}); 1/N has ${e}.`,
- st: (o, lo, hi, ph, pb) => `Observed difference: ${o}. 95% interval of the centred draws: [${lo}, ${hi}]. In the lecture: p = ${ph} (HAC), p = ${pb} (studentized bootstrap).`,
+ st: (o, lo, hi, ph, pb, hh, hb) => `Observed difference: ${o}. 95% interval of the centred draws: [${lo}, ${hi}]. In the lecture: p = ${ph} (HAC), p = ${pb} (studentized bootstrap). Holm-adjusted over all 18 tests: ${hh} (HAC), ${hb} (bootstrap).`,
  bv: (d, s, v, b) => `Up to ${d}: the highest Sharpe ratio is ${s} (${v}); BET-TR has ${b}.`,
  vmU: { 'Sectors': 'Sectors', 'Multi-asset': 'Multi-asset', 'Combined': 'Combined', 'BVB': 'BVB' },
  vm: (u, c, a, b, f, be) => `${u}, ${c} bp per unit of turnover: net Sharpe CMV ${a}, UMV ${b}, CFW ${f}. The CMV advantage over UMV disappears at ${be} bp.`

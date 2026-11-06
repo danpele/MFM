@@ -16,7 +16,7 @@ window.CH4_TEXT = {
  ow: (d, c, s, v, e) => `Pînă în ${d}, cu ${c} bp: cel mai mare raport Sharpe îl are ${s} (${v}); 1/N are ${e}.`,
  os: (y, e, s, v) => `Sectoare, evaluare din ${y}: cel mai mare raport Sharpe îl are ${s} (${v}); 1/N are ${e}.`,
  co: (c, s, v, e) => `La ${c} bp: cel mai mare raport Sharpe net îl are ${s} (${v}); 1/N are ${e}.`,
- st: (o, lo, hi, ph, pb) => `Diferența observată: ${o}. Intervalul de 95% al extragerilor centrate: [${lo}; ${hi}]. În curs: p = ${ph} (HAC), p = ${pb} (bootstrap studentizat).`,
+ st: (o, lo, hi, ph, pb, hh, hb) => `Diferența observată: ${o}. Intervalul de 95% al extragerilor centrate: [${lo}; ${hi}]. În curs: p = ${ph} (HAC), p = ${pb} (bootstrap studentizat). Ajustate Holm pe toate cele 18 teste: ${hh} (HAC), ${hb} (bootstrap).`,
  bv: (d, s, v, b) => `Pînă în ${d}: cel mai mare raport Sharpe îl are ${s} (${v}); BET-TR are ${b}.`,
  vmU: { 'Sectors': 'Sectoare', 'Multi-asset': 'Multi-active', 'Combined': 'Combinat', 'BVB': 'BVB' },
  vm: (u, c, a, b, f, be) => `${u}, ${c} bp pe unitate de turnover: Sharpe net CMV ${a}, UMV ${b}, CFW ${f}. Avantajul CMV față de UMV dispare la ${be} bp.`

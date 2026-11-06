@@ -91,6 +91,11 @@ def main():
     d['rolling'] = dict(dates=ym(W['MV'].index), MV=r(W['MV'].values, 4), GMV_LW=r(W['GMV-LW'].values, 4))
     d['tests'] = {u: {s: {k: v[k] for k in ('diff', 'se_hac', 'p_hac', 'p_boot', 'ci_boot', 'block', 't_obs', 'z_star')}
                       for s, v in tv.items()} for u, tv in res['sharpe_tests'].items()}
+    # Holm-adjusted p-values over the family of all 18 rule-vs-1/N tests (the Holm column of the lecture tables)
+    for u, tv in d['tests'].items():
+        for s, v in tv.items():
+            v['p_holm'] = res['holm']['p_hac'][f'{u}: {s}']
+            v['p_holm_boot'] = res['holm']['p_boot'][f'{u}: {s}']
 
     # BVB blue chips against BET-TR
     ret, to, W, bench, removed, m = g.bvb_backtest()
