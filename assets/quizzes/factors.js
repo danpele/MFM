@@ -231,10 +231,10 @@ window.MFM_DATA.quizzes['factors'] = {
                 "options": [
                     "Sector ETFs are priced more efficiently than size and value portfolios",
                     "The CAPM holds for sectors but not for small value stocks",
-                    "Sectors barely spread size and value, so the test has little power",
+                    "These sectors may separate size and value exposures less sharply, which can reduce power against such alternatives",
                     "The sector test uses a longer sample, so its result is more reliable"
                 ],
-                "correctExplanation": "Test assets must spread the characteristics that carry premia; sectors mix small and big, value and growth stocks. Not rejecting is weak evidence.",
+                "correctExplanation": "Test assets must spread the characteristics that carry premia; forming portfolios by sector imposes no size or B/M contrast comparable with the 5×5 sort. Not rejecting is weak evidence.",
                 "incorrectExplanation": "Both tests use the same months. Not rejecting does not confirm the CAPM; the sectors are not built to contrast the characteristics that the CAPM fails to price."
             },
             "ro": {
@@ -243,10 +243,10 @@ window.MFM_DATA.quizzes['factors'] = {
                 "options": [
                     "ETF-urile sectoriale sînt evaluate mai eficient decît portofoliile pe mărime și valoare",
                     "CAPM este valabil pentru sectoare, dar nu și pentru firmele mici de valoare",
-                    "Sectoarele aproape nu diferă după mărime și valoare, deci testul are putere mică",
+                    "Aceste sectoare pot separa mai slab expunerile de mărime și valoare, ceea ce poate reduce puterea față de asemenea alternative",
                     "Testul pe sectoare folosește un eșantion mai lung, deci rezultatul lui este mai sigur"
                 ],
-                "correctExplanation": "Activele de test trebuie să aibă dispersie mare în caracteristicile care aduc o primă; sectoarele combină firme mici și mari, de valoare și de creștere. Nerespingerea este o dovadă slabă.",
+                "correctExplanation": "Activele de test trebuie să aibă dispersie mare în caracteristicile care aduc o primă; formarea după sector nu impune un contrast de capitalizare sau B/M comparabil cu sortarea 5×5. Nerespingerea este o dovadă slabă.",
                 "incorrectExplanation": "Ambele teste folosesc aceleași luni. Nerespingerea nu confirmă CAPM; sectoarele nu sînt construite pentru a contrasta caracteristicile pe care CAPM nu le evaluează."
             }
         },
@@ -639,7 +639,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "The average excess return that beta does not explain",
                     "The market risk premium E[R_m] − R_f"
                 ],
-                "correctExplanation": "Taking means, α_i = E[R_i] − R_f − β_i (E[R_m] − R_f): the asset's vertical distance from the SML.",
+                "correctExplanation": "Taking means, αᵢ = E[Rᵢ − R_f] − βᵢ E[R_m − R_f], with the time-varying monthly rate inside the expectations: the asset's vertical distance from the SML.",
                 "incorrectExplanation": "Beta is the sensitivity and ε the asset-specific shock; alpha is the part of the average excess return left once beta is priced."
             },
             "ro": {
@@ -651,7 +651,7 @@ window.MFM_DATA.quizzes['factors'] = {
                     "Randamentul mediu în exces pe care beta nu îl explică",
                     "Prima de risc a pieței, E[R_m] − R_f"
                 ],
-                "correctExplanation": "În medie, α_i = E[R_i] − R_f − β_i (E[R_m] − R_f): distanța pe verticală a activului față de SML.",
+                "correctExplanation": "În medie, αᵢ = E[Rᵢ − R_f] − βᵢ E[R_m − R_f], cu rata lunară variabilă în interiorul mediilor: distanța pe verticală a activului față de SML.",
                 "incorrectExplanation": "Beta este sensibilitatea, iar ε este șocul specific activului; alfa este ce rămîne din randamentul mediu în exces după ce ținem cont de beta."
             }
         },
@@ -707,6 +707,33 @@ window.MFM_DATA.quizzes['factors'] = {
                 ],
                 "correctExplanation": "α = 12 − 2 − 1,3 × (10 − 2) = −0,4 puncte. Expunerea la piață se poate obține cu costuri reduse printr-un fond indexat (cu levier pentru β > 1), deci un comision de administrare activă trebuie justificat prin alfa, nu prin depășirea pieței.",
                 "incorrectExplanation": "Depășirea pieței nu înseamnă alfa: scădeți randamentul pe care l-ar fi adus beta fondului, 2 + 1,3 × 8 = 12,4%."
+            }
+        },
+        {
+            "correct": 1,
+            "en": {
+                "title": "Replication of factors",
+                "text": "Jensen, Kelly and Pedersen (2023) re-examine factors from the literature. What do the figures 82.4% and 47% in the lecture measure?",
+                "options": [
+                    "82.4% of all published factors are false, and 47% of them have negative alphas",
+                    "82.4% is the share of the 119 originally significant factors whose CAPM alpha replicates; 47% is the average fall of alpha after the original sample",
+                    "82.4% is the average R² of the factor models; 47% is the share of factors with t > 3",
+                    "Both are shares of factors rejected by Bonferroni"
+                ],
+                "correctExplanation": "For 98 of the 119 originally significant factors (82.4%), the CAPM alpha is reproduced; separately, alpha falls on average by 47% after the original sample. The two numbers answer different questions.",
+                "incorrectExplanation": "The first number is a replication rate among originally significant results, the second an average decay of alpha out of sample."
+            },
+            "ro": {
+                "title": "Replicarea factorilor",
+                "text": "Jensen, Kelly și Pedersen (2023) reexaminează factorii din literatură. Ce măsoară cifrele de 82,4% și 47% din curs?",
+                "options": [
+                    "82,4% dintre toți factorii publicați sînt falși, iar 47% dintre ei au alfa negativ",
+                    "82,4% este proporția celor 119 factori inițial semnificativi al căror alfa CAPM se reproduce; 47% este scăderea medie a lui alfa după eșantionul inițial",
+                    "82,4% este R² mediu al modelelor factoriale; 47% este proporția factorilor cu t > 3",
+                    "Ambele sînt proporții de factori respinși de Bonferroni"
+                ],
+                "correctExplanation": "Pentru 98 dintre cei 119 factori inițial semnificativi (82,4%), alfa CAPM se reproduce; separat, alfa scade în medie cu 47% după eșantionul inițial. Cele două cifre răspund la întrebări diferite.",
+                "incorrectExplanation": "Prima cifră este o rată de replicare printre rezultatele inițial semnificative, a doua o scădere medie a lui alfa în afara eșantionului."
             }
         }
     ]
