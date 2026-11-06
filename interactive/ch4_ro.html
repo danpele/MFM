@@ -9,9 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css?v=20261016e">
-<link rel="stylesheet" href="interactive.css?v=20261030b">
+<link rel="stylesheet" href="interactive.css?v=20261101a">
 <script>window.MFM_LANG = 'ro';</script>
-<link rel="preload" as="script" href="ch4.js?v=20261030b">
+<link rel="preload" as="script" href="ch4.js?v=20261101a">
 <script>
 (function (early, page, rest) {
   'use strict';
@@ -34,7 +34,7 @@
   early.forEach(src => add(src, 0, r => { ok = ok && r; left--; go(); }, false));
   if (!parsed) document.addEventListener('DOMContentLoaded', () => { parsed = true; go(); });
   go();
-})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "ch4_data.js?v=20261030b", "ch4_text_ro.js?v=20261030b", "common.js?v=20261030b"], "ch4.js?v=20261030b", []);
+})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "ch4_data.js?v=20261101a", "ch4_text_ro.js?v=20261101a", "common.js?v=20261101a"], "ch4.js?v=20261101a", []);
 </script>
 </head>
 <body>
@@ -83,7 +83,7 @@
     <div class="live"><div class="ctls"><div class="ctl"><label for="ee-T">Lungimea eșantionului (luni)</label><select id="ee-T"><option value="36">36</option><option value="60" selected>60</option><option value="120">120</option><option value="240">240</option></select></div><div class="ctl"><label for="ee-k">Eșantioane desenate: <b id="ee-k-v"></b></label><input type="range" id="ee-k" min="1" max="25" step="1" value="25"></div><button class="btn play" id="ee-play" type="button"></button><button class="btn" id="ee-new" type="button">Alte eșantioane</button></div><div class="charts "><div class="chart" id="ee-chart"></div><div class="chart" id="ee-hist"></div></div><ul class="out" id="ee-out"></ul></div>
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Cu 60 de luni de date, cît de des depășește portofoliul tangent estimat regula 1/N?</div>
-  <details><summary>Răspuns</summary><p>În aproximativ 4% dintre eșantioane. În simularea din pagină, 18 dintre cele 500 de portofolii (3,6%) depășesc 1/N; în cea din curs, cu 2.000 de portofolii, 4%. Mediana raportului Sharpe evaluat cu parametrii adevărați este 0,30, față de 0,54 pentru 1/N. Mediana raportului Sharpe estimat în eșantion este 1,51 în pagină și 1,56 în curs.</p></details>
+  <details><summary>Răspuns</summary><p>În aproximativ 4% dintre eșantioane. În simularea din pagină, 18 dintre cele 500 de portofolii (3,6%) depășesc 1/N; în cea din curs, cu 2.000 de portofolii, 4%. Mediana raportului Sharpe evaluat cu parametrii adevărați este 0,30, față de 0,54 pentru 1/N. Raportul Sharpe estimat în eșantion are mediana 1,51 în pagină; în curs, mediana valorii lui absolute, |θ̂|, este 1,56.</p></details>
 </section>
 <section class="blk" id="rolling-weights">
   <h3>Ponderi instabile</h3>
