@@ -301,3 +301,6 @@ window.MFMI = { LANG, C, dot, mv, quad, scale, sum, sub, solve, chol, eigSym, co
   ercStep, wERC, riskContrib, frontierUnc, leaves, hrpLevels, rng, sampleMoments, median, mean, sdev, sharpe, nf, pct, $, AX, layout, ttl, CFG, plot, out,
   vline, hline, Player, range, predict, exitTicket };
 })();
+
+// left-hand menu on every page (assets/sidemenu.js)
+;(function () { var c = document.currentScript; if (!c || !c.src) return; var e = document.createElement('script'); e.src = new URL('../assets/sidemenu.js?v=20261108a', c.src).href; document.head.appendChild(e); })();

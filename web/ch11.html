@@ -17,7 +17,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
   startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => { document.body.setAttribute('data-mj', 'done'); window.dispatchEvent(new Event('mfm-mathjax')); }) } };</script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
 <link rel="preload" as="script" href="../interactive/ch11.js?v=20261105a">
-<link rel="preload" as="script" href="web.js?v=20261105a">
+<link rel="preload" as="script" href="web.js?v=20261108s">
 <script>
 (function (early, page, rest) {
   'use strict';
@@ -40,7 +40,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\
   early.forEach(src => add(src, 0, r => { ok = ok && r; left--; go(); }, false));
   if (!parsed) document.addEventListener('DOMContentLoaded', () => { parsed = true; go(); });
   go();
-})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "../interactive/ch11_data.js?v=20261105a", "../interactive/ch11_text_en.js?v=20261105a", "../interactive/common.js?v=20261105a"], "../interactive/ch11.js?v=20261105a", ["web.js?v=20261105a"]);
+})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "../interactive/ch11_data.js?v=20261105a", "../interactive/ch11_text_en.js?v=20261105a", "../interactive/common.js?v=20261108s"], "../interactive/ch11.js?v=20261105a", ["web.js?v=20261108s"]);
 </script>
 </head>
 <body class="web">
