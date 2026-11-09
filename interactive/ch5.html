@@ -34,7 +34,7 @@
   early.forEach(src => add(src, 0, r => { ok = ok && r; left--; go(); }, false));
   if (!parsed) document.addEventListener('DOMContentLoaded', () => { parsed = true; go(); });
   go();
-})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "ch5_data.js?v=20261106c", "ch5_text_en.js?v=20261106c", "common.js?v=20261108s"], "ch5.js?v=20261106c", []);
+})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "ch5_data.js?v=20261106c", "ch5_text_en.js?v=20261106c", "common.js?v=20261109m"], "ch5.js?v=20261106c", []);
 </script>
 </head>
 <body>
@@ -66,9 +66,9 @@
   <details><summary>Answer</summary><p>In 62% of the cases. The threshold is exceeded on 105 days (1.6% of the days); with independent days, the probability would be 8%. The share is 54% for BET and 32% for Bitcoin.</p></details>
 </section>
 <section class="blk" id="acf">
-  <h3>The Sign Is Nearly Unpredictable, the Size Is Not</h3>
+  <h3>Predictability of the Sign and of the Size of Returns</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=7" target="_blank" rel="noopener"><img src="slides/ch5_acf_r_r2_en.jpg" alt="Slide 6: The Sign Is Nearly Unpredictable, the Size Is Not" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter5_garch_models.pdf#page=7" target="_blank" rel="noopener"><img src="slides/ch5_acf_r_r2_en.jpg" alt="Slide 6: Predictability of the Sign and of the Size of Returns" loading="lazy"></a>
       <figcaption>Slide 6</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ac-m">Series</label><select id="ac-m"><option value="sp500" selected>S&amp;P 500</option><option value="bet">BET</option><option value="bettr">BET-TR</option><option value="btc">Bitcoin</option><option value="gold">Gold (XAU/USD)</option></select></div><div class="ctl"><label for="ac-d">Power δ in |r|^δ: <b id="ac-d-v"></b></label><input type="range" id="ac-d" min="0.25" max="4" step="0.25" value="2"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-chart"></div></div><ul class="out" id="ac-out"></ul></div>
   </div>

@@ -34,7 +34,7 @@
   early.forEach(src => add(src, 0, r => { ok = ok && r; left--; go(); }, false));
   if (!parsed) document.addEventListener('DOMContentLoaded', () => { parsed = true; go(); });
   go();
-})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "ch15_data.js?v=20261106c", "ch15_text_en.js?v=20261106c", "common.js?v=20261108s"], "ch15.js?v=20261106c", []);
+})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "ch15_data.js?v=20261106c", "ch15_text_en.js?v=20261106c", "common.js?v=20261109m"], "ch15.js?v=20261106c", []);
 </script>
 </head>
 <body>
@@ -66,9 +66,9 @@
   <details><summary>Answer</summary><p>Below 10% for each word: 2 of the 106 sentences with "service" (1.9%), 7 of the 104 with "capital" (6.7%) and 3 of the 79 with "board" (3.8%). The sign of a word in the dictionary does not determine the label of the sentence. Nor would a word unrelated to tone give 50%: it would occur in negative sentences at the frequency of the negative class in the corpus, 12.5%.</p></details>
 </section><h2 class="sec" id="s-eval">Labelled Data and Evaluation</h2>
 <section class="blk" id="accuracy">
-  <h3>Eleven Classifiers, Two Data Sets: No Single Winner</h3>
+  <h3>Accuracy of Eleven Classifiers on Two Data Sets</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch15_accuracy_en.jpg" alt="Slide 14: Eleven Classifiers, Two Data Sets: No Single Winner" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch15_accuracy_en.jpg" alt="Slide 14: Accuracy of Eleven Classifiers on Two Data Sets" loading="lazy"></a>
       <figcaption>Slide 14</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ac-m">Metric</label><select id="ac-m"><option value="acc" selected>Accuracy</option><option value="f1">Macro-F1</option></select></div><div class="ctl"><label for="ac-a">PhraseBank: annotator agreement: <b id="ac-a-v"></b></label><input type="range" id="ac-a" min="0" max="3" step="1" value="0"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-pb"></div><div class="chart" id="ac-tw"></div></div><ul class="out" id="ac-out"></ul></div>
   </div>

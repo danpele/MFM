@@ -34,7 +34,7 @@
   early.forEach(src => add(src, 0, r => { ok = ok && r; left--; go(); }, false));
   if (!parsed) document.addEventListener('DOMContentLoaded', () => { parsed = true; go(); });
   go();
-})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "ch15_data.js?v=20261106c", "ch15_text_ro.js?v=20261106c", "common.js?v=20261108s"], "ch15.js?v=20261106c", []);
+})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "ch15_data.js?v=20261106c", "ch15_text_ro.js?v=20261106c", "common.js?v=20261109m"], "ch15.js?v=20261106c", []);
 </script>
 </head>
 <body>
@@ -66,9 +66,9 @@
   <details><summary>Răspuns</summary><p>Sub 10% pentru fiecare cuvînt: 2 din 106 propoziții cu „service” (1,9%), 7 din 104 cu „capital” (6,7%) și 3 din 79 cu „board” (3,8%). Semnul unui cuvînt în dicționar nu stabilește eticheta propoziției. Iar un cuvînt fără legătură cu tonul nu ar da 50%: el ar apărea în propoziții negative cu frecvența clasei negative din corpus, 12,5%.</p></details>
 </section><h2 class="sec" id="s-eval">Date etichetate și evaluare</h2>
 <section class="blk" id="accuracy">
-  <h3>Unsprezece clasificatori, două seturi de date: niciun cîștigător unic</h3>
+  <h3>Acuratețea celor unsprezece clasificatori pe două seturi de date</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch15_accuracy_ro.jpg" alt="Slide-ul 14: Unsprezece clasificatori, două seturi de date: niciun cîștigător unic" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch15_accuracy_ro.jpg" alt="Slide-ul 14: Acuratețea celor unsprezece clasificatori pe două seturi de date" loading="lazy"></a>
       <figcaption>Slide-ul 14</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ac-m">Metrica</label><select id="ac-m"><option value="acc" selected>Acuratețe</option><option value="f1">F1 macro</option></select></div><div class="ctl"><label for="ac-a">PhraseBank: acordul adnotatorilor: <b id="ac-a-v"></b></label><input type="range" id="ac-a" min="0" max="3" step="1" value="0"></div><button class="btn play" id="ac-play" type="button"></button></div><div class="charts "><div class="chart" id="ac-pb"></div><div class="chart" id="ac-tw"></div></div><ul class="out" id="ac-out"></ul></div>
   </div>

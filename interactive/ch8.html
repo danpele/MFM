@@ -34,7 +34,7 @@
   early.forEach(src => add(src, 0, r => { ok = ok && r; left--; go(); }, false));
   if (!parsed) document.addEventListener('DOMContentLoaded', () => { parsed = true; go(); });
   go();
-})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "ch8_data.js?v=20261106c", "ch8_text_en.js?v=20261106c", "common.js?v=20261108s"], "ch8.js?v=20261106c", []);
+})(["https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js", "ch8_data.js?v=20261106c", "ch8_text_en.js?v=20261106c", "common.js?v=20261109m"], "ch8.js?v=20261106c", []);
 </script>
 </head>
 <body>
@@ -116,9 +116,9 @@
   <details><summary>Answer</summary><p>No: LR_ind = 0.95, with p = 0.33. The estimate π̂₁₁ rests on only 3 pairs of consecutive breaches (n₁₁ = 3, n₁₀ = 38). On the whole 2007–2026 sample, the same test rejects independence for HS: LR_ind = 15.90, p &lt; 0.001.</p></details>
 </section>
 <section class="blk" id="var-pvalues">
-  <h3>All VaR Tests at a Glance</h3>
+  <h3>Summary of VaR Backtests</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=25" target="_blank" rel="noopener"><img src="slides/ch8_var_pvalues_en.jpg" alt="Slide 24: All VaR Tests at a Glance" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=25" target="_blank" rel="noopener"><img src="slides/ch8_var_pvalues_en.jpg" alt="Slide 24: Summary of VaR Backtests" loading="lazy"></a>
       <figcaption>Slide 24</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="vp-s">Significance level: <b id="vp-s-v"></b></label><input type="range" id="vp-s" min="0.01" max="0.1" step="0.005" value="0.05"></div><button class="btn play" id="vp-play" type="button"></button></div><div class="charts three"><div class="chart" id="vp-uc"></div><div class="chart" id="vp-cc"></div><div class="chart" id="vp-dur"></div></div><ul class="out" id="vp-out"></ul></div>
   </div>
@@ -156,9 +156,9 @@
   <details><summary>Answer</summary><p>The observed share of windows falling below the chosen threshold: a descriptive frequency over overlapping windows (neighbouring windows share 249 days), neither the probability of a false alarm nor the probability that the ES forecasts are wrong. The −0.70 threshold approximates the 5% critical value for T = 250 under many distributions (Acerbi–Szekely); the effective level depends on the forecast distributions. GARCH-t is below −1.8 in 3.0% of the windows; its minimum, −2.52, is in the window ending 05.02.2008.</p></details>
 </section>
 <section class="blk" id="es-pvalues">
-  <h3>All ES Tests at a Glance</h3>
+  <h3>Summary of ES Backtests</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch8_es_pvalues_en.jpg" alt="Slide 36: All ES Tests at a Glance" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=37" target="_blank" rel="noopener"><img src="slides/ch8_es_pvalues_en.jpg" alt="Slide 36: Summary of ES Backtests" loading="lazy"></a>
       <figcaption>Slide 36</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ep-k">Cell values</label><select id="ep-k"><option value="p" selected>p-value</option><option value="stat">test statistic</option></select></div><div class="ctl"><label for="ep-s">Significance level: <b id="ep-s-v"></b></label><input type="range" id="ep-s" min="0.01" max="0.1" step="0.005" value="0.05"></div><button class="btn play" id="ep-play" type="button"></button></div><div class="charts three"><div class="chart" id="ep-mf"></div><div class="chart" id="ep-z2"></div><div class="chart" id="ep-u"></div></div><ul class="out" id="ep-out"></ul></div>
   </div>
@@ -196,9 +196,9 @@
   <details><summary>Answer</summary><p>In this S&amp;P 500 comparison, Normal has a higher mean FZ0 loss than HS. DM = 2.88 exceeds the two-sided 1.96 threshold for an individual 5% test. This does not establish a general superiority of HS over models using the Normal distribution. The 13 significant comparisons out of 15 are individual results without a multiple-testing adjustment; the exceptions are Normal–Student-t (1.94) and FHS–GARCH-EVT (−1.24).</p></details>
 </section>
 <section class="blk" id="mcs">
-  <h3>Which Models Survive?</h3>
+  <h3>Models Retained in the MCS</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=50" target="_blank" rel="noopener"><img src="slides/ch8_mcs_en.jpg" alt="Slide 49: Which Models Survive?" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter8_backtesting_risk.pdf#page=50" target="_blank" rel="noopener"><img src="slides/ch8_mcs_en.jpg" alt="Slide 49: Models Retained in the MCS" loading="lazy"></a>
       <figcaption>Slide 49</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="mc-a">Level α_MCS: <b id="mc-a-v"></b></label><input type="range" id="mc-a" min="0.01" max="0.3" step="0.01" value="0.1"></div><button class="btn play" id="mc-play" type="button"></button></div><div class="charts "><div class="chart" id="mc-chart"></div></div><ul class="out" id="mc-out"></ul></div>
   </div>
