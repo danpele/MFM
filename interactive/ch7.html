@@ -66,9 +66,9 @@
   <details><summary>Answer</summary><p>VaR stays at 3.45%, and ES rises from 5.03% to about 5.18%. The ten modified losses lie above the observations that determine the quantile, so VaR does not change. ES 1% averages the largest nα = 67.17 losses (the last one with weight 0.17); all ten enter with weight 1, so ES rises by 10/67.17 ≈ 0.15 pp. VaR locates the threshold; ES also accounts for the severity of the losses beyond it. The Normal distribution with the same mean and standard deviation gives a VaR 1% of 2.80% and an ES 1% of 3.21%.</p></details>
 </section><h2 class="sec" id="s-coh">Coherent Risk Measures</h2>
 <section class="blk" id="subadditivity">
-  <h3>Subadditivity: VaR Fails, ES Holds</h3>
+  <h3>Subadditivity of VaR and ES: a Counterexample</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=18" target="_blank" rel="noopener"><img src="slides/ch7_subadditivity_en.jpg" alt="Slide 17: Subadditivity: VaR Fails, ES Holds" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter7_var_expected_shortfall.pdf#page=18" target="_blank" rel="noopener"><img src="slides/ch7_subadditivity_en.jpg" alt="Slide 17: Subadditivity of VaR and ES: a Counterexample" loading="lazy"></a>
       <figcaption>Slide 17</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="sa-p">Default probability of each bond: <b id="sa-p-v"></b></label><input type="range" id="sa-p" min="0.1" max="2" step="0.1" value="0.9"></div><button class="btn play" id="sa-play" type="button"></button></div><div class="charts "><div class="chart" id="sa-chart"></div></div><ul class="out" id="sa-out"></ul></div>
   </div>

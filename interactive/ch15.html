@@ -53,7 +53,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
-<p class="toc"><a href="#s-dict">Dictionaries</a> · <a href="#s-eval">Labelled Data and Evaluation</a> · <a href="#s-llm">Language Models: FinBERT and LLMs</a> · <a href="#s-emb">Embeddings as Features</a> · <a href="#s-look">Look-Ahead Bias and Memorisation</a> · <a href="#s-sig">From Sentiment to a Trading Signal</a> · <a href="#s-est">Sentiment Scores Are Estimates</a> · <a href="#s-case">Case Studies: ChatGPT and the Colour of Finance Words</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
+<p class="toc"><a href="#s-dict">Dictionaries</a> · <a href="#s-eval">Labelled Data and Evaluation</a> · <a href="#s-llm">Language Models: FinBERT and LLMs</a> · <a href="#s-emb">Embeddings as Features</a> · <a href="#s-look">Look-Ahead Bias and Memorisation</a> · <a href="#s-sig">From Sentiment to a Trading Signal</a> · <a href="#s-est">Measurement Error in Sentiment Scores</a> · <a href="#s-case">Case Studies: ChatGPT and the Colour of Finance Words</a> · <a href="#s-ai">AI for Scientific Discovery</a></p>
 <h2 class="sec" id="s-dict">Dictionaries</h2>
 <section class="blk" id="dict-words">
   <h3>Negative for a Psychologist, Neutral for an Accountant</h3>
@@ -76,9 +76,9 @@
   <details><summary>Answer</summary><p>TF-IDF + logistic regression, with 83.2%. FinBERT has 72.5%, zero-shot Qwen2.5-7B 74.2% and Qwen2.5-14B 72.4%: neither domain adaptation nor parameter count guarantees first place. All three dictionaries stay below the "always neutral" benchmark (65.6%). TF-IDF + LR is trained on Twitter labels, so the comparison does not isolate the effect of the architecture.</p></details>
 </section><h2 class="sec" id="s-llm">Language Models: FinBERT and LLMs</h2>
 <section class="blk" id="llm-size">
-  <h3>Bigger Is Not Always Better</h3>
+  <h3>Model Size and Zero-Shot Accuracy</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch15_llm_size_en.jpg" alt="Slide 22: Bigger Is Not Always Better" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch15_llm_size_en.jpg" alt="Slide 22: Model Size and Zero-Shot Accuracy" loading="lazy"></a>
       <figcaption>Slide 22</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ls-m">Metric</label><select id="ls-m"><option value="f1" selected>Macro-F1</option><option value="acc">Accuracy</option></select></div><div class="ctl"><label for="ls-p">Prompt on Twitter: <b id="ls-p-v"></b></label><input type="range" id="ls-p" min="1" max="3" step="1" value="1"></div><button class="btn play" id="ls-play" type="button"></button></div><div class="charts "><div class="chart" id="ls-chart"></div></div><ul class="out" id="ls-out"></ul></div>
   </div>
@@ -116,9 +116,9 @@
   <details><summary>Answer</summary><p>Discrimination above 0.5, consistent with memorisation, without identifying the mechanism on its own. The result measures how well past months are discriminated: it does not separate memorisation from calendar or regime regularities, nor does it establish future performance. For single days of Apple, the AUC stays between 0.48 and 0.52. On the 23 months after the release, the AUC is 0.59, with a wide interval, approximately [0.35; 0.84]: about 101 months would be needed.</p></details>
 </section><h2 class="sec" id="s-sig">From Sentiment to a Trading Signal</h2>
 <section class="blk" id="news-hours">
-  <h3>The Timestamp Problem: Dates, Not Times</h3>
+  <h3>News Timestamps: Dates without a Time of Day</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch15_news_hours_en.jpg" alt="Slide 32: The Timestamp Problem: Dates, Not Times" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter15_llm_sentiment.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch15_news_hours_en.jpg" alt="Slide 32: News Timestamps: Dates without a Time of Day" loading="lazy"></a>
       <figcaption>Slide 32</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="nh-o">Clock: offset from UTC (hours): <b id="nh-o-v"></b></label><input type="range" id="nh-o" min="-12" max="12" step="1" value="0"></div><button class="btn play" id="nh-play" type="button"></button></div><div class="charts "><div class="chart" id="nh-chart"></div></div><ul class="out" id="nh-out"></ul></div>
   </div>
@@ -144,7 +144,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> For the Qwen2.5-7B strategy on d+2, the gross mean is 5.64 bp a day and about 95% of the days are active. With a one-way cost c = 5 bp per trade, what is the net mean?</div>
   <details><summary>Answer</summary><p>About −13.36 bp a day. An active day pays 4c: entry and exit for the stock position and for the SPY hedge. The net mean is 5.64 − 0.95 × 4 × 5 ≈ −13.36 bp. +0.89 bp counts a single direction; −3.86 bp counts a single round trip. The Sharpe ratio falls from +0.63 to −1.48, and the break-even cost is 1.5 bp per trade.</p></details>
-</section><h2 class="sec" id="s-est">Sentiment Scores Are Estimates</h2>
+</section><h2 class="sec" id="s-est">Measurement Error in Sentiment Scores</h2>
 <section class="blk" id="ppi">
   <h3>PPI on Twitter Headlines: the Bias Correction Is the Main Gain</h3>
   <div class="pair">

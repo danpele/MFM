@@ -53,7 +53,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
-<p class="toc"><a href="#s-pred">What Can Machine Learning Predict in Finance?</a> · <a href="#s-tool">A Minimal Machine Learning Toolbox</a> · <a href="#s-feat">Features: Fractional Differencing and Its Pitfall</a> · <a href="#s-lab">Labels: What Exactly the Model Learns</a> · <a href="#s-val">Honest Validation</a> · <a href="#s-case">Case Study: Predicting the S&P 500</a> · <a href="#s-sel">Selection and Backtest Overfitting</a> · <a href="#s-inf">Machine Learning for Inference</a> · <a href="#s-front">Research Frontier: Structure before Flexibility</a></p>
+<p class="toc"><a href="#s-pred">What Can Machine Learning Predict in Finance?</a> · <a href="#s-tool">Machine Learning Methods</a> · <a href="#s-feat">Features: Fractional Differencing and Its Limitations</a> · <a href="#s-lab">Labels: Definition of the Target Variable</a> · <a href="#s-val">Validation without Information Leakage</a> · <a href="#s-case">Case Study: Predicting the S&P 500</a> · <a href="#s-sel">Selection and Backtest Overfitting</a> · <a href="#s-inf">Machine Learning for Inference</a> · <a href="#s-front">Current Research: Structural and Flexible Models</a></p>
 <h2 class="sec" id="s-pred">What Can Machine Learning Predict in Finance?</h2>
 <section class="blk" id="predictability">
   <h3>What Is Predictable? Direction vs. Risk</h3>
@@ -64,7 +64,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> For the S&P 500 over 2000–2026, daily-return autocorrelations are small at most lags. What do the autocorrelations of absolute returns |r_t| look like?</div>
   <details><summary>Answer</summary><p>For |r_t|, autocorrelation is 0.29 at lag 1 and 0.16 at lag 40; all 40 lie outside the ±0.024 band. For returns, the first-order autocorrelation is −0.10, and 13 of 40 lie outside the band. Low linear autocorrelation does not imply independence, and taking absolute values does not simply square the ACF. The result indicates persistence in return magnitudes. The ±0.024 band is a pointwise i.i.d. reference, not a simultaneous band robust to heteroskedasticity.</p></details>
-</section><h2 class="sec" id="s-tool">A Minimal Machine Learning Toolbox</h2>
+</section><h2 class="sec" id="s-tool">Machine Learning Methods</h2>
 <section class="blk" id="lasso-path">
   <h3>LASSO Regularisation Path</h3>
   <div class="pair">
@@ -74,7 +74,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> On the LASSO path fitted to the full sample, which feature first becomes non-zero as the penalty decreases?</div>
   <details><summary>Answer</summary><p>The first feature is ffd_price. vol_20 has the largest absolute coefficient at a weak penalty, which does not determine entry order. First-order return autocorrelation does not determine it either. The truncated FFD filter retains a component proportional to the log-price level. Early entry does not establish predictive skill: mean purged-CV AUC, with the scaler estimated in each fold, ranges from 0.476 to 0.486 across penalties with at least one non-zero coefficient.</p></details>
-</section><h2 class="sec" id="s-feat">Features: Fractional Differencing and Its Pitfall</h2>
+</section><h2 class="sec" id="s-feat">Features: Fractional Differencing and Its Limitations</h2>
 <section class="blk" id="ffd-adf">
   <h3>The ADF Statistic Along d: S&P 500</h3>
   <div class="pair">
@@ -84,7 +84,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> At d = 0.25, ADF with one lag rejects the unit root. Is this rejection sufficient to treat the FFD series as stationary?</div>
   <details><summary>Answer</summary><p>ADF with one lag rejects: −2.96 < −2.86. With 34 AIC-selected lags, the statistic is −0.72 and does not reject. Neither decision is a proof. The structural argument is that, for an I(1) log price, a finite filter whose weights sum to 0.178 retains the I(1) component. The 0.98 correlation with the log price is a warning sign, not a stationarity test.</p></details>
-</section><h2 class="sec" id="s-lab">Labels: What Exactly the Model Learns</h2>
+</section><h2 class="sec" id="s-lab">Labels: Definition of the Target Variable</h2>
 <section class="blk" id="triple-barrier">
   <h3>Triple Barrier: S&P 500 in 2022</h3>
   <div class="pair">
@@ -94,7 +94,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> An event first hits the profit barrier on day 5. On day 15, the price is below its entry level. Which label does the page’s implementation assign?</div>
   <details><summary>Answer</summary><p>The event ends on day 5 and receives +1. Subsequent price movements do not change its label. The return sign at the horizon is used only when neither horizontal barrier has already been hit; conflicting signs are not cancelled. On the chart, only the March event reaches the profit barrier; the May, August and November events receive +1 from the return sign at the vertical barrier, and the January event hits the stop-loss (−1).</p></details>
-</section><h2 class="sec" id="s-val">Honest Validation</h2>
+</section><h2 class="sec" id="s-val">Validation without Information Leakage</h2>
 <section class="blk" id="purged-cv">
   <h3>Purged K-Fold with Embargo</h3>
   <div class="pair">
@@ -106,9 +106,9 @@
   <details><summary>Answer</summary><p>The number excluded is 2h + e = 15: h = 6 before the block, whose labels end inside the test set, and h + e = 9 after it, i.e. 6 purged and 3 embargoed. The answer 13 updates only the left boundary; 12 omits the embargo. The 20 test observations are not included in this count.</p></details>
 </section>
 <section class="blk" id="leakage">
-  <h3>Leakage Experiment: Nothing to Predict</h3>
+  <h3>Leakage Experiment with an Unpredictable Target</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch13_leakage_experiment_en.jpg" alt="Slide 31: Leakage Experiment: Nothing to Predict" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter13_machine_learning.pdf#page=32" target="_blank" rel="noopener"><img src="slides/ch13_leakage_experiment_en.jpg" alt="Slide 31: Leakage Experiment with an Unpredictable Target" loading="lazy"></a>
       <figcaption>Slide 31</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="lk-h">Length h of the labels and of the rolling means (days): <b id="lk-h-v"></b></label><input type="range" id="lk-h" min="0" max="6" step="1" value="4"></div><button class="btn play" id="lk-play" type="button"></button></div><div class="charts "><div class="chart" id="lk-bar"></div><div class="chart" id="lk-line"></div></div><ul class="out" id="lk-out"></ul></div>
   </div>
@@ -174,7 +174,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> OLS on log VIX alone gives 7.5 bp, with interval [−10.3, 25.2]. Why is the double-selection interval almost twice as wide?</div>
   <details><summary>Answer</summary><p>With 4 HAC lags, the double-selection interval, [−22.1, 40.8] bp, is about 1.8 times wider. The 15 controls selected for log VIX reduce its remaining variation after adjustment, which can increase the standard error. The methods use the same sample, and both intervals use HAC correction. Coefficient magnitude does not proportionally determine interval width. The [−22.1, 40.8] bp interval does not distinguish the predictive coefficient from zero at the 5% level.</p></details>
-</section><h2 class="sec" id="s-front">Research Frontier: Structure before Flexibility</h2>
+</section><h2 class="sec" id="s-front">Current Research: Structural and Flexible Models</h2>
 <section class="blk" id="deep-sdf">
   <h3>Deep Learning in Asset Pricing: Out-of-Sample Sharpe Ratios</h3>
   <div class="pair">

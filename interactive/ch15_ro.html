@@ -53,7 +53,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
-<p class="toc"><a href="#s-dict">Dicționare</a> · <a href="#s-eval">Date etichetate și evaluare</a> · <a href="#s-llm">Modele de limbaj: FinBERT și LLM-uri</a> · <a href="#s-emb">Embeddings ca variabile</a> · <a href="#s-look">Look-ahead bias și memorarea</a> · <a href="#s-sig">De la sentiment la un semnal de tranzacționare</a> · <a href="#s-est">Scorurile de sentiment sînt estimări</a> · <a href="#s-case">Studii de caz: ChatGPT și culoarea cuvintelor financiare</a> · <a href="#s-ai">AI pentru descoperire științifică</a></p>
+<p class="toc"><a href="#s-dict">Dicționare</a> · <a href="#s-eval">Date etichetate și evaluare</a> · <a href="#s-llm">Modele de limbaj: FinBERT și LLM-uri</a> · <a href="#s-emb">Embeddings ca variabile</a> · <a href="#s-look">Look-ahead bias și memorarea</a> · <a href="#s-sig">De la sentiment la un semnal de tranzacționare</a> · <a href="#s-est">Eroarea de măsurare a scorurilor de sentiment</a> · <a href="#s-case">Studii de caz: ChatGPT și culoarea cuvintelor financiare</a> · <a href="#s-ai">AI pentru descoperire științifică</a></p>
 <h2 class="sec" id="s-dict">Dicționare</h2>
 <section class="blk" id="dict-words">
   <h3>Cuvinte negative în psihologie, neutre în contabilitate</h3>
@@ -76,9 +76,9 @@
   <details><summary>Răspuns</summary><p>TF-IDF + regresie logistică, cu 83,2%. FinBERT are 72,5%, Qwen2.5-7B zero-shot 74,2%, iar Qwen2.5-14B 72,4%: nici adaptarea la domeniu, nici numărul de parametri nu garantează primul loc. Toate cele trei dicționare rămîn sub reperul „mereu neutru” (65,6%). TF-IDF + LR este antrenat pe etichete Twitter, deci comparația nu izolează efectul arhitecturii.</p></details>
 </section><h2 class="sec" id="s-llm">Modele de limbaj: FinBERT și LLM-uri</h2>
 <section class="blk" id="llm-size">
-  <h3>Mai mare nu înseamnă întotdeauna mai bun</h3>
+  <h3>Dimensiunea modelului și acuratețea zero-shot</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch15_llm_size_ro.jpg" alt="Slide-ul 22: Mai mare nu înseamnă întotdeauna mai bun" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=23" target="_blank" rel="noopener"><img src="slides/ch15_llm_size_ro.jpg" alt="Slide-ul 22: Dimensiunea modelului și acuratețea zero-shot" loading="lazy"></a>
       <figcaption>Slide-ul 22</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="ls-m">Metrica</label><select id="ls-m"><option value="f1" selected>F1 macro</option><option value="acc">Acuratețe</option></select></div><div class="ctl"><label for="ls-p">Prompt-ul pe Twitter: <b id="ls-p-v"></b></label><input type="range" id="ls-p" min="1" max="3" step="1" value="1"></div><button class="btn play" id="ls-play" type="button"></button></div><div class="charts "><div class="chart" id="ls-chart"></div></div><ul class="out" id="ls-out"></ul></div>
   </div>
@@ -116,9 +116,9 @@
   <details><summary>Răspuns</summary><p>Discriminare peste 0,5, compatibilă cu memorarea, fără să identifice singură mecanismul. Rezultatul măsoară discriminarea unor luni trecute: nu separă memorarea de regularitățile calendaristice sau de regim și nu stabilește performanța viitoare. Pentru zilele individuale ale Apple, AUC rămîne între 0,48 și 0,52. Pe cele 23 de luni de după publicare, AUC este 0,59, cu un interval larg, aproximativ [0,35; 0,84]: ar fi nevoie de circa 101 luni.</p></details>
 </section><h2 class="sec" id="s-sig">De la sentiment la un semnal de tranzacționare</h2>
 <section class="blk" id="news-hours">
-  <h3>Problema marcajului de timp: date, nu ore</h3>
+  <h3>Marcajul de timp al știrilor: data fără ora publicării</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch15_news_hours_ro.jpg" alt="Slide-ul 32: Problema marcajului de timp: date, nu ore" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../RO/Cursuri/capitol15_llm_sentiment.pdf#page=33" target="_blank" rel="noopener"><img src="slides/ch15_news_hours_ro.jpg" alt="Slide-ul 32: Marcajul de timp al știrilor: data fără ora publicării" loading="lazy"></a>
       <figcaption>Slide-ul 32</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="nh-o">Ceasul: decalajul față de UTC (ore): <b id="nh-o-v"></b></label><input type="range" id="nh-o" min="-12" max="12" step="1" value="0"></div><button class="btn play" id="nh-play" type="button"></button></div><div class="charts "><div class="chart" id="nh-chart"></div></div><ul class="out" id="nh-out"></ul></div>
   </div>
@@ -144,7 +144,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru strategia Qwen2.5-7B pe d+2, media brută este 5,64 bp pe zi, iar proporția zilelor active este aproximativ 95%. La un cost c = 5 bp pe tranzacție, într-un sens, ce medie netă rezultă?</div>
   <details><summary>Răspuns</summary><p>Aproximativ −13,36 bp pe zi. O zi activă plătește 4c: intrare și ieșire pentru poziția în acțiuni și pentru acoperirea cu SPY. Media netă este 5,64 − 0,95 × 4 × 5 ≈ −13,36 bp. +0,89 bp numără un singur sens; −3,86 bp numără un singur dus-întors. Raportul Sharpe scade de la +0,63 la −1,48, iar costul de echilibru este 1,5 bp pe tranzacție.</p></details>
-</section><h2 class="sec" id="s-est">Scorurile de sentiment sînt estimări</h2>
+</section><h2 class="sec" id="s-est">Eroarea de măsurare a scorurilor de sentiment</h2>
 <section class="blk" id="ppi">
   <h3>PPI pe titlurile Twitter: corecția distorsiunii este cîștigul principal</h3>
   <div class="pair">

@@ -53,7 +53,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">The slide of the lecture is on the left, the same figure on the right, computed in the browser from the same data. The ▶ button moves the parameter step by step.</p>
-<p class="toc"><a href="#s-bm">From Random Walk to Brownian Motion</a> · <a href="#s-qv">Quadratic Variation and Itô Calculus</a> · <a href="#s-gbm">Geometric Brownian Motion</a> · <a href="#s-ou">Mean Reversion: the Ornstein–Uhlenbeck Process</a> · <a href="#s-jump">Jumps: the Merton Model</a> · <a href="#s-cmp">Models against the Data</a> · <a href="#s-rough">Case Studies: Rough and Persistent Volatility, Drift Bursts</a></p>
+<p class="toc"><a href="#s-bm">From Random Walk to Brownian Motion</a> · <a href="#s-qv">Quadratic Variation and Itô Calculus</a> · <a href="#s-gbm">Geometric Brownian Motion</a> · <a href="#s-ou">Mean Reversion: the Ornstein–Uhlenbeck Process</a> · <a href="#s-jump">Jumps: the Merton Model</a> · <a href="#s-cmp">Empirical Comparison of the Models</a> · <a href="#s-rough">Case Studies: Rough and Persistent Volatility, Drift Bursts</a></p>
 <h2 class="sec" id="s-bm">From Random Walk to Brownian Motion</h2>
 <section class="blk" id="donsker">
   <h3>From Random Walk to Brownian Motion: Donsker's Theorem</h3>
@@ -114,7 +114,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Question for the room</span> In the Merton model, λ = 102 jumps per year. With 252 trading days per year, what is the probability of at least one jump in a day?</div>
   <details><summary>Answer</summary><p>About 33.3%. The daily jump count has a Poisson distribution with mean 102/252 = 0.405; the required probability is 1 − exp(−102/252) ≈ 33.3%. The value 40.5% confuses the expected jump count with the probability of at least one jump; 66.7% is the probability of no jump. A model jump is not automatically a crash: the estimated standard deviation of jump size is 1.44%. The jumps account for 71% of the variance and fit the shape of the marginal distribution; they do not reproduce volatility clustering. The implied excess kurtosis is 3.7 against 10.9 in the data. At λ = 0, preserving the fitted Merton model’s mean and variance, the S&P 500 log-likelihood is 28,291, against 29,500 at the MLE; for a separately refitted GBM, it is 28,300.</p></details>
-</section><h2 class="sec" id="s-cmp">Models against the Data</h2>
+</section><h2 class="sec" id="s-cmp">Empirical Comparison of the Models</h2>
 <section class="blk" id="models-vs-data">
   <h3>Which Model Reproduces the S&P 500?</h3>
   <div class="pair">

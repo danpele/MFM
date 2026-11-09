@@ -211,7 +211,7 @@ window.MFM_DATA.quizzes['llm'] = {
                 "incorrectExplanation": "The public FinBERT (ProsusAI/finbert) was fine-tuned on a training split of Financial PhraseBank (3 101 of 4 845 sentences in Araci, 2019); its score there is largely in-sample, not a fair comparison."
             },
             "ro": {
-                "title": "Capcana evaluării în eșantion",
+                "title": "Distorsiunea evaluării în eșantion",
                 "text": "Modelul public FinBERT obține 89,0% pe Financial PhraseBank și 72,5% pe Twitter Financial News; Qwen2.5-7B, neajustat fin pe aceste etichete, obține 81,4% și 74,2%. Ce explică scăderea mai mare a lui FinBERT?",
                 "options": [
                     "Titlurile de pe Twitter sînt scrise într-o limbă pe care FinBERT nu o cunoaște",

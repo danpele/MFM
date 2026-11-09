@@ -53,7 +53,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
-<p class="toc"><a href="#s-bm">De la random walk la mișcarea browniană</a> · <a href="#s-qv">Variația pătratică și calculul Itô</a> · <a href="#s-gbm">Mișcarea browniană geometrică</a> · <a href="#s-ou">Revenirea la medie: procesul Ornstein–Uhlenbeck</a> · <a href="#s-jump">Salturi: modelul Merton</a> · <a href="#s-cmp">Modelele confruntate cu datele</a> · <a href="#s-rough">Studii de caz: rough volatility, persistență și drift bursts</a></p>
+<p class="toc"><a href="#s-bm">De la random walk la mișcarea browniană</a> · <a href="#s-qv">Variația pătratică și calculul Itô</a> · <a href="#s-gbm">Mișcarea browniană geometrică</a> · <a href="#s-ou">Revenirea la medie: procesul Ornstein–Uhlenbeck</a> · <a href="#s-jump">Salturi: modelul Merton</a> · <a href="#s-cmp">Compararea empirică a modelelor</a> · <a href="#s-rough">Studii de caz: rough volatility, persistență și drift bursts</a></p>
 <h2 class="sec" id="s-bm">De la random walk la mișcarea browniană</h2>
 <section class="blk" id="donsker">
   <h3>De la random walk la mișcarea browniană: teorema lui Donsker</h3>
@@ -114,7 +114,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> În modelul Merton, λ = 102 salturi pe an. Cu 252 de zile de tranzacționare pe an, care este probabilitatea să apară cel puțin un salt într-o zi?</div>
   <details><summary>Răspuns</summary><p>Circa 33,3%. Numărul zilnic de salturi are distribuția Poisson cu media 102/252 = 0,405; probabilitatea cerută este 1 − exp(−102/252) ≈ 33,3%. Valoarea 40,5% confundă numărul mediu de salturi cu probabilitatea cel puțin unui salt; 66,7% este probabilitatea niciunui salt. Un salt al modelului nu este automat un crah: abaterea standard estimată a mărimii saltului este 1,44%. Salturile explică 71% din dispersie și ajustează forma distribuției marginale; ele nu reproduc volatility clustering. Excesul de kurtosis implicat este 3,7, față de 10,9 în date. La λ = 0, păstrînd media și dispersia modelului Merton estimat, log-verosimilitatea S&P 500 este 28 291, față de 29 500 la estimarea MLE; pentru GBM reestimat separat, este 28 300.</p></details>
-</section><h2 class="sec" id="s-cmp">Modelele confruntate cu datele</h2>
+</section><h2 class="sec" id="s-cmp">Compararea empirică a modelelor</h2>
 <section class="blk" id="models-vs-data">
   <h3>Capacitatea modelelor de a reproduce S&P 500</h3>
   <div class="pair">

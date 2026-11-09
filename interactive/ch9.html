@@ -56,9 +56,9 @@
 <p class="toc"><a href="#s-rv">Realised Variance</a> · <a href="#s-noise">Microstructure Noise</a> · <a href="#s-jump">Jumps</a> · <a href="#s-facts">Stylised Facts of Realised Volatility</a> · <a href="#s-fc">Forecasting: HAR vs GARCH</a> · <a href="#s-rough">Rough Volatility</a> · <a href="#s-case">Case Studies: Machine Learning and Partial Variances</a></p>
 <h2 class="sec" id="s-rv">Realised Variance</h2>
 <section class="blk" id="one-day">
-  <h3>One Day, 78 Returns: 7 April 2025</h3>
+  <h3>Five-Minute Returns on 7 April 2025</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=11" target="_blank" rel="noopener"><img src="slides/ch9_intraday_day_en.jpg" alt="Slide 10: One Day, 78 Returns: 7 April 2025" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=11" target="_blank" rel="noopener"><img src="slides/ch9_intraday_day_en.jpg" alt="Slide 10: Five-Minute Returns on 7 April 2025" loading="lazy"></a>
       <figcaption>Slide 10</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="id-d">Day</label><select id="id-d"><option value="2020-11-20">2020-11-20 (volatility 10%)</option><option value="2021-06-25">2021-06-25 (volatility 3%)</option><option value="2021-08-27">2021-08-27 (volatility 6%)</option><option value="2022-01-24">2022-01-24 (volatility 40%)</option><option value="2022-06-15">2022-06-15 (volatility 37%)</option><option value="2022-09-21">2022-09-21 (volatility 41%)</option><option value="2024-08-05">2024-08-05 (volatility 31%)</option><option value="2025-04-04">2025-04-04 (volatility 46%)</option><option value="2025-04-07" selected>2025-04-07 (volatility 107%)</option><option value="2025-04-08">2025-04-08 (volatility 46%)</option><option value="2025-04-09">2025-04-09 (volatility 72%)</option><option value="2025-04-10">2025-04-10 (volatility 54%)</option></select></div><div class="ctl"><label for="id-k">Time (end of the 5-minute interval): <b id="id-k-v"></b></label><input type="range" id="id-k" min="0" max="78" step="1" value="78"></div><button class="btn play" id="id-play" type="button"></button></div><div class="charts "><div class="chart" id="id-p"></div><div class="chart" id="id-c"></div></div><ul class="out" id="id-out"></ul></div>
   </div>
@@ -76,9 +76,9 @@
   <details><summary>Answer</summary><p>To 11.9%: 20 days, i.e. 1.3% of the 1,489, raise the volatility computed from mean RV by 1.0 percentage point. The mean of the variances is sensitive to a few extreme days; the median is not. For Bitcoin, leaving out its 20 most volatile days lowers the value from 45.1% to 41.6%.</p></details>
 </section>
 <section class="blk" id="overnight">
-  <h3>Where Is the Risk: Day or Night?</h3>
+  <h3>Intraday and Overnight Variance</h3>
   <div class="pair">
-    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch9_overnight_en.jpg" alt="Slide 14: Where Is the Risk: Day or Night?" loading="lazy"></a>
+    <figure class="slide"><a href="../pdfjs/web/viewer.html?file=../../EN/Courses/chapter9_realized_volatility.pdf#page=15" target="_blank" rel="noopener"><img src="slides/ch9_overnight_en.jpg" alt="Slide 14: Intraday and Overnight Variance" loading="lazy"></a>
       <figcaption>Slide 14</figcaption></figure>
     <div class="live"><div class="ctls"><div class="ctl"><label for="on-g">Aggregation</label><select id="on-g"><option value="year" selected>By year</option><option value="quarter">By quarter</option><option value="month">By month</option></select></div><div class="ctl"><label for="on-c">Scaling factor c of intraday RV: <b id="on-c-v"></b></label><input type="range" id="on-c" min="1" max="2" step="0.01" value="1"></div><button class="btn play" id="on-play" type="button"></button></div><div class="charts "><div class="chart" id="on-chart"></div></div><ul class="out" id="on-out"></ul></div>
   </div>

@@ -53,7 +53,7 @@
 </ul></nav>
 <main class="imain">
 <p class="lead">În stînga este slide-ul din curs, în dreapta aceeași figură, calculată în browser din aceleași date. Butonul ▶ modifică parametrul pas cu pas.</p>
-<p class="toc"><a href="#s-pred">Ce poate prezice machine learning în finanțe?</a> · <a href="#s-tool">Trusa minimă de machine learning</a> · <a href="#s-feat">Caracteristici: diferențierea fracționară și capcana ei</a> · <a href="#s-lab">Etichete: ce învață, de fapt, modelul</a> · <a href="#s-val">Validare onestă</a> · <a href="#s-case">Studiu de caz: predicția S&P 500</a> · <a href="#s-sel">Selecție și overfitting-ul backtest-ului</a> · <a href="#s-inf">Machine learning pentru inferență</a> · <a href="#s-front">Frontiera cercetării: structura înaintea flexibilității</a></p>
+<p class="toc"><a href="#s-pred">Ce poate prezice machine learning în finanțe?</a> · <a href="#s-tool">Metode de machine learning</a> · <a href="#s-feat">Caracteristici: diferențierea fracționară și limitele ei</a> · <a href="#s-lab">Etichete: definirea variabilei țintă</a> · <a href="#s-val">Validarea fără informație din viitor</a> · <a href="#s-case">Studiu de caz: predicția S&P 500</a> · <a href="#s-sel">Selecție și overfitting-ul backtest-ului</a> · <a href="#s-inf">Machine learning pentru inferență</a> · <a href="#s-front">Direcții actuale de cercetare: modele structurale și modele flexibile</a></p>
 <h2 class="sec" id="s-pred">Ce poate prezice machine learning în finanțe?</h2>
 <section class="blk" id="predictability">
   <h3>Predictibilitatea direcției și a riscului</h3>
@@ -64,7 +64,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pentru S&P 500, în 2000–2026, autocorelațiile randamentelor zilnice sînt mici la majoritatea lagurilor. Cum arată autocorelațiile randamentelor absolute |r_t|?</div>
   <details><summary>Răspuns</summary><p>Pentru |r_t|, autocorelația este 0,29 la lagul 1 și 0,16 la lagul 40; toate cele 40 ies din banda ±0,024. La randamente, autocorelația de ordinul 1 este −0,10, iar 13 din 40 ies din bandă. Autocorelația liniară redusă nu implică independență, iar aplicarea modulului nu transformă ACF prin simpla ridicare la pătrat. Rezultatul indică persistența amplitudinii randamentelor. Banda ±0,024 este un reper punctual i.i.d., nu o bandă simultană robustă la heteroscedasticitate.</p></details>
-</section><h2 class="sec" id="s-tool">Trusa minimă de machine learning</h2>
+</section><h2 class="sec" id="s-tool">Metode de machine learning</h2>
 <section class="blk" id="lasso-path">
   <h3>Traiectoria de regularizare LASSO</h3>
   <div class="pair">
@@ -74,7 +74,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Pe traiectoria LASSO estimată pe întregul eșantion, ce caracteristică devine prima nenulă cînd penalizarea scade?</div>
   <details><summary>Răspuns</summary><p>Prima caracteristică este ffd_price. vol_20 are cel mai mare coeficient în valoare absolută la penalizare slabă, ceea ce nu stabilește ordinea intrării. Nici autocorelația de ordinul 1 a randamentelor nu stabilește această ordine. Filtrul FFD trunchiat păstrează o componentă proporțională cu nivelul log-prețului. Intrarea timpurie nu dovedește abilitate predictivă: AUC mediu în CV cu purjare, cu scalarea estimată în fiecare pliu, este între 0,476 și 0,486 pentru penalizările cu cel puțin un coeficient nenul.</p></details>
-</section><h2 class="sec" id="s-feat">Caracteristici: diferențierea fracționară și capcana ei</h2>
+</section><h2 class="sec" id="s-feat">Caracteristici: diferențierea fracționară și limitele ei</h2>
 <section class="blk" id="ffd-adf">
   <h3>Statistica ADF în funcție de d: S&P 500</h3>
   <div class="pair">
@@ -84,7 +84,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> La d = 0,25, ADF cu un lag respinge rădăcina unitate. Este această respingere suficientă pentru a considera seria FFD staționară?</div>
   <details><summary>Răspuns</summary><p>ADF cu un lag respinge: −2,96 < −2,86. Cu 34 de laguri alese prin AIC, statistica este −0,72 și nu respinge. Niciun verdict nu este o demonstrație. Argumentul structural este că, pentru un log-preț I(1), filtrul finit cu suma ponderilor 0,178 păstrează componenta I(1). Corelația 0,98 cu log-prețul este un semnal de alarmă, nu un test de staționaritate.</p></details>
-</section><h2 class="sec" id="s-lab">Etichete: ce învață, de fapt, modelul</h2>
+</section><h2 class="sec" id="s-lab">Etichete: definirea variabilei țintă</h2>
 <section class="blk" id="triple-barrier">
   <h3>Trei bariere: S&P 500 în 2022</h3>
   <div class="pair">
@@ -94,7 +94,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> Un eveniment atinge mai întîi bariera de profit, în ziua 5. În ziua 15, prețul este sub nivelul de intrare. Ce etichetă primește în implementarea paginii?</div>
   <details><summary>Răspuns</summary><p>Evenimentul se încheie în ziua 5 și primește +1. Mișcarea ulterioară nu schimbă eticheta. Semnul randamentului la orizont se folosește numai dacă nu a fost atinsă anterior nicio barieră orizontală; nu există o regulă de anulare a semnelor. Pe grafic, doar evenimentul din martie atinge bariera de profit; cele din mai, august și noiembrie primesc +1 prin semnul randamentului la bariera verticală, iar cel din ianuarie atinge stop-loss-ul (−1).</p></details>
-</section><h2 class="sec" id="s-val">Validare onestă</h2>
+</section><h2 class="sec" id="s-val">Validarea fără informație din viitor</h2>
 <section class="blk" id="purged-cv">
   <h3>K-fold cu purjare și embargo</h3>
   <div class="pair">
@@ -174,7 +174,7 @@
   </div>
   <div class="ask"><span class="ask-tag">Întrebare pentru sală</span> OLS doar cu log VIX dă 7,5 bp, cu intervalul [−10,3; 25,2]. De ce intervalul selecției duble este de aproape două ori mai larg?</div>
   <details><summary>Răspuns</summary><p>La 4 laguri HAC, intervalul selecției duble, [−22,1; 40,8] bp, este de aproximativ 1,8 ori mai larg. Cele 15 controale selectate pentru log VIX reduc variația acestuia rămasă după control, ceea ce poate mări eroarea standard. Metodele folosesc același eșantion, iar ambele intervale au corecție HAC. Mărimea coeficientului nu determină proporțional lățimea intervalului. Intervalul [−22,1; 40,8] bp nu separă coeficientul predictiv de zero la nivelul de 5%.</p></details>
-</section><h2 class="sec" id="s-front">Frontiera cercetării: structura înaintea flexibilității</h2>
+</section><h2 class="sec" id="s-front">Direcții actuale de cercetare: modele structurale și modele flexibile</h2>
 <section class="blk" id="deep-sdf">
   <h3>Deep learning în evaluarea activelor: rapoarte Sharpe out-of-sample</h3>
   <div class="pair">
