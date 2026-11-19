@@ -246,7 +246,11 @@ def kendall_toy():
             pairs.append((i + 1, j + 1, 'C' if s > 0 else 'D'))
     return {'a': a.tolist(), 'b': b.tolist(), 'concordant': int(conc), 'discordant': int(disc),
             'tau': (conc - disc) / 10, 'tau_scipy': float(stats.kendalltau(a, b)[0]),
-            'discordant_pairs': [p[:2] for p in pairs if p[2] == 'D']}
+            'discordant_pairs': [p[:2] for p in pairs if p[2] == 'D'],
+            'ranks_a': stats.rankdata(a).tolist(), 'ranks_b': stats.rankdata(b).tolist(),
+            'spearman': float(stats.spearmanr(a, b)[0]),
+            'pearson': float(stats.pearsonr(a, b)[0]), 'pearson_exp_a': float(stats.pearsonr(np.exp(a), b)[0]),
+            'tau_exp_a': float(stats.kendalltau(np.exp(a), b)[0])}
 
 
 if __name__ == '__main__':
